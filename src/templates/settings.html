@@ -1,0 +1,56 @@
+{% import "_includes/forms" as forms %}
+
+{% do view.registerAssetBundle("putyourlightson\\blitz\\assets\\BlitzAsset") %}
+
+
+{% set info %}
+{{ 'Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="">here</a>'})|raw }}
+    (.?) Matches everything
+    entries/(.?) Matches anything beginning with "entries/"
+    entries/([) Matches anything beginning with "entries/"
+    entries/(\d?) Matches anything beginning with "entries/".* Zero or more of any character
+    .+ One or more of any character
+    \d Any digit
+    \w Any word character
+{% endset %}
+
+{{ forms.editableTableField({
+	label: "Include URI Patterns"|t('blitz'),
+	instructions: "The URI patterns to include in static file caching."|t('blitz'),
+    name: 'includeUriPatterns',
+    id: 'includeUriPatterns',
+	cols: [
+		{
+			type: 'text',
+			heading: 'URI Pattern'|t('blitz'),
+            info: info,
+		},
+	],
+	rows: settings.includeUriPatterns,
+	addRowLabel: "Add a URI pattern"|t('blitz'),
+    first: true,
+}) }}
+
+{{ forms.editableTableField({
+	label: "Exclude URI Patterns"|t('blitz'),
+	instructions: "The URI patterns to exclude from static file caching. This will override any matching patterns to include."|t('blitz'),
+    name: 'excludeUriPatterns',
+    id: 'excludeUriPatterns',
+	cols: [
+		{
+			type: 'text',
+			heading: 'URI Pattern'|t('blitz'),
+            info: info,
+		},
+	],
+	rows: settings.excludeUriPatterns,
+	addRowLabel: "Add a URI pattern"|t('blitz'),
+}) }}
+
+{{ forms.textField({
+	label: "Cache Folder Path"|t('blitz'),
+	instructions: "The full path to your cache folder. It can begin with an alias, such as `@webroot`."|t('blitz'),
+	name: 'cacheFolderPath',
+	value: settings.cacheFolderPath,
+	placeholder: '/path/to/folder',
+}) }}

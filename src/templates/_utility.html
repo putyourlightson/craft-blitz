@@ -1,0 +1,19 @@
+{% import "_includes/forms" as forms %}
+
+<form class="utility" method="post" accept-charset="UTF-8">
+    <input type="hidden" name="action" value="blitz/cache/clear">
+    {{ redirectInput('utilities/clear-blitz-cache') }}
+    {{ csrfInput() }}
+
+    {{ forms.checkboxSelect({
+        name: 'caches',
+        options: options,
+        showAllOption: true,
+        values: '*',
+    }) }}
+
+    <div class="buttons">
+        <input type="submit" class="btn submit" value="{{ 'Clear Blitz Cache'|t('blitz') }}" />
+        <div class="utility-status"></div>
+    </div>
+</form>
