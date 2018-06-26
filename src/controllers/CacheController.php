@@ -32,7 +32,7 @@ class CacheController extends Controller
             }
         }
         else {
-            FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias($settings->cacheFolderPath)));
+            FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath));
         }
 
         return $this->redirectToPostedUrl();

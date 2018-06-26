@@ -36,7 +36,7 @@ class CacheService extends Component
             return [];
         }
 
-        $cacheFolderPath = FileHelper::normalizePath(Craft::getAlias($settings->cacheFolderPath));
+        $cacheFolderPath = FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
 
         if (!is_dir($cacheFolderPath)) {
             return [];
@@ -71,13 +71,13 @@ class CacheService extends Component
 
         // Excluded URI patterns take priority
         foreach ($settings->excludeUriPatterns as $excludeUriPattern) {
-            if (preg_match('/'.trim($excludeUriPattern[0], '/').'/', $uri)) {
+            if (preg_match('#'.trim($excludeUriPattern[0], '/').'#', $uri)) {
                 return false;
             }
         }
 
         foreach ($settings->includeUriPatterns as $includeUriPattern) {
-            if (preg_match('/'.trim($includeUriPattern[0], '/').'/', $uri)) {
+            if (preg_match('#'.trim($includeUriPattern[0], '/').'#', $uri)) {
                 return true;
             }
         }
@@ -100,7 +100,7 @@ class CacheService extends Component
             return '';
         }
 
-        return FileHelper::normalizePath(Craft::getAlias($settings->cacheFolderPath).'/'.$uri).'.html';
+        return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath.'/'.$uri).'.html';
     }
 
     /**

@@ -49,8 +49,8 @@
 
 {{ forms.textField({
 	label: "Cache Folder Path"|t('blitz'),
-	instructions: "The full path to your cache folder. It can begin with an alias, such as `@webroot`."|t('blitz'),
+	instructions: "The relative path to your cache folder from your public root."|t('blitz'),
 	name: 'cacheFolderPath',
 	value: settings.cacheFolderPath,
-	placeholder: '/path/to/folder',
+	placeholder: 'cache/blitz',
 }) }}
