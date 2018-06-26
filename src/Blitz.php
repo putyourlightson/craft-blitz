@@ -41,12 +41,19 @@ class Blitz extends Plugin
         // Register services as components
         $this->setComponents(['cache' => CacheService::class]);
 
+        // If cached version exists then output it (assuming this is not being done server-side)
+        if ($this->cache->isCacheableRequest()) {
+            $filePath = $this->cache->uriToFilePath(Craft::$app->getRequest()->getUrl());
+            if (is_file($filePath)) {
+                readfile($filePath);
+                exit;
+            }
+        }
+
         // Register events
         Event::on(View::class, View::EVENT_AFTER_RENDER_TEMPLATE, function(TemplateEvent $event) {
-            /** @var Request $request */
-            $request = Craft::$app->getRequest();
-            if ($request->isSiteRequest) {
-                $this->cache->cacheOutputIfUrlMatch($request->getUrl(), $event->output);
+            if ($this->cache->isCacheableRequest()) {
+                $this->cache->cacheOutput(Craft::$app->getRequest()->getUrl(), $event->output);
             }
         });
 
