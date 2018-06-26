@@ -7,10 +7,12 @@ namespace putyourlightson\blitz;
 
 use Craft;
 use craft\base\Plugin;
+use craft\events\ElementEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\TemplateEvent;
+use craft\services\Elements;
+use craft\services\Structures;
 use craft\services\Utilities;
-use craft\web\Request;
 use craft\web\View;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheService;
@@ -20,7 +22,6 @@ use yii\base\Event;
 /**
  *
  * @property CacheService $cache
- * @property mixed $cpNavItem
  */
 class Blitz extends Plugin
 {
@@ -50,12 +51,15 @@ class Blitz extends Plugin
             }
         }
 
-        // Register events
+        // Register template render event
         Event::on(View::class, View::EVENT_AFTER_RENDER_TEMPLATE, function(TemplateEvent $event) {
             if ($this->cache->isCacheableRequest()) {
                 $this->cache->cacheOutput(Craft::$app->getRequest()->getUrl(), $event->output);
             }
         });
+
+        // Register element events
+        $this->_registerElementEvents();
 
         // Register utilities
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function(RegisterComponentTypesEvent $event) {
@@ -82,5 +86,30 @@ class Blitz extends Plugin
         return Craft::$app->getView()->renderTemplate('blitz/settings', [
             'settings' => $this->getSettings()
         ]);
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    private function _registerElementEvents()
+    {
+        // Clear cache
+        Event::on(Elements::class, Elements::EVENT_BEFORE_SAVE_ELEMENT, function(ElementEvent $event) {
+            $this->cache->clearCacheByElement($event->element);
+        });
+        Event::on(Structures::class, Structures::EVENT_BEFORE_MOVE_ELEMENT, function(ElementEvent $event) {
+            $this->cache->clearCacheByElement($event->element);
+        });
+        Event::on(Elements::class, Elements::EVENT_AFTER_DELETE_ELEMENT, function(ElementEvent $event) {
+            $this->cache->clearCacheByElement($event->element);
+        });
+
+        // Cache
+        Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT, function(ElementEvent $event) {
+            $this->cache->cacheByElement($event->element);
+        });
+        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT, function(ElementEvent $event) {
+            $this->cache->cacheByElement($event->element);
+        });
     }
 }

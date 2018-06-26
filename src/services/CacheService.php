@@ -7,8 +7,10 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use craft\base\Element;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\jobs\CacheJob;
 use putyourlightson\blitz\models\SettingsModel;
 
 /**
@@ -98,7 +100,7 @@ class CacheService extends Component
             return '';
         }
 
-        return FileHelper::normalizePath(Craft::getAlias($settings->cacheFolderPath).$uri).'.html';
+        return FileHelper::normalizePath(Craft::getAlias($settings->cacheFolderPath).'/'.$uri).'.html';
     }
 
     /**
@@ -114,5 +116,69 @@ class CacheService extends Component
         if (!empty($filePath)) {
             FileHelper::writeToFile($filePath, $output);
         }
+    }
+
+    /**
+     * Cache by element
+     *
+     * @param Element $element
+     */
+    public function cacheByElement(Element $element)
+    {
+        $elementUrls = [];
+
+        $relatedElements = $this->_getRelatedElements($element);
+
+        /** @var Element $relatedElement */
+        foreach ($relatedElements as $relatedElement) {
+            if ($relatedElement::hasUris()) {
+                $elementUrls[$relatedElement->id] = $relatedElement->getUrl();
+            }
+        }
+
+        if (count($elementUrls)) {
+            Craft::$app->getQueue()->push(new CacheJob(['elementUrls' => $elementUrls]));
+        }
+    }
+
+    /**
+     * Clears cache by element
+     *
+     * @param Element $element
+     */
+    public function clearCacheByElement(Element $element)
+    {
+        $relatedElements = $this->_getRelatedElements($element);
+
+        /** @var Element $relatedElement */
+        foreach ($relatedElements as $relatedElement) {
+            if ($relatedElement::hasUris()) {
+                $filePath = $this->uriToFilePath($relatedElement->uri);
+
+                // Delete file if it exists
+                if (is_file($filePath)) {
+                    unlink($filePath);
+                }
+            }
+        }
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * @param Element $element
+     * @return Element[]
+     */
+    private function _getRelatedElements(Element $element): array
+    {
+        $relatedElements = $element::find()
+            ->relatedTo($element)
+            ->all();
+
+        // Add element to beginning of array so it is processed first
+        array_unshift($relatedElements, $element);
+
+        return $relatedElements;
     }
 }

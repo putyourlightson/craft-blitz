@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\utilities;
 
 use Craft;
 use craft\base\Utility;
-use craft\web\assets\clearcaches\ClearCachesAsset;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 

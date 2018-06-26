@@ -9,6 +9,7 @@ use Craft;
 use craft\helpers\FileHelper;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\models\SettingsModel;
 
 class CacheController extends Controller
 {
