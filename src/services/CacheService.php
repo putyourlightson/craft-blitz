@@ -29,16 +29,9 @@ class CacheService extends Component
      */
     public function getCacheFolders(): array
     {
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
+        $cacheFolderPath = $this->_getSiteCacheFolderPath();
 
-        if (empty($settings->cacheFolderPath)) {
-            return [];
-        }
-
-        $cacheFolderPath = FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
-
-        if (!is_dir($cacheFolderPath)) {
+        if ($cacheFolderPath == '' || !is_dir($cacheFolderPath)) {
             return [];
         }
 
@@ -71,13 +64,13 @@ class CacheService extends Component
 
         // Excluded URI patterns take priority
         foreach ($settings->excludeUriPatterns as $excludeUriPattern) {
-            if (preg_match('#'.trim($excludeUriPattern[0], '/').'#', $uri)) {
+            if ($this->_matchUriPattern($excludeUriPattern[0], $uri)) {
                 return false;
             }
         }
 
         foreach ($settings->includeUriPatterns as $includeUriPattern) {
-            if (preg_match('#'.trim($includeUriPattern[0], '/').'#', $uri)) {
+            if ($this->_matchUriPattern($includeUriPattern[0], $uri)) {
                 return true;
             }
         }
@@ -93,14 +86,13 @@ class CacheService extends Component
      */
     public function uriToFilePath(string $uri): string
     {
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
+        $cacheFolderPath = $this->_getSiteCacheFolderPath();
 
-        if (empty($settings->cacheFolderPath)) {
+        if ($cacheFolderPath == '') {
             return '';
         }
 
-        return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath.'/'.$uri).'.html';
+        return $cacheFolderPath.'/'.$uri.'.html';
     }
 
     /**
@@ -165,6 +157,33 @@ class CacheService extends Component
 
     // Private Methods
     // =========================================================================
+
+    /**
+     * @return string
+     */
+    private function _getSiteCacheFolderPath(): string
+    {
+        /** @var SettingsModel $settings */
+        $settings = Blitz::$plugin->getSettings();
+
+        if (empty($settings->cacheFolderPath)) {
+            return '';
+        }
+
+        $hostName = Craft::$app->getRequest()->getHostName();
+
+        return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath.'/'.$hostName);
+    }
+
+    /**
+     * @param string $pattern
+     * @param string $uri
+     * @return bool
+     */
+    private function _matchUriPattern(string $pattern, string $uri): bool
+    {
+        return preg_match('#'.trim($pattern, '/').'#', $uri);
+    }
 
     /**
      * @param Element $element
