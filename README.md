@@ -2,7 +2,7 @@
 
 # Blitz for Craft CMS
 
-The Blitz plugin provides intelligent static file caching for lightning-fast sites with  [Craft CMS](https://craftcms.com/).
+The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with  [Craft CMS](https://craftcms.com/).
 
 ## Requirements
 

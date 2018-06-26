@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\jobs;
 use Craft;
 use craft\queue\BaseJob;
 use GuzzleHttp\Client;
+use putyourlightson\blitz\Blitz;
 
 class CacheJob extends BaseJob
 {
@@ -17,7 +18,7 @@ class CacheJob extends BaseJob
     /**
      * @var array
      */
-    public $elementUrls = [];
+    public $elementIds = [];
 
     // Public Methods
     // =========================================================================
@@ -29,15 +30,25 @@ class CacheJob extends BaseJob
      */
     public function execute($queue)
     {
-        $totalElements = count($this->elementUrls);
+        if (Blitz::$plugin->getSettings()->cachingEnabled === false) {
+            return;
+        }
+
+        $elements = Craft::$app->getElements();
+
+        $totalElements = count($this->elementIds);
         $count = 0;
 
-        foreach ($this->elementUrls as $elementUrl) {
+        foreach ($this->elementIds as $elementId) {
             $this->setProgress($queue, $count / $totalElements);
             $count++;
 
-            $client = new Client();
-            $client->get($elementUrl);
+            $url = $elements->getElementById($elementId)->getUrl();
+
+            if ($url) {
+                $client = new Client();
+                $client->get($url);
+            }
         }
     }
 

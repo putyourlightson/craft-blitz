@@ -117,19 +117,23 @@ class CacheService extends Component
      */
     public function cacheByElement(Element $element)
     {
-        $elementUrls = [];
+        if (Blitz::$plugin->getSettings()->cachingEnabled === false) {
+            return;
+        }
+
+        $elementIds = [];
 
         $relatedElements = $this->_getRelatedElements($element);
 
         /** @var Element $relatedElement */
         foreach ($relatedElements as $relatedElement) {
             if ($relatedElement::hasUris()) {
-                $elementUrls[$relatedElement->id] = $relatedElement->getUrl();
+                $elementIds[] = $relatedElement->id;
             }
         }
 
-        if (count($elementUrls)) {
-            Craft::$app->getQueue()->push(new CacheJob(['elementUrls' => $elementUrls]));
+        if (count($elementIds)) {
+            Craft::$app->getQueue()->push(new CacheJob(['elementIds' => $elementIds]));
         }
     }
 
@@ -191,12 +195,20 @@ class CacheService extends Component
      */
     private function _getRelatedElements(Element $element): array
     {
-        $relatedElements = $element::find()
-            ->relatedTo($element)
-            ->all();
+        $relatedElements = [$element];
 
-        // Add element to beginning of array so it is processed first
-        array_unshift($relatedElements, $element);
+        $elementTypes = Craft::$app->getElements()->getAllElementTypes();
+
+        /** @var Element $elementType */
+        foreach ($elementTypes as $elementType) {
+            if ($elementType::hasUris()) {
+                $relatedElementsOfType = $elementType::find()
+                    ->relatedTo($element)
+                    ->all();
+
+                $relatedElements = array_merge($relatedElements, $relatedElementsOfType);
+            }
+        }
 
         return $relatedElements;
     }

@@ -84,7 +84,8 @@ class Blitz extends Plugin
     protected function settingsHtml()
     {
         return Craft::$app->getView()->renderTemplate('blitz/settings', [
-            'settings' => $this->getSettings()
+            'settings' => $this->getSettings(),
+            'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
         ]);
     }
 

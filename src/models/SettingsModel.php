@@ -13,6 +13,16 @@ class SettingsModel extends Model
     // =========================================================================
 
     /**
+     * @var bool
+     */
+    public $cachingEnabled = false;
+
+    /**
+     * @var string
+     */
+    public $cacheFolderPath = '';
+
+    /**
      * @var mixed
      */
     public $includeUriPatterns = [];
@@ -21,10 +31,4 @@ class SettingsModel extends Model
      * @var mixed
      */
     public $excludeUriPatterns = [];
-
-    /**
-     * @var string
-     */
-    public $cacheFolderPath;
-
 }
