@@ -39,6 +39,7 @@
 - `entries/.*` Matches anything beginning with "entries/"
 {% endset %}
 
+<input type="hidden" name="includedUriPatterns" value="" />
 {{ forms.editableTableField({
 	label: "Included URI Patterns"|t('blitz'),
 	instructions: "The URI patterns to include in static file caching."|t('blitz'),
@@ -56,6 +57,7 @@
 	addRowLabel: "Add a URI pattern"|t('blitz'),
 }) }}
 
+<input type="hidden" name="excludedUriPatterns" value="" />
 {{ forms.editableTableField({
 	label: "Excluded URI Patterns"|t('blitz'),
 	instructions: "The URI patterns to exclude from static file caching. This will override any matching patterns to include."|t('blitz'),
