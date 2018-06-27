@@ -48,7 +48,7 @@ class CacheService extends Component
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
-        if ($settings->cachingEnabled === false) {
+        if (!$settings->cachingEnabled) {
             return false;
         }
 
@@ -123,7 +123,7 @@ class CacheService extends Component
      */
     public function cacheByElement(ElementInterface $element)
     {
-        if (Blitz::$plugin->getSettings()->cachingEnabled === false) {
+        if (!Blitz::$plugin->getSettings()->cachingEnabled) {
             return;
         }
 

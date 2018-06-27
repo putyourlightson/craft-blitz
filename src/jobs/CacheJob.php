@@ -30,7 +30,7 @@ class CacheJob extends BaseJob
      */
     public function execute($queue)
     {
-        if (Blitz::$plugin->getSettings()->cachingEnabled === false) {
+        if (!Blitz::$plugin->getSettings()->cachingEnabled) {
             return;
         }
 
