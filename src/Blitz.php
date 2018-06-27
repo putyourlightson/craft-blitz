@@ -9,9 +9,11 @@ use Craft;
 use craft\base\Plugin;
 use craft\events\ElementEvent;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
 use craft\services\Elements;
 use craft\services\Structures;
+use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\web\View;
 use putyourlightson\blitz\models\SettingsModel;
@@ -63,8 +65,19 @@ class Blitz extends Plugin
 
         // Register utilities
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function(RegisterComponentTypesEvent $event) {
-            $event->types[] = ClearCacheUtility::class;
+            if (Craft::$app->getUser()->checkPermission('blitz:clear-cache-utility')) {
+                $event->types[] = ClearCacheUtility::class;
+            }
         });
+
+        // Register user permissions if edition is pro
+        if (Craft::$app->getEdition() === Craft::Pro) {
+            Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $event) {
+                $event->permissions['Blitz'] = [
+                    'blitz:clear-cache-utility' => ['label' => Craft::t('blitz', 'Access clear cache utility')],
+                ];
+            });
+        }
     }
 
     // Protected Methods

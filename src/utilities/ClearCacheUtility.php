@@ -53,7 +53,7 @@ class ClearCacheUtility extends Utility
             $path =
             $options[] = [
                 'label' => $cacheFolder['shortPath'].' ('.$cacheFolder['fileCount'].')',
-                'value' => $cacheFolder['shortPath'],
+                'value' => $cacheFolder['path'],
             ];
         }
 

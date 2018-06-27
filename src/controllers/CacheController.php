@@ -15,7 +15,7 @@ class CacheController extends Controller
 {
     public function actionClear()
     {
-        $this->requirePermission('utility:clear-blitz-cache');
+        $this->requirePermission('blitz:clear-cache-utility');
 
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();

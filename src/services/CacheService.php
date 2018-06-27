@@ -29,7 +29,7 @@ class CacheService extends Component
      */
     public function getCacheFolders(): array
     {
-        $cacheFolderPath = $this->_getSiteCacheFolderPath();
+        $cacheFolderPath = $this->_getCacheFolderPath();
 
         if ($cacheFolderPath == '' || !is_dir($cacheFolderPath)) {
             return [];
@@ -93,13 +93,15 @@ class CacheService extends Component
      */
     public function uriToFilePath(string $uri): string
     {
-        $cacheFolderPath = $this->_getSiteCacheFolderPath();
+        $cacheFolderPath = $this->_getCacheFolderPath();
 
         if ($cacheFolderPath == '') {
             return '';
         }
 
-        return FileHelper::normalizePath($cacheFolderPath.'/'.$uri.'/index.html');
+        $filePath = Craft::$app->getRequest()->getHostName().'/'.$uri.'/index.html';
+
+        return FileHelper::normalizePath($cacheFolderPath.'/'.$filePath);
     }
 
     /**
@@ -173,7 +175,7 @@ class CacheService extends Component
     /**
      * @return string
      */
-    private function _getSiteCacheFolderPath(): string
+    private function _getCacheFolderPath(): string
     {
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
@@ -182,9 +184,7 @@ class CacheService extends Component
             return '';
         }
 
-        $hostName = Craft::$app->getRequest()->getHostName();
-
-        return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath.'/'.$hostName);
+        return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
     }
 
     /**
