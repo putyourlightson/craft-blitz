@@ -22,6 +22,14 @@ When caching is enabled and a URI on the site is visited that matches an include
 
 <p><img src="docs/images/settings-1.0.0.png"></p>
 
+## Clearing Cache
+
+When an element is saved or deleted, any cached files for that element and its related elements will be cleared. A job is then automatically queued to refresh the cleared cache files.
+
+Cached files can be cleared in batch using the "Clear Blitz Cache" utility.
+
+<p><img src="docs/images/utility-1.0.0.png"></p>
+
 ## Server Rewrite
 
 For improved performance, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. 
@@ -52,14 +60,6 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `entries/entry` Matches exact URI
 - `entries/.*` Matches anything beginning with "entries/"
 - `entries/.+` Matches anything beginning with "entries/" followed by at least 1 character
-
-## Clearing Cache
-
-When an element is saved or deleted, any cached files for that element and its related elements will be cleared. A job is then automatically queued to refresh the cleared cache files.
-
-Cached files can be cleared in batch using the "Clear Blitz Cache" utility.
-
-<p><img src="docs/images/utility-1.0.0.png"></p>
 
 ## Debugging
 
