@@ -4,6 +4,10 @@
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with  [Craft CMS](https://craftcms.com/).
 
+It improves performance immensely, reducing time to first byte (TTFB) in tests from:
+
+- 600ms (without caching) => 160ms (with caching, without mod_rewrite) => 12ms (with caching, with mod_rewrite)
+
 This plugin is heavily inspired by the [Grav Static File Cache Plugin](https://github.com/fbrnc/grav-plugin-staticfilecache) by Fabrizio Branca.
 
 ## Requirements
@@ -40,8 +44,8 @@ With Apache this is achieved with `mod_rewrite` by adding the following to your 
     RewriteCond %{REQUEST_METHOD} GET
     RewriteCond %{HTTP:Pragma} !no-cache
     RewriteCond %{HTTP:Cache-Control} !no-cache
-    RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}.html -f
-    RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}.html [L,E=nocache:1]
+    RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -f
+    RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
     
     # Send would-be 404 requests to Craft
 

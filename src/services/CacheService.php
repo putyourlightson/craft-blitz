@@ -99,7 +99,7 @@ class CacheService extends Component
             return '';
         }
 
-        return $cacheFolderPath.'/'.$uri.'.html';
+        return FileHelper::normalizePath($cacheFolderPath.'/'.$uri.'/index.html');
     }
 
     /**
