@@ -24,9 +24,9 @@ When caching is enabled and a URI on the site is visited that matches an include
 
 ## Clearing Cache
 
-When an element is saved or deleted, any cached files for that element and its related elements will be cleared. A job is then automatically queued to refresh the cleared cache files.
+When an element is saved or deleted, any cached files for that element and for all of its related elements will be cleared. A job is then automatically queued to refresh the cleared cache files.
 
-Cached files can be cleared in batch using the "Clear Blitz Cache" utility.
+Cached files can be cleared manually using the "Clear Blitz Cache" utility.
 
 <p><img src="docs/images/utility-1.0.0.png"></p>
 

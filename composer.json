@@ -31,7 +31,6 @@
         "developerUrl": "https://www.putyourlightson.net/",
         "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v1/CHANGELOG.md",
         "class": "putyourlightson\\blitz\\Blitz",
-        "hasCpSettings": true,
-        "hasCpSection": true
+        "hasCpSettings": true
     }
 }
