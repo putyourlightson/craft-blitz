@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\services;
 use Craft;
 use craft\base\Component;
 use craft\base\Element;
+use craft\base\ElementInterface;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\CacheJob;
@@ -15,7 +16,7 @@ use putyourlightson\blitz\models\SettingsModel;
 
 /**
  *
- * @property array $cacheFolders
+ * @property string $cacheFolderPath
  */
 class CacheService extends Component
 {
@@ -23,29 +24,20 @@ class CacheService extends Component
     // =========================================================================
 
     /**
-     * Returns the existing cache folders
+     * Returns the cache folder path
      *
-     * @return array
+     * @return string
      */
-    public function getCacheFolders(): array
+    public function getCacheFolderPath(): string
     {
-        $cacheFolderPath = $this->_getCacheFolderPath();
+        /** @var SettingsModel $settings */
+        $settings = Blitz::$plugin->getSettings();
 
-        if ($cacheFolderPath == '' || !is_dir($cacheFolderPath)) {
-            return [];
+        if (empty($settings->cacheFolderPath)) {
+            return '';
         }
 
-        $cacheFolders = [];
-
-        foreach (FileHelper::findDirectories($cacheFolderPath) as $cacheFolder) {
-            $cacheFolders[] = [
-                'path' => $cacheFolder,
-                'shortPath' => str_replace(Craft::getAlias('@webroot'), '', $cacheFolder),
-                'fileCount' => count(FileHelper::findFiles($cacheFolder)),
-            ];
-        }
-
-        return $cacheFolders;
+        return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
     }
 
     /**
@@ -93,7 +85,7 @@ class CacheService extends Component
      */
     public function uriToFilePath(string $uri): string
     {
-        $cacheFolderPath = $this->_getCacheFolderPath();
+        $cacheFolderPath = $this->getCacheFolderPath();
 
         if ($cacheFolderPath == '') {
             return '';
@@ -123,9 +115,9 @@ class CacheService extends Component
     /**
      * Cache by element
      *
-     * @param Element $element
+     * @param ElementInterface $element
      */
-    public function cacheByElement(Element $element)
+    public function cacheByElement(ElementInterface $element)
     {
         if (Blitz::$plugin->getSettings()->cachingEnabled === false) {
             return;
@@ -150,9 +142,9 @@ class CacheService extends Component
     /**
      * Clears cache by element
      *
-     * @param Element $element
+     * @param ElementInterface $element
      */
-    public function clearCacheByElement(Element $element)
+    public function clearCacheByElement(ElementInterface $element)
     {
         $relatedElements = $this->_getRelatedElements($element);
 
@@ -173,21 +165,6 @@ class CacheService extends Component
     // =========================================================================
 
     /**
-     * @return string
-     */
-    private function _getCacheFolderPath(): string
-    {
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
-
-        if (empty($settings->cacheFolderPath)) {
-            return '';
-        }
-
-        return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
-    }
-
-    /**
      * @param string $pattern
      * @param string $uri
      * @return bool
@@ -202,10 +179,10 @@ class CacheService extends Component
     }
 
     /**
-     * @param Element $element
+     * @param ElementInterface $element
      * @return Element[]
      */
-    private function _getRelatedElements(Element $element): array
+    private function _getRelatedElements(ElementInterface $element): array
     {
         $relatedElements = [$element];
 

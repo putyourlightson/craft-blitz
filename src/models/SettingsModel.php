@@ -20,7 +20,7 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $cacheFolderPath = '';
+    public $cacheFolderPath = 'cache/blitz';
 
     /**
      * @var mixed

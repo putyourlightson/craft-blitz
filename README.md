@@ -44,8 +44,6 @@ With Apache this is achieved with `mod_rewrite` by adding the following to your 
 
     # Blitz cache rewrite
     RewriteCond %{REQUEST_METHOD} GET
-    RewriteCond %{HTTP:Pragma} !no-cache
-    RewriteCond %{HTTP:Cache-Control} !no-cache
     RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -f
     RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
     

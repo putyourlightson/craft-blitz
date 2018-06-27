@@ -7,8 +7,8 @@ namespace putyourlightson\blitz\utilities;
 
 use Craft;
 use craft\base\Utility;
+use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\models\SettingsModel;
 
 class ClearCacheUtility extends Utility
 {
@@ -44,17 +44,19 @@ class ClearCacheUtility extends Utility
      */
     public static function contentHtml(): string
     {
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
-
         $options = [];
 
-        foreach (Blitz::$plugin->cache->getCacheFolders() as $cacheFolder) {
-            $path =
-            $options[] = [
-                'label' => $cacheFolder['shortPath'].' ('.$cacheFolder['fileCount'].')',
-                'value' => $cacheFolder['path'],
-            ];
+        $cacheFolderPath = Blitz::$plugin->cache->getCacheFolderPath();
+
+        if ($cacheFolderPath && is_dir($cacheFolderPath)) {
+            $cacheFolders = [];
+
+            foreach (FileHelper::findDirectories($cacheFolderPath) as $cacheFolder) {
+                $options[] = [
+                    'label' => trim(str_replace(Craft::getAlias('@webroot'), '', $cacheFolder), '/').' ('.count(FileHelper::findFiles($cacheFolder)).')',
+                    'value' => $cacheFolder,
+                ];
+            }
         }
 
         return Craft::$app->getView()->renderTemplate('blitz/_utility', [
