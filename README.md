@@ -4,9 +4,11 @@
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with  [Craft CMS](https://craftcms.com/).
 
-It improves performance immensely, reducing time to first byte (TTFB) in tests from:
+It improves performance immensely, reducing time to first byte (TTFB) in some tests as follows:
 
-- 600ms (without caching) => 160ms (with caching, without mod_rewrite) => 12ms (with caching and mod_rewrite)
+- 600ms (without caching enabled) 
+- 160ms (with caching enabled, without mod_rewrite) 
+- 12ms (with caching enabled and mod_rewrite)
 
 This plugin is heavily inspired by the [Grav Static File Cache Plugin](https://github.com/fbrnc/grav-plugin-staticfilecache) by Fabrizio Branca.
 
