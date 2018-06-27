@@ -4,6 +4,8 @@
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with  [Craft CMS](https://craftcms.com/).
 
+This plugin is heavily inspired by the [Grav Static File Cache Plugin](https://github.com/fbrnc/grav-plugin-staticfilecache) by Fabrizio Branca.
+
 ## Requirements
 
 Craft CMS 3.0.0 or later.
@@ -69,4 +71,6 @@ If the HTML file was served by the plugin rather than with a server rewrite then
 
     <!-- Served by Blitz -->
   
+---
+
 <small>Created by [PutYourLightsOn](https://www.putyourlightson.net/).</small>
