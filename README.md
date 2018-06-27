@@ -26,15 +26,19 @@ To install the plugin, search for "Blitz" in the Craft Plugin Store, or install 
 
 ## Usage
 
-When caching is enabled and a URI on the site is visited that matches an included URI pattern, Blitz will serve a cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns.
+When caching is enabled and a URI on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even more.
 
 <p><img src="docs/images/settings-1.0.0.png"></p>
 
-## Clearing Cache
+## Precautions
+
+When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed based on the current visitor are cached. The easiest way to do this is to add excluded URI patterns for such dynamic pages.
+
+## Cache Breaking
 
 When an element is saved or deleted, any cached files for that element and for all of its related elements will be cleared. A job is then automatically queued to refresh the cleared cache files.
 
-Cached files can be cleared manually using the "Clear Blitz Cache" utility.
+Cached files and folders can be cleared manually using the "Clear Blitz Cache" utility.
 
 <p><img src="docs/images/utility-1.0.0.png"></p>
 
@@ -42,15 +46,20 @@ Cached files can be cleared manually using the "Clear Blitz Cache" utility.
 
 For improved performance, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. 
 
-With Apache this is achieved with `mod_rewrite` by adding the following to your .htaccess file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+In Apache this is achieved with `mod_rewrite` by adding the following to the root .htaccess file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
     # Blitz cache rewrite
-    RewriteCond %{REQUEST_METHOD} GET
     RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -f
     RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
     
     # Send would-be 404 requests to Craft
 
+In Nginx this is achieved by adding a location handler to the configuration file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+
+    # Blitz cache rewrite
+    location / {
+      try_files $uri /cache/blitz/$http_host/$uri/index.html $uri/ /index.php?$query_string;
+    }
 
 ## URI Patterns
 
