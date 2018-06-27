@@ -50,9 +50,10 @@ class ClearCacheUtility extends Utility
         $options = [];
 
         foreach (Blitz::$plugin->cache->getCacheFolders() as $cacheFolder) {
+            $path =
             $options[] = [
-                'label' => $cacheFolder['value'].' ('.$cacheFolder['fileCount'].')',
-                'value' => $cacheFolder['value'],
+                'label' => $cacheFolder['shortPath'].' ('.$cacheFolder['fileCount'].')',
+                'value' => $cacheFolder['shortPath'],
             ];
         }
 

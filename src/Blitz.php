@@ -46,7 +46,7 @@ class Blitz extends Plugin
         if ($this->cache->isCacheableRequest()) {
             $filePath = $this->cache->uriToFilePath(Craft::$app->getRequest()->getUrl());
             if (is_file($filePath)) {
-                readfile($filePath);
+                echo file_get_contents($filePath).'<!-- Served by Blitz -->';
                 exit;
             }
         }

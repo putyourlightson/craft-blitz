@@ -25,10 +25,10 @@ class SettingsModel extends Model
     /**
      * @var mixed
      */
-    public $includeUriPatterns = [];
+    public $includedUriPatterns = [];
 
     /**
      * @var mixed
      */
-    public $excludeUriPatterns = [];
+    public $excludedUriPatterns = [];
 }

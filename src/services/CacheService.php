@@ -39,7 +39,8 @@ class CacheService extends Component
 
         foreach (FileHelper::findDirectories($cacheFolderPath) as $cacheFolder) {
             $cacheFolders[] = [
-                'value' => $cacheFolder,
+                'path' => $cacheFolder,
+                'shortPath' => str_replace(Craft::getAlias('@webroot'), '', $cacheFolder),
                 'fileCount' => count(FileHelper::findFiles($cacheFolder)),
             ];
         }
@@ -52,25 +53,31 @@ class CacheService extends Component
      */
     public function isCacheableRequest(): bool
     {
-        $request = Craft::$app->getRequest();
-        $uri = $request->getUrl();
-
-        if (!$request->getIsSiteRequest() || $request->getIsLivePreview()) {
-            return false;
-        }
-
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
+        if ($settings->cachingEnabled === false) {
+            return false;
+        }
+
+        $request = Craft::$app->getRequest();
+        $response = Craft::$app->getResponse();
+        $uri = $request->getUrl();
+
+        // Check for front-end get request with status 200 that is not an action request or live preview
+        if (!$request->getIsSiteRequest() || !$request->getIsGet() || !$response->getIsOk() || $request->getIsActionRequest() || $request->getIsLivePreview()) {
+            return false;
+        }
+
         // Excluded URI patterns take priority
-        foreach ($settings->excludeUriPatterns as $excludeUriPattern) {
-            if ($this->_matchUriPattern($excludeUriPattern[0], $uri)) {
+        foreach ($settings->excludedUriPatterns as $excludedUriPattern) {
+            if ($this->_matchUriPattern($excludedUriPattern[0], $uri)) {
                 return false;
             }
         }
 
-        foreach ($settings->includeUriPatterns as $includeUriPattern) {
-            if ($this->_matchUriPattern($includeUriPattern[0], $uri)) {
+        foreach ($settings->includedUriPatterns as $includedUriPattern) {
+            if ($this->_matchUriPattern($includedUriPattern[0], $uri)) {
                 return true;
             }
         }
@@ -106,6 +113,7 @@ class CacheService extends Component
         $filePath = $this->uriToFilePath($uri);
 
         if (!empty($filePath)) {
+            $output .= '<!-- Cached by Blitz '.date('c').' -->';
             FileHelper::writeToFile($filePath, $output);
         }
     }

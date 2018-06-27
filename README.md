@@ -14,6 +14,20 @@ To install the plugin, search for "Blitz" in the Craft Plugin Store, or install 
 
         composer require putyourlightson/craft-blitz
 
+## Usage
+
+When caching is enabled and a URI on the site is visited that matches an included URI pattern, Blitz will serve a cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns.
+
+<p><img src="docs/images/settings-1.0.0.png"></p>
+
+## Clearing Cache
+
+When an element is saved or deleted, any cached files for that element and its related elements will be cleared. A job is then automatically queued to refresh the cleared cache files.
+
+Cached files can be cleared in batch using the "Clear Blitz Cache" utility.
+
+<p><img src="docs/images/utility-1.0.0.png"></p>
+
 ## URI Patterns
 
 URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).

@@ -40,11 +40,11 @@
 {% endset %}
 
 {{ forms.editableTableField({
-	label: "Include URI Patterns"|t('blitz'),
+	label: "Included URI Patterns"|t('blitz'),
 	instructions: "The URI patterns to include in static file caching."|t('blitz'),
-    warning: (config.cachingEnabled is defined ? configWarning('includeUriPatterns')),
-    name: 'includeUriPatterns',
-    id: 'includeUriPatterns',
+    warning: (config.cachingEnabled is defined ? configWarning('includedUriPatterns')),
+    name: 'includedUriPatterns',
+    id: 'includedUriPatterns',
 	cols: [
 		{
 			type: 'text',
@@ -52,16 +52,16 @@
             info: info,
 		},
 	],
-	rows: settings.includeUriPatterns,
+	rows: settings.includedUriPatterns,
 	addRowLabel: "Add a URI pattern"|t('blitz'),
 }) }}
 
 {{ forms.editableTableField({
-	label: "Exclude URI Patterns"|t('blitz'),
+	label: "Excluded URI Patterns"|t('blitz'),
 	instructions: "The URI patterns to exclude from static file caching. This will override any matching patterns to include."|t('blitz'),
-    warning: (config.cachingEnabled is defined ? configWarning('excludeUriPatterns')),
-    name: 'excludeUriPatterns',
-    id: 'excludeUriPatterns',
+    warning: (config.cachingEnabled is defined ? configWarning('excludedUriPatterns')),
+    name: 'excludedUriPatterns',
+    id: 'excludedUriPatterns',
 	cols: [
 		{
 			type: 'text',
@@ -69,6 +69,6 @@
             info: info,
 		},
 	],
-	rows: settings.excludeUriPatterns,
+	rows: settings.excludedUriPatterns,
 	addRowLabel: "Add a URI pattern"|t('blitz'),
 }) }}
