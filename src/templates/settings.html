@@ -20,7 +20,7 @@
 
 {{ forms.textField({
 	label: "Cache Folder Path"|t('blitz'),
-	instructions: "The relative path to your cache folder from your public root."|t('blitz'),
+	instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
     warning: (config.cachingEnabled is defined ? configWarning('cacheFolderPath')),
 	name: 'cacheFolderPath',
 	value: settings.cacheFolderPath,
@@ -28,14 +28,15 @@
 }) }}
 
 {% set info %}
-{{ 'Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="">here</a>'})|raw }}
-    (.?) Matches everything
-    entries/(.?) Matches anything beginning with "entries/"
-    entries/([) Matches anything beginning with "entries/"
-    entries/(\d?) Matches anything beginning with "entries/".* Zero or more of any character
-    .+ One or more of any character
-    \d Any digit
-    \w Any word character
+{{ 'Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}
+
+- `.` Matches any character
+- `.*` Matches any character 0 or more times
+- `.+` Matches any character 1 or more times
+- `\d` Matches any four digits
+- `\w` Matches any word character
+- `entries/entry` Matches exact URI
+- `entries/.*` Matches anything beginning with "entries/"
 {% endset %}
 
 {{ forms.editableTableField({
