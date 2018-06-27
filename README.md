@@ -7,8 +7,8 @@ The Blitz plugin provides intelligent static file caching for creating lightning
 It can highly improve a site's performance, reducing time to first byte (TTFB) dramatically. Although the performance gains depend on the individual site setup, the following results are common:
 
 - 600ms (without caching enabled) 
-- 160ms (with caching enabled, without mod_rewrite) 
-- 12ms (with caching enabled and mod_rewrite)
+- 160ms (with caching enabled, without server rewrite) 
+- 12ms (with caching enabled and server rewrite)
 
 <p><img src="docs/images/ttfb-1.0.0.svg"></p>
 
