@@ -1,6 +1,6 @@
 <p align="center"><img width="200" src="src/icon.svg"></p>
 
-# Blitz for Craft CMS
+# Blitz Plugin for Craft CMS 3
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with  [Craft CMS](https://craftcms.com/).
 
@@ -16,7 +16,7 @@ To install the plugin, search for "Blitz" in the Craft Plugin Store, or install 
 
 ## URI Patterns
 
-URI patterns can use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
+URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
 - `.` Matches any character
 - `.*` Matches any character 0 or more times

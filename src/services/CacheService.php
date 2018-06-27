@@ -186,6 +186,10 @@ class CacheService extends Component
      */
     private function _matchUriPattern(string $pattern, string $uri): bool
     {
+        if ($pattern == '') {
+            return false;
+        }
+
         return preg_match('#'.trim($pattern, '/').'#', $uri);
     }
 
