@@ -18,7 +18,7 @@ class CacheJob extends BaseJob
     /**
      * @var array
      */
-    public $elementIds = [];
+    public $urls = [];
 
     // Public Methods
     // =========================================================================
@@ -34,21 +34,15 @@ class CacheJob extends BaseJob
             return;
         }
 
-        $elements = Craft::$app->getElements();
-
-        $totalElements = count($this->elementIds);
+        $totalElements = count($this->urls);
         $count = 0;
 
-        foreach ($this->elementIds as $elementId) {
+        foreach ($this->urls as $url) {
             $this->setProgress($queue, $count / $totalElements);
             $count++;
 
-            $url = $elements->getElementById($elementId)->getUrl();
-
-            if ($url) {
-                $client = new Client();
-                $client->get($url);
-            }
+            $client = new Client();
+            $client->get($url);
         }
     }
 

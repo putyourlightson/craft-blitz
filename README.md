@@ -36,9 +36,9 @@ When a URI is cached, the static cached file will be served up on all subsequent
 
 ## Cache Breaking
 
-When an element is saved or deleted, any cached files for that element and for all of its related elements will be cleared. A job is then automatically queued to refresh the cleared cache files.
+When an element is saved or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
 
-Cached files and folders can be cleared manually using the "Clear Blitz Cache" utility.
+Cached files and folders can be cleared manually using the "Clear Blitz Cache" utility or by simply deleting them on the server.
 
 <p><img src="docs/images/utility-1.0.0.png"></p>
 

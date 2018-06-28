@@ -7,7 +7,9 @@ namespace putyourlightson\blitz;
 
 use Craft;
 use craft\base\Plugin;
+use craft\elements\db\ElementQuery;
 use craft\events\ElementEvent;
+use craft\events\PopulateElementEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
@@ -41,42 +43,59 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
+        $uri = Craft::$app->getRequest()->getUrl();
+
         // Register services as components
         $this->setComponents(['cache' => CacheService::class]);
 
-        // If cached version exists then output it (assuming this is not being done server-side)
-        if ($this->cache->isCacheableRequest()) {
-            $filePath = $this->cache->uriToFilePath(Craft::$app->getRequest()->getUrl());
+        // If cached version exists then output it (assuming this has not already been done server-side)
+        if ($this->cache->getIsCacheableRequest()) {
+            $filePath = $this->cache->uriToFilePath($uri);
             if (is_file($filePath)) {
                 echo file_get_contents($filePath).'<!-- Served by Blitz -->';
                 exit;
             }
         }
 
-        // Register template render event
-        Event::on(View::class, View::EVENT_AFTER_RENDER_TEMPLATE, function(TemplateEvent $event) {
-            if ($this->cache->isCacheableRequest()) {
-                $this->cache->cacheOutput(Craft::$app->getRequest()->getUrl(), $event->output);
-            }
-        });
-
         // Register element events
         $this->_registerElementEvents();
 
-        // Register utilities
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES, function(RegisterComponentTypesEvent $event) {
-            if (Craft::$app->getUser()->checkPermission('blitz:clear-cache-utility')) {
-                $event->types[] = ClearCacheUtility::class;
+        // Register element populate event
+        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
+            function(PopulateElementEvent $event) use ($uri) {
+                if ($this->cache->getIsCacheableRequest()) {
+                    $this->cache->addElementCache($event->element, $uri);
+                }
             }
-        });
+        );
+
+        // Register template page render event
+        Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
+            function(TemplateEvent $event) use ($uri) {
+                if ($this->cache->getIsCacheableRequest()) {
+                    $this->cache->cacheOutput($event->output, $uri);
+                }
+            }
+        );
+
+        // Register utilities
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                if (Craft::$app->getUser()->checkPermission('blitz:clear-cache-utility')) {
+                    $event->types[] = ClearCacheUtility::class;
+                }
+            }
+        );
 
         // Register user permissions if edition is pro
         if (Craft::$app->getEdition() === Craft::Pro) {
-            Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS, function(RegisterUserPermissionsEvent $event) {
-                $event->permissions['Blitz'] = [
-                    'blitz:clear-cache-utility' => ['label' => Craft::t('blitz', 'Access clear cache utility')],
-                ];
-            });
+            Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,
+                function(RegisterUserPermissionsEvent $event) {
+                    $event->permissions['Blitz'] = [
+                        'blitz:clear-cache-utility' => ['label' => Craft::t('blitz', 'Access clear cache utility')],
+                    ];
+                }
+            );
         }
     }
 
@@ -107,23 +126,33 @@ class Blitz extends Plugin
 
     private function _registerElementEvents()
     {
-        // Clear cache
-        Event::on(Elements::class, Elements::EVENT_BEFORE_SAVE_ELEMENT, function(ElementEvent $event) {
-            $this->cache->clearCacheByElement($event->element);
-        });
-        Event::on(Structures::class, Structures::EVENT_BEFORE_MOVE_ELEMENT, function(ElementEvent $event) {
-            $this->cache->clearCacheByElement($event->element);
-        });
-        Event::on(Elements::class, Elements::EVENT_AFTER_DELETE_ELEMENT, function(ElementEvent $event) {
-            $this->cache->clearCacheByElement($event->element);
-        });
+        // Clear cache by elements
+        Event::on(Elements::class, Elements::EVENT_BEFORE_SAVE_ELEMENT,
+            function(ElementEvent $event) {
+                $this->cache->clearCacheByElement($event->element);
+            }
+        );
+        Event::on(Structures::class, Structures::EVENT_BEFORE_MOVE_ELEMENT,
+            function(ElementEvent $event) {
+                $this->cache->clearCacheByElement($event->element);
+            }
+        );
+        Event::on(Elements::class, Elements::EVENT_AFTER_DELETE_ELEMENT,
+            function(ElementEvent $event) {
+                $this->cache->clearCacheByElement($event->element);
+            }
+        );
 
-        // Cache
-        Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT, function(ElementEvent $event) {
-            $this->cache->cacheByElement($event->element);
-        });
-        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT, function(ElementEvent $event) {
-            $this->cache->cacheByElement($event->element);
-        });
+        // Cache elements
+        Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
+            function(ElementEvent $event) {
+                $this->cache->cacheByElement($event->element);
+            }
+        );
+        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
+            function(ElementEvent $event) {
+                $this->cache->cacheByElement($event->element);
+            }
+        );
     }
 }

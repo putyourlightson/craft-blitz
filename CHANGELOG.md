@@ -1,5 +1,12 @@
 # Blitz Changelog
 
+## 1.1.0 - 2018-06-28
+### Added
+- Added cache breaking for all cached template files that used an element that is saved or deleted
+
+### Changed
+- Changed template render event to a later firing event
+
 ## 1.0.4 - 2018-06-28
 ### Fixed
 - Fixed clearing cache when URI is homepage
