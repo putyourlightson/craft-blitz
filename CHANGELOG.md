@@ -1,5 +1,9 @@
 # Blitz Changelog
 
+## 1.0.4 - 2018-06-28
+### Fixed
+- Fixed clearing cache when URI is homepage
+
 ## 1.0.3 - 2018-06-28
 ### Fixed
 - Fixed error that could occur when a section has a blank URI format

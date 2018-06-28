@@ -95,6 +95,8 @@ class CacheService extends Component
             return '';
         }
 
+        $uri = $uri === '__home__' ? '' : $uri;
+
         return FileHelper::normalizePath($cacheFolderPath.'/'.Craft::$app->getRequest()->getHostName().'/'.$uri.'/index.html');
     }
 
@@ -153,8 +155,10 @@ class CacheService extends Component
         /** @var Element $relatedElement */
         foreach ($relatedElements as $relatedElement) {
             if ($relatedElement::hasUris()) {
-                $uri = $relatedElement->uri ?? '';
-                $filePath = $this->uriToFilePath($uri);
+                if (empty($relatedElement->uri)) {
+                    continue;
+                }
+                $filePath = $this->uriToFilePath($relatedElement->uri);
 
                 // Delete file if it exists
                 if (is_file($filePath)) {
