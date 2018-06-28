@@ -1,15 +1,19 @@
 {
     "name": "putyourlightson/craft-blitz",
     "description": "Intelligent static file caching for creating lightning-fast sites.",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "type": "craft-plugin",
     "homepage": "https://github.com/putyourlightson/craft-blitz",
-    "license": "MIT",
+    "license": "Craft",
     "keywords": [
         "craft",
         "cms",
         "craftcms",
-        "plugin"
+        "plugin",
+        "cache",
+        "caching",
+        "performance",
+        "speed"
     ],
     "require": {
         "craftcms/cms": "^3.0.0"
