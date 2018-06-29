@@ -79,9 +79,10 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `\d{4}` Matches any four digits
 - `\w` Matches any word character
 - `\w+` Matches any word character 1 or more times
-- `entries/entry` Matches exact URI
-- `entries/.*` Matches anything beginning with "entries/"
-- `entries/.+` Matches anything beginning with "entries/" followed by at least 1 character
+- `entries` Matches anything containing "entries"
+- `^entries` Matches anything beginning with "entries"
+- `^entries/entry$` Matches exact URI
+- `^entries/\w+$` Matches anything beginning with "entries/" followed by at least 1 word character
 
 ## Debugging
 

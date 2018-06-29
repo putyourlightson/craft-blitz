@@ -35,8 +35,9 @@
 - `.+` Matches any character 1 or more times
 - `\d` Matches any four digits
 - `\w` Matches any word character
-- `entries/entry` Matches exact URI
-- `entries/.*` Matches anything beginning with "entries/"
+- `entries` Matches anything containing "entries"
+- `^entries` Matches anything beginning with "entries"
+- `^entries/entry$` Matches exact URI
 {% endset %}
 
 <input type="hidden" name="includedUriPatterns" value="" />
