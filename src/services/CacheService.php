@@ -32,6 +32,20 @@ class CacheService extends Component
     // =========================================================================
 
     /**
+     * Returns whether the request is cacheable
+     */
+    public function getIsCacheableRequest(): bool
+    {
+        if ($this->_isCacheableRequest !== null) {
+            return $this->_isCacheableRequest;
+        }
+
+        $this->_isCacheableRequest = $this->_checkIsCacheableRequest();
+
+        return $this->_isCacheableRequest;
+    }
+
+    /**
      * Returns the cache folder path
      *
      * @return string
@@ -46,20 +60,6 @@ class CacheService extends Component
         }
 
         return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
-    }
-
-    /**
-     * Returns whether the request is cacheable
-     */
-    public function getIsCacheableRequest(): bool
-    {
-        if ($this->_isCacheableRequest !== null) {
-            return $this->_isCacheableRequest;
-        }
-
-        $this->_isCacheableRequest = $this->_checkIsCacheableRequest();
-
-        return $this->_isCacheableRequest;
     }
 
     /**
@@ -187,6 +187,14 @@ class CacheService extends Component
      */
     private function _checkIsCacheableRequest(): bool
     {
+        $request = Craft::$app->getRequest();
+        $response = Craft::$app->getResponse();
+
+        // Ensure this is a front-end get that is not a console request or an action request or live preview and returns status 200
+        if (!$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsLivePreview() || !$response->getIsOk()) {
+            return false;
+        }
+
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
@@ -194,14 +202,7 @@ class CacheService extends Component
             return false;
         }
 
-        $request = Craft::$app->getRequest();
-        $response = Craft::$app->getResponse();
         $uri = $request->getUrl();
-
-        // Check for front-end get request that is not an action request or live preview and returns status 200
-        if (!$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsLivePreview() || !$response->getIsOk()) {
-            return false;
-        }
 
         // Excluded URI patterns take priority
         if (is_array($settings->excludedUriPatterns)) {

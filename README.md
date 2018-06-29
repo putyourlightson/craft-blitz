@@ -42,6 +42,11 @@ Cached files and folders can be cleared manually using the "Clear Blitz Cache" u
 
 <p><img src="docs/images/utility-1.0.0.png"></p>
 
+The terminal can also be used to clear all cache with the following console command:
+
+    ./craft blitz/cache/clear
+
+
 ## Server Rewrite
 
 For improved performance, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. 

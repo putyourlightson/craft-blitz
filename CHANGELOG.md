@@ -1,5 +1,12 @@
 # Blitz Changelog
 
+## 1.1.1 - 2018-06-29
+### Added
+- Added console command to clear all cache
+
+### Fixed
+- Fixed error that occurred when running console commands
+
 ## 1.1.0 - 2018-06-28
 ### Added
 - Added cache breaking for all cached template files that used an element that is saved or deleted
