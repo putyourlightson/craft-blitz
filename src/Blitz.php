@@ -20,7 +20,7 @@ use craft\services\Utilities;
 use craft\web\View;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheService;
-use putyourlightson\blitz\utilities\ClearCacheUtility;
+use putyourlightson\blitz\utilities\CacheUtility;
 use yii\base\Event;
 
 /**
@@ -43,29 +43,35 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
+        $request = Craft::$app->getRequest();
+
         // Register services as components
         $this->setComponents(['cache' => CacheService::class]);
 
         // Console request
-        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
-            // Add console commands and return
+        if ($request->getIsConsoleRequest()) {
+            // Add console commands
             $this->controllerNamespace = 'putyourlightson\blitz\console\controllers';
         }
 
         // Cacheable request
         if ($this->cache->getIsCacheableRequest()) {
+            $uri = $request->getUrl();
+
             // If cached version exists then output it (assuming this has not already been done server-side)
-            $filePath = $this->cache->uriToFilePath(Craft::$app->getRequest()->getUrl());
-            if (is_file($filePath)) {
-                echo file_get_contents($filePath).'<!-- Served by Blitz -->';
-                exit;
+            if ($this->cache->getIsCacheableUri($uri)) {
+                $filePath = $this->cache->uriToFilePath($uri);
+                if (is_file($filePath)) {
+                    echo file_get_contents($filePath).'<!-- Served by Blitz -->';
+                    exit;
+                }
             }
 
             $this->_registerCacheableRequestEvents();
         }
 
         // CP request
-        if (Craft::$app->getRequest()->getIsCpRequest()) {
+        if ($request->getIsCpRequest()) {
             $this->_registerElementEvents();
 
             $this->_registerUtilities();
@@ -156,8 +162,8 @@ class Blitz extends Plugin
     {
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function(RegisterComponentTypesEvent $event) {
-                if (Craft::$app->getUser()->checkPermission('blitz:clear-cache-utility')) {
-                    $event->types[] = ClearCacheUtility::class;
+                if (Craft::$app->getUser()->checkPermission('blitz:cache-utility')) {
+                    $event->types[] = CacheUtility::class;
                 }
             }
         );
@@ -168,7 +174,7 @@ class Blitz extends Plugin
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {
                 $event->permissions['Blitz'] = [
-                    'blitz:clear-cache-utility' => ['label' => Craft::t('blitz', 'Access clear cache utility')],
+                    'blitz:cache-utility' => ['label' => Craft::t('blitz', 'Access cache utility')],
                 ];
             }
         );

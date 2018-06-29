@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\jobs;
 use Craft;
 use craft\queue\BaseJob;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use putyourlightson\blitz\Blitz;
 
 class CacheJob extends BaseJob
@@ -42,7 +43,11 @@ class CacheJob extends BaseJob
             $count++;
 
             $client = new Client();
-            $client->get($url);
+
+            try {
+                $client->get($url);
+            }
+            catch (ClientException $exception) {}
         }
     }
 
@@ -54,6 +59,6 @@ class CacheJob extends BaseJob
      */
     protected function defaultDescription(): string
     {
-        return Craft::t('blitz', 'Caching elements.');
+        return Craft::t('blitz', 'Caching files.');
     }
 }

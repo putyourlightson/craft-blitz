@@ -1,19 +1,44 @@
 {% import "_includes/forms" as forms %}
 
 <form class="utility" method="post" accept-charset="UTF-8">
-    <input type="hidden" name="action" value="blitz/cache/clear">
-    {{ redirectInput('utilities/clear-blitz-cache') }}
+    <input type="hidden" name="action" value="blitz/cache/warm">
+    {{ redirectInput('utilities/blitz-cache') }}
     {{ csrfInput() }}
 
-    {{ forms.checkboxSelect({
-        name: 'caches',
-        options: options,
-        showAllOption: true,
-        values: '*',
-    }) }}
-
-    <div class="buttons">
-        <input type="submit" class="btn submit" value="{{ 'Clear Blitz Cache'|t('blitz') }}" />
-        <div class="utility-status"></div>
-    </div>
+    <p class="light">Warming the Blitz cache will clear the cache and add a job to the queue to pre-cache files.</p>
+    <input type="submit" class="btn submit" value="{{ 'Warm Blitz Cache'|t('blitz') }}" />
 </form>
+
+<br/>
+
+<form class="utility" method="post" accept-charset="UTF-8">
+    <input type="hidden" name="action" value="blitz/cache/clear">
+    {{ redirectInput('utilities/blitz-cache') }}
+    {{ csrfInput() }}
+
+    <p class="light">Clearing the Blitz cache will delete all cached files.</p>
+    <input type="submit" class="btn submit" value="{{ 'Clear All Blitz Cache'|t('blitz') }}" />
+</form>
+
+<br/>
+
+{% if options|length > 0 %}
+    <form class="utility" method="post" accept-charset="UTF-8">
+        <input type="hidden" name="action" value="blitz/cache/clear">
+        {{ redirectInput('utilities/blitz-cache') }}
+        {{ csrfInput() }}
+
+        <p class="light">Clear the Blitz cache selectively by folder.</p>
+
+        {{ forms.checkboxSelect({
+            name: 'caches',
+            options: options,
+            showAllOption: true,
+            values: '*',
+        }) }}
+
+        <div class="buttons">
+            <input type="submit" class="btn submit" value="{{ 'Clear Blitz Cache'|t('blitz') }}" />
+        </div>
+    </form>
+{% endif %}

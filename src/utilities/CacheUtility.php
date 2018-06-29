@@ -10,7 +10,7 @@ use craft\base\Utility;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 
-class ClearCacheUtility extends Utility
+class CacheUtility extends Utility
 {
     // Static
     // =========================================================================
@@ -20,7 +20,7 @@ class ClearCacheUtility extends Utility
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Clear Blitz Cache');
+        return Craft::t('blitz', 'Blitz Cache');
     }
 
     /**
@@ -28,7 +28,7 @@ class ClearCacheUtility extends Utility
      */
     public static function id(): string
     {
-        return 'clear-blitz-cache';
+        return 'blitz-cache';
     }
 
     /**
@@ -36,7 +36,7 @@ class ClearCacheUtility extends Utility
      */
     public static function iconPath()
     {
-        return Craft::getAlias('@app/icons/trash.svg');
+        return Craft::getAlias('@vendor/putyourlightson/craft-blitz/src/icon-mask.svg');
     }
 
     /**

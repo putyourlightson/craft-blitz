@@ -1,5 +1,11 @@
 # Blitz Changelog
 
+## 1.2.0 - 2018-06-29
+### Added
+- Added button to utility to clear all cache
+- Added button to utility to warm cache
+- Added console command to warm cache
+
 ## 1.1.1 - 2018-06-29
 ### Added
 - Added console command to clear all cache

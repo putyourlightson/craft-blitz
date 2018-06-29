@@ -38,12 +38,14 @@ When a URI is cached, the static cached file will be served up on all subsequent
 
 When an element is saved or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
 
-Cached files and folders can be cleared manually using the "Clear Blitz Cache" utility or by simply deleting them on the server.
+The "Blitz Cache" utility allows users to clear and warm the cache. Warming the cache will first clear the cache and then add a job to the queue to pre-cache files. Cached files and folders can be cleared manually using the  utility or by simply deleting them on the server.
 
-<p><img src="docs/images/utility-1.0.0.png"></p>
+<p><img src="docs/images/utility-1.2.0.png"></p>
 
-The terminal can also be used to clear all cache with the following console command:
+The terminal can also be used to warm or clear all cache with the following console commands:
 
+    ./craft blitz/cache/warm
+    
     ./craft blitz/cache/clear
 
 

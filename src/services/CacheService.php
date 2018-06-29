@@ -11,15 +11,18 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\CacheJob;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\ElementCacheRecord;
+use yii\base\ErrorException;
 
 /**
  *
- * @property string $cacheFolderPath
  * @property bool $isCacheableRequest
+ * @property string $cacheFolderPath
  */
 class CacheService extends Component
 {
@@ -33,6 +36,8 @@ class CacheService extends Component
 
     /**
      * Returns whether the request is cacheable
+     *
+     * @return bool
      */
     public function getIsCacheableRequest(): bool
     {
@@ -43,6 +48,37 @@ class CacheService extends Component
         $this->_isCacheableRequest = $this->_checkIsCacheableRequest();
 
         return $this->_isCacheableRequest;
+    }
+
+    /**
+     * Returns whether the URI is cacheable
+     *
+     * @param string $uri
+     * @return bool
+     */
+    public function getIsCacheableUri(string $uri): bool
+    {
+        /** @var SettingsModel $settings */
+        $settings = Blitz::$plugin->getSettings();
+
+        // Excluded URI patterns take priority
+        if (is_array($settings->excludedUriPatterns)) {
+            foreach ($settings->excludedUriPatterns as $excludedUriPattern) {
+                if ($this->_matchUriPattern($excludedUriPattern[0], $uri)) {
+                    return false;
+                }
+            }
+        }
+
+        if (is_array($settings->includedUriPatterns)) {
+            foreach ($settings->includedUriPatterns as $includedUriPattern) {
+                if ($this->_matchUriPattern($includedUriPattern[0], $uri)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -76,7 +112,7 @@ class CacheService extends Component
             return '';
         }
 
-        $uri = $uri === '__home__' ? '' : $uri;
+        $uri = ($uri == '__home__' ? '' : $uri);
 
         return FileHelper::normalizePath($cacheFolderPath.'/'.Craft::$app->getRequest()->getHostName().'/'.$uri.'/index.html');
     }
@@ -117,7 +153,11 @@ class CacheService extends Component
 
         if (!empty($filePath)) {
             $output .= '<!-- Cached by Blitz '.date('c').' -->';
-            FileHelper::writeToFile($filePath, $output);
+
+            try {
+                FileHelper::writeToFile($filePath, $output);
+            }
+            catch (ErrorException $e) {}
         }
     }
 
@@ -156,6 +196,24 @@ class CacheService extends Component
     }
 
     /**
+     * Clears all cache
+     */
+    public function clearCache()
+    {
+        /** @var SettingsModel $settings */
+        $settings = Blitz::$plugin->getSettings();
+
+        if (empty($settings->cacheFolderPath)) {
+            return;
+        }
+
+        try {
+            FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath));
+        }
+        catch (ErrorException $e) {}
+    }
+
+    /**
      * Clears cache by element
      *
      * @param ElementInterface $element
@@ -177,6 +235,96 @@ class CacheService extends Component
                 unlink($filePath);
             }
         }
+    }
+
+    /**
+     * Warms cache
+     *
+     * @param bool $queue
+     * @return int
+     */
+    public function warmCache(bool $queue = false): int
+    {
+        /** @var SettingsModel $settings */
+        $settings = Blitz::$plugin->getSettings();
+
+        if (empty($settings->cacheFolderPath)) {
+            return 0;
+        }
+
+        $this->clearCache();
+
+        $count = 0;
+        $uris = [];
+
+        // Get URLs from all element cache records
+        $elementCacheRecords = ElementCacheRecord::find()
+            ->select('uri')
+            ->groupBy('uri')
+            ->all();
+
+        /** @var ElementCacheRecord $elementCacheRecord */
+        foreach ($elementCacheRecords as $elementCacheRecord) {
+            $uris[] = trim($elementCacheRecord->uri, '/');
+
+            // Delete all records with this URI so we get a fresh element cache table on next cache
+            ElementCacheRecord::deleteAll([
+                'uri' => $elementCacheRecord->uri,
+            ]);
+        }
+
+        // Get URLs from all element types
+        $elementTypes = Craft::$app->getElements()->getAllElementTypes();
+
+        /** @var Element $elementType */
+        foreach ($elementTypes as $elementType) {
+            if ($elementType::hasUris()) {
+                $elements = $elementType::find()->all();
+
+                /** @var Element $element */
+                foreach ($elements as $element) {
+                    $uri = trim($element->uri, '/');
+                    $uri = ($uri == '__home__' ? '' : $uri);
+
+                    if ($uri !== null && !in_array($uri, $uris, true)) {
+                        $uris[] = $uri;
+                    }
+                }
+            }
+        }
+
+        $urls = [];
+
+        foreach ($uris as $uri) {
+            if ($this->getIsCacheableUri($uri)) {
+                $urls[] = UrlHelper::siteUrl($uri);
+            }
+        }
+
+        if (count($urls) > 0)
+        {
+            if ($queue === true ) {
+                Craft::$app->getQueue()->push(new CacheJob([
+                    'urls' => $urls,
+                    'description' => Craft::t('blitz', 'Warming cache'),
+                ]));
+
+                return 0;
+            }
+
+            $client = new Client();
+
+            foreach ($urls as $url) {
+                try {
+                    $response = $client->get($url);
+
+                    $count++;
+                }
+                catch (ClientException $exception) {}
+            }
+        }
+
+        return $count;
     }
 
     // Private Methods
@@ -202,26 +350,7 @@ class CacheService extends Component
             return false;
         }
 
-        $uri = $request->getUrl();
-
-        // Excluded URI patterns take priority
-        if (is_array($settings->excludedUriPatterns)) {
-            foreach ($settings->excludedUriPatterns as $excludedUriPattern) {
-                if ($this->_matchUriPattern($excludedUriPattern[0], $uri)) {
-                    return false;
-                }
-            }
-        }
-
-        if (is_array($settings->includedUriPatterns)) {
-            foreach ($settings->includedUriPatterns as $includedUriPattern) {
-                if ($this->_matchUriPattern($includedUriPattern[0], $uri)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return true;
     }
 
     /**
