@@ -1,5 +1,9 @@
 # Blitz Changelog
 
+## Unreleased
+### Changed
+- Changed icon colours
+
 ## 1.2.1 - 2018-06-30
 ### Fixed
 - Fixed bug where excluded URIs were still being cached
