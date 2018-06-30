@@ -32,7 +32,12 @@ When caching is enabled and a URI on the site is visited that matches an include
 
 ## Precautions
 
-When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed based on the current visitor are cached. The easiest way to do this is to add excluded URI patterns for such dynamic pages.
+When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+
+Pages that display the following should in general _not_ be cached:
+- Logged-in user specific content such as username, orders, etc.
+- Forms that use CSRF protection
+- Shopping carts and checkout pages
 
 ## Cache Breaking
 
