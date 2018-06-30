@@ -30,15 +30,6 @@ When caching is enabled and a URI on the site is visited that matches an include
 
 <p><img src="docs/images/settings-1.0.0.png"></p>
 
-## Precautions
-
-When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
-
-Pages that display the following should in general _not_ be cached:
-- Logged-in user specific content such as username, orders, etc.
-- Forms that use CSRF protection
-- Shopping carts and checkout pages
-
 ## Cache Breaking
 
 When an element is saved or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
@@ -53,6 +44,16 @@ The terminal can also be used to warm or clear all cache with the following cons
     
     ./craft blitz/cache/clear
 
+## Precautions
+
+When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+
+Pages that display the following should in general _not_ be cached:
+- Logged-in user specific content such as username, orders, etc.
+- Forms that use CSRF protection
+- Shopping carts and checkout pages
+
+Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
 ## Server Rewrite
 
@@ -61,6 +62,7 @@ For improved performance, adding a server rewrite will avoid the request from ev
 In Apache this is achieved with `mod_rewrite` by adding the following to the root .htaccess file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
     # Blitz cache rewrite
+    RewriteCond %{REQUEST_METHOD} GET
     RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -f
     RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
     
@@ -70,8 +72,12 @@ In Nginx this is achieved by adding a location handler to the configuration file
 
     # Blitz cache rewrite
     location / {
-      try_files $uri /cache/blitz/$http_host/$uri/index.html $uri/ /index.php?$query_string;
+      if ($request_method = GET) {
+        try_files $uri /cache/blitz/$http_host/$uri/index.html;
+      }
     }
+    
+    # Send would-be 404 requests to Craft
 
 ## URI Patterns
 
