@@ -58,16 +58,16 @@ class Blitz extends Plugin
         if ($this->cache->getIsCacheableRequest()) {
             $uri = $request->getUrl();
 
-            // If cached version exists then output it (assuming this has not already been done server-side)
             if ($this->cache->getIsCacheableUri($uri)) {
+                // If cached version exists then output it (assuming this has not already been done server-side)
                 $filePath = $this->cache->uriToFilePath($uri);
                 if (is_file($filePath)) {
                     echo file_get_contents($filePath).'<!-- Served by Blitz -->';
                     exit;
                 }
-            }
 
-            $this->_registerCacheableRequestEvents();
+                $this->_registerCacheableRequestEvents();
+            }
         }
 
         // CP request
