@@ -26,8 +26,11 @@ To install the plugin, search for "Blitz" in the Craft Plugin Store, or install 
 
 ## Usage
 
-When caching is enabled and a URI on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even more.
+When caching is enabled and a URI on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
 
+Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even more.
+
+Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 <p><img src="docs/images/settings-1.0.0.png"></p>
 
 ## Cache Breaking
@@ -52,8 +55,6 @@ Pages that display the following should in general _not_ be cached:
 - Logged-in user specific content such as username, orders, etc.
 - Forms that use CSRF protection
 - Shopping carts and checkout pages
-
-Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
 ## Server Rewrite
 
