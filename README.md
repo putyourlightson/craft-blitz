@@ -4,15 +4,15 @@
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with  [Craft CMS](https://craftcms.com/).
 
-It can highly improve a site's performance, reducing time to first byte (TTFB) dramatically. Although the performance gains depend on the individual site setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency):
+It can highly improve a site's performance by reducing the time to first byte (TTFB). This reduces the load time of the site as well as the load on the server. Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
+
+Although the performance gains depend on the individual site setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency):
 
 - 650ms (without caching enabled) 
 - 400ms (with caching enabled, without server rewrite) 
-- 160ms (with caching enabled and server rewrite)
+- 120ms (with caching enabled and server rewrite)
 
-<p><img src="docs/images/ttfb-1.2.0.png"></p>
-
-This plugin is heavily inspired by the [Grav Static File Cache Plugin](https://github.com/fbrnc/grav-plugin-staticfilecache) by Fabrizio Branca.
+<p><img src="docs/images/ttfb-1.2.2.png"></p>
 
 ## Requirements
 
@@ -63,8 +63,8 @@ For improved performance, adding a server rewrite will avoid the request from ev
 In Apache this is achieved with `mod_rewrite` by adding the following to the root .htaccess file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
     # Blitz cache rewrite
+    RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -s
     RewriteCond %{REQUEST_METHOD} GET
-    RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -f
     RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
     
     # Send would-be 404 requests to Craft

@@ -1,8 +1,8 @@
 # Blitz Changelog
 
-## Unreleased
+## 1.2.2 - 2018-07-01
 ### Changed
-- Changed icon colours
+- Changed plugin icon
 
 ## 1.2.1 - 2018-06-30
 ### Fixed
