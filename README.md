@@ -6,7 +6,7 @@ The Blitz plugin provides intelligent static file caching for creating lightning
 
 It can highly improve a site's performance by reducing the time to first byte (TTFB). This reduces the load time of the site as well as the load on the server. Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
 
-Although the performance gains depend on the individual site setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency):
+Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency):
 
 - 650ms (without caching enabled) 
 - 400ms (with caching enabled, without server rewrite) 
@@ -20,7 +20,7 @@ Craft CMS 3.0.0 or later.
 
 ## Installation
 
-To install the plugin, search for "Blitz" in the Craft Plugin Store, or install manually using composer.
+Blitz is available in the Craft Plugin Store and can also be installed manually using composer.
 
     composer require putyourlightson/craft-blitz
 
