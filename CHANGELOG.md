@@ -1,5 +1,9 @@
 # Blitz Changelog
 
+## 1.2.3 - 2018-07-01
+### Fixed
+- Fixed bug when reordering structure elements in the CP
+
 ## 1.2.2 - 2018-07-01
 ### Changed
 - Changed plugin icon

@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
 use craft\events\ElementEvent;
+use craft\events\MoveElementEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
@@ -133,7 +134,7 @@ class Blitz extends Plugin
             }
         );
         Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
-            function(ElementEvent $event) {
+            function(MoveElementEvent $event) {
                 $this->cache->cacheByElement($event->element);
             }
         );
