@@ -117,7 +117,7 @@ class Blitz extends Plugin
             }
         );
         Event::on(Structures::class, Structures::EVENT_BEFORE_MOVE_ELEMENT,
-            function(ElementEvent $event) {
+            function(MoveElementEvent $event) {
                 $this->cache->clearCacheByElement($event->element);
             }
         );
