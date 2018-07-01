@@ -152,7 +152,7 @@ class CacheService extends Component
         $filePath = $this->uriToFilePath($uri);
 
         if (!empty($filePath)) {
-            $output .= '<!-- Cached by Blitz '.date('c').' -->';
+            $output .= '<!-- Cached by Blitz on '.date('c').' -->';
 
             try {
                 FileHelper::writeToFile($filePath, $output);
