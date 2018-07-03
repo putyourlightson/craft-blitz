@@ -153,6 +153,7 @@ class CacheService extends Component
 
         if (!empty($filePath)) {
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
+            $output = "\xEF\xBB\xBF".$output; // This forces UTF8 encoding as per https://stackoverflow.com/a/9047876
 
             try {
                 FileHelper::writeToFile($filePath, $output);
