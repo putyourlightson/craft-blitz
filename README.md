@@ -1,5 +1,5 @@
-<p align="center"><img width="200" src="src/icon.svg"></p>
-
+<p align="center"><img height="120" src="src/icon.svg"></p>
+ 
 # Blitz Plugin for Craft CMS 3
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with  [Craft CMS](https://craftcms.com/).
@@ -12,7 +12,7 @@ Although the performance gains depend on the individual site and server setup, t
 - 400ms (with caching enabled, without server rewrite) 
 - 120ms (with caching enabled and server rewrite)
 
-<p><img src="docs/images/ttfb-1.2.2.png"></p>
+![TTFB](docs/images/ttfb-1.2.2.png)  
 
 ## Requirements
 
@@ -31,7 +31,8 @@ When caching is enabled and a URI on the site is visited that matches an include
 Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even more.
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
-<p><img src="docs/images/settings-1.0.0.png"></p>
+
+![Settings](docs/images/settings-1.0.0.png)
 
 ## Cache Breaking
 
@@ -39,7 +40,7 @@ When an element is saved or deleted, any cached template files that used that el
 
 The "Blitz Cache" utility allows users to clear and warm the cache. Warming the cache will first clear the cache and then add a job to the queue to pre-cache files. Cached files and folders can be cleared manually using the  utility or by simply deleting them on the server.
 
-<p><img src="docs/images/utility-1.2.0.png"></p>
+![Utility](docs/images/utility-1.2.0.png)
 
 The terminal can also be used to warm or clear all cache with the following console commands:
 

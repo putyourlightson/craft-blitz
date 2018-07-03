@@ -56,7 +56,7 @@ class Blitz extends Plugin
         }
 
         // Cacheable request
-        if ($this->cache->getIsCacheableRequest()) {
+        else if ($this->cache->getIsCacheableRequest()) {
             $uri = $request->getUrl();
 
             if ($this->cache->getIsCacheableUri($uri)) {
@@ -72,7 +72,7 @@ class Blitz extends Plugin
         }
 
         // CP request
-        if ($request->getIsCpRequest()) {
+        else if ($request->getIsCpRequest()) {
             $this->_registerElementEvents();
 
             $this->_registerUtilities();
@@ -143,11 +143,12 @@ class Blitz extends Plugin
     private function _registerCacheableRequestEvents()
     {
         $uri = Craft::$app->getRequest()->getUrl();
+        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 
         // Register element populate event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event) use ($uri) {
-                $this->cache->addElementCache($event->element, $uri);
+            function(PopulateElementEvent $event) use ($siteId, $uri) {
+                $this->cache->addElementCache($event->element, $siteId, $uri);
             }
         );
 

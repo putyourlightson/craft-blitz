@@ -10,6 +10,7 @@ use craft\db\ActiveRecord;
 /**
  * @property int $id
  * @property int $elementId
+ * @property int $siteId
  * @property string $uri
  */
 class ElementCacheRecord extends ActiveRecord

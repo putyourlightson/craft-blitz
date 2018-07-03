@@ -1,5 +1,10 @@
 # Blitz Changelog
 
+## 1.3.0 - 2018-07-03
+### Added
+- Added functionality for multi-site setups
+- Added UTF8 encoding to cached files  
+
 ## 1.2.3.1 - 2018-07-01
 ### Fixed
 - Fixed bug when reordering structure elements in the CP

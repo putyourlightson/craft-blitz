@@ -25,15 +25,17 @@ class Install extends Migration
             $this->createTable($elementCacheTable, [
                 'id' => $this->primaryKey(),
                 'elementId' => $this->integer()->notNull(),
+                'siteId' => $this->integer()->notNull(),
                 'uri' => $this->string()->notNull(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),
             ]);
 
-            $this->createIndex(null, $elementCacheTable, ['elementId', 'uri'], true);
+            $this->createIndex(null, $elementCacheTable, ['elementId', 'siteId', 'uri'], true);
 
             $this->addForeignKey(null, $elementCacheTable, 'elementId', '{{%elements}}', 'id', 'CASCADE');
+            $this->addForeignKey(null, $elementCacheTable, 'siteId', '{{%sites}}', 'id', 'CASCADE');
 
             // Refresh the db schema caches
             Craft::$app->db->schema->refresh();

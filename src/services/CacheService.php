@@ -121,13 +121,15 @@ class CacheService extends Component
      * Adds an element cache to the database
      *
      * @param ElementInterface $element
+     * @param int $siteId
      * @param string $uri
      */
-    public function addElementCache(ElementInterface $element, string $uri)
+    public function addElementCache(ElementInterface $element, int $siteId, string $uri)
     {
         /** @var Element $element */
         $values = [
             'elementId' => $element->id,
+            'siteId' => $siteId,
             'uri' => $uri,
         ];
 
@@ -152,8 +154,11 @@ class CacheService extends Component
         $filePath = $this->uriToFilePath($uri);
 
         if (!empty($filePath)) {
+            // Append timestamp
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
-            $output = "\xEF\xBB\xBF".$output; // This forces UTF8 encoding as per https://stackoverflow.com/a/9047876
+
+            // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
+            $output = "\xEF\xBB\xBF".$output;
 
             try {
                 FileHelper::writeToFile($filePath, $output);
@@ -177,16 +182,17 @@ class CacheService extends Component
 
         /** @var Element $element */
         $elementCacheRecords = ElementCacheRecord::find()
-            ->select('uri')
+            ->select(['siteId', 'uri'])
             ->where(['elementId' => $element->id])
             ->all();
 
         /** @var ElementCacheRecord $elementCacheRecord */
         foreach ($elementCacheRecords as $elementCacheRecord) {
-            $urls[] = UrlHelper::siteUrl($elementCacheRecord->uri);
+            $urls[] = UrlHelper::siteUrl($elementCacheRecord->uri, $elementCacheRecord->siteId);
 
             // Delete all records with this URI so we get a fresh element cache table on next cache
             ElementCacheRecord::deleteAll([
+                'siteId' => $elementCacheRecord->siteId,
                 'uri' => $elementCacheRecord->uri,
             ]);
         }
@@ -223,7 +229,7 @@ class CacheService extends Component
     {
         /** @var Element $element */
         $elementCacheRecords = ElementCacheRecord::find()
-            ->select('uri')
+            ->select(['uri'])
             ->where(['elementId' => $element->id])
             ->all();
 
@@ -256,20 +262,23 @@ class CacheService extends Component
         $this->clearCache();
 
         $count = 0;
-        $uris = [];
+        $urls = [];
 
         // Get URLs from all element cache records
         $elementCacheRecords = ElementCacheRecord::find()
-            ->select('uri')
-            ->groupBy('uri')
+            ->select(['siteId', 'uri'])
+            ->groupBy(['siteId', 'uri'])
             ->all();
 
         /** @var ElementCacheRecord $elementCacheRecord */
         foreach ($elementCacheRecords as $elementCacheRecord) {
-            $uris[] = trim($elementCacheRecord->uri, '/');
+            if ($this->getIsCacheableUri($elementCacheRecord->uri)) {
+                $urls[] = UrlHelper::siteUrl($elementCacheRecord->uri, null, null, $elementCacheRecord->siteId);
+            }
 
-            // Delete all records with this URI so we get a fresh element cache table on next cache
+            // Delete all records with this site and URI so we get a fresh cache
             ElementCacheRecord::deleteAll([
+                'siteId' => $elementCacheRecord->siteId,
                 'uri' => $elementCacheRecord->uri,
             ]);
         }
@@ -280,25 +289,26 @@ class CacheService extends Component
         /** @var Element $elementType */
         foreach ($elementTypes as $elementType) {
             if ($elementType::hasUris()) {
-                $elements = $elementType::find()->all();
+                // Loop through all sites to ensure we warm all site element URLs
+                $sites = Craft::$app->getSites()->getAllSites();
 
-                /** @var Element $element */
-                foreach ($elements as $element) {
-                    $uri = trim($element->uri, '/');
-                    $uri = ($uri == '__home__' ? '' : $uri);
+                foreach ($sites as $site) {
+                    $elements = $elementType::find()->siteId($site->id)->all();
 
-                    if ($uri !== null && !in_array($uri, $uris, true)) {
-                        $uris[] = $uri;
+                    /** @var Element $element */
+                    foreach ($elements as $element) {
+                        $uri = trim($element->uri, '/');
+                        $uri = ($uri == '__home__' ? '' : $uri);
+
+                        if ($uri !== null && $this->getIsCacheableUri($uri)) {
+                            $url = $element->getUrl();
+
+                            if ($url !== null && !in_array($url, $urls, true)) {
+                                $urls[] = $url;
+                            }
+                        }
                     }
                 }
-            }
-        }
-
-        $urls = [];
-
-        foreach ($uris as $uri) {
-            if ($this->getIsCacheableUri($uri)) {
-                $urls[] = UrlHelper::siteUrl($uri);
             }
         }
 

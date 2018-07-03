@@ -9,6 +9,7 @@ use Craft;
 use craft\queue\BaseJob;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\ConnectException;
 use putyourlightson\blitz\Blitz;
 
 class CacheJob extends BaseJob
@@ -48,6 +49,7 @@ class CacheJob extends BaseJob
                 $client->get($url);
             }
             catch (ClientException $exception) {}
+            catch (ConnectException $exception) {}
         }
     }
 
