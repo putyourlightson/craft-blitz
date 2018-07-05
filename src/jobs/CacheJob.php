@@ -61,6 +61,6 @@ class CacheJob extends BaseJob
      */
     protected function defaultDescription(): string
     {
-        return Craft::t('blitz', 'Caching files.');
+        return Craft::t('blitz', 'Warming Blitz cache');
     }
 }

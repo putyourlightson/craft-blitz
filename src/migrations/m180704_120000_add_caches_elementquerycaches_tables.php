@@ -4,7 +4,7 @@ namespace putyourlightson\blitz\migrations;
 
 use craft\db\Migration;
 
-class m180703_120000_add_siteid_column extends Migration
+class m180704_120000_add_caches_elementquerycaches_tables extends Migration
 {
     // Public Methods
     // =========================================================================
@@ -25,7 +25,7 @@ class m180703_120000_add_siteid_column extends Migration
      */
     public function safeDown(): bool
     {
-        echo "m180703_120000_add_siteid_column cannot be reverted.\n";
+        echo "m180704_120000_add_caches_elementquerycaches_tables cannot be reverted.\n";
 
         return false;
     }

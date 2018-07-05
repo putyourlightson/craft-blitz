@@ -10,11 +10,13 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
- * @property int $cacheId
- * @property int $elementId
+ * @property int $siteId
+ * @property string $uri
+ * @property string $type
+ * @property string $query
  * @property CacheRecord $cache
  */
-class ElementCacheRecord extends ActiveRecord
+class ElementQueryCacheRecord extends ActiveRecord
 {
     // Public Static Methods
     // =========================================================================
@@ -26,7 +28,7 @@ class ElementCacheRecord extends ActiveRecord
      */
     public static function tableName(): string
     {
-        return '{{%blitz_elementcaches}}';
+        return '{{%blitz_elementquerycaches}}';
     }
 
     /**

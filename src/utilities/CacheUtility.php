@@ -52,8 +52,9 @@ class CacheUtility extends Utility
             $cacheFolders = [];
 
             foreach (FileHelper::findDirectories($cacheFolderPath) as $cacheFolder) {
+                $count = count(FileHelper::findFiles($cacheFolder));
                 $options[] = [
-                    'label' => trim(str_replace(Craft::getAlias('@webroot'), '', $cacheFolder), '/').' ('.count(FileHelper::findFiles($cacheFolder)).')',
+                    'label' => trim(str_replace(Craft::getAlias('@webroot'), '', $cacheFolder), '/').' ('.$count.' file'.($count == 1 ? '' : 's').')',
                     'value' => $cacheFolder,
                 ];
             }

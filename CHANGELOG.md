@@ -1,5 +1,9 @@
 # Blitz Changelog
 
+## 1.4.0 - 2018-07-05
+### Added
+- Added automatic cache clearing and warming to pages that contain element queries 
+
 ## 1.3.0 - 2018-07-03
 ### Added
 - Added functionality for multi-site setups

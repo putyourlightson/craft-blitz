@@ -8,6 +8,7 @@ namespace putyourlightson\blitz;
 use Craft;
 use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
+use craft\events\CancelableEvent;
 use craft\events\ElementEvent;
 use craft\events\MoveElementEvent;
 use craft\events\PopulateElementEvent;
@@ -110,32 +111,20 @@ class Blitz extends Plugin
 
     private function _registerElementEvents()
     {
-        // Clear cache by elements
-        Event::on(Elements::class, Elements::EVENT_BEFORE_SAVE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->cache->clearCacheByElement($event->element);
-            }
-        );
-        Event::on(Structures::class, Structures::EVENT_BEFORE_MOVE_ELEMENT,
-            function(MoveElementEvent $event) {
-                $this->cache->clearCacheByElement($event->element);
-            }
-        );
-        Event::on(Elements::class, Elements::EVENT_AFTER_DELETE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->cache->clearCacheByElement($event->element);
-            }
-        );
-
         // Cache elements
         Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
             function(ElementEvent $event) {
-                $this->cache->cacheByElement($event->element);
+                $this->cache->cacheByElementId($event->element->getId());
             }
         );
         Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
             function(MoveElementEvent $event) {
-                $this->cache->cacheByElement($event->element);
+                $this->cache->cacheByElementId($event->element->getId());
+            }
+        );
+        Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
+            function(ElementEvent $event) {
+                $this->cache->cacheByElementId($event->element->getId());
             }
         );
     }
@@ -152,7 +141,21 @@ class Blitz extends Plugin
             }
         );
 
-        // Register template page render event
+        // Register element query prepare event
+        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_PREPARE,
+            function(CancelableEvent $event) use ($siteId, $uri) {
+                /** @var ElementQuery $elementQuery */
+                $elementQuery = $event->sender;
+                $this->cache->addElementQueryCache($elementQuery, $siteId, $uri);
+            }
+        );
+
+        // Register template page render events
+        Event::on(View::class, View::EVENT_BEFORE_RENDER_PAGE_TEMPLATE,
+            function() use ($siteId, $uri) {
+                $this->cache->clearCacheRecord($siteId, $uri);
+            }
+        );
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
             function(TemplateEvent $event) use ($uri) {
                 $this->cache->cacheOutput($event->output, $uri);
