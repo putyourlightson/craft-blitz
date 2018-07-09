@@ -50,6 +50,8 @@ The terminal can also be used to warm or clear all cache with the following cons
 
 ## Precautions
 
+Craft's template caching (`{% cache %}`) tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URIs that Blitz will cache.
+
 When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
 
 Pages that display the following should in general _not_ be cached:
