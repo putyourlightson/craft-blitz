@@ -14,6 +14,7 @@ use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\RequestException;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\CacheJob;
 use putyourlightson\blitz\models\SettingsModel;
@@ -382,7 +383,8 @@ class CacheService extends Component
 
                     $count++;
                 }
-                catch (ClientException $exception) {}
+                catch (ClientException $e) {}
+                catch (RequestException $e) {}
             }
         }
 

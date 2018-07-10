@@ -131,22 +131,27 @@ class Blitz extends Plugin
 
     private function _registerCacheableRequestEvents()
     {
-        $uri = Craft::$app->getRequest()->getUrl();
+        $response = Craft::$app->getResponse();
         $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $uri = Craft::$app->getRequest()->getUrl();
 
         // Register element populate event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event) use ($siteId, $uri) {
-                $this->cache->addElementCache($event->element, $siteId, $uri);
+            function(PopulateElementEvent $event) use ($response, $siteId, $uri) {
+                if ($response->getIsOk()) {
+                    $this->cache->addElementCache($event->element, $siteId, $uri);
+                }
             }
         );
 
         // Register element query prepare event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_PREPARE,
-            function(CancelableEvent $event) use ($siteId, $uri) {
-                /** @var ElementQuery $elementQuery */
-                $elementQuery = $event->sender;
-                $this->cache->addElementQueryCache($elementQuery, $siteId, $uri);
+            function(CancelableEvent $event) use ($response, $siteId, $uri) {
+                if ($response->getIsOk()) {
+                    /** @var ElementQuery $elementQuery */
+                    $elementQuery = $event->sender;
+                    $this->cache->addElementQueryCache($elementQuery, $siteId, $uri);
+                }
             }
         );
 
@@ -157,8 +162,10 @@ class Blitz extends Plugin
             }
         );
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-            function(TemplateEvent $event) use ($uri) {
-                $this->cache->cacheOutput($event->output, $uri);
+            function(TemplateEvent $event) use ($response, $uri) {
+                if ($response->getIsOk()) {
+                    $this->cache->cacheOutput($event->output, $uri);
+                }
             }
         );
     }

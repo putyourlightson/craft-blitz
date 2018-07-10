@@ -47,6 +47,8 @@ The terminal can also be used to warm or clear all cache with the following cons
     ./craft blitz/cache/warm
     
     ./craft blitz/cache/clear
+    
+Note that if the `@web` alias is used in a site URL then it is only available to web requests and will therefore not be included in cache warming with the console command. 
 
 ## Precautions
 

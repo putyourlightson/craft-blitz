@@ -1,5 +1,10 @@
 # Blitz Changelog
 
+## 1.4.1 - 2018-07-10
+### Fixed
+- Fixed bug where 404 error templates were being cached
+- Fixed error that occurred when warming cache with the console command when `@web` was used in a site URL 
+
 ## 1.4.0 - 2018-07-05
 ### Added
 - Added automatic cache clearing and warming to pages that contain element queries 
