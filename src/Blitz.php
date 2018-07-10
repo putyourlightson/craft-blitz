@@ -131,7 +131,9 @@ class Blitz extends Plugin
 
     private function _registerCacheableRequestEvents()
     {
+        // We'll need to check if the response is Ok again inside the event functions as it may change throughout the request
         $response = Craft::$app->getResponse();
+
         $siteId = Craft::$app->getSites()->getCurrentSite()->id;
         $uri = Craft::$app->getRequest()->getUrl();
 

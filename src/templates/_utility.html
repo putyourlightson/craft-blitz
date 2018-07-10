@@ -5,7 +5,8 @@
     {{ redirectInput('utilities/blitz-cache') }}
     {{ csrfInput() }}
 
-    <p class="light">Warming the Blitz cache will clear the cache and add a job to the queue to pre-cache files.</p>
+    <p class="light">
+        {{ 'Warming the Blitz cache will clear and cache and add a job to the queue to recache all of the files. This may take some time on large sites.'|t('blitz') }}</p>
     <input type="submit" class="btn submit" value="{{ 'Warm Blitz Cache'|t('blitz') }}" />
 </form>
 
@@ -16,7 +17,7 @@
     {{ redirectInput('utilities/blitz-cache') }}
     {{ csrfInput() }}
 
-    <p class="light">Clearing the Blitz cache will delete all cached files.</p>
+    <p class="light">{{ 'Clearing the Blitz cache will delete all cached files.'|t('blitz') }}</p>
     <input type="submit" class="btn submit" value="{{ 'Clear All Blitz Cache'|t('blitz') }}" />
 </form>
 
@@ -28,7 +29,7 @@
         {{ redirectInput('utilities/blitz-cache') }}
         {{ csrfInput() }}
 
-        <p class="light">Clear the Blitz cache selectively by folder.</p>
+        <p class="light">{{ 'Clear the Blitz cache selectively by folder.'|t('blitz') }}</p>
 
         {{ forms.checkboxSelect({
             name: 'caches',
