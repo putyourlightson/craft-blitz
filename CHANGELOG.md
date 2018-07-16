@@ -1,5 +1,10 @@
 # Blitz Changelog
 
+## 1.4.2 - 2018-07-16
+### Changed
+- Calls for max power before warming the cache to prevent timeouts or memory limits being exceeded
+- Enabled cache clearing even if "Caching Enabled" setting is disabled
+
 ## 1.4.1 - 2018-07-10
 ### Fixed
 - Fixed bug where 404 error templates were being cached

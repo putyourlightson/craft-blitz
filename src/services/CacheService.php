@@ -224,10 +224,6 @@ class CacheService extends Component
      */
     public function cacheByElementId(int $elementId)
     {
-        if (!Blitz::$plugin->getSettings()->cachingEnabled) {
-            return;
-        }
-
         $urls = [];
 
         /** @var ElementCacheRecord[] $elementCacheRecords */
@@ -264,6 +260,10 @@ class CacheService extends Component
                 // Delete cache record so we get a fresh element cache table
                 $elementQueryCacheRecord->cache->delete();
             }
+        }
+
+        if (!Blitz::$plugin->getSettings()->cachingEnabled) {
+            return;
         }
 
         if (count($urls)) {

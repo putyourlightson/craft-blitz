@@ -36,6 +36,8 @@ class CacheJob extends BaseJob
             return;
         }
 
+        App::maxPowerCaptain();
+
         $totalElements = count($this->urls);
         $count = 0;
 
