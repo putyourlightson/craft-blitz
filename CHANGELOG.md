@@ -1,5 +1,9 @@
 # Blitz Changelog
 
+## 1.4.3 - 2018-07-23
+### Fixed
+- Fixed bug with App not being defined when cache warmed
+
 ## 1.4.2 - 2018-07-16
 ### Changed
 - Calls for max power before warming the cache to prevent timeouts or memory limits being exceeded
