@@ -32,7 +32,7 @@ Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
-![Settings](docs/images/settings-1.0.0.png)
+![Settings](docs/images/settings-1.5.0.png)
 
 ## Cache Breaking
 
@@ -50,9 +50,11 @@ The terminal can also be used to warm or clear all cache with the following cons
     
 Note that if the `@web` alias is used in a site URL then it is only available to web requests and will therefore not be included in cache warming with the console command. 
 
-## Precautions
+## Considerations
 
 Craft's template caching (`{% cache %}`) tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URIs that Blitz will cache.
+
+URIs with query strings will only be cached if the "Query String Caching Enabled" setting is enabled. If it is disabled then no caching of URIs with query strings (anything following a `?` in a URI) will take place. If it is enabled then all URIs with query strings will be cached. This will help with performance but may end up in a large amount of cached files.
 
 When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
 
@@ -79,7 +81,7 @@ In Nginx this is achieved by adding a location handler to the configuration file
     # Blitz cache rewrite
     location / {
       if ($request_method = GET) {
-        try_files $uri /cache/blitz/$http_host/$uri/index.html;
+        try_files $uri /cache/blitz/$http_host/$uri/$args/index.html;
       }
     }
     
