@@ -65,6 +65,10 @@ class CacheService extends Component
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
+        if (!$settings->queryStringCachingEnabled && mb_strpos($uri, '?') !== false) {
+            return false;
+        }
+
         // Excluded URI patterns take priority
         if (is_array($settings->excludedUriPatterns)) {
             foreach ($settings->excludedUriPatterns as $excludedUriPattern) {
@@ -116,7 +120,11 @@ class CacheService extends Component
             return '';
         }
 
+        // Replace __home__ with blank string
         $uri = ($uri == '__home__' ? '' : $uri);
+
+        // Replace ? with / in URI
+        $uri = str_replace('?', '/', $uri);
 
         return FileHelper::normalizePath($cacheFolderPath.'/'.Craft::$app->getRequest()->getHostName().'/'.$uri.'/index.html');
     }
@@ -201,6 +209,11 @@ class CacheService extends Component
      */
     public function cacheOutput(string $output, string $uri)
     {
+        // Ignore URIs that begin with /index.php
+        if (strpos($uri, '/index.php') === 0) {
+            return;
+        }
+
         $filePath = $this->uriToFilePath($uri);
 
         if (!empty($filePath)) {
@@ -325,7 +338,8 @@ class CacheService extends Component
 
         // Get URLs from all cache records
         $cacheRecords = CacheRecord::find()
-            ->select(['siteId', 'uri'])
+            // ID is required for later deleting record
+            ->select(['id', 'siteId', 'uri'])
             ->all();
 
         /** @var CacheRecord $cacheRecord */

@@ -18,6 +18,11 @@ class SettingsModel extends Model
     public $cachingEnabled = false;
 
     /**
+     * @var bool
+     */
+    public $queryStringCachingEnabled = false;
+
+    /**
      * @var string
      */
     public $cacheFolderPath = 'cache/blitz';

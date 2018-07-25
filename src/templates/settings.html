@@ -18,6 +18,14 @@
     first: true,
 }) }}
 
+{{ forms.lightswitchField({
+	label: "Query String Caching Enabled"|t('blitz'),
+	instructions: "Whether URLs with query strings should cached. Disabling this will not cache any URLs that contain query strings."|t('blitz'),
+    warning: (config.queryStringCachingEnabled is defined ? configWarning('queryStringCachingEnabled')),
+	name: 'queryStringCachingEnabled',
+	on: settings.queryStringCachingEnabled,
+}) }}
+
 {{ forms.textField({
 	label: "Cache Folder Path"|t('blitz'),
 	instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),

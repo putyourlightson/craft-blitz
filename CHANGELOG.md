@@ -1,5 +1,12 @@
 # Blitz Changelog
 
+## 1.5.0 - 2018-07-25
+### Added
+- Added "Query String Caching Enabled" setting
+- Added `%{QUERY_STRING}` to `mod_rewrite` code sample in docs
+### Changed
+- Disabled caching of URLs beginning with `/index.php` to avoid issues when `mod_rewrite` is enabled
+
 ## 1.4.3 - 2018-07-23
 ### Fixed
 - Fixed bug with App not being defined when cache warmed
