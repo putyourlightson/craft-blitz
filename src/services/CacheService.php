@@ -72,7 +72,7 @@ class CacheService extends Component
         // Excluded URI patterns take priority
         if (is_array($settings->excludedUriPatterns)) {
             foreach ($settings->excludedUriPatterns as $excludedUriPattern) {
-                if ($this->_matchUriPattern($excludedUriPattern[0], $uri)) {
+                if ($this->_matchUriPattern($excludedUriPattern, $uri)) {
                     return false;
                 }
             }
@@ -80,7 +80,7 @@ class CacheService extends Component
 
         if (is_array($settings->includedUriPatterns)) {
             foreach ($settings->includedUriPatterns as $includedUriPattern) {
-                if ($this->_matchUriPattern($includedUriPattern[0], $uri)) {
+                if ($this->_matchUriPattern($includedUriPattern, $uri)) {
                     return true;
                 }
             }
