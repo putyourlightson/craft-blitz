@@ -19,7 +19,15 @@
 }) }}
 
 {{ forms.lightswitchField({
-	label: "Query String Caching Enabled"|t('blitz'),
+	label: "Warm Cache Automatically"|t('blitz'),
+	instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz'),
+    warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
+	name: 'warmCacheAutomatically',
+	on: settings.warmCacheAutomatically,
+}) }}
+
+{{ forms.lightswitchField({
+	label: "Query String Caching"|t('blitz'),
 	instructions: "Whether URLs with query strings should cached. Disabling this will not cache any URLs that contain query strings."|t('blitz'),
     warning: (config.queryStringCachingEnabled is defined ? configWarning('queryStringCachingEnabled')),
 	name: 'queryStringCachingEnabled',

@@ -20,6 +20,11 @@ class SettingsModel extends Model
     /**
      * @var bool
      */
+    public $warmCacheAutomatically = true;
+
+    /**
+     * @var bool
+     */
     public $queryStringCachingEnabled = false;
 
     /**

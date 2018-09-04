@@ -6,18 +6,28 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\errors\MissingComponentException;
 use craft\helpers\FileHelper;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 use yii\base\ErrorException;
+use yii\web\BadRequestHttpException;
+use yii\web\Response;
 
 class CacheController extends Controller
 {
     // Public Methods
     // =========================================================================
 
-    public function actionClear()
+    /**
+     * Clears cache
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     * @throws MissingComponentException
+     */
+    public function actionClear(): Response
     {
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
@@ -47,7 +57,14 @@ class CacheController extends Controller
         return $this->redirectToPostedUrl();
     }
 
-    public function actionWarm()
+    /**
+     * Warms cache
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     * @throws MissingComponentException
+     */
+    public function actionWarm(): Response
     {
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();

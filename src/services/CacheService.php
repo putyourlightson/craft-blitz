@@ -285,11 +285,10 @@ class CacheService extends Component
             }
         }
 
-        if (!Blitz::$plugin->getSettings()->cachingEnabled) {
-            return;
-        }
+        /** @var SettingsModel $settings */
+        $settings = Blitz::$plugin->getSettings();
 
-        if (count($urls)) {
+        if ($settings->cachingEnabled AND $settings->warmCacheAutomatically AND count($urls) > 0) {
             Craft::$app->getQueue()->push(new CacheJob(['urls' => $urls]));
         }
     }

@@ -1,12 +1,16 @@
 # Blitz Changelog
 
+## 1.5.2 - 2018-09-04
+### Added
+- Added "Warm Cache Automatically" setting
+
 ## 1.5.1 - 2018-08-17
 ### Changed
 - Patterns are normalized to strings to allow for flat arrays in config settings ([github issue](https://github.com/putyourlightson/craft-blitz/issues/17#issuecomment-413897648))
 
 ## 1.5.0 - 2018-07-25
 ### Added
-- Added "Query String Caching Enabled" setting
+- Added "Query String Caching" setting
 - Added `%{QUERY_STRING}` to `mod_rewrite` code sample in docs
 ### Changed
 - Disabled caching of URLs beginning with `/index.php` to avoid issues when `mod_rewrite` is enabled
