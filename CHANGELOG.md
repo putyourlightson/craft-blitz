@@ -2,11 +2,11 @@
 
 ## 1.5.2 - 2018-09-04
 ### Added
-- Added "Warm Cache Automatically" setting
+- Added "Warm Cache Automatically" setting ([#21](https://github.com/putyourlightson/craft-blitz/issues/21))
 
 ## 1.5.1 - 2018-08-17
 ### Changed
-- Patterns are normalized to strings to allow for flat arrays in config settings ([github issue](https://github.com/putyourlightson/craft-blitz/issues/17#issuecomment-413897648))
+- Patterns are normalized to strings to allow for flat arrays in config settings ([#17](https://github.com/putyourlightson/craft-blitz/issues/17#issuecomment-413897648))
 
 ## 1.5.0 - 2018-07-25
 ### Added
