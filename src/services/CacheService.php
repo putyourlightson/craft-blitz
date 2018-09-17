@@ -271,17 +271,24 @@ class CacheService extends Component
             $query = @unserialize(base64_decode($elementQueryCacheRecord->query));
 
             if ($query === false || in_array($elementId, $query->ids(), true)) {
-                $url = UrlHelper::siteUrl($elementQueryCacheRecord->cache->uri, null, null, $elementQueryCacheRecord->cache->siteId);
+                /** @var CacheRecord|null $cache */
+                $cacheRecord = $elementQueryCacheRecord->getCache();
+
+                if ($cacheRecord === null) {
+                    continue;
+                }
+
+                $url = UrlHelper::siteUrl($cacheRecord->uri, null, null, $cacheRecord->siteId);
 
                 if (!in_array($url, $urls, true)) {
                     $urls[] = $url;
                 }
 
                 // Delete cached file so we get a fresh file cache
-                $this->_deleteFileByUri($elementQueryCacheRecord->cache->uri);
+                $this->_deleteFileByUri($cacheRecord->uri);
 
                 // Delete cache record so we get a fresh element cache table
-                $elementQueryCacheRecord->cache->delete();
+                $cacheRecord->delete();
             }
         }
 

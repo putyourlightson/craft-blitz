@@ -1,4 +1,8 @@
-# Blitz Changelog
+# Changelog
+
+## 1.5.3 - 2018-09-17
+### Fixed
+- Fixed bug that could occur when element query cache records had no existing cache ID
 
 ## 1.5.2 - 2018-09-04
 ### Added
