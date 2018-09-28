@@ -53,7 +53,7 @@ class Blitz extends Plugin
         // Console request
         if ($request->getIsConsoleRequest()) {
             // Add console commands
-            $this->controllerNamespace = 'putyourlightson\blitz\console\controllers';
+            $this->controllerNamespace = __NAMESPACE__.'\console\controllers';
         }
 
         // Cacheable request

@@ -272,7 +272,7 @@ class CacheService extends Component
 
             if ($query === false || in_array($elementId, $query->ids(), true)) {
                 /** @var CacheRecord|null $cache */
-                $cacheRecord = $elementQueryCacheRecord->getCache();
+                $cacheRecord = $elementQueryCacheRecord->getCache()->one();
 
                 if ($cacheRecord === null) {
                     continue;
