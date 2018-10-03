@@ -14,6 +14,10 @@ Although the performance gains depend on the individual site and server setup, t
 
 ![TTFB](docs/images/ttfb-1.2.2.png)  
 
+## License
+
+This plugin requires a commercial license which can be purchased through the Craft Plugin Store. The license fee is $49 plus $19 per subsequent year for updates (optional).
+
 ## Requirements
 
 Craft CMS 3.0.0 or later.
