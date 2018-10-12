@@ -71,7 +71,7 @@ Pages that display the following should in general _not_ be cached:
 
 For improved performance, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. 
 
-In Apache this is achieved with `mod_rewrite` by adding the following to the root .htaccess file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+In Apache this is achieved with `mod_rewrite` by adding the following to the root .htaccess file, just before the rewrites rivided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
     # Blitz cache rewrite
     RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.html -s
