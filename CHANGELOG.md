@@ -1,4 +1,8 @@
-# Changelog
+# Release Notes for Blitz
+
+## 1.5.5 - 2018-11-01
+### Fixed
+- Fixed a bug that originated from leading slashes not being trimmed when matching a URI
 
 ## 1.5.4 - 2018-09-28
 ### Fixed

@@ -462,7 +462,7 @@ class CacheService extends Component
             return false;
         }
 
-        return preg_match('#'.trim($pattern, '/').'#', $uri);
+        return preg_match('#'.trim($pattern, '/').'#', trim($uri, '/'));
     }
 
     /**
