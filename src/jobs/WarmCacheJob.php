@@ -13,7 +13,7 @@ use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use putyourlightson\blitz\Blitz;
 
-class CacheJob extends BaseJob
+class WarmCacheJob extends BaseJob
 {
     // Properties
     // =========================================================================

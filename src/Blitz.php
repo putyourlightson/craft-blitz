@@ -58,17 +58,18 @@ class Blitz extends Plugin
 
         // Cacheable request
         else if ($this->cache->getIsCacheableRequest()) {
-            $uri = $request->getUrl();
+            $uri = $request->getPathInfo();
+            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 
             if ($this->cache->getIsCacheableUri($uri)) {
                 // If cached version exists then output it (assuming this has not already been done server-side)
-                $filePath = $this->cache->uriToFilePath($uri);
+                $filePath = $this->cache->uriToFilePath($siteId, $uri);
                 if (is_file($filePath)) {
                     echo file_get_contents($filePath).'<!-- Served by Blitz -->';
                     exit;
                 }
 
-                $this->_registerCacheableRequestEvents();
+                $this->_registerCacheableRequestEvents($siteId, $uri);
             }
         }
 
@@ -114,28 +115,29 @@ class Blitz extends Plugin
         // Cache elements
         Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
             function(ElementEvent $event) {
-                $this->cache->cacheByElementId($event->element->getId());
+                $this->cache->cacheByElement($event->element);
             }
         );
         Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
             function(MoveElementEvent $event) {
-                $this->cache->cacheByElementId($event->element->getId());
+                $this->cache->cacheByElement($event->element);
             }
         );
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(ElementEvent $event) {
-                $this->cache->cacheByElementId($event->element->getId());
+                $this->cache->cacheByElement($event->element);
             }
         );
     }
 
-    private function _registerCacheableRequestEvents()
+    /**
+     * @param int $siteId
+     * @param string $uri
+     */
+    private function _registerCacheableRequestEvents(int $siteId, string $uri)
     {
-        // We'll need to check if the response is Ok again inside the event functions as it may change throughout the request
+        // We'll need to check if the response is ok again inside the event functions as it may change throughout the request
         $response = Craft::$app->getResponse();
-
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
-        $uri = Craft::$app->getRequest()->getUrl();
 
         // Register element populate event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
@@ -164,9 +166,9 @@ class Blitz extends Plugin
             }
         );
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-            function(TemplateEvent $event) use ($response, $uri) {
+            function(TemplateEvent $event) use ($response, $siteId, $uri) {
                 if ($response->getIsOk()) {
-                    $this->cache->cacheOutput($event->output, $uri);
+                    $this->cache->cacheOutput($event->output, $siteId, $uri);
                 }
             }
         );

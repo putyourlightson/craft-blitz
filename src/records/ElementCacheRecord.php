@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\records;
 
 use craft\db\ActiveRecord;
+use craft\records\Element;
 use yii\db\ActiveQueryInterface;
 
 /**
@@ -37,5 +38,15 @@ class ElementCacheRecord extends ActiveRecord
     public function getCache(): ActiveQueryInterface
     {
         return $this->hasOne(CacheRecord::class, ['id' => 'cacheId']);
+    }
+
+    /**
+     * Returns the associated element
+     *
+     * @return ActiveQueryInterface
+     */
+    public function getElement(): ActiveQueryInterface
+    {
+        return $this->hasOne(Element::class, ['id' => 'elementId']);
     }
 }

@@ -10,13 +10,17 @@ use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
+use craft\elements\GlobalSet;
+use craft\elements\MatrixBlock;
 use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\jobs\CacheJob;
+use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
+use putyourlightson\blitz\jobs\RefreshCacheJob;
+use putyourlightson\blitz\jobs\WarmCacheJob;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -30,6 +34,17 @@ use yii\base\ErrorException;
  */
 class CacheService extends Component
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event RegisterNonCacheableElementTypesEvent
+     */
+    const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
+
+    // Properties
+    // =========================================================================
+
     /**
      * @var bool|null
      */
@@ -37,6 +52,26 @@ class CacheService extends Component
 
     // Public Methods
     // =========================================================================
+
+    /**
+     * Returns non cacheable element types
+     *
+     * @return string[]
+     */
+    public function getNonCacheableElementTypes(): array
+    {
+        $elementTypes = [
+            GlobalSet::class,
+            MatrixBlock::class,
+        ];
+
+        $event = new RegisterNonCacheableElementTypesEvent([
+            'elementTypes' => $elementTypes,
+        ]);
+        $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
+
+        return $event->elementTypes;
+    }
 
     /**
      * Returns whether the request is cacheable
@@ -119,10 +154,11 @@ class CacheService extends Component
     /**
      * Converts URI to file path
      *
+     * @param int $siteId
      * @param string $uri
      * @return string
      */
-    public function uriToFilePath(string $uri): string
+    public function uriToFilePath(int $siteId, string $uri): string
     {
         $cacheFolderPath = $this->getCacheFolderPath();
 
@@ -130,13 +166,18 @@ class CacheService extends Component
             return '';
         }
 
+        // Get the site host and path from the site's base URL
+        $site = Craft::$app->getSites()->getSiteById($siteId);
+        $parsedSiteUrl = parse_url($site->baseUrl);
+        $siteHostPath = trim($parsedSiteUrl['host'].$parsedSiteUrl['path'], '/');
+
         // Replace __home__ with blank string
         $uri = ($uri == '__home__' ? '' : $uri);
 
         // Replace ? with / in URI
         $uri = str_replace('?', '/', $uri);
 
-        return FileHelper::normalizePath($cacheFolderPath.'/'.Craft::$app->getRequest()->getHostName().'/'.$uri.'/index.html');
+        return FileHelper::normalizePath($cacheFolderPath.'/'.$siteHostPath.'/'.$uri.'/index.html');
     }
 
     /**
@@ -148,6 +189,11 @@ class CacheService extends Component
      */
     public function addElementCache(ElementInterface $element, int $siteId, string $uri)
     {
+        // Don't proceed if this is a non cacheable element type
+        if (in_array(get_class($element), $this->getNonCacheableElementTypes(), true)) {
+            return;
+        }
+
         $cacheRecord = $this->_getOrCreateCacheRecord($siteId, $uri);
 
         /** @var Element $element */
@@ -175,6 +221,11 @@ class CacheService extends Component
      */
     public function addElementQueryCache(ElementQuery $elementQuery, int $siteId, string $uri)
     {
+        // Don't proceed if this is a non cacheable element type
+        if (in_array($elementQuery->elementType, $this->getNonCacheableElementTypes(), true)) {
+            return;
+        }
+
         $cacheRecord = $this->_getOrCreateCacheRecord($siteId, $uri);
 
         /** @var Element $element */
@@ -183,7 +234,7 @@ class CacheService extends Component
             'type' => $elementQuery->elementType,
         ];
 
-        // Based on code from includeElementQueryInTemplateCaches method in \craft\servicesTemplateCaches-
+        // Based on code from includeElementQueryInTemplateCaches method in \craft\servicesTemplateCaches
         $query = $elementQuery->query;
         $subQuery = $elementQuery->subQuery;
         $customFields = $elementQuery->customFields;
@@ -215,16 +266,24 @@ class CacheService extends Component
      * Caches the output to a URI
      *
      * @param string $output
+     * @param int $siteId
      * @param string $uri
      */
-    public function cacheOutput(string $output, string $uri)
+    public function cacheOutput(string $output, int $siteId, string $uri)
     {
+        // If the URI represents an element then add it to the element cache
+        $element = Craft::$app->getElements()->getElementByUri($uri, $siteId, true);
+
+        if ($element !== null) {
+            $this->addElementCache($element, $siteId, $uri);
+        }
+
         // Ignore URIs that begin with /index.php
         if (strpos($uri, '/index.php') === 0) {
             return;
         }
 
-        $filePath = $this->uriToFilePath($uri);
+        $filePath = $this->uriToFilePath($siteId, $uri);
 
         if (!empty($filePath)) {
             // Append timestamp
@@ -241,63 +300,32 @@ class CacheService extends Component
     }
 
     /**
-     * Caches by an element ID
+     * Caches by an element
      *
-     * @param int $elementId
+     * @param Element $element
      */
-    public function cacheByElementId(int $elementId)
+    public function cacheByElement(Element $element)
     {
-        $urls = [];
-
-        /** @var ElementCacheRecord[] $elementCacheRecords */
-        $elementCacheRecords = $this->_getElementCacheRecords($elementId);
-
-        foreach ($elementCacheRecords as $elementCacheRecord) {
-            $urls[] = UrlHelper::siteUrl($elementCacheRecord->cache->uri, null, null, $elementCacheRecord->cache->siteId);
-
-            // Delete cached file so we get a fresh file cache
-            $this->_deleteFileByUri($elementCacheRecord->cache->uri);
-
-            // Delete cache record so we get a fresh element cache table
-            $elementCacheRecord->cache->delete();
-        }
-
-        /** @var ElementQueryCacheRecord[] $elementQueryCacheRecords */
-        $elementQueryCacheRecords = $this->_getElementQueryCacheRecords($elementId);
-
-        foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
-            /** @var ElementQuery|false $query */
-            /** @noinspection UnserializeExploitsInspection */
-            $query = @unserialize(base64_decode($elementQueryCacheRecord->query));
-
-            if ($query === false || in_array($elementId, $query->ids(), true)) {
-                /** @var CacheRecord|null $cache */
-                $cacheRecord = $elementQueryCacheRecord->getCache()->one();
-
-                if ($cacheRecord === null) {
-                    continue;
-                }
-
-                $url = UrlHelper::siteUrl($cacheRecord->uri, null, null, $cacheRecord->siteId);
-
-                if (!in_array($url, $urls, true)) {
-                    $urls[] = $url;
-                }
-
-                // Delete cached file so we get a fresh file cache
-                $this->_deleteFileByUri($cacheRecord->uri);
-
-                // Delete cache record so we get a fresh element cache table
-                $cacheRecord->delete();
-            }
-        }
-
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
-        if ($settings->cachingEnabled AND $settings->warmCacheAutomatically AND count($urls) > 0) {
-            Craft::$app->getQueue()->push(new CacheJob(['urls' => $urls]));
+        // Clear and warm the cache if this is a global set element as they are populated on every request
+        if ($element instanceof GlobalSet) {
+            $this->clearCache();
+
+            if ($settings->cachingEnabled AND $settings->warmCacheAutomatically) {
+                $this->warmCache(true);
+            }
+
+            return;
         }
+
+        // Don't proceed if this is a non cacheable element type
+        if (in_array(get_class($element), $this->getNonCacheableElementTypes(), true)) {
+            return;
+        }
+
+        Craft::$app->getQueue()->push(new RefreshCacheJob(['elementId' => $element->id]));
     }
 
     /**
@@ -400,7 +428,7 @@ class CacheService extends Component
         if (count($urls) > 0)
         {
             if ($queue === true ) {
-                Craft::$app->getQueue()->push(new CacheJob(['urls' => $urls]));
+                Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
 
                 return 0;
             }
@@ -419,6 +447,22 @@ class CacheService extends Component
         }
 
         return $count;
+    }
+
+    /**
+     * Deletes a file for a given site and URI
+     *
+     * @param int $siteId
+     * @param string $uri
+     */
+    public function deleteFileByUri(int $siteId, string $uri)
+    {
+        $filePath = $this->uriToFilePath($siteId, $uri);
+
+        // Delete file if it exists
+        if (is_file($filePath)) {
+            @unlink($filePath);
+        }
     }
 
     // Private Methods
@@ -490,52 +534,5 @@ class CacheService extends Component
         }
 
         return $cacheRecord;
-    }
-
-    /**
-     * Returns element cache records for a given element ID
-     *
-     * @param int $elementId
-     * @return ElementCacheRecord[]
-     */
-    private function _getElementCacheRecords(int $elementId): array
-    {
-        return ElementCacheRecord::find()
-            ->select('cacheId')
-            ->with('cache')
-            ->where(['elementId' => $elementId])
-            ->groupBy('cacheId')
-            ->all();
-    }
-
-    /**
-     * Returns element query cache records for a given element ID
-     *
-     * @param int $elementId
-     * @return ElementQueryCacheRecord[]
-     */
-    private function _getElementQueryCacheRecords(int $elementId): array
-    {
-        return ElementQueryCacheRecord::find()
-            ->select('cacheId')
-            ->with('cache')
-            ->where(['type' => Craft::$app->getElements()->getElementTypeById($elementId)])
-            ->groupBy('cacheId')
-            ->all();
-    }
-
-    /**
-     * Deletes a file for a given URI
-     *
-     * @param string $uri
-     */
-    private function _deleteFileByUri(string $uri)
-    {
-        $filePath = $this->uriToFilePath($uri);
-
-        // Delete file if it exists
-        if (is_file($filePath)) {
-            @unlink($filePath);
-        }
     }
 }

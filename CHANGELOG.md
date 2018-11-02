@@ -1,5 +1,13 @@
 # Release Notes for Blitz
 
+## 1.6.0 - 2018-11-02
+###Added
+- Added queue job for refreshing cache based on element changes which can require a lot of processing
+- Added `registerNonCacheableElementTypes` event to `CacheService` class
+
+### Changed
+- Optimised caching tables by not caching global sets or matrix blocks
+
 ## 1.5.5 - 2018-11-01
 ### Fixed
 - Fixed a bug that originated from leading slashes not being trimmed when matching a URI [[#29](https://github.com/putyourlightson/craft-blitz/issues/29)]
