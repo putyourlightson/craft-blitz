@@ -1,7 +1,11 @@
 # Release Notes for Blitz
 
+## 1.6.1 - 2018-11-02
+### Fixed
+- Fixed a site URL alias that was not converted to an absolute URL
+
 ## 1.6.0 - 2018-11-02
-###Added
+### Added
 - Added queue job for refreshing cache based on element changes which can require a lot of processing
 - Added `registerNonCacheableElementTypes` event to `CacheService` class
 

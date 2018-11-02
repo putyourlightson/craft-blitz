@@ -119,4 +119,4 @@ If the HTML file was served by the plugin rather than with a server rewrite then
   
 ---
 
-<small>Created by [PutYourLightsOn](https://www.putyourlightson.net/).</small>
+<small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>
