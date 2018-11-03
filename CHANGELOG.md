@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.6.2 - 2018-11-03
+### Fixed
+- Fixed an error that could occur if no host was found in the site URL
+
 ## 1.6.1 - 2018-11-02
 ### Fixed
 - Fixed a site URL alias that was not converted to an absolute URL

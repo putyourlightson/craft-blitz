@@ -1,7 +1,7 @@
 {
     "name": "putyourlightson/craft-blitz",
     "description": "Intelligent static file caching for creating lightning-fast sites.",
-    "version": "1.6.1",
+    "version": "1.6.2",
     "type": "craft-plugin",
     "homepage": "https://github.com/putyourlightson/craft-blitz",
     "license": "proprietary",

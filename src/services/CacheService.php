@@ -168,8 +168,8 @@ class CacheService extends Component
 
         // Get the site host and path from the site's base URL
         $site = Craft::$app->getSites()->getSiteById($siteId);
-        $parsedSiteUrl = parse_url(Craft::getAlias($site->baseUrl));
-        $siteHostPath = trim($parsedSiteUrl['host'].$parsedSiteUrl['path'], '/');
+        $siteUrl = Craft::getAlias($site->baseUrl);
+        $siteHostPath = preg_replace('/https?:\/\//', '', $siteUrl);
 
         // Replace __home__ with blank string
         $uri = ($uri == '__home__' ? '' : $uri);
