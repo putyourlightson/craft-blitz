@@ -10,8 +10,7 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
- * @property int $siteId
- * @property string $uri
+ * @property int $cacheId
  * @property string $type
  * @property string $query
  * @property CacheRecord $cache

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.6.3 - 2018-11-04
+### Changed
+- Improved performance of cache invalidation in refresh job
+
 ## 1.6.2 - 2018-11-03
 ### Fixed
 - Fixed an error that could occur if no host was found in the site URL

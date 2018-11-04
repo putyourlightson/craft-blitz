@@ -12,9 +12,9 @@ use craft\helpers\UrlHelper;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
+use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
-use yii\db\ActiveQuery;
 
 class RefreshCacheJob extends BaseJob
 {
@@ -38,59 +38,61 @@ class RefreshCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
-        $urls = [];
+        // Get cache IDs to clear
+        $cacheIds = [];
 
-        /** @var ElementCacheRecord[] $elementCacheRecords */
+        // Get element cache records grouped by cache ID
         $elementCacheRecords = ElementCacheRecord::find()
             ->select('cacheId')
-            ->with('cache')
             ->where(['elementId' => $this->elementId])
             ->groupBy('cacheId')
             ->all();
 
+        /** @var ElementCacheRecord[] $elementCacheRecords */
         foreach ($elementCacheRecords as $elementCacheRecord) {
-            $url = UrlHelper::siteUrl($elementCacheRecord->cache->uri, null, null, $elementCacheRecord->cache->siteId);
-
-            if (!in_array($url, $urls, true)) {
-                $urls[] = $url;
+            if (!in_array($elementCacheRecord->cacheId, $cacheIds, true)) {
+                $cacheIds[] = $elementCacheRecord->cacheId;
             }
-
-            // Delete cached file so we get a fresh file cache
-            Blitz::$plugin->cache->deleteFileByUri($elementCacheRecord->cache->siteId, $elementCacheRecord->cache->uri);
-
-            // Delete cache record so we get a fresh element cache table
-            $elementCacheRecord->cache->delete();
         }
 
-        /** @var ElementQueryCacheRecord[] $elementQueryCacheRecords */
+        // Get element query cache records of the element type with a cache ID that has not already been stored
         $elementQueryCacheRecords = ElementQueryCacheRecord::find()
             ->select('cacheId, query')
-            ->with([
-                'cache' => function(ActiveQuery $query) {
-                    $query->select('id, siteId, uri');
-                }
-            ])
-            ->where(['type' => Craft::$app->getElements()->getElementTypeById($this->elementId)])
+            ->where(['not', ['cacheId' => $cacheIds]])
+            ->andWhere(['type' => Craft::$app->getElements()->getElementTypeById($this->elementId)])
             ->all();
 
+        /** @var ElementQueryCacheRecord[] $elementQueryCacheRecords */
         foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
-            /** @var ElementQuery|false $query */
-            /** @noinspection UnserializeExploitsInspection */
-            $query = @unserialize(base64_decode($elementQueryCacheRecord->query));
+            if (!in_array($elementQueryCacheRecord->cacheId, $cacheIds, true)) {
+                /** @var ElementQuery|false $query */
+                /** @noinspection UnserializeExploitsInspection */
+                $query = @unserialize(base64_decode($elementQueryCacheRecord->query));
 
-            if ($query === false || in_array($this->elementId, $query->ids(), true)) {
-                $url = UrlHelper::siteUrl($elementQueryCacheRecord->cache->uri, null, null, $elementQueryCacheRecord->cache->siteId);
-
-                if (!in_array($url, $urls, true)) {
-                    $urls[] = $url;
+                if ($query === false || in_array($this->elementId, $query->ids(), true)) {
+                    $cacheIds[] = $elementQueryCacheRecord->cacheId;
                 }
-
-                // Delete cached file so we get a fresh file cache
-                Blitz::$plugin->cache->deleteFileByUri($elementQueryCacheRecord->cache->siteId, $elementQueryCacheRecord->cache->uri);
-
-                // Delete cache record so we get a fresh element cache table
-                $elementQueryCacheRecord->cache->delete();
             }
+        }
+
+        // Get URLs of caches to clear
+        $urls = [];
+
+        /** @var CacheRecord[] $cacheRecords */
+        $cacheRecords = CacheRecord::find()
+            ->select('id, uri, siteId')
+            ->where(['id' => $cacheIds])
+            ->all();
+
+        foreach ($cacheRecords as $cacheRecord) {
+            $url = UrlHelper::siteUrl($cacheRecord->uri, null, null, $cacheRecord->siteId);
+            $urls[] = $url;
+
+            // Delete cached file so we get a fresh file cache
+            Blitz::$plugin->cache->deleteFileByUri($cacheRecord->siteId, $cacheRecord->uri);
+
+            // Delete cache record so we get a fresh element cache table
+            $cacheRecord->delete();
         }
 
         /** @var SettingsModel $settings */
