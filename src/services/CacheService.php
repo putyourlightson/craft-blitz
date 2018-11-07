@@ -325,6 +325,11 @@ class CacheService extends Component
             return;
         }
 
+        // Delete the cached file immediately if this element has a URI
+        if ($element->uri !== null) {
+            $this->deleteFileByUri($element->siteId, $element->uri);
+        }
+
         Craft::$app->getQueue()->push(new RefreshCacheJob(['elementId' => $element->id]));
     }
 

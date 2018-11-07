@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.6.4 - 2018-11-07
+### Changed
+- Cached files are deleted immediately when elements that have a URI are updated 
+
 ## 1.6.3 - 2018-11-04
 ### Changed
 - Improved performance of cache invalidation in refresh job
