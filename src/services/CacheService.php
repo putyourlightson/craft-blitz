@@ -511,6 +511,11 @@ class CacheService extends Component
             return false;
         }
 
+        // Replace "*" with 0 or more characters as otherwise it'll throw an error
+        if ($pattern == '*') {
+            $pattern = '.*';
+        }
+
         return preg_match('#'.trim($pattern, '/').'#', trim($uri, '/'));
     }
 

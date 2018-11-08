@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.6.5 - Unreleased
+### Fixed
+- Fixed an error that could occur if the URI pattern was set to "`*`"
+
 ## 1.6.4 - 2018-11-07
 ### Changed
 - Cached files are deleted immediately when elements that have a URI are updated 
