@@ -492,7 +492,7 @@ class CacheService extends Component
             return false;
         }
 
-        if (!$settings->queryStringCachingEnabled && $request->getQueryString() !== '') {
+        if (!$settings->queryStringCachingEnabled && $request->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
