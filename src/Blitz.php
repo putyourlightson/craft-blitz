@@ -50,14 +50,8 @@ class Blitz extends Plugin
         // Register services as components
         $this->setComponents(['cache' => CacheService::class]);
 
-        // Console request
-        if ($request->getIsConsoleRequest()) {
-            // Add console commands
-            $this->controllerNamespace = __NAMESPACE__.'\console\controllers';
-        }
-
         // Cacheable request
-        else if ($this->cache->getIsCacheableRequest()) {
+        if ($this->cache->getIsCacheableRequest()) {
             $uri = $request->getPathInfo();
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 

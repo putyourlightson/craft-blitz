@@ -100,10 +100,6 @@ class CacheService extends Component
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
-        if (!$settings->queryStringCachingEnabled && mb_strpos($uri, '?') !== false) {
-            return false;
-        }
-
         // Excluded URI patterns take priority
         if (is_array($settings->excludedUriPatterns)) {
             foreach ($settings->excludedUriPatterns as $excludedUriPattern) {
@@ -302,9 +298,9 @@ class CacheService extends Component
     /**
      * Caches by an element
      *
-     * @param Element $element
+     * @param ElementInterface $element
      */
-    public function cacheByElement(Element $element)
+    public function cacheByElement(ElementInterface $element)
     {
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
@@ -326,6 +322,7 @@ class CacheService extends Component
         }
 
         // Delete the cached file immediately if this element has a URI
+        /** @var Element $element */
         if ($element->uri !== null) {
             $this->deleteFileByUri($element->siteId, $element->uri);
         }
@@ -492,6 +489,10 @@ class CacheService extends Component
         $settings = Blitz::$plugin->getSettings();
 
         if (!$settings->cachingEnabled) {
+            return false;
+        }
+
+        if (!$settings->queryStringCachingEnabled && $request->getQueryString() !== '') {
             return false;
         }
 

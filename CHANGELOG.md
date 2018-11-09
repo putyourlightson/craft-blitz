@@ -1,7 +1,8 @@
 # Release Notes for Blitz
 
-## 1.6.5 - Unreleased
+## 1.6.5 - 2018-11-09
 ### Fixed
+- Fixed a bug when checking whether URLs with query strings should cached 
 - Fixed an error that could occur if the URI pattern was set to "`*`"
 
 ## 1.6.4 - 2018-11-07
