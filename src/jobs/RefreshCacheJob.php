@@ -66,8 +66,7 @@ class RefreshCacheJob extends BaseJob
         foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
             if (!in_array($elementQueryCacheRecord->cacheId, $cacheIds, true)) {
                 /** @var ElementQuery|false $query */
-                /** @noinspection UnserializeExploitsInspection */
-                $query = @unserialize(base64_decode($elementQueryCacheRecord->query));
+                $query = unserialize(base64_decode($elementQueryCacheRecord->query));
 
                 if ($query === false || in_array($this->elementId, $query->ids(), true)) {
                     $cacheIds[] = $elementQueryCacheRecord->cacheId;

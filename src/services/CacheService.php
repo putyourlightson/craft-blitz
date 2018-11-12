@@ -466,7 +466,7 @@ class CacheService extends Component
 
         // Delete file if it exists
         if (is_file($filePath)) {
-            @unlink($filePath);
+            unlink($filePath);
         }
     }
 
