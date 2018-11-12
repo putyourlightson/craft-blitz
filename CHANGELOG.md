@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.6.7 - 2018-11-12
+### Fixed
+- Fixed caching and invalidation of URIs with query strings
+
 ## 1.6.6 - 2018-11-09
 ### Fixed
 - Fixed a bug introduced in 1.6.5

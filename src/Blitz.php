@@ -52,7 +52,7 @@ class Blitz extends Plugin
 
         // Cacheable request
         if ($this->cache->getIsCacheableRequest()) {
-            $uri = $request->getPathInfo();
+            $uri = $request->getUrl();
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 
             if ($this->cache->getIsCacheableUri($uri)) {

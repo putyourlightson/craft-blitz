@@ -267,8 +267,11 @@ class CacheService extends Component
      */
     public function cacheOutput(string $output, int $siteId, string $uri)
     {
-        // If the URI represents an element then add it to the element cache
-        $element = Craft::$app->getElements()->getElementByUri($uri, $siteId, true);
+        // Get the URI path
+        $uriPath = preg_replace('/\?.*/', '', $uri);
+
+        // If the URI path represents an element then add the full URI to the element cache
+        $element = Craft::$app->getElements()->getElementByUri(trim($uriPath, '/'), $siteId, true);
 
         if ($element !== null) {
             $this->addElementCache($element, $siteId, $uri);
