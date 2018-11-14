@@ -52,8 +52,13 @@ class Blitz extends Plugin
 
         // Cacheable request
         if ($this->cache->getIsCacheableRequest()) {
-            $uri = $request->getUrl();
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+
+            // Get URI from path info and query string without path
+            $uri = $request->getPathInfo().'?'.$request->getQueryStringWithoutPath();
+
+            // Trim question mark in case query string was empty
+            $uri = trim($uri, '?');
 
             if ($this->cache->getIsCacheableUri($uri)) {
                 // If cached version exists then output it (assuming this has not already been done server-side)

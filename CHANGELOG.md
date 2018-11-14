@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.6.8 - 2018-11-14
+### Fixed
+- Fixed a bug that affected sites with locale/language segments in the base URL
+
 ## 1.6.7 - 2018-11-12
 ### Fixed
 - Fixed caching and invalidation of URIs with query strings
