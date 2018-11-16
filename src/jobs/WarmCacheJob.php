@@ -46,7 +46,7 @@ class WarmCacheJob extends BaseJob
             $this->setProgress($queue, $count / $totalElements);
             $count++;
 
-            $client = new Client();
+            $client = Craft::createGuzzleClient();
 
             try {
                 $client->get($url);

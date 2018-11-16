@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 1.6.9 - Unreleased
+### Changed
+- Optimised caching process to speed up initial page load time
+- Changed Guzzle client to use default config values
+
 ## 1.6.8 - 2018-11-14
 ### Fixed
 - Fixed a bug that affected sites with locale/language segments in the base URL

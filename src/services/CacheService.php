@@ -14,7 +14,6 @@ use craft\elements\GlobalSet;
 use craft\elements\MatrixBlock;
 use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\RequestException;
 use putyourlightson\blitz\Blitz;
@@ -46,32 +45,22 @@ class CacheService extends Component
     // =========================================================================
 
     /**
-     * @var bool|null
+     * @var string|null
      */
-    private $_isCacheableRequest;
+    private $_cacheFolderPath;
+
+    /**
+     * @var array|null
+     */
+    private $_nonCacheableElementTypes;
+
+    /**
+     * @var array|null
+     */
+    private $_filePaths;
 
     // Public Methods
     // =========================================================================
-
-    /**
-     * Returns non cacheable element types
-     *
-     * @return string[]
-     */
-    public function getNonCacheableElementTypes(): array
-    {
-        $elementTypes = [
-            GlobalSet::class,
-            MatrixBlock::class,
-        ];
-
-        $event = new RegisterNonCacheableElementTypesEvent([
-            'elementTypes' => $elementTypes,
-        ]);
-        $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
-
-        return $event->elementTypes;
-    }
 
     /**
      * Returns whether the request is cacheable
@@ -80,13 +69,26 @@ class CacheService extends Component
      */
     public function getIsCacheableRequest(): bool
     {
-        if ($this->_isCacheableRequest !== null) {
-            return $this->_isCacheableRequest;
+        $request = Craft::$app->getRequest();
+        $response = Craft::$app->getResponse();
+
+        // Ensure this is a front-end get that is not a console request or an action request or live preview and returns status 200
+        if (!$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsLivePreview() || !$response->getIsOk()) {
+            return false;
         }
 
-        $this->_isCacheableRequest = $this->_checkIsCacheableRequest();
+        /** @var SettingsModel $settings */
+        $settings = Blitz::$plugin->getSettings();
 
-        return $this->_isCacheableRequest;
+        if (!$settings->cachingEnabled) {
+            return false;
+        }
+
+        if (!$settings->queryStringCachingEnabled && $request->getQueryStringWithoutPath() !== '') {
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -137,25 +139,62 @@ class CacheService extends Component
      */
     public function getCacheFolderPath(): string
     {
+        if ($this->_cacheFolderPath !== null) {
+            return $this->_cacheFolderPath;
+        }
+
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
         if (empty($settings->cacheFolderPath)) {
-            return '';
+            $this->_cacheFolderPath = '';
+        }
+        else {
+            $this->_cacheFolderPath = FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
         }
 
-        return FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
+        return $this->_cacheFolderPath;
     }
 
     /**
-     * Converts URI to file path
+     * Returns non cacheable element types
+     *
+     * @return string[]
+     */
+    public function getNonCacheableElementTypes(): array
+    {
+        if ($this->_nonCacheableElementTypes !== null) {
+            return $this->_nonCacheableElementTypes;
+        }
+
+        $elementTypes = [
+            GlobalSet::class,
+            MatrixBlock::class,
+        ];
+
+        $event = new RegisterNonCacheableElementTypesEvent([
+            'elementTypes' => $elementTypes,
+        ]);
+        $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
+
+        $this->_nonCacheableElementTypes = $event->elementTypes;
+
+        return $this->_nonCacheableElementTypes;
+    }
+
+    /**
+     * Returns file path from provided site ID and URI
      *
      * @param int $siteId
      * @param string $uri
      * @return string
      */
-    public function uriToFilePath(int $siteId, string $uri): string
+    public function getFilePath(int $siteId, string $uri): string
     {
+        if (!empty($this->_filePaths[$siteId][$uri])) {
+            return $this->_filePaths[$siteId][$uri];
+        }
+
         $cacheFolderPath = $this->getCacheFolderPath();
 
         if ($cacheFolderPath == '') {
@@ -173,7 +212,9 @@ class CacheService extends Component
         // Replace ? with / in URI
         $uri = str_replace('?', '/', $uri);
 
-        return FileHelper::normalizePath($cacheFolderPath.'/'.$siteHostPath.'/'.$uri.'/index.html');
+        $this->_filePaths[$siteId][$uri] = FileHelper::normalizePath($cacheFolderPath.'/'.$siteHostPath.'/'.$uri.'/index.html');
+
+        return $this->_filePaths[$siteId][$uri];
     }
 
     /**
@@ -190,11 +231,11 @@ class CacheService extends Component
             return;
         }
 
-        $cacheRecord = $this->_getOrCreateCacheRecord($siteId, $uri);
+        $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
 
         /** @var Element $element */
         $values = [
-            'cacheId' => $cacheRecord->id,
+            'cacheId' => $cacheId,
             'elementId' => $element->id,
         ];
 
@@ -222,11 +263,11 @@ class CacheService extends Component
             return;
         }
 
-        $cacheRecord = $this->_getOrCreateCacheRecord($siteId, $uri);
+        $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
 
         /** @var Element $element */
         $values = [
-            'cacheId' => $cacheRecord->id,
+            'cacheId' => $cacheId,
             'type' => $elementQuery->elementType,
         ];
 
@@ -282,7 +323,7 @@ class CacheService extends Component
             return;
         }
 
-        $filePath = $this->uriToFilePath($siteId, $uri);
+        $filePath = $this->getFilePath($siteId, $uri);
 
         if (!empty($filePath)) {
             // Append timestamp
@@ -438,7 +479,7 @@ class CacheService extends Component
                 return 0;
             }
 
-            $client = new Client();
+            $client = Craft::createGuzzleClient();
 
             foreach ($urls as $url) {
                 try {
@@ -462,7 +503,7 @@ class CacheService extends Component
      */
     public function deleteFileByUri(int $siteId, string $uri)
     {
-        $filePath = $this->uriToFilePath($siteId, $uri);
+        $filePath = $this->getFilePath($siteId, $uri);
 
         // Delete file if it exists
         if (is_file($filePath)) {
@@ -472,35 +513,6 @@ class CacheService extends Component
 
     // Private Methods
     // =========================================================================
-
-    /**
-     * Checks if the request is cacheable
-     *
-     * @return bool
-     */
-    private function _checkIsCacheableRequest(): bool
-    {
-        $request = Craft::$app->getRequest();
-        $response = Craft::$app->getResponse();
-
-        // Ensure this is a front-end get that is not a console request or an action request or live preview and returns status 200
-        if (!$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsLivePreview() || !$response->getIsOk()) {
-            return false;
-        }
-
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
-
-        if (!$settings->cachingEnabled) {
-            return false;
-        }
-
-        if (!$settings->queryStringCachingEnabled && $request->getQueryStringWithoutPath() !== '') {
-            return false;
-        }
-
-        return true;
-    }
 
     /**
      * Matches a URI pattern
@@ -524,13 +536,14 @@ class CacheService extends Component
     }
 
     /**
-     * Returns a cache record or creates it if it doesn't exist
+     * Returns a cache record ID or creates it if it doesn't exist
      *
      * @param int $siteId
      * @param string $uri
-     * @return CacheRecord
+     *
+     * @return int
      */
-    private function _getOrCreateCacheRecord(int $siteId, string $uri): CacheRecord
+    private function _getOrCreateCacheId(int $siteId, string $uri): int
     {
         $values = [
             'siteId' => $siteId,
@@ -547,6 +560,6 @@ class CacheService extends Component
             $cacheRecord->save();
         }
 
-        return $cacheRecord;
+        return $cacheRecord->id;
     }
 }
