@@ -56,7 +56,7 @@ class Blitz extends Plugin
 
             // Get URI from absolute path with the site base URL removed
             $url = $request->getAbsoluteUrl();
-            $uri = str_replace(Craft::alias($site->baseUrl), '', $url);
+            $uri = str_replace(Craft::getAlias($site->baseUrl), '', $url);
 
             // Trim slashes from the beginning and end of the URI
             $uri = trim($uri, '/');
