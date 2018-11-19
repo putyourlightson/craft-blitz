@@ -54,8 +54,8 @@ class Blitz extends Plugin
         if ($this->cache->getIsCacheableRequest()) {
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 
-            // Get URI from path info and query string without path
-            $uri = $request->getPathInfo().'?'.$request->getQueryStringWithoutPath();
+            // Get URI from full path and query string without path
+            $uri = $request->getFullPath().'?'.$request->getQueryStringWithoutPath();
 
             // Trim question mark in case query string was empty
             $uri = trim($uri, '?');
