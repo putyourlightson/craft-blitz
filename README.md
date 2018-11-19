@@ -84,9 +84,7 @@ In Nginx this is achieved by adding a location handler to the configuration file
 
     # Blitz cache rewrite
     location / {
-      if ($request_method = GET) {
-        try_files $uri /cache/blitz/$http_host/$uri/$args/index.html;
-      }
+      try_files /cache/blitz/$http_host/$uri/$args/index.html;
     }
     
     # Send would-be 404 requests to Craft
