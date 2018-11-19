@@ -1,9 +1,13 @@
 # Release Notes for Blitz
 
-## 1.6.9 - Unreleased
+## 1.6.9 - 2018-11-19
 ### Changed
 - Optimised caching process to speed up initial page load time
 - Changed Guzzle client to use default config values
+
+### Fixed
+- Fixed a bug with caching paginated pages
+
 
 ## 1.6.8 - 2018-11-14
 ### Fixed
