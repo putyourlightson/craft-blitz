@@ -52,23 +52,24 @@ class Blitz extends Plugin
 
         // Cacheable request
         if ($this->cache->getIsCacheableRequest()) {
-            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+            $site = Craft::$app->getSites()->getCurrentSite();
 
-            // Get URI from full path and query string without path
-            $uri = $request->getFullPath().'?'.$request->getQueryStringWithoutPath();
+            // Get URI from absolute path with the site base URL removed
+            $url = $request->getAbsoluteUrl();
+            $uri = str_replace(Craft::alias($site->baseUrl), '', $url);
 
-            // Trim question mark in case query string was empty
-            $uri = trim($uri, '?');
+            // Trim slashes from the beginning and end of the URI
+            $uri = trim($uri, '/');
 
             if ($this->cache->getIsCacheableUri($uri)) {
                 // If cached version exists then output it (assuming this has not already been done server-side)
-                $filePath = $this->cache->getFilePath($siteId, $uri);
+                $filePath = $this->cache->getFilePath($site->id, $uri);
                 if (is_file($filePath)) {
                     echo file_get_contents($filePath).'<!-- Served by Blitz -->';
                     exit;
                 }
 
-                $this->_registerCacheableRequestEvents($siteId, $uri);
+                $this->_registerCacheableRequestEvents($site->id, $uri);
             }
         }
 
