@@ -57,17 +57,20 @@ class CacheController extends Controller
         $urls = Blitz::$plugin->cache->prepareWarmCacheUrls();
         $total = count($urls);
         $count = 0;
+        $errors = 0;
 
         $client = Craft::createGuzzleClient();
 
-        $this->stdout(Craft::t('blitz', 'Warming Blitz cache with {total} files – this may take some time.', ['total' => $total]).PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Warming {total} files in Blitz cache.', ['total' => $total]).PHP_EOL, Console::FG_GREEN);
 
         Console::startProgress(0, $total);
 
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http
             if (strpos($url, 'http') !== 0) {
-                $this->stdout(Craft::t('blitz', 'The URL "{url}" does not begin with "http", ignoring.', ['url' => $url]).PHP_EOL, Console::FG_RED);
+                $errors++;
+
+                $this->stdout(Craft::t('blitz', 'The URL "{url}" does not begin with "http", ignoring.', ['url' => $url]).PHP_EOL);
 
                 continue;
             }
@@ -84,6 +87,10 @@ class CacheController extends Controller
         }
 
         Console::endProgress();
+
+        if ($errors > 0) {
+            $this->stdout(Craft::t('blitz', 'One or more URLs were ignored. Please ensure that your site’s base URLs do not use the @web alias.').PHP_EOL, Console::FG_RED);
+        }
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {count} files.', ['count' => $count]).PHP_EOL, Console::FG_GREEN);
     }
