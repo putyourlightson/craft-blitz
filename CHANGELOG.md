@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.7.0 - Unreleased
+### Added 
+- Added progress bar to warm cache console command
+
 ## 1.6.9 - 2018-11-19
 ### Changed
 - Optimised caching process to speed up initial page load time

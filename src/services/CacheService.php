@@ -14,8 +14,6 @@ use craft\elements\GlobalSet;
 use craft\elements\MatrixBlock;
 use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
@@ -351,10 +349,10 @@ class CacheService extends Component
 
         // Clear and warm the cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
-            $this->clearCache();
+            $this->clearFileCache();
 
             if ($settings->cachingEnabled AND $settings->warmCacheAutomatically) {
-                $this->warmCache(true);
+                Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $this->prepareWarmCacheUrls()]));
             }
 
             return;
@@ -375,9 +373,9 @@ class CacheService extends Component
     }
 
     /**
-     * Clears all cache
+     * Clears file cache
      */
-    public function clearCache()
+    public function clearFileCache()
     {
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
@@ -407,21 +405,20 @@ class CacheService extends Component
     }
 
     /**
-     * Warms cache
+     * Prepares cache for warming and returns URLS to warm
      *
-     * @param bool $queue
-     * @return int
+     * @return string[]
      */
-    public function warmCache(bool $queue = false): int
+    public function prepareWarmCacheUrls(): array
     {
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
         if (empty($settings->cacheFolderPath)) {
-            return 0;
+            return [];
         }
 
-        $this->clearCache();
+        $this->clearFileCache();
 
         $count = 0;
         $urls = [];
@@ -471,28 +468,7 @@ class CacheService extends Component
             }
         }
 
-        if (count($urls) > 0)
-        {
-            if ($queue === true ) {
-                Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
-
-                return 0;
-            }
-
-            $client = Craft::createGuzzleClient();
-
-            foreach ($urls as $url) {
-                try {
-                    $response = $client->get($url);
-
-                    $count++;
-                }
-                catch (ClientException $e) {}
-                catch (RequestException $e) {}
-            }
-        }
-
-        return $count;
+        return $urls;
     }
 
     /**

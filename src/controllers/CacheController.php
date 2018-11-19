@@ -10,6 +10,7 @@ use craft\errors\MissingComponentException;
 use craft\helpers\FileHelper;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\jobs\WarmCacheJob;
 use putyourlightson\blitz\models\SettingsModel;
 use yii\base\ErrorException;
 use yii\web\BadRequestHttpException;
@@ -49,7 +50,7 @@ class CacheController extends Controller
             }
         }
         else {
-            Blitz::$plugin->cache->clearCache();
+            Blitz::$plugin->cache->clearFileCache();
         }
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully cleared.'));
@@ -81,7 +82,7 @@ class CacheController extends Controller
             return $this->redirectToPostedUrl();
         }
 
-        $count = Blitz::$plugin->cache->warmCache(true);
+        Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->prepareWarmCacheUrls()]));
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully queued for warming.'));
 

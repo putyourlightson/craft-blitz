@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\jobs;
 use Craft;
 use craft\helpers\App;
 use craft\queue\BaseJob;
-use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\ConnectException;
 use putyourlightson\blitz\Blitz;
