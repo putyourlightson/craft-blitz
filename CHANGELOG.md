@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.7.1 - 2018-11-20
+### Fixed 
+- Fixed info text for URI patterns
+
 ## 1.7.0 - 2018-11-20
 ### Added 
 - Added multi-site functionality to URI pattern matching ([#39](https://github.com/putyourlightson/craft-blitz/issues/39))
