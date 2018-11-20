@@ -1,7 +1,8 @@
 # Release Notes for Blitz
 
-## 1.7.0 - Unreleased
+## 1.7.0 - 2018-11-20
 ### Added 
+- Added multi-site functionality to URI pattern matching 
 - Added progress bar to warm cache console command
 
 ## 1.6.9 - 2018-11-19

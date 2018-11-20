@@ -44,7 +44,7 @@
 }) }}
 
 {% set info %}
-{{ 'Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}
+{{ 'The URI pattern relative to the sites Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}
 
 - `.` Matches any character
 - `.*` Matches any character 0 or more times
@@ -56,6 +56,30 @@
 - `^entries/entry$` Matches exact URI
 {% endset %}
 
+{% set cols = [
+	{
+		type: 'text',
+		heading: 'URI Pattern'|t('blitz'),
+		info: info,
+	}
+] %}
+
+{% if craft.app.getIsMultiSite() %}
+	{% set siteOptions = [{value: '', label: 'All Sites'|t('blitz')}] %}
+	{% for site in craft.app.sites.getAllSites() %}
+		{% set siteOptions = siteOptions|merge([{value: site.id, label: site.name}]) %}
+	{% endfor %}
+
+	{% set cols = cols|merge([
+		{
+			type: 'select',
+			heading: 'Site'|t('blitz'),
+			info: 'The site that the URI pattern should be applied to.'|t('blitz'),
+			options: siteOptions,
+		}
+	]) %}
+{% endif %}
+
 <input type="hidden" name="includedUriPatterns" value="" />
 {{ forms.editableTableField({
 	label: "Included URI Patterns"|t('blitz'),
@@ -63,13 +87,7 @@
     warning: (config.cachingEnabled is defined ? configWarning('includedUriPatterns')),
     name: 'includedUriPatterns',
     id: 'includedUriPatterns',
-	cols: [
-		{
-			type: 'text',
-			heading: 'URI Pattern'|t('blitz'),
-            info: info,
-		},
-	],
+	cols: cols,
 	rows: settings.includedUriPatterns,
 	addRowLabel: "Add a URI pattern"|t('blitz'),
 }) }}
@@ -77,17 +95,11 @@
 <input type="hidden" name="excludedUriPatterns" value="" />
 {{ forms.editableTableField({
 	label: "Excluded URI Patterns"|t('blitz'),
-	instructions: "The URI patterns to exclude from static file caching. This will override any matching patterns to include."|t('blitz'),
+	instructions: "The URI patterns to exclude from static file caching (overrides any matching patterns to include)."|t('blitz'),
     warning: (config.cachingEnabled is defined ? configWarning('excludedUriPatterns')),
     name: 'excludedUriPatterns',
     id: 'excludedUriPatterns',
-	cols: [
-		{
-			type: 'text',
-			heading: 'URI Pattern'|t('blitz'),
-            info: info,
-		},
-	],
+	cols: cols,
 	rows: settings.excludedUriPatterns,
 	addRowLabel: "Add a URI pattern"|t('blitz'),
 }) }}

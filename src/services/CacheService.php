@@ -92,10 +92,12 @@ class CacheService extends Component
     /**
      * Returns whether the URI is cacheable
      *
+     * @param int $siteId
      * @param string $uri
+     *
      * @return bool
      */
-    public function getIsCacheableUri(string $uri): bool
+    public function getIsCacheableUri(int $siteId, string $uri): bool
     {
         /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
@@ -103,12 +105,7 @@ class CacheService extends Component
         // Excluded URI patterns take priority
         if (is_array($settings->excludedUriPatterns)) {
             foreach ($settings->excludedUriPatterns as $excludedUriPattern) {
-                // Normalize to string
-                if (is_array($excludedUriPattern)) {
-                    $excludedUriPattern = $excludedUriPattern[0];
-                }
-
-                if ($this->_matchUriPattern($excludedUriPattern, $uri)) {
+                if ($this->_matchUriPattern($excludedUriPattern, $siteId, $uri)) {
                     return false;
                 }
             }
@@ -116,12 +113,7 @@ class CacheService extends Component
 
         if (is_array($settings->includedUriPatterns)) {
             foreach ($settings->includedUriPatterns as $includedUriPattern) {
-                // Normalize to string
-                if (is_array($includedUriPattern)) {
-                    $includedUriPattern = $includedUriPattern[0];
-                }
-
-                if ($this->_matchUriPattern($includedUriPattern, $uri)) {
+                if ($this->_matchUriPattern($includedUriPattern, $siteId, $uri)) {
                     return true;
                 }
             }
@@ -431,7 +423,7 @@ class CacheService extends Component
 
         /** @var CacheRecord $cacheRecord */
         foreach ($cacheRecords as $cacheRecord) {
-            if ($this->getIsCacheableUri($cacheRecord->uri)) {
+            if ($this->getIsCacheableUri($cacheRecord->siteId, $cacheRecord->uri)) {
                 $urls[] = UrlHelper::siteUrl($cacheRecord->uri, null, null, $cacheRecord->siteId);
             }
 
@@ -456,7 +448,7 @@ class CacheService extends Component
                         $uri = trim($element->uri, '/');
                         $uri = ($uri == '__home__' ? '' : $uri);
 
-                        if ($uri !== null && $this->getIsCacheableUri($uri)) {
+                        if ($uri !== null && $this->getIsCacheableUri($site->id, $uri)) {
                             $url = $element->getUrl();
 
                             if ($url !== null && !in_array($url, $urls, true)) {
@@ -493,22 +485,31 @@ class CacheService extends Component
     /**
      * Matches a URI pattern
      *
-     * @param string $pattern
+     * @param array $pattern
+     * @param int $siteId
      * @param string $uri
+     *
      * @return bool
      */
-    private function _matchUriPattern(string $pattern, string $uri): bool
+    private function _matchUriPattern(array $pattern, int $siteId, string $uri): bool
     {
-        if ($pattern == '') {
+        // Return false if site is not empty and does not match the provided site ID
+        if (!empty($pattern[1]) && $pattern[1] != $siteId) {
+            return false;
+        }
+
+        $uriPattern = $pattern[0];
+
+        if ($uriPattern == '') {
             return false;
         }
 
         // Replace "*" with 0 or more characters as otherwise it'll throw an error
-        if ($pattern == '*') {
-            $pattern = '.*';
+        if ($uriPattern == '*') {
+            $uriPattern = '.*';
         }
 
-        return preg_match('#'.trim($pattern, '/').'#', trim($uri, '/'));
+        return preg_match('#'.trim($uriPattern, '/').'#', trim($uri, '/'));
     }
 
     /**

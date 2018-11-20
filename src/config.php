@@ -30,9 +30,9 @@ return [
     // The relative path to your cache folder from your public webroot.
     //'cacheFolderPath' => 'cache/blitz',
 
-    // The URI patterns to include in static file caching.
-    //'includedUriPatterns' => [["pages/.*"], ["articles/.*"]],
+    // The URI patterns to include in static file caching. The second variable represents a site ID, or a blank string for all sites.
+    //'includedUriPatterns' => [["pages/.*","1"], ["articles/.*","2"]],
 
-    // The URI patterns to exclude from static file caching. This will override any matching patterns to include.
-    //'excludedUriPatterns' => [["contact"]],
+    // The URI patterns to exclude from static file caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
+    //'excludedUriPatterns' => [["contact",""]],
 ];

@@ -61,7 +61,7 @@ class Blitz extends Plugin
             // Trim slashes from the beginning and end of the URI
             $uri = trim($uri, '/');
 
-            if ($this->cache->getIsCacheableUri($uri)) {
+            if ($this->cache->getIsCacheableUri($site->id,$uri)) {
                 // If cached version exists then output it (assuming this has not already been done server-side)
                 $filePath = $this->cache->getFilePath($site->id, $uri);
                 if (is_file($filePath)) {
