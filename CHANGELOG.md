@@ -2,7 +2,7 @@
 
 ## 1.7.0 - 2018-11-20
 ### Added 
-- Added multi-site functionality to URI pattern matching 
+- Added multi-site functionality to URI pattern matching ([#39](https://github.com/putyourlightson/craft-blitz/issues/39))
 - Added progress bar to warm cache console command
 
 ## 1.6.9 - 2018-11-19
