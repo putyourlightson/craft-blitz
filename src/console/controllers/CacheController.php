@@ -7,8 +7,8 @@ namespace putyourlightson\blitz\console\controllers;
 
 use Craft;
 use craft\helpers\Console;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 use yii\console\Controller;
@@ -59,32 +59,43 @@ class CacheController extends Controller
         $count = 0;
         $success = 0;
         $urlErrors = false;
-
         $client = Craft::createGuzzleClient();
+        $requests = [];
 
-        $this->stdout(Craft::t('blitz', 'Warming Blitz cache.', ['total' => $total]).PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
         Console::startProgress(0, $total, '', 0.8);
 
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http
             if (strpos($url, 'http') === 0) {
-                try {
-                    $response = $client->get($url);
-                    $success++;
-                }
-                catch (ClientException $e) {}
-                catch (RequestException $e) {}
+                $requests[] = new Request('GET', $url);
             }
             else {
                 $urlErrors = true;
+                $count++;
+                Console::updateProgress($count, $total);
             }
-
-            $count++;
-
-            Console::updateProgress($count, $total);
         }
 
+        // Create a pool of requests for sending multiple concurrent requests
+        $pool = new Pool($client, $requests, [
+            'concurrency' => $settings->concurrency,
+            'fulfilled' => function () use (&$success, &$count, $total) {
+                $success++;
+                $count++;
+                Console::updateProgress($count, $total);
+            },
+            'rejected' => function () use (&$count, $total) {
+                $count++;
+                Console::updateProgress($count, $total);
+            },
+        ]);
+
+        // Initiate the transfers and wait for the pool of requests to complete
+        $pool->promise()->wait();
+
+        Console::updateProgress($total, $total);
         Console::endProgress();
 
         if ($urlErrors) {

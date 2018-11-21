@@ -15,6 +15,7 @@
     warning: (config.cachingEnabled is defined ? configWarning('cachingEnabled')),
 	name: 'cachingEnabled',
 	on: settings.cachingEnabled,
+	required: true,
     first: true,
 }) }}
 
@@ -24,6 +25,7 @@
     warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
 	name: 'warmCacheAutomatically',
 	on: settings.warmCacheAutomatically,
+	required: true,
 }) }}
 
 {{ forms.lightswitchField({
@@ -32,6 +34,7 @@
     warning: (config.queryStringCachingEnabled is defined ? configWarning('queryStringCachingEnabled')),
 	name: 'queryStringCachingEnabled',
 	on: settings.queryStringCachingEnabled,
+	required: true,
 }) }}
 
 {{ forms.textField({
@@ -40,7 +43,24 @@
     warning: (config.cachingEnabled is defined ? configWarning('cacheFolderPath')),
 	name: 'cacheFolderPath',
 	value: settings.cacheFolderPath,
+	errors: settings.getErrors('cacheFolderPath'),
 	placeholder: 'cache/blitz',
+	required: true,
+}) }}
+
+{% set info %}
+	<span class="info">{{ "The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended."|t('blitz') }}</span>
+{% endset %}
+{{ forms.textField({
+	type: 'number',
+	unit: "concurrent requests."|t('blitz'),
+	label: "Concurrency"|t('blitz'),
+	instructions: "The max number of multiple concurrent requests to use when warming the cache."|t('blitz') ~ info,
+	warning: (config.cachingEnabled is defined ? configWarning('concurrency')),
+	name: 'concurrency',
+	value: settings.concurrency,
+	errors: settings.getErrors('concurrency'),
+	required: true,
 }) }}
 
 {% set info %}

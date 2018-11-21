@@ -8,8 +8,8 @@ namespace putyourlightson\blitz\jobs;
 use Craft;
 use craft\helpers\App;
 use craft\queue\BaseJob;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
 
 class WarmCacheJob extends BaseJob
@@ -32,27 +32,38 @@ class WarmCacheJob extends BaseJob
      */
     public function execute($queue)
     {
-        if (!Blitz::$plugin->getSettings()->cachingEnabled) {
+        $settings = Blitz::$plugin->getSettings();
+
+        if (!$settings->cachingEnabled) {
             return;
         }
 
         App::maxPowerCaptain();
 
-        $totalElements = count($this->urls);
+        $total = count($this->urls);
         $count = 0;
+        $client = Craft::createGuzzleClient();
+        $requests = [];
 
         foreach ($this->urls as $url) {
-            $this->setProgress($queue, $count / $totalElements);
-            $count++;
-
-            $client = Craft::createGuzzleClient();
-
-            try {
-                $client->get($url);
-            }
-            catch (ClientException $exception) {}
-            catch (ConnectException $exception) {}
+            $requests[] = new Request('GET', $url);
         }
+
+        // Create a pool of requests for sending multiple concurrent requests
+        $pool = new Pool($client, $requests, [
+            'concurrency' => $settings->concurrency,
+            'fulfilled' => function () use (&$queue, &$count, $total) {
+                $count++;
+                $this->setProgress($queue, $count / $total);
+            },
+            'rejected' => function () use (&$queue, &$count, $total) {
+                $count++;
+                $this->setProgress($queue, $count / $total);
+            },
+        ]);
+
+        // Initiate the transfers and wait for the pool of requests to complete
+        $pool->promise()->wait();
     }
 
     // Protected Methods

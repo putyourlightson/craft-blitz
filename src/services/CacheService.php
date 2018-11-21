@@ -43,6 +43,11 @@ class CacheService extends Component
     // =========================================================================
 
     /**
+     * @var SettingsModel
+     */
+    private $_settings;
+
+    /**
      * @var string|null
      */
     private $_cacheFolderPath;
@@ -59,6 +64,11 @@ class CacheService extends Component
 
     // Public Methods
     // =========================================================================
+
+    public function init()
+    {
+        parent::init();
+    }
 
     /**
      * Returns whether the request is cacheable
@@ -99,20 +109,17 @@ class CacheService extends Component
      */
     public function getIsCacheableUri(int $siteId, string $uri): bool
     {
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
-
         // Excluded URI patterns take priority
-        if (is_array($settings->excludedUriPatterns)) {
-            foreach ($settings->excludedUriPatterns as $excludedUriPattern) {
+        if (is_array($this->_settings->excludedUriPatterns)) {
+            foreach ($this->_settings->excludedUriPatterns as $excludedUriPattern) {
                 if ($this->_matchUriPattern($excludedUriPattern, $siteId, $uri)) {
                     return false;
                 }
             }
         }
 
-        if (is_array($settings->includedUriPatterns)) {
-            foreach ($settings->includedUriPatterns as $includedUriPattern) {
+        if (is_array($this->_settings->includedUriPatterns)) {
+            foreach ($this->_settings->includedUriPatterns as $includedUriPattern) {
                 if ($this->_matchUriPattern($includedUriPattern, $siteId, $uri)) {
                     return true;
                 }
@@ -133,14 +140,11 @@ class CacheService extends Component
             return $this->_cacheFolderPath;
         }
 
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
-
-        if (empty($settings->cacheFolderPath)) {
+        if (empty($this->_settings->cacheFolderPath)) {
             $this->_cacheFolderPath = '';
         }
         else {
-            $this->_cacheFolderPath = FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath);
+            $this->_cacheFolderPath = FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$this->_settings->cacheFolderPath);
         }
 
         return $this->_cacheFolderPath;
@@ -223,6 +227,11 @@ class CacheService extends Component
 
         $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
 
+        // Don't proceed if element caching is disabled
+        if ($this->_settings->elementCachingDisabled) {
+            return;
+        }
+
         /** @var Element $element */
         $values = [
             'cacheId' => $cacheId,
@@ -254,6 +263,11 @@ class CacheService extends Component
         }
 
         $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
+
+        // Don't proceed if element query caching is disabled
+        if ($this->_settings->elementQueryCachingDisabled) {
+            return;
+        }
 
         /** @var Element $element */
         $values = [
@@ -336,14 +350,11 @@ class CacheService extends Component
      */
     public function cacheByElement(ElementInterface $element)
     {
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
-
         // Clear and warm the cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
             $this->clearFileCache();
 
-            if ($settings->cachingEnabled AND $settings->warmCacheAutomatically) {
+            if ($this->_settings->cachingEnabled AND $this->_settings->warmCacheAutomatically) {
                 Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $this->prepareWarmCacheUrls()]));
             }
 
@@ -369,15 +380,12 @@ class CacheService extends Component
      */
     public function clearFileCache()
     {
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
-
-        if (empty($settings->cacheFolderPath)) {
+        if (empty($this->_settings->cacheFolderPath)) {
             return;
         }
 
         try {
-            FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$settings->cacheFolderPath));
+            FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$this->_settings->cacheFolderPath));
         }
         catch (ErrorException $e) {}
     }
@@ -403,10 +411,7 @@ class CacheService extends Component
      */
     public function prepareWarmCacheUrls(): array
     {
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
-
-        if (empty($settings->cacheFolderPath)) {
+        if (empty($this->_settings->cacheFolderPath)) {
             return [];
         }
 

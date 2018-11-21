@@ -20,7 +20,7 @@ class SettingsModel extends Model
     /**
      * @var bool
      */
-    public $warmCacheAutomatically = true;
+    public $warmCacheAutomatically = false;
 
     /**
      * @var bool
@@ -33,6 +33,11 @@ class SettingsModel extends Model
     public $cacheFolderPath = 'cache/blitz';
 
     /**
+     * @var int
+     */
+    public $concurrency = 1;
+
+    /**
      * @var mixed
      */
     public $includedUriPatterns = [];
@@ -41,4 +46,28 @@ class SettingsModel extends Model
      * @var mixed
      */
     public $excludedUriPatterns = [];
+
+    /**
+     * @var bool
+     */
+    public $elementCachingDisabled = true;
+
+    /**
+     * @var bool
+     */
+    public $elementQueryCachingDisabled = true;
+
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * @return array
+     */
+    public function rules(): array
+    {
+        return [
+            [['concurrency'], 'integer', 'min' => 1],
+        ];
+    }
+
 }
