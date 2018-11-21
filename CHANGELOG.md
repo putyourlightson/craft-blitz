@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.7.2 - Unreleased
+### Changed
+- Changed messages and progress bar behaviour in warm cache console command
+
 ## 1.7.1 - 2018-11-20
 ### Fixed 
 - Fixed info text for URI patterns
