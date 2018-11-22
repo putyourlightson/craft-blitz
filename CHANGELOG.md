@@ -4,9 +4,10 @@
 ### Added 
 - Added a setting to enable multiple concurrent requests when warming the cache
 - Added a config setting to disable element caches and element query caches from being stored in the database
-
+- Added check for currently logged in user having the `enableDebugToolbarForSite` setting enabled, in which case cachiing does not happen
+ 
 ### Changed
-- Improved messages and progress bar behaviour in warm cache console command
+- Improved messages and progress bar behaviour in warm cache console command 
 
 ## 1.7.1 - 2018-11-20
 ### Fixed 

@@ -68,6 +68,8 @@ class CacheService extends Component
     public function init()
     {
         parent::init();
+
+        $this->_settings = Blitz::$plugin->getSettings();
     }
 
     /**
@@ -85,14 +87,18 @@ class CacheService extends Component
             return false;
         }
 
-        /** @var SettingsModel $settings */
-        $settings = Blitz::$plugin->getSettings();
+        $user = Craft::$app->getUser()->getIdentity();
 
-        if (!$settings->cachingEnabled) {
+        // Ensure that if user is logged in then debug toolbar is not enabled
+        if ($user !== null && $user->getPreference('enableDebugToolbarForSite')) {
             return false;
         }
 
-        if (!$settings->queryStringCachingEnabled && $request->getQueryStringWithoutPath() !== '') {
+        if (!$this->_settings->cachingEnabled) {
+            return false;
+        }
+
+        if (!$this->_settings->queryStringCachingEnabled && $request->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
