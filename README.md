@@ -36,7 +36,7 @@ Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
-![Settings](docs/images/settings-1.8.0.png)
+![Settings](docs/images/settings-1.8.0a.png)
 
 ## URI Patterns
 
@@ -118,7 +118,7 @@ Console commands can also be used to warm or clear all cache as follows:
     
     ./craft blitz/cache/clear
     
-![Console commands](docs/images/console-1.8.0.png)
+![Console commands](docs/images/console-1.8.0a.png)
 
 Note that if the `@web` alias is used in a site URL then it is only available to web requests and will therefore not be included in cache warming with the console command. 
 
