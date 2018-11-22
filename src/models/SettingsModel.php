@@ -23,9 +23,9 @@ class SettingsModel extends Model
     public $warmCacheAutomatically = false;
 
     /**
-     * @var bool
+     * @var int
      */
-    public $queryStringCachingEnabled = false;
+    public $queryStringCaching = 0;
 
     /**
      * @var string

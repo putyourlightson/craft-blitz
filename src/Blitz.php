@@ -15,6 +15,7 @@ use craft\events\PopulateElementEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
+use craft\models\Site;
 use craft\services\Elements;
 use craft\services\Structures;
 use craft\services\UserPermissions;
@@ -28,6 +29,7 @@ use yii\base\Event;
 /**
  *
  * @property CacheService $cache
+ * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
 {
@@ -54,14 +56,10 @@ class Blitz extends Plugin
         if ($this->cache->getIsCacheableRequest()) {
             $site = Craft::$app->getSites()->getCurrentSite();
 
-            // Get URI from absolute path with the site base URL removed
-            $url = $request->getAbsoluteUrl();
-            $uri = str_replace(Craft::getAlias($site->baseUrl), '', $url);
+            // Get URI from absolute URL
+            $uri = $this->_getUri($site, $request->getAbsoluteUrl());
 
-            // Trim slashes from the beginning and end of the URI
-            $uri = trim($uri, '/');
-
-            if ($this->cache->getIsCacheableUri($site->id,$uri)) {
+            if ($this->cache->getIsCacheableUri($site->id, $uri)) {
                 // If cached version exists then output it (assuming this has not already been done server-side)
                 $filePath = $this->cache->getFilePath($site->id, $uri);
                 if (is_file($filePath)) {
@@ -109,6 +107,22 @@ class Blitz extends Plugin
 
     // Private Methods
     // =========================================================================
+
+    private function _getUri(Site $site, string $uri)
+    {
+        // Remove the query string if unique query strings should be cached as the same page
+        if ($this->getSettings()->queryStringCaching == 2) {
+            $uri = preg_replace('/\?.*/', '', $uri);
+        }
+
+        // Remove site base URL
+        $uri = str_replace(Craft::getAlias($site->baseUrl), '', $uri);
+
+        // Trim slashes from the beginning and end of the URI
+        $uri = trim($uri, '/');
+
+        return $uri;
+    }
 
     private function _registerElementEvents()
     {

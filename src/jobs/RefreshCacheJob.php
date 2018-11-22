@@ -95,7 +95,6 @@ class RefreshCacheJob extends BaseJob
             $cacheRecord->delete();
         }
 
-        /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
         if ($settings->cachingEnabled AND $settings->warmCacheAutomatically AND count($urls) > 0) {

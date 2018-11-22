@@ -24,8 +24,11 @@ return [
     // Whether the cache should automatically be warmed after clearing.
     //'warmCacheAutomatically' => 'true',
 
-    // Whether URLs with query strings should cached. Disabling this will not cache any URLs that contain query strings.
-    //'queryStringCachingEnabled' => false,
+    // Whether URLs with query strings should cached and how.
+    // 0: Do not cache URLs with query strings
+    // 1: Cache URLs with query strings as unique pages
+    // 2: Cache URLs with query strings as the same page
+    //'queryStringCaching' => 0,
 
     // The relative path to your cache folder from your public webroot.
     //'cacheFolderPath' => 'cache/blitz',

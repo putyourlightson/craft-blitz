@@ -58,7 +58,11 @@ Note that if the `@web` alias is used in a site URL then it is only available to
 
 Craft's template caching (`{% cache %}`) tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URIs that Blitz will cache.
 
-URIs with query strings will only be cached if the "Query String Caching Enabled" setting is enabled. If it is disabled then no caching of URIs with query strings (anything following a `?` in a URI) will take place. If it is enabled then all URIs with query strings will be cached. This will help with performance but may end up in a large amount of cached files.
+URIs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
+
+- `Do not cache URLs with query strings`: URIs with query strings (anything following a `?` in a URI) will not be cached.
+- `Cache URLs with query strings as unique pages`: URIs with query strings will be cached as unique pages, so `domain.com`, `domain.com?p=1` and `domain.com?p=2` will be cached separately.
+- `Cache URLs with query strings as the same page`: URIs with query strings will be cached as the same page, so `domain.com`, `domain.com?p=1` and `domain.com?p=2` will all be cached with the output.
 
 When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
 
@@ -71,16 +75,33 @@ Pages that display the following should in general _not_ be cached:
 
 For improved performance, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. 
 
-In Apache this is achieved with `mod_rewrite` by adding the following to the root .htaccess file, just before the rewrites provided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+### Apache
 
-    # Blitz cache rewrite
+In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the root .htaccess file, just before the rewrites provided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+
+If the "Query String Caching" setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
+
+    # Blitz cache rewrite 
     RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.html -s
     RewriteCond %{REQUEST_METHOD} GET
     RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.html [L]
     
     # Send would-be 404 requests to Craft
 
+If the "Query String Caching" setting is set to `Cache URLs with query strings as the same page` then use the following code.
+
+    # Blitz cache rewrite 
+    RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -s
+    RewriteCond %{REQUEST_METHOD} GET
+    RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
+    
+    # Send would-be 404 requests to Craft
+
+### Nginx
+
 In Nginx this is achieved by adding a location handler to the configuration file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+
+If the "Query String Caching" setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
     # Blitz cache rewrite
     location / {
@@ -89,20 +110,29 @@ In Nginx this is achieved by adding a location handler to the configuration file
     
     # Send would-be 404 requests to Craft
 
+If the "Query String Caching" setting is set to `Cache URLs with query strings as the same page` then use the following code.
+
+    # Blitz cache rewrite
+    location / {
+      try_files /cache/blitz/$http_host/$uri/index.html;
+    }
+    
+    # Send would-be 404 requests to Craft
+
 ## URI Patterns
 
 URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
-- `.` Matches any character
-- `.*` Matches any character 0 or more times
+- `.*` Matches any character 0 or more times (use this to include everything)
 - `.+` Matches any character 1 or more times
+- `.` Matches any character
 - `\d` Matches any digit
 - `\d{4}` Matches any four digits
 - `\w` Matches any word character
 - `\w+` Matches any word character 1 or more times
 - `entries` Matches anything containing "entries"
 - `^entries` Matches anything beginning with "entries"
-- `^entries/entry$` Matches exact URI
+- `^entries/entry$` Matches an exact URI
 - `^entries/\w+$` Matches anything beginning with "entries/" followed by at least 1 word character
 
 ## Debugging

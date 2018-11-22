@@ -28,12 +28,20 @@
 	required: true,
 }) }}
 
-{{ forms.lightswitchField({
+{% set info %}
+	<span class="info">{{ "Depending on the option selected, the server rewrite may need to be modified ([see the docs]({url}))."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
+{% endset %}
+{{ forms.selectField({
 	label: "Query String Caching"|t('blitz'),
-	instructions: "Whether URLs with query strings should cached. Disabling this will not cache any URLs that contain query strings."|t('blitz'),
-    warning: (config.queryStringCachingEnabled is defined ? configWarning('queryStringCachingEnabled')),
-	name: 'queryStringCachingEnabled',
-	on: settings.queryStringCachingEnabled,
+	instructions: "Whether URLs with query strings should cached and how."|t('blitz') ~ info,
+    warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
+	name: 'queryStringCaching',
+	options: {
+		0: "Do not cache URLs with query strings"|t('blitz'),
+		1: "Cache URLs with unique query strings as unique pages"|t('blitz'),
+		2: "Cache URLs with unique query strings as the same page"|t('blitz'),
+	},
+	value: settings.queryStringCaching,
 	required: true,
 }) }}
 
@@ -66,14 +74,14 @@
 {% set info %}
 {{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}
 
-- `.` Matches any character
-- `.*` Matches any character 0 or more times
+- `.*` Matches any character 0 or more times (use this to include everything)
 - `.+` Matches any character 1 or more times
-- `\d` Matches any four digits
+- `.` Matches any character
+- `\d` Matches any digit
 - `\w` Matches any word character
 - `entries` Matches anything containing "entries"
 - `^entries` Matches anything beginning with "entries"
-- `^entries/entry$` Matches exact URI
+- `^entries/entry$` Matches an exact URI
 {% endset %}
 
 {% set cols = [

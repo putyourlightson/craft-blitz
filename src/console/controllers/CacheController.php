@@ -20,7 +20,6 @@ class CacheController extends Controller
 
     public function actionClear()
     {
-        /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
         if (empty($settings->cacheFolderPath)) {
@@ -38,7 +37,6 @@ class CacheController extends Controller
 
     public function actionWarm()
     {
-        /** @var SettingsModel $settings */
         $settings = Blitz::$plugin->getSettings();
 
         if (!$settings->cachingEnabled) {
