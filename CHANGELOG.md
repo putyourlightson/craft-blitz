@@ -2,8 +2,8 @@
 
 ## 1.8.0 - Unreleased
 ### Added 
-- Added a setting to enable multiple concurrent requests when warming the cache
-- Added a config setting to disable element caches and element query caches from being stored in the database
+- Added multiple concurrent requests when warming the cache with a new setting
+- Added the ability to disable element caches and element query caches from being stored in the database with a config setting ([#41](https://github.com/putyourlightson/craft-blitz/issues/41))
 - Added check for currently logged in user having the `enableDebugToolbarForSite` setting enabled, in which case cachiing does not happen
  
 ### Changed
