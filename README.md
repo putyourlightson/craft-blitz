@@ -30,7 +30,7 @@ Blitz is available in the Craft Plugin Store and can also be installed manually 
 
 ## Usage
 
-In the plugin settings, enable caching and add at least one included URI pattern. When a URI on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
+In the plugin settings, enable caching and add at least one included URI pattern. When a URL on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
 
 Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even further.
 
@@ -124,15 +124,15 @@ Note that if the `@web` alias is used in a site URL then it is only available to
 
 ## Considerations
 
-Craft's template caching (`{% cache %}`) tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URIs that Blitz will cache.
+Craft's template caching `{% cache %}` tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URLs that Blitz will cache.
 
-URIs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
+URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
 
-- `Do not cache URLs with query strings`: URIs with query strings (anything following a `?` in a URI) will not be cached.
-- `Cache URLs with query strings as unique pages`: URIs with query strings will be cached as unique pages, so `domain.com`, `domain.com?p=1` and `domain.com?p=2` will be cached separately.
-- `Cache URLs with query strings as the same page`: URIs with query strings will be cached as the same page, so `domain.com`, `domain.com?p=1` and `domain.com?p=2` will all be cached with the output.
+- `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
+- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page's output in a deterministic way and can therefore be cached as unique pages.
+- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page's output and can therefore be cached as the same page.
 
-When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
 
 Pages that display the following should in general _not_ be cached:
 - Logged-in user specific content such as username, orders, etc.
