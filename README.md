@@ -108,7 +108,7 @@ When an element is created, updated or deleted, any cached template files that u
 
 The "Blitz Cache" utility allows users to clear and warm the cache. Warming the cache will first clear the cache and then add a job to the queue to pre-cache files. Cached files and folders can be cleared manually using the utility or by simply deleting them on the server.
 
-![Utility](docs/images/utility-1.2.0.png)
+![Utility](docs/images/utility-1.8.0.png)
 
 ## Console Commands
 
