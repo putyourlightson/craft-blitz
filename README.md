@@ -30,48 +30,29 @@ Blitz is available in the Craft Plugin Store and can also be installed manually 
 
 ## Usage
 
-When caching is enabled and a URI on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
+In the plugin settings, enable caching and add at least one included URI pattern. When a URI on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
 
 Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even further.
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
-![Settings](docs/images/settings-1.7.1.png)
+![Settings](docs/images/settings-1.8.0.png)
 
-## Cache Invalidation
+## URI Patterns
 
-When an element is created, updated or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
+URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
-The "Blitz Cache" utility allows users to clear and warm the cache. Warming the cache will first clear the cache and then add a job to the queue to pre-cache files. Cached files and folders can be cleared manually using the utility or by simply deleting them on the server.
-
-![Utility](docs/images/utility-1.2.0.png)
-
-The terminal can also be used to warm or clear all cache with the following console commands:
-
-    ./craft blitz/cache/warm
-    
-    ./craft blitz/cache/clear
-    
-![Console commands](docs/images/console-1.8.0.png)
-
-Note that if the `@web` alias is used in a site URL then it is only available to web requests and will therefore not be included in cache warming with the console command. 
-
-## Considerations
-
-Craft's template caching (`{% cache %}`) tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URIs that Blitz will cache.
-
-URIs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
-
-- `Do not cache URLs with query strings`: URIs with query strings (anything following a `?` in a URI) will not be cached.
-- `Cache URLs with query strings as unique pages`: URIs with query strings will be cached as unique pages, so `domain.com`, `domain.com?p=1` and `domain.com?p=2` will be cached separately.
-- `Cache URLs with query strings as the same page`: URIs with query strings will be cached as the same page, so `domain.com`, `domain.com?p=1` and `domain.com?p=2` will all be cached with the output.
-
-When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
-
-Pages that display the following should in general _not_ be cached:
-- Logged-in user specific content such as username, orders, etc.
-- Forms that use CSRF protection
-- Shopping carts and checkout pages
+- `.*` Matches any character 0 or more times (use this to include everything)
+- `.+` Matches any character 1 or more times
+- `.` Matches any character
+- `\d` Matches any digit
+- `\d{4}` Matches any four digits
+- `\w` Matches any word character
+- `\w+` Matches any word character 1 or more times
+- `entries` Matches anything containing "entries"
+- `^entries` Matches anything beginning with "entries"
+- `^entries/entry$` Matches an exact URI
+- `^entries/\w+$` Matches anything beginning with "entries/" followed by at least 1 word character
 
 ## Server Rewrite
 
@@ -121,21 +102,42 @@ If the "Query String Caching" setting is set to `Cache URLs with query strings a
     
     # Send would-be 404 requests to Craft
 
-## URI Patterns
+## Cache Invalidation
 
-URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
+When an element is created, updated or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
 
-- `.*` Matches any character 0 or more times (use this to include everything)
-- `.+` Matches any character 1 or more times
-- `.` Matches any character
-- `\d` Matches any digit
-- `\d{4}` Matches any four digits
-- `\w` Matches any word character
-- `\w+` Matches any word character 1 or more times
-- `entries` Matches anything containing "entries"
-- `^entries` Matches anything beginning with "entries"
-- `^entries/entry$` Matches an exact URI
-- `^entries/\w+$` Matches anything beginning with "entries/" followed by at least 1 word character
+The "Blitz Cache" utility allows users to clear and warm the cache. Warming the cache will first clear the cache and then add a job to the queue to pre-cache files. Cached files and folders can be cleared manually using the utility or by simply deleting them on the server.
+
+![Utility](docs/images/utility-1.2.0.png)
+
+## Console Commands
+
+Console commands can also be used to warm or clear all cache as follows:
+
+    ./craft blitz/cache/warm
+    
+    ./craft blitz/cache/clear
+    
+![Console commands](docs/images/console-1.8.0.png)
+
+Note that if the `@web` alias is used in a site URL then it is only available to web requests and will therefore not be included in cache warming with the console command. 
+
+## Considerations
+
+Craft's template caching (`{% cache %}`) tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URIs that Blitz will cache.
+
+URIs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
+
+- `Do not cache URLs with query strings`: URIs with query strings (anything following a `?` in a URI) will not be cached.
+- `Cache URLs with query strings as unique pages`: URIs with query strings will be cached as unique pages, so `domain.com`, `domain.com?p=1` and `domain.com?p=2` will be cached separately.
+- `Cache URLs with query strings as the same page`: URIs with query strings will be cached as the same page, so `domain.com`, `domain.com?p=1` and `domain.com?p=2` will all be cached with the output.
+
+When a URI is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+
+Pages that display the following should in general _not_ be cached:
+- Logged-in user specific content such as username, orders, etc.
+- Forms that use CSRF protection
+- Shopping carts and checkout pages
 
 ## Debugging
 
