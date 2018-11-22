@@ -36,7 +36,7 @@ Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
-![Settings](docs/images/settings-1.8.0a.png)
+![Settings](docs/images/settings-1.8.0b.png)
 
 ## URI Patterns
 
