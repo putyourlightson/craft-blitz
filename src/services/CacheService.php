@@ -234,7 +234,7 @@ class CacheService extends Component
         $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
 
         // Don't proceed if element caching is disabled
-        if ($this->_settings->elementCachingDisabled) {
+        if (!$this->_settings->cacheElements) {
             return;
         }
 
@@ -271,7 +271,7 @@ class CacheService extends Component
         $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
 
         // Don't proceed if element query caching is disabled
-        if ($this->_settings->elementQueryCachingDisabled) {
+        if (!$this->_settings->cacheElementQueries) {
             return;
         }
 

@@ -50,12 +50,12 @@ class SettingsModel extends Model
     /**
      * @var bool
      */
-    public $elementCachingDisabled = false;
+    public $cacheElements = true;
 
     /**
      * @var bool
      */
-    public $elementQueryCachingDisabled = false;
+    public $cacheElementQueries = true;
 
     // Public Methods
     // =========================================================================

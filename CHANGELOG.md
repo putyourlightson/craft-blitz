@@ -4,7 +4,7 @@
 ### Added 
 - Added multiple concurrent requests when warming the cache with a new setting.
 - Added new option to cache URLs with unique query strings as the same page ([#40](https://github.com/putyourlightson/craft-blitz/issues/40)).
-- Added the ability to disable element caches and element query caches from being stored in the database with a config setting ([#41](https://github.com/putyourlightson/craft-blitz/issues/41)).
+- Added the ability to disable element caches and element query caches from being stored in the database with the config settings `cacheElements` and `cacheElementQueries` ([#41](https://github.com/putyourlightson/craft-blitz/issues/41)).
 - Added check for currently logged in user having the `enableDebugToolbarForSite` setting enabled, in which case caching does not happen.
  
 ### Changed

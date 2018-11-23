@@ -10,7 +10,6 @@ use craft\helpers\Console;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\models\SettingsModel;
 use yii\console\Controller;
 
 class CacheController extends Controller
