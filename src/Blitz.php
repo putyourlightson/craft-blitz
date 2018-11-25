@@ -23,12 +23,14 @@ use craft\services\Utilities;
 use craft\web\View;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheService;
+use putyourlightson\blitz\services\FileService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use yii\base\Event;
 
 /**
  *
  * @property CacheService $cache
+ * @property FileService $file
  * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
@@ -50,7 +52,10 @@ class Blitz extends Plugin
         $request = Craft::$app->getRequest();
 
         // Register services as components
-        $this->setComponents(['cache' => CacheService::class]);
+        $this->setComponents([
+            'cache' => CacheService::class,
+            'file' => FileService::class,
+        ]);
 
         // Cacheable request
         if ($this->cache->getIsCacheableRequest()) {
@@ -61,7 +66,7 @@ class Blitz extends Plugin
 
             if ($this->cache->getIsCacheableUri($site->id, $uri)) {
                 // If cached version exists then output it (assuming this has not already been done server-side)
-                $filePath = $this->cache->getFilePath($site->id, $uri);
+                $filePath = $this->file->getFilePath($site->id, $uri);
                 if (is_file($filePath)) {
                     echo file_get_contents($filePath).'<!-- Served by Blitz -->';
                     exit;

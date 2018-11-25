@@ -12,7 +12,6 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\elements\GlobalSet;
 use craft\elements\MatrixBlock;
-use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
@@ -23,12 +22,10 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use yii\base\ErrorException;
 
 /**
  *
  * @property bool $isCacheableRequest
- * @property string $cacheFolderPath
  */
 class CacheService extends Component
 {
@@ -49,19 +46,9 @@ class CacheService extends Component
     private $_settings;
 
     /**
-     * @var string|null
-     */
-    private $_cacheFolderPath;
-
-    /**
      * @var array|null
      */
     private $_nonCacheableElementTypes;
-
-    /**
-     * @var array|null
-     */
-    private $_filePaths;
 
     // Public Methods
     // =========================================================================
@@ -137,27 +124,6 @@ class CacheService extends Component
     }
 
     /**
-     * Returns the cache folder path
-     *
-     * @return string
-     */
-    public function getCacheFolderPath(): string
-    {
-        if ($this->_cacheFolderPath !== null) {
-            return $this->_cacheFolderPath;
-        }
-
-        if (empty($this->_settings->cacheFolderPath)) {
-            $this->_cacheFolderPath = '';
-        }
-        else {
-            $this->_cacheFolderPath = FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$this->_settings->cacheFolderPath);
-        }
-
-        return $this->_cacheFolderPath;
-    }
-
-    /**
      * Returns non cacheable element types
      *
      * @return string[]
@@ -181,41 +147,6 @@ class CacheService extends Component
         $this->_nonCacheableElementTypes = $event->elementTypes;
 
         return $this->_nonCacheableElementTypes;
-    }
-
-    /**
-     * Returns file path from provided site ID and URI
-     *
-     * @param int $siteId
-     * @param string $uri
-     * @return string
-     */
-    public function getFilePath(int $siteId, string $uri): string
-    {
-        if (!empty($this->_filePaths[$siteId][$uri])) {
-            return $this->_filePaths[$siteId][$uri];
-        }
-
-        $cacheFolderPath = $this->getCacheFolderPath();
-
-        if ($cacheFolderPath == '') {
-            return '';
-        }
-
-        // Get the site host and path from the site's base URL
-        $site = Craft::$app->getSites()->getSiteById($siteId);
-        $siteUrl = Craft::getAlias($site->baseUrl);
-        $siteHostPath = preg_replace('/https?:\/\//', '', $siteUrl);
-
-        // Replace __home__ with blank string
-        $uri = ($uri == '__home__' ? '' : $uri);
-
-        // Replace ? with / in URI
-        $uri = str_replace('?', '/', $uri);
-
-        $this->_filePaths[$siteId][$uri] = FileHelper::normalizePath($cacheFolderPath.'/'.$siteHostPath.'/'.$uri.'/index.html');
-
-        return $this->_filePaths[$siteId][$uri];
     }
 
     /**
@@ -350,20 +281,7 @@ class CacheService extends Component
             return;
         }
 
-        $filePath = $this->getFilePath($siteId, $uri);
-
-        if (!empty($filePath)) {
-            // Append timestamp
-            $output .= '<!-- Cached by Blitz on '.date('c').' -->';
-
-            // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
-            $output = "\xEF\xBB\xBF".$output;
-
-            try {
-                FileHelper::writeToFile($filePath, $output);
-            }
-            catch (ErrorException $e) {}
-        }
+        Blitz::$plugin->file->cacheToFile($output, $siteId, $uri);
     }
 
     /**
@@ -375,7 +293,7 @@ class CacheService extends Component
     {
         // Clear and warm the cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
-            $this->clearFileCache();
+            Blitz::$plugin->file->clearFileCache();
 
             if ($this->_settings->cachingEnabled AND $this->_settings->warmCacheAutomatically) {
                 Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $this->prepareWarmCacheUrls()]));
@@ -392,25 +310,10 @@ class CacheService extends Component
         // Delete the cached file immediately if this element has a URI
         /** @var Element $element */
         if ($element->uri !== null) {
-            $this->deleteFileByUri($element->siteId, $element->uri);
+            Blitz::$plugin->file->deleteFileByUri($element->siteId, $element->uri);
         }
 
         Craft::$app->getQueue()->push(new RefreshCacheJob(['elementId' => $element->id]));
-    }
-
-    /**
-     * Clears file cache
-     */
-    public function clearFileCache()
-    {
-        if (empty($this->_settings->cacheFolderPath)) {
-            return;
-        }
-
-        try {
-            FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$this->_settings->cacheFolderPath));
-        }
-        catch (ErrorException $e) {}
     }
 
     /**
@@ -432,7 +335,7 @@ class CacheService extends Component
      */
     public function cleanElementQueryTable()
     {
-        // Get element query records without an associated element query cache
+        // Get and delete element query records without an associated element query cache
         $elementQueryRecords = ElementQueryRecord::find()
             ->joinWith('elementQueryCache')
             ->where(['cacheId' => null])
@@ -454,7 +357,7 @@ class CacheService extends Component
             return [];
         }
 
-        $this->clearFileCache();
+        Blitz::$plugin->file->clearFileCache();
 
         $count = 0;
         $urls = [];
@@ -505,22 +408,6 @@ class CacheService extends Component
         }
 
         return $urls;
-    }
-
-    /**
-     * Deletes a file for a given site and URI
-     *
-     * @param int $siteId
-     * @param string $uri
-     */
-    public function deleteFileByUri(int $siteId, string $uri)
-    {
-        $filePath = $this->getFilePath($siteId, $uri);
-
-        // Delete file if it exists
-        if (is_file($filePath)) {
-            @unlink($filePath);
-        }
     }
 
     // Private Methods

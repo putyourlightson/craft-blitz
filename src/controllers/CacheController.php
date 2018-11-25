@@ -48,7 +48,7 @@ class CacheController extends Controller
             }
         }
         else {
-            Blitz::$plugin->cache->clearFileCache();
+            Blitz::$plugin->file->clearFileCache();
         }
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully cleared.'));

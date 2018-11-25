@@ -8,11 +8,15 @@
 - Added check for currently logged in user having the `enableDebugToolbarForSite` setting enabled, in which case caching does not happen.
  
 ### Changed
-- Optimised how element queries are stored to reduce database storage ([#41](https://github.com/putyourlightson/craft-blitz/issues/41)).
+- Optimised how element queries are stored to avoid duplicates and reduce required database storage ([#41](https://github.com/putyourlightson/craft-blitz/issues/41)).
 - Improved messages and progress bar behaviour in warm cache console command.
 
 ### Fixed
 - Fixed bug where warm cache job fails if a server error is ecnountered ([#42](https://github.com/putyourlightson/craft-blitz/issues/42)).
+
+> {tip} A new `concurrency` setting is available in the plugin settings for faster cache warming.
+
+> {note} This release optimises the element query cache table and the cache should therefore be warmed manually following the update.
 
 ## 1.7.1 - 2018-11-20
 ### Fixed 

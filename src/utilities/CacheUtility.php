@@ -46,7 +46,7 @@ class CacheUtility extends Utility
     {
         $options = [];
 
-        $cacheFolderPath = Blitz::$plugin->cache->getCacheFolderPath();
+        $cacheFolderPath = Blitz::$plugin->file->getCacheFolderPath();
 
         if ($cacheFolderPath && is_dir($cacheFolderPath)) {
             $cacheFolders = [];

@@ -29,7 +29,7 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Clearing Blitz cache.').PHP_EOL);
 
-        Blitz::$plugin->cache->clearFileCache();
+        Blitz::$plugin->file->clearFileCache();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
     }
