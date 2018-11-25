@@ -11,9 +11,9 @@ use yii\db\ActiveQueryInterface;
 /**
  * @property int $id
  * @property int $cacheId
- * @property string $type
- * @property string $query
+ * @property int $queryId
  * @property CacheRecord $cache
+ * @property ElementQueryRecord $elementQuery
  */
 class ElementQueryCacheRecord extends ActiveRecord
 {
@@ -38,5 +38,15 @@ class ElementQueryCacheRecord extends ActiveRecord
     public function getCache(): ActiveQueryInterface
     {
         return $this->hasOne(CacheRecord::class, ['id' => 'cacheId']);
+    }
+
+    /**
+     * Returns the associated element query
+     *
+     * @return ActiveQueryInterface
+     */
+    public function getElementQuery(): ActiveQueryInterface
+    {
+        return $this->hasOne(ElementQueryRecord::class, ['id' => 'queryId']);
     }
 }

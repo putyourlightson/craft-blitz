@@ -7,9 +7,12 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
+use craft\records\Element;
+use craft\records\Site;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
 
 class Install extends Migration
 {
@@ -21,57 +24,13 @@ class Install extends Migration
      */
     public function safeUp(): bool
     {
-        $cachesTable = CacheRecord::tableName();
+        if ($this->createTables()) {
+            $this->createIndexes();
+            $this->addForeignKeys();
 
-        if (!$this->db->tableExists($cachesTable)) {
-            $this->createTable($cachesTable, [
-                'id' => $this->primaryKey(),
-                'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string()->notNull(),
-                'dateCreated' => $this->dateTime()->notNull(),
-                'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid(),
-            ]);
-
-            $this->createIndex(null, $cachesTable, ['siteId', 'uri'], true);
-
-            $this->addForeignKey(null, $cachesTable, 'siteId', '{{%sites}}', 'id', 'CASCADE');
+            // Refresh the db schema caches
+            Craft::$app->db->schema->refresh();
         }
-
-        $elementCacheTable = ElementCacheRecord::tableName();
-
-        if (!$this->db->tableExists($elementCacheTable)) {
-            $this->createTable($elementCacheTable, [
-                'id' => $this->primaryKey(),
-                'cacheId' => $this->integer()->notNull(),
-                'elementId' => $this->integer()->notNull(),
-                'dateCreated' => $this->dateTime()->notNull(),
-                'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid(),
-            ]);
-
-            $this->addForeignKey(null, $elementCacheTable, 'cacheId', $cachesTable, 'id', 'CASCADE');
-            $this->addForeignKey(null, $elementCacheTable, 'elementId', '{{%elements}}', 'id', 'CASCADE');
-        }
-
-        $elementQueryCacheTable = ElementQueryCacheRecord::tableName();
-
-        if (!$this->db->tableExists($elementQueryCacheTable)) {
-            $this->createTable($elementQueryCacheTable, [
-                'id' => $this->primaryKey(),
-                'cacheId' => $this->integer()->notNull(),
-                'type' => $this->string()->notNull(),
-                'query' => $this->longText(),
-                'dateCreated' => $this->dateTime()->notNull(),
-                'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid(),
-            ]);
-
-            $this->addForeignKey(null, $elementQueryCacheTable, 'cacheId', $cachesTable, 'id', 'CASCADE');
-        }
-
-        // Refresh the db schema caches
-        Craft::$app->db->schema->refresh();
 
         return true;
     }
@@ -82,10 +41,93 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
-        $this->dropTableIfExists(ElementCacheRecord::tableName());
+        $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
+        $this->dropTableIfExists(ElementCacheRecord::tableName());
         $this->dropTableIfExists(CacheRecord::tableName());
 
         return true;
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * Creates the tables needed for the Records used by the plugin
+     *
+     * @return boolean
+     */
+    protected function createTables(): bool
+    {
+        if (!$this->db->tableExists(CacheRecord::tableName())) {
+            $this->createTable(CacheRecord::tableName(), [
+                'id' => $this->primaryKey(),
+                'siteId' => $this->integer()->notNull(),
+                'uri' => $this->string()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+            ]);
+        }
+
+        if (!$this->db->tableExists(ElementCacheRecord::tableName())) {
+            $this->createTable(ElementCacheRecord::tableName(), [
+                'id' => $this->primaryKey(),
+                'cacheId' => $this->integer()->notNull(),
+                'elementId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+            ]);
+        }
+
+        if (!$this->db->tableExists(ElementQueryCacheRecord::tableName())) {
+            $this->createTable(ElementQueryCacheRecord::tableName(), [
+                'id' => $this->primaryKey(),
+                'cacheId' => $this->integer()->notNull(),
+                'queryId' => $this->integer()->notNull(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+            ]);
+        }
+
+        if (!$this->db->tableExists(ElementQueryRecord::tableName())) {
+            $this->createTable(ElementQueryRecord::tableName(), [
+                'id' => $this->primaryKey(),
+                'type' => $this->string()->notNull(),
+                'query' => $this->longText(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
+            ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * Creates the indexes needed for the Records used by the plugin
+     *
+     * @return void
+     */
+    protected function createIndexes()
+    {
+        $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
+        $this->createIndex(null, ElementQueryRecord::tableName(), ['type'], false);
+    }
+
+    /**
+     * Creates the foreign keys needed for the Records used by the plugin
+     *
+     * @return void
+     */
+    protected function addForeignKeys()
+    {
+        $this->addForeignKey(null, CacheRecord::tableName(), 'siteId', Site::tableName(), 'id', 'CASCADE');
+        $this->addForeignKey(null, ElementCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE');
+        $this->addForeignKey(null, ElementCacheRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE');
+        $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE');
+        $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE');
     }
 }

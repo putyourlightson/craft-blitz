@@ -11,10 +11,9 @@ use craft\helpers\App;
 use craft\helpers\UrlHelper;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
-use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
 
 class RefreshCacheJob extends BaseJob
 {
@@ -55,22 +54,28 @@ class RefreshCacheJob extends BaseJob
             }
         }
 
-        // Get element query cache records of the element type with a cache ID that has not already been stored
-        $elementQueryCacheRecords = ElementQueryCacheRecord::find()
-            ->select('cacheId, query')
-            ->where(['not', ['cacheId' => $cacheIds]])
-            ->andWhere(['type' => Craft::$app->getElements()->getElementTypeById($this->elementId)])
+        // Get element query records of the element type without eager loading element query cache records
+        $elementQueryRecords = ElementQueryRecord::find()
+            ->select('id, query')
+            ->where(['type' => Craft::$app->getElements()->getElementTypeById($this->elementId)])
             ->all();
 
-        /** @var ElementQueryCacheRecord[] $elementQueryCacheRecords */
-        foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
-            if (!in_array($elementQueryCacheRecord->cacheId, $cacheIds, true)) {
-                /** @var ElementQuery|false $query */
-                /** @noinspection UnserializeExploitsInspection */
-                $query = @unserialize(base64_decode($elementQueryCacheRecord->query));
+        /** @var ElementQueryRecord[] $elementQueryRecords */
+        foreach ($elementQueryRecords as $elementQueryRecord) {
+            /** @var ElementQuery|false $query */
+            /** @noinspection UnserializeExploitsInspection */
+            $query = @unserialize(base64_decode($elementQueryRecord->query));
 
-                if ($query === false || in_array($this->elementId, $query->ids(), true)) {
-                    $cacheIds[] = $elementQueryCacheRecord->cacheId;
+            // If the element ID is in the query's results
+            if ($query === false || in_array($this->elementId, $query->ids(), true)) {
+                // Get related element query cache records
+                $elementQueryCacheRecords = $elementQueryRecord->elementQueryCache;
+
+                // Add cache IDs to the array that do not already exist
+                foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
+                    if (!in_array($elementQueryCacheRecord->cacheId, $cacheIds, true)) {
+                        $cacheIds[] = $elementQueryCacheRecord->cacheId;
+                    }
                 }
             }
         }

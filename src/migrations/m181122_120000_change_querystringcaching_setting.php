@@ -7,7 +7,6 @@ use craft\db\Migration;
 use craft\helpers\Json;
 use craft\records\Plugin;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\models\SettingsModel;
 
 class m181122_120000_change_querystringcaching_setting extends Migration
 {

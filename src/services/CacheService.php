@@ -22,6 +22,7 @@ use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\base\ErrorException;
 
 /**
@@ -275,13 +276,7 @@ class CacheService extends Component
             return;
         }
 
-        /** @var Element $element */
-        $values = [
-            'cacheId' => $cacheId,
-            'type' => $elementQuery->elementType,
-        ];
-
-        // Based on code from includeElementQueryInTemplateCaches method in \craft\servicesTemplateCaches
+        // Based on code from includeElementQueryInTemplateCaches method in \craft\services\TemplateCaches)
         $query = $elementQuery->query;
         $subQuery = $elementQuery->subQuery;
         $customFields = $elementQuery->customFields;
@@ -291,20 +286,42 @@ class CacheService extends Component
         $elementQuery->subQuery = null;
         $elementQuery->customFields = null;
 
-        // We need to base64-encode the string so db\Connection::quoteSql() doesn't tweak any of the table/columns names
-        $values['query'] = base64_encode(serialize($elementQuery));
+        // Base64-encode the query so db\Connection::quoteSql() doesn't tweak any of the table/columns names
+        $values = [
+            'cacheId' => $cacheId,
+            'type' => $elementQuery->elementType,
+            'query' => base64_encode(serialize($elementQuery))
+        ];
 
         // Set back to original values
         $elementQuery->query = $query;
         $elementQuery->subQuery = $subQuery;
         $elementQuery->customFields = $customFields;
 
-        $elementQueryCacheRecordCount = ElementQueryCacheRecord::find()
+        // If a record with the values does not exist then create a new one
+        /** @var ElementQueryCacheRecord $elementQueryCacheRecord */
+        $elementQueryCacheRecord = ElementQueryCacheRecord::find()
+            ->joinWith('elementQuery', false, 'INNER JOIN')
             ->where($values)
-            ->count();
+            ->one();
 
-        if ($elementQueryCacheRecordCount == 0) {
-            $elementQueryCacheRecord = new ElementQueryCacheRecord($values);
+        if ($elementQueryCacheRecord === null) {
+            $elementQueryCacheRecord = new ElementQueryCacheRecord(['cacheId' => $cacheId]);
+
+            // Remove cacheId from values
+            unset($values['cacheId']);
+
+            // If an element query record with the values does not exist then create a new one
+            $elementQueryRecord = ElementQueryRecord::find()
+                ->where($values)
+                ->one();
+
+            if ($elementQueryRecord === null) {
+                $elementQueryRecord = new ElementQueryRecord($values);
+                $elementQueryRecord->save();
+            }
+
+            $elementQueryCacheRecord->queryId = $elementQueryRecord->id;
             $elementQueryCacheRecord->save();
         }
     }
@@ -408,6 +425,22 @@ class CacheService extends Component
             'siteId' => $siteId,
             'uri' => $uri,
         ]);
+    }
+
+    /**
+     * Cleans element query table
+     */
+    public function cleanElementQueryTable()
+    {
+        // Get element query records without an associated element query cache
+        $elementQueryRecords = ElementQueryRecord::find()
+            ->joinWith('elementQueryCache')
+            ->where(['cacheId' => null])
+            ->all();
+
+        foreach ($elementQueryRecords as $elementQueryRecord) {
+            $elementQueryRecord->delete();
+        }
     }
 
     /**

@@ -8,6 +8,7 @@
 - Added check for currently logged in user having the `enableDebugToolbarForSite` setting enabled, in which case caching does not happen.
  
 ### Changed
+- Optimised how element queries are stored to reduce database storage ([#41](https://github.com/putyourlightson/craft-blitz/issues/41)).
 - Improved messages and progress bar behaviour in warm cache console command.
 
 ### Fixed
