@@ -28,8 +28,9 @@ class m181122_120000_change_querystringcaching_setting extends Migration
         }
 
         /** @var Plugin $pluginRecord */
-        $pluginSettings = Json::decode($pluginRecord->settings);
-
+        /** @var string $oldSettingsRaw */
+        $oldSettingsRaw = $pluginRecord->settings;
+        $pluginSettings = Json::decode($oldSettingsRaw);
         $queryStringCachingEnabled = $pluginSettings['queryStringCachingEnabled'];
 
         // Update and save settings with new setting
