@@ -102,6 +102,28 @@ If the "Query String Caching" setting is set to `Cache URLs with query strings a
     
     # Send would-be 404 requests to Craft
 
+## Query Strings
+
+URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
+
+- `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
+- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page's output in a deterministic way and can therefore be cached as unique pages.
+- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page's output and can therefore be cached as the same page.
+
+## Dynamic Content
+
+When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+
+Blitz offers a workaround for injecting dynamic content into a cached page using an AJX request. The following template tags are available for doing so.
+
+#### `{{ craft.blitz.getUri('/template/name') }}`
+
+Returns the contents of the URI provided. 
+ 
+#### `{{ craft.blitz.csrfInput() }}`
+
+Returns a dynamically generated CSRF input field.
+
 ## Cache Invalidation
 
 When an element is created, updated or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
@@ -125,19 +147,6 @@ Note that if the `@web` alias is used in a site URL then it is only available to
 ## Considerations
 
 Craft's template caching `{% cache %}` tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URLs that Blitz will cache.
-
-URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
-
-- `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
-- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page's output in a deterministic way and can therefore be cached as unique pages.
-- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page's output and can therefore be cached as the same page.
-
-When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
-
-Pages that display the following should in general _not_ be cached:
-- Logged-in user specific content such as username, orders, etc.
-- Forms that use CSRF protection
-- Shopping carts and checkout pages
 
 ## Debugging
 
