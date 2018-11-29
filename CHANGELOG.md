@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 1.9.0 - Unreleased
+### Added
+- Added a twig tag to dynamically inject the content of a URI into a cached page.
+- Added a twig tag to dynamically inject a CSRF input field into a cached page.
+
 ## 1.8.0 - 2018-11-28
 ### Added 
 - Added multiple concurrent requests when warming the cache with a new plugin setting.

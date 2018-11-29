@@ -20,11 +20,13 @@ use craft\services\Elements;
 use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
+use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheService;
 use putyourlightson\blitz\services\FileService;
 use putyourlightson\blitz\utilities\CacheUtility;
+use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
 
 /**
@@ -56,6 +58,13 @@ class Blitz extends Plugin
             'cache' => CacheService::class,
             'file' => FileService::class,
         ]);
+
+        // Register variable
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
+            /** @var CraftVariable $variable */
+            $variable = $event->sender;
+            $variable->set('blitz', BlitzVariable::class);
+        });
 
         // Cacheable request
         if ($this->cache->getIsCacheableRequest()) {
