@@ -5,7 +5,9 @@
 
 namespace putyourlightson\blitz\variables;
 
+use Craft;
 use craft\helpers\Template;
+use craft\web\View;
 use Twig_Markup;
 
 class BlitzVariable
@@ -37,7 +39,9 @@ class BlitzVariable
      */
     public function csrfInput(): Twig_Markup
     {
-        return $this->_getScript('/actions/blitz/csrf/input');
+        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/input';
+
+        return $this->_getScript($uri);
     }
 
     // Private Methods
@@ -52,11 +56,10 @@ class BlitzVariable
      */
     private function _getScript(string $uri): Twig_Markup
     {
-        $output = '';
+        $view = Craft::$app->getView();
 
         if ($this->_injected === 0) {
-            $output .= '
-                <script>
+            $view->registerJs('
                 function blitzInject(id, uri) {
                     var xhr = new XMLHttpRequest();
                     xhr.onload = function () {
@@ -67,18 +70,16 @@ class BlitzVariable
                     xhr.open("GET", uri);
                     xhr.send();
                 }
-                </script>
-            ';
+            ', View::POS_END);
         }
 
         $this->_injected++;
 
         $id = 'blitz-inject-'.$this->_injected;
 
-        $output .= '
-            <div id="'.$id.'"></div>
-            <script>blitzInject('.$this->_injected.', "'.$uri.'");</script>
-        ';
+        $view->registerJs('blitzInject('.$this->_injected.', "'.$uri.'");', View::POS_END);
+
+        $output = '<div id="'.$id.'"></div>';
 
         return Template::raw($output);
     }
