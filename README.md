@@ -114,15 +114,15 @@ URLs with query strings will be cached according to the selected option in the "
 
 When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
 
-Blitz offers a workaround for injecting dynamic content into a cached page using an AJX request. The following template tags are available for doing so.
+Blitz offers a workaround for injecting dynamic content into a cached page using an AJAX (Javascript XHR) request. The following template tags are available for doing so.
 
 #### `{{ craft.blitz.getUri('/template/name') }}`
 
-Returns the contents of the URI provided. 
+Returns a script that injects the contents of the URI provided. 
  
 #### `{{ craft.blitz.csrfInput() }}`
 
-Returns a dynamically generated CSRF input field.
+Returns a script that injects a CSRF input field.
 
 ## Cache Invalidation
 
@@ -147,6 +147,8 @@ Note that if the `@web` alias is used in a site URL then it is only available to
 ## Considerations
 
 Craft's template caching `{% cache %}` tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URLs that Blitz will cache.
+
+If a global is saved then Blitz will clear the entire cache and warm it if the "Warm Cache Automatically" setting is enabled. This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 
 ## Debugging
 
