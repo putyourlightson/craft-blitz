@@ -440,6 +440,9 @@ class CacheService extends Component
             $uriPattern = '.*';
         }
 
+        // Escape hash symbols slashes
+        $uriPattern = str_replace('#', '\#', $uriPattern);
+
         return preg_match('#'.trim($uriPattern, '/').'#', trim($uri, '/'));
     }
 

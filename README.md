@@ -118,11 +118,11 @@ Blitz offers a workaround for injecting dynamic content into a cached page using
 
 #### `{{ craft.blitz.getUri('/template/name') }}`
 
-Returns a script that injects the contents of the URI provided. 
+Returns a script that injects the contents of the URI provided in place of the twig tag. 
  
 #### `{{ craft.blitz.csrfInput() }}`
 
-Returns a script that injects a CSRF input field.
+Returns a script that injects a CSRF input field in place of the twig tag.
 
 ## Cache Invalidation
 
@@ -142,7 +142,7 @@ Console commands can also be used to warm or clear all cache as follows:
     
 ![Console commands](docs/images/console-1.8.0a.png)
 
-Note that if the `@web` alias is used in a site URL then it is only available to web requests and will therefore not be included in cache warming with the console command. 
+Note that if the `@web` alias, or any other method that requires a web request, is used to determine the site URL then it cannot be included in cache warming with the console command. Using an absolute site URL is therefore recommended.
 
 ## Considerations
 

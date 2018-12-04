@@ -89,7 +89,7 @@ class FileService extends Component
         // Get the site host and path from the site's base URL
         $site = Craft::$app->getSites()->getSiteById($siteId);
         $siteUrl = Craft::getAlias($site->baseUrl);
-        $siteHostPath = preg_replace('/https?:\/\//', '', $siteUrl);
+        $siteHostPath = preg_replace('/^(http|https):\/\//i', '', $siteUrl);
 
         // Replace __home__ with blank string
         $uri = ($uri == '__home__' ? '' : $uri);
