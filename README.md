@@ -42,6 +42,7 @@ Blitz is compatible with live preview. It will detect when it is being used and 
 
 URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
+- `^$` Matches the homepage
 - `.*` Matches any character 0 or more times (use this to include everything)
 - `.+` Matches any character 1 or more times
 - `.` Matches any character
