@@ -14,6 +14,14 @@ class CsrfController extends Controller
     // Public Methods
     // =========================================================================
 
+    // Properties
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    protected $allowAnonymous = ['input'];
+
     /**
      * Returns a CSRF input field.
      *

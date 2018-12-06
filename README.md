@@ -115,7 +115,7 @@ URLs with query strings will be cached according to the selected option in the "
 
 When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
 
-Blitz offers a workaround for injecting dynamic content into a cached page using an AJAX (Javascript XHR) request. The following template tags are available for doing so.
+Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
 
 #### `{{ craft.blitz.getUri('/template/name') }}`
 
@@ -124,6 +124,16 @@ Returns a script that injects the contents of the URI provided in place of the t
 #### `{{ craft.blitz.csrfInput() }}`
 
 Returns a script that injects a CSRF input field in place of the twig tag.
+
+Below is an example of how you might use the tags to create a page containing dynamic content and a form that can be cached by Blitz.
+
+    Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
+    
+    <form method="post">
+       {{ craft.blitz.csrfInput() }}
+       ...
+     
+     </form>
 
 ## Cache Invalidation
 

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.9.1 - 2018-12-06
+### Fixed
+- Fixed a bug that prevented the CSRF field being shown to anonymous users.
+
 ## 1.9.0 - 2018-12-04
 ### Added
 - Added a twig tag to dynamically inject the content of a URI into a cached page.
