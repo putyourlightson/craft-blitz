@@ -170,7 +170,11 @@ Cached HTML files are timestamped with a comment at the end of the file.
 If the HTML file was served by the plugin rather than with a server rewrite then an additional comment is added.
 
     <!-- Served by Blitz -->
-  
+
+Note that if your HTML is minified then all comments will be removed from the markup, including the comments above.
+
+If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Powered-By: Blitz` header will be sent.
+
 ---
 
 <small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>
