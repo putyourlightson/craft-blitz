@@ -13,7 +13,6 @@ use putyourlightson\blitz\models\SettingsModel;
 use yii\base\ErrorException;
 
 /**
- *
  * @property string $cacheFolderPath
  */
 class FileService extends Component
@@ -47,7 +46,7 @@ class FileService extends Component
     }
 
     /**
-     * Returns the cache folder path
+     * Returns the cache folder path.
      *
      * @return string
      */
@@ -68,7 +67,7 @@ class FileService extends Component
     }
 
     /**
-     * Returns file path from provided site ID and URI
+     * Returns file path from provided site ID and URI.
      *
      * @param int $siteId
      * @param string $uri
@@ -103,7 +102,7 @@ class FileService extends Component
     }
 
     /**
-     * Caches the output to a file
+     * Caches the output to a file.
      *
      * @param string $output
      * @param int $siteId
@@ -128,7 +127,24 @@ class FileService extends Component
     }
 
     /**
-     * Clears file cache
+     * Outputs the contents of a file.
+     *
+     * @var string $filePath
+     */
+    public function outputFile(string $filePath)
+    {
+        header_remove('X-Powered-By');
+
+        if ($this->_settings->sendPoweredByHeader) {
+            $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
+            header('X-Powered-By: '.$header.'Blitz');
+        }
+
+        exit(file_get_contents($filePath).'<!-- Served by Blitz -->');
+    }
+
+    /**
+     * Clears file cache.
      */
     public function clearFileCache()
     {
@@ -143,7 +159,7 @@ class FileService extends Component
     }
 
     /**
-     * Deletes a file for a given site and URI
+     * Deletes a file for a given site and URI.
      *
      * @param int $siteId
      * @param string $uri

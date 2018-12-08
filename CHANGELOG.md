@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.9.2 - Unreleased
+### Added
+- Added `sendPoweredByHeader` config setting to determine whether an `X-Powered-By: Blitz` header should be sent.
+
 ## 1.9.1 - 2018-12-06
 ### Fixed
 - Fixed a bug that prevented the CSRF field being shown to anonymous users.
@@ -23,7 +27,7 @@
 - Improved messages and progress bar behaviour in warm cache console command.
 
 ### Fixed
-- Fixed bug where warm cache job fails if a server error is ecnountered ([#42](https://github.com/putyourlightson/craft-blitz/issues/42)).
+- Fixed bug where warm cache job fails if a server error is encountered ([#42](https://github.com/putyourlightson/craft-blitz/issues/42)).
 
 > {tip} A new `concurrency` setting is available in the plugin settings for faster cache warming.
 

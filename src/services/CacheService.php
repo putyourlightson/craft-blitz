@@ -24,7 +24,6 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 
 /**
- *
  * @property bool $isCacheableRequest
  */
 class CacheService extends Component
@@ -61,7 +60,7 @@ class CacheService extends Component
     }
 
     /**
-     * Returns whether the request is cacheable
+     * Returns whether the request is cacheable.
      *
      * @return bool
      */
@@ -94,7 +93,7 @@ class CacheService extends Component
     }
 
     /**
-     * Returns whether the URI is cacheable
+     * Returns whether the URI is cacheable.
      *
      * @param int $siteId
      * @param string $uri
@@ -124,7 +123,7 @@ class CacheService extends Component
     }
 
     /**
-     * Returns non cacheable element types
+     * Returns non cacheable element types.
      *
      * @return string[]
      */
@@ -150,7 +149,7 @@ class CacheService extends Component
     }
 
     /**
-     * Adds an element cache to the database
+     * Adds an element cache to the database.
      *
      * @param ElementInterface $element
      * @param int $siteId
@@ -187,7 +186,7 @@ class CacheService extends Component
     }
 
     /**
-     * Adds an element query cache to the database
+     * Adds an element query cache to the database.
      *
      * @param ElementQuery $elementQuery
      * @param int $siteId
@@ -258,7 +257,7 @@ class CacheService extends Component
     }
 
     /**
-     * Caches the output to a URI
+     * Caches the output to a URI.
      *
      * @param string $output
      * @param int $siteId
@@ -285,7 +284,7 @@ class CacheService extends Component
     }
 
     /**
-     * Caches by an element
+     * Caches by an element.
      *
      * @param ElementInterface $element
      */
@@ -317,7 +316,7 @@ class CacheService extends Component
     }
 
     /**
-     * Clears cache record
+     * Clears cache record.
      *
      * @param int $siteId
      * @param string $uri
@@ -331,7 +330,7 @@ class CacheService extends Component
     }
 
     /**
-     * Cleans element query table
+     * Cleans element query table.
      */
     public function cleanElementQueryTable()
     {
@@ -347,7 +346,7 @@ class CacheService extends Component
     }
 
     /**
-     * Prepares cache for warming and returns URLS to warm
+     * Prepares cache for warming and returns URLS to warm.
      *
      * @return string[]
      */
@@ -414,7 +413,7 @@ class CacheService extends Component
     // =========================================================================
 
     /**
-     * Matches a URI pattern
+     * Matches a URI pattern.
      *
      * @param array $pattern
      * @param int $siteId
@@ -447,7 +446,7 @@ class CacheService extends Component
     }
 
     /**
-     * Returns a cache record ID or creates it if it doesn't exist
+     * Returns a cache record ID or creates it if it doesn't exist.
      *
      * @param int $siteId
      * @param string $uri

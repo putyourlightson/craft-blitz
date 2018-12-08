@@ -51,8 +51,6 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
-        $request = Craft::$app->getRequest();
-
         // Register services as components
         $this->setComponents([
             'cache' => CacheService::class,
@@ -66,6 +64,17 @@ class Blitz extends Plugin
             $variable->set('blitz', BlitzVariable::class);
         });
 
+        // Process request
+        $this->processRequest();
+    }
+
+    /**
+     * Processes the request
+     */
+    public function processRequest()
+    {
+        $request = Craft::$app->getRequest();
+
         // Cacheable request
         if ($this->cache->getIsCacheableRequest()) {
             $site = Craft::$app->getSites()->getCurrentSite();
@@ -77,8 +86,7 @@ class Blitz extends Plugin
                 // If cached version exists then output it (assuming this has not already been done server-side)
                 $filePath = $this->file->getFilePath($site->id, $uri);
                 if (is_file($filePath)) {
-                    echo file_get_contents($filePath).'<!-- Served by Blitz -->';
-                    exit;
+                    $this->file->outputFile($filePath);
                 }
 
                 $this->_registerCacheableRequestEvents($site->id, $uri);
@@ -86,7 +94,7 @@ class Blitz extends Plugin
         }
 
         // CP request
-        else if ($request->getIsCpRequest()) {
+        if ($request->getIsCpRequest()) {
             $this->_registerElementEvents();
 
             $this->_registerUtilities();
@@ -122,7 +130,15 @@ class Blitz extends Plugin
     // Private Methods
     // =========================================================================
 
-    private function _getUri(Site $site, string $uri)
+    /**
+     * Gets the URI
+     *
+     * @param Site $site
+     * @param string $uri
+     *
+     * @return string
+     */
+    private function _getUri(Site $site, string $uri): string
     {
         // Remove the query string if unique query strings should be cached as the same page
         if ($this->getSettings()->queryStringCaching == 2) {
@@ -138,6 +154,9 @@ class Blitz extends Plugin
         return $uri;
     }
 
+    /**
+     * Registers element events
+     */
     private function _registerElementEvents()
     {
         // Cache elements
@@ -159,6 +178,8 @@ class Blitz extends Plugin
     }
 
     /**
+     * Registers cacheable request events
+     *
      * @param int $siteId
      * @param string $uri
      */
@@ -202,6 +223,9 @@ class Blitz extends Plugin
         );
     }
 
+    /**
+     * Registers utilities
+     */
     private function _registerUtilities()
     {
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
@@ -213,6 +237,9 @@ class Blitz extends Plugin
         );
     }
 
+    /**
+     * Registers user permissions
+     */
     private function _registerUserPermissions()
     {
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,

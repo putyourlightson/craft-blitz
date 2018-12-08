@@ -57,6 +57,11 @@ class SettingsModel extends Model
      */
     public $cacheElementQueries = true;
 
+    /**
+     * @var bool
+     */
+    public $sendPoweredByHeader = true;
+
     // Public Methods
     // =========================================================================
 

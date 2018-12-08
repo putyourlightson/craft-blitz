@@ -44,4 +44,7 @@ return [
 
     // Whether element queries should be cached in the database.
     //'cacheElementQueries' => true,
+
+    // Whether an `X-Powered-By: Craft CMS, Blitz` header should be sent.
+    //'sendPoweredByHeader' => true,
 ];
