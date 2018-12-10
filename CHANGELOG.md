@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
-## 1.9.2 - Unreleased
+## 1.9.2 - 2018-12-10
 ### Added
 - Added `sendPoweredByHeader` config setting to determine whether an `X-Powered-By: Blitz` header should be sent.
+
+### Fixed
+- Fixed a bug in which homepage was not cached if the site base URL contained a trailing slash.
 
 ## 1.9.1 - 2018-12-06
 ### Fixed

@@ -146,7 +146,8 @@ class Blitz extends Plugin
         }
 
         // Remove site base URL
-        $uri = str_replace(Craft::getAlias($site->baseUrl), '', $uri);
+        $baseUrl = trim(Craft::getAlias($site->baseUrl), '/');
+        $uri = str_replace($baseUrl, '', $uri);
 
         // Trim slashes from the beginning and end of the URI
         $uri = trim($uri, '/');
