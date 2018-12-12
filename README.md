@@ -135,6 +135,8 @@ Below is an example of how you might use the tags to create a page containing dy
      
      </form>
 
+In the case above it would make sense to add `ajax.*` as an excluded URI pattern in the plugin settings.
+
 ## Cache Invalidation
 
 When an element is created, updated or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.

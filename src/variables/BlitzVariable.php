@@ -79,7 +79,7 @@ class BlitzVariable
 
         $view->registerJs('blitzInject('.$this->_injected.', "'.$uri.'");', View::POS_END);
 
-        $output = '<div id="'.$id.'"></div>';
+        $output = '<span class="blitz-inject" id="'.$id.'"></span>';
 
         return Template::raw($output);
     }
