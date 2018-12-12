@@ -49,6 +49,11 @@ class CacheService extends Component
      */
     private $_nonCacheableElementTypes;
 
+    /**
+     * @var array
+     */
+    private $_processedQueries = [];
+
     // Public Methods
     // =========================================================================
 
@@ -162,12 +167,12 @@ class CacheService extends Component
             return;
         }
 
-        $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
-
         // Don't proceed if element caching is disabled
         if (!$this->_settings->cacheElements) {
             return;
         }
+
+        $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
 
         /** @var Element $element */
         $values = [
@@ -199,12 +204,15 @@ class CacheService extends Component
             return;
         }
 
-        $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
-
         // Don't proceed if element query caching is disabled
         if (!$this->_settings->cacheElementQueries) {
             return;
         }
+
+        $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
+
+        // Get the element type
+        $elementType = $elementQuery->elementType;
 
         // Based on code from includeElementQueryInTemplateCaches method in \craft\services\TemplateCaches)
         $query = $elementQuery->query;
@@ -217,37 +225,46 @@ class CacheService extends Component
         $elementQuery->customFields = null;
 
         // Base64-encode the query so db\Connection::quoteSql() doesn't tweak any of the table/columns names
-        $values = [
-            'cacheId' => $cacheId,
-            'type' => $elementQuery->elementType,
-            'query' => base64_encode(serialize($elementQuery))
-        ];
+        $encodedQuery = base64_encode(serialize($elementQuery));
 
         // Set back to original values
         $elementQuery->query = $query;
         $elementQuery->subQuery = $subQuery;
         $elementQuery->customFields = $customFields;
 
+        // Don't proceed if this query has already been processed (required to prevent an infinite loop when calling  $elementQuery->ids() below)
+        if (in_array($encodedQuery, $this->_processedQueries)) {
+            return;
+        }
+
+        $this->_processedQueries[] = $encodedQuery;
+
         // If a record with the values does not exist then create a new one
-        /** @var ElementQueryCacheRecord $elementQueryCacheRecord */
-        $elementQueryCacheRecord = ElementQueryCacheRecord::find()
-            ->joinWith('elementQuery', false, 'INNER JOIN')
-            ->where($values)
-            ->one();
+        $elementQueryCacheRecordCount = ElementQueryCacheRecord::find()
+            ->innerJoinWith('elementQuery', false)
+            ->where([
+                'cacheId' => $cacheId,
+                'type' => $elementType,
+                'query' => $encodedQuery,
+            ])
+            ->count();
 
-        if ($elementQueryCacheRecord === null) {
+        if ($elementQueryCacheRecordCount == 0) {
             $elementQueryCacheRecord = new ElementQueryCacheRecord(['cacheId' => $cacheId]);
-
-            // Remove cacheId from values
-            unset($values['cacheId']);
 
             // If an element query record with the values does not exist then create a new one
             $elementQueryRecord = ElementQueryRecord::find()
-                ->where($values)
+                ->where([
+                    'type' => $elementType,
+                    'query' => $encodedQuery,
+                ])
                 ->one();
 
             if ($elementQueryRecord === null) {
-                $elementQueryRecord = new ElementQueryRecord($values);
+                $elementQueryRecord = new ElementQueryRecord();
+                $elementQueryRecord->type = $elementType;
+                $elementQueryRecord->query = $encodedQuery;
+                $elementQueryRecord->elementIds = implode(',', $elementQuery->ids());
                 $elementQueryRecord->save();
             }
 
@@ -336,7 +353,7 @@ class CacheService extends Component
     {
         // Get and delete element query records without an associated element query cache
         $elementQueryRecords = ElementQueryRecord::find()
-            ->joinWith('elementQueryCache')
+            ->joinWith('elementQueryCaches')
             ->where(['cacheId' => null])
             ->all();
 

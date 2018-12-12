@@ -97,6 +97,7 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'type' => $this->string()->notNull(),
                 'query' => $this->longText(),
+                'elementIds' => $this->longText(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),

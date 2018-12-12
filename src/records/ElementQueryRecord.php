@@ -13,7 +13,8 @@ use yii\db\ActiveQueryInterface;
  * @property int $cacheId
  * @property string $type
  * @property string $query
- * @property ElementQueryCacheRecord[] $elementQueryCache
+ * @property string $elementIds
+ * @property ElementQueryCacheRecord[] $elementQueryCaches
  */
 class ElementQueryRecord extends ActiveRecord
 {
@@ -31,11 +32,11 @@ class ElementQueryRecord extends ActiveRecord
     }
 
     /**
-     * Returns the associated element query cache
+     * Returns the associated element query caches
      *
      * @return ActiveQueryInterface
      */
-    public function getElementQueryCache(): ActiveQueryInterface
+    public function getElementQueryCaches(): ActiveQueryInterface
     {
         return $this->hasMany(ElementQueryCacheRecord::class, ['queryId' => 'id']);
     }

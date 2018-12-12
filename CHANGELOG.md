@@ -1,5 +1,12 @@
 # Release Notes for Blitz
 
+## 1.10.0 - 2018-12-12
+### Added
+- Added element IDs that are returned by element queries to allow for detecting when deleted entries should trigger a cache refresh ([#51](https://github.com/putyourlightson/craft-blitz/issues/51)).
+
+### Changed
+- Changed dynamically injected tag from `div` to `span` and added a class for easier styling.
+
 ## 1.9.2 - 2018-12-10
 ### Added
 - Added `sendPoweredByHeader` config setting to determine whether an `X-Powered-By: Blitz` header should be sent.
