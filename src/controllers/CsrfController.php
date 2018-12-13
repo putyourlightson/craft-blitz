@@ -32,7 +32,7 @@ class CsrfController extends Controller
         $generalConfig = Craft::$app->getConfig()->getGeneral();
 
         if ($generalConfig->enableCsrfProtection === '') {
-            return '';
+            return $this->asRaw('');
         }
 
         $input = '<input type="hidden" name="'.$generalConfig->csrfTokenName.'" value="'.Craft::$app->getRequest()->getCsrfToken().'">';

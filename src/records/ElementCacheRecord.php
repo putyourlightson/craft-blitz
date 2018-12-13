@@ -10,7 +10,6 @@ use craft\records\Element;
 use yii\db\ActiveQueryInterface;
 
 /**
- * @property int $id
  * @property int $cacheId
  * @property int $elementId
  * @property CacheRecord $cache

@@ -52,7 +52,12 @@ class CacheService extends Component
     /**
      * @var array
      */
-    private $_processedQueries = [];
+    private $_addElementCaches = [];
+
+    /**
+     * @var array
+     */
+    private $_addElementQueryCaches = [];
 
     // Public Methods
     // =========================================================================
@@ -107,6 +112,11 @@ class CacheService extends Component
      */
     public function getIsCacheableUri(int $siteId, string $uri): bool
     {
+        // Ignore URIs that contain index.php
+        if (strpos($uri, 'index.php') !== false) {
+            return false;
+        }
+
         // Excluded URI patterns take priority
         if (is_array($this->_settings->excludedUriPatterns)) {
             foreach ($this->_settings->excludedUriPatterns as $excludedUriPattern) {
@@ -154,65 +164,49 @@ class CacheService extends Component
     }
 
     /**
-     * Adds an element cache to the database.
+     * Adds an element cache.
      *
      * @param ElementInterface $element
-     * @param int $siteId
-     * @param string $uri
      */
-    public function addElementCache(ElementInterface $element, int $siteId, string $uri)
+    public function addElementCache(ElementInterface $element)
     {
-        // Don't proceed if this is a non cacheable element type
-        if (in_array(get_class($element), $this->getNonCacheableElementTypes(), true)) {
-            return;
-        }
-
         // Don't proceed if element caching is disabled
         if (!$this->_settings->cacheElements) {
             return;
         }
 
-        $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
+        // Don't proceed if this is a non cacheable element type
+        if (in_array(get_class($element), $this->getNonCacheableElementTypes(), true)) {
+            return;
+        }
 
         /** @var Element $element */
-        $values = [
-            'cacheId' => $cacheId,
-            'elementId' => $element->id,
-        ];
-
-        $elementCacheRecordCount = ElementCacheRecord::find()
-            ->where($values)
-            ->count();
-
-        if ($elementCacheRecordCount == 0) {
-            $elementCacheRecord = new ElementCacheRecord($values);
-            $elementCacheRecord->save();
+        if (!in_array($element->id, $this->_addElementCaches, true)) {
+            $this->_addElementCaches[] = $element->id;
         }
     }
 
     /**
-     * Adds an element query cache to the database.
+     * Adds an element query cache.
      *
      * @param ElementQuery $elementQuery
-     * @param int $siteId
-     * @param string $uri
      */
-    public function addElementQueryCache(ElementQuery $elementQuery, int $siteId, string $uri)
+    public function addElementQueryCache(ElementQuery $elementQuery)
     {
-        // Don't proceed if this is a non cacheable element type
-        if (in_array($elementQuery->elementType, $this->getNonCacheableElementTypes(), true)) {
-            return;
-        }
-
         // Don't proceed if element query caching is disabled
         if (!$this->_settings->cacheElementQueries) {
             return;
         }
 
-        $cacheId = $this->_getOrCreateCacheId($siteId, $uri);
+        // Don't proceed if this is a non cacheable element type
+        if (in_array($elementQuery->elementType, $this->getNonCacheableElementTypes(), true)) {
+            return;
+        }
 
-        // Get the element type
-        $elementType = $elementQuery->elementType;
+        // Don't proceed if the query has a value set for ID
+        if ($elementQuery->id) {
+            return;
+        }
 
         // Based on code from includeElementQueryInTemplateCaches method in \craft\services\TemplateCaches)
         $query = $elementQuery->query;
@@ -232,44 +226,30 @@ class CacheService extends Component
         $elementQuery->subQuery = $subQuery;
         $elementQuery->customFields = $customFields;
 
-        // Don't proceed if this query has already been processed (required to prevent an infinite loop when calling  $elementQuery->ids() below)
-        if (in_array($encodedQuery, $this->_processedQueries)) {
-            return;
+        // Create an element query record if it does not exist
+        $values = [
+            'type' => $elementQuery->elementType,
+            'query' => $encodedQuery,
+        ];
+
+        $queryId = ElementQueryRecord::find()
+            ->select('id')
+            ->where($values)
+            ->scalar();
+
+        if (!$queryId) {
+            Craft::$app->getDb()->createCommand()
+                ->insert(
+                    ElementQueryRecord::tableName(),
+                    $values,
+                    false)
+                ->execute();
+
+            $queryId = Craft::$app->getDb()->getLastInsertID();
         }
 
-        $this->_processedQueries[] = $encodedQuery;
-
-        // If a record with the values does not exist then create a new one
-        $elementQueryCacheRecordCount = ElementQueryCacheRecord::find()
-            ->innerJoinWith('elementQuery', false)
-            ->where([
-                'cacheId' => $cacheId,
-                'type' => $elementType,
-                'query' => $encodedQuery,
-            ])
-            ->count();
-
-        if ($elementQueryCacheRecordCount == 0) {
-            $elementQueryCacheRecord = new ElementQueryCacheRecord(['cacheId' => $cacheId]);
-
-            // If an element query record with the values does not exist then create a new one
-            $elementQueryRecord = ElementQueryRecord::find()
-                ->where([
-                    'type' => $elementType,
-                    'query' => $encodedQuery,
-                ])
-                ->one();
-
-            if ($elementQueryRecord === null) {
-                $elementQueryRecord = new ElementQueryRecord();
-                $elementQueryRecord->type = $elementType;
-                $elementQueryRecord->query = $encodedQuery;
-                $elementQueryRecord->elementIds = implode(',', $elementQuery->ids());
-                $elementQueryRecord->save();
-            }
-
-            $elementQueryCacheRecord->queryId = $elementQueryRecord->id;
-            $elementQueryCacheRecord->save();
+        if (!in_array($queryId, $this->_addElementQueryCaches, true)) {
+            $this->_addElementQueryCaches[] = $queryId;
         }
     }
 
@@ -289,13 +269,50 @@ class CacheService extends Component
         $element = Craft::$app->getElements()->getElementByUri(trim($uriPath, '/'), $siteId, true);
 
         if ($element !== null) {
-            $this->addElementCache($element, $siteId, $uri);
+            $this->addElementCache($element);
         }
 
-        // Ignore URIs that begin with /index.php
-        if (strpos($uri, '/index.php') === 0) {
-            return;
+        $db = Craft::$app->getDb();
+
+        // Create a cache record if it does not exist
+        $db->createCommand()
+            ->insert(
+                CacheRecord::tableName(),
+                ['siteId' => $siteId, 'uri' => $uri],
+                false)
+            ->execute();
+
+        $cacheId = $db->getLastInsertID();
+
+        // Add element caches to database
+        $values = [];
+
+        foreach ($this->_addElementCaches as $elementId) {
+            $values[] = [$cacheId, $elementId];
         }
+
+        $db->createCommand()
+            ->batchInsert(
+                ElementCacheRecord::tableName(),
+                ['cacheId', 'elementId'],
+                $values,
+                false)
+            ->execute();
+
+        // Add element query caches to database
+        $values = [];
+
+        foreach ($this->_addElementQueryCaches as $queryId) {
+            $values[] = [$cacheId, $queryId];
+        }
+
+        $db->createCommand()
+            ->batchInsert(
+                ElementQueryCacheRecord::tableName(),
+                ['cacheId', 'queryId'],
+                $values,
+                false)
+            ->execute();
 
         Blitz::$plugin->file->cacheToFile($output, $siteId, $uri);
     }
@@ -456,37 +473,9 @@ class CacheService extends Component
             $uriPattern = '.*';
         }
 
-        // Escape hash symbols slashes
+        // Escape hash symbols
         $uriPattern = str_replace('#', '\#', $uriPattern);
 
         return preg_match('#'.trim($uriPattern, '/').'#', trim($uri, '/'));
-    }
-
-    /**
-     * Returns a cache record ID or creates it if it doesn't exist.
-     *
-     * @param int $siteId
-     * @param string $uri
-     *
-     * @return int
-     */
-    private function _getOrCreateCacheId(int $siteId, string $uri): int
-    {
-        $values = [
-            'siteId' => $siteId,
-            'uri' => $uri,
-        ];
-
-        $cacheRecord = CacheRecord::find()
-            ->select('id')
-            ->where($values)
-            ->one();
-
-        if ($cacheRecord === null) {
-            $cacheRecord = new CacheRecord($values);
-            $cacheRecord->save();
-        }
-
-        return $cacheRecord->id;
     }
 }

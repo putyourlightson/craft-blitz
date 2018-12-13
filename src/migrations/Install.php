@@ -64,9 +64,6 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
                 'uri' => $this->string()->notNull(),
-                'dateCreated' => $this->dateTime()->notNull(),
-                'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid(),
             ]);
         }
 
@@ -75,9 +72,6 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
-                'dateCreated' => $this->dateTime()->notNull(),
-                'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid(),
             ]);
         }
 
@@ -86,9 +80,6 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'cacheId' => $this->integer()->notNull(),
                 'queryId' => $this->integer()->notNull(),
-                'dateCreated' => $this->dateTime()->notNull(),
-                'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid(),
             ]);
         }
 
@@ -97,10 +88,6 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'type' => $this->string()->notNull(),
                 'query' => $this->longText(),
-                'elementIds' => $this->longText(),
-                'dateCreated' => $this->dateTime()->notNull(),
-                'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid(),
             ]);
         }
 
@@ -116,6 +103,7 @@ class Install extends Migration
     {
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
         $this->createIndex(null, ElementQueryRecord::tableName(), ['type'], false);
+        $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
     }
 
     /**

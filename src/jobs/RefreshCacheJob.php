@@ -66,24 +66,12 @@ class RefreshCacheJob extends BaseJob
 
         /** @var ElementQueryRecord[] $elementQueryRecords */
         foreach ($elementQueryRecords as $elementQueryRecord) {
-            $found = false;
+            /** @var ElementQuery|false $query */
+            /** @noinspection UnserializeExploitsInspection */
+            $query = @unserialize(base64_decode($elementQueryRecord->query));
 
-            // If the element ID is in the record's element IDs
-            if (in_array($this->elementId, explode(',', $elementQueryRecord->elementIds), true)) {
-                $found = true;
-            }
-            else {
-                /** @var ElementQuery|false $query */
-                /** @noinspection UnserializeExploitsInspection */
-                $query = @unserialize(base64_decode($elementQueryRecord->query));
-
-                // If the element ID is in the query's results
-                if ($query !== false && in_array($this->elementId, $query->limit(null)->ids(), true)) {
-                    $found = true;
-                }
-            }
-
-            if ($found) {
+            // If the element ID is in the query's results
+            if ($query !== false && in_array($this->elementId, $query->limit(null)->ids(), true)) {
                 // Get related element query cache records
                 $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
 

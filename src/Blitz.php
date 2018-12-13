@@ -191,20 +191,20 @@ class Blitz extends Plugin
 
         // Register element populate event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event) use ($response, $siteId, $uri) {
+            function(PopulateElementEvent $event) use ($response) {
                 if ($response->getIsOk()) {
-                    $this->cache->addElementCache($event->element, $siteId, $uri);
+                    $this->cache->addElementCache($event->element);
                 }
             }
         );
 
         // Register element query prepare event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_PREPARE,
-            function(CancelableEvent $event) use ($response, $siteId, $uri) {
+            function(CancelableEvent $event) use ($response) {
                 if ($response->getIsOk()) {
                     /** @var ElementQuery $elementQuery */
                     $elementQuery = $event->sender;
-                    $this->cache->addElementQueryCache($elementQuery, $siteId, $uri);
+                    $this->cache->addElementQueryCache($elementQuery);
                 }
             }
         );
