@@ -12,8 +12,10 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\elements\GlobalSet;
 use craft\elements\MatrixBlock;
+use craft\helpers\App;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\jobs\WarmCacheJob;
@@ -22,6 +24,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use yii\db\ActiveQuery;
 
 /**
  * @property bool $isCacheableRequest
@@ -36,6 +39,11 @@ class CacheService extends Component
      */
     const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
 
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
+
     // Properties
     // =========================================================================
 
@@ -45,19 +53,24 @@ class CacheService extends Component
     private $_settings;
 
     /**
-     * @var array|null
+     * @var string[]|null
      */
     private $_nonCacheableElementTypes;
 
     /**
-     * @var array
+     * @var int[]
      */
     private $_addElementCaches = [];
 
     /**
-     * @var array
+     * @var int[]
      */
     private $_addElementQueryCaches = [];
+
+    /**
+     * @var int[]
+     */
+    private $_invalidateCacheIds = [];
 
     // Public Methods
     // =========================================================================
@@ -232,24 +245,18 @@ class CacheService extends Component
             'query' => $encodedQuery,
         ];
 
-        $queryId = ElementQueryRecord::find()
+        $elementQueryRecord = ElementQueryRecord::find()
             ->select('id')
             ->where($values)
-            ->scalar();
+            ->one();
 
-        if (!$queryId) {
-            Craft::$app->getDb()->createCommand()
-                ->insert(
-                    ElementQueryRecord::tableName(),
-                    $values,
-                    false)
-                ->execute();
-
-            $queryId = Craft::$app->getDb()->getLastInsertID();
+        if ($elementQueryRecord === null) {
+            $elementQueryRecord = new ElementQueryRecord($values);
+            $elementQueryRecord->save();
         }
 
-        if (!in_array($queryId, $this->_addElementQueryCaches, true)) {
-            $this->_addElementQueryCaches[] = $queryId;
+        if (!in_array($elementQueryRecord->id, $this->_addElementQueryCaches, true)) {
+            $this->_addElementQueryCaches[] = $elementQueryRecord->id;
         }
     }
 
@@ -272,23 +279,27 @@ class CacheService extends Component
             $this->addElementCache($element);
         }
 
+        // Get cache record or create one if it does not exist
+        $values = ['siteId' => $siteId, 'uri' => $uri];
+
+        $cacheRecord = CacheRecord::find()
+            ->select('id')
+            ->where($values)
+            ->one();
+
+        if ($cacheRecord === null) {
+            $cacheRecord = new CacheRecord($values);
+            $cacheRecord->save();
+        }
+
+        // Use DB connection so we can batch insert
         $db = Craft::$app->getDb();
-
-        // Create a cache record if it does not exist
-        $db->createCommand()
-            ->insert(
-                CacheRecord::tableName(),
-                ['siteId' => $siteId, 'uri' => $uri],
-                false)
-            ->execute();
-
-        $cacheId = $db->getLastInsertID();
 
         // Add element caches to database
         $values = [];
 
         foreach ($this->_addElementCaches as $elementId) {
-            $values[] = [$cacheId, $elementId];
+            $values[] = [$cacheRecord->id, $elementId];
         }
 
         $db->createCommand()
@@ -303,7 +314,7 @@ class CacheService extends Component
         $values = [];
 
         foreach ($this->_addElementQueryCaches as $queryId) {
-            $values[] = [$cacheId, $queryId];
+            $values[] = [$cacheRecord->id, $queryId];
         }
 
         $db->createCommand()
@@ -318,18 +329,18 @@ class CacheService extends Component
     }
 
     /**
-     * Caches by an element.
+     * Invalidates the cache by an element.
      *
      * @param ElementInterface $element
      */
-    public function cacheByElement(ElementInterface $element)
+    public function invalidateElement(ElementInterface $element)
     {
-        // Clear and warm the cache if this is a global set element as they are populated on every request
+        // Clear and the cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
-            Blitz::$plugin->file->clearFileCache();
+            $this->emptyCache();
 
             if ($this->_settings->cachingEnabled AND $this->_settings->warmCacheAutomatically) {
-                Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $this->prepareWarmCacheUrls()]));
+                Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $this->getAllCacheUrls()]));
             }
 
             return;
@@ -346,16 +357,75 @@ class CacheService extends Component
             Blitz::$plugin->file->deleteFileByUri($element->siteId, $element->uri);
         }
 
-        Craft::$app->getQueue()->push(new RefreshCacheJob(['elementId' => $element->id]));
+        App::maxPowerCaptain();
+
+        // Get element cache records grouped by cache ID
+        $elementCacheRecords = ElementCacheRecord::find()
+            ->select('cacheId')
+            ->where(['elementId' => $element->id])
+            ->groupBy('cacheId')
+            ->all();
+
+        /** @var ElementCacheRecord[] $elementCacheRecords */
+        foreach ($elementCacheRecords as $elementCacheRecord) {
+            if (!in_array($elementCacheRecord->cacheId, $this->_invalidateCacheIds, true)) {
+                $this->_invalidateCacheIds[] = $elementCacheRecord->cacheId;
+            }
+        }
+
+        // Get element query records of the element type without already saved cache IDs and without eager-loading
+        $elementQueryRecords = ElementQueryRecord::find()
+            ->select(['query'])
+            ->innerJoinWith([
+                'elementQueryCaches' => function(ActiveQuery $query) {
+                    $query->where(['not', ['cacheId' => $this->_invalidateCacheIds]]);
+                }
+            ], false)
+            ->where(['type' => Craft::$app->getElements()->getElementTypeById($element->id)])
+            ->all();
+
+        /** @var ElementQueryRecord[] $elementQueryRecords */
+        foreach ($elementQueryRecords as $elementQueryRecord) {
+            /** @var ElementQuery|false $query */
+            /** @noinspection UnserializeExploitsInspection */
+            $query = @unserialize(base64_decode($elementQueryRecord->query));
+
+            // If the element ID is in the query's results
+            if ($query !== false && in_array($element->id, $query->ids(), true)) {
+                // Get related element query cache records
+                $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
+
+                // Add cache IDs to the array that do not already exist
+                foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
+                    if (!in_array($elementQueryCacheRecord->cacheId, $this->_invalidateCacheIds, true)) {
+                        $this->_invalidateCacheIds[] = $elementQueryCacheRecord->cacheId;
+                    }
+                }
+            }
+        }
     }
 
     /**
-     * Clears cache record.
+     * Invalidates the cache.
+     */
+    public function invalidateCache()
+    {
+        if (empty($this->_invalidateCacheIds)) {
+            return;
+        }
+
+        Craft::$app->getQueue()->push(new RefreshCacheJob([
+            'cacheIds' => $this->_invalidateCacheIds,
+        ]));
+    }
+
+    /**
+     * Clears cache records for a given site and URI.
      *
      * @param int $siteId
      * @param string $uri
      */
-    public function clearCacheRecord(int $siteId, string $uri)
+    public function clearCacheRecords(int $siteId, string $uri)
     {
         CacheRecord::deleteAll([
             'siteId' => $siteId,
@@ -380,25 +450,59 @@ class CacheService extends Component
     }
 
     /**
-     * Prepares cache for warming and returns URLS to warm.
+     * Empties the entire cache.
+     *
+     * @param bool $clearRecords
+     */
+    public function emptyCache(bool $clearRecords = false)
+    {
+        // Empties the file cache
+        Blitz::$plugin->file->emptyFileCache();
+
+        // Get all cache IDs
+        $cacheIds = CacheRecord::find()
+            ->select('id')
+            ->column();
+
+        $this->afterRefreshCache($cacheIds);
+
+        if ($clearRecords) {
+            // Delete all cache records
+            CacheRecord::deleteAll();
+        }
+    }
+
+    /**
+     * Fires an event after the cache is refreshed.
+     *
+     * @param int[] $cacheIds
+     */
+    public function afterRefreshCache(array $cacheIds)
+    {
+        if (empty($cacheIds)) {
+            return;
+        }
+
+        // Fire an 'afterRefreshCache' event
+        if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, new RefreshCacheEvent([
+                'cacheIds' => $cacheIds,
+            ]));
+        }
+    }
+
+    /**
+     * Gets all cache URLs.
      *
      * @return string[]
      */
-    public function prepareWarmCacheUrls(): array
+    public function getAllCacheUrls(): array
     {
-        if (empty($this->_settings->cacheFolderPath)) {
-            return [];
-        }
-
-        Blitz::$plugin->file->clearFileCache();
-
-        $count = 0;
         $urls = [];
 
         // Get URLs from all cache records
         $cacheRecords = CacheRecord::find()
-            // ID is required for later deleting record
-            ->select(['id', 'siteId', 'uri'])
+            ->select(['siteId', 'uri'])
             ->all();
 
         /** @var CacheRecord $cacheRecord */
@@ -406,9 +510,6 @@ class CacheService extends Component
             if ($this->getIsCacheableUri($cacheRecord->siteId, $cacheRecord->uri)) {
                 $urls[] = UrlHelper::siteUrl($cacheRecord->uri, null, null, $cacheRecord->siteId);
             }
-
-            // Delete cache record so we get a fresh cache
-            $cacheRecord->delete();
         }
 
         // Get URLs from all element types

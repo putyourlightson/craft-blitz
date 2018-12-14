@@ -35,7 +35,7 @@ class SettingsModel extends Model
     /**
      * @var int
      */
-    public $concurrency = 1;
+    public $concurrency = 5;
 
     /**
      * @var mixed

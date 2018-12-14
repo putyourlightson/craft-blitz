@@ -48,7 +48,7 @@
 {{ forms.textField({
 	label: "Cache Folder Path"|t('blitz'),
 	instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
-    warning: (config.cachingEnabled is defined ? configWarning('cacheFolderPath')),
+    warning: (config.cacheFolderPath is defined ? configWarning('cacheFolderPath')),
 	name: 'cacheFolderPath',
 	value: settings.cacheFolderPath,
 	errors: settings.getErrors('cacheFolderPath'),
@@ -64,7 +64,7 @@
 	unit: "concurrent requests."|t('blitz'),
 	label: "Concurrency"|t('blitz'),
 	instructions: "The max number of multiple concurrent requests to use when warming the cache."|t('blitz') ~ info,
-	warning: (config.cachingEnabled is defined ? configWarning('concurrency')),
+	warning: (config.concurrency is defined ? configWarning('concurrency')),
 	name: 'concurrency',
 	value: settings.concurrency,
 	errors: settings.getErrors('concurrency'),
@@ -113,7 +113,7 @@
 {{ forms.editableTableField({
 	label: "Included URI Patterns"|t('blitz'),
 	instructions: "The URI patterns to include in static file caching."|t('blitz'),
-    warning: (config.cachingEnabled is defined ? configWarning('includedUriPatterns')),
+    warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
     name: 'includedUriPatterns',
     id: 'includedUriPatterns',
 	cols: cols,
@@ -125,7 +125,7 @@
 {{ forms.editableTableField({
 	label: "Excluded URI Patterns"|t('blitz'),
 	instructions: "The URI patterns to exclude from static file caching (overrides any matching patterns to include)."|t('blitz'),
-    warning: (config.cachingEnabled is defined ? configWarning('excludedUriPatterns')),
+    warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
     name: 'excludedUriPatterns',
     id: 'excludedUriPatterns',
 	cols: cols,

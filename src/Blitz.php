@@ -20,6 +20,7 @@ use craft\services\Elements;
 use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
+use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
 use putyourlightson\blitz\models\SettingsModel;
@@ -33,6 +34,7 @@ use yii\base\Event;
  *
  * @property CacheService $cache
  * @property FileService $file
+ *
  * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
@@ -160,21 +162,30 @@ class Blitz extends Plugin
      */
     private function _registerElementEvents()
     {
-        // Cache elements
+        // Invalidate elements
         Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
             function(ElementEvent $event) {
-                $this->cache->cacheByElement($event->element);
+                $this->cache->invalidateElement($event->element);
             }
         );
         Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
             function(MoveElementEvent $event) {
-                $this->cache->cacheByElement($event->element);
+                $this->cache->invalidateElement($event->element);
             }
         );
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(ElementEvent $event) {
-                $this->cache->cacheByElement($event->element);
+                $this->cache->invalidateElement($event->element);
             }
+        );
+
+        // Invalidate cache after response is prepared (set append to false we get in early)
+        Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
+            function() {
+                $this->cache->invalidateCache();
+            },
+            null,
+            false
         );
     }
 
@@ -212,7 +223,7 @@ class Blitz extends Plugin
         // Register template page render events
         Event::on(View::class, View::EVENT_BEFORE_RENDER_PAGE_TEMPLATE,
             function() use ($siteId, $uri) {
-                $this->cache->clearCacheRecord($siteId, $uri);
+                $this->cache->clearCacheRecords($siteId, $uri);
             }
         );
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,

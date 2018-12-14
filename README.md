@@ -159,7 +159,9 @@ Note that if the `@web` alias, or any other method that requires a web request, 
 
 ## Considerations
 
-Craft's template caching `{% cache %}` tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to remove all template caching from URLs that Blitz will cache.
+Craft's template caching `{% cache %}` tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to disable template caching completely in the `config/general.php` file:
+
+    'enableTemplateCaching' => false,
 
 If a global is saved then Blitz will clear the entire cache and warm it if the "Warm Cache Automatically" setting is enabled. This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 

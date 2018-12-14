@@ -5,10 +5,12 @@
 
 namespace putyourlightson\blitz\records;
 
-use craft\db\ActiveRecord;
 use yii\db\ActiveQueryInterface;
+use yii\db\ActiveRecord;
 
 /**
+ * A Yii ActiveRecord
+ *
  * @property int $id
  * @property int $cacheId
  * @property string $type

@@ -29,7 +29,7 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Clearing Blitz cache.').PHP_EOL);
 
-        Blitz::$plugin->file->clearFileCache();
+        Blitz::$plugin->cache->emptyCache();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
     }
@@ -50,8 +50,11 @@ class CacheController extends Controller
             return;
         }
 
-        // Prepare and get warm cache URLS
-        $urls = Blitz::$plugin->cache->prepareWarmCacheUrls();
+        Blitz::$plugin->cache->emptyCache(true);
+
+        // Get warm cache URLS
+        $urls = Blitz::$plugin->cache->getAllCacheUrls();
+
         $total = count($urls);
         $count = 0;
         $success = 0;

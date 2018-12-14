@@ -33,6 +33,9 @@ return [
     // The relative path to your cache folder from your public webroot.
     //'cacheFolderPath' => 'cache/blitz',
 
+    // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
+    //'concurrency' => 5,
+
     // The URI patterns to include in static file caching. The second variable represents a site ID, or a blank string for all sites.
     //'includedUriPatterns' => [["pages/.*","1"], ["articles/.*","2"]],
 

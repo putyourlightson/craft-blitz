@@ -144,21 +144,6 @@ class FileService extends Component
     }
 
     /**
-     * Clears file cache.
-     */
-    public function clearFileCache()
-    {
-        if (empty($this->_settings->cacheFolderPath)) {
-            return;
-        }
-
-        try {
-            FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$this->_settings->cacheFolderPath));
-        }
-        catch (ErrorException $e) {}
-    }
-
-    /**
      * Deletes a file for a given site and URI.
      *
      * @param int $siteId
@@ -172,5 +157,20 @@ class FileService extends Component
         if (is_file($filePath)) {
             @unlink($filePath);
         }
+    }
+
+    /**
+     * Empties the file cache.
+     */
+    public function emptyFileCache()
+    {
+        if (empty($this->_settings->cacheFolderPath)) {
+            return;
+        }
+
+        try {
+            FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$this->_settings->cacheFolderPath));
+        }
+        catch (ErrorException $e) {}
     }
 }

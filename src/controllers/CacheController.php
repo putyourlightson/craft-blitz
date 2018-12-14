@@ -42,13 +42,14 @@ class CacheController extends Controller
         if (is_array($cacheFolders)) {
             foreach ($cacheFolders as $cacheFolder) {
                 try {
+                    // TODO: refactor this so the `afterRefreshCache` event is triggered
                     FileHelper::removeDirectory(FileHelper::normalizePath($cacheFolder));
                 }
                 catch (ErrorException $e) {}
             }
         }
         else {
-            Blitz::$plugin->file->clearFileCache();
+            Blitz::$plugin->cache->emptyCache();
         }
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully cleared.'));
@@ -79,7 +80,13 @@ class CacheController extends Controller
             return $this->redirectToPostedUrl();
         }
 
-        Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->prepareWarmCacheUrls()]));
+        Blitz::$plugin->cache->emptyCache(true);
+
+        $settings = Blitz::$plugin->getSettings();
+
+        if ($settings->cachingEnabled AND $settings->warmCacheAutomatically) {
+            Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->getAllCacheUrls()]));
+        }
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully queued for warming.'));
 
