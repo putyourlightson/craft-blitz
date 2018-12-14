@@ -239,24 +239,30 @@ class CacheService extends Component
         $elementQuery->subQuery = $subQuery;
         $elementQuery->customFields = $customFields;
 
-        // Create an element query record if it does not exist
+        // Use DB connection so we can batch insert and exclude audit columns
+        $db = Craft::$app->getDb();
+
+        // Get element query record or create one if it does not exist
         $values = [
             'type' => $elementQuery->elementType,
             'query' => $encodedQuery,
         ];
 
-        $elementQueryRecord = ElementQueryRecord::find()
+        $queryId = ElementQueryRecord::find()
             ->select('id')
             ->where($values)
-            ->one();
+            ->scalar();
 
-        if ($elementQueryRecord === null) {
-            $elementQueryRecord = new ElementQueryRecord($values);
-            $elementQueryRecord->save();
+        if (!$queryId) {
+            $db->createCommand()
+                ->insert(ElementQueryRecord::tableName(), $values, false)
+                ->execute();
+
+            $queryId = $db->getLastInsertID();
         }
 
-        if (!in_array($elementQueryRecord->id, $this->_addElementQueryCaches, true)) {
-            $this->_addElementQueryCaches[] = $elementQueryRecord->id;
+        if (!in_array($queryId, $this->_addElementQueryCaches, true)) {
+            $this->_addElementQueryCaches[] = $queryId;
         }
     }
 
@@ -279,50 +285,48 @@ class CacheService extends Component
             $this->addElementCache($element);
         }
 
-        // Get cache record or create one if it does not exist
-        $values = ['siteId' => $siteId, 'uri' => $uri];
+        // Use DB connection so we can batch insert and exclude audit columns
+        $db = Craft::$app->getDb();
 
-        $cacheRecord = CacheRecord::find()
+        // Get cache record or create one if it does not exist
+        $values = [
+            'siteId' => $siteId,
+            'uri' => $uri,
+        ];
+
+        $cacheId = CacheRecord::find()
             ->select('id')
             ->where($values)
-            ->one();
+            ->scalar();
 
-        if ($cacheRecord === null) {
-            $cacheRecord = new CacheRecord($values);
-            $cacheRecord->save();
+        if (!$cacheId) {
+            $db->createCommand()
+                ->insert(CacheRecord::tableName(), $values, false)
+                ->execute();
+
+            $cacheId = $db->getLastInsertID();
         }
-
-        // Use DB connection so we can batch insert
-        $db = Craft::$app->getDb();
 
         // Add element caches to database
         $values = [];
 
         foreach ($this->_addElementCaches as $elementId) {
-            $values[] = [$cacheRecord->id, $elementId];
+            $values[] = [$cacheId, $elementId];
         }
 
         $db->createCommand()
-            ->batchInsert(
-                ElementCacheRecord::tableName(),
-                ['cacheId', 'elementId'],
-                $values,
-                false)
+            ->batchInsert(ElementCacheRecord::tableName(), ['cacheId', 'elementId'], $values, false)
             ->execute();
 
         // Add element query caches to database
         $values = [];
 
         foreach ($this->_addElementQueryCaches as $queryId) {
-            $values[] = [$cacheRecord->id, $queryId];
+            $values[] = [$cacheId, $queryId];
         }
 
         $db->createCommand()
-            ->batchInsert(
-                ElementQueryCacheRecord::tableName(),
-                ['cacheId', 'queryId'],
-                $values,
-                false)
+            ->batchInsert(ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], $values, false)
             ->execute();
 
         Blitz::$plugin->file->cacheToFile($output, $siteId, $uri);
@@ -375,7 +379,7 @@ class CacheService extends Component
 
         // Get element query records of the element type without already saved cache IDs and without eager-loading
         $elementQueryRecords = ElementQueryRecord::find()
-            ->select(['query'])
+            ->select(['id', 'query'])
             ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) {
                     $query->where(['not', ['cacheId' => $this->_invalidateCacheIds]]);

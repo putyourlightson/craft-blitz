@@ -2,6 +2,7 @@
 
 namespace putyourlightson\blitz\migrations;
 
+use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -52,6 +53,9 @@ class m181213_120000_remove_id_audit_columns extends Migration
                 $this->dropColumn($table, 'uid');
             }
         }
+
+        // Refresh the db schema caches
+        Craft::$app->db->schema->refresh();
     }
 
     /**

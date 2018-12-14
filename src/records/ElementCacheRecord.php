@@ -7,11 +7,9 @@ namespace putyourlightson\blitz\records;
 
 use craft\records\Element;
 use yii\db\ActiveQueryInterface;
-use yii\db\ActiveRecord;
+use craft\db\ActiveRecord;
 
 /**
- * A Yii ActiveRecord
- *
  * @property int $cacheId
  * @property int $elementId
  * @property CacheRecord $cache

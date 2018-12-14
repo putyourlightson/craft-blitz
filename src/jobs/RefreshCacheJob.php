@@ -10,7 +10,6 @@ use craft\helpers\App;
 use craft\helpers\UrlHelper;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\records\CacheRecord;
 
 class RefreshCacheJob extends BaseJob

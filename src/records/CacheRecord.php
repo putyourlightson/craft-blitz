@@ -5,11 +5,9 @@
 
 namespace putyourlightson\blitz\records;
 
-use yii\db\ActiveRecord;
+use craft\db\ActiveRecord;
 
 /**
- * A Yii ActiveRecord
- *
  * @property int $id
  * @property int $siteId
  * @property string $uri

@@ -173,6 +173,11 @@ class Blitz extends Plugin
                 $this->cache->invalidateElement($event->element);
             }
         );
+        Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
+            function(ElementEvent $event) {
+                $this->cache->invalidateElement($event->element);
+            }
+        );
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(ElementEvent $event) {
                 $this->cache->invalidateElement($event->element);
@@ -180,12 +185,10 @@ class Blitz extends Plugin
         );
 
         // Invalidate cache after response is prepared (set append to false we get in early)
-        Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
+        Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE,
             function() {
                 $this->cache->invalidateCache();
-            },
-            null,
-            false
+            }
         );
     }
 
