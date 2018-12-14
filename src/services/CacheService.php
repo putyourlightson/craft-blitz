@@ -246,22 +246,18 @@ class CacheService extends Component
         $db = Craft::$app->getDb();
 
         // Get element query record from type and hash or create one if it does not exist
-        $values = [
-            'type' => $elementQuery->elementType,
-            'hash' => $hash,
-        ];
-
         $queryId = ElementQueryRecord::find()
             ->select('id')
-            ->where($values)
+            ->where(['hash' => $hash])
             ->scalar();
 
         if (!$queryId) {
-            // Set query before inserting
-            $values['query'] = $encodedQuery;
-
             $db->createCommand()
-                ->insert(ElementQueryRecord::tableName(), $values, false)
+                ->insert(ElementQueryRecord::tableName(), [
+                    'hash' => $hash,
+                    'type' => $elementQuery->elementType,
+                    'query' => $encodedQuery,
+                ], false)
                 ->execute();
 
             $queryId = $db->getLastInsertID();
@@ -449,14 +445,13 @@ class CacheService extends Component
     public function cleanElementQueryTable()
     {
         // Get and delete element query records without an associated element query cache
-        $elementQueryRecords = ElementQueryRecord::find()
+        $elementQueryRecordIds = ElementQueryRecord::find()
+            ->select('id')
             ->joinWith('elementQueryCaches')
             ->where(['cacheId' => null])
-            ->all();
+            ->column();
 
-        foreach ($elementQueryRecords as $elementQueryRecord) {
-            $elementQueryRecord->delete();
-        }
+        ElementQueryRecord::deleteAll(['id' => $elementQueryRecordIds]);
     }
 
     /**
