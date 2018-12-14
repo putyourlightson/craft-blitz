@@ -34,15 +34,16 @@ class m181125_120000_add_elementqueries_table extends Migration
         if (!$this->db->tableExists(ElementQueryRecord::tableName())) {
             $this->createTable(ElementQueryRecord::tableName(), [
                 'id' => $this->primaryKey(),
+                'hash' => $this->string()->notNull(),
                 'type' => $this->string()->notNull(),
-                'hash' => $this->string(),
                 'query' => $this->longText(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),
             ]);
 
-            $this->createIndex(null, ElementQueryRecord::tableName(), ['type', 'hash'], false);
+            $this->createIndex(null, ElementQueryRecord::tableName(), 'hash', true);
+            $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
         }
 
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);

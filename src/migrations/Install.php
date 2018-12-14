@@ -41,8 +41,8 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
-        $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
+        $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementCacheRecord::tableName());
         $this->dropTableIfExists(CacheRecord::tableName());
 
@@ -69,7 +69,6 @@ class Install extends Migration
 
         if (!$this->db->tableExists(ElementCacheRecord::tableName())) {
             $this->createTable(ElementCacheRecord::tableName(), [
-                'id' => $this->primaryKey(),
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
             ]);
@@ -77,7 +76,6 @@ class Install extends Migration
 
         if (!$this->db->tableExists(ElementQueryCacheRecord::tableName())) {
             $this->createTable(ElementQueryCacheRecord::tableName(), [
-                'id' => $this->primaryKey(),
                 'cacheId' => $this->integer()->notNull(),
                 'queryId' => $this->integer()->notNull(),
             ]);
@@ -86,8 +84,8 @@ class Install extends Migration
         if (!$this->db->tableExists(ElementQueryRecord::tableName())) {
             $this->createTable(ElementQueryRecord::tableName(), [
                 'id' => $this->primaryKey(),
+                'hash' => $this->string()->notNull(),
                 'type' => $this->string()->notNull(),
-                'hash' => $this->string(),
                 'query' => $this->longText(),
             ]);
         }
@@ -103,8 +101,9 @@ class Install extends Migration
     protected function createIndexes()
     {
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
-        $this->createIndex(null, ElementQueryRecord::tableName(), ['type'], false);
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
+        $this->createIndex(null, ElementQueryRecord::tableName(), 'hash', true);
+        $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
     }
 
     /**
@@ -114,10 +113,10 @@ class Install extends Migration
      */
     protected function addForeignKeys()
     {
-        $this->addForeignKey(null, CacheRecord::tableName(), 'siteId', Site::tableName(), 'id', 'CASCADE');
-        $this->addForeignKey(null, ElementCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE');
-        $this->addForeignKey(null, ElementCacheRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE');
-        $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE');
-        $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE');
+        $this->addForeignKey(null, CacheRecord::tableName(), 'siteId', Site::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementCacheRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
     }
 }
