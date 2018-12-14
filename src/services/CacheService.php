@@ -234,6 +234,9 @@ class CacheService extends Component
         // Base64-encode the query so db\Connection::quoteSql() doesn't tweak any of the table/columns names
         $encodedQuery = base64_encode(serialize($elementQuery));
 
+        // Hash the encoded query for quicker indexing
+        $hash = md5($encodedQuery);
+
         // Set back to original values
         $elementQuery->query = $query;
         $elementQuery->subQuery = $subQuery;
@@ -242,10 +245,10 @@ class CacheService extends Component
         // Use DB connection so we can batch insert and exclude audit columns
         $db = Craft::$app->getDb();
 
-        // Get element query record or create one if it does not exist
+        // Get element query record from type and hash or create one if it does not exist
         $values = [
             'type' => $elementQuery->elementType,
-            'query' => $encodedQuery,
+            'hash' => $hash,
         ];
 
         $queryId = ElementQueryRecord::find()
@@ -254,6 +257,9 @@ class CacheService extends Component
             ->scalar();
 
         if (!$queryId) {
+            // Set query before inserting
+            $values['query'] = $encodedQuery;
+
             $db->createCommand()
                 ->insert(ElementQueryRecord::tableName(), $values, false)
                 ->execute();

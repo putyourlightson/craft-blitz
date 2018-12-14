@@ -87,6 +87,7 @@ class Install extends Migration
             $this->createTable(ElementQueryRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'type' => $this->string()->notNull(),
+                'hash' => $this->string(),
                 'query' => $this->longText(),
             ]);
         }

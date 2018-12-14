@@ -12,6 +12,7 @@ use craft\db\ActiveRecord;
  * @property int $id
  * @property int $cacheId
  * @property string $type
+ * @property string $hash
  * @property string $query
  * @property ElementQueryCacheRecord[] $elementQueryCaches
  */

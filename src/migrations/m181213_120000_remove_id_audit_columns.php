@@ -19,10 +19,6 @@ class m181213_120000_remove_id_audit_columns extends Migration
      */
     public function safeUp()
     {
-        // Create new indexes
-        $this->createIndex(null, ElementCacheRecord::tableName(), ['cacheId', 'elementId'], true);
-        $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
-
         // Remove ID columns
         $tables = [
             ElementCacheRecord::tableName(),

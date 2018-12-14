@@ -18,6 +18,8 @@ class m181125_120000_add_elementqueries_table extends Migration
      */
     public function safeUp()
     {
+        $this->createIndex(null, ElementCacheRecord::tableName(), ['cacheId', 'elementId'], true);
+
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
 
         $this->createTable(ElementQueryCacheRecord::tableName(), [
@@ -33,14 +35,17 @@ class m181125_120000_add_elementqueries_table extends Migration
             $this->createTable(ElementQueryRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'type' => $this->string()->notNull(),
+                'hash' => $this->string(),
                 'query' => $this->longText(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),
             ]);
 
-            $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
+            $this->createIndex(null, ElementQueryRecord::tableName(), ['type', 'hash'], false);
         }
+
+        $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
 
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE');
