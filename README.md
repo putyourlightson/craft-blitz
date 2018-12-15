@@ -16,7 +16,7 @@ Although the performance gains depend on the individual site and server setup, t
 
 ## License
 
-This plugin requires a commercial license which can be purchased through the Craft Plugin Store. The license fee is $49 plus $19 per subsequent year for updates (optional).
+This plugin requires a commercial license which can be purchased through the Craft Plugin Store. The license fee is $59 plus $29 per subsequent year for updates (optional).
 
 ## Requirements
 
