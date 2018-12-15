@@ -6,6 +6,7 @@
 - Added `afterRefreshCache` event for third-party plugins.
 
 ### Changed
+- Changed ability to clear individual file paths to entire sites in utility.
 - Changed dynamically injected tag from `div` to `span` and added a `blitz-inject` class for easier styling.
 
 ### Fixed

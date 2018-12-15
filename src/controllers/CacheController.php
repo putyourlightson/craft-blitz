@@ -11,6 +11,7 @@ use craft\helpers\FileHelper;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\WarmCacheJob;
+use putyourlightson\blitz\records\CacheRecord;
 use yii\base\ErrorException;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
@@ -29,27 +30,30 @@ class CacheController extends Controller
      */
     public function actionClear(): Response
     {
-        $settings = Blitz::$plugin->getSettings();
+        $siteIds = Craft::$app->getRequest()->getBodyParam('siteIds');
 
-        if (empty($settings->cacheFolderPath)) {
-            Craft::$app->getSession()->setError(Craft::t('blitz', 'Blitz cache folder path is not set.'));
+        if (is_array($siteIds)) {
+            $cacheIds = [];
 
-            return $this->redirectToPostedUrl();
-        }
+            /** @var CacheRecord[] $cacheRecords */
+            $cacheRecords = CacheRecord::find()
+                ->where(['siteId' => $siteIds])
+                ->all();
 
-        $cacheFolders = Craft::$app->getRequest()->getBodyParam('caches');
+            foreach ($cacheRecords as $cacheRecord) {
+                $cacheIds[] = $cacheRecord->id;
 
-        if (is_array($cacheFolders)) {
-            foreach ($cacheFolders as $cacheFolder) {
-                try {
-                    // TODO: refactor this so the `afterRefreshCache` event is triggered
-                    FileHelper::removeDirectory(FileHelper::normalizePath($cacheFolder));
-                }
-                catch (ErrorException $e) {}
+                Blitz::$plugin->file->deleteFileByUri($cacheRecord->siteId, $cacheRecord->uri);
             }
+
+            // Trigger afterRefreshCache event
+            $this->afterRefreshCache($cacheIds);
+
+            // Delete cache records so we get fresh caches
+            CacheRecord::deleteAll(['siteId' => $siteIds]);
         }
         else {
-            Blitz::$plugin->cache->emptyCache();
+            Blitz::$plugin->cache->emptyCache(true);
         }
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully cleared.'));
@@ -82,11 +86,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->cache->emptyCache(true);
 
-        $settings = Blitz::$plugin->getSettings();
-
-        if ($settings->cachingEnabled AND $settings->warmCacheAutomatically) {
-            Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->getAllCacheUrls()]));
-        }
+        Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->getAllCacheUrls()]));
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully queued for warming.'));
 

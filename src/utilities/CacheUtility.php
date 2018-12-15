@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Utility;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\records\CacheRecord;
 
 class CacheUtility extends Utility
 {
@@ -46,18 +47,19 @@ class CacheUtility extends Utility
     {
         $options = [];
 
-        $cacheFolderPath = Blitz::$plugin->file->getCacheFolderPath();
+        $sites = Craft::$app->getSites()->getAllSites();
 
-        if ($cacheFolderPath && is_dir($cacheFolderPath)) {
-            $cacheFolders = [];
+        foreach ($sites as $site) {
+            $cacheRecordCount = CacheRecord::find()
+                ->where(['siteId' => $site->id])
+                ->count();
 
-            foreach (FileHelper::findDirectories($cacheFolderPath) as $cacheFolder) {
-                $count = count(FileHelper::findFiles($cacheFolder));
-                $options[] = [
-                    'label' => trim(str_replace(Craft::getAlias('@webroot'), '', $cacheFolder), '/').' ('.$count.' file'.($count == 1 ? '' : 's').')',
-                    'value' => $cacheFolder,
-                ];
-            }
+            $options[] = [
+                'label' => Craft::t('blitz', '{site} ({count} {n,plural,=1{page} other{pages}} cached)',
+                    ['site' => $site->name, 'count' => $cacheRecordCount, 'n' => $cacheRecordCount]
+                ),
+                'value' => $site->id,
+            ];
         }
 
         return Craft::$app->getView()->renderTemplate('blitz/_utility', [

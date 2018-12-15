@@ -456,6 +456,7 @@ class CacheService extends Component
             ->select('id')
             ->column();
 
+        // Trigger afterRefreshCache event
         $this->afterRefreshCache($cacheIds);
 
         if ($clearRecords) {

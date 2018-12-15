@@ -117,7 +117,7 @@ class RefreshCacheJob extends BaseJob
         // Trigger afterRefreshCache event
         Blitz::$plugin->cache->afterRefreshCache($this->cacheIds);
 
-        // Delete cache records so we get a fresh element cache table
+        // Delete cache records so we get fresh caches
         CacheRecord::deleteAll(['id' => $this->cacheIds]);
 
         $settings = Blitz::$plugin->getSettings();
