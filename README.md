@@ -28,32 +28,44 @@ Blitz is available in the Craft Plugin Store and can also be installed manually 
 
     composer require putyourlightson/craft-blitz
 
+## Quick Setup
+
+After installing the plugin, go to the plugin settings.
+
+1. Turn "Enable Caching" on.
+2. Add a row to "Included URI Patterns" such as `__home__` for the homepage or `.*` for the entire site.
+3. Save the settings and visit the homepage (it will be cached in the first visit).
+
 ## Usage
 
 In the plugin settings, enable caching and add at least one included URI pattern. When a URL on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
+
+![Settings](docs/images/settings-1.8.0b.png)
 
 Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even further.
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
-![Settings](docs/images/settings-1.8.0b.png)
+Craft's template caching `{% cache %}` tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to disable template caching completely in the `config/general.php` file:
+
+    'enableTemplateCaching' => false,
 
 ## URI Patterns
 
 URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
-- `^$` Matches the homepage
-- `.*` Matches any character 0 or more times (use this to include everything)
-- `.+` Matches any character 1 or more times
-- `.` Matches any character
-- `\d` Matches any digit
-- `\d{4}` Matches any four digits
-- `\w` Matches any word character
-- `\w+` Matches any word character 1 or more times
-- `entries` Matches anything containing "entries"
-- `^entries` Matches anything beginning with "entries"
-- `^entries/entry$` Matches an exact URI
-- `^entries/\w+$` Matches anything beginning with "entries/" followed by at least 1 word character
+- `__home__` matches the homepage
+- `.*` matches any character 0 or more times (use this to include everything)
+- `.+` matches any character 1 or more times
+- `.` matches any character
+- `\d` matches any digit
+- `\d{4}` matches any four digits
+- `\w` matches any word character
+- `\w+` matches any word character 1 or more times
+- `entries` matches anything containing "entries"
+- `^entries` matches anything beginning with "entries"
+- `^entries/entry$` matches an exact URI
+- `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character
 
 ## Server Rewrite
 
@@ -158,10 +170,6 @@ Console commands can also be used to warm or clear all cache as follows:
 Note that if the `@web` alias, or any other method that requires a web request, is used to determine the site URL then it cannot be included in cache warming with the console command. Using an absolute site URL is therefore recommended.
 
 ## Considerations
-
-Craft's template caching `{% cache %}` tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to disable template caching completely in the `config/general.php` file:
-
-    'enableTemplateCaching' => false,
 
 If a global is saved then Blitz will clear the entire cache and warm it if the "Warm Cache Automatically" setting is enabled. This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 

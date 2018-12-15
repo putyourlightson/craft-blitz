@@ -20,7 +20,7 @@ class SettingsModel extends Model
     /**
      * @var bool
      */
-    public $warmCacheAutomatically = false;
+    public $warmCacheAutomatically = true;
 
     /**
      * @var int

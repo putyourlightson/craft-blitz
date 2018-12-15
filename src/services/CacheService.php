@@ -571,14 +571,22 @@ class CacheService extends Component
             return false;
         }
 
+        // Replace "__home__" alias
+        if ($uriPattern == '__home__') {
+            $uriPattern = '^$';
+        }
+
         // Replace "*" with 0 or more characters as otherwise it'll throw an error
         if ($uriPattern == '*') {
             $uriPattern = '.*';
         }
 
+        // Trim slashes
+        $uriPattern = trim($uriPattern, '/');
+
         // Escape hash symbols
         $uriPattern = str_replace('#', '\#', $uriPattern);
 
-        return preg_match('#'.trim($uriPattern, '/').'#', trim($uri, '/'));
+        return preg_match('#'.$uriPattern.'#', trim($uri, '/'));
     }
 }
