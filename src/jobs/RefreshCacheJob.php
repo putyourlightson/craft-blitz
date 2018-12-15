@@ -6,11 +6,13 @@
 namespace putyourlightson\blitz\jobs;
 
 use Craft;
+use craft\elements\db\ElementQuery;
 use craft\helpers\App;
-use craft\helpers\UrlHelper;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
+use yii\db\ActiveQuery;
 
 class RefreshCacheJob extends BaseJob
 {
@@ -20,7 +22,18 @@ class RefreshCacheJob extends BaseJob
     /**
      * @var int[]
      */
-    public $cacheIds;
+    public $cacheIds = [];
+
+    /**
+     * @var int[]
+     */
+    public $elementIds = [];
+
+    /**
+     * @var string[]
+     */
+    public $elementTypes = [];
+
 
     // Public Methods
     // =========================================================================
@@ -34,7 +47,52 @@ class RefreshCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
-        // Get URLs of caches to clear
+        /*
+         * Get element query records of the element type without already saved cache IDs and without eager-loading.
+         * This is used for detecting if pages with element queries need to be updated.
+         */
+        $elementQueryRecords = ElementQueryRecord::find()
+            ->select(['id', 'query'])
+            ->where(['type' => $this->elementTypes])
+            ->innerJoinWith([
+                'elementQueryCaches' => function(ActiveQuery $query) {
+                    $query->where(['not', ['cacheId' => $this->cacheIds]]);
+                }
+            ], false)
+            ->all();
+
+        /** @var ElementQueryRecord[] $elementQueryRecords */
+        foreach ($elementQueryRecords as $elementQueryRecord) {
+            /** @var ElementQuery|false $query */
+            /** @noinspection UnserializeExploitsInspection */
+            $query = @unserialize(base64_decode($elementQueryRecord->query));
+
+            // Ensure the unserialization worked
+            if ($query === false) {
+                continue;
+            }
+
+            // If one or more of the element IDs are in the query's results
+            $matchedElementIds = array_intersect($this->elementIds, $query->ids());
+
+            if (!empty($matchedElementIds)) {
+                // Get related element query cache records
+                $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
+
+                // Add cache IDs to the array that do not already exist
+                foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
+                    if (!in_array($elementQueryCacheRecord->cacheId, $this->cacheIds, true)) {
+                        $this->cacheIds[] = $elementQueryCacheRecord->cacheId;
+                    }
+                }
+            }
+        }
+
+        if (empty($this->cacheIds)) {
+            return;
+        }
+
+        // Get URLs to clear from cache IDs
         $urls = [];
 
         /** @var CacheRecord[] $cacheRecords */
@@ -47,8 +105,7 @@ class RefreshCacheJob extends BaseJob
         $count = 0;
 
         foreach ($cacheRecords as $cacheRecord) {
-            $url = UrlHelper::siteUrl($cacheRecord->uri, null, null, $cacheRecord->siteId);
-            $urls[] = $url;
+            $urls[] = Blitz::$plugin->cache->getUrl($cacheRecord->siteId, $cacheRecord->uri);
 
             // Delete cached file so we get a fresh file cache
             Blitz::$plugin->file->deleteFileByUri($cacheRecord->siteId, $cacheRecord->uri);
