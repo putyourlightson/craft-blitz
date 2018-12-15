@@ -12,6 +12,8 @@
 ### Fixed
 - Fixed config warnings that were not being displayed on settings page.
 
+> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
+
 ## 1.9.2 - 2018-12-10
 ### Added
 - Added `sendPoweredByHeader` config setting to determine whether an `X-Powered-By: Blitz` header should be sent.
@@ -46,7 +48,7 @@
 
 > {tip} A new `concurrency` setting is available in the plugin settings for faster cache warming.
 
-> {note} This release optimises the element query cache table and the cache should therefore be warmed manually following the update.
+> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
 
 ## 1.7.1 - 2018-11-20
 ### Fixed 

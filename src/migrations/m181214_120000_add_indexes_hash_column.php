@@ -24,6 +24,8 @@ class m181214_120000_add_indexes_hash_column extends Migration
 
         $table = ElementQueryRecord::tableName();
 
+        $this->delete($table);
+
         if (!$this->db->columnExists($table, 'hash')) {
             $this->addColumn($table, 'hash', $this->string()->notNull()->after('id'));
 
