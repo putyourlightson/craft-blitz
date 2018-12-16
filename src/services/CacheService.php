@@ -200,9 +200,12 @@ class CacheService extends Component
             return;
         }
 
+        // Cast ID to integer to ensure the strict type check below works
+        $elementId = (int)$element->id;
+
         /** @var Element $element */
-        if (!in_array($element->id, $this->_addElementCaches, true)) {
-            $this->_addElementCaches[] = $element->id;
+        if (!in_array($elementId, $this->_addElementCaches, true)) {
+            $this->_addElementCaches[] = $elementId;
         }
     }
 
@@ -270,6 +273,9 @@ class CacheService extends Component
             $queryId = $db->getLastInsertID();
         }
 
+        // Cast ID to integer to ensure the strict type check below works
+        $queryId = (int)$queryId;
+
         if (!in_array($queryId, $this->_addElementQueryCaches, true)) {
             $this->_addElementQueryCaches[] = $queryId;
         }
@@ -284,16 +290,6 @@ class CacheService extends Component
      */
     public function cacheOutput(string $output, int $siteId, string $uri)
     {
-        // Get the URI path
-        $uriPath = preg_replace('/\?.*/', '', $uri);
-
-        // If the URI path represents an element then add the full URI to the element cache
-        $element = Craft::$app->getElements()->getElementByUri(trim($uriPath, '/'), $siteId, true);
-
-        if ($element !== null) {
-            $this->addElementCache($element);
-        }
-
         // Use DB connection so we can batch insert and exclude audit columns
         $db = Craft::$app->getDb();
 
@@ -324,7 +320,11 @@ class CacheService extends Component
         }
 
         $db->createCommand()
-            ->batchInsert(ElementCacheRecord::tableName(), ['cacheId', 'elementId'], $values, false)
+            ->batchInsert(
+                ElementCacheRecord::tableName(),
+                ['cacheId', 'elementId'],
+                $values,
+                false)
             ->execute();
 
         // Add element query caches to database
@@ -335,7 +335,11 @@ class CacheService extends Component
         }
 
         $db->createCommand()
-            ->batchInsert(ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], $values, false)
+            ->batchInsert(
+                ElementQueryCacheRecord::tableName(),
+                ['cacheId', 'queryId'],
+                $values,
+                false)
             ->execute();
 
         Blitz::$plugin->file->cacheToFile($output, $siteId, $uri);
@@ -353,7 +357,9 @@ class CacheService extends Component
             $this->emptyCache();
 
             if ($this->_settings->cachingEnabled AND $this->_settings->warmCacheAutomatically) {
-                Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $this->getAllCacheUrls()]));
+                Craft::$app->getQueue()->push(new WarmCacheJob([
+                    'urls' => $this->getAllCacheUrls()
+                ]));
             }
 
             return;
@@ -367,7 +373,7 @@ class CacheService extends Component
             return;
         }
 
-        // Cast element ID to integer as it may come in as a string
+        // Cast ID to integer to ensure the strict type check below works
         $elementId = (int)$element->id;
 
         // Don't proceed if this entry has already been added
