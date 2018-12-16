@@ -2,7 +2,7 @@
 
 ## 1.10.0 - Unreleased
 ### Added
-- Added optimisations to make the caching process even faster and more performant.
+- Added optimisations to make the caching process faster and more performant.
 - Added `afterRefreshCache` event for third-party plugins to use.
 - Added a blank field as an alias for the homepage when matching URI patterns.
 

@@ -16,7 +16,8 @@ Although the performance gains depend on the individual site and server setup, t
 
 ## License
 
-This plugin requires a commercial license which can be purchased through the Craft Plugin Store. The license fee is $59 plus $29 per subsequent year for updates (optional).
+This plugin requires a commercial license which can be purchased through the Craft Plugin Store.  
+The license fee is $59 plus $29 per subsequent year for updates (optional).
 
 ## Requirements
 
@@ -40,8 +41,6 @@ After installing the plugin, go to the plugin settings.
 
 In the plugin settings, enable caching and add at least one included URI pattern. When a URL on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
 
-![Settings](docs/images/settings-1.8.0b.png)
-
 Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even further.
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
@@ -49,6 +48,8 @@ Blitz is compatible with live preview. It will detect when it is being used and 
 Craft’s template caching `{% cache %}` tag doesn’t play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to disable template caching completely in the `config/general.php` file:
 
     'enableTemplateCaching' => false,
+
+![Settings](docs/images/settings-1.8.0b.png)
 
 ## URI Patterns
 
