@@ -4,7 +4,7 @@
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
-It can highly improve a site's performance by reducing the time to first byte (TTFB). This reduces the load time of the site as well as the load on the server. Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
+It can highly improve a site’s performance by reducing the time to first byte (TTFB). This reduces the load time of the site as well as the load on the server. Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
 
 Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency):
 
@@ -32,8 +32,8 @@ Blitz is available in the Craft Plugin Store and can also be installed manually 
 
 After installing the plugin, go to the plugin settings.
 
-1. Turn "Enable Caching" on.
-2. Add a row to "Included URI Patterns" such as `__home__` for the homepage or `.*` for the entire site.
+1. Turn “Enable Caching” on.
+2. Add a row to “Included URI Patterns” such as `__home__` for the homepage or `.*` for the entire site.
 3. Save the settings and visit the homepage (it will be cached in the first visit).
 
 ## Usage
@@ -46,7 +46,7 @@ Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
-Craft's template caching `{% cache %}` tag does not play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to disable template caching completely in the `config/general.php` file:
+Craft’s template caching `{% cache %}` tag doesn’t play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to disable template caching completely in the `config/general.php` file:
 
     'enableTemplateCaching' => false,
 
@@ -120,8 +120,8 @@ If the "Query String Caching" setting is set to `Cache URLs with query strings a
 URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
 
 - `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
-- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page's output in a deterministic way and can therefore be cached as unique pages.
-- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page's output and can therefore be cached as the same page.
+- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
+- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
 
 ## Dynamic Content
 
