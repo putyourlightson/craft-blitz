@@ -34,7 +34,6 @@ class RefreshCacheJob extends BaseJob
      */
     public $elementTypes = [];
 
-
     // Public Methods
     // =========================================================================
 
@@ -48,7 +47,7 @@ class RefreshCacheJob extends BaseJob
         App::maxPowerCaptain();
 
         /*
-         * Get element query records of the element type without already saved cache IDs and without eager-loading.
+         * Get element query records of the element types without already saved cache IDs and without eager-loading.
          * This is used for detecting if pages with element queries need to be updated.
          */
         $elementQueryRecords = ElementQueryRecord::find()
@@ -70,6 +69,14 @@ class RefreshCacheJob extends BaseJob
             // Ensure the unserialization worked
             if ($query === false) {
                 continue;
+            }
+
+            // If the the query has an offset then add it to the limit and make it null
+            if ($query->offset) {
+                if ($query->limit) {
+                    $query->limit($query->limit + $query->offset);
+                }
+                $query->offset(null);
             }
 
             // If one or more of the element IDs are in the query's results
@@ -122,11 +129,9 @@ class RefreshCacheJob extends BaseJob
 
         $settings = Blitz::$plugin->getSettings();
 
-        if ($settings->cachingEnabled AND $settings->warmCacheAutomatically) {
+        if ($settings->cachingEnabled && $settings->warmCacheAutomatically) {
             Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
         }
-
-        return;
     }
 
     // Protected Methods

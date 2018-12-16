@@ -139,18 +139,14 @@ class CacheService extends Component
 
         // Excluded URI patterns take priority
         if (is_array($this->_settings->excludedUriPatterns)) {
-            foreach ($this->_settings->excludedUriPatterns as $excludedUriPattern) {
-                if ($this->_matchUriPattern($excludedUriPattern, $siteId, $uri)) {
-                    return false;
-                }
+            if ($this->matchesUriPattern($this->_settings->excludedUriPatterns, $siteId, $uri)) {
+                return false;
             }
         }
 
         if (is_array($this->_settings->includedUriPatterns)) {
-            foreach ($this->_settings->includedUriPatterns as $includedUriPattern) {
-                if ($this->_matchUriPattern($includedUriPattern, $siteId, $uri)) {
-                    return true;
-                }
+            if ($this->matchesUriPattern($this->_settings->includedUriPatterns, $siteId, $uri)) {
+                return true;
             }
         }
 
@@ -356,7 +352,7 @@ class CacheService extends Component
         if ($element instanceof GlobalSet) {
             $this->emptyCache();
 
-            if ($this->_settings->cachingEnabled AND $this->_settings->warmCacheAutomatically) {
+            if ($this->_settings->cachingEnabled && $this->_settings->warmCacheAutomatically) {
                 Craft::$app->getQueue()->push(new WarmCacheJob([
                     'urls' => $this->getAllCacheUrls()
                 ]));
@@ -552,43 +548,46 @@ class CacheService extends Component
         return $urls;
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
-     * Matches a URI pattern.
+     * Matches a URI pattern in a set of patterns.
      *
-     * @param array $pattern
+     * @param array $patterns
      * @param int $siteId
      * @param string $uri
      *
      * @return bool
      */
-    private function _matchUriPattern(array $pattern, int $siteId, string $uri): bool
+    public function matchesUriPattern(array $patterns, int $siteId, string $uri): bool
     {
-        // Return false if site is not empty and does not match the provided site ID
-        if (!empty($pattern[1]) && $pattern[1] != $siteId) {
-            return false;
+        foreach ($patterns as $pattern) {
+            // Don't proceed if site is not empty and does not match the provided site ID
+            if (!empty($pattern[1]) && $pattern[1] != $siteId) {
+                continue;
+            }
+
+            $uriPattern = $pattern[0];
+
+            // Replace a blank string with the homepage
+            if ($uriPattern == '') {
+                $uriPattern = '^$';
+            }
+
+            // Replace "*" with 0 or more characters as otherwise it'll throw an error
+            if ($uriPattern == '*') {
+                $uriPattern = '.*';
+            }
+
+            // Trim slashes
+            $uriPattern = trim($uriPattern, '/');
+
+            // Escape hash symbols
+            $uriPattern = str_replace('#', '\#', $uriPattern);
+
+            if (preg_match('#'.$uriPattern.'#', trim($uri, '/'))) {
+                return true;
+            }
         }
 
-        $uriPattern = $pattern[0];
-
-        // Replace a blank string with the homepage
-        if ($uriPattern == '') {
-            $uriPattern = '^$';
-        }
-
-        // Replace "*" with 0 or more characters as otherwise it'll throw an error
-        if ($uriPattern == '*') {
-            $uriPattern = '.*';
-        }
-
-        // Trim slashes
-        $uriPattern = trim($uriPattern, '/');
-
-        // Escape hash symbols
-        $uriPattern = str_replace('#', '\#', $uriPattern);
-
-        return preg_match('#'.$uriPattern.'#', trim($uri, '/'));
+        return false;
     }
 }
