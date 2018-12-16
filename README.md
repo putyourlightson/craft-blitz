@@ -54,18 +54,18 @@ Craft's template caching `{% cache %}` tag does not play well with the cache bre
 
 URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
-- `__home__` matches the homepage
-- `.*` matches any character 0 or more times (use this to include everything)
-- `.+` matches any character 1 or more times
-- `.` matches any character
-- `\d` matches any digit
-- `\d{4}` matches any four digits
-- `\w` matches any word character
-- `\w+` matches any word character 1 or more times
-- `entries` matches anything containing "entries"
-- `^entries` matches anything beginning with "entries"
-- `^entries/entry$` matches an exact URI
-- `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character
+- A blank field matches the homepage.
+- `.*` matches any character 0 or more times (use this to include everything).
+- `.+` matches any character 1 or more times.
+- `.` matches any character.
+- `\d` matches any digit.
+- `\d{4}` matches any four digits.
+- `\w` matches any word character.
+- `\w+` matches any word character 1 or more times.
+- `entries` matches anything containing "entries".
+- `^entries` matches anything beginning with "entries".
+- `^entries/entry$` matches an exact URI.
+- `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character.
 
 ## Server Rewrite
 

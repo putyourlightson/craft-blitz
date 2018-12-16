@@ -567,12 +567,8 @@ class CacheService extends Component
 
         $uriPattern = $pattern[0];
 
+        // Replace a blank string with the homepage
         if ($uriPattern == '') {
-            return false;
-        }
-
-        // Replace "__home__" alias
-        if ($uriPattern == '__home__') {
             $uriPattern = '^$';
         }
 

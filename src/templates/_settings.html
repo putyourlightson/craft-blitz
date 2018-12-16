@@ -45,17 +45,6 @@
 	required: true,
 }) }}
 
-{{ forms.textField({
-	label: "Cache Folder Path"|t('blitz'),
-	instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
-    warning: (config.cacheFolderPath is defined ? configWarning('cacheFolderPath')),
-	name: 'cacheFolderPath',
-	value: settings.cacheFolderPath,
-	errors: settings.getErrors('cacheFolderPath'),
-	placeholder: 'cache/blitz',
-	required: true,
-}) }}
-
 {% set info %}
 	<span class="info">{{ "The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended."|t('blitz') }}</span>
 {% endset %}
@@ -71,24 +60,38 @@
 	required: true,
 }) }}
 
+{{ forms.textField({
+	label: "Cache Folder Path"|t('blitz'),
+	instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
+    warning: (config.cacheFolderPath is defined ? configWarning('cacheFolderPath')),
+	name: 'cacheFolderPath',
+	class: 'code',
+	value: settings.cacheFolderPath,
+	errors: settings.getErrors('cacheFolderPath'),
+	placeholder: 'cache/blitz',
+	required: true,
+}) }}
+
 {% set info %}
 {{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}
 
-- `^$` Matches the homepage
-- `.*` Matches any character 0 or more times (use this to include everything)
-- `.+` Matches any character 1 or more times
-- `.` Matches any character
-- `\d` Matches any digit
-- `\w` Matches any word character
-- `entries` Matches anything containing "entries"
-- `^entries` Matches anything beginning with "entries"
-- `^entries/entry$` Matches an exact URI
+- A blank field matches the homepage.
+- `.*` matches any character 0 or more times (use this to include everything).
+- `.+` matches any character 1 or more times.
+- `.` matches any character.
+- `\d` matches any digit.
+- `\w` matches any word character.
+- `entries` matches anything containing "entries".
+- `^entries` matches anything beginning with "entries".
+- `^entries/entry$` matches an exact URI.
 {% endset %}
 
 {% set cols = [
 	{
-		type: 'text',
+		type: 'singleline',
 		heading: 'URI Pattern'|t('blitz'),
+		placeholder: "Leave blank to match the homepage"|t('blitz'),
+		code: true,
 		info: info,
 	}
 ] %}

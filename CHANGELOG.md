@@ -4,7 +4,7 @@
 ### Added
 - Added optimisations to make the caching process even faster and more performant.
 - Added `afterRefreshCache` event for third-party plugins to use.
-- Added `__home__` as an alias for the homepage when matching URI patterns.
+- Added a blank field as an alias for the homepage when matching URI patterns.
 
 ### Changed
 - Changed ability to clear individual file paths to entire sites in utility.
