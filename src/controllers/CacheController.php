@@ -86,7 +86,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->cache->emptyCache(true);
 
-        Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->getAllCacheUrls()]));
+        Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->getAllCacheableUrls()]));
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully queued for warming.'));
 

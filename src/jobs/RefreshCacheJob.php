@@ -112,7 +112,7 @@ class RefreshCacheJob extends BaseJob
         $count = 0;
 
         foreach ($cacheRecords as $cacheRecord) {
-            $urls[] = Blitz::$plugin->cache->getUrl($cacheRecord->siteId, $cacheRecord->uri);
+            $urls[] = Blitz::$plugin->cache->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
 
             // Delete cached file so we get a fresh file cache
             Blitz::$plugin->file->deleteFileByUri($cacheRecord->siteId, $cacheRecord->uri);

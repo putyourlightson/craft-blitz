@@ -53,7 +53,7 @@ class CacheController extends Controller
         Blitz::$plugin->cache->emptyCache(true);
 
         // Get warm cache URLS
-        $urls = Blitz::$plugin->cache->getAllCacheUrls();
+        $urls = Blitz::$plugin->cache->getAllCacheableUrls();
 
         $total = count($urls);
         $count = 0;

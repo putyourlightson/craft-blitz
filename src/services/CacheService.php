@@ -354,7 +354,7 @@ class CacheService extends Component
 
             if ($this->_settings->cachingEnabled && $this->_settings->warmCacheAutomatically) {
                 Craft::$app->getQueue()->push(new WarmCacheJob([
-                    'urls' => $this->getAllCacheUrls()
+                    'urls' => $this->getAllCacheableUrls()
                 ]));
             }
 
@@ -490,17 +490,41 @@ class CacheService extends Component
      *
      * @return string
      */
-    public function getUrl(int $siteId, string $uri): string
+    public function getSiteUrl(int $siteId, string $uri): string
     {
         return UrlHelper::siteUrl($uri, null, null, $siteId);
     }
 
     /**
-     * Gets all cache URLs.
+     * Gets cache URLs given an array of cache IDs.
+     *
+     * @param int[] $cacheIds
      *
      * @return string[]
      */
-    public function getAllCacheUrls(): array
+    public function getCacheUrls(array $cacheIds): array
+    {
+        $urls = [];
+
+        /** @var CacheRecord[] $cacheRecords */
+        $cacheRecords = CacheRecord::find()
+            ->select('uri, siteId')
+            ->where(['id' => $cacheIds])
+            ->all();
+
+        foreach ($cacheRecords as $cacheRecord) {
+            $urls[] = $this->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
+        }
+
+        return $urls;
+    }
+
+    /**
+     * Gets all cacheable URLs.
+     *
+     * @return string[]
+     */
+    public function getAllCacheableUrls(): array
     {
         $urls = [];
 
@@ -512,7 +536,7 @@ class CacheService extends Component
         /** @var CacheRecord $cacheRecord */
         foreach ($cacheRecords as $cacheRecord) {
             if ($this->getIsCacheableUri($cacheRecord->siteId, $cacheRecord->uri)) {
-                $urls[] = $this->getUrl($cacheRecord->siteId, $cacheRecord->uri);
+                $urls[] = $this->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
             }
         }
 

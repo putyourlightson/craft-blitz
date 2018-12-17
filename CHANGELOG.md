@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 1.10.0 - Unreleased
+## 1.10.0 - 2018-12-17
 ### Added
 - Added optimisations to make the caching process faster and more performant.
 - Added `afterRefreshCache` event for third-party plugins to use.
