@@ -4,10 +4,7 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
-use craft\helpers\MigrationHelper;
-use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
-use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 
 class m181214_120000_add_indexes_hash_column extends Migration

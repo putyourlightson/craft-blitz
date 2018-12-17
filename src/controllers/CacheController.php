@@ -7,12 +7,10 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\errors\MissingComponentException;
-use craft\helpers\FileHelper;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\WarmCacheJob;
 use putyourlightson\blitz\records\CacheRecord;
-use yii\base\ErrorException;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -47,7 +45,7 @@ class CacheController extends Controller
             }
 
             // Trigger afterRefreshCache event
-            $this->afterRefreshCache($cacheIds);
+            Blitz::$plugin->cache->afterRefreshCache($cacheIds);
 
             // Delete cache records so we get fresh caches
             CacheRecord::deleteAll(['siteId' => $siteIds]);

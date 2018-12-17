@@ -11,20 +11,29 @@ use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
 use yii\console\Controller;
+use yii\console\ExitCode;
 
+/**
+ * Performs functions on the Blitz cache.
+ */
 class CacheController extends Controller
 {
     // Public Methods
     // =========================================================================
 
-    public function actionClear()
+    /**
+     * Clears the entire cache.
+     *
+     * @return int
+     */
+    public function actionClear(): int
     {
         $settings = Blitz::$plugin->getSettings();
 
         if (empty($settings->cacheFolderPath)) {
             $this->stderr(Craft::t('blitz', 'Blitz cache folder path is not set.').PHP_EOL, Console::FG_RED);
 
-            return;
+            return ExitCode::OK;
         }
 
         $this->stdout(Craft::t('blitz', 'Clearing Blitz cache.').PHP_EOL);
@@ -32,22 +41,29 @@ class CacheController extends Controller
         Blitz::$plugin->cache->emptyCache();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
     }
 
-    public function actionWarm()
+    /**
+     * Clears and warms the entire cache.
+     *
+     * @return int
+     */
+    public function actionWarm(): int
     {
         $settings = Blitz::$plugin->getSettings();
 
         if (!$settings->cachingEnabled) {
             $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
 
-            return;
+            return ExitCode::OK;
         }
 
         if (empty($settings->cacheFolderPath)) {
             $this->stderr(Craft::t('blitz', 'Blitz cache folder path is not set.').PHP_EOL, Console::FG_RED);
 
-            return;
+            return ExitCode::OK;
         }
 
         Blitz::$plugin->cache->emptyCache(true);
@@ -105,5 +121,7 @@ class CacheController extends Controller
         }
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
     }
 }

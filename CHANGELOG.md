@@ -1,5 +1,12 @@
 # Release Notes for Blitz
 
+## 1.10.1 - 2018-12-17
+### Added
+- Added comments to Blitz console commands when running `./craft` from the terminal. 
+
+### Fixed
+- Fixed error when clearing the cache from the utility.
+
 ## 1.10.0 - 2018-12-17
 ### Added
 - Added optimisations to make the caching process faster and more performant.

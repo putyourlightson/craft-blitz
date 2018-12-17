@@ -197,9 +197,9 @@ class CacheService extends Component
         }
 
         // Cast ID to integer to ensure the strict type check below works
+        /** @var Element $element */
         $elementId = (int)$element->id;
 
-        /** @var Element $element */
         if (!in_array($elementId, $this->_addElementCaches, true)) {
             $this->_addElementCaches[] = $elementId;
         }
