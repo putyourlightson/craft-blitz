@@ -34,8 +34,8 @@ Blitz is available in the Craft Plugin Store and can also be installed manually 
 After installing the plugin, go to the plugin settings.
 
 1. Turn “Enable Caching” on.
-2. Add a row to “Included URI Patterns” such as `__home__` for the homepage or `.*` for the entire site.
-3. Save the settings and visit the homepage (it will be cached in the first visit).
+2. Add a row to “Included URI Patterns” such as `.*` for the entire site.
+3. Save the settings and visit the site (it will be cached in the first visit).
 
 ## Usage
 
@@ -50,6 +50,14 @@ Craft’s template caching `{% cache %}` tag doesn’t play well with the cache 
     'enableTemplateCaching' => false,
 
 ![Settings](docs/images/settings-1.8.0b.png)
+
+## Query Strings
+
+URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
+
+- `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
+- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
+- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
 
 ## URI Patterns
 
@@ -67,6 +75,56 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `^entries` matches anything beginning with "entries".
 - `^entries/entry$` matches an exact URI.
 - `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character.
+
+## Dynamic Content
+
+When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+
+Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
+
+#### `{{ craft.blitz.getUri('/template/name') }}`
+
+Returns a script that injects the contents of the URI provided in place of the twig tag. 
+ 
+#### `{{ craft.blitz.csrfInput() }}`
+
+Returns a script that injects a CSRF input field in place of the twig tag.
+
+Below is an example of how you might use the tags to create a page containing dynamic content and a form that can be cached by Blitz.
+
+    Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
+    
+    <form method="post">
+       {{ craft.blitz.csrfInput() }}
+       ...
+     
+     </form>
+
+In the case above it would make sense to add `ajax/.*` as an excluded URI pattern in the plugin settings.
+
+## Cache Invalidation
+
+When an element is created, updated or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
+
+The "Blitz Cache" utility allows users to clear and warm the cache. Warming the cache will first clear the cache and then add a job to the queue to pre-cache files. Cached files and folders can be cleared manually using the utility or by simply deleting them on the server.
+
+![Utility](docs/images/utility-1.8.0.png)
+
+## Console Commands
+
+Console commands can also be used to warm or clear all cache as follows:
+
+    ./craft blitz/cache/warm
+    
+    ./craft blitz/cache/clear
+    
+![Console commands](docs/images/console-1.8.0a.png)
+
+Note that if the `@web` alias, or any other method that requires a web request, is used to determine the site URL then it cannot be included in cache warming with the console command. Using an absolute site URL is therefore recommended.
+
+## Considerations
+
+If a global is saved then Blitz will clear the entire cache and warm it if the "Warm Cache Automatically" setting is enabled. This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 
 ## Server Rewrite
 
@@ -115,64 +173,6 @@ If the "Query String Caching" setting is set to `Cache URLs with query strings a
     }
     
     # Send would-be 404 requests to Craft
-
-## Query Strings
-
-URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
-
-- `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
-- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
-- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
-
-## Dynamic Content
-
-When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
-
-Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
-
-#### `{{ craft.blitz.getUri('/template/name') }}`
-
-Returns a script that injects the contents of the URI provided in place of the twig tag. 
- 
-#### `{{ craft.blitz.csrfInput() }}`
-
-Returns a script that injects a CSRF input field in place of the twig tag.
-
-Below is an example of how you might use the tags to create a page containing dynamic content and a form that can be cached by Blitz.
-
-    Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
-    
-    <form method="post">
-       {{ craft.blitz.csrfInput() }}
-       ...
-     
-     </form>
-
-In the case above it would make sense to add `ajax.*` as an excluded URI pattern in the plugin settings.
-
-## Cache Invalidation
-
-When an element is created, updated or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
-
-The "Blitz Cache" utility allows users to clear and warm the cache. Warming the cache will first clear the cache and then add a job to the queue to pre-cache files. Cached files and folders can be cleared manually using the utility or by simply deleting them on the server.
-
-![Utility](docs/images/utility-1.8.0.png)
-
-## Console Commands
-
-Console commands can also be used to warm or clear all cache as follows:
-
-    ./craft blitz/cache/warm
-    
-    ./craft blitz/cache/clear
-    
-![Console commands](docs/images/console-1.8.0a.png)
-
-Note that if the `@web` alias, or any other method that requires a web request, is used to determine the site URL then it cannot be included in cache warming with the console command. Using an absolute site URL is therefore recommended.
-
-## Considerations
-
-If a global is saved then Blitz will clear the entire cache and warm it if the "Warm Cache Automatically" setting is enabled. This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 
 ## Debugging
 
