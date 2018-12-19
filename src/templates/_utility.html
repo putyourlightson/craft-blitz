@@ -5,8 +5,19 @@
     {{ redirectInput('utilities/blitz-cache') }}
     {{ csrfInput() }}
 
-    <p class="light">{{ 'Warming the Blitz cache will clear the cache and add a job to the queue to recache all of the files.'|t('blitz') }}</p>
+    <p class="light">{{ 'Warming the Blitz cache will flush the cache and add a job to the queue to recache all of the files.'|t('blitz') }}</p>
     <input type="submit" class="btn submit" value="{{ 'Warm Blitz Cache'|t('blitz') }}" />
+</form>
+
+<br/>
+
+<form class="utility" method="post" accept-charset="UTF-8">
+    <input type="hidden" name="action" value="blitz/cache/flush">
+    {{ redirectInput('utilities/blitz-cache') }}
+    {{ csrfInput() }}
+
+    <p class="light">{{ 'Flushing the Blitz cache will clear the cache and remove all records from the database.'|t('blitz') }}</p>
+    <input type="submit" class="btn submit" value="{{ 'Flush Blitz Cache'|t('blitz') }}" />
 </form>
 
 <br/>

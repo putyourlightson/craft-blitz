@@ -22,27 +22,23 @@ class CacheController extends Controller
     // =========================================================================
 
     /**
-     * Clears the entire cache.
+     * Clears the cache.
      *
      * @return int
      */
     public function actionClear(): int
     {
-        $settings = Blitz::$plugin->getSettings();
+        return $this->_clearFlushCache(false);
+    }
 
-        if (empty($settings->cacheFolderPath)) {
-            $this->stderr(Craft::t('blitz', 'Blitz cache folder path is not set.').PHP_EOL, Console::FG_RED);
-
-            return ExitCode::OK;
-        }
-
-        $this->stdout(Craft::t('blitz', 'Clearing Blitz cache.').PHP_EOL);
-
-        Blitz::$plugin->cache->emptyCache();
-
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
-
-        return ExitCode::OK;
+    /**
+     * Flushes the cache.
+     *
+     * @return int
+     */
+    public function actionFlush(): int
+    {
+        return $this->_clearFlushCache(true);
     }
 
     /**
@@ -65,6 +61,8 @@ class CacheController extends Controller
 
             return ExitCode::OK;
         }
+
+        $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
         Blitz::$plugin->cache->emptyCache(true);
 
@@ -121,6 +119,39 @@ class CacheController extends Controller
         }
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Clears or flushes the cache.
+     *
+     * @param bool $flush
+     *
+     * @return int
+     */
+    public function _clearFlushCache(bool $flush = false): int
+    {
+        $settings = Blitz::$plugin->getSettings();
+
+        if (empty($settings->cacheFolderPath)) {
+            $this->stderr(Craft::t('blitz', 'Blitz cache folder path is not set.').PHP_EOL, Console::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        $this->stdout(Craft::t('blitz', '{action} Blitz cache.', [
+            'action' => $flush ? 'Flushing' : 'Clearing'
+        ]).PHP_EOL, Console::FG_GREEN);
+
+        Blitz::$plugin->cache->emptyCache($flush);
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully {action}.', [
+            'action' => $flush ? 'flushed' : 'cleared'
+        ]).PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }

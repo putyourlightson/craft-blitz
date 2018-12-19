@@ -20,7 +20,7 @@ class CacheController extends Controller
     // =========================================================================
 
     /**
-     * Clears cache
+     * Clears the cache.
      *
      * @return Response
      * @throws BadRequestHttpException
@@ -51,7 +51,7 @@ class CacheController extends Controller
             CacheRecord::deleteAll(['siteId' => $siteIds]);
         }
         else {
-            Blitz::$plugin->cache->emptyCache(true);
+            Blitz::$plugin->cache->emptyCache();
         }
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully cleared.'));
@@ -60,7 +60,22 @@ class CacheController extends Controller
     }
 
     /**
-     * Warms cache
+     * Flushes the cache.
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     */
+    public function actionFlush(): Response
+    {
+        Blitz::$plugin->cache->emptyCache(true);
+
+        Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully flushed.'));
+
+        return $this->redirectToPostedUrl();
+    }
+
+    /**
+     * Warms the cache.
      *
      * @return Response
      * @throws BadRequestHttpException

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.10.2 - Unreleased
+### Added
+- Added flush cache utility and console command. 
+
 ## 1.10.1 - 2018-12-17
 ### Added
 - Added comments to Blitz console commands when running `./craft` from the terminal. 

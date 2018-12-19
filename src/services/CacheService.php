@@ -446,9 +446,9 @@ class CacheService extends Component
     /**
      * Empties the entire cache.
      *
-     * @param bool $clearRecords
+     * @param bool $flush
      */
-    public function emptyCache(bool $clearRecords = false)
+    public function emptyCache(bool $flush = false)
     {
         // Empties the file cache
         Blitz::$plugin->file->emptyFileCache();
@@ -461,7 +461,7 @@ class CacheService extends Component
         // Trigger afterRefreshCache event
         $this->afterRefreshCache($cacheIds);
 
-        if ($clearRecords) {
+        if ($flush) {
             // Delete all cache records
             CacheRecord::deleteAll();
         }
