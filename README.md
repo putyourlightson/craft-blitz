@@ -104,19 +104,23 @@ In the case above it would make sense to add `ajax/.*` as an excluded URI patter
 
 ## Cache Invalidation
 
-When an element is created, updated or deleted, any cached template files that used that element are deleted. A job is then automatically queued to refresh the cleared cache files. This applies to all element types, including global sets.
+When an element is created, updated or deleted, any cached template files that used that element are deleted. If the "Warm Cache Automatically" setting is enabled the a job is  queued to warm the cleared cache files. This applies to all element types, including global sets.
 
-The "Blitz Cache" utility allows users to clear and warm the cache. Warming the cache will first clear the cache and then add a job to the queue to pre-cache files. Cached files and folders can be cleared manually using the utility or by simply deleting them on the server.
+The "Blitz Cache" utility allows users to clear, flush and warm the cache. Clearing the cache deletes the cached files. Flushing the cache deletes the cached files and also clears the database tables. Warming the cache will first flush the cache and then add a job to the queue to pre-cache files. 
+
+Cached files and folders can be cleared manually using the utility or by simply deleting them on the server.
 
 ![Utility](docs/images/utility-1.8.0.png)
 
 ## Console Commands
 
-Console commands can also be used to warm or clear all cache as follows:
+Console commands can also be used to clear, flush or warm the entire cache as follows:
 
-    ./craft blitz/cache/warm
-    
     ./craft blitz/cache/clear
+    
+    ./craft blitz/cache/flush
+    
+    ./craft blitz/cache/warm
     
 ![Console commands](docs/images/console-1.8.0a.png)
 
@@ -124,7 +128,7 @@ Note that if the `@web` alias, or any other method that requires a web request, 
 
 ## Considerations
 
-If a global is saved then Blitz will clear the entire cache and warm it if the "Warm Cache Automatically" setting is enabled. This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
+If a global is saved then Blitz will clear and warm the entire cache if the "Warm Cache Automatically" setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 
 ## Server Rewrite
 

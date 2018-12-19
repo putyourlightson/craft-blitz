@@ -62,6 +62,11 @@ class SettingsModel extends Model
      */
     public $sendPoweredByHeader = true;
 
+    /**
+     * @var bool
+     */
+    public $warmCacheAutomaticallyForGlobals = true;
+
     // Public Methods
     // =========================================================================
 

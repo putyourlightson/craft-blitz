@@ -1,8 +1,9 @@
 # Release Notes for Blitz
 
-## 1.10.2 - Unreleased
+## 1.10.2 - 2018-12-19
 ### Added
 - Added flush cache utility and console command. 
+- Added `warmCacheAutomaticallyForGlobals` config setting.
 
 ## 1.10.1 - 2018-12-17
 ### Added

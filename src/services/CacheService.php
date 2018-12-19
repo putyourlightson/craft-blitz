@@ -352,7 +352,7 @@ class CacheService extends Component
         if ($element instanceof GlobalSet) {
             $this->emptyCache();
 
-            if ($this->_settings->cachingEnabled && $this->_settings->warmCacheAutomatically) {
+            if ($this->_settings->cachingEnabled && $this->_settings->warmCacheAutomatically && $this->_settings->warmCacheAutomaticallyForGlobals) {
                 Craft::$app->getQueue()->push(new WarmCacheJob([
                     'urls' => $this->getAllCacheableUrls()
                 ]));

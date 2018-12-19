@@ -50,4 +50,8 @@ return [
 
     // Whether an `X-Powered-By: Craft CMS, Blitz` header should be sent.
     //'sendPoweredByHeader' => true,
+
+    // Whether the cache should automatically be warmed after clearing globals.
+    //'warmCacheAutomaticallyForGlobals' => 'true',
+
 ];
