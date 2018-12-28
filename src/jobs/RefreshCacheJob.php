@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\jobs;
 
 use Craft;
+use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\App;
 use craft\queue\BaseJob;
@@ -51,7 +52,7 @@ class RefreshCacheJob extends BaseJob
          * This is used for detecting if pages with element queries need to be updated.
          */
         $elementQueryRecords = ElementQueryRecord::find()
-            ->select(['id', 'query'])
+            ->select(['id', 'type', 'params'])
             ->where(['type' => $this->elementTypes])
             ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) {
@@ -62,25 +63,33 @@ class RefreshCacheJob extends BaseJob
 
         /** @var ElementQueryRecord[] $elementQueryRecords */
         foreach ($elementQueryRecords as $elementQueryRecord) {
-            /** @var ElementQuery|false $query */
-            /** @noinspection UnserializeExploitsInspection */
-            $query = @unserialize(base64_decode($elementQueryRecord->query));
-
-            // Ensure the unserialization worked
-            if ($query === false) {
+            // Ensure class still exists as a plugin may have been removed since being saved
+            if (!class_exists($elementQueryRecord->type)) {
                 continue;
             }
 
-            // If the the query has an offset then add it to the limit and make it null
-            if ($query->offset) {
-                if ($query->limit) {
-                    $query->limit($query->limit + $query->offset);
+            /** @var ElementInterface $elementType */
+            $elementType = $elementQueryRecord->type;
+
+            /** @var ElementQuery $elementQuery */
+            $elementQuery = $elementType::find();
+
+            $params = json_decode($elementQueryRecord->params, true);
+
+            foreach ($params as $key => $val) {
+                $elementQuery->{$key} = $val;
+            }
+
+            // If the element query has an offset then add it to the limit and make it null
+            if ($elementQuery->offset) {
+                if ($elementQuery->limit) {
+                    $elementQuery->limit($elementQuery->limit + $elementQuery->offset);
                 }
-                $query->offset(null);
+                $elementQuery->offset(null);
             }
 
             // If one or more of the element IDs are in the query's results
-            $matchedElementIds = array_intersect($this->elementIds, $query->ids());
+            $matchedElementIds = array_intersect($this->elementIds, $elementQuery->ids());
 
             if (!empty($matchedElementIds)) {
                 // Get related element query cache records

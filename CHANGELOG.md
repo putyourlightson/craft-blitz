@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.11.0 - 2018-12-28
+### Added
+- Added optimisations to make the cache refresh process faster and more performant and the cached element queries more lightweight.
+
 ## 1.10.2 - 2018-12-19
 ### Added
 - Added flush cache utility and console command. 

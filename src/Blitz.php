@@ -213,7 +213,7 @@ class Blitz extends Plugin
         );
 
         // Register element query prepare event
-        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_PREPARE,
+        Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
             function(CancelableEvent $event) use ($response) {
                 if ($response->getIsOk()) {
                     /** @var ElementQuery $elementQuery */

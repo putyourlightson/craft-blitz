@@ -227,42 +227,38 @@ class CacheService extends Component
             return;
         }
 
-        // Based on code from includeElementQueryInTemplateCaches method in \craft\services\TemplateCaches)
-        $query = $elementQuery->query;
-        $subQuery = $elementQuery->subQuery;
-        $customFields = $elementQuery->customFields;
+        /** @var ElementInterface $elementType */
+        $elementType = $elementQuery->elementType;
+        $defaultParams = get_object_vars($elementType::find());
 
-        // Nullify values
-        $elementQuery->query = null;
-        $elementQuery->subQuery = null;
-        $elementQuery->customFields = null;
+        $params = [];
+        $ignore = ['query', 'subQuery', 'customFields'];
 
-        // Base64-encode the query so db\Connection::quoteSql() doesn't tweak any of the table/columns names
-        $encodedQuery = base64_encode(serialize($elementQuery));
+        foreach (get_object_vars($elementQuery) as $key => $val) {
+            if (!in_array($key, $ignore, true) && $defaultParams[$key] !== $val)
+                $params[$key] = $val;
+        }
 
-        // Hash the encoded query for quicker indexing
-        $hash = md5($encodedQuery);
+        $params = json_encode($params);
 
-        // Set back to original values
-        $elementQuery->query = $query;
-        $elementQuery->subQuery = $subQuery;
-        $elementQuery->customFields = $customFields;
+        // Create a unique index from the element type and parameters for quicker indexing and less storage
+        $index = sprintf('%u', crc32($elementQuery->elementType.$params));
 
-        // Use DB connection so we can batch insert and exclude audit columns
+        // Use DB connection so we can insert and exclude audit columns
         $db = Craft::$app->getDb();
 
-        // Get element query record from type and hash or create one if it does not exist
+        // Get element query record from index or create one if it does not exist
         $queryId = ElementQueryRecord::find()
             ->select('id')
-            ->where(['hash' => $hash])
+            ->where(['index' => $index])
             ->scalar();
 
         if (!$queryId) {
             $db->createCommand()
                 ->insert(ElementQueryRecord::tableName(), [
-                    'hash' => $hash,
+                    'index' => $index,
                     'type' => $elementQuery->elementType,
-                    'query' => $encodedQuery,
+                    'params' => $params,
                 ], false)
                 ->execute();
 
