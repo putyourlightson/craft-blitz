@@ -68,7 +68,7 @@ class RefreshCacheJob extends BaseJob
         foreach ($elementQueryRecords as $elementQueryRecord) {
             $count++;
             $this->setProgress($queue, $count / $total);
-            
+
             // Ensure class still exists as a plugin may have been removed since being saved
             if (!class_exists($elementQueryRecord->type)) {
                 continue;

@@ -625,9 +625,7 @@ class CacheService extends Component
         $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
 
         foreach ($ignoreParams as $key) {
-            if (isset($this->_defaultElementQueryParams[$elementType][$key])) {
-                unset($this->_defaultElementQueryParams[$elementType][$key]);
-            }
+            unset($this->_defaultElementQueryParams[$elementType][$key]);
         }
 
         return $this->_defaultElementQueryParams[$elementType];
