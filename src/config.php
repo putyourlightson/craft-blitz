@@ -52,6 +52,5 @@ return [
     //'sendPoweredByHeader' => true,
 
     // Whether the cache should automatically be warmed after clearing globals.
-    //'warmCacheAutomaticallyForGlobals' => 'true',
-
+    //'warmCacheAutomaticallyForGlobals' => true,
 ];

@@ -66,6 +66,11 @@ class CacheService extends Component
     private $_addElementQueryCaches = [];
 
     /**
+     * @var array
+     */
+    private $_defaultElementQueryParams = [];
+
+    /**
      * @var int[]
      */
     private $_invalidateCacheIds = [];
@@ -222,24 +227,12 @@ class CacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has a value set for ID
-        if ($elementQuery->id) {
+        // Don't proceed if the query has a value set for ID or an `elements.id` value set for where (used when eager loading elements)
+        if ($elementQuery->id || !empty($elementQuery->where['elements.id'])) {
             return;
         }
 
-        /** @var ElementInterface $elementType */
-        $elementType = $elementQuery->elementType;
-        $defaultParams = get_object_vars($elementType::find());
-
-        $params = [];
-        $ignore = ['query', 'subQuery', 'customFields'];
-
-        foreach (get_object_vars($elementQuery) as $key => $val) {
-            if (!in_array($key, $ignore, true) && $defaultParams[$key] !== $val)
-                $params[$key] = $val;
-        }
-
-        $params = json_encode($params);
+        $params = json_encode($this->_getUniqueElementQueryParams($elementQuery));
 
         // Create a unique index from the element type and parameters for quicker indexing and less storage
         $index = sprintf('%u', crc32($elementQuery->elementType.$params));
@@ -609,5 +602,67 @@ class CacheService extends Component
         }
 
         return false;
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Returns an element query's default parameters for a given element type.
+     *
+     * @param string $elementType
+     *
+     * @return array
+     */
+    private function _getDefaultElementQueryParams(string $elementType): array
+    {
+        if (!empty($this->_defaultElementQueryParams[$elementType])) {
+            return $this->_defaultElementQueryParams[$elementType];
+        }
+
+        $this->_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
+
+        $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
+
+        foreach ($ignoreParams as $key) {
+            if (isset($this->_defaultElementQueryParams[$elementType][$key])) {
+                unset($this->_defaultElementQueryParams[$elementType][$key]);
+            }
+        }
+
+        return $this->_defaultElementQueryParams[$elementType];
+    }
+
+    /**
+     * Returns the element query's unique parameters.
+     *
+     * @param ElementQuery $elementQuery
+     *
+     * @return array
+     */
+    private function _getUniqueElementQueryParams(ElementQuery $elementQuery): array
+    {
+        $params = [];
+
+        $defaultParams = $this->_getDefaultElementQueryParams($elementQuery->elementType);
+
+        foreach ($defaultParams as $key => $default) {
+            $value = $elementQuery->{$key};
+
+            if ($value !== $default)
+                $params[$key] = $value;
+
+                // Convert datetime parameters to Unix timestamps
+                if ($value instanceof \DateTime) {
+                    $params[$key] = $value->getTimestamp();
+                }
+
+                // Convert element parameters to ID
+                if ($value instanceof Element) {
+                    $params[$key] = $value->id;
+                }
+        }
+
+        return $params;
     }
 }

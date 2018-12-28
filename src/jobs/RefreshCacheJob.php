@@ -61,8 +61,14 @@ class RefreshCacheJob extends BaseJob
             ], false)
             ->all();
 
+        $total = count($elementQueryRecords);
+        $count = 0;
+
         /** @var ElementQueryRecord[] $elementQueryRecords */
         foreach ($elementQueryRecords as $elementQueryRecord) {
+            $count++;
+            $this->setProgress($queue, $count / $total);
+            
             // Ensure class still exists as a plugin may have been removed since being saved
             if (!class_exists($elementQueryRecord->type)) {
                 continue;
@@ -89,9 +95,7 @@ class RefreshCacheJob extends BaseJob
             }
 
             // If one or more of the element IDs are in the query's results
-            $matchedElementIds = array_intersect($this->elementIds, $elementQuery->ids());
-
-            if (!empty($matchedElementIds)) {
+            if (!empty(array_intersect($this->elementIds, $elementQuery->ids()))) {
                 // Get related element query cache records
                 $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
 
@@ -121,13 +125,13 @@ class RefreshCacheJob extends BaseJob
         $count = 0;
 
         foreach ($cacheRecords as $cacheRecord) {
+            $count++;
+            $this->setProgress($queue, $count / $total);
+
             $urls[] = Blitz::$plugin->cache->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
 
             // Delete cached file so we get a fresh file cache
             Blitz::$plugin->file->deleteFileByUri($cacheRecord->siteId, $cacheRecord->uri);
-
-            $count++;
-            $this->setProgress($queue, $count / $total);
         }
 
         // Trigger afterRefreshCache event
