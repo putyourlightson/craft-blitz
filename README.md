@@ -76,6 +76,10 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `^entries/entry$` matches an exact URI.
 - `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character.
 
+## Config Settings
+
+Blitz comes with a config file for more advanced plugin configuration settings. Copy the `config.php` to your Craft `config` directory as `blitz.php` and you can configure the settings in a multi-environment way.
+
 ## Dynamic Content
 
 When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
@@ -106,7 +110,7 @@ In the case above it would make sense to add `ajax/.*` as an excluded URI patter
 
 When an element is created, updated or deleted, any cached template files that used that element are deleted. If the "Warm Cache Automatically" setting is enabled the a job is  queued to warm the cleared cache files.
 
-The "Blitz Cache" utility displays the number of cached URLs for each site. It also provides the following functionality:
+The "Blitz Cache" utility displays the number of cached URIs for each site. It also provides the following functionality:
 
 - Clearing the cache will delete all cached files.
 - Flushing the cache will clear the cache and remove all records from the database.
