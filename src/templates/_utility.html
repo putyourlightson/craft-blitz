@@ -2,24 +2,24 @@
 
 {% set utilities = [
     {
-        action: 'warm',
-        title: 'Warm Blitz Cache',
-        instructions: 'Warming the Blitz cache will flush the cache and add a job to the queue to recache all of the files.',
-    },
-    {
         action: 'clear',
         title: 'Clear Blitz Cache',
-        instructions: 'Clearing the Blitz cache will delete all cached files.',
+        instructions: 'Clearing the cache will delete all cached files.',
     },
     {
         action: 'flush',
         title: 'Flush Blitz Cache',
-        instructions: 'Flushing the Blitz cache will clear the cache and remove all records from the database.',
+        instructions: 'Flushing the cache will clear the cache and remove all records from the database.',
+    },
+    {
+        action: 'warm',
+        title: 'Warm Blitz Cache',
+        instructions: 'Warming the cache will flush the cache and add a job to the queue to recache all of the files.',
     },
     {
         action: 'refresh-expired',
         title: 'Refresh Expired Blitz Cache',
-        instructions: 'Refreshing the expired Blitz cache will refresh all elements that have expired since they were cached.',
+        instructions: 'Refreshing the expired cache will refresh all elements that have expired since they were cached.',
     },
 ] %}
 

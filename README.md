@@ -104,23 +104,30 @@ In the case above it would make sense to add `ajax/.*` as an excluded URI patter
 
 ## Cache Invalidation
 
-When an element is created, updated or deleted, any cached template files that used that element are deleted. If the "Warm Cache Automatically" setting is enabled the a job is  queued to warm the cleared cache files. This applies to all element types, including global sets.
+When an element is created, updated or deleted, any cached template files that used that element are deleted. If the "Warm Cache Automatically" setting is enabled the a job is  queued to warm the cleared cache files.
 
-The "Blitz Cache" utility allows users to clear, flush and warm the cache. Clearing the cache deletes the cached files. Flushing the cache deletes the cached files and also clears the database tables. Warming the cache will first flush the cache and then add a job to the queue to pre-cache files. 
+The "Blitz Cache" utility displays the number of cached URLs for each site. It also provides the following functionality:
 
-Cached files and folders can be cleared manually using the utility or by simply deleting them on the server.
+- Clearing the cache will delete all cached files.
+- Flushing the cache will clear the cache and remove all records from the database.
+- Warming the cache will flush the cache and add a job to the queue to recache all of the files.
+- Refreshing the expired cache will refresh all elements that have expired since they were cached.
 
-![Utility](docs/images/utility-1.8.0.png)
+Cached files and folders can be cleared manually by simply deleting them on the server.
+
+![Utility](docs/images/utility-1.11.0.png)
 
 ## Console Commands
 
-Console commands can also be used to clear, flush or warm the entire cache as follows:
+Console commands with the functionality described above can also be used as follows:
 
     ./craft blitz/cache/clear
     
     ./craft blitz/cache/flush
     
     ./craft blitz/cache/warm
+    
+    ./craft blitz/cache/refresh-expired
     
 ![Console commands](docs/images/console-1.8.0a.png)
 
