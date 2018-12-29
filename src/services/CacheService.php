@@ -174,15 +174,10 @@ class CacheService extends Component
     {
         if ($this->_nonCacheableElementTypes !== null) {
             return $this->_nonCacheableElementTypes;
-        }
-
-        $elementTypes = [
-            GlobalSet::class,
-            MatrixBlock::class,
-        ];
+        };
 
         $event = new RegisterNonCacheableElementTypesEvent([
-            'elementTypes' => $elementTypes,
+            'elementTypes' => $this->_settings->nonCacheableElementTypes,
         ]);
         $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
 
@@ -489,6 +484,8 @@ class CacheService extends Component
         if ($flush) {
             // Delete all cache records
             CacheRecord::deleteAll();
+
+            $this->cleanElementQueryTable();
         }
     }
 

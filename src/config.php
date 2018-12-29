@@ -48,6 +48,12 @@ return [
     // Whether element queries should be cached in the database.
     //'cacheElementQueries' => true,
 
+    // Element types that should not be cached.
+    //'nonCacheableElementTypes' => [
+    //    'craft\elements\GlobalSet',
+    //    'craft\elements\MatrixBlock',
+    //],
+
     // Whether an `X-Powered-By: Craft CMS, Blitz` header should be sent.
     //'sendPoweredByHeader' => true,
 
