@@ -28,31 +28,7 @@ class CacheController extends Controller
      */
     public function actionClear(): Response
     {
-        $siteIds = Craft::$app->getRequest()->getBodyParam('siteIds');
-
-        if (is_array($siteIds)) {
-            $cacheIds = [];
-
-            /** @var CacheRecord[] $cacheRecords */
-            $cacheRecords = CacheRecord::find()
-                ->where(['siteId' => $siteIds])
-                ->all();
-
-            foreach ($cacheRecords as $cacheRecord) {
-                $cacheIds[] = $cacheRecord->id;
-
-                Blitz::$plugin->file->deleteFileByUri($cacheRecord->siteId, $cacheRecord->uri);
-            }
-
-            // Trigger afterRefreshCache event
-            Blitz::$plugin->cache->afterRefreshCache($cacheIds);
-
-            // Delete cache records so we get fresh caches
-            CacheRecord::deleteAll(['siteId' => $siteIds]);
-        }
-        else {
-            Blitz::$plugin->cache->emptyCache();
-        }
+        Blitz::$plugin->cache->emptyCache(false);
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully cleared.'));
 
@@ -70,6 +46,21 @@ class CacheController extends Controller
         Blitz::$plugin->cache->emptyCache(true);
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully flushed.'));
+
+        return $this->redirectToPostedUrl();
+    }
+
+    /**
+     * Refreshes expired elements.
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     */
+    public function actionRefreshExpired(): Response
+    {
+        Blitz::$plugin->cache->invalidateCache();
+
+        Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.'));
 
         return $this->redirectToPostedUrl();
     }
@@ -102,21 +93,6 @@ class CacheController extends Controller
         Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->getAllCacheableUrls()]));
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully queued for warming.'));
-
-        return $this->redirectToPostedUrl();
-    }
-
-    /**
-     * Refreshes expired elements.
-     *
-     * @return Response
-     * @throws BadRequestHttpException
-     */
-    public function actionRefreshExpired(): Response
-    {
-        Blitz::$plugin->cache->invalidateCache();
-
-        Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.'));
 
         return $this->redirectToPostedUrl();
     }

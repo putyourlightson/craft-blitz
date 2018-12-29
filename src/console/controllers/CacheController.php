@@ -28,7 +28,11 @@ class CacheController extends Controller
      */
     public function actionClear(): int
     {
-        return $this->_clearFlushCache(false);
+        Blitz::$plugin->cache->emptyCache(false);
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
     }
 
     /**
@@ -38,7 +42,27 @@ class CacheController extends Controller
      */
     public function actionFlush(): int
     {
-        return $this->_clearFlushCache(true);
+        Blitz::$plugin->cache->emptyCache(true);
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Refreshes expired elements.
+     *
+     * @return int
+     */
+    public function actionRefreshExpired(): int
+    {
+        Blitz::$plugin->cache->invalidateCache();
+
+        Craft::$app->getQueue()->run();
+
+        $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
     }
 
     /**
@@ -119,51 +143,6 @@ class CacheController extends Controller
         }
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
-
-        return ExitCode::OK;
-    }
-
-    /**
-     * Refreshes expired elements.
-     *
-     * @return int
-     */
-    public function actionRefreshExpired(): int
-    {
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
-
-        return ExitCode::OK;
-    }
-
-    // Private Methods
-    // =========================================================================
-
-    /**
-     * Clears or flushes the cache.
-     *
-     * @param bool $flush
-     *
-     * @return int
-     */
-    public function _clearFlushCache(bool $flush = false): int
-    {
-        $settings = Blitz::$plugin->getSettings();
-
-        if (empty($settings->cacheFolderPath)) {
-            $this->stderr(Craft::t('blitz', 'Blitz cache folder path is not set.').PHP_EOL, Console::FG_RED);
-
-            return ExitCode::OK;
-        }
-
-        $this->stdout(Craft::t('blitz', '{action} Blitz cache.', [
-            'action' => $flush ? 'Flushing' : 'Clearing'
-        ]).PHP_EOL, Console::FG_GREEN);
-
-        Blitz::$plugin->cache->emptyCache($flush);
-
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully {action}.', [
-            'action' => $flush ? 'flushed' : 'cleared'
-        ]).PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }
