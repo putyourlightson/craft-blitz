@@ -105,4 +105,19 @@ class CacheController extends Controller
 
         return $this->redirectToPostedUrl();
     }
+
+    /**
+     * Refreshes expired elements.
+     *
+     * @return Response
+     * @throws BadRequestHttpException
+     */
+    public function actionRefreshExpired(): Response
+    {
+        Blitz::$plugin->cache->invalidateCache();
+
+        Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.'));
+
+        return $this->redirectToPostedUrl();
+    }
 }

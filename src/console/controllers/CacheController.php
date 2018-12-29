@@ -22,7 +22,7 @@ class CacheController extends Controller
     // =========================================================================
 
     /**
-     * Clears the cache.
+     * Clears the cache (files only).
      *
      * @return int
      */
@@ -32,7 +32,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Flushes the cache.
+     * Flushes the cache (files and database records).
      *
      * @return int
      */
@@ -42,7 +42,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Clears and warms the entire cache.
+     * Flushes and warms the entire cache.
      *
      * @return int
      */
@@ -62,12 +62,12 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
+        // Get warm cache URLS
+        $urls = Blitz::$plugin->cache->getAllCacheableUrls();
+
         $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
         Blitz::$plugin->cache->emptyCache(true);
-
-        // Get warm cache URLS
-        $urls = Blitz::$plugin->cache->getAllCacheableUrls();
 
         $total = count($urls);
         $count = 0;
@@ -118,6 +118,18 @@ class CacheController extends Controller
             $this->stdout(Craft::t('blitz', 'One or more URLs do not begin with "http" and were ignored. Please ensure that your site’s base URLs do not use the @web alias.').PHP_EOL, Console::FG_RED);
         }
 
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Refreshes expired elements.
+     *
+     * @return int
+     */
+    public function actionRefreshExpired(): int
+    {
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;

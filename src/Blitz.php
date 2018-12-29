@@ -66,18 +66,9 @@ class Blitz extends Plugin
             $variable->set('blitz', BlitzVariable::class);
         });
 
-        // Process request
-        $this->processRequest();
-    }
-
-    /**
-     * Processes the request
-     */
-    public function processRequest()
-    {
         $request = Craft::$app->getRequest();
 
-        // Cacheable request
+        // Process request
         if ($this->cache->getIsCacheableRequest()) {
             $site = Craft::$app->getSites()->getCurrentSite();
 
@@ -94,9 +85,7 @@ class Blitz extends Plugin
                 $this->_registerCacheableRequestEvents($site->id, $uri);
             }
         }
-
-        // CP request
-        if ($request->getIsCpRequest()) {
+        else if ($request->getIsCpRequest()) {
             $this->_registerElementEvents();
 
             $this->_registerUtilities();
@@ -184,7 +173,7 @@ class Blitz extends Plugin
             }
         );
 
-        // Invalidate cache after response is prepared (set append to false we get in early)
+        // Invalidate cache after response is prepared
         Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE,
             function() {
                 $this->cache->invalidateCache();

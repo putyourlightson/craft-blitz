@@ -40,3 +40,15 @@
         <input type="submit" class="btn submit" value="{{ 'Clear Blitz Cache'|t('blitz') }}" />
     </div>
 </form>
+
+<br/>
+
+<form class="utility" method="post" accept-charset="UTF-8">
+    <input type="hidden" name="action" value="blitz/cache/refresh-expired">
+    {{ redirectInput('utilities/blitz-cache') }}
+    {{ csrfInput() }}
+
+    <p class="light">{{ 'Refreshing the expired Blitz cache will refresh all elements that have expired.'|t('blitz') }}</p>
+    <input type="submit" class="btn submit" value="{{ 'Refresh Expired Blitz Cache'|t('blitz') }}" />
+</form>
+

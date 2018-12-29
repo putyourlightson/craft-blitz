@@ -2,6 +2,8 @@
 
 ## 1.11.0 - 2018-12-28
 ### Added
+- Added expiry date to elements, specifically to entries with future post dates or expiry dates.
+- Added console command to refresh elements with expiry dates.
 - Added optimisations to make the cache refresh process faster and more performant and the cached element queries more lightweight.
 
 ## 1.10.2 - 2018-12-19
