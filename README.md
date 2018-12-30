@@ -1,5 +1,5 @@
 <p align="center"><img height="120" src="src/icon.svg"></p>
- 
+
 # Blitz Plugin for Craft CMS 3
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
@@ -14,6 +14,15 @@ Although the performance gains depend on the individual site and server setup, t
 
 ![TTFB](docs/images/ttfb-1.2.2.png)  
 
+## Contents
+
+- [License](#license)
+- [Requirements](#installation)
+- [Usage](#usage)
+- [Settings](#settings)
+- [How It Works](#how-it-works)
+- [Roadmap](#roadmap)
+
 ## License
 
 This plugin requires a commercial license which can be purchased through the Craft Plugin Store.  
@@ -21,37 +30,31 @@ The license fee is $59 plus $29 per subsequent year for updates (optional).
 
 ## Requirements
 
-Craft CMS 3.0.0 or later.
+This plugin requires Craft CMS 3.0.0 or later.
 
-## Installation
+## Usage
 
-Blitz is available in the Craft Plugin Store and can also be installed manually using composer.
+Install the plugin from the Craft Plugin Store in your site’s control panel or manually using composer.
 
-    composer require putyourlightson/craft-blitz
-
-## Quick Setup
+```
+composer require putyourlightson/craft-blitz
+```
 
 After installing the plugin, go to the plugin settings.
 
 1. Turn “Enable Caching” on.
-2. Add a row to “Included URI Patterns” such as `.*` for the entire site.
+2. Add at least one row to “Included URI Patterns” such as `.*` to cache the entire site.
 3. Save the settings and visit the site (it will be cached in the first visit).
-
-## Usage
-
-In the plugin settings, enable caching and add at least one included URI pattern. When a URL on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
 
 Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even further.
 
-Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
-
-Craft’s template caching `{% cache %}` tag doesn’t play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to disable template caching completely in the `config/general.php` file:
+Craft’s template caching `{% cache %}` tag doesn’t play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to simply disable template caching completely in the `config/general.php` file:
 
     'enableTemplateCaching' => false,
 
-![Settings](docs/images/settings-1.8.0b.png)
+## Settings
 
-## Query Strings
+### Query String Caching
 
 URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
 
@@ -59,7 +62,7 @@ URLs with query strings will be cached according to the selected option in the "
 - `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
 - `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
 
-## URI Patterns
+### URI Patterns
 
 URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
@@ -76,11 +79,21 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `^entries/entry$` matches an exact URI.
 - `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character.
 
-## Config Settings
+### Config Settings
 
-Blitz comes with a config file for more advanced plugin configuration settings. Copy the `config.php` to your Craft `config` directory as `blitz.php` and you can configure the settings in a multi-environment way.
+Blitz comes with a config file for a multi-environment way to set the plugin settings. The config file also provides more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
 
-## Dynamic Content
+![Settings](docs/images/settings-1.8.0b.png)
+
+## How It Works
+
+When a URL on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
+
+Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
+
+If a global is saved then Blitz will clear and warm the entire cache if the "Warm Cache Automatically" setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
+
+### Dynamic Content
 
 When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
 
@@ -89,7 +102,7 @@ Blitz offers a workaround for injecting dynamic content into a cached page using
 #### `{{ craft.blitz.getUri('/template/name') }}`
 
 Returns a script that injects the contents of the URI provided in place of the twig tag. 
- 
+
 #### `{{ craft.blitz.csrfInput() }}`
 
 Returns a script that injects a CSRF input field in place of the twig tag.
@@ -106,7 +119,7 @@ Below is an example of how you might use the tags to create a page containing dy
 
 In the case above it would make sense to add `ajax/.*` as an excluded URI pattern in the plugin settings.
 
-## Cache Invalidation
+### Cache Invalidation
 
 When an element is created, updated or deleted, any cached template files that used that element are deleted. If the "Warm Cache Automatically" setting is enabled the a job is  queued to warm the cleared cache files.
 
@@ -121,7 +134,7 @@ Cached files and folders can be cleared manually by simply deleting them on the 
 
 ![Utility](docs/images/utility-1.11.0.png)
 
-## Console Commands
+### Console Commands
 
 Console commands with the functionality described above can also be used as follows:
 
@@ -132,20 +145,16 @@ Console commands with the functionality described above can also be used as foll
     ./craft blitz/cache/warm
     
     ./craft blitz/cache/refresh-expired
-    
+
 ![Console commands](docs/images/console-1.8.0a.png)
 
 Note that if the `@web` alias, or any other method that requires a web request, is used to determine the site URL then it cannot be included in cache warming with the console command. Using an absolute site URL is therefore recommended.
 
-## Considerations
-
-If a global is saved then Blitz will clear and warm the entire cache if the "Warm Cache Automatically" setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
-
-## Server Rewrite
+### Server Rewrite
 
 For improved performance, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. 
 
-### Apache
+#### Apache
 
 In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the root .htaccess file, just before the rewrites provided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
@@ -167,7 +176,7 @@ If the "Query String Caching" setting is set to `Cache URLs with query strings a
     
     # Send would-be 404 requests to Craft
 
-### Nginx
+#### Nginx
 
 In Nginx this is achieved by adding a location handler to the configuration file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
@@ -189,7 +198,7 @@ If the "Query String Caching" setting is set to `Cache URLs with query strings a
     
     # Send would-be 404 requests to Craft
 
-## Debugging
+### Debugging
 
 Cached HTML files are timestamped with a comment at the end of the file. 
 
