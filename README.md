@@ -212,6 +212,10 @@ Note that if your HTML is minified then all comments will be removed from the ma
 
 If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Powered-By: Blitz` header will be sent.
 
+## Roadmap
+
+- Add better control of local caching of dynamically loaded content.
+
 ---
 
 <small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>
