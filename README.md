@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 <p align="center"><img height="120" src="./src/icon.svg"></p>
-=======
-<p align="center"><img height="120" src="src/icon.svg"></p>
->>>>>>> develop
 
 # Blitz Plugin for Craft CMS 3
 
@@ -98,11 +94,7 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 
 Blitz comes with a config file for a multi-environment way to set the plugin settings. The config file also provides more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
 
-<<<<<<< HEAD
 ![Settings](./docs/images/settings-1.8.0b.png)
-=======
-![Settings](docs/images/settings-1.8.0b.png)
->>>>>>> develop
 
 ## How It Works
 
@@ -149,21 +141,11 @@ The "Blitz Cache" utility displays the number of cached URIs for each site. It a
 - Clearing the cache will delete all cached files.
 - Flushing the cache will clear the cache and remove all records from the database.
 - Warming the cache will flush the cache and add a job to the queue to recache all of the files.
-<<<<<<< HEAD
-
-Cached files and folders can be cleared manually by simply deleting them on the server.
-
-![Utility](/Users/ben/Sites/plugins/craft-blitz/docs/images/utility-1.11.0.png)
-
-### Console Commands
-
-Console commands with the functionality described above can also be used as follows:
-=======
 - Refreshing the expired cache will refresh all elements that have expired since they were cached.
 
 Cached files and folders can be cleared manually by simply deleting them on the server.
 
-![Utility](docs/images/utility-1.11.0.png)
+![Utility](./docs/images/utility-1.11.0.png)
 
 ### Console Commands
 
@@ -177,24 +159,10 @@ Console commands with the functionality described above can also be used as foll
     
     ./craft blitz/cache/refresh-expired
 
-![Console commands](docs/images/console-1.8.0a.png)
->>>>>>> develop
-
-```
-./craft blitz/cache/clear
-
-<<<<<<< HEAD
-./craft blitz/cache/flush
-
-./craft blitz/cache/warm
-```
-
 ![Console commands](./docs/images/console-1.8.0a.png)
 
 Note that if the `@web` alias, or any other method that requires a web request, is used to determine the site URL then it cannot be included in cache warming with the console command. Using an absolute site URL is therefore recommended.
 
-=======
->>>>>>> develop
 ### Server Rewrite
 
 For improved performance, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. 
@@ -271,15 +239,6 @@ If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Pow
 
 ## Roadmap
 
-<<<<<<< HEAD
-- Add expiry dates to cached elements that have a future post or expiry date.
 - Add better control of local caching of dynamically loaded content.
-
-------
-=======
-- Add better control of local caching of dynamically loaded content.
-
----
->>>>>>> develop
 
 <small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>
