@@ -10,8 +10,10 @@ use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
+use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\elements\MatrixBlock;
+use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
@@ -61,9 +63,19 @@ class CacheService extends Component
     private $_addElementCaches = [];
 
     /**
+     * @var \DateTime[]
+     */
+    private $_addElementExpiryDates = [];
+
+    /**
      * @var int[]
      */
     private $_addElementQueryCaches = [];
+
+    /**
+     * @var array
+     */
+    private $_defaultElementQueryParams = [];
 
     /**
      * @var int[]
@@ -162,15 +174,10 @@ class CacheService extends Component
     {
         if ($this->_nonCacheableElementTypes !== null) {
             return $this->_nonCacheableElementTypes;
-        }
-
-        $elementTypes = [
-            GlobalSet::class,
-            MatrixBlock::class,
-        ];
+        };
 
         $event = new RegisterNonCacheableElementTypesEvent([
-            'elementTypes' => $elementTypes,
+            'elementTypes' => $this->_settings->nonCacheableElementTypes,
         ]);
         $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
 
@@ -202,6 +209,19 @@ class CacheService extends Component
 
         if (!in_array($elementId, $this->_addElementCaches, true)) {
             $this->_addElementCaches[] = $elementId;
+
+            // Check if element is an entry that should expire
+            if ($element instanceof Entry) {
+                $now = new \DateTime();
+
+                if ($element->postDate > $now) {
+                    $this->_addElementExpiryDates[$elementId] = $element->postDate;
+                }
+                else if ($element->expiryDate > $now) {
+                    $this->_addElementExpiryDates[$elementId] = $element->expiryDate;
+                }
+            }
+
         }
     }
 
@@ -222,47 +242,31 @@ class CacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has a value set for ID
-        if ($elementQuery->id) {
+        // Don't proceed if the query has a value set for ID or an `elements.id` value set for where (used when eager loading elements)
+        if ($elementQuery->id || !empty($elementQuery->where['elements.id'])) {
             return;
         }
 
-        // Based on code from includeElementQueryInTemplateCaches method in \craft\services\TemplateCaches)
-        $query = $elementQuery->query;
-        $subQuery = $elementQuery->subQuery;
-        $customFields = $elementQuery->customFields;
+        $params = json_encode($this->_getUniqueElementQueryParams($elementQuery));
 
-        // Nullify values
-        $elementQuery->query = null;
-        $elementQuery->subQuery = null;
-        $elementQuery->customFields = null;
+        // Create a unique index from the element type and parameters for quicker indexing and less storage
+        $index = sprintf('%u', crc32($elementQuery->elementType.$params));
 
-        // Base64-encode the query so db\Connection::quoteSql() doesn't tweak any of the table/columns names
-        $encodedQuery = base64_encode(serialize($elementQuery));
-
-        // Hash the encoded query for quicker indexing
-        $hash = md5($encodedQuery);
-
-        // Set back to original values
-        $elementQuery->query = $query;
-        $elementQuery->subQuery = $subQuery;
-        $elementQuery->customFields = $customFields;
-
-        // Use DB connection so we can batch insert and exclude audit columns
+        // Use DB connection so we can insert and exclude audit columns
         $db = Craft::$app->getDb();
 
-        // Get element query record from type and hash or create one if it does not exist
+        // Get element query record from index or create one if it does not exist
         $queryId = ElementQueryRecord::find()
             ->select('id')
-            ->where(['hash' => $hash])
+            ->where(['index' => $index])
             ->scalar();
 
         if (!$queryId) {
             $db->createCommand()
                 ->insert(ElementQueryRecord::tableName(), [
-                    'hash' => $hash,
+                    'index' => $index,
                     'type' => $elementQuery->elementType,
-                    'query' => $encodedQuery,
+                    'params' => $params,
                 ], false)
                 ->execute();
 
@@ -312,13 +316,17 @@ class CacheService extends Component
         $values = [];
 
         foreach ($this->_addElementCaches as $elementId) {
-            $values[] = [$cacheId, $elementId];
+            // Get and prepare expiry date for DB if not null
+            $expiryDate = $this->_addElementExpiryDates[$elementId] ?? null;
+            $expiryDate = $expiryDate !== null ? Db::prepareDateForDb($expiryDate) : null;
+
+            $values[] = [$cacheId, $elementId, $expiryDate];
         }
 
         $db->createCommand()
             ->batchInsert(
                 ElementCacheRecord::tableName(),
-                ['cacheId', 'elementId'],
+                ['cacheId', 'elementId', 'expiryDate'],
                 $values,
                 false)
             ->execute();
@@ -383,17 +391,16 @@ class CacheService extends Component
             $this->_invalidateElementTypes[] = $elementType;
         }
 
-        // Get the element cache IDs to clear now as we may not be able to detect it later in a job (if the element was deleted)
-        $elementCacheRecords = ElementCacheRecord::find()
+        // Get the element cache IDs to clear now as we may not be able to detect it later in a job (if the element was deleted for example)
+        $cacheIds = ElementCacheRecord::find()
             ->select('cacheId')
             ->where(['elementId' => $elementId])
             ->groupBy('cacheId')
-            ->all();
+            ->column();
 
-        /** @var ElementCacheRecord[] $elementCacheRecords */
-        foreach ($elementCacheRecords as $elementCacheRecord) {
-            if (!in_array($elementCacheRecord->cacheId, $this->_invalidateCacheIds, true)) {
-                $this->_invalidateCacheIds[] = $elementCacheRecord->cacheId;
+        foreach ($cacheIds as $cacheId) {
+            if (!in_array($cacheId, $this->_invalidateCacheIds, true)) {
+                $this->_invalidateCacheIds[] = $cacheId;
             }
         }
     }
@@ -403,6 +410,19 @@ class CacheService extends Component
      */
     public function invalidateCache()
     {
+        // Check for expired element caches
+        $cacheIds = ElementCacheRecord::find()
+            ->select('cacheId')
+            ->where(['and',
+                ['not', ['expiryDate' => null]],
+                ['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())],
+            ])
+            ->groupBy('cacheId')
+            ->column();
+
+        // Merge expired element cache IDs
+        $this->_invalidateCacheIds = array_merge($this->_invalidateCacheIds, $cacheIds);
+
         if (empty($this->_invalidateCacheIds) && empty($this->_invalidateElementIds)) {
             return;
         }
@@ -464,6 +484,8 @@ class CacheService extends Component
         if ($flush) {
             // Delete all cache records
             CacheRecord::deleteAll();
+
+            $this->cleanElementQueryTable();
         }
     }
 
@@ -613,5 +635,65 @@ class CacheService extends Component
         }
 
         return false;
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Returns an element query's default parameters for a given element type.
+     *
+     * @param string $elementType
+     *
+     * @return array
+     */
+    private function _getDefaultElementQueryParams(string $elementType): array
+    {
+        if (!empty($this->_defaultElementQueryParams[$elementType])) {
+            return $this->_defaultElementQueryParams[$elementType];
+        }
+
+        $this->_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
+
+        $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
+
+        foreach ($ignoreParams as $key) {
+            unset($this->_defaultElementQueryParams[$elementType][$key]);
+        }
+
+        return $this->_defaultElementQueryParams[$elementType];
+    }
+
+    /**
+     * Returns the element query's unique parameters.
+     *
+     * @param ElementQuery $elementQuery
+     *
+     * @return array
+     */
+    private function _getUniqueElementQueryParams(ElementQuery $elementQuery): array
+    {
+        $params = [];
+
+        $defaultParams = $this->_getDefaultElementQueryParams($elementQuery->elementType);
+
+        foreach ($defaultParams as $key => $default) {
+            $value = $elementQuery->{$key};
+
+            if ($value !== $default)
+                $params[$key] = $value;
+
+                // Convert datetime parameters to Unix timestamps
+                if ($value instanceof \DateTime) {
+                    $params[$key] = $value->getTimestamp();
+                }
+
+                // Convert element parameters to ID
+                if ($value instanceof Element) {
+                    $params[$key] = $value->id;
+                }
+        }
+
+        return $params;
     }
 }

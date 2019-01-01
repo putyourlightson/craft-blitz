@@ -71,6 +71,7 @@ class Install extends Migration
             $this->createTable(ElementCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
+                'expiryDate' => $this->dateTime(),
             ]);
         }
 
@@ -84,9 +85,9 @@ class Install extends Migration
         if (!$this->db->tableExists(ElementQueryRecord::tableName())) {
             $this->createTable(ElementQueryRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'hash' => $this->string()->notNull(),
+                'index' => $this->integer()->unsigned()->notNull(),
                 'type' => $this->string()->notNull(),
-                'query' => $this->longText(),
+                'params' => $this->text(),
             ]);
         }
 
@@ -102,7 +103,7 @@ class Install extends Migration
     {
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
-        $this->createIndex(null, ElementQueryRecord::tableName(), 'hash', true);
+        $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
     }
 

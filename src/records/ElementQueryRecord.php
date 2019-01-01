@@ -10,9 +10,9 @@ use craft\db\ActiveRecord;
 
 /**
  * @property int $id
- * @property string $hash
+ * @property int $index
  * @property string $type
- * @property string $query
+ * @property string|array $params
  * @property ElementQueryCacheRecord[] $elementQueryCaches
  */
 class ElementQueryRecord extends ActiveRecord

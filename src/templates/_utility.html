@@ -1,42 +1,54 @@
 {% import "_includes/forms" as forms %}
 
-<form class="utility" method="post" accept-charset="UTF-8">
-    <input type="hidden" name="action" value="blitz/cache/warm">
-    {{ redirectInput('utilities/blitz-cache') }}
-    {{ csrfInput() }}
+{% set utilities = [
+    {
+        action: 'clear',
+        title: 'Clear Blitz Cache',
+        instructions: 'Clearing the cache will delete all cached files.',
+    },
+    {
+        action: 'flush',
+        title: 'Flush Blitz Cache',
+        instructions: 'Flushing the cache will clear the cache and remove all records from the database.',
+    },
+    {
+        action: 'warm',
+        title: 'Warm Blitz Cache',
+        instructions: 'Warming the cache will flush the cache and add a job to the queue to recache all of the files.',
+    },
+    {
+        action: 'refresh-expired',
+        title: 'Refresh Expired Blitz Cache',
+        instructions: 'Refreshing the expired cache will refresh all elements that have expired since they were cached.',
+    },
+] %}
 
-    <p class="light">{{ 'Warming the Blitz cache will flush the cache and add a job to the queue to recache all of the files.'|t('blitz') }}</p>
-    <input type="submit" class="btn submit" value="{{ 'Warm Blitz Cache'|t('blitz') }}" />
-</form>
+<h1>Cached Sites</h1>
 
-<br/>
+<table class="data fullwidth collapsible">
+    <thead>
+        <th scope="col">{{ 'Site'|t('blitz') }}</th>
+        <th scope="col">{{ 'Path'|t('blitz') }}</th>
+        <th scope="col">{{ 'Cached URIs'|t('blitz') }}</th>
+    </thead>
+    <tbody>
+        {% for site in sites %}
+            <tr>
+                <td>{{ site.name }}</td>
+                <td><code>{{ site.path }}</code></td>
+                <td>{{ site.count }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-<form class="utility" method="post" accept-charset="UTF-8">
-    <input type="hidden" name="action" value="blitz/cache/flush">
-    {{ redirectInput('utilities/blitz-cache') }}
-    {{ csrfInput() }}
-
-    <p class="light">{{ 'Flushing the Blitz cache will clear the cache and remove all records from the database.'|t('blitz') }}</p>
-    <input type="submit" class="btn submit" value="{{ 'Flush Blitz Cache'|t('blitz') }}" />
-</form>
-
-<br/>
-
-<form class="utility" method="post" accept-charset="UTF-8">
-    <input type="hidden" name="action" value="blitz/cache/clear">
-    {{ redirectInput('utilities/blitz-cache') }}
-    {{ csrfInput() }}
-
-    <p class="light">{{ 'Clear the Blitz cache by site.'|t('blitz') }}</p>
-
-    {{ forms.checkboxSelect({
-        name: 'siteIds',
-        options: options,
-        showAllOption: true,
-        values: '*',
-    }) }}
-
-    <div class="buttons">
-        <input type="submit" class="btn submit" value="{{ 'Clear Blitz Cache'|t('blitz') }}" />
-    </div>
-</form>
+{% for utility in utilities %}
+    <br/>
+    <form class="utility" method="post" accept-charset="UTF-8">
+        <input type="hidden" name="action" value="blitz/cache/{{ utility.action }}">
+        {{ redirectInput('utilities/blitz-cache') }}
+        {{ csrfInput() }}
+        <p class="light">{{ utility.instructions|t('blitz') }}</p>
+        <input type="submit" class="btn submit" value="{{ utility.title|t('blitz') }}" />
+    </form>
+{% endfor %}

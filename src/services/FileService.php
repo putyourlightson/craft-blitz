@@ -33,6 +33,11 @@ class FileService extends Component
     /**
      * @var array|null
      */
+    private $_sitePaths;
+
+    /**
+     * @var array|null
+     */
     private $_filePaths;
 
     // Public Methods
@@ -67,16 +72,16 @@ class FileService extends Component
     }
 
     /**
-     * Returns file path from provided site ID and URI.
+     * Returns site path from provided site ID.
      *
      * @param int $siteId
-     * @param string $uri
+     *
      * @return string
      */
-    public function getFilePath(int $siteId, string $uri): string
+    public function getSitePath(int $siteId): string
     {
-        if (!empty($this->_filePaths[$siteId][$uri])) {
-            return $this->_filePaths[$siteId][$uri];
+        if (!empty($this->_sitePaths[$siteId])) {
+            return $this->_sitePaths[$siteId];
         }
 
         $cacheFolderPath = $this->getCacheFolderPath();
@@ -90,13 +95,38 @@ class FileService extends Component
         $siteUrl = Craft::getAlias($site->baseUrl);
         $siteHostPath = preg_replace('/^(http|https):\/\//i', '', $siteUrl);
 
+        $this->_sitePaths[$siteId] = FileHelper::normalizePath($cacheFolderPath.'/'.$siteHostPath);
+
+        return $this->_sitePaths[$siteId];
+    }
+
+    /**
+     * Returns file path from provided site ID and URI.
+     *
+     * @param int $siteId
+     * @param string $uri
+     *
+     * @return string
+     */
+    public function getFilePath(int $siteId, string $uri): string
+    {
+        if (!empty($this->_filePaths[$siteId][$uri])) {
+            return $this->_filePaths[$siteId][$uri];
+        }
+
+        $sitePath = $this->getSitePath($siteId);
+
+        if ($sitePath == '') {
+            return '';
+        }
+
         // Replace __home__ with blank string
         $uri = ($uri == '__home__' ? '' : $uri);
 
         // Replace ? with / in URI
         $uri = str_replace('?', '/', $uri);
 
-        $this->_filePaths[$siteId][$uri] = FileHelper::normalizePath($cacheFolderPath.'/'.$siteHostPath.'/'.$uri.'/index.html');
+        $this->_filePaths[$siteId][$uri] = FileHelper::normalizePath($sitePath.'/'.$uri.'/index.html');
 
         return $this->_filePaths[$siteId][$uri];
     }

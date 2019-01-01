@@ -58,6 +58,14 @@ class SettingsModel extends Model
     public $cacheElementQueries = true;
 
     /**
+     * @var string[]
+     */
+    public $nonCacheableElementTypes = [
+        'craft\elements\GlobalSet',
+        'craft\elements\MatrixBlock',
+    ];
+
+    /**
      * @var bool
      */
     public $sendPoweredByHeader = true;

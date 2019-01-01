@@ -1,5 +1,15 @@
 # Release Notes for Blitz
 
+## 1.11.0 - Unreleased
+### Added
+- Added expiry date to elements, specifically to entries with future post dates or expiry dates.
+- Added utility and console command to refresh elements with expiry dates.
+- Added `nonCacheableElementTypes` config setting.
+- Added optimisations to make the cached element queries more lightweight.
+
+### Changed
+- Replaced ability to clear sites in utility with table of cached sites.
+
 ## 1.10.2 - 2018-12-19
 ### Added
 - Added flush cache utility and console command. 
