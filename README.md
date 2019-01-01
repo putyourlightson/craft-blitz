@@ -23,15 +23,6 @@ Although the performance gains depend on the individual site and server setup, t
 - [How It Works](#how-it-works)
 - [Roadmap](#roadmap)
 
-## Contents
-
-- [License](#license)
-- [Requirements](#installation)
-- [Usage](#usage)
-- [Settings](#settings)
-- [How It Works](#how-it-works)
-- [Roadmap](#roadmap)
-
 ## License
 
 This plugin requires a commercial license which can be purchased through the Craft Plugin Store.  
