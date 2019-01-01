@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 1.11.0 - Unreleased
+## 1.11.0 - 2019-01-01
 ### Added
 - Added expiry date to elements, specifically to entries with future post dates or expiry dates.
 - Added utility and console command to refresh elements with expiry dates.
@@ -9,6 +9,8 @@
 
 ### Changed
 - Replaced ability to clear sites in utility with table of cached sites.
+
+> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
 
 ## 1.10.2 - 2018-12-19
 ### Added
