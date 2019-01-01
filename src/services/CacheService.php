@@ -12,7 +12,6 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\elements\Entry;
 use craft\elements\GlobalSet;
-use craft\elements\MatrixBlock;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
@@ -643,7 +642,7 @@ class CacheService extends Component
     /**
      * Returns an element query's default parameters for a given element type.
      *
-     * @param string $elementType
+     * @param string|ElementInterface $elementType
      *
      * @return array
      */

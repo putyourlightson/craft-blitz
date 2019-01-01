@@ -10,7 +10,6 @@ use craft\errors\MissingComponentException;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\WarmCacheJob;
-use putyourlightson\blitz\records\CacheRecord;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
