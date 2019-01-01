@@ -409,6 +409,22 @@ class CacheService extends Component
      */
     public function invalidateCache()
     {
+        if (empty($this->_invalidateCacheIds) && empty($this->_invalidateElementIds)) {
+            return;
+        }
+
+        Craft::$app->getQueue()->push(new RefreshCacheJob([
+            'cacheIds' => $this->_invalidateCacheIds,
+            'elementIds' => $this->_invalidateElementIds,
+            'elementTypes' => $this->_invalidateElementTypes,
+        ]));
+    }
+
+    /**
+     * Refrshes expired cache.
+     */
+    public function refreshExpiredCache()
+    {
         // Check for expired element caches
         $cacheIds = ElementCacheRecord::find()
             ->select('cacheId')
@@ -419,17 +435,12 @@ class CacheService extends Component
             ->groupBy('cacheId')
             ->column();
 
-        // Merge expired element cache IDs
-        $this->_invalidateCacheIds = array_merge($this->_invalidateCacheIds, $cacheIds);
-
-        if (empty($this->_invalidateCacheIds) && empty($this->_invalidateElementIds)) {
+        if (empty($cacheIds)) {
             return;
         }
 
         Craft::$app->getQueue()->push(new RefreshCacheJob([
-            'cacheIds' => $this->_invalidateCacheIds,
-            'elementIds' => $this->_invalidateElementIds,
-            'elementTypes' => $this->_invalidateElementTypes,
+            'cacheIds' => $cacheIds,
         ]));
     }
 

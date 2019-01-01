@@ -57,7 +57,7 @@ class CacheController extends Controller
      */
     public function actionRefreshExpired(): Response
     {
-        Blitz::$plugin->cache->invalidateCache();
+        Blitz::$plugin->cache->refreshExpiredCache();
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.'));
 

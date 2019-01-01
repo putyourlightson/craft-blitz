@@ -51,58 +51,60 @@ class RefreshCacheJob extends BaseJob
          * Get element query records of the element types without already saved cache IDs and without eager-loading.
          * This is used for detecting if pages with element queries need to be updated.
          */
-        $elementQueryRecords = ElementQueryRecord::find()
-            ->select(['id', 'type', 'params'])
-            ->where(['type' => $this->elementTypes])
-            ->innerJoinWith([
-                'elementQueryCaches' => function(ActiveQuery $query) {
-                    $query->where(['not', ['cacheId' => $this->cacheIds]]);
+        if (!empty($this->elementIds)) {
+            $elementQueryRecords = ElementQueryRecord::find()
+                ->select(['id', 'type', 'params'])
+                ->where(['type' => $this->elementTypes])
+                ->innerJoinWith([
+                    'elementQueryCaches' => function(ActiveQuery $query) {
+                        $query->where(['not', ['cacheId' => $this->cacheIds]]);
+                    }
+                ], false)
+                ->all();
+
+            $total = count($elementQueryRecords);
+            $count = 0;
+
+            /** @var ElementQueryRecord[] $elementQueryRecords */
+            foreach ($elementQueryRecords as $elementQueryRecord) {
+                $count++;
+                $this->setProgress($queue, $count / $total);
+
+                // Ensure class still exists as a plugin may have been removed since being saved
+                if (!class_exists($elementQueryRecord->type)) {
+                    continue;
                 }
-            ], false)
-            ->all();
 
-        $total = count($elementQueryRecords);
-        $count = 0;
+                /** @var ElementInterface $elementType */
+                $elementType = $elementQueryRecord->type;
 
-        /** @var ElementQueryRecord[] $elementQueryRecords */
-        foreach ($elementQueryRecords as $elementQueryRecord) {
-            $count++;
-            $this->setProgress($queue, $count / $total);
+                /** @var ElementQuery $elementQuery */
+                $elementQuery = $elementType::find();
 
-            // Ensure class still exists as a plugin may have been removed since being saved
-            if (!class_exists($elementQueryRecord->type)) {
-                continue;
-            }
+                $params = json_decode($elementQueryRecord->params, true);
 
-            /** @var ElementInterface $elementType */
-            $elementType = $elementQueryRecord->type;
-
-            /** @var ElementQuery $elementQuery */
-            $elementQuery = $elementType::find();
-
-            $params = json_decode($elementQueryRecord->params, true);
-
-            foreach ($params as $key => $val) {
-                $elementQuery->{$key} = $val;
-            }
-
-            // If the element query has an offset then add it to the limit and make it null
-            if ($elementQuery->offset) {
-                if ($elementQuery->limit) {
-                    $elementQuery->limit($elementQuery->limit + $elementQuery->offset);
+                foreach ($params as $key => $val) {
+                    $elementQuery->{$key} = $val;
                 }
-                $elementQuery->offset(null);
-            }
 
-            // If one or more of the element IDs are in the query's results
-            if (!empty(array_intersect($this->elementIds, $elementQuery->ids()))) {
-                // Get related element query cache records
-                $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
+                // If the element query has an offset then add it to the limit and make it null
+                if ($elementQuery->offset) {
+                    if ($elementQuery->limit) {
+                        $elementQuery->limit($elementQuery->limit + $elementQuery->offset);
+                    }
+                    $elementQuery->offset(null);
+                }
 
-                // Add cache IDs to the array that do not already exist
-                foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
-                    if (!in_array($elementQueryCacheRecord->cacheId, $this->cacheIds, true)) {
-                        $this->cacheIds[] = $elementQueryCacheRecord->cacheId;
+                // If one or more of the element IDs are in the query's results
+                if (!empty(array_intersect($this->elementIds, $elementQuery->ids()))) {
+                    // Get related element query cache records
+                    $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
+
+                    // Add cache IDs to the array that do not already exist
+                    foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
+                        if (!in_array($elementQueryCacheRecord->cacheId, $this->cacheIds, true)) {
+                            $this->cacheIds[] = $elementQueryCacheRecord->cacheId;
+                        }
                     }
                 }
             }

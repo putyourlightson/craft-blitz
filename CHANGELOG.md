@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.11.1 - 2019-01-01
+### Fixed
+- Fixed bug when refreshing expired cache.
+
 ## 1.11.0 - 2019-01-01
 ### Added
 - Added expiry date to elements, specifically to entries with future post dates or expiry dates.
