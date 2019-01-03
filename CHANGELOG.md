@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.11.2 - Unreleased
+### Changed
+- Changed cache folder path to relative path in utilty.
+
 ## 1.11.1 - 2019-01-01
 ### Fixed
 - Fixed bug when refreshing expired cache.

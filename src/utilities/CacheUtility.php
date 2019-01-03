@@ -54,9 +54,12 @@ class CacheUtility extends Utility
             $path = Blitz::$plugin->file->getSitePath($site->id);
             $count = is_dir($path) ? count(FileHelper::findFiles($path)) : 0;
 
+            $relativePath = trim(str_replace(Craft::getAlias('@webroot'), '', $path), '/');
+
             $sites[$site->id] = [
                 'name' => $site->name,
                 'path' => $path,
+                'relativePath' => $relativePath,
                 'count' => $count,
             ];
         }
