@@ -48,6 +48,8 @@ After installing the plugin, go to the plugin settings.
 
 Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even further.
 
+Creating a cron job to [refresh expired cache](#refresh-expired-blitz-cache) (see below) will ensure that URIs that contain elements that have expired since they were cached are automatically refreshed when necessary.
+
 Craft’s template caching `{% cache %}` tag doesn’t play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to simply disable template caching completely in the `config/general.php` file:
 
 ```
@@ -129,10 +131,25 @@ When an element is created, updated or deleted, any cached template files that u
 
 The "Blitz Cache" utility displays the number of cached URIs for each site. It also provides the following functionality:
 
-- Clearing the cache will delete all cached files.
-- Flushing the cache will clear the cache and remove all records from the database.
-- Warming the cache will flush the cache and add a job to the queue to recache all of the files.
-- Refreshing the expired cache will refresh all elements that have expired since they were cached.
+#### Clear Blitz Cache
+Clearing the cache will delete all cached files.
+
+#### Flush Blitz Cache
+Flushing the cache will clear the cache and remove all records from the database.
+
+#### Warm Blitz Cache
+Warming the cache will flush the cache and add a job to the queue to recache all of the files.
+
+#### Refresh Expired Blitz Cache
+Refreshing the expired cache will refresh all cached URIs that contain elements that have expired since they were cached, specifically entries with future post and expiry dates.
+
+Create a cron job with the following console command to refresh expired cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
+
+```
+5 * * * * /usr/bin/php /path/to/craft blitz/cache/refresh-expired
+```
+
+#### Manually Clearing Cached Files
 
 Cached files and folders can be cleared manually by simply deleting them on the server.
 
@@ -140,7 +157,7 @@ Cached files and folders can be cleared manually by simply deleting them on the 
 
 ### Console Commands
 
-Console commands with the functionality described above can also be used as follows:
+The following console commands with the functionality described above are available.
 
     ./craft blitz/cache/clear
     
@@ -231,5 +248,6 @@ If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Pow
 ## Roadmap
 
 - Add better control of local caching of dynamically loaded content.
+- Add Blitz to `clear-caches` console command ([#3588](https://github.com/craftcms/cms/pull/3588)).
 
 <small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>
