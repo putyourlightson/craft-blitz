@@ -127,9 +127,9 @@ In the case above it would make sense to add `ajax/.*` as an excluded URI patter
 
 ### Cache Invalidation
 
-When an element is created, updated or deleted, any cached template files that used that element are deleted. If the "Warm Cache Automatically" setting is enabled the a job is  queued to warm the cleared cache files.
+When an element is created, updated or deleted, any cached template files that used that element are deleted. If the “Warm Cache Automatically” setting is enabled the a job is  queued to warm the cleared cache files.
 
-The "Blitz Cache" utility displays the number of cached URIs for each site. It also provides the following functionality:
+The Blitz Cache Utility displays the number of cached URIs for each site. It also provides the following functionality:
 
 #### Clear Blitz Cache
 Clearing the cache will delete all cached files.
@@ -157,7 +157,7 @@ Cached files and folders can be cleared manually by simply deleting them on the 
 
 ### Console Commands
 
-The following console commands with the functionality described above are available.
+The following console commands with the functionality described above are also available.
 
     ./craft blitz/cache/clear
     
