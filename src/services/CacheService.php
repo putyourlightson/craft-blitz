@@ -10,7 +10,6 @@ use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
-use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
@@ -22,6 +21,7 @@ use putyourlightson\blitz\jobs\WarmCacheJob;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
+use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 
@@ -62,14 +62,14 @@ class CacheService extends Component
     private $_addElementCaches = [];
 
     /**
-     * @var \DateTime[]
-     */
-    private $_addElementExpiryDates = [];
-
-    /**
      * @var int[]
      */
     private $_addElementQueryCaches = [];
+
+    /**
+     * @var \DateTime[]
+     */
+    private $_addElementExpiryDates = [];
 
     /**
      * @var array
@@ -208,19 +208,6 @@ class CacheService extends Component
 
         if (!in_array($elementId, $this->_addElementCaches, true)) {
             $this->_addElementCaches[] = $elementId;
-
-            // Check if element is an entry that should expire
-            if ($element instanceof Entry) {
-                $now = new \DateTime();
-
-                if ($element->postDate > $now) {
-                    $this->_addElementExpiryDates[$elementId] = $element->postDate;
-                }
-                else if ($element->expiryDate > $now) {
-                    $this->_addElementExpiryDates[$elementId] = $element->expiryDate;
-                }
-            }
-
         }
     }
 
@@ -315,17 +302,13 @@ class CacheService extends Component
         $values = [];
 
         foreach ($this->_addElementCaches as $elementId) {
-            // Get and prepare expiry date for DB if not null
-            $expiryDate = $this->_addElementExpiryDates[$elementId] ?? null;
-            $expiryDate = $expiryDate !== null ? Db::prepareDateForDb($expiryDate) : null;
-
-            $values[] = [$cacheId, $elementId, $expiryDate];
+            $values[] = [$cacheId, $elementId];
         }
 
         $db->createCommand()
             ->batchInsert(
                 ElementCacheRecord::tableName(),
-                ['cacheId', 'elementId', 'expiryDate'],
+                ['cacheId', 'elementId'],
                 $values,
                 false)
             ->execute();
@@ -402,6 +385,41 @@ class CacheService extends Component
                 $this->_invalidateCacheIds[] = $cacheId;
             }
         }
+
+        // Check if element has a future post or expiry date
+        $expiryDate = null;
+        $now = new \DateTime();
+
+        if (!empty($element->postDate) && $element->postDate > $now) {
+            $expiryDate = $element->postDate;
+        }
+        else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
+            $expiryDate = $element->expiryDate;
+        }
+
+        if ($expiryDate !== null) {
+            $expiryDate = Db::prepareDateForDb($expiryDate);
+
+            /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
+            $elementExpiryDateRecord = ElementExpiryDateRecord::find()
+                ->where(['elementId' => $elementId])
+                ->one();
+
+            if ($elementExpiryDateRecord !== null && $elementExpiryDateRecord->expiryDate < $expiryDate) {
+                $expiryDate = $elementExpiryDateRecord->expiryDate;
+            }
+
+            Craft::$app->getDb()->createCommand()
+                ->upsert(
+                    ElementExpiryDateRecord::tableName(), [
+                        'elementId' => $elementId,
+                        'expiryDate' => $expiryDate,
+                    ],
+                    ['expiryDate' => $expiryDate],
+                    [],
+                    false)
+                ->execute();
+        }
     }
 
     /**
@@ -425,15 +443,24 @@ class CacheService extends Component
      */
     public function refreshExpiredCache()
     {
+        $cacheIds = [];
+
         // Check for expired element caches
-        $cacheIds = ElementCacheRecord::find()
-            ->select('cacheId')
-            ->where(['and',
-                ['not', ['expiryDate' => null]],
-                ['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())],
-            ])
-            ->groupBy('cacheId')
-            ->column();
+        $elementExpiryDates = ElementExpiryDateRecord::find()
+            ->where(['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())])
+            ->with('elementCaches')
+            ->all();
+
+        /** @var ElementExpiryDateRecord $elementExpiryDate */
+        foreach ($elementExpiryDates as $elementExpiryDate) {
+            foreach ($elementExpiryDate->elementCaches as $elementCache) {
+                if (!in_array($elementCache->id, $cacheIds, true)) {
+                    $cacheIds[] = $elementCache->id;
+                }
+            }
+
+            $elementExpiryDate->delete();
+        }
 
         if (empty($cacheIds)) {
             return;

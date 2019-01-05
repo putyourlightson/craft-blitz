@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Utility;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\records\CacheRecord;
 
 class CacheUtility extends Utility
 {

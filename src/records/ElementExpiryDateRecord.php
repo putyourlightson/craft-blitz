@@ -10,12 +10,12 @@ use yii\db\ActiveQueryInterface;
 use craft\db\ActiveRecord;
 
 /**
- * @property int $cacheId
  * @property int $elementId
- * @property CacheRecord $cache
+ * @property \DateTime $expiryDate
+ * @property CacheRecord[] $elementCaches
  * @property Element $element
  */
-class ElementCacheRecord extends ActiveRecord
+class ElementExpiryDateRecord extends ActiveRecord
 {
     // Public Static Methods
     // =========================================================================
@@ -27,17 +27,17 @@ class ElementCacheRecord extends ActiveRecord
      */
     public static function tableName(): string
     {
-        return '{{%blitz_elementcaches}}';
+        return '{{%blitz_elementexpirydates}}';
     }
 
     /**
-     * Returns the associated cache
+     * Returns the associated element caches
      *
      * @return ActiveQueryInterface
      */
-    public function getCache(): ActiveQueryInterface
+    public function getElementCaches(): ActiveQueryInterface
     {
-        return $this->hasOne(CacheRecord::class, ['id' => 'cacheId']);
+        return $this->hasMany(ElementCacheRecord::class, ['elementId' => 'elementId']);
     }
 
     /**

@@ -11,6 +11,7 @@ use craft\records\Element;
 use craft\records\Site;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
+use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 
@@ -44,6 +45,7 @@ class Install extends Migration
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
         $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementCacheRecord::tableName());
+        $this->dropTableIfExists(ElementExpiryDateRecord::tableName());
         $this->dropTableIfExists(CacheRecord::tableName());
 
         return true;
@@ -71,6 +73,12 @@ class Install extends Migration
             $this->createTable(ElementCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
+            ]);
+        }
+
+        if (!$this->db->tableExists(ElementExpiryDateRecord::tableName())) {
+            $this->createTable(ElementExpiryDateRecord::tableName(), [
+                'elementId' => $this->integer()->notNull(),
                 'expiryDate' => $this->dateTime(),
             ]);
         }
@@ -85,7 +93,7 @@ class Install extends Migration
         if (!$this->db->tableExists(ElementQueryRecord::tableName())) {
             $this->createTable(ElementQueryRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'index' => $this->integer()->unsigned()->notNull(),
+                'index' => $this->bigInteger()->notNull(),
                 'type' => $this->string()->notNull(),
                 'params' => $this->text(),
             ]);
@@ -102,6 +110,8 @@ class Install extends Migration
     protected function createIndexes()
     {
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
+        $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'elementId', true);
+        $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate', false);
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
@@ -117,6 +127,7 @@ class Install extends Migration
         $this->addForeignKey(null, CacheRecord::tableName(), 'siteId', Site::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementCacheRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementExpiryDateRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
     }
