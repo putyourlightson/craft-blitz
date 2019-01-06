@@ -2,6 +2,7 @@
 
 ## 1.11.2 - 2019-01-06
 ### Changed
+- Expiry dates are now applied to all element types that have `postDate` and `expiryDate` fields, not just entries.
 - Changed cache folder path to relative path in utilty.
 
 ### Fixed
