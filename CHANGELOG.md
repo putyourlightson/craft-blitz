@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
-## 1.11.2 - Unreleased
+## 1.11.2 - 2019-01-06
 ### Changed
 - Changed cache folder path to relative path in utilty.
+
+### Fixed
+- Fixed functionality for elements with future post dates when refreshing expired cache.
 
 ## 1.11.1 - 2019-01-01
 ### Fixed

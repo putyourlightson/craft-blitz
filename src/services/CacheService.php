@@ -67,11 +67,6 @@ class CacheService extends Component
     private $_addElementQueryCaches = [];
 
     /**
-     * @var \DateTime[]
-     */
-    private $_addElementExpiryDates = [];
-
-    /**
      * @var array
      */
     private $_defaultElementQueryParams = [];
@@ -439,36 +434,27 @@ class CacheService extends Component
     }
 
     /**
-     * Refrshes expired cache.
+     * Refreshes expired cache.
      */
     public function refreshExpiredCache()
     {
-        $cacheIds = [];
-
-        // Check for expired element caches
+        // Check for expired elements and invalidate them
         $elementExpiryDates = ElementExpiryDateRecord::find()
             ->where(['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())])
-            ->with('elementCaches')
             ->all();
+
+        $elements = Craft::$app->getElements();
 
         /** @var ElementExpiryDateRecord $elementExpiryDate */
         foreach ($elementExpiryDates as $elementExpiryDate) {
-            foreach ($elementExpiryDate->elementCaches as $elementCache) {
-                if (!in_array($elementCache->id, $cacheIds, true)) {
-                    $cacheIds[] = $elementCache->id;
-                }
+            $element = $elements->getElementById($elementExpiryDate->elementId);
+
+            if ($element !== null) {
+                $this->invalidateElement($element);
             }
 
             $elementExpiryDate->delete();
         }
-
-        if (empty($cacheIds)) {
-            return;
-        }
-
-        Craft::$app->getQueue()->push(new RefreshCacheJob([
-            'cacheIds' => $cacheIds,
-        ]));
     }
 
     /**

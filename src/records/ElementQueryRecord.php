@@ -5,8 +5,8 @@
 
 namespace putyourlightson\blitz\records;
 
-use yii\db\ActiveQueryInterface;
 use craft\db\ActiveRecord;
+use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
