@@ -443,17 +443,22 @@ class CacheService extends Component
             ->where(['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())])
             ->all();
 
+        if (empty($elementExpiryDates)) {
+            return;
+        }
+
         $elements = Craft::$app->getElements();
 
         /** @var ElementExpiryDateRecord $elementExpiryDate */
         foreach ($elementExpiryDates as $elementExpiryDate) {
             $element = $elements->getElementById($elementExpiryDate->elementId);
 
+            // This should happen before invalidating the element so that other expire dates will be saved
+            $elementExpiryDate->delete();
+
             if ($element !== null) {
                 $this->invalidateElement($element);
             }
-
-            $elementExpiryDate->delete();
         }
     }
 

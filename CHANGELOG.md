@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.11.3 - 2019-01-09
+### Fixed
+- Fixed expiry date being deleted when an element cache is refreshed if it had a future post and expiry date.
+
 ## 1.11.2 - 2019-01-06
 ### Changed
 - Expiry dates are now applied to all element types that have `postDate` and `expiryDate` fields, not just entries.
