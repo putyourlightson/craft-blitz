@@ -8,9 +8,11 @@ namespace putyourlightson\blitz\jobs;
 use Craft;
 use craft\helpers\App;
 use craft\queue\BaseJob;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
+use yii\log\Logger;
 
 class WarmCacheJob extends BaseJob
 {
@@ -56,9 +58,18 @@ class WarmCacheJob extends BaseJob
                 $count++;
                 $this->setProgress($queue, $count / $total);
             },
-            'rejected' => function () use (&$queue, &$count, $total) {
+            'rejected' => function ($reason) use (&$queue, &$count, $total) {
                 $count++;
                 $this->setProgress($queue, $count / $total);
+
+                if ($reason instanceof RequestException) {
+                    /** RequestException $reason */
+                    preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
+
+                    if (!empty($matches[1])) {
+                        Craft::getLogger()->log(trim($matches[1], ':'), Logger::LEVEL_ERROR, 'blitz');
+                    }
+                }
             },
         ]);
 

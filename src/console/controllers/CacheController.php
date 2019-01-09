@@ -7,11 +7,13 @@ namespace putyourlightson\blitz\console\controllers;
 
 use Craft;
 use craft\helpers\Console;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
 use yii\console\Controller;
 use yii\console\ExitCode;
+use yii\log\Logger;
 
 /**
  * Performs functions on the Blitz cache.
@@ -124,9 +126,18 @@ class CacheController extends Controller
                 $count++;
                 Console::updateProgress($count, $total);
             },
-            'rejected' => function () use (&$count, $total) {
+            'rejected' => function ($reason) use (&$count, $total) {
                 $count++;
                 Console::updateProgress($count, $total);
+
+                if ($reason instanceof RequestException) {
+                    /** RequestException $reason */
+                    preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
+
+                    if (!empty($matches[1])) {
+                        Craft::getLogger()->log(trim($matches[1], ':'), Logger::LEVEL_ERROR, 'blitz');
+                    }
+                }
             },
         ]);
 
