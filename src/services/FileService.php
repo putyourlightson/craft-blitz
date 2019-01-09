@@ -11,6 +11,8 @@ use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 use yii\base\ErrorException;
+use yii\base\InvalidArgumentException;
+use yii\log\Logger;
 
 /**
  * @property string $cacheFolderPath
@@ -152,7 +154,12 @@ class FileService extends Component
             try {
                 FileHelper::writeToFile($filePath, $output);
             }
-            catch (ErrorException $e) {}
+            catch (ErrorException $e) {
+                Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+            }
+            catch (InvalidArgumentException $e) {
+                Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+            }
         }
     }
 
@@ -201,6 +208,11 @@ class FileService extends Component
         try {
             FileHelper::removeDirectory(FileHelper::normalizePath(Craft::getAlias('@webroot').'/'.$this->_settings->cacheFolderPath));
         }
-        catch (ErrorException $e) {}
+        catch (ErrorException $e) {
+            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+        }
+        catch (IOException $e) {
+            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+        }
     }
 }
