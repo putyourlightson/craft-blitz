@@ -87,9 +87,12 @@ class CacheController extends Controller
             return $this->redirectToPostedUrl();
         }
 
+        // Get URLs before flushing the cache
+        $urls = Blitz::$plugin->cache->getAllCacheableUrls();
+
         Blitz::$plugin->cache->emptyCache(true);
 
-        Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => Blitz::$plugin->cache->getAllCacheableUrls()]));
+        Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully queued for warming.'));
 

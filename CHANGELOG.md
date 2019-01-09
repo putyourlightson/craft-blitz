@@ -2,7 +2,8 @@
 
 ## 1.11.3 - 2019-01-09
 ### Fixed
-- Fixed expiry date being deleted when an element cache is refreshed if it had a future post and expiry date.
+- Fixed bug whereby the the cache was being flushed too early when warming with the utility.
+- Fixed expiry date being deleted too early when an element cache is refreshed if it had a future post and expiry date.
 
 ## 1.11.2 - 2019-01-06
 ### Changed
