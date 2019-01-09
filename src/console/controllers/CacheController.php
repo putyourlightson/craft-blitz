@@ -28,7 +28,7 @@ class CacheController extends Controller
      */
     public function actionClear(): int
     {
-        Blitz::$plugin->cache->emptyCache(false);
+        Blitz::$plugin->cache->clearCache(false);
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
 
@@ -42,7 +42,7 @@ class CacheController extends Controller
      */
     public function actionFlush(): int
     {
-        Blitz::$plugin->cache->emptyCache(true);
+        Blitz::$plugin->cache->clearCache(true);
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
 
@@ -91,7 +91,7 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
-        Blitz::$plugin->cache->emptyCache(true);
+        Blitz::$plugin->cache->clearCache(true);
 
         $total = count($urls);
         $count = 0;

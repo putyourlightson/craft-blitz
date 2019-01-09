@@ -1,9 +1,12 @@
 # Release Notes for Blitz
 
 ## 1.11.3 - 2019-01-09
+### Added
+- Added clear cache options in control panel and console commands (requires Craft 3.0.37 or above).
+
 ### Fixed
 - Fixed bug whereby the the cache was being flushed too early when warming with the utility.
-- Fixed expiry date being deleted too early when an element cache is refreshed if it had a future post and expiry date.
+- Fixed expiry date being deleted too early when an element cache was refreshed if it had both a future post and expiry date.
 
 ## 1.11.2 - 2019-01-06
 ### Changed

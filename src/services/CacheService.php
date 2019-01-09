@@ -335,7 +335,7 @@ class CacheService extends Component
     {
         // Clear and the cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
-            $this->emptyCache();
+            $this->clearCache();
 
             if ($this->_settings->cachingEnabled && $this->_settings->warmCacheAutomatically && $this->_settings->warmCacheAutomaticallyForGlobals) {
                 Craft::$app->getQueue()->push(new WarmCacheJob([
@@ -492,11 +492,11 @@ class CacheService extends Component
     }
 
     /**
-     * Empties the entire cache.
+     * Clears the cache.
      *
      * @param bool $flush
      */
-    public function emptyCache(bool $flush = false)
+    public function clearCache(bool $flush = false)
     {
         // Empties the file cache
         Blitz::$plugin->file->emptyFileCache();

@@ -12,6 +12,7 @@ use craft\events\CancelableEvent;
 use craft\events\ElementEvent;
 use craft\events\MoveElementEvent;
 use craft\events\PopulateElementEvent;
+use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
@@ -20,6 +21,7 @@ use craft\services\Elements;
 use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
+use craft\utilities\ClearCaches;
 use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
@@ -93,6 +95,10 @@ class Blitz extends Plugin
             if (Craft::$app->getEdition() === Craft::Pro) {
                 $this->_registerUserPermissions();
             }
+        }
+
+        if ($request->getIsCpRequest() || $request->getIsConsoleRequest()) {
+            $this->_registerClearCaches();
         }
     }
 
@@ -237,6 +243,22 @@ class Blitz extends Plugin
                 if (Craft::$app->getUser()->checkPermission('blitz:cache-utility')) {
                     $event->types[] = CacheUtility::class;
                 }
+            }
+        );
+    }
+
+    /**
+     * Registers clear caches
+     */
+    private function _registerClearCaches()
+    {
+        Event::on(ClearCaches::class, ClearCaches::EVENT_REGISTER_CACHE_OPTIONS,
+            function(RegisterCacheOptionsEvent $event) {
+                $event->options[] = [
+                    'key' => 'blitz',
+                    'label' => Craft::t('blitz', 'Blitz cache'),
+                    'action' => [Blitz::$plugin->cache, 'clearCache'],
+                ];
             }
         );
     }

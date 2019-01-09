@@ -27,7 +27,7 @@ class CacheController extends Controller
      */
     public function actionClear(): Response
     {
-        Blitz::$plugin->cache->emptyCache(false);
+        Blitz::$plugin->cache->clearCache(false);
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully cleared.'));
 
@@ -42,7 +42,7 @@ class CacheController extends Controller
      */
     public function actionFlush(): Response
     {
-        Blitz::$plugin->cache->emptyCache(true);
+        Blitz::$plugin->cache->clearCache(true);
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully flushed.'));
 
@@ -90,7 +90,7 @@ class CacheController extends Controller
         // Get URLs before flushing the cache
         $urls = Blitz::$plugin->cache->getAllCacheableUrls();
 
-        Blitz::$plugin->cache->emptyCache(true);
+        Blitz::$plugin->cache->clearCache(true);
 
         Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
 
