@@ -10,6 +10,7 @@ use craft\base\Component;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
+use Symfony\Component\Filesystem\Exception\IOException;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
 use yii\log\Logger;

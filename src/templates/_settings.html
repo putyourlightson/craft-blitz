@@ -10,66 +10,66 @@
 
 
 {{ forms.lightswitchField({
-	label: "Caching Enabled"|t('blitz'),
-	instructions: "Whether static file caching should be enabled."|t('blitz'),
+    label: "Caching Enabled"|t('blitz'),
+    instructions: "Whether static file caching should be enabled."|t('blitz'),
     warning: (config.cachingEnabled is defined ? configWarning('cachingEnabled')),
-	name: 'cachingEnabled',
-	on: settings.cachingEnabled,
-	required: true,
+    name: 'cachingEnabled',
+    on: settings.cachingEnabled,
+    required: true,
     first: true,
 }) }}
 
 {{ forms.lightswitchField({
-	label: "Warm Cache Automatically"|t('blitz'),
-	instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz'),
+    label: "Warm Cache Automatically"|t('blitz'),
+    instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz'),
     warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
-	name: 'warmCacheAutomatically',
-	on: settings.warmCacheAutomatically,
-	required: true,
+    name: 'warmCacheAutomatically',
+    on: settings.warmCacheAutomatically,
+    required: true,
 }) }}
 
 {% set info %}
-	<span class="info">{{ "Depending on the option selected, the server rewrite may need to be modified ([see the docs]({url}))."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
+    <span class="info">{{ "Depending on the option selected, the server rewrite may need to be modified ([see the docs]({url}))."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
 {% endset %}
 {{ forms.selectField({
-	label: "Query String Caching"|t('blitz'),
-	instructions: "Whether URLs with query strings should cached and how."|t('blitz') ~ info,
+    label: "Query String Caching"|t('blitz'),
+    instructions: "Whether URLs with query strings should cached and how."|t('blitz') ~ info,
     warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
-	name: 'queryStringCaching',
-	options: {
-		0: "Do not cache URLs with query strings"|t('blitz'),
-		1: "Cache URLs with unique query strings as unique pages"|t('blitz'),
-		2: "Cache URLs with unique query strings as the same page"|t('blitz'),
-	},
-	value: settings.queryStringCaching,
-	required: true,
+    name: 'queryStringCaching',
+    options: {
+        0: "Do not cache URLs with query strings"|t('blitz'),
+        1: "Cache URLs with unique query strings as unique pages"|t('blitz'),
+        2: "Cache URLs with unique query strings as the same page"|t('blitz'),
+    },
+    value: settings.queryStringCaching,
+    required: true,
 }) }}
 
 {% set info %}
-	<span class="info">{{ "The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended."|t('blitz') }}</span>
+    <span class="info">{{ "The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended."|t('blitz') }}</span>
 {% endset %}
 {{ forms.textField({
-	type: 'number',
-	unit: "concurrent requests."|t('blitz'),
-	label: "Concurrency"|t('blitz'),
-	instructions: "The max number of multiple concurrent requests to use when warming the cache."|t('blitz') ~ info,
-	warning: (config.concurrency is defined ? configWarning('concurrency')),
-	name: 'concurrency',
-	value: settings.concurrency,
-	errors: settings.getErrors('concurrency'),
-	required: true,
+    type: 'number',
+    unit: "concurrent requests."|t('blitz'),
+    label: "Concurrency"|t('blitz'),
+    instructions: "The max number of multiple concurrent requests to use when warming the cache."|t('blitz') ~ info,
+    warning: (config.concurrency is defined ? configWarning('concurrency')),
+    name: 'concurrency',
+    value: settings.concurrency,
+    errors: settings.getErrors('concurrency'),
+    required: true,
 }) }}
 
 {{ forms.textField({
-	label: "Cache Folder Path"|t('blitz'),
-	instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
+    label: "Cache Folder Path"|t('blitz'),
+    instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
     warning: (config.cacheFolderPath is defined ? configWarning('cacheFolderPath')),
-	name: 'cacheFolderPath',
-	class: 'code',
-	value: settings.cacheFolderPath,
-	errors: settings.getErrors('cacheFolderPath'),
-	placeholder: 'cache/blitz',
-	required: true,
+    name: 'cacheFolderPath',
+    class: 'code',
+    value: settings.cacheFolderPath,
+    errors: settings.getErrors('cacheFolderPath'),
+    placeholder: 'cache/blitz',
+    required: true,
 }) }}
 
 {% set info %}
@@ -87,51 +87,51 @@
 {% endset %}
 
 {% set cols = [
-	{
-		type: 'singleline',
-		heading: 'URI Pattern'|t('blitz'),
-		placeholder: "Leave blank to match the homepage"|t('blitz'),
-		code: true,
-		info: info,
-	}
+    {
+        type: 'singleline',
+        heading: 'URI Pattern'|t('blitz'),
+        placeholder: "Leave blank to match the homepage"|t('blitz'),
+        code: true,
+        info: info,
+    }
 ] %}
 
 {% if craft.app.getIsMultiSite() %}
-	{% set siteOptions = [{value: '', label: 'All Sites'|t('blitz')}] %}
-	{% for site in craft.app.sites.getAllSites() %}
-		{% set siteOptions = siteOptions|merge([{value: site.id, label: site.name}]) %}
-	{% endfor %}
+    {% set siteOptions = [{value: '', label: 'All Sites'|t('blitz')}] %}
+    {% for site in craft.app.sites.getAllSites() %}
+        {% set siteOptions = siteOptions|merge([{value: site.id, label: site.name}]) %}
+    {% endfor %}
 
-	{% set cols = cols|merge([
-		{
-			type: 'select',
-			heading: 'Site'|t('blitz'),
-			info: 'The site that the URI pattern should be applied to.'|t('blitz'),
-			options: siteOptions,
-		}
-	]) %}
+    {% set cols = cols|merge([
+        {
+            type: 'select',
+            heading: 'Site'|t('blitz'),
+            info: 'The site that the URI pattern should be applied to.'|t('blitz'),
+            options: siteOptions,
+        }
+    ]) %}
 {% endif %}
 
 <input type="hidden" name="includedUriPatterns" value="" />
 {{ forms.editableTableField({
-	label: "Included URI Patterns"|t('blitz'),
-	instructions: "The URI patterns to include in static file caching."|t('blitz'),
+    label: "Included URI Patterns"|t('blitz'),
+    instructions: "The URI patterns to include in static file caching."|t('blitz'),
     warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
     name: 'includedUriPatterns',
     id: 'includedUriPatterns',
-	cols: cols,
-	rows: settings.includedUriPatterns,
-	addRowLabel: "Add a URI pattern"|t('blitz'),
+    cols: cols,
+    rows: settings.includedUriPatterns,
+    addRowLabel: "Add a URI pattern"|t('blitz'),
 }) }}
 
 <input type="hidden" name="excludedUriPatterns" value="" />
 {{ forms.editableTableField({
-	label: "Excluded URI Patterns"|t('blitz'),
-	instructions: "The URI patterns to exclude from static file caching (overrides any matching patterns to include)."|t('blitz'),
+    label: "Excluded URI Patterns"|t('blitz'),
+    instructions: "The URI patterns to exclude from static file caching (overrides any matching patterns to include)."|t('blitz'),
     warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
     name: 'excludedUriPatterns',
     id: 'excludedUriPatterns',
-	cols: cols,
-	rows: settings.excludedUriPatterns,
-	addRowLabel: "Add a URI pattern"|t('blitz'),
+    cols: cols,
+    rows: settings.excludedUriPatterns,
+    addRowLabel: "Add a URI pattern"|t('blitz'),
 }) }}

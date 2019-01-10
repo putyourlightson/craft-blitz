@@ -45,7 +45,6 @@ class CacheUtility extends Utility
     public static function contentHtml(): string
     {
         $sites = [];
-        $sitePaths = [];
 
         $allSites = Craft::$app->getSites()->getAllSites();
 

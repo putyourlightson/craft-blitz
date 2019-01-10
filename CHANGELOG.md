@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.11.4 - Unreleased
+### Added
+- Added logging of file and request exceptions.
+
 ## 1.11.3 - 2019-01-09
 ### Added
 - Added clear cache options in control panel and console commands (requires Craft 3.0.37 or above).
