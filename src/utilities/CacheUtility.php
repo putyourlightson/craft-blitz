@@ -7,9 +7,7 @@ namespace putyourlightson\blitz\utilities;
 
 use Craft;
 use craft\base\Utility;
-use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\FileDriver;
 
 class CacheUtility extends Utility
 {

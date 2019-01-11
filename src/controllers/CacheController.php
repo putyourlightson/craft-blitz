@@ -10,6 +10,7 @@ use craft\errors\MissingComponentException;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\WarmCacheJob;
+use yii\base\Exception;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -39,6 +40,7 @@ class CacheController extends Controller
      *
      * @return Response
      * @throws BadRequestHttpException
+     * @throws MissingComponentException
      */
     public function actionFlush(): Response
     {
@@ -54,6 +56,7 @@ class CacheController extends Controller
      *
      * @return Response
      * @throws BadRequestHttpException
+     * @throws MissingComponentException
      */
     public function actionRefreshExpired(): Response
     {
@@ -70,6 +73,7 @@ class CacheController extends Controller
      * @return Response
      * @throws BadRequestHttpException
      * @throws MissingComponentException
+     * @throws Exception
      */
     public function actionWarm(): Response
     {

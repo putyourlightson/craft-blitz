@@ -16,7 +16,6 @@ use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
-use craft\helpers\Component;
 use craft\models\Site;
 use craft\services\Elements;
 use craft\services\Structures;
@@ -27,17 +26,20 @@ use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
 use putyourlightson\blitz\drivers\BaseDriver;
-use putyourlightson\blitz\drivers\DriverInterface;
+use putyourlightson\blitz\helpers\DriverHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
+use yii\base\InvalidConfigException;
 
 /**
  *
  * @property CacheService $cache
  * @property BaseDriver $driver
+ *
+ * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
 {
@@ -45,14 +47,6 @@ class Blitz extends Plugin
      * @var Blitz
      */
     public static $plugin;
-
-    // Properties
-    // =========================================================================
-
-    /**
-     * @var BaseDriver
-     */
-    private $_driver;
 
     // Public Methods
     // =========================================================================
@@ -67,6 +61,9 @@ class Blitz extends Plugin
         $this->setComponents([
             'cache' => CacheService::class,
         ]);
+
+        // Set driver
+        $this->setDriver();
 
         // Register variable
         Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
@@ -110,27 +107,24 @@ class Blitz extends Plugin
         }
     }
 
-    public function getDriver(): BaseDriver
-    {
-        if (!(empty($this->_driver))) {
-            return $this->_driver;
-        }
-
-        $this->_driver = Component::createComponent([
-            'type' => $this->getSettings()->driverType,
-            'settings' => $this->getSettings()->driverSettings,
-        ], DriverInterface::class);
-
-        return $this->_driver;
-    }
-
     /**
      * @inheritdoc
      */
     public function beforeSaveSettings(): bool
     {
-        // Validate the driver before saving the settings
-        if (!$this->driver->validate()) {
+        $settings = $this->getSettings();
+
+        // Remove driver type from settings
+        $settings->driverSettings = $settings->driverSettings[$settings->driverType] ?? [];
+
+        // Create the driver so that we can validate it
+        /* @var BaseDriver $driver */
+        $driver = DriverHelper::createDriver(
+            $settings->driverType,
+            $settings->driverSettings
+        );
+
+        if (!$driver->validate()) {
             return false;
         }
 
@@ -139,6 +133,24 @@ class Blitz extends Plugin
 
     // Protected Methods
     // =========================================================================
+
+    /**
+     * Sets the driver
+     */
+    protected function setDriver()
+    {
+        $settings = $this->getSettings();
+
+        try {
+            $this->set('driver', array_merge(
+                ['class' => $settings->driverType],
+                $settings->driverSettings[$settings->driverType] ?? []
+            ));
+        }
+        catch (InvalidConfigException $e) {
+            Craft::error($e->getMessage(), __METHOD__);
+        }
+    }
 
     /**
      * @inheritdoc
@@ -153,10 +165,41 @@ class Blitz extends Plugin
      */
     protected function settingsHtml()
     {
+        $settings = $this->getSettings();
+
+        $allDrivers = [];
+        $driverTypeOptions = [];
+
+        /** @var BaseDriver[] $allDriverTypes */
+        $allDriverTypes = DriverHelper::getAllDriverTypes();
+
+        $settings->driverType = $settings->driverType ?: $allDriverTypes[0];
+
+        /** @var BaseDriver $driver */
+        $driver = DriverHelper::createDriver(
+            $settings->driverType,
+            $settings->driverSettings
+        );
+
+        // Validate the driver so that any errors will be displayed
+        $driver->validate();
+
+        foreach ($allDriverTypes as $class) {
+            if ($class::isSelectable()) {
+                $allDrivers[] = DriverHelper::createDriver($class);
+                $driverTypeOptions[] = [
+                    'value' => $class,
+                    'label' => $class::displayName(),
+                ];
+            }
+        }
+
         return Craft::$app->getView()->renderTemplate('blitz/_settings', [
-            'settings' => $this->getSettings(),
+            'settings' => $settings,
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
-            'driverSettings' => $this->driver->getSettingsHtml(),
+            'driver' => $driver,
+            'allDrivers' => $allDrivers,
+            'driverTypeOptions' => $driverTypeOptions,
         ]);
     }
 

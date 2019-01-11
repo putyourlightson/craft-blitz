@@ -42,6 +42,9 @@ return [
     // The URI patterns to exclude from static file caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
     //'excludedUriPatterns' => [["contact",""]],
 
+    // The driver type classes to add to the plugin’s default driver types
+    //'defaultDriverTypes' => [],
+
     // Whether elements should be cached in the database.
     //'cacheElements' => true,
 

@@ -11,6 +11,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
+use yii\base\Exception;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\log\Logger;
@@ -71,6 +72,7 @@ class CacheController extends Controller
      * Flushes and warms the entire cache.
      *
      * @return int
+     * @throws Exception
      */
     public function actionWarm(): int
     {

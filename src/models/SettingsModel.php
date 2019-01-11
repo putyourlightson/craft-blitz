@@ -46,6 +46,11 @@ class SettingsModel extends Model
     /**
      * @var array
      */
+    public $defaultDriverTypes = [];
+
+    /**
+     * @var array
+     */
     public $includedUriPatterns = [];
 
     /**

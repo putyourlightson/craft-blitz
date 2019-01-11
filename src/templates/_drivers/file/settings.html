@@ -4,7 +4,7 @@
 {{ forms.textField({
     label: "Folder Path"|t('blitz'),
     instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
-    name: 'driverSettings[folderPath]',
+    name: 'folderPath',
     class: 'code',
     value: driver.folderPath,
     errors: driver.getErrors('folderPath'),

@@ -60,7 +60,20 @@
     required: true,
 }) }}
 
-{{ driverSettings|raw }}
+{{ forms.text({
+    type: 'hidden',
+    name: 'driverType',
+    value: className(driver),
+}) }}
+
+{% for _driver in allDrivers %}
+    {% set isCurrent = (className(_driver) == className(driver)) %}
+    <div id="{{ className(_driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+        {% namespace 'driverSettings[' ~ className(_driver) ~ ']' %}
+            {{ (isCurrent ? driver : _driver).getSettingsHtml()|raw }}
+        {% endnamespace %}
+    </div>
+{% endfor %}
 
 {% set info %}
 {{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}

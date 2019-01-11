@@ -24,6 +24,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use yii\db\Exception;
 
 /**
  * @property bool $isCacheableRequest
@@ -210,6 +211,7 @@ class CacheService extends Component
      * Adds an element query cache.
      *
      * @param ElementQuery $elementQuery
+     * @throws Exception
      */
     public function addElementQueryCache(ElementQuery $elementQuery)
     {
@@ -268,6 +270,7 @@ class CacheService extends Component
      * @param string $output
      * @param int $siteId
      * @param string $uri
+     * @throws Exception
      */
     public function cacheOutput(string $output, int $siteId, string $uri)
     {
@@ -330,6 +333,8 @@ class CacheService extends Component
      * Invalidates the cache by an element.
      *
      * @param ElementInterface $element
+     * @throws Exception
+     * @throws \yii\base\Exception
      */
     public function invalidateElement(ElementInterface $element)
     {
@@ -539,6 +544,7 @@ class CacheService extends Component
      * @param string $uri
      *
      * @return string
+     * @throws \yii\base\Exception
      */
     public function getSiteUrl(int $siteId, string $uri): string
     {
@@ -551,6 +557,7 @@ class CacheService extends Component
      * @param int[] $cacheIds
      *
      * @return string[]
+     * @throws \yii\base\Exception
      */
     public function getCacheUrls(array $cacheIds): array
     {
@@ -573,6 +580,7 @@ class CacheService extends Component
      * Gets all cacheable URLs.
      *
      * @return string[]
+     * @throws \yii\base\Exception
      */
     public function getAllCacheableUrls(): array
     {
