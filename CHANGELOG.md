@@ -1,7 +1,8 @@
 # Release Notes for Blitz
 
-## 1.11.4 - Unreleased
+## 1.12.0 - Unreleased
 ### Added
+- Added changeable driver and replaced file service with file driver.
 - Added logging of file and request exceptions.
 
 ## 1.11.3 - 2019-01-09

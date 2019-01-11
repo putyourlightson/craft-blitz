@@ -29,32 +29,27 @@ class SettingsModel extends Model
     public $queryStringCaching = 0;
 
     /**
-     * @var string
-     */
-    public $cacheFolderPath = 'cache/blitz';
-
-    /**
      * @var int
      */
     public $concurrency = 5;
 
     /**
-     * @var mixed
+     * @var string
      */
     public $driverType = FileDriver::class;
 
     /**
-     * @var mixed
+     * @var array|null
      */
     public $driverSettings;
 
     /**
-     * @var mixed
+     * @var array
      */
     public $includedUriPatterns = [];
 
     /**
-     * @var mixed
+     * @var array
      */
     public $excludedUriPatterns = [];
 
@@ -95,6 +90,8 @@ class SettingsModel extends Model
     public function rules(): array
     {
         return [
+            [['queryStringCaching', 'concurrency', 'driverType'], 'required'],
+            [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
             [['concurrency'], 'integer', 'min' => 1],
         ];
     }

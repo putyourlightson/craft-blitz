@@ -124,6 +124,19 @@ class Blitz extends Plugin
         return $this->_driver;
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function beforeSaveSettings(): bool
+    {
+        // Validate the driver before saving the settings
+        if (!$this->driver->validate()) {
+            return false;
+        }
+
+        return parent::beforeSaveSettings();
+    }
+
     // Protected Methods
     // =========================================================================
 

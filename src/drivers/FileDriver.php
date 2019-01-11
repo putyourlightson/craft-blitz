@@ -79,7 +79,7 @@ class FileDriver extends BaseDriver
     public function rules()
     {
         return [
-            [['folderPath'], 'string', 'required'],
+            [['folderPath'], 'required'],
         ];
     }
 
@@ -197,7 +197,7 @@ class FileDriver extends BaseDriver
     public function getSettingsHtml()
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/file/settings', [
-            'driver' => $this
+            'driver' => $this,
         ]);
     }
 
