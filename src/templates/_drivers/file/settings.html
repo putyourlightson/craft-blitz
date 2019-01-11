@@ -1,0 +1,13 @@
+{% import "_includes/forms" as forms %}
+
+
+{{ forms.textField({
+    label: "Folder Path"|t('blitz'),
+    instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
+    name: 'driverSettings[folderPath]',
+    class: 'code',
+    value: driver.folderPath,
+    errors: driver.getErrors('folderPath'),
+    placeholder: 'cache/blitz',
+    required: true,
+}) }}

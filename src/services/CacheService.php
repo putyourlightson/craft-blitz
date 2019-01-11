@@ -323,7 +323,7 @@ class CacheService extends Component
                 false)
             ->execute();
 
-        Blitz::$plugin->file->cacheToFile($output, $siteId, $uri);
+        Blitz::$plugin->driver->saveCache($output, $siteId, $uri);
     }
 
     /**
@@ -498,8 +498,8 @@ class CacheService extends Component
      */
     public function clearCache(bool $flush = false)
     {
-        // Empties the file cache
-        Blitz::$plugin->file->emptyFileCache();
+        // Clears the cache
+        Blitz::$plugin->driver->clearCache();
 
         // Get all cache IDs
         $cacheIds = CacheRecord::find()

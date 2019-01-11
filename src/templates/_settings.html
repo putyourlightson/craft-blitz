@@ -60,17 +60,7 @@
     required: true,
 }) }}
 
-{{ forms.textField({
-    label: "Cache Folder Path"|t('blitz'),
-    instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
-    warning: (config.cacheFolderPath is defined ? configWarning('cacheFolderPath')),
-    name: 'cacheFolderPath',
-    class: 'code',
-    value: settings.cacheFolderPath,
-    errors: settings.getErrors('cacheFolderPath'),
-    placeholder: 'cache/blitz',
-    required: true,
-}) }}
+{{ driverSettings|raw }}
 
 {% set info %}
 {{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}

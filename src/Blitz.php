@@ -16,6 +16,7 @@ use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
+use craft\helpers\Component;
 use craft\models\Site;
 use craft\services\Elements;
 use craft\services\Structures;
@@ -25,9 +26,10 @@ use craft\utilities\ClearCaches;
 use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
+use putyourlightson\blitz\drivers\BaseDriver;
+use putyourlightson\blitz\drivers\DriverInterface;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheService;
-use putyourlightson\blitz\services\FileService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
@@ -35,9 +37,7 @@ use yii\base\Event;
 /**
  *
  * @property CacheService $cache
- * @property FileService $file
- *
- * @method SettingsModel getSettings()
+ * @property BaseDriver $driver
  */
 class Blitz extends Plugin
 {
@@ -45,6 +45,14 @@ class Blitz extends Plugin
      * @var Blitz
      */
     public static $plugin;
+
+    // Properties
+    // =========================================================================
+
+    /**
+     * @var BaseDriver
+     */
+    private $_driver;
 
     // Public Methods
     // =========================================================================
@@ -55,10 +63,9 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
-        // Register services as components
+        // Register services
         $this->setComponents([
             'cache' => CacheService::class,
-            'file' => FileService::class,
         ]);
 
         // Register variable
@@ -78,10 +85,11 @@ class Blitz extends Plugin
             $uri = $this->_getUri($site, $request->getAbsoluteUrl());
 
             if ($this->cache->getIsCacheableUri($site->id, $uri)) {
-                // If cached version exists then output it (assuming this has not already been done server-side)
-                $filePath = $this->file->getFilePath($site->id, $uri);
-                if (is_file($filePath)) {
-                    $this->file->outputFile($filePath);
+                // If cached value exists then output it (assuming this has not already been done server-side)
+                $value = $this->driver->getCachedUri($site->id, $uri);
+
+                if ($value) {
+                    $this->_output($value);
                 }
 
                 $this->_registerCacheableRequestEvents($site->id, $uri);
@@ -100,6 +108,20 @@ class Blitz extends Plugin
         if ($request->getIsCpRequest() || $request->getIsConsoleRequest()) {
             $this->_registerClearCaches();
         }
+    }
+
+    public function getDriver(): BaseDriver
+    {
+        if (!(empty($this->_driver))) {
+            return $this->_driver;
+        }
+
+        $this->_driver = Component::createComponent([
+            'type' => $this->getSettings()->driverType,
+            'settings' => $this->getSettings()->driverSettings,
+        ], DriverInterface::class);
+
+        return $this->_driver;
     }
 
     // Protected Methods
@@ -121,6 +143,7 @@ class Blitz extends Plugin
         return Craft::$app->getView()->renderTemplate('blitz/_settings', [
             'settings' => $this->getSettings(),
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
+            'driverSettings' => $this->driver->getSettingsHtml(),
         ]);
     }
 
@@ -150,6 +173,25 @@ class Blitz extends Plugin
         $uri = trim($uri, '/');
 
         return $uri;
+    }
+
+    /**
+     * Outputs a given value.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    private function _output(string $value)
+    {
+        header_remove('X-Powered-By');
+
+        if ($this->getSettings()->sendPoweredByHeader) {
+            $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
+            header('X-Powered-By: '.$header.'Blitz');
+        }
+
+        exit($value.'<!-- Served by Blitz -->');
     }
 
     /**

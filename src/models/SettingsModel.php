@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\models;
 
 use craft\base\Model;
+use putyourlightson\blitz\drivers\FileDriver;
 
 class SettingsModel extends Model
 {
@@ -36,6 +37,16 @@ class SettingsModel extends Model
      * @var int
      */
     public $concurrency = 5;
+
+    /**
+     * @var mixed
+     */
+    public $driverType = FileDriver::class;
+
+    /**
+     * @var mixed
+     */
+    public $driverSettings;
 
     /**
      * @var mixed
