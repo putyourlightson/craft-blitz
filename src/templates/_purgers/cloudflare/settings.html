@@ -1,0 +1,12 @@
+{% import "_includes/forms" as forms %}
+
+
+{{ forms.autosuggestField({
+    label: "API Key"|t('blitz'),
+    instructions: "The API key for your Cloudflare account."|t('blitz'),
+    name: 'apiKey',
+    suggestions: craft.cp.getEnvSuggestions(),
+    value: purger.apiKey,
+    errors: purger.getErrors('apiKey'),
+    required: true,
+}) }}

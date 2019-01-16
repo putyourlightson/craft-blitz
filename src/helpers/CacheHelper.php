@@ -12,7 +12,7 @@ use yii\base\Exception;
 
 class CacheHelper
 {
-    // Static Methods
+    // Static
     // =========================================================================
 
     /**

@@ -49,6 +49,21 @@ class SettingsModel extends Model
     public $driverTypes = [];
 
     /**
+     * @var string
+     */
+    public $purgerType = '';
+
+    /**
+     * @var array|null
+     */
+    public $purgerSettings;
+
+    /**
+     * @var array
+     */
+    public $purgerTypes = [];
+
+    /**
      * @var array
      */
     public $includedUriPatterns = [];

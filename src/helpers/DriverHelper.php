@@ -9,6 +9,7 @@ use craft\errors\MissingComponentException;
 use craft\events\RegisterComponentTypesEvent;
 use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\BaseDriver;
 use putyourlightson\blitz\drivers\DriverInterface;
 use putyourlightson\blitz\drivers\FileDriver;
 use yii\base\Event;
@@ -20,11 +21,11 @@ class DriverHelper
     // =========================================================================
 
     /**
-     * @event RefreshCacheEvent
+     * @event RegisterComponentTypesEvent
      */
     const EVENT_REGISTER_DRIVER_TYPES = 'registerDriverTypes';
 
-    // Static Methods
+    // Static
     // =========================================================================
 
     /**
@@ -34,21 +35,44 @@ class DriverHelper
      */
     public static function getAllDriverTypes(): array
     {
-        $drivers = [
+        $driverTypes = [
             FileDriver::class,
         ];
 
-        $drivers = array_unique(array_merge(
-            $drivers,
-            Blitz::$plugin->getSettings()->driverTypes ?? []
+        $driverTypes = array_unique(array_merge(
+            $driverTypes,
+            Blitz::$plugin->getSettings()->driverTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([
-            'types' => $drivers,
+            'types' => $driverTypes,
         ]);
         Event::trigger(static::class, self::EVENT_REGISTER_DRIVER_TYPES, $event);
 
         return $event->types;
+    }
+
+    /**
+     * Returns all drivers.
+     *
+     * @return BaseDriver[]
+     */
+    public static function getAllDrivers(): array
+    {
+        $drivers = [];
+
+        /** @var BaseDriver $class */
+        foreach (DriverHelper::getAllDriverTypes() as $class) {
+            if ($class::isSelectable()) {
+                $driver = self::createDriver($class);
+
+                if ($driver !== null) {
+                    $drivers[] = $driver;
+                }
+            }
+        }
+
+        return $drivers;
     }
 
     /**
@@ -57,17 +81,21 @@ class DriverHelper
      * @param string $type
      * @param array|null $settings
      *
-     * @return DriverInterface
-     * @throws MissingComponentException
-     * @throws InvalidConfigException
+     * @return DriverInterface|null
      */
-    public static function createDriver(string $type, array $settings = null): DriverInterface
+    public static function createDriver(string $type, array $settings = null)
     {
-        /** @var DriverInterface $driver */
-        $driver = Component::createComponent([
-            'type' => $type,
-            'settings' => $settings ?? [],
-        ], DriverInterface::class);
+        $driver = null;
+
+        try {
+            /** @var DriverInterface $driver */
+            $driver = Component::createComponent([
+                'type' => $type,
+                'settings' => $settings ?? [],
+            ], DriverInterface::class);
+        }
+        catch (InvalidConfigException $e) {}
+        catch (MissingComponentException $e) {}
 
         return $driver;
     }

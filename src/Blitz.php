@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz;
 
 use Craft;
+use craft\base\ComponentInterface;
 use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
@@ -29,7 +30,9 @@ use putyourlightson\blitz\drivers\BaseDriver;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\helpers\DriverHelper;
+use putyourlightson\blitz\helpers\PurgerHelper;
 use putyourlightson\blitz\models\SettingsModel;
+use putyourlightson\blitz\purgers\BasePurger;
 use putyourlightson\blitz\services\CacheService;
 use putyourlightson\blitz\services\InvalidateService;
 use putyourlightson\blitz\utilities\CacheUtility;
@@ -43,6 +46,7 @@ use yii\base\InvalidConfigException;
  * @property InvalidateService $invalidate
  * @property BaseDriver $driver
  * @property SettingsModel $settings
+ * @property mixed $settingsResponse
  * @property string[] $nonCacheableElementTypes
  *
  * @method SettingsModel getSettings()
@@ -189,14 +193,6 @@ class Blitz extends Plugin
     {
         $settings = $this->getSettings();
 
-        $allDrivers = [];
-        $driverTypeOptions = [];
-
-        /** @var BaseDriver[] $allDriverTypes */
-        $allDriverTypes = DriverHelper::getAllDriverTypes();
-
-        $settings->driverType = $settings->driverType ?: $allDriverTypes[0];
-
         /** @var BaseDriver $driver */
         $driver = DriverHelper::createDriver(
             $settings->driverType,
@@ -206,23 +202,48 @@ class Blitz extends Plugin
         // Validate the driver so that any errors will be displayed
         $driver->validate();
 
-        foreach ($allDriverTypes as $class) {
-            if ($class::isSelectable()) {
-                $allDrivers[] = DriverHelper::createDriver($class);
-                $driverTypeOptions[] = [
-                    'value' => $class,
-                    'label' => $class::displayName(),
-                ];
-            }
+        $drivers = DriverHelper::getAllDrivers();
+
+        $purger = null;
+
+        if ($settings->purgerType) {
+            /** @var BasePurger $purger */
+            $purger = PurgerHelper::createPurger(
+                $settings->purgerType,
+                $settings->purgerSettings
+            );
+
+            // Validate the purger so that any errors will be displayed
+            $purger->validate();
         }
 
-        return Craft::$app->controller->renderTemplate('blitz/_settings', [
+        $purgers = PurgerHelper::getAllPurgers();
+
+        return Craft::$app->controller->renderTemplate('blitz/settings', [
             'settings' => $settings,
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
             'driver' => $driver,
-            'allDrivers' => $allDrivers,
-            'driverTypeOptions' => $driverTypeOptions,
+            'drivers' => $drivers,
+            'driverTypeOptions' => array_map([$this, 'getSelectOption'], $drivers),
+            'purger' => $purger,
+            'purgers' => $purgers,
+            'purgerTypeOptions' => array_map([$this, 'getSelectOption'], $purgers),
         ]);
+    }
+
+    /**
+     * Gets select option from a component.
+     *
+     * @param ComponentInterface $component
+     *
+     * @return array
+     */
+    public function getSelectOption(ComponentInterface $component): array
+    {
+        return [
+            'value' => get_class($component),
+            'label' => $component::displayName(),
+        ];
     }
 
     // Private Methods
