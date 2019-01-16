@@ -31,7 +31,7 @@ class CacheController extends Controller
      */
     public function actionClear(): int
     {
-        Blitz::$plugin->cache->clearCache(false);
+        Blitz::$plugin->invalidate->clearCache(false);
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
 
@@ -45,7 +45,7 @@ class CacheController extends Controller
      */
     public function actionFlush(): int
     {
-        Blitz::$plugin->cache->clearCache(true);
+        Blitz::$plugin->invalidate->clearCache(true);
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
 
@@ -59,7 +59,7 @@ class CacheController extends Controller
      */
     public function actionRefreshExpired(): int
     {
-        Blitz::$plugin->cache->refreshExpiredCache();
+        Blitz::$plugin->invalidate->refreshExpiredCache();
 
         Craft::$app->getQueue()->run();
 
@@ -84,18 +84,18 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        if (empty($settings->cacheFolderPath)) {
+        if (empty(Blitz::$plugin->driver->getSettings())) {
             $this->stderr(Craft::t('blitz', 'Blitz cache folder path is not set.').PHP_EOL, Console::FG_RED);
 
             return ExitCode::OK;
         }
 
         // Get warm cache URLS
-        $urls = Blitz::$plugin->cache->getAllCacheableUrls();
+        $urls = Blitz::$plugin->invalidate->getAllCachedUrls();
 
         $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
-        Blitz::$plugin->cache->clearCache(true);
+        Blitz::$plugin->invalidate->clearCache(true);
 
         $total = count($urls);
         $count = 0;
@@ -146,7 +146,7 @@ class CacheController extends Controller
         // Initiate the transfers and wait for the pool of requests to complete
         $pool->promise()->wait();
 
-        Blitz::$plugin->cache->cleanElementQueryTable();
+        Blitz::$plugin->invalidate->cleanElementQueryTable();
 
         Console::updateProgress($total, $total);
         Console::endProgress();

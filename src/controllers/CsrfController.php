@@ -11,9 +11,6 @@ use yii\web\Response;
 
 class CsrfController extends Controller
 {
-    // Public Methods
-    // =========================================================================
-
     // Properties
     // =========================================================================
 
@@ -21,6 +18,9 @@ class CsrfController extends Controller
      * @inheritdoc
      */
     protected $allowAnonymous = ['input'];
+
+    // Public Methods
+    // =========================================================================
 
     /**
      * Returns a CSRF input field.

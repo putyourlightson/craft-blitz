@@ -13,7 +13,7 @@ use yii\base\InvalidArgumentException;
 use yii\log\Logger;
 
 /**
- * @property string $cacheFolderPath
+ * @property mixed $settingsHtml
  */
 class FileDriver extends BaseDriver
 {
@@ -68,7 +68,7 @@ class FileDriver extends BaseDriver
 
         if (!empty($this->folderPath)) {
             $this->_cacheFolderPath = FileHelper::normalizePath(
-                Craft::getAlias('@webroot').'/'.$this->folderPath
+                Craft::getAlias('@webroot').'/'.Craft::parseEnv($this->folderPath)
             );
         }
     }

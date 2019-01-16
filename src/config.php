@@ -30,9 +30,6 @@ return [
     // 2: Cache URLs with query strings as the same page
     //'queryStringCaching' => 0,
 
-    // The relative path to your cache folder from your public webroot.
-    //'cacheFolderPath' => 'cache/blitz',
-
     // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
     //'concurrency' => 5,
 
@@ -43,7 +40,7 @@ return [
     //'excludedUriPatterns' => [["contact",""]],
 
     // The driver type classes to add to the plugin’s default driver types
-    //'defaultDriverTypes' => [],
+    //'driverTypes' => [],
 
     // Whether elements should be cached in the database.
     //'cacheElements' => true,

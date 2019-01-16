@@ -247,7 +247,7 @@ If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Pow
 
 ## Roadmap
 
-- Add better control of local caching of dynamically loaded content.
-- Add Blitz to `clear-caches` console command ([#3588](https://github.com/craftcms/cms/pull/3588)).
+- Add garbage collection integration with Craft 3.1.
+- Add support for Reddis.
 
 <small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>

@@ -26,9 +26,12 @@ use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\View;
 use putyourlightson\blitz\drivers\BaseDriver;
+use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
+use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\helpers\DriverHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheService;
+use putyourlightson\blitz\services\InvalidateService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
@@ -37,16 +40,35 @@ use yii\base\InvalidConfigException;
 /**
  *
  * @property CacheService $cache
+ * @property InvalidateService $invalidate
  * @property BaseDriver $driver
+ * @property SettingsModel $settings
+ * @property string[] $nonCacheableElementTypes
  *
  * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event RegisterNonCacheableElementTypesEvent
+     */
+    const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
+
+    // Properties
+    // =========================================================================
+
     /**
      * @var Blitz
      */
     public static $plugin;
+
+    /**
+     * @var string[]|null
+     */
+    private $_nonCacheableElementTypes;
 
     // Public Methods
     // =========================================================================
@@ -60,9 +82,10 @@ class Blitz extends Plugin
         // Register services
         $this->setComponents([
             'cache' => CacheService::class,
+            'invalidate' => InvalidateService::class,
         ]);
 
-        // Set driver
+        // Register driver
         $this->setDriver();
 
         // Register variable
@@ -75,13 +98,13 @@ class Blitz extends Plugin
         $request = Craft::$app->getRequest();
 
         // Process request
-        if ($this->cache->getIsCacheableRequest()) {
+        if (CacheHelper::getIsCacheableRequest()) {
             $site = Craft::$app->getSites()->getCurrentSite();
 
             // Get URI from absolute URL
             $uri = $this->_getUri($site, $request->getAbsoluteUrl());
 
-            if ($this->cache->getIsCacheableUri($site->id, $uri)) {
+            if (CacheHelper::getIsCacheableUri($site->id, $uri)) {
                 // If cached value exists then output it (assuming this has not already been done server-side)
                 $value = $this->driver->getCachedUri($site->id, $uri);
 
@@ -108,34 +131,33 @@ class Blitz extends Plugin
     }
 
     /**
-     * @inheritdoc
+     * Returns non cacheable element types.
+     *
+     * @return string[]
      */
-    public function beforeSaveSettings(): bool
+    public function getNonCacheableElementTypes(): array
     {
         $settings = $this->getSettings();
 
-        // Remove driver type from settings
-        $settings->driverSettings = $settings->driverSettings[$settings->driverType] ?? [];
+        if ($this->_nonCacheableElementTypes !== null) {
+            return $this->_nonCacheableElementTypes;
+        };
 
-        // Create the driver so that we can validate it
-        /* @var BaseDriver $driver */
-        $driver = DriverHelper::createDriver(
-            $settings->driverType,
-            $settings->driverSettings
-        );
+        $event = new RegisterNonCacheableElementTypesEvent([
+            'elementTypes' => $settings->nonCacheableElementTypes,
+        ]);
+        $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
 
-        if (!$driver->validate()) {
-            return false;
-        }
+        $this->_nonCacheableElementTypes = $event->elementTypes;
 
-        return parent::beforeSaveSettings();
+        return $this->_nonCacheableElementTypes;
     }
 
     // Protected Methods
     // =========================================================================
 
     /**
-     * Sets the driver
+     * Registers the driver
      */
     protected function setDriver()
     {
@@ -144,7 +166,7 @@ class Blitz extends Plugin
         try {
             $this->set('driver', array_merge(
                 ['class' => $settings->driverType],
-                $settings->driverSettings[$settings->driverType] ?? []
+                $settings->driverSettings ?? []
             ));
         }
         catch (InvalidConfigException $e) {
@@ -163,7 +185,7 @@ class Blitz extends Plugin
     /**
      * @inheritdoc
      */
-    protected function settingsHtml()
+    public function getSettingsResponse()
     {
         $settings = $this->getSettings();
 
@@ -194,7 +216,7 @@ class Blitz extends Plugin
             }
         }
 
-        return Craft::$app->getView()->renderTemplate('blitz/_settings', [
+        return Craft::$app->controller->renderTemplate('blitz/_settings', [
             'settings' => $settings,
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
             'driver' => $driver,
@@ -258,29 +280,29 @@ class Blitz extends Plugin
         // Invalidate elements
         Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
             function(ElementEvent $event) {
-                $this->cache->invalidateElement($event->element);
+                $this->invalidate->addElement($event->element);
             }
         );
         Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
             function(MoveElementEvent $event) {
-                $this->cache->invalidateElement($event->element);
+                $this->invalidate->addElement($event->element);
             }
         );
         Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
             function(ElementEvent $event) {
-                $this->cache->invalidateElement($event->element);
+                $this->invalidate->addElement($event->element);
             }
         );
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(ElementEvent $event) {
-                $this->cache->invalidateElement($event->element);
+                $this->invalidate->addElement($event->element);
             }
         );
 
         // Invalidate cache after response is prepared
         Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE,
             function() {
-                $this->cache->invalidateCache();
+                $this->invalidate->refreshCache();
             }
         );
     }
@@ -319,13 +341,13 @@ class Blitz extends Plugin
         // Register template page render events
         Event::on(View::class, View::EVENT_BEFORE_RENDER_PAGE_TEMPLATE,
             function() use ($siteId, $uri) {
-                $this->cache->clearCacheRecords($siteId, $uri);
+                $this->invalidate->clearCacheRecords($siteId, $uri);
             }
         );
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
             function(TemplateEvent $event) use ($response, $siteId, $uri) {
                 if ($response->getIsOk()) {
-                    $this->cache->cacheOutput($event->output, $siteId, $uri);
+                    $this->cache->saveOutput($event->output, $siteId, $uri);
                 }
             }
         );

@@ -11,6 +11,7 @@ use craft\elements\db\ElementQuery;
 use craft\helpers\App;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\ActiveQuery;
@@ -130,14 +131,14 @@ class RefreshCacheJob extends BaseJob
             $count++;
             $this->setProgress($queue, $count / $total);
 
-            $urls[] = Blitz::$plugin->cache->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
+            $urls[] = CacheHelper::getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
 
             // Clear cached URI so we get a fresh file version
             Blitz::$plugin->driver->clearCachedUri($cacheRecord->siteId, $cacheRecord->uri);
         }
 
         // Trigger afterRefreshCache event
-        Blitz::$plugin->cache->afterRefreshCache($this->cacheIds);
+        Blitz::$plugin->invalidate->afterRefreshCache($this->cacheIds);
 
         // Delete cache records so we get fresh caches
         CacheRecord::deleteAll(['id' => $this->cacheIds]);

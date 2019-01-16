@@ -1,3 +1,5 @@
+{% extends '_layouts/cp' %}
+
 {% import "_includes/forms" as forms %}
 
 {% macro configWarning(setting) -%}
@@ -8,133 +10,168 @@
 
 {% do view.registerAssetBundle("putyourlightson\\blitz\\assets\\BlitzAsset") %}
 
-
-{{ forms.lightswitchField({
-    label: "Caching Enabled"|t('blitz'),
-    instructions: "Whether static file caching should be enabled."|t('blitz'),
-    warning: (config.cachingEnabled is defined ? configWarning('cachingEnabled')),
-    name: 'cachingEnabled',
-    on: settings.cachingEnabled,
-    required: true,
-    first: true,
-}) }}
-
-{{ forms.lightswitchField({
-    label: "Warm Cache Automatically"|t('blitz'),
-    instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz'),
-    warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
-    name: 'warmCacheAutomatically',
-    on: settings.warmCacheAutomatically,
-    required: true,
-}) }}
-
-{% set info %}
-    <span class="info">{{ "Depending on the option selected, the server rewrite may need to be modified ([see the docs]({url}))."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
-{% endset %}
-{{ forms.selectField({
-    label: "Query String Caching"|t('blitz'),
-    instructions: "Whether URLs with query strings should cached and how."|t('blitz') ~ info,
-    warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
-    name: 'queryStringCaching',
-    options: {
-        0: "Do not cache URLs with query strings"|t('blitz'),
-        1: "Cache URLs with unique query strings as unique pages"|t('blitz'),
-        2: "Cache URLs with unique query strings as the same page"|t('blitz'),
-    },
-    value: settings.queryStringCaching,
-    required: true,
-}) }}
-
-{% set info %}
-    <span class="info">{{ "The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended."|t('blitz') }}</span>
-{% endset %}
-{{ forms.textField({
-    type: 'number',
-    unit: "concurrent requests."|t('blitz'),
-    label: "Concurrency"|t('blitz'),
-    instructions: "The max number of multiple concurrent requests to use when warming the cache."|t('blitz') ~ info,
-    warning: (config.concurrency is defined ? configWarning('concurrency')),
-    name: 'concurrency',
-    value: settings.concurrency,
-    errors: settings.getErrors('concurrency'),
-    required: true,
-}) }}
-
-{{ forms.text({
-    type: 'hidden',
-    name: 'driverType',
-    value: className(driver),
-}) }}
-
-{% for _driver in allDrivers %}
-    {% set isCurrent = (className(_driver) == className(driver)) %}
-    <div id="{{ className(_driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
-        {% namespace 'driverSettings[' ~ className(_driver) ~ ']' %}
-            {{ (isCurrent ? driver : _driver).getSettingsHtml()|raw }}
-        {% endnamespace %}
-    </div>
-{% endfor %}
-
-{% set info %}
-{{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}
-
-- A blank field matches the homepage.
-- `.*` matches any character 0 or more times (use this to include everything).
-- `.+` matches any character 1 or more times.
-- `.` matches any character.
-- `\d` matches any digit.
-- `\w` matches any word character.
-- `entries` matches anything containing "entries".
-- `^entries` matches anything beginning with "entries".
-- `^entries/entry$` matches an exact URI.
-{% endset %}
-
-{% set cols = [
-    {
-        type: 'singleline',
-        heading: 'URI Pattern'|t('blitz'),
-        placeholder: "Leave blank to match the homepage"|t('blitz'),
-        code: true,
-        info: info,
-    }
+{% set crumbs = [
+    { label: 'Settings'|t('app'), url: url('settings') },
+    { label: 'Plugins'|t('app'), url: url('settings/plugins') }
 ] %}
 
-{% if craft.app.getIsMultiSite() %}
-    {% set siteOptions = [{value: '', label: 'All Sites'|t('blitz')}] %}
-    {% for site in craft.app.sites.getAllSites() %}
-        {% set siteOptions = siteOptions|merge([{value: site.id, label: site.name}]) %}
-    {% endfor %}
+{% set title = 'Blitz' %}
 
-    {% set cols = cols|merge([
-        {
-            type: 'select',
-            heading: 'Site'|t('blitz'),
-            info: 'The site that the URI pattern should be applied to.'|t('blitz'),
-            options: siteOptions,
-        }
-    ]) %}
-{% endif %}
+{% set tabs = {
+    general: {label: 'General'|t('blitz'), url: '#general'},
+    driver: {label: 'Driver'|t('blitz'), url: '#driver'},
+    purger: {label: 'Purger'|t('blitz'), url: '#purger'},
+} %}
 
-<input type="hidden" name="includedUriPatterns" value="" />
-{{ forms.editableTableField({
-    label: "Included URI Patterns"|t('blitz'),
-    instructions: "The URI patterns to include in static file caching."|t('blitz'),
-    warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
-    name: 'includedUriPatterns',
-    id: 'includedUriPatterns',
-    cols: cols,
-    rows: settings.includedUriPatterns,
-    addRowLabel: "Add a URI pattern"|t('blitz'),
-}) }}
+{% set fullPageForm = true %}
 
-<input type="hidden" name="excludedUriPatterns" value="" />
-{{ forms.editableTableField({
-    label: "Excluded URI Patterns"|t('blitz'),
-    instructions: "The URI patterns to exclude from static file caching (overrides any matching patterns to include)."|t('blitz'),
-    warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
-    name: 'excludedUriPatterns',
-    id: 'excludedUriPatterns',
-    cols: cols,
-    rows: settings.excludedUriPatterns,
-    addRowLabel: "Add a URI pattern"|t('blitz'),
-}) }}
+
+{% block actionButton %}
+
+    <input type="submit" class="btn submit" value="{{ 'Save'|t('app') }}">
+
+{% endblock %}
+
+
+{% block content %}
+
+    <input type="hidden" name="action" value="blitz/settings/save">
+    <input type="hidden" name="pluginHandle" value="blitz">
+
+    <div id="general">
+        {{ forms.lightswitchField({
+            label: "Caching Enabled"|t('blitz'),
+            instructions: "Whether static file caching should be enabled."|t('blitz'),
+            warning: (config.cachingEnabled is defined ? configWarning('cachingEnabled')),
+            name: 'settings[cachingEnabled]',
+            on: settings.cachingEnabled,
+            required: true,
+        }) }}
+
+        {{ forms.lightswitchField({
+            label: "Warm Cache Automatically"|t('blitz'),
+            instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz'),
+            warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
+            name: 'settings[warmCacheAutomatically]',
+            on: settings.warmCacheAutomatically,
+            required: true,
+        }) }}
+
+        {% set info %}
+            <span class="info">{{ "Depending on the option selected, the server rewrite may need to be modified ([see the docs]({url}))."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
+        {% endset %}
+        {{ forms.selectField({
+            label: "Query String Caching"|t('blitz'),
+            instructions: "Whether URLs with query strings should cached and how."|t('blitz') ~ info,
+            warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
+            name: 'settings[queryStringCaching]',
+            options: {
+                0: "Do not cache URLs with query strings"|t('blitz'),
+                1: "Cache URLs with unique query strings as unique pages"|t('blitz'),
+                2: "Cache URLs with unique query strings as the same page"|t('blitz'),
+            },
+            value: settings.queryStringCaching,
+            required: true,
+        }) }}
+
+        {% set info %}
+            <span class="info">{{ "The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended."|t('blitz') }}</span>
+        {% endset %}
+        {{ forms.textField({
+            type: 'number',
+            unit: "concurrent requests."|t('blitz'),
+            label: "Concurrency"|t('blitz'),
+            instructions: "The max number of multiple concurrent requests to use when warming the cache."|t('blitz') ~ info,
+            warning: (config.concurrency is defined ? configWarning('concurrency')),
+            name: 'settings[concurrency]',
+            value: settings.concurrency,
+            errors: settings.getErrors('concurrency'),
+            required: true,
+        }) }}
+
+        {% set info %}
+        {{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}
+
+        - A blank field matches the homepage.
+        - `.*` matches any character 0 or more times (use this to include everything).
+        - `.+` matches any character 1 or more times.
+        - `.` matches any character.
+        - `\d` matches any digit.
+        - `\w` matches any word character.
+        - `entries` matches anything containing "entries".
+        - `^entries` matches anything beginning with "entries".
+        - `^entries/entry$` matches an exact URI.
+        {% endset %}
+
+        {% set cols = [
+            {
+                type: 'singleline',
+                heading: 'URI Pattern'|t('blitz'),
+                placeholder: "Leave blank to match the homepage"|t('blitz'),
+                code: true,
+                info: info,
+            }
+        ] %}
+
+        {% if craft.app.getIsMultiSite() %}
+            {% set siteOptions = [{value: '', label: 'All Sites'|t('blitz')}] %}
+            {% for site in craft.app.sites.getAllSites() %}
+                {% set siteOptions = siteOptions|merge([{value: site.id, label: site.name}]) %}
+            {% endfor %}
+
+            {% set cols = cols|merge([
+                {
+                    type: 'select',
+                    heading: 'Site'|t('blitz'),
+                    info: 'The site that the URI pattern should be applied to.'|t('blitz'),
+                    options: siteOptions,
+                }
+            ]) %}
+        {% endif %}
+
+        <input type="hidden" name="includedUriPatterns" value="" />
+        {{ forms.editableTableField({
+            label: "Included URI Patterns"|t('blitz'),
+            instructions: "The URI patterns to include in static file caching."|t('blitz'),
+            warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
+            name: 'settings[includedUriPatterns]',
+            id: 'includedUriPatterns',
+            cols: cols,
+            rows: settings.includedUriPatterns,
+            addRowLabel: "Add a URI pattern"|t('blitz'),
+        }) }}
+
+        <input type="hidden" name="excludedUriPatterns" value="" />
+        {{ forms.editableTableField({
+            label: "Excluded URI Patterns"|t('blitz'),
+            instructions: "The URI patterns to exclude from static file caching (overrides any matching patterns to include)."|t('blitz'),
+            warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
+            name: 'settings[excludedUriPatterns]',
+            id: 'excludedUriPatterns',
+            cols: cols,
+            rows: settings.excludedUriPatterns,
+            addRowLabel: "Add a URI pattern"|t('blitz'),
+        }) }}
+    </div>
+
+    <div id="driver" class="hidden">
+        {{ forms.selectField({
+            label: "Driver Type"|t('blitz'),
+            instructions: "The cache driver to use for storing cached pages."|t('blitz'),
+            warning: (config.driverType is defined ? configWarning('driverType')),
+            name: 'settings[driverType]',
+            options: driverTypeOptions,
+            value: className(driver),
+        }) }}
+
+        {% for _driver in allDrivers %}
+            {% set isCurrent = (className(_driver) == className(driver)) %}
+            <div id="{{ className(_driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+                {% namespace 'driverSettings[' ~ className(_driver) ~ ']' %}
+                    {{ (isCurrent ? driver : _driver).getSettingsHtml()|raw }}
+                {% endnamespace %}
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

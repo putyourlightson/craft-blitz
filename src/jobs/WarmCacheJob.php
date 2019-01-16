@@ -76,7 +76,7 @@ class WarmCacheJob extends BaseJob
         // Initiate the transfers and wait for the pool of requests to complete
         $pool->promise()->wait();
 
-        Blitz::$plugin->cache->cleanElementQueryTable();
+        Blitz::$plugin->invalidate->cleanElementQueryTable();
     }
 
     // Protected Methods

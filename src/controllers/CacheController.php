@@ -28,7 +28,7 @@ class CacheController extends Controller
      */
     public function actionClear(): Response
     {
-        Blitz::$plugin->cache->clearCache(false);
+        Blitz::$plugin->invalidate->clearCache(false);
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully cleared.'));
 
@@ -44,7 +44,7 @@ class CacheController extends Controller
      */
     public function actionFlush(): Response
     {
-        Blitz::$plugin->cache->clearCache(true);
+        Blitz::$plugin->invalidate->clearCache(true);
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Blitz cache successfully flushed.'));
 
@@ -60,7 +60,7 @@ class CacheController extends Controller
      */
     public function actionRefreshExpired(): Response
     {
-        Blitz::$plugin->cache->refreshExpiredCache();
+        Blitz::$plugin->invalidate->refreshExpiredCache();
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.'));
 
@@ -85,16 +85,10 @@ class CacheController extends Controller
             return $this->redirectToPostedUrl();
         }
 
-        if (empty($settings->cacheFolderPath)) {
-            Craft::$app->getSession()->setError(Craft::t('blitz', 'Blitz cache folder path is not set.'));
-
-            return $this->redirectToPostedUrl();
-        }
-
         // Get URLs before flushing the cache
-        $urls = Blitz::$plugin->cache->getAllCacheableUrls();
+        $urls = Blitz::$plugin->invalidate->getAllCachedUrls();
 
-        Blitz::$plugin->cache->clearCache(true);
+        Blitz::$plugin->invalidate->clearCache(true);
 
         Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
 

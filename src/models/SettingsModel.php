@@ -46,7 +46,7 @@ class SettingsModel extends Model
     /**
      * @var array
      */
-    public $defaultDriverTypes = [];
+    public $driverTypes = [];
 
     /**
      * @var array
