@@ -148,7 +148,7 @@
     <div id="purger" class="hidden">
         {{ forms.selectField({
             label: "Reverse Proxy Purger"|t('blitz'),
-            instructions: "A reverse proxy purger to use for clearing cache."|t('blitz'),
+            instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz'),
             warning: (config.purgerType is defined ? configWarning('purgerType')),
             name: 'settings[purgerType]',
             options: purgerTypeOptions,

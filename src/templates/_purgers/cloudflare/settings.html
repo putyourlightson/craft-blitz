@@ -10,3 +10,23 @@
     errors: purger.getErrors('apiKey'),
     required: true,
 }) }}
+
+{{ forms.autosuggestField({
+    label: "Email"|t('blitz'),
+    instructions: "The email address associated with your Cloudflare account."|t('blitz'),
+    name: 'email',
+    suggestions: craft.cp.getEnvSuggestions(),
+    value: purger.email,
+    errors: purger.getErrors('email'),
+    required: true,
+}) }}
+
+{{ forms.autosuggestField({
+    label: "Zone ID"|t('blitz'),
+    instructions: "The zone ID of your Cloudflare account."|t('blitz'),
+    name: 'zoneId',
+    suggestions: craft.cp.getEnvSuggestions(),
+    value: purger.zoneId,
+    errors: purger.getErrors('zoneId'),
+    required: true,
+}) }}

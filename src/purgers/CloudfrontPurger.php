@@ -28,17 +28,12 @@ class CloudfrontPurger extends BasePurger
     /**
      * @var string
      */
-    public $apiEmail;
+    public $email;
 
     /**
      * @var string
      */
     public $zoneId;
-
-    /**
-     * @var string
-     */
-    public $domain;
 
     // Static
     // =========================================================================
@@ -61,7 +56,7 @@ class CloudfrontPurger extends BasePurger
     {
         return [
             'apiKey' => Craft::t('blitz', 'API Key'),
-            'apiSecret' => Craft::t('blitz', 'API Secret'),
+            'zoneId' => Craft::t('blitz', 'Zone ID'),
         ];
     }
 
@@ -71,7 +66,7 @@ class CloudfrontPurger extends BasePurger
     public function rules()
     {
         return [
-            [['apiKey'], 'required'],
+            [['apiKey', 'email', 'zoneId'], 'required'],
         ];
     }
 
