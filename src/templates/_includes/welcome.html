@@ -1,7 +1,7 @@
 <div class="welcome readable">
     <div class="icon">
         {% set icon = craft.app.plugins.getPluginIconSvg('blitz') %}
-        {{ svg(icon, sanitize=true, namespace=true) }}
+        {{ svg(icon, sanitize=true) }}
     </div>
     <h1>{{ 'Thanks for using Blitz!'|t('blitz') }}</h1>
     <h3>{{ 'Get set up in 3 simple steps:'|t('blitz') }}</h3>
