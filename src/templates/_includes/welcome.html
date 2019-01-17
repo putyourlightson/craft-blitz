@@ -1,0 +1,14 @@
+<div class="welcome readable">
+    <div class="icon">
+        {% set icon = craft.app.plugins.getPluginIconSvg('blitz') %}
+        {{ svg(icon, sanitize=true, namespace=true) }}
+    </div>
+    <h1>{{ 'Thanks for using Blitz!'|t('blitz') }}</h1>
+    <h3>{{ 'Get set up in 3 simple steps:'|t('blitz') }}</h3>
+    <p>
+        1. {{ 'Enable caching below.'|t('blitz') }}<br/>
+        2. {{ 'Include at least one URI pattern.'|t('blitz') }}<br/>
+        3. {{ 'Visit your site.'|t('blitz') }}
+    </p>
+    <p>Read the <a href="" target="_blank">documentation &raquo;</a></p>
+</div>

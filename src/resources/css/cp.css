@@ -1,3 +1,12 @@
+.welcome {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.welcome .icon {
+    height: 180px;
+}
+
 .info-hud {
     max-width: 450px;
 }

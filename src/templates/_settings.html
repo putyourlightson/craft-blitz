@@ -36,6 +36,10 @@
 
 {% block content %}
 
+    {% if craft.app.request.getParam('welcome') %}
+        {% include 'blitz/_includes/welcome' %}
+    {% endif %}
+
     <input type="hidden" name="action" value="blitz/settings/save">
     <input type="hidden" name="pluginHandle" value="blitz">
 

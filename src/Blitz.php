@@ -160,6 +160,17 @@ class Blitz extends Plugin
     }
 
     /**
+     * @inheritdoc
+     */
+    protected function afterInstall()
+    {
+        // Redirect to settings page with welcome
+        $url = UrlHelper::cpUrl('settings/plugins/blitz?welcome=1');
+
+        Craft::$app->getResponse()->redirect($url)->send();
+    }
+
+    /**
      * Returns the CP routes
      *
      * @return array

@@ -2,7 +2,7 @@
 
 ## 2.0.0 - Unreleased
 ### Added
-- Added welcome screen that appears on install.
+- Added welcome screen that appears after installing the plugin.
 - Added cache drivers and replaced file service with file driver.
 - Added reverse proxy purgers.
 - Added environmental settings to file driver.
