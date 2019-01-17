@@ -174,7 +174,7 @@ class InvalidateService extends Component
         $elementType = get_class($element);
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array($elementType, Blitz::$plugin->getNonCacheableElementTypes(), true)) {
+        if (in_array($elementType, Blitz::$plugin->cache->getNonCacheableElementTypes(), true)) {
             return;
         }
 

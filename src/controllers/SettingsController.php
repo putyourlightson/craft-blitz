@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\base\ComponentInterface;
 use craft\errors\MissingComponentException;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
@@ -13,7 +14,6 @@ use putyourlightson\blitz\drivers\BaseDriver;
 use putyourlightson\blitz\helpers\DriverHelper;
 use putyourlightson\blitz\helpers\PurgerHelper;
 use putyourlightson\blitz\purgers\BasePurger;
-use yii\base\InvalidConfigException;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -23,9 +23,58 @@ class SettingsController extends Controller
     // =========================================================================
 
     /**
+     * Edit the plugin settings.
+     *
+     * @return Response|null
+     */
+    public function actionEdit()
+    {
+        $settings = Blitz::$plugin->getSettings();
+
+        /** @var BaseDriver $driver */
+        $driver = DriverHelper::createDriver(
+            $settings->driverType,
+            $settings->driverSettings
+        );
+
+        // Validate the driver so that any errors will be displayed
+        $driver->validate();
+
+        $drivers = DriverHelper::getAllDrivers();
+
+        $purger = null;
+
+        if ($settings->purgerType) {
+            /** @var BasePurger $purger */
+            $purger = PurgerHelper::createPurger(
+                $settings->purgerType,
+                $settings->purgerSettings
+            );
+
+            // Validate the purger so that any errors will be displayed
+            $purger->validate();
+        }
+
+        $purgers = PurgerHelper::getAllPurgers();
+
+        return $this->renderTemplate('blitz/_settings', [
+            'settings' => $settings,
+            'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
+            'driver' => $driver,
+            'drivers' => $drivers,
+            'driverTypeOptions' => array_map([$this, '_getSelectOption'], $drivers),
+            'purger' => $purger,
+            'purgers' => $purgers,
+            'purgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgers),
+        ]);
+    }
+
+    /**
      * Saves the plugin settings.
      *
      * @return Response|null
+     * @throws BadRequestHttpException
+     * @throws MissingComponentException
      */
     public function actionSave()
     {
@@ -85,5 +134,23 @@ class SettingsController extends Controller
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Plugin settings saved.'));
 
         return $this->redirectToPostedUrl();
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Gets select option from a component.
+     *
+     * @param ComponentInterface $component
+     *
+     * @return array
+     */
+    private function _getSelectOption(ComponentInterface $component): array
+    {
+        return [
+            'value' => get_class($component),
+            'label' => $component::displayName(),
+        ];
     }
 }

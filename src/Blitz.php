@@ -15,8 +15,10 @@ use craft\events\MoveElementEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
+use craft\helpers\UrlHelper;
 use craft\models\Site;
 use craft\services\Elements;
 use craft\services\Structures;
@@ -25,7 +27,9 @@ use craft\services\Utilities;
 use craft\utilities\ClearCaches;
 use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
+use craft\web\UrlManager;
 use craft\web\View;
+use putyourlightson\blitz\controllers\SettingsController;
 use putyourlightson\blitz\drivers\BaseDriver;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use putyourlightson\blitz\helpers\CacheHelper;
@@ -53,14 +57,6 @@ use yii\base\InvalidConfigException;
  */
 class Blitz extends Plugin
 {
-    // Constants
-    // =========================================================================
-
-    /**
-     * @event RegisterNonCacheableElementTypesEvent
-     */
-    const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
-
     // Properties
     // =========================================================================
 
@@ -68,11 +64,6 @@ class Blitz extends Plugin
      * @var Blitz
      */
     public static $plugin;
-
-    /**
-     * @var string[]|null
-     */
-    private $_nonCacheableElementTypes;
 
     // Public Methods
     // =========================================================================
@@ -92,6 +83,11 @@ class Blitz extends Plugin
         // Register driver
         $this->setDriver();
 
+        // Register CP URL rules event
+        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event) {
+            $event->rules = array_merge($this->getCpRoutes(), $event->rules);
+        });
+
         // Register variable
         Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
             /** @var CraftVariable $variable */
@@ -99,9 +95,9 @@ class Blitz extends Plugin
             $variable->set('blitz', BlitzVariable::class);
         });
 
+        // Process request
         $request = Craft::$app->getRequest();
 
-        // Process request
         if (CacheHelper::getIsCacheableRequest()) {
             $site = Craft::$app->getSites()->getCurrentSite();
 
@@ -134,29 +130,6 @@ class Blitz extends Plugin
         }
     }
 
-    /**
-     * Returns non cacheable element types.
-     *
-     * @return string[]
-     */
-    public function getNonCacheableElementTypes(): array
-    {
-        $settings = $this->getSettings();
-
-        if ($this->_nonCacheableElementTypes !== null) {
-            return $this->_nonCacheableElementTypes;
-        };
-
-        $event = new RegisterNonCacheableElementTypesEvent([
-            'elementTypes' => $settings->nonCacheableElementTypes,
-        ]);
-        $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
-
-        $this->_nonCacheableElementTypes = $event->elementTypes;
-
-        return $this->_nonCacheableElementTypes;
-    }
-
     // Protected Methods
     // =========================================================================
 
@@ -187,62 +160,14 @@ class Blitz extends Plugin
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getSettingsResponse()
-    {
-        $settings = $this->getSettings();
-
-        /** @var BaseDriver $driver */
-        $driver = DriverHelper::createDriver(
-            $settings->driverType,
-            $settings->driverSettings
-        );
-
-        // Validate the driver so that any errors will be displayed
-        $driver->validate();
-
-        $drivers = DriverHelper::getAllDrivers();
-
-        $purger = null;
-
-        if ($settings->purgerType) {
-            /** @var BasePurger $purger */
-            $purger = PurgerHelper::createPurger(
-                $settings->purgerType,
-                $settings->purgerSettings
-            );
-
-            // Validate the purger so that any errors will be displayed
-            $purger->validate();
-        }
-
-        $purgers = PurgerHelper::getAllPurgers();
-
-        return Craft::$app->controller->renderTemplate('blitz/settings', [
-            'settings' => $settings,
-            'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
-            'driver' => $driver,
-            'drivers' => $drivers,
-            'driverTypeOptions' => array_map([$this, 'getSelectOption'], $drivers),
-            'purger' => $purger,
-            'purgers' => $purgers,
-            'purgerTypeOptions' => array_map([$this, 'getSelectOption'], $purgers),
-        ]);
-    }
-
-    /**
-     * Gets select option from a component.
-     *
-     * @param ComponentInterface $component
+     * Returns the CP routes
      *
      * @return array
      */
-    public function getSelectOption(ComponentInterface $component): array
+    protected function getCpRoutes(): array
     {
         return [
-            'value' => get_class($component),
-            'label' => $component::displayName(),
+            'settings/plugins/blitz' => 'blitz/settings/edit',
         ];
     }
 

@@ -11,6 +11,7 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -20,6 +21,14 @@ use yii\db\Exception;
 
 class CacheService extends Component
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event RegisterNonCacheableElementTypesEvent
+     */
+    const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
+
     // Properties
     // =========================================================================
 
@@ -27,6 +36,11 @@ class CacheService extends Component
      * @var SettingsModel
      */
     private $_settings;
+
+    /**
+     * @var string[]|null
+     */
+    private $_nonCacheableElementTypes;
 
     /**
      * @var int[]
@@ -54,6 +68,27 @@ class CacheService extends Component
     }
 
     /**
+     * Returns non cacheable element types.
+     *
+     * @return string[]
+     */
+    public function getNonCacheableElementTypes(): array
+    {
+        if ($this->_nonCacheableElementTypes !== null) {
+            return $this->_nonCacheableElementTypes;
+        };
+
+        $event = new RegisterNonCacheableElementTypesEvent([
+            'elementTypes' => $this->_settings->nonCacheableElementTypes,
+        ]);
+        $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
+
+        $this->_nonCacheableElementTypes = $event->elementTypes;
+
+        return $this->_nonCacheableElementTypes;
+    }
+
+    /**
      * Adds an element cache.
      *
      * @param ElementInterface $element
@@ -66,7 +101,7 @@ class CacheService extends Component
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array(get_class($element), Blitz::$plugin->getNonCacheableElementTypes(), true)) {
+        if (in_array(get_class($element), $this->getNonCacheableElementTypes(), true)) {
             return;
         }
 
@@ -93,7 +128,7 @@ class CacheService extends Component
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array($elementQuery->elementType, Blitz::$plugin->getNonCacheableElementTypes(), true)) {
+        if (in_array($elementQuery->elementType, $this->getNonCacheableElementTypes(), true)) {
             return;
         }
 

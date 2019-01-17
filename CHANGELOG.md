@@ -2,7 +2,9 @@
 
 ## 2.0.0 - Unreleased
 ### Added
-- Added changeable driver and replaced file service with file driver.
+- Added welcome screen that appears on install.
+- Added cache drivers and replaced file service with file driver.
+- Added reverse proxy purgers.
 - Added environmental settings to file driver.
 - Added logging of file and request exceptions.
 
