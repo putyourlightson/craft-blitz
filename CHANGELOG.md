@@ -8,6 +8,9 @@
 - Added environmental settings to file driver.
 - Added logging of file and request exceptions.
 
+### Changed
+- Minimum requirement of Craft has been changed to version 3.1.0.
+
 ## 1.11.3 - 2019-01-09
 ### Added
 - Added clear cache options in control panel and console commands (requires Craft 3.0.37 or above).

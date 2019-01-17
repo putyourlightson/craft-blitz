@@ -36,14 +36,15 @@
 
 {% block content %}
 
-    {% if craft.app.request.getParam('welcome') %}
-        {% include 'blitz/_includes/welcome' %}
-    {% endif %}
-
     <input type="hidden" name="action" value="blitz/settings/save">
     <input type="hidden" name="pluginHandle" value="blitz">
 
     <div id="general">
+
+        {% if craft.app.request.getParam('welcome') %}
+            {% include 'blitz/_includes/welcome' %}
+        {% endif %}
+
         {{ forms.lightswitchField({
             label: "Caching Enabled"|t('blitz'),
             instructions: "Whether static file caching should be enabled."|t('blitz'),
