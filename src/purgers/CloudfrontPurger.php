@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\purgers;
 
 use Craft;
+use GuzzleHttp\Exception\BadResponseException;
 
 /**
  * @property mixed $settingsHtml
@@ -23,12 +24,12 @@ class CloudfrontPurger extends BasePurger
     /**
      * @var string
      */
-    public $apiKey;
+    public $email;
 
     /**
      * @var string
      */
-    public $email;
+    public $apiKey;
 
     /**
      * @var string
@@ -73,9 +74,17 @@ class CloudfrontPurger extends BasePurger
     /**
      * @inheritdoc
      */
-    public function purge(array $cacheIds)
+    public function purgeUrls(array $urls)
     {
+        $this->_purge(['files' => $urls]);
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function purgeAll()
+    {
+        $this->_purge(['purge_everything' => true]);
     }
 
     /**
@@ -86,5 +95,34 @@ class CloudfrontPurger extends BasePurger
         return Craft::$app->getView()->renderTemplate('blitz/_purgers/cloudflare/settings', [
             'purger' => $this,
         ]);
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Sends a DELETE request to the API.
+     *
+     * @param array|null $options
+     */
+    private function _purge(array $options = [])
+    {
+        $client = Craft::createGuzzleClient([
+            'base_uri' => self::API_ENDPOINT,
+            'headers'  => [
+                'Content-Type' => 'application/json',
+                'X-Auth-Email' => $this->email,
+                'X-Auth-Key'   => $this->apiKey,
+            ],
+        ]);
+
+        try {
+            $client->request(
+                'DELETE',
+                'zones/'.$this->zoneId.'/purge_cache',
+                $options
+            );
+        }
+        catch (BadResponseException $e) { }
     }
 }

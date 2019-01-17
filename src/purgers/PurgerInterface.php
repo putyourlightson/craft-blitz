@@ -8,9 +8,14 @@ namespace putyourlightson\blitz\purgers;
 interface PurgerInterface
 {
     /**
-     * Purges the cache given an array of cache IDs.
+     * Purges the cache given an array of URLs.
      *
-     * @param array $cacheIds
+     * @param array $urls
      */
-    public function purge(array $cacheIds);
+    public function purgeUrls(array $urls);
+
+    /**
+     * Purges the entire cache.
+     */
+    public function purgeAll();
 }
