@@ -11,7 +11,7 @@ use GuzzleHttp\Exception\BadResponseException;
 /**
  * @property mixed $settingsHtml
  */
-class CloudfrontPurger extends BasePurger
+class CloudflarePurger extends BasePurger
 {
     // Constants
     // =========================================================================
@@ -44,7 +44,7 @@ class CloudfrontPurger extends BasePurger
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Cloudfront Purger');
+        return Craft::t('blitz', 'Cloudflare Purger');
     }
 
     // Public Methods

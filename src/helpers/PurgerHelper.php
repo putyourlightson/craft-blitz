@@ -10,7 +10,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\purgers\BasePurger;
-use putyourlightson\blitz\purgers\CloudfrontPurger;
+use putyourlightson\blitz\purgers\CloudflarePurger;
 use putyourlightson\blitz\purgers\DummyPurger;
 use putyourlightson\blitz\purgers\PurgerInterface;
 use yii\base\Event;
@@ -38,7 +38,7 @@ class PurgerHelper
     {
         $purgerTypes = [
             DummyPurger::class,
-            CloudfrontPurger::class,
+            CloudflarePurger::class,
         ];
 
         $purgerTypes = array_unique(array_merge(
