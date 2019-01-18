@@ -84,26 +84,18 @@ class Blitz extends Plugin
         $this->setDriver();
         $this->setPurger();
 
-        // Register CP URL rules event
-        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event) {
-            $event->rules = array_merge($this->getCpRoutes(), $event->rules);
-        });
-
         // Register variable
-        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT, function(Event $event) {
-            /** @var CraftVariable $variable */
-            $variable = $event->sender;
-            $variable->set('blitz', BlitzVariable::class);
-        });
+        $this->_registerVariable();
 
-        // Process request
-        $request = Craft::$app->getRequest();
+        // Register CP URL rules event
+        $this->_registerCpUrlRules();
 
+        // Process cacheable requests
         if (CacheHelper::getIsCacheableRequest()) {
             $site = Craft::$app->getSites()->getCurrentSite();
 
             // Get URI from absolute URL
-            $uri = $this->_getUri($site, $request->getAbsoluteUrl());
+            $uri = $this->_getUri($site, Craft::$app->getRequest()->getAbsoluteUrl());
 
             if (CacheHelper::getIsCacheableUri($site->id, $uri)) {
                 // If cached value exists then output it (assuming this has not already been done server-side)
@@ -116,18 +108,17 @@ class Blitz extends Plugin
                 $this->_registerCacheableRequestEvents($site->id, $uri);
             }
         }
-        else {
-            $this->_registerElementEvents();
-            $this->_registerResaveElementEvents();
-            $this->_registerClearCaches();
-            $this->_registerGarbageCollection();
 
-            if ($request->getIsCpRequest()) {
-                $this->_registerUtilities();
+        $this->_registerElementEvents();
+        $this->_registerResaveElementEvents();
+        $this->_registerClearCaches();
+        $this->_registerGarbageCollection();
 
-                if (Craft::$app->getEdition() === Craft::Pro) {
-                    $this->_registerUserPermissions();
-                }
+        if (Craft::$app->getRequest()->getIsCpRequest()) {
+            $this->_registerUtilities();
+
+            if (Craft::$app->getEdition() === Craft::Pro) {
+                $this->_registerUserPermissions();
             }
         }
     }
@@ -190,18 +181,6 @@ class Blitz extends Plugin
         Craft::$app->getResponse()->redirect($url)->send();
     }
 
-    /**
-     * Returns the CP routes
-     *
-     * @return array
-     */
-    protected function getCpRoutes(): array
-    {
-        return [
-            'settings/plugins/blitz' => 'blitz/settings/edit',
-        ];
-    }
-
     // Private Methods
     // =========================================================================
 
@@ -231,7 +210,7 @@ class Blitz extends Plugin
     }
 
     /**
-     * Outputs a given value.
+     * Outputs a given value
      *
      * @param string $value
      *
@@ -249,6 +228,36 @@ class Blitz extends Plugin
         exit($value.'<!-- Served by Blitz -->');
     }
 
+    /**
+     * Registers variable
+     */
+    private function _registerVariable()
+    {
+        Event::on(CraftVariable::class, CraftVariable::EVENT_INIT,
+            function(Event $event) {
+                /** @var CraftVariable $variable */
+                $variable = $event->sender;
+                $variable->set('blitz', BlitzVariable::class);
+            }
+        );
+    }
+
+    /**
+     * Registers CP URL rules event
+     */
+    private function _registerCpUrlRules()
+    {
+        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
+            function(RegisterUrlRulesEvent $event) {
+                $event->rules = array_merge([
+                        'settings/plugins/blitz' => 'blitz/settings/edit',
+                    ],
+                    $event->rules
+                );
+            }
+        );
+    }
+    
     /**
      * Registers cacheable request events
      *
