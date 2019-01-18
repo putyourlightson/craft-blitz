@@ -53,7 +53,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes expired elements.
+     * Refreshes expired cache.
      *
      * @return int
      */
@@ -146,7 +146,7 @@ class CacheController extends Controller
         // Initiate the transfers and wait for the pool of requests to complete
         $pool->promise()->wait();
 
-        Blitz::$plugin->invalidate->cleanElementQueryTable();
+        Blitz::$plugin->invalidate->runGarbageCollection();
 
         Console::updateProgress($total, $total);
         Console::endProgress();

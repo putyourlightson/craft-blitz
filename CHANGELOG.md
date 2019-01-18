@@ -6,11 +6,12 @@
 - Added cache drivers.
 - Added reverse proxy purgers.
 - Added environmental settings to file driver.
+- Added garbage collection to element query records.
 - Added logging of file and request exceptions.
 
 ### Changed
 - Minimum requirement of Craft has been changed to version 3.1.0.
-- Cache is invalidated also when elements are updated through non control panel requests.
+- Cache is invalidated when elements are updated through non control panel requests.
 
 ## 1.11.3 - 2019-01-09
 ### Added

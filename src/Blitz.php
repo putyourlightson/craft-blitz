@@ -22,6 +22,7 @@ use craft\models\Site;
 use craft\queue\jobs\ResaveElements;
 use craft\queue\Queue;
 use craft\services\Elements;
+use craft\services\Gc;
 use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
@@ -117,10 +118,9 @@ class Blitz extends Plugin
         }
         else {
             $this->_registerElementEvents();
-
             $this->_registerResaveElementEvents();
-
             $this->_registerClearCaches();
+            $this->_registerGarbageCollection();
 
             if ($request->getIsCpRequest()) {
                 $this->_registerUtilities();
@@ -366,6 +366,18 @@ class Blitz extends Plugin
                     'label' => Craft::t('blitz', 'Blitz cache'),
                     'action' => [Blitz::$plugin->cache, 'clearCache'],
                 ];
+            }
+        );
+    }
+
+    /**
+     * Registers garbage collection
+     */
+    private function _registerGarbageCollection()
+    {
+        Event::on(Gc::class, Gc::EVENT_RUN,
+            function() {
+                $this->invalidate->runGarbageCollection();
             }
         );
     }

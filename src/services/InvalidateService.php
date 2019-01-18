@@ -346,21 +346,6 @@ class InvalidateService extends Component
     }
 
     /**
-     * Cleans element query table.
-     */
-    public function cleanElementQueryTable()
-    {
-        // Get and delete element query records without an associated element query cache
-        $elementQueryRecordIds = ElementQueryRecord::find()
-            ->select('id')
-            ->joinWith('elementQueryCaches')
-            ->where(['cacheId' => null])
-            ->column();
-
-        ElementQueryRecord::deleteAll(['id' => $elementQueryRecordIds]);
-    }
-
-    /**
      * Clears the cache.
      *
      * @param bool $flush
@@ -385,7 +370,22 @@ class InvalidateService extends Component
             // Delete all cache records
             CacheRecord::deleteAll();
 
-            $this->cleanElementQueryTable();
+            $this->runGarbageCollection();
         }
+    }
+
+    /**
+     * Runs garbage collection.
+     */
+    public function runGarbageCollection()
+    {
+        // Get and delete element query records without an associated element query cache
+        $elementQueryRecordIds = ElementQueryRecord::find()
+            ->select('id')
+            ->joinWith('elementQueryCaches')
+            ->where(['cacheId' => null])
+            ->column();
+
+        ElementQueryRecord::deleteAll(['id' => $elementQueryRecordIds]);
     }
 }

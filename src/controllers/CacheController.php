@@ -52,7 +52,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes expired elements.
+     * Refreshes expired cache.
      *
      * @return Response
      * @throws BadRequestHttpException
