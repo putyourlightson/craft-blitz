@@ -26,7 +26,7 @@ The license fee is $59 plus $29 per subsequent year for updates (optional).
 
 ## Requirements
 
-This plugin requires Craft CMS 3.0.0 or later.
+This plugin requires Craft CMS 3.1.0 or later.
 
 ## Usage
 
@@ -40,9 +40,9 @@ After installing the plugin, go to the plugin settings.
 
 1. Turn “Enable Caching” on.
 2. Add at least one row to “Included URI Patterns” such as `.*` to cache the entire site.
-3. Save the settings and visit the site (it will be cached in the first visit).
+3. Save the settings and visit the site or warm the cache in the [Blitz Utility](#cache-invalidation).
 
-Using a [server rewrite](#server-rewrite) (see below) will avoid unnecessary PHP processing and will increase performance even further.
+Using a [server rewrite](#server-rewrite) will avoid unnecessary PHP processing and will increase performance even further.
 
 Creating a cron job to [refresh expired cache](#refresh-expired-blitz-cache) (see below) will ensure that URIs that contain elements that have expired since they were cached are automatically refreshed when necessary.
 
@@ -125,7 +125,7 @@ In the case above it would make sense to add `ajax/.*` as an excluded URI patter
 
 When an element is created, updated or deleted, any cached template files that used that element are deleted. If the “Warm Cache Automatically” setting is enabled the a job is  queued to warm the cleared cache files.
 
-The Blitz Cache Utility displays the number of cached URIs for each site. It also provides the following functionality:
+The Blitz utility at “Utilities → Blitz Cache” displays the number of cached URIs for each site. It also provides the following functionality:
 
 #### Clear Blitz Cache
 Clearing the cache will delete all cached files.

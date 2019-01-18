@@ -26,7 +26,6 @@ use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
-use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
@@ -329,6 +328,7 @@ class Blitz extends Plugin
      */
     private function _registerResaveElementEvents()
     {
+        // Turn on batch mode
         Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
             function(ExecEvent $event) {
                 if ($event->job instanceof ResaveElements) {
@@ -337,6 +337,7 @@ class Blitz extends Plugin
             }
         );
 
+        // Refresh the cache
         Event::on(Queue::class, Queue::EVENT_AFTER_EXEC,
             function(ExecEvent $event) {
                 if ($event->job instanceof ResaveElements) {
@@ -344,7 +345,6 @@ class Blitz extends Plugin
                 }
             }
         );
-
         Event::on(Queue::class, Queue::EVENT_AFTER_ERROR,
             function(ExecEvent $event) {
                 if ($event->job instanceof ResaveElements) {
