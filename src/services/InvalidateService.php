@@ -25,6 +25,7 @@ use yii\db\Exception;
 
 /**
  *
+ * @property bool $batchMode
  * @property string[] $allCachedUrls
  */
 class InvalidateService extends Component
@@ -41,6 +42,11 @@ class InvalidateService extends Component
     // =========================================================================
 
     /**
+     * @var bool
+     */
+    private $_batchMode = false;
+
+    /**
      * @var SettingsModel
      */
     private $_settings;
@@ -49,6 +55,7 @@ class InvalidateService extends Component
      * @var int[]
      */
     private $_cacheIds = [];
+
     /**
      * @var int[]
      */
@@ -149,6 +156,24 @@ class InvalidateService extends Component
     }
 
     /**
+     * Gets the batch mode.
+     */
+    public function getBatchMode()
+    {
+        return $this->_batchMode;
+    }
+
+    /**
+     * Sets the batch mode.
+     *
+     * @param bool $mode
+     */
+    public function setBatchMode(bool $mode)
+    {
+        $this->_batchMode = $mode;
+    }
+
+    /**
      * Adds an element to invalidate.
      *
      * @param ElementInterface $element
@@ -228,6 +253,7 @@ class InvalidateService extends Component
                 $expiryDate = $elementExpiryDateRecord->expiryDate;
             }
 
+            /** @noinspection MissedFieldInspection */
             Craft::$app->getDb()->createCommand()
                 ->upsert(ElementExpiryDateRecord::tableName(), [
                         'elementId' => $elementId,
@@ -237,6 +263,11 @@ class InvalidateService extends Component
                     [],
                     false)
                 ->execute();
+        }
+
+        // Refresh the cache if not in batch mode
+        if ($this->_batchMode === false) {
+            $this->refreshCache();
         }
     }
 

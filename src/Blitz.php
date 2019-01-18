@@ -19,6 +19,8 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
 use craft\models\Site;
+use craft\queue\jobs\ResaveElements;
+use craft\queue\Queue;
 use craft\services\Elements;
 use craft\services\Structures;
 use craft\services\UserPermissions;
@@ -38,6 +40,7 @@ use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
+use yii\queue\ExecEvent;
 
 /**
  *
@@ -115,6 +118,8 @@ class Blitz extends Plugin
         }
         else {
             $this->_registerElementEvents();
+
+            $this->_registerResaveElementEvents();
 
             $this->_registerClearCaches();
 
@@ -322,6 +327,36 @@ class Blitz extends Plugin
         Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE,
             function() {
                 $this->invalidate->refreshCache();
+            }
+        );
+    }
+
+    /**
+     * Registers resave element events
+     */
+    private function _registerResaveElementEvents()
+    {
+        Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
+            function(ExecEvent $event) {
+                if ($event->job instanceof ResaveElements) {
+                    $this->invalidate->setBatchMode(true);
+                }
+            }
+        );
+
+        Event::on(Queue::class, Queue::EVENT_AFTER_EXEC,
+            function(ExecEvent $event) {
+                if ($event->job instanceof ResaveElements) {
+                    $this->invalidate->refreshCache();
+                }
+            }
+        );
+
+        Event::on(Queue::class, Queue::EVENT_AFTER_ERROR,
+            function(ExecEvent $event) {
+                if ($event->job instanceof ResaveElements) {
+                    $this->invalidate->refreshCache();
+                }
             }
         );
     }

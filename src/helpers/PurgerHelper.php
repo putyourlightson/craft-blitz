@@ -63,7 +63,7 @@ class PurgerHelper
     {
         $purgers = [];
 
-        /** @var PurgerInterface $class */
+        /** @var BasePurger $class */
         foreach (PurgerHelper::getAllPurgerTypes() as $class) {
             if ($class::isSelectable()) {
                 $purger = self::createPurger($class);

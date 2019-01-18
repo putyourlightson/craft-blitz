@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\purgers;
 
 use Craft;
 use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * @property mixed $settingsHtml

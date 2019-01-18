@@ -19,6 +19,10 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\Exception;
 
+/**
+ *
+ * @property string[] $nonCacheableElementTypes
+ */
 class CacheService extends Component
 {
     // Constants
