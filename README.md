@@ -83,7 +83,7 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 
 Blitz comes with a config file for a multi-environment way to set the plugin settings. The config file also provides more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
 
-![Settings](./docs/images/settings-1.8.0b.png)
+![Settings](./docs/images/settings-2.0.0.png)
 
 ## How It Works
 
@@ -149,7 +149,7 @@ Create a cron job with the following console command to refresh expired cache on
 
 Cached files and folders can be cleared manually by simply deleting them on the server.
 
-![Utility](./docs/images/utility-1.11.0.png)
+![Utility](./docs/images/utility-2.0.0.png)
 
 ### Console Commands
 
@@ -163,7 +163,7 @@ The following console commands with the functionality described above are also a
     
     ./craft blitz/cache/refresh-expired
 
-![Console commands](./docs/images/console-1.8.0a.png)
+![Console commands](./docs/images/console-2.0.0.png)
 
 Note that if the `@web` alias, or any other method that requires a web request, is used to determine the site URL then it cannot be included in cache warming with the console command. Using an absolute site URL is therefore recommended.
 
