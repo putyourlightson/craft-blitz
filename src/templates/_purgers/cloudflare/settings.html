@@ -12,8 +12,8 @@
 }) }}
 
 {{ forms.autosuggestField({
-    label: "API Key"|t('blitz'),
-    instructions: "The API key for your Cloudflare account."|t('blitz'),
+    label: "Global API Key"|t('blitz'),
+    instructions: "The global API key for your Cloudflare account. This can be found under “My Profile” in your Cloudflare account."|t('blitz'),
     name: 'apiKey',
     suggestions: craft.cp.getEnvSuggestions(),
     value: purger.apiKey,
@@ -23,7 +23,7 @@
 
 {{ forms.autosuggestField({
     label: "Zone ID"|t('blitz'),
-    instructions: "The zone ID of your Cloudflare account."|t('blitz'),
+    instructions: "The zone ID of your Cloudflare account. This is available on the “Overview” screen of your domain in your Cloudflare account."|t('blitz'),
     name: 'zoneId',
     suggestions: craft.cp.getEnvSuggestions(),
     value: purger.zoneId,

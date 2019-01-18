@@ -137,6 +137,9 @@ class RefreshCacheJob extends BaseJob
             Blitz::$plugin->driver->clearCachedUri($cacheRecord->siteId, $cacheRecord->uri);
         }
 
+        // Purge the cache
+        Blitz::$plugin->purger->purgeUrls($urls);
+
         // Trigger afterRefreshCache event
         Blitz::$plugin->invalidate->afterRefreshCache($this->cacheIds);
 

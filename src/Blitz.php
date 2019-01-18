@@ -6,7 +6,6 @@
 namespace putyourlightson\blitz;
 
 use Craft;
-use craft\base\ComponentInterface;
 use craft\base\Plugin;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
@@ -29,12 +28,8 @@ use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
-use putyourlightson\blitz\controllers\SettingsController;
 use putyourlightson\blitz\drivers\BaseDriver;
-use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use putyourlightson\blitz\helpers\CacheHelper;
-use putyourlightson\blitz\helpers\DriverHelper;
-use putyourlightson\blitz\helpers\PurgerHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\purgers\BasePurger;
 use putyourlightson\blitz\services\CacheService;
@@ -49,8 +44,10 @@ use yii\base\InvalidConfigException;
  * @property CacheService $cache
  * @property InvalidateService $invalidate
  * @property BaseDriver $driver
+ * @property BasePurger $purger
  * @property SettingsModel $settings
  * @property mixed $settingsResponse
+ * @property array $cpRoutes
  * @property string[] $nonCacheableElementTypes
  *
  * @method SettingsModel getSettings()
@@ -80,8 +77,9 @@ class Blitz extends Plugin
             'invalidate' => InvalidateService::class,
         ]);
 
-        // Register driver
+        // Register driver and purger
         $this->setDriver();
+        $this->setPurger();
 
         // Register CP URL rules event
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES, function(RegisterUrlRulesEvent $event) {
@@ -115,18 +113,18 @@ class Blitz extends Plugin
                 $this->_registerCacheableRequestEvents($site->id, $uri);
             }
         }
-        else if ($request->getIsCpRequest()) {
+        else {
             $this->_registerElementEvents();
 
-            $this->_registerUtilities();
-
-            if (Craft::$app->getEdition() === Craft::Pro) {
-                $this->_registerUserPermissions();
-            }
-        }
-
-        if ($request->getIsCpRequest() || $request->getIsConsoleRequest()) {
             $this->_registerClearCaches();
+
+            if ($request->getIsCpRequest()) {
+                $this->_registerUtilities();
+
+                if (Craft::$app->getEdition() === Craft::Pro) {
+                    $this->_registerUserPermissions();
+                }
+            }
         }
     }
 
@@ -143,7 +141,25 @@ class Blitz extends Plugin
         try {
             $this->set('driver', array_merge(
                 ['class' => $settings->driverType],
-                $settings->driverSettings ?? []
+                $settings->driverSettings
+            ));
+        }
+        catch (InvalidConfigException $e) {
+            Craft::error($e->getMessage(), __METHOD__);
+        }
+    }
+
+    /**
+     * Registers the purger
+     */
+    protected function setPurger()
+    {
+        $settings = $this->getSettings();
+
+        try {
+            $this->set('purger', array_merge(
+                ['class' => $settings->purgerType],
+                $settings->purgerSettings
             ));
         }
         catch (InvalidConfigException $e) {
@@ -230,41 +246,6 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers element events
-     */
-    private function _registerElementEvents()
-    {
-        // Invalidate elements
-        Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->invalidate->addElement($event->element);
-            }
-        );
-        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
-            function(MoveElementEvent $event) {
-                $this->invalidate->addElement($event->element);
-            }
-        );
-        Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
-            function(ElementEvent $event) {
-                $this->invalidate->addElement($event->element);
-            }
-        );
-        Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->invalidate->addElement($event->element);
-            }
-        );
-
-        // Invalidate cache after response is prepared
-        Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE,
-            function() {
-                $this->invalidate->refreshCache();
-            }
-        );
-    }
-
-    /**
      * Registers cacheable request events
      *
      * @param int $siteId
@@ -311,15 +292,36 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers utilities
+     * Registers element events
      */
-    private function _registerUtilities()
+    private function _registerElementEvents()
     {
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
-            function(RegisterComponentTypesEvent $event) {
-                if (Craft::$app->getUser()->checkPermission('blitz:cache-utility')) {
-                    $event->types[] = CacheUtility::class;
-                }
+        // Invalidate elements
+        Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
+            function(ElementEvent $event) {
+                $this->invalidate->addElement($event->element);
+            }
+        );
+        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
+            function(MoveElementEvent $event) {
+                $this->invalidate->addElement($event->element);
+            }
+        );
+        Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
+            function(ElementEvent $event) {
+                $this->invalidate->addElement($event->element);
+            }
+        );
+        Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
+            function(ElementEvent $event) {
+                $this->invalidate->addElement($event->element);
+            }
+        );
+
+        // Invalidate cache after response is prepared
+        Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE,
+            function() {
+                $this->invalidate->refreshCache();
             }
         );
     }
@@ -336,6 +338,20 @@ class Blitz extends Plugin
                     'label' => Craft::t('blitz', 'Blitz cache'),
                     'action' => [Blitz::$plugin->cache, 'clearCache'],
                 ];
+            }
+        );
+    }
+
+    /**
+     * Registers utilities
+     */
+    private function _registerUtilities()
+    {
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                if (Craft::$app->getUser()->checkPermission('blitz:cache-utility')) {
+                    $event->types[] = CacheUtility::class;
+                }
             }
         );
     }

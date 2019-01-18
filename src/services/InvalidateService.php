@@ -336,8 +336,11 @@ class InvalidateService extends Component
      */
     public function clearCache(bool $flush = false)
     {
-        // Clears the cache
+        // Clear the cache
         Blitz::$plugin->driver->clearCache();
+
+        // Purge all cache
+        Blitz::$plugin->purger->purgeAll();
 
         // Get all cache IDs
         $cacheIds = CacheRecord::find()

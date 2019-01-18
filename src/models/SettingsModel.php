@@ -40,9 +40,9 @@ class SettingsModel extends Model
     public $driverType = FileDriver::class;
 
     /**
-     * @var array|null
+     * @var array
      */
-    public $driverSettings;
+    public $driverSettings = [];
 
     /**
      * @var array
@@ -55,9 +55,9 @@ class SettingsModel extends Model
     public $purgerType = DummyPurger::class;
 
     /**
-     * @var array|null
+     * @var array
      */
-    public $purgerSettings;
+    public $purgerSettings = [];
 
     /**
      * @var array
