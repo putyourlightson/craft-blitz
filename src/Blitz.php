@@ -322,13 +322,6 @@ class Blitz extends Plugin
                 $this->invalidate->addElement($event->element);
             }
         );
-
-        // Invalidate cache after response is prepared
-        Craft::$app->getResponse()->on(Response::EVENT_AFTER_PREPARE,
-            function() {
-                $this->invalidate->refreshCache();
-            }
-        );
     }
 
     /**
