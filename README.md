@@ -243,7 +243,6 @@ If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Pow
 
 ## Roadmap
 
-- Add garbage collection integration with Craft 3.1.
 - Add support for Reddis.
 
 <small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>

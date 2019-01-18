@@ -5,7 +5,7 @@
 - Added welcome screen.
 - Added cache drivers.
 - Added reverse proxy purgers.
-- Added environmental settings to file driver.
+- Added environment variables to file driver.
 - Added garbage collection to element query records.
 - Added logging of file and request exceptions.
 
