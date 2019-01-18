@@ -11,7 +11,7 @@ use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\purgers\BasePurger;
 use putyourlightson\blitz\purgers\CloudfrontPurger;
-use putyourlightson\blitz\purgers\GenericPurger;
+use putyourlightson\blitz\purgers\DummyPurger;
 use putyourlightson\blitz\purgers\PurgerInterface;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
@@ -37,7 +37,7 @@ class PurgerHelper
     public static function getAllPurgerTypes(): array
     {
         $purgerTypes = [
-            GenericPurger::class,
+            DummyPurger::class,
             CloudfrontPurger::class,
         ];
 

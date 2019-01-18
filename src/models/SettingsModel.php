@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\models;
 
 use craft\base\Model;
 use putyourlightson\blitz\drivers\FileDriver;
+use putyourlightson\blitz\purgers\DummyPurger;
 
 class SettingsModel extends Model
 {
@@ -51,7 +52,7 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $purgerType = '';
+    public $purgerType = DummyPurger::class;
 
     /**
      * @var array|null

@@ -7,7 +7,7 @@ namespace putyourlightson\blitz\purgers;
 
 use Craft;
 
-class GenericPurger extends BasePurger
+class DummyPurger extends BasePurger
 {
     // Static
     // =========================================================================
@@ -26,8 +26,10 @@ class GenericPurger extends BasePurger
     /**
      * @inheritdoc
      */
-    public function purge(array $cacheIds)
-    {
+    public function purgeUrls(array $urls) { }
 
-    }
+    /**
+     * @inheritdoc
+     */
+    public function purgeAll() { }
 }

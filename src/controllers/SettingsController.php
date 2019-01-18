@@ -42,18 +42,14 @@ class SettingsController extends Controller
 
         $drivers = DriverHelper::getAllDrivers();
 
-        $purger = null;
+        /** @var BasePurger $purger */
+        $purger = PurgerHelper::createPurger(
+            $settings->purgerType,
+            $settings->purgerSettings
+        );
 
-        if ($settings->purgerType) {
-            /** @var BasePurger $purger */
-            $purger = PurgerHelper::createPurger(
-                $settings->purgerType,
-                $settings->purgerSettings
-            );
-
-            // Validate the purger so that any errors will be displayed
-            $purger->validate();
-        }
+        // Validate the purger so that any errors will be displayed
+        $purger->validate();
 
         $purgers = PurgerHelper::getAllPurgers();
 
@@ -110,12 +106,9 @@ class SettingsController extends Controller
         // Validate
         $settings->validate();
         $driver->validate();
+        $purger->validate();
 
-        if ($purger !== null) {
-            $purger->validate();
-        }
-
-        if ($settings->hasErrors() || $driver->hasErrors() || ($purger !== null && $purger->hasErrors())) {
+        if ($settings->hasErrors() || $driver->hasErrors() || $purger->hasErrors()) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
 
             // Send the settings back to the template

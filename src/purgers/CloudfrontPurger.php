@@ -6,7 +6,7 @@
 namespace putyourlightson\blitz\purgers;
 
 use Craft;
-use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * @property mixed $settingsHtml
@@ -76,7 +76,7 @@ class CloudfrontPurger extends BasePurger
      */
     public function purgeUrls(array $urls)
     {
-        $this->_purge(['files' => $urls]);
+        $this->_sendPurgeRequest(['files' => $urls]);
     }
 
     /**
@@ -84,7 +84,7 @@ class CloudfrontPurger extends BasePurger
      */
     public function purgeAll()
     {
-        $this->_purge(['purge_everything' => true]);
+        $this->_sendPurgeRequest(['purge_everything' => true]);
     }
 
     /**
@@ -101,11 +101,11 @@ class CloudfrontPurger extends BasePurger
     // =========================================================================
 
     /**
-     * Sends a DELETE request to the API.
+     * Sends a purge request to the API.
      *
      * @param array|null $options
      */
-    private function _purge(array $options = [])
+    private function _sendPurgeRequest(array $options = [])
     {
         $client = Craft::createGuzzleClient([
             'base_uri' => self::API_ENDPOINT,
@@ -123,6 +123,6 @@ class CloudfrontPurger extends BasePurger
                 $options
             );
         }
-        catch (BadResponseException $e) { }
+        catch (GuzzleException $e) { }
     }
 }
