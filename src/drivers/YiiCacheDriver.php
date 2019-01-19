@@ -30,7 +30,7 @@ class YiiCacheDriver extends BaseDriver
      */
     public function getCachedUri(int $siteId, string $uri): string
     {
-        $value = Craft::$app->getCache()->get([$siteId, $uri]);
+        $value = Craft::$app->getCache()->get(['blitz', $siteId, $uri]);
 
         if ($value === false) {
             return '';
@@ -58,7 +58,7 @@ class YiiCacheDriver extends BaseDriver
         // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
         $value = "\xEF\xBB\xBF".$value;
 
-        Craft::$app->getCache()->set([$siteId, $uri], $value);
+        Craft::$app->getCache()->set(['blitz', $siteId, $uri], $value);
     }
 
     /**
