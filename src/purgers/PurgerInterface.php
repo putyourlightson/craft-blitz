@@ -18,4 +18,11 @@ interface PurgerInterface
      * Purges the entire cache.
      */
     public function purgeAll();
+
+    /**
+     * Tests the purge settings.
+     *
+     * @return bool
+     */
+    public function test(): bool;
 }

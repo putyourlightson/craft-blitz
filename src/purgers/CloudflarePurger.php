@@ -7,6 +7,8 @@ namespace putyourlightson\blitz\purgers;
 
 use Craft;
 use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\GuzzleException;
+use Psr\Http\Message\ResponseInterface;
 
 /**
  * @property mixed $settingsHtml
@@ -76,7 +78,7 @@ class CloudflarePurger extends BasePurger
      */
     public function purgeUrls(array $urls)
     {
-        $this->_sendPurgeRequest(['files' => $urls]);
+        $this->_sendRequest('delete', 'purge_cache', ['files' => $urls]);
     }
 
     /**
@@ -84,7 +86,21 @@ class CloudflarePurger extends BasePurger
      */
     public function purgeAll()
     {
-        $this->_sendPurgeRequest(['purge_everything' => true]);
+        $this->_sendRequest('delete', 'purge_cache', ['purge_everything' => true]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function test(): bool
+    {
+        $response = $this->_sendRequest('get');
+
+        if (!$response) {
+            return false;
+        }
+
+        return $response->getStatusCode() == 200;
     }
 
     /**
@@ -101,17 +117,24 @@ class CloudflarePurger extends BasePurger
     // =========================================================================
 
     /**
-     * Sends a purge request to the API.
+     * Sends a request to the API.
      *
+     * @param string $method
+     * @param string|null $action
      * @param array|null $params
+     *
+     * @return ResponseInterface|string
      */
-    private function _sendPurgeRequest(array $params = [])
+    private function _sendRequest(string $method, string $action = '', array $params = [])
     {
+        $response = '';
+
         $client = Craft::createGuzzleClient();
 
         try {
-            $client->delete(
-                self::API_ENDPOINT.'zones/'.$this->zoneId.'/purge_cache',
+            $response = $client->request(
+                $method,
+                self::API_ENDPOINT.'zones/'.$this->zoneId.'/'.$action,
                 [
                     'headers'  => [
                         'Content-Type' => 'application/json',
@@ -123,5 +146,8 @@ class CloudflarePurger extends BasePurger
             );
         }
         catch (BadResponseException $e) { }
+        catch (GuzzleException $e) { }
+
+        return $response;
     }
 }

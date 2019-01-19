@@ -32,4 +32,12 @@ class DummyPurger extends BasePurger
      * @inheritdoc
      */
     public function purgeAll() { }
+
+    /**
+     * @inheritdoc
+     */
+    public function test(): bool
+    {
+        return true;
+    }
 }

@@ -105,6 +105,12 @@ class SettingsController extends Controller
             $settings->purgerSettings
         );
 
+        $variables = [
+            'settings' => $settings,
+            'driver' => $driver,
+            'purger' => $purger,
+        ];
+
         // Validate
         $settings->validate();
         $driver->validate();
@@ -113,12 +119,15 @@ class SettingsController extends Controller
         if ($settings->hasErrors() || $driver->hasErrors() || $purger->hasErrors()) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
 
-            // Send the settings back to the template
-            Craft::$app->getUrlManager()->setRouteParams([
-                'settings' => $settings,
-                'driver' => $driver,
-                'purger' => $purger,
-            ]);
+            Craft::$app->getUrlManager()->setRouteParams($variables);
+
+            return null;
+        }
+
+        if (!$purger->test()) {
+            Craft::$app->getSession()->setError(Craft::t('blitz', 'Purger connection failed.'));
+
+            Craft::$app->getUrlManager()->setRouteParams($variables);
 
             return null;
         }
