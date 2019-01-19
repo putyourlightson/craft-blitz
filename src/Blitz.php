@@ -87,10 +87,7 @@ class Blitz extends Plugin
         // Register variable
         $this->_registerVariable();
 
-        // Register CP URL rules event
-        $this->_registerCpUrlRules();
-
-        // Process cacheable requests
+        // Cacheable requests
         if (CacheHelper::getIsCacheableRequest()) {
             $site = Craft::$app->getSites()->getCurrentSite();
 
@@ -106,21 +103,26 @@ class Blitz extends Plugin
                 }
 
                 $this->_registerCacheableRequestEvents($site->id, $uri);
+
+                return;
             }
         }
 
-        $this->_registerElementEvents();
-        $this->_registerResaveElementEvents();
-        $this->_registerClearCaches();
-        $this->_registerGarbageCollection();
-
+        // Control panel requests
         if (Craft::$app->getRequest()->getIsCpRequest()) {
+            $this->_registerCpUrlRules();
             $this->_registerUtilities();
 
             if (Craft::$app->getEdition() === Craft::Pro) {
                 $this->_registerUserPermissions();
             }
         }
+
+        // All requests
+        $this->_registerElementEvents();
+        $this->_registerResaveElementEvents();
+        $this->_registerClearCaches();
+        $this->_registerGarbageCollection();
     }
 
     // Protected Methods
@@ -218,12 +220,16 @@ class Blitz extends Plugin
      */
     private function _output(string $value)
     {
+        // Update powered by header
         header_remove('X-Powered-By');
 
         if ($this->getSettings()->sendPoweredByHeader) {
             $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
             header('X-Powered-By: '.$header.'Blitz');
         }
+
+        // Update cache control header
+        header('Cache-Control: '.$this->getSettings()->cacheControlHeader);
 
         exit($value.'<!-- Served by Blitz -->');
     }

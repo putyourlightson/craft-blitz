@@ -25,14 +25,14 @@ class SettingsModel extends Model
     public $warmCacheAutomatically = true;
 
     /**
-     * @var int
+     * @var array
      */
-    public $queryStringCaching = 0;
+    public $includedUriPatterns = [];
 
     /**
-     * @var int
+     * @var array
      */
-    public $concurrency = 5;
+    public $excludedUriPatterns = [];
 
     /**
      * @var string
@@ -65,14 +65,14 @@ class SettingsModel extends Model
     public $purgerTypes = [];
 
     /**
-     * @var array
+     * @var int
      */
-    public $includedUriPatterns = [];
+    public $queryStringCaching = 0;
 
     /**
-     * @var array
+     * @var int
      */
-    public $excludedUriPatterns = [];
+    public $concurrency = 5;
 
     /**
      * @var bool
@@ -91,6 +91,11 @@ class SettingsModel extends Model
         'craft\elements\GlobalSet',
         'craft\elements\MatrixBlock',
     ];
+
+    /**
+     * @var string
+     */
+    public $cacheControlHeader = 'public, s-maxage=604800';
 
     /**
      * @var bool

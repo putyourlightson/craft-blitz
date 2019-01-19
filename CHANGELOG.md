@@ -2,12 +2,13 @@
 
 ## 2.0.0 - Unreleased
 ### Added
-- Added welcome screen.
-- Added Yii cache drivers.
-- Added Cloudflare reverse proxy purger.
+- Added Yii cache driver.
 - Added environment variables to file driver.
+- Added Cloudflare reverse proxy purger.
 - Added garbage collection to element query records.
+- Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
+- Added `cacheControlHeader` config setting.
 
 ### Changed
 - Minimum requirement of Craft has been changed to version 3.1.0.

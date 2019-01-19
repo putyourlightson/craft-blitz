@@ -22,7 +22,31 @@ return [
     //'cachingEnabled' => false,
 
     // Whether the cache should automatically be warmed after clearing.
-    //'warmCacheAutomatically' => 'true',
+    //'warmCacheAutomatically' => true,
+
+    // The URI patterns to include in static file caching. The second variable represents a site ID, or a blank string for all sites.
+    //'includedUriPatterns' => [['pages/.*', '1'], ['articles/.*', '2']],
+
+    // The URI patterns to exclude from static file caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
+    //'excludedUriPatterns' => [['contact', '']],
+
+    // The driver type to use.
+    //'driverType' => FileDriver::class,
+
+    // The driver settings.
+    //'driverSettings' => ['folderPath' => 'cache/blitz'],
+
+    // The driver type classes to add to the plugin’s default driver types.
+    //'driverTypes' => [],
+
+    // The purger type to use.
+    //'purgerType' => DummyPurger::class,
+
+    // The purger settings.
+    //'purgerSettings' => [],
+
+    // The purger type classes to add to the plugin’s default purger types.
+    //'purgerTypes' => [],
 
     // Whether URLs with query strings should cached and how.
     // 0: Do not cache URLs with query strings
@@ -32,15 +56,6 @@ return [
 
     // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
     //'concurrency' => 5,
-
-    // The URI patterns to include in static file caching. The second variable represents a site ID, or a blank string for all sites.
-    //'includedUriPatterns' => [["pages/.*","1"], ["articles/.*","2"]],
-
-    // The URI patterns to exclude from static file caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
-    //'excludedUriPatterns' => [["contact",""]],
-
-    // The driver type classes to add to the plugin’s default driver types
-    //'driverTypes' => [],
 
     // Whether elements should be cached in the database.
     //'cacheElements' => true,
@@ -53,6 +68,9 @@ return [
     //    'craft\elements\GlobalSet',
     //    'craft\elements\MatrixBlock',
     //],
+
+    // The value to send in the cache control header.
+    //'cacheControlHeader' => 'public, s-maxage=604800',
 
     // Whether an `X-Powered-By: Craft CMS, Blitz` header should be sent.
     //'sendPoweredByHeader' => true,
