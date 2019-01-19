@@ -25,7 +25,7 @@ class FileDriver extends BaseDriver
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'File Driver');
+        return Craft::t('blitz', 'Blitz File Driver');
     }
 
     // Properties

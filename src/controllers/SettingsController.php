@@ -76,9 +76,11 @@ class SettingsController extends Controller
     {
         $this->requirePostRequest();
 
-        $postedSettings = Craft::$app->getRequest()->getBodyParam('settings', []);
-        $driverSettings = Craft::$app->getRequest()->getBodyParam('driverSettings', []);
-        $purgerSettings = Craft::$app->getRequest()->getBodyParam('purgerSettings', []);
+        $request = Craft::$app->getRequest();
+
+        $postedSettings = $request->getBodyParam('settings', []);
+        $driverSettings = $request->getBodyParam('driverSettings', []);
+        $purgerSettings = $request->getBodyParam('purgerSettings', []);
 
         $settings = Blitz::$plugin->getSettings();
         $settings->setAttributes($postedSettings, false);

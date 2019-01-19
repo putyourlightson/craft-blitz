@@ -17,7 +17,6 @@ Although the performance gains depend on the individual site and server setup, t
 - [Usage](#usage)
 - [Settings](#settings)
 - [How It Works](#how-it-works)
-- [Roadmap](#roadmap)
 
 ## License
 
@@ -56,7 +55,7 @@ Craft’s template caching `{% cache %}` tag doesn’t play well with the cache 
 
 ### Query String Caching
 
-URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
+URLs with query strings will be cached according to the selected option in the “Query String Caching” setting  as follows:
 
 - `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
 - `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
@@ -74,10 +73,10 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `\d{4}` matches any four digits.
 - `\w` matches any word character.
 - `\w+` matches any word character 1 or more times.
-- `entries` matches anything containing "entries".
-- `^entries` matches anything beginning with "entries".
+- `entries` matches anything containing “entries”.
+- `^entries` matches anything beginning with “entries”.
 - `^entries/entry$` matches an exact URI.
-- `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character.
+- `^entries/\w+$` matches anything beginning with “entries/” followed by at least 1 word character.
 
 ### Config Settings
 
@@ -91,7 +90,7 @@ When a URL on the site is visited that matches an included URI pattern, Blitz wi
 
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
 
-If a global is saved then Blitz will clear and warm the entire cache if the "Warm Cache Automatically" setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
+If a global is saved then Blitz will clear and warm the entire cache if the “Warm Cache Automatically” setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 
 ### Dynamic Content
 
@@ -173,9 +172,9 @@ For improved performance, adding a server rewrite will avoid the request from ev
 
 #### Apache
 
-In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the root .htaccess file, just before the rewrites provided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the virtual host `.conf` file (this [article](https://nystudio107.com/blog/stop-using-htaccess-files-no-really) explains how), or the root `.htaccess` file if you must, just before the rewrites provided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
-If the "Query String Caching" setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
+If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
 ```
 # Blitz cache rewrite 
@@ -186,7 +185,7 @@ RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.ht
 # Send would-be 404 requests to Craft
 ```
 
-If the "Query String Caching" setting is set to `Cache URLs with query strings as the same page` then use the following code.
+If the “Query String Caching” setting is set to `Cache URLs with query strings as the same page` then use the following code.
 
 ```
 # Blitz cache rewrite 
@@ -201,7 +200,7 @@ RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
 
 In Nginx this is achieved by adding a location handler to the configuration file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
-If the "Query String Caching" setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
+If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
 ```
 # Blitz cache rewrite
@@ -212,7 +211,7 @@ location / {
 # Send would-be 404 requests to Craft
 ```
 
-If the "Query String Caching" setting is set to `Cache URLs with query strings as the same page` then use the following code.
+If the “Query String Caching” setting is set to `Cache URLs with query strings as the same page` then use the following code.
 
 ```
 # Blitz cache rewrite
@@ -240,9 +239,5 @@ If the HTML file was served by the plugin rather than with a server rewrite then
 Note that if your HTML is minified then all comments will be removed from the markup, including the comments above.
 
 If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Powered-By: Blitz` header will be sent.
-
-## Roadmap
-
-- Add support for Reddis.
 
 <small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>

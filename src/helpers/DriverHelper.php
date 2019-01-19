@@ -12,6 +12,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\BaseDriver;
 use putyourlightson\blitz\drivers\DriverInterface;
 use putyourlightson\blitz\drivers\FileDriver;
+use putyourlightson\blitz\drivers\YiiCacheDriver;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
@@ -37,6 +38,7 @@ class DriverHelper
     {
         $driverTypes = [
             FileDriver::class,
+            YiiCacheDriver::class,
         ];
 
         $driverTypes = array_unique(array_merge(
