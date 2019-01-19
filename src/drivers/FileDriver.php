@@ -93,7 +93,7 @@ class FileDriver extends BaseDriver
         $filePath = $this->getFilePath($siteId, $uri);
 
         if (is_file($filePath)) {
-            $value = file_get_contents($filePath).'<!-- Served by Blitz -->';
+            $value = file_get_contents($filePath);
         }
 
         return $value;
