@@ -57,6 +57,9 @@ return [
     // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
     //'concurrency' => 5,
 
+    // An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
+    //'apiKey' => '',
+
     // Whether elements should be cached in the database.
     //'cacheElements' => true,
 

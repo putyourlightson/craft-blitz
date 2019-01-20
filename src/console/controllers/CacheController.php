@@ -84,12 +84,6 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        if (empty(Blitz::$plugin->driver->getSettings())) {
-            $this->stderr(Craft::t('blitz', 'Blitz cache folder path is not set.').PHP_EOL, Console::FG_RED);
-
-            return ExitCode::OK;
-        }
-
         // Get warm cache URLS
         $urls = Blitz::$plugin->invalidate->getAllCachedUrls();
 

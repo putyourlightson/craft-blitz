@@ -4,7 +4,7 @@
 
 > This is the Blitz v2 branch which is currently in public beta. For the stable version, use the v1 branch.
 
-The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
+The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
 It can highly improve a site’s performance by reducing the time to first byte (TTFB). This reduces the load time of the site as well as the load on the server. Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
 
@@ -47,7 +47,7 @@ Using a [server rewrite](#server-rewrite) will avoid unnecessary PHP processing 
 
 Creating a cron job to [refresh expired cache](#refresh-expired-blitz-cache) (see below) will ensure that URIs that contain elements that have expired since they were cached are automatically refreshed when necessary.
 
-Craft’s template caching `{% cache %}` tag doesn’t play well with the cache breaking feature in Blitz. Template caching also becomes redundant with static file caching, so it is best to either remove all template caching from URLs that Blitz will cache or to simply disable template caching completely in the `config/general.php` file:
+Craft’s template caching `{% cache %}` tag doesn’t play well with the cache invalidation feature in Blitz. Template caching also becomes redundant with pull page caching, so it is best to either remove all template caching from URLs that Blitz will cache or to simply disable template caching completely in the `config/general.php` file:
 
 ```
 'enableTemplateCaching' => false,
@@ -88,15 +88,17 @@ Blitz comes with a config file for a multi-environment way to set the plugin set
 
 ## How It Works
 
-When a URL on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
+When a URL on the site is visited that matches an included URI pattern, Blitz will serve a cached version of the page if it exists, otherwise it will display and cache the template output. Excluded URI patterns will override any matching included URI patterns. 
 
-Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
+When an element is created, updated or deleted, any cached URLs that used that element are deleted. If the “Warm Cache Automatically” setting is enabled the a job is queued to warm the cleared cache.
+
+Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached content (provided the server rewrite, if used, checks for GET requests only).
 
 If a global is saved then Blitz will clear and warm the entire cache if the “Warm Cache Automatically” setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 
 ### Dynamic Content
 
-When a URL is cached, the static cached file will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+When a URL is cached, a cached version of the page will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
 
 Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
 
@@ -122,20 +124,18 @@ Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
 
 In the case above it would make sense to add `ajax/.*` as an excluded URI pattern in the plugin settings.
 
-### Cache Invalidation
-
-When an element is created, updated or deleted, any cached template files that used that element are deleted. If the “Warm Cache Automatically” setting is enabled the a job is  queued to warm the cleared cache files.
+### Cache Utility
 
 The Blitz utility at “Utilities → Blitz Cache” displays the number of cached URIs for each site. It also provides the following functionality:
 
 #### Clear Blitz Cache
-Clearing the cache will delete all cached files.
+Clearing the cache will delete all cached pages.
 
 #### Flush Blitz Cache
 Flushing the cache will clear the cache and remove all records from the database.
 
 #### Warm Blitz Cache
-Warming the cache will flush the cache and add a job to the queue to recache all of the files.
+Warming the cache will flush the cache and add a job to the queue to recache all of the pages.
 
 #### Refresh Expired Blitz Cache
 Refreshing the expired cache will refresh all cached URIs that contain elements that have expired since they were cached, specifically entries with future post and expiry dates.
@@ -146,11 +146,11 @@ Create a cron job with the following console command to refresh expired cache on
 5 * * * * /usr/bin/php /path/to/craft blitz/cache/refresh-expired
 ```
 
-#### Manually Clearing Cached Files
-
-Cached files and folders can be cleared manually by simply deleting them on the server.
-
 ![Utility](./docs/images/utility-2.0.0.png)
+
+### Clearing Cache with a URL
+
+If an API key is set in “Settings → Advanced” then  it is possible to clear, flush, warm, or refresh expired cache through a URL. The available URLs are displayed under the API key field after the setting has been saved. 
 
 ### Console Commands
 
@@ -226,13 +226,13 @@ location / {
 
 ### Debugging
 
-Cached HTML files are timestamped with a comment at the end of the file. 
+Cached HTML pages are timestamped with a comment at the end of the page. 
 
 ```
 <!-- Cached by Blitz on 2018-06-27T10:05:00+02:00 -->
 ```
 
-If the HTML file was served by the plugin rather than with a server rewrite then an additional comment is added.
+If the HTML was served by the plugin rather than with a server rewrite then an additional comment is added.
 
 ```
 <!-- Served by Blitz -->

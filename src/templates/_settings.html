@@ -203,6 +203,46 @@
             errors: settings.getErrors('concurrency'),
             required: true,
         }) }}
+
+        {{ forms.autosuggestField({
+            label: "API Key"|t('blitz'),
+            instructions: "An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters)."|t('blitz'),
+            name: 'settings[apiKey]',
+            suggestions: craft.cp.getEnvSuggestions(),
+            value: settings.apiKey,
+            errors: settings.getErrors('apiKey'),
+        }) }}
+
+        {% if settings.apiKey and not settings.getErrors('apiKey') %}
+            <table class="shadow-box editable">
+                <tbody>
+                    <tr>
+                        <th class="thin">{{ 'Clear Cache' }}</th>
+                        <td class="textual code">
+                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: settings.apiKey }) }}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="thin">{{ 'Flush Cache' }}</th>
+                        <td class="textual code">
+                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: settings.apiKey }) }}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="thin">{{ 'Warm Cache' }}</th>
+                        <td class="textual code">
+                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: settings.apiKey }) }}</textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th class="thin">{{ 'Refresh Expired Cache' }}</th>
+                        <td class="textual code">
+                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: settings.apiKey }) }}</textarea>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        {% endif %}
     </div>
 
 {% endblock %}

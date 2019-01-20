@@ -44,6 +44,7 @@
     <br/>
     <form class="utility" method="post" accept-charset="UTF-8">
         <input type="hidden" name="action" value="blitz/cache/{{ utility.action }}">
+        <input type="hidden" name="utility" value="1">
         {{ redirectInput('utilities/blitz-cache') }}
         {{ csrfInput() }}
         <p class="light">{{ utility.instructions|t('blitz') }}</p>

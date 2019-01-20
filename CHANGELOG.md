@@ -9,6 +9,7 @@
 - Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
 - Added `cacheControlHeader` config setting.
+- Added an API key that can be used to clear, flush, warm, or refresh expired cache through a URL.
 
 ### Changed
 - Minimum requirement of Craft has been changed to version 3.1.0.

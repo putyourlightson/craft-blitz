@@ -5,7 +5,9 @@
 
 namespace putyourlightson\blitz\models;
 
+use Craft;
 use craft\base\Model;
+use craft\behaviors\EnvAttributeParserBehavior;
 use putyourlightson\blitz\drivers\FileDriver;
 use putyourlightson\blitz\purgers\DummyPurger;
 
@@ -75,6 +77,11 @@ class SettingsModel extends Model
     public $concurrency = 5;
 
     /**
+     * @var string
+     */
+    public $apiKey = '';
+
+    /**
      * @var bool
      */
     public $cacheElements = true;
@@ -111,7 +118,20 @@ class SettingsModel extends Model
     // =========================================================================
 
     /**
-     * @return array
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'parser' => [
+                'class' => EnvAttributeParserBehavior::class,
+                'attributes' => ['apiKey'],
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
      */
     public function rules(): array
     {
@@ -119,7 +139,20 @@ class SettingsModel extends Model
             [['queryStringCaching', 'concurrency', 'driverType'], 'required'],
             [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
             [['concurrency'], 'integer', 'min' => 1],
+            [['apiKey'], 'string', 'length' => [16]],
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels(): array
+    {
+        $labels = parent::attributeLabels();
+
+        // Set the field labels
+        $labels['apiKey'] = Craft::t('blitz', 'API Key');
+
+        return $labels;
+    }
 }
