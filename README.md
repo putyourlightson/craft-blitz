@@ -1,3 +1,5 @@
+> This is the Blitz v2 branch which is currently in public beta. For the stable version, use the v1 branch.
+
 <p align="center"><img height="180" src="./src/icon.svg"></p>
 
 # Blitz Plugin for Craft CMS 3
