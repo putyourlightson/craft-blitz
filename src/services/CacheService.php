@@ -12,7 +12,6 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
-use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;

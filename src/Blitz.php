@@ -18,7 +18,6 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
-use craft\models\Site;
 use craft\queue\jobs\ResaveElements;
 use craft\queue\Queue;
 use craft\services\Elements;
@@ -31,11 +30,11 @@ use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\drivers\BaseDriver;
-use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\purgers\BasePurger;
 use putyourlightson\blitz\services\CacheService;
 use putyourlightson\blitz\services\InvalidateService;
+use putyourlightson\blitz\services\RequestService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
@@ -46,6 +45,7 @@ use yii\queue\ExecEvent;
  *
  * @property CacheService $cache
  * @property InvalidateService $invalidate
+ * @property RequestService $request
  * @property BaseDriver $driver
  * @property BasePurger $purger
  * @property mixed $settingsResponse
@@ -85,6 +85,7 @@ class Blitz extends Plugin
         $this->setComponents([
             'cache' => CacheService::class,
             'invalidate' => InvalidateService::class,
+            'request' => RequestService::class,
         ]);
 
         // Register driver and purger
@@ -94,19 +95,17 @@ class Blitz extends Plugin
         // Register variable
         $this->_registerVariable();
 
-        // Cacheable requests
-        if (CacheHelper::getIsCacheableRequest()) {
+        // Process cacheable requests
+        if ($this->request->getIsCacheableRequest()) {
             $site = Craft::$app->getSites()->getCurrentSite();
+            $uri = $this->request->getCurrentUri();
 
-            // Get URI from absolute URL
-            $uri = $this->_getUri($site, Craft::$app->getRequest()->getAbsoluteUrl());
-
-            if (CacheHelper::getIsCacheableUri($site->id, $uri)) {
-                // If cached value exists then output it (assuming this has not already been done server-side)
+            if ($this->request->getIsCacheableUri($site->id, $uri)) {
                 $value = $this->driver->getCachedUri($site->id, $uri);
 
+                // If cached value exists then output it (assuming this has not already been done server-side)
                 if ($value) {
-                    $this->_output($value);
+                    $this->request->output($value);
                 }
 
                 $this->_registerCacheableRequestEvents($site->id, $uri);
@@ -189,54 +188,6 @@ class Blitz extends Plugin
 
     // Private Methods
     // =========================================================================
-
-    /**
-     * Gets the URI
-     *
-     * @param Site $site
-     * @param string $uri
-     *
-     * @return string
-     */
-    private function _getUri(Site $site, string $uri): string
-    {
-        // Remove the query string if unique query strings should be cached as the same page
-        if (self::$settings->queryStringCaching == 2) {
-            $uri = preg_replace('/\?.*/', '', $uri);
-        }
-
-        // Remove site base URL
-        $baseUrl = trim(Craft::getAlias($site->baseUrl), '/');
-        $uri = str_replace($baseUrl, '', $uri);
-
-        // Trim slashes from the beginning and end of the URI
-        $uri = trim($uri, '/');
-
-        return $uri;
-    }
-
-    /**
-     * Outputs a given value
-     *
-     * @param string $value
-     *
-     * @return string
-     */
-    private function _output(string $value)
-    {
-        // Update powered by header
-        header_remove('X-Powered-By');
-
-        if (self::$settings->sendPoweredByHeader) {
-            $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
-            header('X-Powered-By: '.$header.'Blitz');
-        }
-
-        // Update cache control header
-        header('Cache-Control: '.self::$settings->cacheControlHeader);
-
-        exit($value.'<!-- Served by Blitz -->');
-    }
 
     /**
      * Registers variable

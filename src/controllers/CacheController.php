@@ -6,13 +6,11 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
-use craft\errors\MissingComponentException;
 use craft\web\Controller;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\WarmCacheJob;
 use yii\base\Exception;
-use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
@@ -28,6 +26,31 @@ class CacheController extends Controller
 
     // Public Methods
     // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeAction($action)
+    {
+        parent::beforeAction($action);
+
+        $request = Craft::$app->getRequest();
+
+        // Require permission if posted from utility
+        if ($request->getIsPost() && $request->getParam('utility')) {
+            $this->requirePermission('blitz:cache-utility');
+        }
+        else {
+            // Verify API key
+            $apiKey = $request->getParam('key');
+
+            if (empty($apiKey) || empty(Blitz::$settings->apiKey) || $apiKey != Craft::parseEnv(Blitz::$settings->apiKey)) {
+                throw new ForbiddenHttpException('Unauthorised access.');
+            }
+        }
+
+        return true;
+    }
 
     /**
      * Clears the cache.
@@ -73,9 +96,7 @@ class CacheController extends Controller
      */
     public function actionWarm(): Response
     {
-        $settings = Blitz::$plugin->getSettings();
-
-        if (!$settings->cachingEnabled) {
+        if (!Blitz::$settings->cachingEnabled) {
             return $this->_getResponse('Blitz caching is disabled.');
         }
 
@@ -87,33 +108,6 @@ class CacheController extends Controller
         Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
 
         return $this->_getResponse('Blitz cache successfully queued for warming.');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function beforeAction($action)
-    {
-        parent::beforeAction($action);
-
-        $request = Craft::$app->getRequest();
-
-        // Require permission if posted from utility
-        if ($request->getIsPost() && $request->getParam('utility')) {
-            $this->requirePermission('blitz:cache-utility');
-        }
-        else {
-            // Verify API key
-            $apiKey = $request->getParam('key');
-
-            $settings = Blitz::$plugin->getSettings();
-
-            if (empty($apiKey) || empty($settings->apiKey) || $apiKey != Craft::parseEnv($settings->apiKey)) {
-                throw new ForbiddenHttpException('Unauthorised access.');
-            }
-        }
-
-        return true;
     }
 
     // Private Methods

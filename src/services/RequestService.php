@@ -3,16 +3,16 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\helpers;
+namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use yii\base\Exception;
 
-class CacheHelper
+class RequestService
 {
-    // Static
+    // Public Methods
     // =========================================================================
 
     /**
@@ -20,10 +20,8 @@ class CacheHelper
      *
      * @return bool
      */
-    public static function getIsCacheableRequest(): bool
+    public function getIsCacheableRequest(): bool
     {
-        Blitz::$settings = Blitz::$plugin->getSettings();
-
         $request = Craft::$app->getRequest();
         $response = Craft::$app->getResponse();
 
@@ -58,7 +56,7 @@ class CacheHelper
      *
      * @return bool
      */
-    public static function getIsCacheableUri(int $siteId, string $uri): bool
+    public function getIsCacheableUri(int $siteId, string $uri): bool
     {
         // Ignore URIs that contain index.php
         if (strpos($uri, 'index.php') !== false) {
@@ -90,7 +88,7 @@ class CacheHelper
      * @return string
      * @throws Exception
      */
-    public static function getSiteUrl(int $siteId, string $uri): string
+    public function getSiteUrl(int $siteId, string $uri): string
     {
         return UrlHelper::siteUrl($uri, null, null, $siteId);
     }
@@ -104,7 +102,7 @@ class CacheHelper
      *
      * @return bool
      */
-    public static function matchesUriPattern(array $patterns, int $siteId, string $uri): bool
+    public function matchesUriPattern(array $patterns, int $siteId, string $uri): bool
     {
         foreach ($patterns as $pattern) {
             // Don't proceed if site is not empty and does not match the provided site ID
@@ -136,5 +134,53 @@ class CacheHelper
         }
 
         return false;
+    }
+
+    /**
+     * Gets the requested URI.
+     *
+     * @return string
+     */
+    public function getCurrentUri(): string
+    {
+        $site = Craft::$app->getSites()->getCurrentSite();
+        $uri = Craft::$app->getRequest()->getAbsoluteUrl();
+
+        // Remove the query string if unique query strings should be cached as the same page
+        if (Blitz::$settings->queryStringCaching == 2) {
+            $uri = preg_replace('/\?.*/', '', $uri);
+        }
+
+        // Remove site base URL
+        $baseUrl = trim(Craft::getAlias($site->baseUrl), '/');
+        $uri = str_replace($baseUrl, '', $uri);
+
+        // Trim slashes from the beginning and end of the URI
+        $uri = trim($uri, '/');
+
+        return $uri;
+    }
+
+    /**
+     * Outputs a given value.
+     *
+     * @param string $value
+     *
+     * @return string
+     */
+    public function output(string $value)
+    {
+        // Update powered by header
+        header_remove('X-Powered-By');
+
+        if (Blitz::$settings->sendPoweredByHeader) {
+            $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
+            header('X-Powered-By: '.$header.'Blitz');
+        }
+
+        // Update cache control header
+        header('Cache-Control: '.Blitz::$settings->cacheControlHeader);
+
+        exit($value.'<!-- Served by Blitz -->');
     }
 }

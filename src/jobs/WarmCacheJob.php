@@ -34,9 +34,7 @@ class WarmCacheJob extends BaseJob
      */
     public function execute($queue)
     {
-        $settings = Blitz::$plugin->getSettings();
-
-        if (!$settings->cachingEnabled) {
+        if (!Blitz::$settings->cachingEnabled) {
             return;
         }
 
@@ -53,7 +51,7 @@ class WarmCacheJob extends BaseJob
 
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $requests, [
-            'concurrency' => $settings->concurrency,
+            'concurrency' => Blitz::$settings->concurrency,
             'fulfilled' => function () use (&$queue, &$count, $total) {
                 $count++;
                 $this->setProgress($queue, $count / $total);

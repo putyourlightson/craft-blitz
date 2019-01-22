@@ -29,12 +29,10 @@ class SettingsController extends Controller
      */
     public function actionEdit()
     {
-        $settings = Blitz::$plugin->getSettings();
-
         /** @var BaseDriver $driver */
         $driver = DriverHelper::createDriver(
-            $settings->driverType,
-            $settings->driverSettings
+            Blitz::$settings->driverType,
+            Blitz::$settings->driverSettings
         );
 
         // Validate the driver so that any errors will be displayed
@@ -44,8 +42,8 @@ class SettingsController extends Controller
 
         /** @var BasePurger $purger */
         $purger = PurgerHelper::createPurger(
-            $settings->purgerType,
-            $settings->purgerSettings
+            Blitz::$settings->purgerType,
+            Blitz::$settings->purgerSettings
         );
 
         // Validate the purger so that any errors will be displayed
@@ -54,7 +52,7 @@ class SettingsController extends Controller
         $purgers = PurgerHelper::getAllPurgers();
 
         return $this->renderTemplate('blitz/_settings', [
-            'settings' => $settings,
+            'settings' => Blitz::$settings,
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
             'driver' => $driver,
             'drivers' => $drivers,
@@ -82,41 +80,40 @@ class SettingsController extends Controller
         $driverSettings = $request->getBodyParam('driverSettings', []);
         $purgerSettings = $request->getBodyParam('purgerSettings', []);
 
-        $settings = Blitz::$plugin->getSettings();
-        $settings->setAttributes($postedSettings, false);
+        Blitz::$settings->setAttributes($postedSettings, false);
 
         // Remove driver type from settings
-        $settings->driverSettings = $driverSettings[$settings->driverType] ?? [];
+        Blitz::$settings->driverSettings = $driverSettings[Blitz::$settings->driverType] ?? [];
 
         // Create the driver so that we can validate it
         /* @var BaseDriver $driver */
         $driver = DriverHelper::createDriver(
-            $settings->driverType,
-            $settings->driverSettings
+            Blitz::$settings->driverType,
+            Blitz::$settings->driverSettings
         );
 
         // Remove purger type from settings
-        $settings->purgerSettings = $purgerSettings[$settings->purgerType] ?? [];
+        Blitz::$settings->purgerSettings = $purgerSettings[Blitz::$settings->purgerType] ?? [];
 
         // Create the purger so that we can validate it
         /* @var BasePurger $purger */
         $purger = PurgerHelper::createPurger(
-            $settings->purgerType,
-            $settings->purgerSettings
+            Blitz::$settings->purgerType,
+            Blitz::$settings->purgerSettings
         );
 
         $variables = [
-            'settings' => $settings,
+            'settings' => Blitz::$settings,
             'driver' => $driver,
             'purger' => $purger,
         ];
 
         // Validate
-        $settings->validate();
+        Blitz::$settings->validate();
         $driver->validate();
         $purger->validate();
 
-        if ($settings->hasErrors() || $driver->hasErrors() || $purger->hasErrors()) {
+        if (Blitz::$settings->hasErrors() || $driver->hasErrors() || $purger->hasErrors()) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
 
             Craft::$app->getUrlManager()->setRouteParams($variables);
@@ -133,7 +130,7 @@ class SettingsController extends Controller
         }
 
         // Save it
-        Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
+        Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, Blitz::$settings->getAttributes());
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Plugin settings saved.'));
 

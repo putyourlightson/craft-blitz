@@ -7,6 +7,10 @@ namespace putyourlightson\blitz\drivers;
 
 use Craft;
 
+/**
+ *
+ * @property mixed $settingsHtml
+ */
 class YiiCacheDriver extends BaseDriver
 {
     // Static

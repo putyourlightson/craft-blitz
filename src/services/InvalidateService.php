@@ -13,7 +13,6 @@ use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
-use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\jobs\WarmCacheJob;
 use putyourlightson\blitz\records\CacheRecord;
@@ -82,7 +81,7 @@ class InvalidateService extends Component
             ->all();
 
         foreach ($cacheRecords as $cacheRecord) {
-            $urls[] = CacheHelper::getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
+            $urls[] = Blitz::$plugin->request->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
         }
 
         return $urls;
@@ -105,8 +104,8 @@ class InvalidateService extends Component
 
         /** @var CacheRecord $cacheRecord */
         foreach ($cacheRecords as $cacheRecord) {
-            if (CacheHelper::getIsCacheableUri($cacheRecord->siteId, $cacheRecord->uri)) {
-                $urls[] = CacheHelper::getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
+            if (Blitz::$plugin->request->getIsCacheableUri($cacheRecord->siteId, $cacheRecord->uri)) {
+                $urls[] = Blitz::$plugin->request->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
             }
         }
 
@@ -127,7 +126,7 @@ class InvalidateService extends Component
                         $uri = trim($element->uri, '/');
                         $uri = ($uri == '__home__' ? '' : $uri);
 
-                        if ($uri !== null && CacheHelper::getIsCacheableUri($site->id, $uri)) {
+                        if ($uri !== null && Blitz::$plugin->request->getIsCacheableUri($site->id, $uri)) {
                             $url = $element->getUrl();
 
                             if ($url !== null && !in_array($url, $urls, true)) {
