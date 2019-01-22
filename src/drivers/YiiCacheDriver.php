@@ -44,6 +44,7 @@ class YiiCacheDriver extends BaseDriver
      */
     public function getCacheCount(int $siteId): int
     {
+        // TODO: investigate if this is possible
         return 0;
     }
 

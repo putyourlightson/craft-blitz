@@ -25,7 +25,7 @@ class CacheController extends Controller
     // =========================================================================
 
     /**
-     * Clears the cache (files only).
+     * Clears the cache (pages only).
      *
      * @return int
      */
@@ -39,7 +39,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Flushes the cache (files and database records).
+     * Flushes the cache (pages and database records).
      *
      * @return int
      */

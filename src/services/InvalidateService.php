@@ -16,7 +16,6 @@ use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\jobs\WarmCacheJob;
-use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
@@ -47,11 +46,6 @@ class InvalidateService extends Component
     private $_batchMode = false;
 
     /**
-     * @var SettingsModel
-     */
-    private $_settings;
-
-    /**
      * @var int[]
      */
     private $_cacheIds = [];
@@ -68,13 +62,6 @@ class InvalidateService extends Component
 
     // Public Methods
     // =========================================================================
-
-    public function init()
-    {
-        parent::init();
-
-        $this->_settings = Blitz::$plugin->getSettings();
-    }
 
     /**
      * Returns cached URLs given an array of cache IDs.
@@ -186,7 +173,7 @@ class InvalidateService extends Component
         if ($element instanceof GlobalSet) {
             $this->clearCache();
 
-            if ($this->_settings->cachingEnabled && $this->_settings->warmCacheAutomatically && $this->_settings->warmCacheAutomaticallyForGlobals) {
+            if (Blitz::$settings->cachingEnabled && Blitz::$settings->warmCacheAutomatically && Blitz::$settings->warmCacheAutomaticallyForGlobals) {
                 Craft::$app->getQueue()->push(new WarmCacheJob([
                     'urls' => $this->getAllCachedUrls()
                 ]));

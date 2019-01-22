@@ -48,12 +48,9 @@ use yii\queue\ExecEvent;
  * @property InvalidateService $invalidate
  * @property BaseDriver $driver
  * @property BasePurger $purger
- * @property SettingsModel $settings
  * @property mixed $settingsResponse
  * @property array $cpRoutes
  * @property string[] $nonCacheableElementTypes
- *
- * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
 {
@@ -65,14 +62,24 @@ class Blitz extends Plugin
      */
     public static $plugin;
 
+    /**
+     * @var SettingsModel
+     */
+    public static $settings;
+
     // Public Methods
     // =========================================================================
 
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         parent::init();
 
         self::$plugin = $this;
+
+        self::$settings = $this->getSettings();
 
         // Register services
         $this->setComponents([
@@ -104,6 +111,7 @@ class Blitz extends Plugin
 
                 $this->_registerCacheableRequestEvents($site->id, $uri);
 
+                // Stop execution
                 return;
             }
         }
@@ -133,12 +141,10 @@ class Blitz extends Plugin
      */
     protected function setDriver()
     {
-        $settings = $this->getSettings();
-
         try {
             $this->set('driver', array_merge(
-                ['class' => $settings->driverType],
-                $settings->driverSettings
+                ['class' => self::$settings->driverType],
+                self::$settings->driverSettings
             ));
         }
         catch (InvalidConfigException $e) {
@@ -151,12 +157,10 @@ class Blitz extends Plugin
      */
     protected function setPurger()
     {
-        $settings = $this->getSettings();
-
         try {
             $this->set('purger', array_merge(
-                ['class' => $settings->purgerType],
-                $settings->purgerSettings
+                ['class' => self::$settings->purgerType],
+                self::$settings->purgerSettings
             ));
         }
         catch (InvalidConfigException $e) {
@@ -197,7 +201,7 @@ class Blitz extends Plugin
     private function _getUri(Site $site, string $uri): string
     {
         // Remove the query string if unique query strings should be cached as the same page
-        if ($this->getSettings()->queryStringCaching == 2) {
+        if (self::$settings->queryStringCaching == 2) {
             $uri = preg_replace('/\?.*/', '', $uri);
         }
 
@@ -223,13 +227,13 @@ class Blitz extends Plugin
         // Update powered by header
         header_remove('X-Powered-By');
 
-        if ($this->getSettings()->sendPoweredByHeader) {
+        if (self::$settings->sendPoweredByHeader) {
             $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
             header('X-Powered-By: '.$header.'Blitz');
         }
 
         // Update cache control header
-        header('Cache-Control: '.$this->getSettings()->cacheControlHeader);
+        header('Cache-Control: '.self::$settings->cacheControlHeader);
 
         exit($value.'<!-- Served by Blitz -->');
     }

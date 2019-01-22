@@ -22,7 +22,7 @@ class CacheHelper
      */
     public static function getIsCacheableRequest(): bool
     {
-        $settings = Blitz::$plugin->getSettings();
+        Blitz::$settings = Blitz::$plugin->getSettings();
 
         $request = Craft::$app->getRequest();
         $response = Craft::$app->getResponse();
@@ -39,11 +39,11 @@ class CacheHelper
             return false;
         }
 
-        if (!$settings->cachingEnabled) {
+        if (!Blitz::$settings->cachingEnabled) {
             return false;
         }
 
-        if ($settings->queryStringCaching == 0 && $request->getQueryStringWithoutPath() !== '') {
+        if (Blitz::$settings->queryStringCaching == 0 && $request->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
@@ -60,22 +60,20 @@ class CacheHelper
      */
     public static function getIsCacheableUri(int $siteId, string $uri): bool
     {
-        $settings = Blitz::$plugin->getSettings();
-
         // Ignore URIs that contain index.php
         if (strpos($uri, 'index.php') !== false) {
             return false;
         }
 
         // Excluded URI patterns take priority
-        if (is_array($settings->excludedUriPatterns)) {
-            if (self::matchesUriPattern($settings->excludedUriPatterns, $siteId, $uri)) {
+        if (is_array(Blitz::$settings->excludedUriPatterns)) {
+            if (self::matchesUriPattern(Blitz::$settings->excludedUriPatterns, $siteId, $uri)) {
                 return false;
             }
         }
 
-        if (is_array($settings->includedUriPatterns)) {
-            if (self::matchesUriPattern($settings->includedUriPatterns, $siteId, $uri)) {
+        if (is_array(Blitz::$settings->includedUriPatterns)) {
+            if (self::matchesUriPattern(Blitz::$settings->includedUriPatterns, $siteId, $uri)) {
                 return true;
             }
         }
