@@ -1,15 +1,10 @@
 .welcome {
-    display: flex;
-    margin: 20px 0 40px 0;
+    text-align: center;
+    margin-bottom: 30px;
 }
 
 .welcome .icon {
-    flex-direction: row;
-    height: 210px;
-}
-
-.welcome .readable {
-    flex-direction: row;
+    height: 180px;
 }
 
 .info-hud {

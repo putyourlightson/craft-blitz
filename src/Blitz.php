@@ -386,18 +386,6 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers garbage collection
-     */
-    private function _registerGarbageCollection()
-    {
-        Event::on(Gc::class, Gc::EVENT_RUN,
-            function() {
-                $this->invalidate->runGarbageCollection();
-            }
-        );
-    }
-
-    /**
      * Registers utilities
      */
     private function _registerUtilities()
@@ -421,6 +409,18 @@ class Blitz extends Plugin
                 $event->permissions['Blitz'] = [
                     'blitz:cache-utility' => ['label' => Craft::t('blitz', 'Access cache utility')],
                 ];
+            }
+        );
+    }
+
+    /**
+     * Registers garbage collection
+     */
+    private function _registerGarbageCollection()
+    {
+        Event::on(Gc::class, Gc::EVENT_RUN,
+            function() {
+                $this->invalidate->runGarbageCollection();
             }
         );
     }

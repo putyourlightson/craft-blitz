@@ -19,7 +19,7 @@ class YiiCacheDriver extends BaseDriver
     {
         $name = get_class(Craft::$app->getCache());
 
-        return Craft::t('blitz', 'Yii Cache Driver ({name})', ['name' => $name]);
+        return Craft::t('blitz', 'Yii Cache Driver [{name}]', ['name' => $name]);
     }
 
     // Public Methods
