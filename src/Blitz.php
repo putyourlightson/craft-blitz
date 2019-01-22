@@ -379,7 +379,7 @@ class Blitz extends Plugin
                 $event->options[] = [
                     'key' => 'blitz',
                     'label' => Craft::t('blitz', 'Blitz cache'),
-                    'action' => [Blitz::$plugin->cache, 'clearCache'],
+                    'action' => [Blitz::$plugin->invalidate, 'clearCache'],
                 ];
             }
         );
