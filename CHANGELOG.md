@@ -16,6 +16,10 @@
 - Cache is invalidated when elements are updated through non control panel requests.
 - Neo blocks are now considered non cacheable element types.
 
+## 1.11.4 - 2019-01-23
+### Fixed
+- Fixed error which could appear when query params were longer than the available column size. 
+
 ## 1.11.3 - 2019-01-09
 ### Added
 - Added clear cache options in control panel and console commands (requires Craft 3.0.37 or above).
