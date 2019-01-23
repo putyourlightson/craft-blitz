@@ -22,6 +22,16 @@ class CacheController extends Controller
     /**
      * @inheritdoc
      */
+    public $enableCsrfValidation = false;
+
+    /**
+     * @var bool Disable Snaptcha validation
+     */
+    public $enableSnaptchaValidation = false;
+
+    /**
+     * @inheritdoc
+     */
     protected $allowAnonymous = true;
 
     // Public Methods
