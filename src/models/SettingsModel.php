@@ -97,6 +97,7 @@ class SettingsModel extends Model
     public $nonCacheableElementTypes = [
         'craft\elements\GlobalSet',
         'craft\elements\MatrixBlock',
+        'benf\neo\elements\Block',
     ];
 
     /**

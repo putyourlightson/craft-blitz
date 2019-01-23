@@ -3,8 +3,8 @@
 ## 2.0.0 - Unreleased
 ### Added
 - Added Yii cache driver.
-- Added environment variables to file driver.
 - Added Cloudflare reverse proxy purger.
+- Added environment variables to file driver field.
 - Added garbage collection to element query records.
 - Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
@@ -14,6 +14,7 @@
 ### Changed
 - Minimum requirement of Craft has been changed to version 3.1.0.
 - Cache is invalidated when elements are updated through non control panel requests.
+- Neo blocks are now considered non cacheable element types.
 
 ## 1.11.3 - 2019-01-09
 ### Added
