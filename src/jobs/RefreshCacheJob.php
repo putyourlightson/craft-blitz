@@ -83,6 +83,11 @@ class RefreshCacheJob extends BaseJob
 
                 $params = json_decode($elementQueryRecord->params, true);
 
+                // If json decode failed
+                if (!is_array($params)) {
+                    continue;
+                }
+
                 foreach ($params as $key => $val) {
                     $elementQuery->{$key} = $val;
                 }
