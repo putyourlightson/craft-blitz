@@ -165,15 +165,12 @@ class Blitz extends Plugin
     {
         $settings = $this->getSettings();
 
-        $driverConfig = array_merge(['class' => $settings->driverType], $settings->driverSettings);
-        $purgerConfig = array_merge(['class' => $settings->purgerType], $settings->purgerSettings);
-
         $this->setComponents([
             'cache' => ['class' => CacheService::class, 'settings' => $settings],
             'invalidate' => ['class' => InvalidateService::class, 'settings' => $settings],
             'request' => ['class' => RequestService::class, 'settings' => $settings],
-            'driver' => $driverConfig,
-            'purger' => $purgerConfig,
+            'driver' => array_merge(['class' => $settings->driverType], $settings->driverSettings),
+            'purger' => array_merge(['class' => $settings->purgerType], $settings->purgerSettings),
         ]);
     }
 
