@@ -37,11 +37,11 @@ class RequestService
             return false;
         }
 
-        if (!Blitz::$settings->cachingEnabled) {
+        if (!Blitz::$plugin->settings->cachingEnabled) {
             return false;
         }
 
-        if (Blitz::$settings->queryStringCaching == 0 && $request->getQueryStringWithoutPath() !== '') {
+        if (Blitz::$plugin->settings->queryStringCaching == 0 && $request->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
@@ -64,14 +64,14 @@ class RequestService
         }
 
         // Excluded URI patterns take priority
-        if (is_array(Blitz::$settings->excludedUriPatterns)) {
-            if (self::matchesUriPattern(Blitz::$settings->excludedUriPatterns, $siteId, $uri)) {
+        if (is_array(Blitz::$plugin->settings->excludedUriPatterns)) {
+            if (self::matchesUriPattern(Blitz::$plugin->settings->excludedUriPatterns, $siteId, $uri)) {
                 return false;
             }
         }
 
-        if (is_array(Blitz::$settings->includedUriPatterns)) {
-            if (self::matchesUriPattern(Blitz::$settings->includedUriPatterns, $siteId, $uri)) {
+        if (is_array(Blitz::$plugin->settings->includedUriPatterns)) {
+            if (self::matchesUriPattern(Blitz::$plugin->settings->includedUriPatterns, $siteId, $uri)) {
                 return true;
             }
         }
@@ -147,7 +147,7 @@ class RequestService
         $uri = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
-        if (Blitz::$settings->queryStringCaching == 2) {
+        if (Blitz::$plugin->settings->queryStringCaching == 2) {
             $uri = preg_replace('/\?.*/', '', $uri);
         }
 
@@ -173,13 +173,13 @@ class RequestService
         // Update powered by header
         header_remove('X-Powered-By');
 
-        if (Blitz::$settings->sendPoweredByHeader) {
+        if (Blitz::$plugin->settings->sendPoweredByHeader) {
             $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
             header('X-Powered-By: '.$header.'Blitz');
         }
 
         // Update cache control header
-        header('Cache-Control: '.Blitz::$settings->cacheControlHeader);
+        header('Cache-Control: '.Blitz::$plugin->settings->cacheControlHeader);
 
         exit($value.'<!-- Served by Blitz -->');
     }

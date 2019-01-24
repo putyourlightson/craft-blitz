@@ -47,7 +47,7 @@ class ClientService extends Component
 
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $requests, [
-            'concurrency' => Blitz::$settings->concurrency,
+            'concurrency' => Blitz::$plugin->settings->concurrency,
             'fulfilled' => function () use (&$success, &$count, $total, $setProgressHandler, $queue) {
                 $success++;
                 $count++;

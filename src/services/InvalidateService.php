@@ -157,7 +157,7 @@ class InvalidateService extends Component
         if ($element instanceof GlobalSet) {
             $this->clearCache();
 
-            if (Blitz::$settings->cachingEnabled && Blitz::$settings->warmCacheAutomatically && Blitz::$settings->warmCacheAutomaticallyForGlobals) {
+            if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically && Blitz::$plugin->settings->warmCacheAutomaticallyForGlobals) {
                 $this->warmCache($this->getAllCachedUrls());
             }
 
@@ -270,7 +270,7 @@ class InvalidateService extends Component
             ]));
         }
 
-        if (Blitz::$settings->cachingEnabled && Blitz::$settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
             $this->warmCache($urls);
         }
     }
@@ -284,7 +284,7 @@ class InvalidateService extends Component
     {
         Craft::$app->getQueue()->push(new WarmCacheJob([
             'urls' => $urls,
-            'concurrency' => Blitz::$settings->concurrency,
+            'concurrency' => Blitz::$plugin->settings->concurrency,
         ]));
     }
 

@@ -53,7 +53,7 @@ class CacheController extends Controller
             // Verify API key
             $apiKey = $request->getParam('key');
 
-            if (empty($apiKey) || empty(Blitz::$settings->apiKey) || $apiKey != Craft::parseEnv(Blitz::$settings->apiKey)) {
+            if (empty($apiKey) || empty(Blitz::$plugin->settings->apiKey) || $apiKey != Craft::parseEnv(Blitz::$plugin->settings->apiKey)) {
                 throw new ForbiddenHttpException('Unauthorised access.');
             }
         }
@@ -93,7 +93,7 @@ class CacheController extends Controller
      */
     public function actionWarm(): Response
     {
-        if (!Blitz::$settings->cachingEnabled) {
+        if (!Blitz::$plugin->settings->cachingEnabled) {
             return $this->_getResponse('Blitz caching is disabled.');
         }
 

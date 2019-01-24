@@ -49,8 +49,11 @@ use yii\queue\ExecEvent;
  * @property RequestService $request
  * @property BaseDriver $driver
  * @property BasePurger $purger
+ * @property SettingsModel $settings
  * @property mixed $settingsResponse
  * @property array $cpRoutes
+ *
+ * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
 {
@@ -78,7 +81,6 @@ class Blitz extends Plugin
         parent::init();
 
         self::$plugin = $this;
-        self::$settings = $this->getSettings();
 
         // Register components
         $this->_registerComponents();
@@ -173,8 +175,8 @@ class Blitz extends Plugin
             'client' => ClientService::class,
             'invalidate' => InvalidateService::class,
             'request' => RequestService::class,
-            'driver' => array_merge(['class' => self::$settings->driverType], self::$settings->driverSettings),
-            'purger' => array_merge(['class' => self::$settings->purgerType], self::$settings->purgerSettings),
+            'driver' => array_merge(['class' => $this->settings->driverType], $this->settings->driverSettings),
+            'purger' => array_merge(['class' => $this->settings->purgerType], $this->settings->purgerSettings),
         ]);
     }
 

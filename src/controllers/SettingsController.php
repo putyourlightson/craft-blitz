@@ -31,8 +31,8 @@ class SettingsController extends Controller
     {
         /** @var BaseDriver $driver */
         $driver = DriverHelper::createDriver(
-            Blitz::$settings->driverType,
-            Blitz::$settings->driverSettings
+            Blitz::$plugin->settings->driverType,
+            Blitz::$plugin->settings->driverSettings
         );
 
         // Validate the driver so that any errors will be displayed
@@ -42,8 +42,8 @@ class SettingsController extends Controller
 
         /** @var BasePurger $purger */
         $purger = PurgerHelper::createPurger(
-            Blitz::$settings->purgerType,
-            Blitz::$settings->purgerSettings
+            Blitz::$plugin->settings->purgerType,
+            Blitz::$plugin->settings->purgerSettings
         );
 
         // Validate the purger so that any errors will be displayed
@@ -52,8 +52,8 @@ class SettingsController extends Controller
         $purgers = PurgerHelper::getAllPurgers();
 
         return $this->renderTemplate('blitz/_settings', [
-            'settings' => Blitz::$settings,
-            'parsedApiKey' => Craft::parseEnv(Blitz::$settings->apiKey),
+            'settings' => Blitz::$plugin->settings,
+            'parsedApiKey' => Craft::parseEnv(Blitz::$plugin->settings->apiKey),
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
             'driver' => $driver,
             'drivers' => $drivers,
@@ -81,40 +81,41 @@ class SettingsController extends Controller
         $driverSettings = $request->getBodyParam('driverSettings', []);
         $purgerSettings = $request->getBodyParam('purgerSettings', []);
 
-        Blitz::$settings->setAttributes($postedSettings, false);
+        $settings = Blitz::$plugin->settings;
+        $settings->setAttributes($postedSettings, false);
 
-        // Remove driver type from settings
-        Blitz::$settings->driverSettings = $driverSettings[Blitz::$settings->driverType] ?? [];
+        // Apply driver settings excluding type
+        $settings->driverSettings = $driverSettings[$settings->driverType] ?? [];
 
         // Create the driver so that we can validate it
         /* @var BaseDriver $driver */
         $driver = DriverHelper::createDriver(
-            Blitz::$settings->driverType,
-            Blitz::$settings->driverSettings
+            $settings->driverType,
+            $settings->driverSettings
         );
 
-        // Remove purger type from settings
-        Blitz::$settings->purgerSettings = $purgerSettings[Blitz::$settings->purgerType] ?? [];
+        // Apply purger settings excluding type
+        $settings->purgerSettings = $purgerSettings[$settings->purgerType] ?? [];
 
         // Create the purger so that we can validate it
         /* @var BasePurger $purger */
         $purger = PurgerHelper::createPurger(
-            Blitz::$settings->purgerType,
-            Blitz::$settings->purgerSettings
+            $settings->purgerType,
+            $settings->purgerSettings
         );
 
         $variables = [
-            'settings' => Blitz::$settings,
+            'settings' => $settings,
             'driver' => $driver,
             'purger' => $purger,
         ];
 
         // Validate
-        Blitz::$settings->validate();
+        $settings->validate();
         $driver->validate();
         $purger->validate();
 
-        if (Blitz::$settings->hasErrors() || $driver->hasErrors() || $purger->hasErrors()) {
+        if ($settings->hasErrors() || $driver->hasErrors() || $purger->hasErrors()) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
 
             Craft::$app->getUrlManager()->setRouteParams($variables);
@@ -131,7 +132,7 @@ class SettingsController extends Controller
         }
 
         // Save it
-        Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, Blitz::$settings->getAttributes());
+        Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Plugin settings saved.'));
 

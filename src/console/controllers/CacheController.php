@@ -72,7 +72,7 @@ class CacheController extends Controller
      */
     public function actionWarm(): int
     {
-        if (!Blitz::$settings->cachingEnabled) {
+        if (!Blitz::$plugin->settings->cachingEnabled) {
             $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
 
             return ExitCode::OK;
