@@ -8,11 +8,8 @@ namespace putyourlightson\blitz\jobs;
 use Craft;
 use craft\helpers\App;
 use craft\queue\BaseJob;
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Pool;
-use GuzzleHttp\Psr7\Request;
+use craft\queue\QueueInterface;
 use putyourlightson\blitz\Blitz;
-use yii\log\Logger;
 
 class WarmCacheJob extends BaseJob
 {
@@ -24,51 +21,34 @@ class WarmCacheJob extends BaseJob
      */
     public $urls = [];
 
+    /**
+     * @var int
+     */
+    public $concurrency = 1;
+
     // Public Methods
     // =========================================================================
 
     /**
      * @inheritdoc
-     * @throws \Exception
-     * @throws \Throwable
      */
     public function execute($queue)
     {
         App::maxPowerCaptain();
 
-        $total = count($this->urls);
-        $count = 0;
-        $client = Craft::createGuzzleClient();
-        $requests = [];
+        Blitz::$plugin->client->requestUrls($this->urls, $this->concurrency, [$this, 'setRequestsProgress'], $queue);
+    }
 
-        foreach ($this->urls as $url) {
-            $requests[] = new Request('GET', $url);
-        }
-
-        // Create a pool of requests for sending multiple concurrent requests
-        $pool = new Pool($client, $requests, [
-            'concurrency' => Blitz::$plugin->settings->concurrency,
-            'fulfilled' => function () use (&$queue, &$count, $total) {
-                $count++;
-                $this->setProgress($queue, $count / $total);
-            },
-            'rejected' => function ($reason) use (&$queue, &$count, $total) {
-                $count++;
-                $this->setProgress($queue, $count / $total);
-
-                if ($reason instanceof RequestException) {
-                    /** RequestException $reason */
-                    preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
-
-                    if (!empty($matches[1])) {
-                        Craft::getLogger()->log(trim($matches[1], ':'), Logger::LEVEL_ERROR, 'blitz');
-                    }
-                }
-            },
-        ]);
-
-        // Initiate the transfers and wait for the pool of requests to complete
-        $pool->promise()->wait();
+    /**
+     * Sets the progress for the requests.
+     *
+     * @param int $count
+     * @param int $total
+     * @param QueueInterface $queue
+     */
+    public function setRequestsProgress(int $count, int $total, QueueInterface $queue)
+    {
+        $this->setProgress($queue, $count / $total);
     }
 
     // Protected Methods

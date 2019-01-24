@@ -144,15 +144,11 @@ class RefreshCacheJob extends BaseJob
         // Purge the cache
         Blitz::$plugin->purger->purgeUrls($urls);
 
-        // Trigger afterRefreshCache event
-        Blitz::$plugin->invalidate->afterRefreshCache($this->cacheIds);
+        // Trigger afterRefreshCache events
+        Blitz::$plugin->invalidate->afterRefreshCache($urls);
 
         // Delete cache records so we get fresh caches
         CacheRecord::deleteAll(['id' => $this->cacheIds]);
-
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
-        }
     }
 
     // Protected Methods

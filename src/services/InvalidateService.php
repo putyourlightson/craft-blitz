@@ -23,8 +23,6 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\Exception;
 
 /**
- *
- * @property bool $batchMode
  * @property string[] $allCachedUrls
  */
 class InvalidateService extends Component
@@ -37,6 +35,11 @@ class InvalidateService extends Component
      */
     const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
 
+    /**
+     * @event Event
+     */
+    const EVENT_AFTER_CLEAR_CACHE = 'afterClearCache';
+
     // Properties
     // =========================================================================
 
@@ -48,7 +51,7 @@ class InvalidateService extends Component
     /**
      * @var bool
      */
-    private $_batchMode = false;
+    public $batchMode = false;
 
     /**
      * @var int[]
@@ -148,24 +151,6 @@ class InvalidateService extends Component
     }
 
     /**
-     * Gets the batch mode.
-     */
-    public function getBatchMode()
-    {
-        return $this->_batchMode;
-    }
-
-    /**
-     * Sets the batch mode.
-     *
-     * @param bool $mode
-     */
-    public function setBatchMode(bool $mode)
-    {
-        $this->_batchMode = $mode;
-    }
-
-    /**
      * Adds an element to invalidate.
      *
      * @param ElementInterface $element
@@ -179,9 +164,7 @@ class InvalidateService extends Component
             $this->clearCache();
 
             if ($this->settings->cachingEnabled && $this->settings->warmCacheAutomatically && $this->settings->warmCacheAutomaticallyForGlobals) {
-                Craft::$app->getQueue()->push(new WarmCacheJob([
-                    'urls' => $this->getAllCachedUrls()
-                ]));
+                $this->warmCache($this->getAllCachedUrls());
             }
 
             return;
@@ -258,7 +241,7 @@ class InvalidateService extends Component
         }
 
         // Refresh the cache if not in batch mode
-        if ($this->_batchMode === false) {
+        if ($this->batchMode === false) {
             $this->refreshCache();
         }
     }
@@ -280,18 +263,35 @@ class InvalidateService extends Component
     }
 
     /**
-     * Fires an event after the cache is refreshed.
+     * Performs actions after the cache is refreshed.
      *
-     * @param int[] $cacheIds
+     * @param string[] $urls
      */
-    public function afterRefreshCache(array $cacheIds)
+    public function afterRefreshCache(array $urls)
     {
         // Fire an 'afterRefreshCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, new RefreshCacheEvent([
-                'cacheIds' => $cacheIds,
+                'urls' => $urls,
             ]));
         }
+
+        if ($this->settings->cachingEnabled && $this->settings->warmCacheAutomatically) {
+            $this->warmCache($urls);
+        }
+    }
+
+    /**
+     * Warms the cache.
+     *
+     * @param string[] $urls
+     */
+    public function warmCache(array $urls)
+    {
+        Craft::$app->getQueue()->push(new WarmCacheJob([
+            'urls' => $urls,
+            'concurrency' => $this->settings->concurrency,
+        ]));
     }
 
     /**
@@ -350,19 +350,16 @@ class InvalidateService extends Component
         // Purge all cache
         Blitz::$plugin->purger->purgeAll();
 
-        // Get all cache IDs
-        $cacheIds = CacheRecord::find()
-            ->select('id')
-            ->column();
-
-        // Trigger afterRefreshCache event
-        $this->afterRefreshCache($cacheIds);
-
         if ($flush) {
             // Delete all cache records
             CacheRecord::deleteAll();
 
             $this->runGarbageCollection();
+        }
+
+        // Fire an 'afterClearCache' event
+        if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_CLEAR_CACHE);
         }
     }
 

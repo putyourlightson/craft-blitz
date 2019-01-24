@@ -87,18 +87,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes expired cache.
-     *
-     * @return Response
-     */
-    public function actionRefreshExpired(): Response
-    {
-        Blitz::$plugin->invalidate->refreshExpiredCache();
-
-        return $this->_getResponse('Expired Blitz cache successfully refreshed.');
-    }
-
-    /**
      * Warms the cache.
      *
      * @return Response
@@ -115,9 +103,21 @@ class CacheController extends Controller
 
         Blitz::$plugin->invalidate->clearCache(true);
 
-        Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
+        Blitz::$plugin->invalidate->warmCache(['urls' => $urls]);
 
         return $this->_getResponse('Blitz cache successfully queued for warming.');
+    }
+
+    /**
+     * Refreshes expired cache.
+     *
+     * @return Response
+     */
+    public function actionRefreshExpired(): Response
+    {
+        Blitz::$plugin->invalidate->refreshExpiredCache();
+
+        return $this->_getResponse('Expired Blitz cache successfully refreshed.');
     }
 
     // Private Methods

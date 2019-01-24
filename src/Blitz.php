@@ -33,12 +33,12 @@ use putyourlightson\blitz\drivers\BaseDriver;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\purgers\BasePurger;
 use putyourlightson\blitz\services\CacheService;
+use putyourlightson\blitz\services\ClientService;
 use putyourlightson\blitz\services\InvalidateService;
 use putyourlightson\blitz\services\RequestService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
-use yii\base\InvalidConfigException;
 use yii\queue\ExecEvent;
 
 /**
@@ -46,6 +46,7 @@ use yii\queue\ExecEvent;
  * @property CacheService $cache
  * @property InvalidateService $invalidate
  * @property RequestService $request
+ * @property ClientService $client
  * @property BaseDriver $driver
  * @property BasePurger $purger
  * @property mixed $settingsResponse
@@ -169,6 +170,7 @@ class Blitz extends Plugin
             'cache' => ['class' => CacheService::class, 'settings' => $settings],
             'invalidate' => ['class' => InvalidateService::class, 'settings' => $settings],
             'request' => ['class' => RequestService::class, 'settings' => $settings],
+            'client' => ['class' => ClientService::class, 'settings' => $settings],
             'driver' => array_merge(['class' => $settings->driverType], $settings->driverSettings),
             'purger' => array_merge(['class' => $settings->purgerType], $settings->purgerSettings),
         ]);
@@ -271,7 +273,7 @@ class Blitz extends Plugin
         Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
             function(ExecEvent $event) {
                 if ($event->job instanceof ResaveElements) {
-                    $this->invalidate->setBatchMode(true);
+                    $this->invalidate->batchMode = true;
                 }
             }
         );

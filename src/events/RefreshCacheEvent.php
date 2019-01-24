@@ -13,7 +13,7 @@ class RefreshCacheEvent extends Event
     // =========================================================================
 
     /**
-     * @var int[]
+     * @var string[]
      */
-    public $cacheIds = [];
+    public $urls = [];
 }
