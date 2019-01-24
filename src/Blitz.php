@@ -76,12 +76,8 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
-        // Register services
-        $this->_registerServices();
-
-        // Register driver and purger
-        $this->_registerDriver();
-        $this->_registerPurger();
+        // Register components
+        $this->_registerComponents();
 
         // Register variable
         $this->_registerVariable();
@@ -163,53 +159,22 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers the services
+     * Registers the components
      */
-    private function _registerServices()
+    private function _registerComponents()
     {
         $settings = $this->getSettings();
+
+        $driverConfig = array_merge(['class' => $settings->driverType], $settings->driverSettings);
+        $purgerConfig = array_merge(['class' => $settings->purgerType], $settings->purgerSettings);
 
         $this->setComponents([
             'cache' => ['class' => CacheService::class, 'settings' => $settings],
             'invalidate' => ['class' => InvalidateService::class, 'settings' => $settings],
             'request' => ['class' => RequestService::class, 'settings' => $settings],
+            'driver' => $driverConfig,
+            'purger' => $purgerConfig,
         ]);
-    }
-
-    /**
-     * Registers the driver
-     */
-    private function _registerDriver()
-    {
-        $settings = $this->getSettings();
-
-        try {
-            $this->set('driver', array_merge(
-                ['class' => $settings->driverType],
-                $settings->driverSettings
-            ));
-        }
-        catch (InvalidConfigException $e) {
-            Craft::error($e->getMessage(), __METHOD__);
-        }
-    }
-
-    /**
-     * Registers the purger
-     */
-    private function _registerPurger()
-    {
-        $settings = $this->getSettings();
-
-        try {
-            $this->set('purger', array_merge(
-                ['class' => $settings->purgerType],
-                $settings->purgerSettings
-            ));
-        }
-        catch (InvalidConfigException $e) {
-            Craft::error($e->getMessage(), __METHOD__);
-        }
     }
 
     /**
