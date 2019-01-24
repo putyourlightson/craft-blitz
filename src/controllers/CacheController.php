@@ -9,7 +9,6 @@ use Craft;
 use craft\web\Controller;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\jobs\WarmCacheJob;
 use yii\base\Exception;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
