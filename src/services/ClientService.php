@@ -11,19 +11,11 @@ use craft\queue\QueueInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
-use putyourlightson\blitz\models\SettingsModel;
+use putyourlightson\blitz\Blitz;
 use yii\log\Logger;
 
 class ClientService extends Component
 {
-    // Properties
-    // =========================================================================
-
-    /**
-     * @var SettingsModel
-     */
-    public $settings;
-
     // Public Methods
     // =========================================================================
 
@@ -55,7 +47,7 @@ class ClientService extends Component
 
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $requests, [
-            'concurrency' => $this->settings->concurrency,
+            'concurrency' => Blitz::$settings->concurrency,
             'fulfilled' => function () use (&$success, &$count, $total, $setProgressHandler, $queue) {
                 $success++;
                 $count++;

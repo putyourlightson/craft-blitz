@@ -43,7 +43,7 @@ class DriverHelper
 
         $driverTypes = array_unique(array_merge(
             $driverTypes,
-            Blitz::$plugin->settings->driverTypes
+            Blitz::$settings->driverTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([

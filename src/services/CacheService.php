@@ -37,11 +37,6 @@ class CacheService extends Component
     // =========================================================================
 
     /**
-     * @var SettingsModel
-     */
-    public $settings;
-
-    /**
      * @var string[]|null
      */
     private $_nonCacheableElementTypes;
@@ -76,7 +71,7 @@ class CacheService extends Component
         };
 
         $event = new RegisterNonCacheableElementTypesEvent([
-            'elementTypes' => $this->settings->nonCacheableElementTypes,
+            'elementTypes' => Blitz::$settings->nonCacheableElementTypes,
         ]);
         $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
 
@@ -93,7 +88,7 @@ class CacheService extends Component
     public function addElementCache(ElementInterface $element)
     {
         // Don't proceed if element caching is disabled
-        if (!$this->settings->cacheElements) {
+        if (!Blitz::$settings->cacheElements) {
             return;
         }
 
@@ -120,7 +115,7 @@ class CacheService extends Component
     public function addElementQueryCache(ElementQuery $elementQuery)
     {
         // Don't proceed if element query caching is disabled
-        if (!$this->settings->cacheElementQueries) {
+        if (!Blitz::$settings->cacheElementQueries) {
             return;
         }
 

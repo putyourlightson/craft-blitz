@@ -44,16 +44,13 @@ use yii\queue\ExecEvent;
 /**
  *
  * @property CacheService $cache
+ * @property ClientService $client
  * @property InvalidateService $invalidate
  * @property RequestService $request
- * @property ClientService $client
  * @property BaseDriver $driver
  * @property BasePurger $purger
  * @property mixed $settingsResponse
  * @property array $cpRoutes
- * @property SettingsModel $settings
- *
- * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
 {
@@ -64,6 +61,11 @@ class Blitz extends Plugin
      * @var Blitz
      */
     public static $plugin;
+
+    /**
+     * @var SettingsModel
+     */
+    public static $settings;
 
     // Public Methods
     // =========================================================================
@@ -76,6 +78,7 @@ class Blitz extends Plugin
         parent::init();
 
         self::$plugin = $this;
+        self::$settings = $this->getSettings();
 
         // Register components
         $this->_registerComponents();
@@ -165,15 +168,13 @@ class Blitz extends Plugin
      */
     private function _registerComponents()
     {
-        $settings = $this->getSettings();
-
         $this->setComponents([
-            'cache' => ['class' => CacheService::class, 'settings' => $settings],
-            'invalidate' => ['class' => InvalidateService::class, 'settings' => $settings],
-            'request' => ['class' => RequestService::class, 'settings' => $settings],
-            'client' => ['class' => ClientService::class, 'settings' => $settings],
-            'driver' => array_merge(['class' => $settings->driverType], $settings->driverSettings),
-            'purger' => array_merge(['class' => $settings->purgerType], $settings->purgerSettings),
+            'cache' => CacheService::class,
+            'client' => ClientService::class,
+            'invalidate' => InvalidateService::class,
+            'request' => RequestService::class,
+            'driver' => array_merge(['class' => self::$settings->driverType], self::$settings->driverSettings),
+            'purger' => array_merge(['class' => self::$settings->purgerType], self::$settings->purgerSettings),
         ]);
     }
 

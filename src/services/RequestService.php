@@ -7,19 +7,11 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\helpers\UrlHelper;
-use putyourlightson\blitz\models\SettingsModel;
+use putyourlightson\blitz\Blitz;
 use yii\base\Exception;
 
 class RequestService
 {
-    // Properties
-    // =========================================================================
-
-    /**
-     * @var SettingsModel
-     */
-    public $settings;
-
     // Public Methods
     // =========================================================================
 
@@ -45,11 +37,11 @@ class RequestService
             return false;
         }
 
-        if (!$this->settings->cachingEnabled) {
+        if (!Blitz::$settings->cachingEnabled) {
             return false;
         }
 
-        if ($this->settings->queryStringCaching == 0 && $request->getQueryStringWithoutPath() !== '') {
+        if (Blitz::$settings->queryStringCaching == 0 && $request->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
@@ -72,14 +64,14 @@ class RequestService
         }
 
         // Excluded URI patterns take priority
-        if (is_array($this->settings->excludedUriPatterns)) {
-            if (self::matchesUriPattern($this->settings->excludedUriPatterns, $siteId, $uri)) {
+        if (is_array(Blitz::$settings->excludedUriPatterns)) {
+            if (self::matchesUriPattern(Blitz::$settings->excludedUriPatterns, $siteId, $uri)) {
                 return false;
             }
         }
 
-        if (is_array($this->settings->includedUriPatterns)) {
-            if (self::matchesUriPattern($this->settings->includedUriPatterns, $siteId, $uri)) {
+        if (is_array(Blitz::$settings->includedUriPatterns)) {
+            if (self::matchesUriPattern(Blitz::$settings->includedUriPatterns, $siteId, $uri)) {
                 return true;
             }
         }
@@ -155,7 +147,7 @@ class RequestService
         $uri = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
-        if ($this->settings->queryStringCaching == 2) {
+        if (Blitz::$settings->queryStringCaching == 2) {
             $uri = preg_replace('/\?.*/', '', $uri);
         }
 
@@ -181,13 +173,13 @@ class RequestService
         // Update powered by header
         header_remove('X-Powered-By');
 
-        if ($this->settings->sendPoweredByHeader) {
+        if (Blitz::$settings->sendPoweredByHeader) {
             $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
             header('X-Powered-By: '.$header.'Blitz');
         }
 
         // Update cache control header
-        header('Cache-Control: '.$this->settings->cacheControlHeader);
+        header('Cache-Control: '.Blitz::$settings->cacheControlHeader);
 
         exit($value.'<!-- Served by Blitz -->');
     }
