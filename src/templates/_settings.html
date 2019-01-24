@@ -219,25 +219,25 @@
                     <tr>
                         <th class="thin">{{ 'Clear Cache' }}</th>
                         <td class="textual code">
-                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: settings.apiKey }) }}</textarea>
+                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: parsedApiKey }) }}</textarea>
                         </td>
                     </tr>
                     <tr>
                         <th class="thin">{{ 'Flush Cache' }}</th>
                         <td class="textual code">
-                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: settings.apiKey }) }}</textarea>
+                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: parsedApiKey }) }}</textarea>
                         </td>
                     </tr>
                     <tr>
                         <th class="thin">{{ 'Warm Cache' }}</th>
                         <td class="textual code">
-                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: settings.apiKey }) }}</textarea>
+                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: parsedApiKey }) }}</textarea>
                         </td>
                     </tr>
                     <tr>
                         <th class="thin">{{ 'Refresh Expired Cache' }}</th>
                         <td class="textual code">
-                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: settings.apiKey }) }}</textarea>
+                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: parsedApiKey }) }}</textarea>
                         </td>
                     </tr>
                 </tbody>

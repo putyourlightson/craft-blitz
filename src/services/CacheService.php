@@ -12,6 +12,7 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
+use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
@@ -34,6 +35,11 @@ class CacheService extends Component
 
     // Properties
     // =========================================================================
+
+    /**
+     * @var SettingsModel
+     */
+    public $settings;
 
     /**
      * @var string[]|null
@@ -70,7 +76,7 @@ class CacheService extends Component
         };
 
         $event = new RegisterNonCacheableElementTypesEvent([
-            'elementTypes' => Blitz::$settings->nonCacheableElementTypes,
+            'elementTypes' => $this->settings->nonCacheableElementTypes,
         ]);
         $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
 
@@ -87,7 +93,7 @@ class CacheService extends Component
     public function addElementCache(ElementInterface $element)
     {
         // Don't proceed if element caching is disabled
-        if (!Blitz::$settings->cacheElements) {
+        if (!$this->settings->cacheElements) {
             return;
         }
 
@@ -114,7 +120,7 @@ class CacheService extends Component
     public function addElementQueryCache(ElementQuery $elementQuery)
     {
         // Don't proceed if element query caching is disabled
-        if (!Blitz::$settings->cacheElementQueries) {
+        if (!$this->settings->cacheElementQueries) {
             return;
         }
 

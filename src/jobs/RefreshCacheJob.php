@@ -150,7 +150,7 @@ class RefreshCacheJob extends BaseJob
         // Delete cache records so we get fresh caches
         CacheRecord::deleteAll(['id' => $this->cacheIds]);
 
-        if (Blitz::$settings->cachingEnabled && Blitz::$settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
             Craft::$app->getQueue()->push(new WarmCacheJob(['urls' => $urls]));
         }
     }

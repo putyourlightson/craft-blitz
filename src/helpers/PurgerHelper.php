@@ -43,7 +43,7 @@ class PurgerHelper
 
         $purgerTypes = array_unique(array_merge(
             $purgerTypes,
-            Blitz::$settings->purgerTypes
+            Blitz::$plugin->settings->purgerTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([

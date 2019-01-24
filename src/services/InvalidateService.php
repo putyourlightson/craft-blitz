@@ -15,6 +15,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\jobs\WarmCacheJob;
+use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
@@ -38,6 +39,11 @@ class InvalidateService extends Component
 
     // Properties
     // =========================================================================
+
+    /**
+     * @var SettingsModel
+     */
+    public $settings;
 
     /**
      * @var bool
@@ -172,7 +178,7 @@ class InvalidateService extends Component
         if ($element instanceof GlobalSet) {
             $this->clearCache();
 
-            if (Blitz::$settings->cachingEnabled && Blitz::$settings->warmCacheAutomatically && Blitz::$settings->warmCacheAutomaticallyForGlobals) {
+            if ($this->settings->cachingEnabled && $this->settings->warmCacheAutomatically && $this->settings->warmCacheAutomaticallyForGlobals) {
                 Craft::$app->getQueue()->push(new WarmCacheJob([
                     'urls' => $this->getAllCachedUrls()
                 ]));

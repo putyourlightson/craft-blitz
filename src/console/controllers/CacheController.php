@@ -76,7 +76,7 @@ class CacheController extends Controller
      */
     public function actionWarm(): int
     {
-        if (!Blitz::$settings->cachingEnabled) {
+        if (!Blitz::$plugin->settings->cachingEnabled) {
             $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
 
             return ExitCode::OK;
@@ -114,7 +114,7 @@ class CacheController extends Controller
 
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $requests, [
-            'concurrency' => Blitz::$settings->concurrency,
+            'concurrency' => Blitz::$plugin->settings->concurrency,
             'fulfilled' => function () use (&$success, &$count, $total) {
                 $success++;
                 $count++;

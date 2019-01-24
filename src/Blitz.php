@@ -50,7 +50,9 @@ use yii\queue\ExecEvent;
  * @property BasePurger $purger
  * @property mixed $settingsResponse
  * @property array $cpRoutes
- * @property string[] $nonCacheableElementTypes
+ * @property SettingsModel $settings
+ *
+ * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
 {
@@ -61,11 +63,6 @@ class Blitz extends Plugin
      * @var Blitz
      */
     public static $plugin;
-
-    /**
-     * @var SettingsModel
-     */
-    public static $settings;
 
     // Public Methods
     // =========================================================================
@@ -79,41 +76,26 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
-        self::$settings = $this->getSettings();
-
         // Register services
-        $this->setComponents([
-            'cache' => CacheService::class,
-            'invalidate' => InvalidateService::class,
-            'request' => RequestService::class,
-        ]);
+        $this->_registerServices();
 
         // Register driver and purger
-        $this->setDriver();
-        $this->setPurger();
+        $this->_registerDriver();
+        $this->_registerPurger();
 
         // Register variable
         $this->_registerVariable();
 
         // Process cacheable requests
-        if ($this->request->getIsCacheableRequest()) {
-            $site = Craft::$app->getSites()->getCurrentSite();
-            $uri = $this->request->getCurrentUri();
-
-            if ($this->request->getIsCacheableUri($site->id, $uri)) {
-                $value = $this->driver->getCachedUri($site->id, $uri);
-
-                // If cached value exists then output it (assuming this has not already been done server-side)
-                if ($value) {
-                    $this->request->output($value);
-                }
-
-                $this->_registerCacheableRequestEvents($site->id, $uri);
-
-                // Stop execution
-                return;
-            }
+        if ($this->_processCacheableRequest()) {
+            // Stop execution
+            return;
         }
+
+        $this->_registerElementEvents();
+        $this->_registerResaveElementEvents();
+        $this->_registerClearCaches();
+        $this->_registerGarbageCollection();
 
         // Control panel requests
         if (Craft::$app->getRequest()->getIsCpRequest()) {
@@ -124,48 +106,10 @@ class Blitz extends Plugin
                 $this->_registerUserPermissions();
             }
         }
-
-        // All requests
-        $this->_registerElementEvents();
-        $this->_registerResaveElementEvents();
-        $this->_registerClearCaches();
-        $this->_registerGarbageCollection();
     }
 
     // Protected Methods
     // =========================================================================
-
-    /**
-     * Registers the driver
-     */
-    protected function setDriver()
-    {
-        try {
-            $this->set('driver', array_merge(
-                ['class' => self::$settings->driverType],
-                self::$settings->driverSettings
-            ));
-        }
-        catch (InvalidConfigException $e) {
-            Craft::error($e->getMessage(), __METHOD__);
-        }
-    }
-
-    /**
-     * Registers the purger
-     */
-    protected function setPurger()
-    {
-        try {
-            $this->set('purger', array_merge(
-                ['class' => self::$settings->purgerType],
-                self::$settings->purgerSettings
-            ));
-        }
-        catch (InvalidConfigException $e) {
-            Craft::error($e->getMessage(), __METHOD__);
-        }
-    }
 
     /**
      * @inheritdoc
@@ -190,6 +134,85 @@ class Blitz extends Plugin
     // =========================================================================
 
     /**
+     * Processes cacheable requests.
+     *
+     * @return bool
+     */
+    private function _processCacheableRequest(): bool
+    {
+        if ($this->request->getIsCacheableRequest()) {
+            $site = Craft::$app->getSites()->getCurrentSite();
+            $uri = $this->request->getCurrentUri();
+
+            if ($this->request->getIsCacheableUri($site->id, $uri)) {
+                $value = $this->driver->getCachedUri($site->id, $uri);
+
+                // If cached value exists then output it (assuming this has not already been done server-side)
+                if ($value) {
+                    $this->request->output($value);
+                }
+
+                $this->_registerCacheableRequestEvents($site->id, $uri);
+
+                // Stop execution
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Registers the services
+     */
+    private function _registerServices()
+    {
+        $settings = $this->getSettings();
+
+        $this->setComponents([
+            'cache' => ['class' => CacheService::class, 'settings' => $settings],
+            'invalidate' => ['class' => InvalidateService::class, 'settings' => $settings],
+            'request' => ['class' => RequestService::class, 'settings' => $settings],
+        ]);
+    }
+
+    /**
+     * Registers the driver
+     */
+    private function _registerDriver()
+    {
+        $settings = $this->getSettings();
+
+        try {
+            $this->set('driver', array_merge(
+                ['class' => $settings->driverType],
+                $settings->driverSettings
+            ));
+        }
+        catch (InvalidConfigException $e) {
+            Craft::error($e->getMessage(), __METHOD__);
+        }
+    }
+
+    /**
+     * Registers the purger
+     */
+    private function _registerPurger()
+    {
+        $settings = $this->getSettings();
+
+        try {
+            $this->set('purger', array_merge(
+                ['class' => $settings->purgerType],
+                $settings->purgerSettings
+            ));
+        }
+        catch (InvalidConfigException $e) {
+            Craft::error($e->getMessage(), __METHOD__);
+        }
+    }
+
+    /**
      * Registers variable
      */
     private function _registerVariable()
@@ -203,22 +226,6 @@ class Blitz extends Plugin
         );
     }
 
-    /**
-     * Registers CP URL rules event
-     */
-    private function _registerCpUrlRules()
-    {
-        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            function(RegisterUrlRulesEvent $event) {
-                $event->rules = array_merge([
-                        'settings/plugins/blitz' => 'blitz/settings/edit',
-                    ],
-                    $event->rules
-                );
-            }
-        );
-    }
-    
     /**
      * Registers cacheable request events
      *
@@ -341,6 +348,34 @@ class Blitz extends Plugin
     }
 
     /**
+     * Registers garbage collection
+     */
+    private function _registerGarbageCollection()
+    {
+        Event::on(Gc::class, Gc::EVENT_RUN,
+            function() {
+                $this->invalidate->runGarbageCollection();
+            }
+        );
+    }
+
+    /**
+     * Registers CP URL rules event
+     */
+    private function _registerCpUrlRules()
+    {
+        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
+            function(RegisterUrlRulesEvent $event) {
+                $event->rules = array_merge([
+                        'settings/plugins/blitz' => 'blitz/settings/edit',
+                    ],
+                    $event->rules
+                );
+            }
+        );
+    }
+
+    /**
      * Registers utilities
      */
     private function _registerUtilities()
@@ -364,18 +399,6 @@ class Blitz extends Plugin
                 $event->permissions['Blitz'] = [
                     'blitz:cache-utility' => ['label' => Craft::t('blitz', 'Access cache utility')],
                 ];
-            }
-        );
-    }
-
-    /**
-     * Registers garbage collection
-     */
-    private function _registerGarbageCollection()
-    {
-        Event::on(Gc::class, Gc::EVENT_RUN,
-            function() {
-                $this->invalidate->runGarbageCollection();
             }
         );
     }
