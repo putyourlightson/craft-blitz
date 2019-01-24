@@ -23,7 +23,7 @@ class m181122_120000_change_querystringcaching_setting extends Migration
             ->where(['handle' => 'blitz'])
             ->one();
 
-        if ($pluginRecord === null) {
+        if ($pluginRecord === null || empty($pluginRecord->settings)) {
             return;
         }
 
@@ -34,9 +34,10 @@ class m181122_120000_change_querystringcaching_setting extends Migration
         $queryStringCachingEnabled = $pluginSettings['queryStringCachingEnabled'];
 
         // Update and save settings with new setting
-        Blitz::$plugin->settings->queryStringCaching = $queryStringCachingEnabled ? 1 : 0;
+        $settings = Blitz::$plugin->settings;
+        $settings->queryStringCaching = $queryStringCachingEnabled ? 1 : 0;
 
-        Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, Blitz::$plugin->settings->getAttributes());
+        Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
     }
 
     /**

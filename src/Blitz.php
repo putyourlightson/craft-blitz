@@ -65,11 +65,6 @@ class Blitz extends Plugin
      */
     public static $plugin;
 
-    /**
-     * @var SettingsModel
-     */
-    public static $settings;
-
     // Public Methods
     // =========================================================================
 

@@ -51,9 +51,10 @@ class CacheController extends Controller
         }
         else {
             // Verify API key
-            $apiKey = $request->getParam('key');
+            $key = $request->getParam('key');
+            $apiKey = Craft::parseEnv(Blitz::$plugin->settings->apiKey);
 
-            if (empty($apiKey) || empty(Blitz::$plugin->settings->apiKey) || $apiKey != Craft::parseEnv(Blitz::$plugin->settings->apiKey)) {
+            if (empty($key) || empty($apiKey) || $key != $apiKey) {
                 throw new ForbiddenHttpException('Unauthorised access.');
             }
         }
