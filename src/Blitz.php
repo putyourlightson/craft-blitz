@@ -89,12 +89,13 @@ class Blitz extends Plugin
             return;
         }
 
+        // Register events
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
         $this->_registerClearCaches();
         $this->_registerGarbageCollection();
 
-        // Control panel requests
+        // Register control panel events
         if (Craft::$app->getRequest()->getIsCpRequest()) {
             $this->_registerCpUrlRules();
             $this->_registerUtilities();
