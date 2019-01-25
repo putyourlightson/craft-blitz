@@ -27,10 +27,10 @@ class RequestService extends Request
     public function getIsCacheableRequest(): bool
     {
         // Ensure this is a front-end get request that is not a console request or an action request or live preview
-        if (!$this->getIsSiteRequest() || !$this->getIsGet() || $this->getIsConsoleRequest() || $this->getIsActionRequest() || $this->getIsLivePreview() || !$response->getIsOk()) {
+        if (!$this->getIsSiteRequest() || !$this->getIsGet() || $this->getIsConsoleRequest() || $this->getIsActionRequest() || $this->getIsLivePreview()) {
             return false;
         }
-        
+
         // Ensure the response is not an error
         if (!Craft::$app->getResponse()->getIsOk()) {
             return false;
