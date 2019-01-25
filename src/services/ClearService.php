@@ -31,8 +31,8 @@ class ClearService extends Component
      */
     public function clearCache(bool $flush = false)
     {
-        // Clear the cache
-        Blitz::$plugin->driver->clearCache();
+        // Clear all cache
+        Blitz::$plugin->driver->clearAllCache();
 
         // Purge all cache
         Blitz::$plugin->purger->purgeAll();
@@ -55,7 +55,7 @@ class ClearService extends Component
      *
      * @param int[] $cacheIds
      */
-    public function deleteCacheByCacheIds(array $cacheIds)
+    public function deleteCacheIds(array $cacheIds)
     {
         CacheRecord::deleteAll(['id' => $cacheIds]);
     }
@@ -65,7 +65,7 @@ class ClearService extends Component
      *
      * @param SiteUriModel $siteUri
      */
-    public function deleteCacheBySiteUri(SiteUriModel $siteUri)
+    public function deleteSiteUri(SiteUriModel $siteUri)
     {
         CacheRecord::deleteAll($siteUri->toArray());
     }

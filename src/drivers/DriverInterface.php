@@ -36,7 +36,7 @@ interface DriverInterface
     /**
      * Clears the cache.
      */
-    public function clearCache();
+    public function clearAllCache();
 
     /**
      * Clears the cache for the provided site URIs.

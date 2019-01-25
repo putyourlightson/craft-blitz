@@ -119,7 +119,7 @@ class FileDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function clearCache()
+    public function clearAllCache()
     {
         if (empty($this->_cacheFolderPath)) {
             return;

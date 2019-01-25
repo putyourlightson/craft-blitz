@@ -73,7 +73,7 @@ class YiiCacheDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function clearCache()
+    public function clearAllCache()
     {
         Craft::$app->getCache()->flush();
     }
