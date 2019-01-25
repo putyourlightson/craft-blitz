@@ -2,7 +2,11 @@
 
 # Blitz Plugin for Craft CMS 3
 
-> This is the Blitz v2 branch which is currently in public beta. For the stable version, use the v1 branch.
+> This is the Blitz v2 branch which is currently in public beta. For the stable version, use the v1 branch. It can be installed using composer as follows.
+
+```
+composer require putyourlightson/craft-blitz:2.0.0-beta.5
+```
 
 The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
