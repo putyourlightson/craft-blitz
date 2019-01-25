@@ -31,14 +31,11 @@ class ClearService extends Component
      */
     public function clearCache(bool $flush = false)
     {
-        // Clear all cache
-        Blitz::$plugin->driver->clearAllCache();
+        Blitz::$plugin->cacheStorage->deleteAll();
 
-        // Purge all cache
-        Blitz::$plugin->purger->purgeAll();
+        Blitz::$plugin->cachePurger->purgeAll();
 
         if ($flush) {
-            // Delete all cache records
             CacheRecord::deleteAll();
 
             $this->runGarbageCollection();

@@ -3,7 +3,7 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\drivers;
+namespace putyourlightson\blitz\drivers\storage;
 
 use Craft;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -12,7 +12,7 @@ use putyourlightson\blitz\models\SiteUriModel;
  *
  * @property mixed $settingsHtml
  */
-class YiiCacheDriver extends BaseDriver
+class YiiCacheStorage extends BaseCacheStorage
 {
     // Constants
     // =========================================================================
@@ -41,7 +41,7 @@ class YiiCacheDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function getCachedUri(SiteUriModel $siteUri): string
+    public function getValue(SiteUriModel $siteUri): string
     {
         $value = Craft::$app->getCache()->get([
             self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
@@ -57,7 +57,7 @@ class YiiCacheDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function saveCache(string $value, SiteUriModel $siteUri)
+    public function save(string $value, SiteUriModel $siteUri)
     {
         // Append timestamp
         $value .= '<!-- Cached by Blitz on '.date('c').' -->';
@@ -73,7 +73,7 @@ class YiiCacheDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function clearAllCache()
+    public function deleteAll()
     {
         Craft::$app->getCache()->flush();
     }
@@ -81,7 +81,7 @@ class YiiCacheDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function clearCachedUris(array $siteUris)
+    public function deleteValues(array $siteUris)
     {
         foreach ($siteUris as $siteUri) {
             Craft::$app->getCache()->delete([

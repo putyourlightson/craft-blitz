@@ -17,7 +17,7 @@ class WarmCacheJob extends BaseJob
     // =========================================================================
 
     /**
-     * @var array
+     * @var string[]
      */
     public $urls = [];
 

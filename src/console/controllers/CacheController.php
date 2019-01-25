@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\console\controllers;
 use Craft;
 use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -76,15 +77,16 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        // Get warm cache URLS
-        $urls = Blitz::$plugin->refreshService->getAllCachedSiteUris();
-
         $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
+
+        // Get cached site URIs before flushing the cache
+        $siteUris = Blitz::$plugin->refreshService->getAllCachedSiteUris();
 
         Blitz::$plugin->clearService->clearCache(true);
 
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
+        $urls = SiteUriHelper::getUrls($siteUris);
         $total = count($urls);
         Console::startProgress(0, $total, '', 0.8);
 

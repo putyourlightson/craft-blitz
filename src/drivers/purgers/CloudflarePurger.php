@@ -3,7 +3,7 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\purgers;
+namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
 use GuzzleHttp\Exception\BadResponseException;
@@ -14,7 +14,7 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 /**
  * @property mixed $settingsHtml
  */
-class CloudflarePurger extends BasePurger
+class CloudflarePurger extends BaseCachePurger
 {
     // Constants
     // =========================================================================

@@ -9,10 +9,10 @@ use craft\errors\MissingComponentException;
 use craft\events\RegisterComponentTypesEvent;
 use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\BaseDriver;
-use putyourlightson\blitz\drivers\DriverInterface;
-use putyourlightson\blitz\drivers\FileDriver;
-use putyourlightson\blitz\drivers\YiiCacheDriver;
+use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
+use putyourlightson\blitz\drivers\storage\CacheStorageInterface;
+use putyourlightson\blitz\drivers\storage\FileStorage;
+use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
@@ -37,8 +37,8 @@ class DriverHelper
     public static function getAllDriverTypes(): array
     {
         $driverTypes = [
-            FileDriver::class,
-            YiiCacheDriver::class,
+            FileStorage::class,
+            YiiCacheStorage::class,
         ];
 
         $driverTypes = array_unique(array_merge(
@@ -57,13 +57,13 @@ class DriverHelper
     /**
      * Returns all drivers.
      *
-     * @return BaseDriver[]
+     * @return BaseCacheStorage[]
      */
     public static function getAllDrivers(): array
     {
         $drivers = [];
 
-        /** @var BaseDriver $class */
+        /** @var BaseCacheStorage $class */
         foreach (DriverHelper::getAllDriverTypes() as $class) {
             if ($class::isSelectable()) {
                 $driver = self::createDriver($class);
@@ -83,18 +83,18 @@ class DriverHelper
      * @param string $type
      * @param array|null $settings
      *
-     * @return DriverInterface|null
+     * @return CacheStorageInterface|null
      */
     public static function createDriver(string $type, array $settings = null)
     {
         $driver = null;
 
         try {
-            /** @var DriverInterface $driver */
+            /** @var CacheStorageInterface $driver */
             $driver = Component::createComponent([
                 'type' => $type,
                 'settings' => $settings ?? [],
-            ], DriverInterface::class);
+            ], CacheStorageInterface::class);
         }
         catch (InvalidConfigException $e) {}
         catch (MissingComponentException $e) {}

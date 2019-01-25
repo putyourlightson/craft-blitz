@@ -29,10 +29,10 @@ use craft\utilities\ClearCaches;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
-use putyourlightson\blitz\drivers\BaseDriver;
+use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\purgers\BasePurger;
+use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\services\CacheService;
 use putyourlightson\blitz\services\ClearService;
 use putyourlightson\blitz\services\WarmService;
@@ -50,8 +50,8 @@ use yii\queue\ExecEvent;
  * @property RefreshService $refreshService
  * @property RequestService $requestService
  * @property WarmService $warmService
- * @property BaseDriver $driver
- * @property BasePurger $purger
+ * @property BaseCacheStorage $cacheStorage
+ * @property BaseCachePurger $cachePurger
  * @property SettingsModel $settings
  * @property mixed $settingsResponse
  * @property array $cpRoutes
@@ -145,7 +145,7 @@ class Blitz extends Plugin
             $siteUri = $this->requestService->getRequestedSiteUri();
 
             if ($siteUri->getIsCacheableUri()) {
-                $value = $this->driver->getCachedUri($siteUri);
+                $value = $this->cacheStorage->getValue($siteUri);
 
                 // If cached value exists then output it (assuming this has not already been done server-side)
                 if ($value) {

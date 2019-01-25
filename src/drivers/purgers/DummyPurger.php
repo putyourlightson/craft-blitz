@@ -3,11 +3,11 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\purgers;
+namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
 
-class DummyPurger extends BasePurger
+class DummyPurger extends BaseCachePurger
 {
     // Static
     // =========================================================================

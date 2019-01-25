@@ -185,7 +185,7 @@ class CacheService extends Component
                 false)
             ->execute();
 
-        Blitz::$plugin->driver->saveCache($output, $siteUri);
+        Blitz::$plugin->cacheStorage->save($output, $siteUri);
     }
 
     // Private Methods

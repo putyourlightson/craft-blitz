@@ -9,10 +9,10 @@ use craft\errors\MissingComponentException;
 use craft\events\RegisterComponentTypesEvent;
 use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\purgers\BasePurger;
-use putyourlightson\blitz\purgers\CloudflarePurger;
-use putyourlightson\blitz\purgers\DummyPurger;
-use putyourlightson\blitz\purgers\PurgerInterface;
+use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
+use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
+use putyourlightson\blitz\drivers\purgers\DummyPurger;
+use putyourlightson\blitz\drivers\purgers\CachePurgerInterface;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
@@ -57,13 +57,13 @@ class PurgerHelper
     /**
      * Returns all purgers.
      *
-     * @return BasePurger[]
+     * @return BaseCachePurger[]
      */
     public static function getAllPurgers(): array
     {
         $purgers = [];
 
-        /** @var BasePurger $class */
+        /** @var BaseCachePurger $class */
         foreach (PurgerHelper::getAllPurgerTypes() as $class) {
             if ($class::isSelectable()) {
                 $purger = self::createPurger($class);
@@ -83,18 +83,18 @@ class PurgerHelper
      * @param string $type
      * @param array|null $settings
      *
-     * @return PurgerInterface|null
+     * @return CachePurgerInterface|null
      */
     public static function createPurger(string $type, array $settings = null)
     {
         $purger = null;
 
         try {
-            /** @var PurgerInterface $purger */
+            /** @var CachePurgerInterface $purger */
             $purger = Component::createComponent([
                 'type' => $type,
                 'settings' => $settings ?? [],
-            ], PurgerInterface::class);
+            ], CachePurgerInterface::class);
         }
         catch (InvalidConfigException $e) {}
         catch (MissingComponentException $e) {}

@@ -3,11 +3,11 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\drivers;
+namespace putyourlightson\blitz\drivers\storage;
 
 use putyourlightson\blitz\models\SiteUriModel;
 
-interface DriverInterface
+interface CacheStorageInterface
 {
     /**
      * Returns the cached value for the provided site and URI.
@@ -16,7 +16,7 @@ interface DriverInterface
      *
      * @return string
      */
-    public function getCachedUri(SiteUriModel $siteUri): string;
+    public function getValue(SiteUriModel $siteUri): string;
 
     /**
      * Returns the utility HTML.
@@ -31,17 +31,17 @@ interface DriverInterface
      * @param string $value
      * @param SiteUriModel $siteUri
      */
-    public function saveCache(string $value, SiteUriModel $siteUri);
+    public function save(string $value, SiteUriModel $siteUri);
 
     /**
-     * Clears the cache.
+     * Deletes all cached values.
      */
-    public function clearAllCache();
+    public function deleteAll();
 
     /**
-     * Clears the cache for the provided site URIs.
+     * Deletes the cache values for the provided site URIs.
      *
      * @param SiteUriModel[]
      */
-    public function clearCachedUris(array $siteUris);
+    public function deleteValues(array $siteUris);
 }

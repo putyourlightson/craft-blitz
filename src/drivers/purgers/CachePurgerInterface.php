@@ -3,11 +3,11 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\purgers;
+namespace putyourlightson\blitz\drivers\purgers;
 
 use putyourlightson\blitz\models\SiteUriModel;
 
-interface PurgerInterface
+interface CachePurgerInterface
 {
     /**
      * Purges the cache given an array of URLs.

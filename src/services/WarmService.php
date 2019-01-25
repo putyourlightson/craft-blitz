@@ -38,7 +38,7 @@ class WarmService extends Component
     /**
      * Requests the provided URLs concurrently.
      *
-     * @param array $urls
+     * @param string[] $urls
      * @param array $setProgressHandler
      * @param QueueInterface|null $queue
      *
@@ -64,12 +64,12 @@ class WarmService extends Component
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $requests, [
             'concurrency' => Blitz::$plugin->settings->concurrency,
-            'fulfilled' => function () use (&$success, &$count, $total, $setProgressHandler, $queue) {
+            'fulfilled' => function() use (&$success, &$count, $total, $setProgressHandler, $queue) {
                 $success++;
                 $count++;
                 call_user_func_array($setProgressHandler, [$count, $total, $queue]);
             },
-            'rejected' => function ($reason) use (&$count, $total, $setProgressHandler, $queue) {
+            'rejected' => function($reason) use (&$count, $total, $setProgressHandler, $queue) {
                 $count++;
                 call_user_func_array($setProgressHandler, [$count, $total, $queue]);
 

@@ -10,10 +10,10 @@ use craft\base\ComponentInterface;
 use craft\errors\MissingComponentException;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\BaseDriver;
+use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\helpers\DriverHelper;
 use putyourlightson\blitz\helpers\PurgerHelper;
-use putyourlightson\blitz\purgers\BasePurger;
+use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -29,7 +29,7 @@ class SettingsController extends Controller
      */
     public function actionEdit()
     {
-        /** @var BaseDriver $driver */
+        /** @var BaseCacheStorage $driver */
         $driver = DriverHelper::createDriver(
             Blitz::$plugin->settings->driverType,
             Blitz::$plugin->settings->driverSettings
@@ -40,7 +40,7 @@ class SettingsController extends Controller
 
         $drivers = DriverHelper::getAllDrivers();
 
-        /** @var BasePurger $purger */
+        /** @var BaseCachePurger $purger */
         $purger = PurgerHelper::createPurger(
             Blitz::$plugin->settings->purgerType,
             Blitz::$plugin->settings->purgerSettings
@@ -88,7 +88,7 @@ class SettingsController extends Controller
         $settings->driverSettings = $driverSettings[$settings->driverType] ?? [];
 
         // Create the driver so that we can validate it
-        /* @var BaseDriver $driver */
+        /* @var BaseCacheStorage $driver */
         $driver = DriverHelper::createDriver(
             $settings->driverType,
             $settings->driverSettings
@@ -98,7 +98,7 @@ class SettingsController extends Controller
         $settings->purgerSettings = $purgerSettings[$settings->purgerType] ?? [];
 
         // Create the purger so that we can validate it
-        /* @var BasePurger $purger */
+        /* @var BaseCachePurger $purger */
         $purger = PurgerHelper::createPurger(
             $settings->purgerType,
             $settings->purgerSettings

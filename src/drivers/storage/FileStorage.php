@@ -3,7 +3,7 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\drivers;
+namespace putyourlightson\blitz\drivers\storage;
 
 use Craft;
 use craft\helpers\FileHelper;
@@ -16,7 +16,7 @@ use yii\log\Logger;
 /**
  * @property mixed $settingsHtml
  */
-class FileDriver extends BaseDriver
+class FileStorage extends BaseCacheStorage
 {
     // Static
     // =========================================================================
@@ -77,7 +77,7 @@ class FileDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function getCachedUri(SiteUriModel $siteUri): string
+    public function getValue(SiteUriModel $siteUri): string
     {
         $value = '';
 
@@ -93,7 +93,7 @@ class FileDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function saveCache(string $value, SiteUriModel $siteUri)
+    public function save(string $value, SiteUriModel $siteUri)
     {
         $filePath = $this->_getFilePath($siteUri);
 
@@ -119,7 +119,7 @@ class FileDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function clearAllCache()
+    public function deleteAll()
     {
         if (empty($this->_cacheFolderPath)) {
             return;
@@ -139,7 +139,7 @@ class FileDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function clearCachedUris(array $siteUris)
+    public function deleteValues(array $siteUris)
     {
         foreach ($siteUris as $siteUri) {
             $filePath = $this->_getFilePath($siteUri);

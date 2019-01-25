@@ -8,8 +8,8 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
-use putyourlightson\blitz\drivers\FileDriver;
-use putyourlightson\blitz\purgers\DummyPurger;
+use putyourlightson\blitz\drivers\storage\FileStorage;
+use putyourlightson\blitz\drivers\purgers\DummyPurger;
 
 class SettingsModel extends Model
 {
@@ -39,7 +39,7 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $driverType = FileDriver::class;
+    public $driverType = FileStorage::class;
 
     /**
      * @var array

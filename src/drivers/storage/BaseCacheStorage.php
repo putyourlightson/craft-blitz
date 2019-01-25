@@ -3,14 +3,14 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\drivers;
+namespace putyourlightson\blitz\drivers\storage;
 
 use craft\base\SavableComponent;
 
 /**
  * @property string $utilityHtml
  */
-abstract class BaseDriver extends SavableComponent implements DriverInterface
+abstract class BaseCacheStorage extends SavableComponent implements CacheStorageInterface
 {
     /**
      * @inheritdoc

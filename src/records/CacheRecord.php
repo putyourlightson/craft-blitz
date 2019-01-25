@@ -17,7 +17,7 @@ class CacheRecord extends ActiveRecord
     // Public Static Methods
     // =========================================================================
 
-     /**
+    /**
      * @inheritdoc
      *
      * @return string

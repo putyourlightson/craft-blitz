@@ -19,12 +19,12 @@ class SiteUriModel extends Model
     // =========================================================================
 
     /**
-     * @var int|null
+     * @var int
      */
     public $siteId;
 
     /**
-     * @var string|null
+     * @var string
      */
     public $uri;
 

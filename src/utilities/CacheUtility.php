@@ -44,7 +44,7 @@ class CacheUtility extends Utility
     public static function contentHtml(): string
     {
         return Craft::$app->getView()->renderTemplate('blitz/_utility', [
-            'driverHtml' => Blitz::$plugin->driver->getUtilityHtml(),
+            'driverHtml' => Blitz::$plugin->cacheStorage->getUtilityHtml(),
         ]);
     }
 }
