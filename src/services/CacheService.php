@@ -12,7 +12,6 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
-use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
@@ -269,20 +268,32 @@ class CacheService extends Component
         foreach ($defaultParams as $key => $default) {
             $value = $elementQuery->{$key};
 
-            if ($value !== $default)
+            if ($value !== $default) {
                 $params[$key] = $value;
-
-                // Convert datetime parameters to Unix timestamps
-                if ($value instanceof \DateTime) {
-                    $params[$key] = $value->getTimestamp();
-                }
-
-                // Convert element parameters to ID
-                if ($value instanceof Element) {
-                    $params[$key] = $value->id;
-                }
+            }
         }
 
+        // Convert the query parameter values recursively
+        array_walk_recursive($params, [$this, '_convertQueryParams']);
+
         return $params;
+    }
+
+    /**
+     * Converts query parameter values to more concise formats.
+     *
+     * @param mixed $value
+     */
+    private function _convertQueryParams(&$value)
+    {
+        // Convert element parameters to their ID
+        if ($value instanceof Element) {
+            $value = $value->id;
+        }
+
+        // Convert DateTime objects to Unix timestamp
+        if ($value instanceof \DateTime) {
+            $value = $value->getTimestamp();
+        }
     }
 }
