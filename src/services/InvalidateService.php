@@ -19,6 +19,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use yii\db\ActiveQuery;
 use yii\db\Exception;
 
 /**
@@ -64,31 +65,6 @@ class InvalidateService extends Component
 
     // Public Methods
     // =========================================================================
-
-    /**
-     * Returns cached URLs given an array of cache IDs.
-     *
-     * @param int[] $cacheIds
-     *
-     * @return string[]
-     * @throws \yii\base\Exception
-     */
-    public function getCachedUrls(array $cacheIds): array
-    {
-        $urls = [];
-
-        /** @var CacheRecord[] $cacheRecords */
-        $cacheRecords = CacheRecord::find()
-            ->select('uri, siteId')
-            ->where(['id' => $cacheIds])
-            ->all();
-
-        foreach ($cacheRecords as $cacheRecord) {
-            $urls[] = Blitz::$plugin->request->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
-        }
-
-        return $urls;
-    }
 
     /**
      * Returns all cached URLs.
@@ -142,6 +118,92 @@ class InvalidateService extends Component
         }
 
         return $urls;
+    }
+
+    /**
+     * Returns refreshable cache IDs from the provided element IDs and types without the cache IDs.
+     *
+     * @param int[] $cacheIds
+     * @param int[] $elementIds
+     * @param string[] $elementTypes
+     *
+     * @return int[]
+     */
+    public function getRefreshableCacheIds(array $cacheIds, array $elementIds, array $elementTypes): array
+    {
+        // Get element query records of the provided element types without the cache IDs and without eager loading
+        $elementQueryRecords = ElementQueryRecord::find()
+            ->select(['id', 'type', 'params'])
+            ->where(['type' => $elementTypes])
+            ->innerJoinWith([
+                'elementQueryCaches' => function(ActiveQuery $query) use ($cacheIds) {
+                    $query->where(['not', ['cacheId' => $cacheIds]]);
+                }
+            ], false)
+            ->all();
+
+        foreach ($elementQueryRecords as $elementQueryRecord) {
+            // Ensure class still exists as a plugin may have been removed since being saved
+            if (!class_exists($elementQueryRecord->type)) {
+                continue;
+            }
+
+            /** @var ElementInterface $elementType */
+            $elementType = $elementQueryRecord->type;
+
+            /** @var ElementQuery $elementQuery */
+            $elementQuery = $elementType::find();
+
+            $params = json_decode($elementQueryRecord->params, true);
+
+            // If json decode failed
+            if (!is_array($params)) {
+                continue;
+            }
+
+            foreach ($params as $key => $val) {
+                $elementQuery->{$key} = $val;
+            }
+
+            // If the element query has an offset then add it to the limit and make it null
+            if ($elementQuery->offset) {
+                if ($elementQuery->limit) {
+                    $elementQuery->limit($elementQuery->limit + $elementQuery->offset);
+                }
+                $elementQuery->offset(null);
+            }
+
+            // If one or more of the element IDs are in the query's results
+            if (!empty(array_intersect($elementIds, $elementQuery->ids()))) {
+                // Get related element query cache records
+                $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
+
+                // Add cache IDs to the array that do not already exist
+                foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
+                    if (!in_array($elementQueryCacheRecord->cacheId, $cacheIds, true)) {
+                        $cacheIds[] = $elementQueryCacheRecord->cacheId;
+                    }
+                }
+            }
+        }
+
+        return $cacheIds;
+    }
+
+    /**
+     * Returns cached URIs given an array of cache IDs.
+     *
+     * @param int[] $cacheIds
+     *
+     * @return array
+     */
+    public function getCachedSiteUris(array $cacheIds): array
+    {
+        return CacheRecord::find()
+            ->select(['siteId', 'uri'])
+            ->where(['id' => $cacheIds])
+            ->asArray(true)
+            ->all();
     }
 
     /**
