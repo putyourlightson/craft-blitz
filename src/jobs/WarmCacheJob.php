@@ -21,11 +21,6 @@ class WarmCacheJob extends BaseJob
      */
     public $urls = [];
 
-    /**
-     * @var int
-     */
-    public $concurrency = 1;
-
     // Public Methods
     // =========================================================================
 
@@ -36,7 +31,7 @@ class WarmCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
-        Blitz::$plugin->warmService->requestUrls($this->urls, [$this, 'setRequestsProgress'], $queue);
+        Blitz::$plugin->warmCache->requestUrls($this->urls, [$this, 'setRequestsProgress'], $queue);
     }
 
     /**

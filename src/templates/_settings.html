@@ -19,7 +19,7 @@
 
 {% set tabs = {
     general: {label: 'General'|t('blitz'), url: '#general'},
-    driver: {label: 'Cache Driver'|t('blitz'), url: '#driver'},
+    storage: {label: 'Cache Storage'|t('blitz'), url: '#storage'},
     purger: {label: 'Reverse Proxy Purger'|t('blitz'), url: '#purger'},
     advanced: {label: 'Advanced'|t('blitz'), url: '#advanced'},
 } %}
@@ -128,23 +128,23 @@
         }) }}
     </div>
 
-    <div id="driver" class="hidden">
+    <div id="storage" class="hidden">
         {{ forms.selectField({
-            label: "Cache Driver"|t('blitz'),
-            instructions: "The cache driver to use for storing cached pages."|t('blitz'),
-            warning: (config.driverType is defined ? configWarning('driverType')),
-            name: 'settings[driverType]',
-            options: driverTypeOptions,
-            value: className(driver),
+            label: "Cache Storage"|t('blitz'),
+            instructions: "The storage type to use for storing cached pages."|t('blitz'),
+            warning: (config.cacheStorageType is defined ? configWarning('cacheStorageType')),
+            name: 'settings[cacheStorageType]',
+            options: storageTypeOptions,
+            value: className(storageDriver),
             required: true,
             toggle: true,
         }) }}
 
-        {% for _driver in drivers %}
-            {% set isCurrent = (className(_driver) == className(driver)) %}
-            <div id="{{ className(_driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
-                {% namespace 'driverSettings[' ~ className(_driver) ~ ']' %}
-                    {{ (isCurrent ? driver : _driver).getSettingsHtml()|raw }}
+        {% for driver in storageDrivers %}
+            {% set isCurrent = (className(driver) == className(storageDriver)) %}
+            <div id="{{ className(driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+                {% namespace 'cacheStorageSettings[' ~ className(driver) ~ ']' %}
+                    {{ (isCurrent ? storageDriver : driver).getSettingsHtml()|raw }}
                 {% endnamespace %}
             </div>
         {% endfor %}
@@ -154,18 +154,18 @@
         {{ forms.selectField({
             label: "Reverse Proxy Purger"|t('blitz'),
             instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz'),
-            warning: (config.purgerType is defined ? configWarning('purgerType')),
-            name: 'settings[purgerType]',
+            warning: (config.cachePurgerType is defined ? configWarning('cachePurgerType')),
+            name: 'settings[cachePurgerType]',
             options: purgerTypeOptions,
-            value: className(purger),
+            value: className(purgerDriver),
             toggle: true,
         }) }}
 
-        {% for _purger in purgers %}
-            {% set isCurrent = (className(_purger) == className(purger)) %}
-            <div id="{{ className(_purger)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
-                {% namespace 'purgerSettings[' ~ className(_purger) ~ ']' %}
-                    {{ (isCurrent ? purger : _purger).getSettingsHtml()|raw }}
+        {% for driver in purgerDrivers %}
+            {% set isCurrent = (className(driver) == className(purgerDriver)) %}
+            <div id="{{ className(driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+                {% namespace 'cachePurgerSettings[' ~ className(driver) ~ ']' %}
+                    {{ (isCurrent ? purgerDriver : driver).getSettingsHtml()|raw }}
                 {% endnamespace %}
             </div>
         {% endfor %}

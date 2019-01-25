@@ -16,7 +16,7 @@ use putyourlightson\blitz\drivers\purgers\CachePurgerInterface;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
-class PurgerHelper
+class CachePurgerHelper
 {
     // Constants
     // =========================================================================
@@ -30,12 +30,14 @@ class PurgerHelper
     // =========================================================================
 
     /**
-     * Returns all purger types.
+     * Returns all purger drivers.
      *
-     * @return string[]
+     * @return BaseCachePurger[]
      */
-    public static function getAllPurgerTypes(): array
+    public static function getAllDrivers(): array
     {
+        $drivers = [];
+
         $purgerTypes = [
             DummyPurger::class,
             CloudflarePurger::class,
@@ -43,7 +45,7 @@ class PurgerHelper
 
         $purgerTypes = array_unique(array_merge(
             $purgerTypes,
-            Blitz::$plugin->settings->purgerTypes
+            Blitz::$plugin->settings->cachePurgerTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([
@@ -51,47 +53,37 @@ class PurgerHelper
         ]);
         Event::trigger(static::class, self::EVENT_REGISTER_PURGER_TYPES, $event);
 
-        return $event->types;
-    }
-
-    /**
-     * Returns all purgers.
-     *
-     * @return BaseCachePurger[]
-     */
-    public static function getAllPurgers(): array
-    {
-        $purgers = [];
+        $purgerTypes = $event->types;
 
         /** @var BaseCachePurger $class */
-        foreach (PurgerHelper::getAllPurgerTypes() as $class) {
+        foreach ($purgerTypes as $class) {
             if ($class::isSelectable()) {
-                $purger = self::createPurger($class);
+                $driver = self::createDriver($class);
 
-                if ($purger !== null) {
-                    $purgers[] = $purger;
+                if ($driver !== null) {
+                    $drivers[] = $driver;
                 }
             }
         }
 
-        return $purgers;
+        return $drivers;
     }
 
     /**
-     * Creates a purger of the provided type with the optional settings.
+     * Creates a purger driver of the provided type with the optional settings.
      *
      * @param string $type
      * @param array|null $settings
      *
      * @return CachePurgerInterface|null
      */
-    public static function createPurger(string $type, array $settings = null)
+    public static function createDriver(string $type, array $settings = null)
     {
-        $purger = null;
+        $driver = null;
 
         try {
-            /** @var CachePurgerInterface $purger */
-            $purger = Component::createComponent([
+            /** @var CachePurgerInterface $driver */
+            $driver = Component::createComponent([
                 'type' => $type,
                 'settings' => $settings ?? [],
             ], CachePurgerInterface::class);
@@ -99,6 +91,6 @@ class PurgerHelper
         catch (InvalidConfigException $e) {}
         catch (MissingComponentException $e) {}
 
-        return $purger;
+        return $driver;
     }
 }

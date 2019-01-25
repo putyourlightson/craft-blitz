@@ -11,8 +11,8 @@ use craft\errors\MissingComponentException;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
-use putyourlightson\blitz\helpers\DriverHelper;
-use putyourlightson\blitz\helpers\PurgerHelper;
+use putyourlightson\blitz\helpers\CacheStorageHelper;
+use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
@@ -29,38 +29,38 @@ class SettingsController extends Controller
      */
     public function actionEdit()
     {
-        /** @var BaseCacheStorage $driver */
-        $driver = DriverHelper::createDriver(
-            Blitz::$plugin->settings->driverType,
-            Blitz::$plugin->settings->driverSettings
+        /** @var BaseCacheStorage $storageDriver */
+        $storageDriver = CacheStorageHelper::createDriver(
+            Blitz::$plugin->settings->cacheStorageType,
+            Blitz::$plugin->settings->cacheStorageSettings
         );
 
         // Validate the driver so that any errors will be displayed
-        $driver->validate();
+        $storageDriver->validate();
 
-        $drivers = DriverHelper::getAllDrivers();
+        $storageDrivers = CacheStorageHelper::getAllDrivers();
 
-        /** @var BaseCachePurger $purger */
-        $purger = PurgerHelper::createPurger(
-            Blitz::$plugin->settings->purgerType,
-            Blitz::$plugin->settings->purgerSettings
+        /** @var BaseCachePurger $purgerDriver */
+        $purgerDriver = CachePurgerHelper::createDriver(
+            Blitz::$plugin->settings->cachePurgerType,
+            Blitz::$plugin->settings->cachePurgerSettings
         );
 
         // Validate the purger so that any errors will be displayed
-        $purger->validate();
+        $purgerDriver->validate();
 
-        $purgers = PurgerHelper::getAllPurgers();
+        $purgerDrivers = CachePurgerHelper::getAllDrivers();
 
         return $this->renderTemplate('blitz/_settings', [
             'settings' => Blitz::$plugin->settings,
             'parsedApiKey' => Craft::parseEnv(Blitz::$plugin->settings->apiKey),
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
-            'driver' => $driver,
-            'drivers' => $drivers,
-            'driverTypeOptions' => array_map([$this, '_getSelectOption'], $drivers),
-            'purger' => $purger,
-            'purgers' => $purgers,
-            'purgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgers),
+            'storageDriver' => $storageDriver,
+            'storageDrivers' => $storageDrivers,
+            'storageTypeOptions' => array_map([$this, '_getSelectOption'], $storageDrivers),
+            'purgerDriver' => $purgerDriver,
+            'purgerDrivers' => $purgerDrivers,
+            'purgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgerDrivers),
         ]);
     }
 
@@ -78,44 +78,44 @@ class SettingsController extends Controller
         $request = Craft::$app->getRequest();
 
         $postedSettings = $request->getBodyParam('settings', []);
-        $driverSettings = $request->getBodyParam('driverSettings', []);
-        $purgerSettings = $request->getBodyParam('purgerSettings', []);
+        $storageSettings = $request->getBodyParam('cacheStorageSettings', []);
+        $purgerSettings = $request->getBodyParam('cachePurgerSettings', []);
 
         $settings = Blitz::$plugin->settings;
         $settings->setAttributes($postedSettings, false);
 
-        // Apply driver settings excluding type
-        $settings->driverSettings = $driverSettings[$settings->driverType] ?? [];
+        // Apply storage settings excluding type
+        $settings->cacheStorageSettings = $storageSettings[$settings->cacheStorageType] ?? [];
 
-        // Create the driver so that we can validate it
-        /* @var BaseCacheStorage $driver */
-        $driver = DriverHelper::createDriver(
-            $settings->driverType,
-            $settings->driverSettings
+        // Create the storage driver so that we can validate it
+        /* @var BaseCacheStorage $storageDriver */
+        $storageDriver = CacheStorageHelper::createDriver(
+            $settings->cacheStorageType,
+            $settings->cacheStorageSettings
         );
 
         // Apply purger settings excluding type
-        $settings->purgerSettings = $purgerSettings[$settings->purgerType] ?? [];
+        $settings->cachePurgerSettings = $purgerSettings[$settings->cachePurgerType] ?? [];
 
-        // Create the purger so that we can validate it
-        /* @var BaseCachePurger $purger */
-        $purger = PurgerHelper::createPurger(
-            $settings->purgerType,
-            $settings->purgerSettings
+        // Create the purger driver so that we can validate it
+        /* @var BaseCachePurger $purgerDriver */
+        $purgerDriver = CachePurgerHelper::createDriver(
+            $settings->cachePurgerType,
+            $settings->cachePurgerSettings
         );
 
         $variables = [
             'settings' => $settings,
-            'driver' => $driver,
-            'purger' => $purger,
+            'storageDriver' => $storageDriver,
+            'purgerDriver' => $purgerDriver,
         ];
 
         // Validate
         $settings->validate();
-        $driver->validate();
-        $purger->validate();
+        $storageDriver->validate();
+        $purgerDriver->validate();
 
-        if ($settings->hasErrors() || $driver->hasErrors() || $purger->hasErrors()) {
+        if ($settings->hasErrors() || $storageDriver->hasErrors() || $purgerDriver->hasErrors()) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
 
             Craft::$app->getUrlManager()->setRouteParams($variables);
@@ -123,7 +123,7 @@ class SettingsController extends Controller
             return null;
         }
 
-        if (!$purger->test()) {
+        if (!$purgerDriver->test()) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Purger connection failed.'));
 
             Craft::$app->getUrlManager()->setRouteParams($variables);

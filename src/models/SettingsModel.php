@@ -39,32 +39,32 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $driverType = FileStorage::class;
+    public $cacheStorageType = FileStorage::class;
 
     /**
      * @var array
      */
-    public $driverSettings = [];
+    public $cacheStorageSettings = [];
 
     /**
      * @var array
      */
-    public $driverTypes = [];
+    public $cacheStorageTypes = [];
 
     /**
      * @var string
      */
-    public $purgerType = DummyPurger::class;
+    public $cachePurgerType = DummyPurger::class;
 
     /**
      * @var array
      */
-    public $purgerSettings = [];
+    public $cachePurgerSettings = [];
 
     /**
      * @var array
      */
-    public $purgerTypes = [];
+    public $cachePurgerTypes = [];
 
     /**
      * @var int
@@ -137,7 +137,7 @@ class SettingsModel extends Model
     public function rules(): array
     {
         return [
-            [['queryStringCaching', 'concurrency', 'driverType'], 'required'],
+            [['queryStringCaching', 'concurrency', 'cacheStorageType'], 'required'],
             [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
             [['concurrency'], 'integer', 'min' => 1],
             [['apiKey'], 'string', 'length' => [16]],

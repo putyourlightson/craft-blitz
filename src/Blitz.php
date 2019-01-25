@@ -33,10 +33,11 @@ use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
-use putyourlightson\blitz\services\CacheService;
-use putyourlightson\blitz\services\ClearService;
-use putyourlightson\blitz\services\WarmService;
-use putyourlightson\blitz\services\RefreshService;
+use putyourlightson\blitz\services\GenerateCacheService;
+use putyourlightson\blitz\services\ClearCacheService;
+use putyourlightson\blitz\services\OutputCacheService;
+use putyourlightson\blitz\services\WarmCacheService;
+use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\services\RequestService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
@@ -45,11 +46,12 @@ use yii\queue\ExecEvent;
 
 /**
  *
- * @property CacheService $cacheService
- * @property ClearService $clearService
- * @property RefreshService $refreshService
- * @property RequestService $requestService
- * @property WarmService $warmService
+ * @property ClearCacheService $clearCache
+ * @property GenerateCacheService $generateCache
+ * @property OutputCacheService $outputCache
+ * @property RefreshCacheService $refreshCache
+ * @property RequestService $request
+ * @property WarmCacheService $warmCache
  * @property BaseCacheStorage $cacheStorage
  * @property BaseCachePurger $cachePurger
  * @property SettingsModel $settings
@@ -141,15 +143,15 @@ class Blitz extends Plugin
      */
     private function _processCacheableRequest(): bool
     {
-        if ($this->requestService->getIsCacheableRequest()) {
-            $siteUri = $this->requestService->getRequestedSiteUri();
+        if ($this->request->getIsCacheableRequest()) {
+            $siteUri = $this->request->getRequestedSiteUri();
 
             if ($siteUri->getIsCacheableUri()) {
                 $value = $this->cacheStorage->getValue($siteUri);
 
                 // If cached value exists then output it (assuming this has not already been done server-side)
                 if ($value) {
-                    $this->requestService->output($value);
+                    $this->outputCache->output($value);
                 }
 
                 $this->_registerCacheableRequestEvents($siteUri);
@@ -168,13 +170,13 @@ class Blitz extends Plugin
     private function _registerComponents()
     {
         $this->setComponents([
-            'cacheService' => CacheService::class,
-            'clearService' => ClearService::class,
-            'refreshService' => RefreshService::class,
-            'requestService' => RequestService::class,
-            'warmService' => WarmService::class,
-            'driver' => array_merge(['class' => $this->settings->driverType], $this->settings->driverSettings),
-            'purger' => array_merge(['class' => $this->settings->purgerType], $this->settings->purgerSettings),
+            'generateCache' => GenerateCacheService::class,
+            'clearCache' => ClearCacheService::class,
+            'refreshCache' => RefreshCacheService::class,
+            'request' => RequestService::class,
+            'warmCache' => WarmCacheService::class,
+            'cacheStorage' => array_merge(['class' => $this->settings->cacheStorageType], $this->settings->cacheStorageSettings),
+            'cachePurger' => array_merge(['class' => $this->settings->cachePurgerType], $this->settings->cachePurgerSettings),
         ]);
     }
 
@@ -206,7 +208,7 @@ class Blitz extends Plugin
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
             function(PopulateElementEvent $event) use ($response) {
                 if ($response->getIsOk()) {
-                    $this->cacheService->addElementCache($event->element);
+                    $this->generateCache->addElement($event->element);
                 }
             }
         );
@@ -217,7 +219,7 @@ class Blitz extends Plugin
                 if ($response->getIsOk()) {
                     /** @var ElementQuery $elementQuery */
                     $elementQuery = $event->sender;
-                    $this->cacheService->addElementQueryCache($elementQuery);
+                    $this->generateCache->addElementQuery($elementQuery);
                 }
             }
         );
@@ -225,13 +227,13 @@ class Blitz extends Plugin
         // Register template page render events
         Event::on(View::class, View::EVENT_BEFORE_RENDER_PAGE_TEMPLATE,
             function() use ($siteUri) {
-                $this->clearService->deleteSiteUri($siteUri);
+                $this->clearCache->deleteSiteUri($siteUri);
             }
         );
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
             function(TemplateEvent $event) use ($response, $siteUri) {
                 if ($response->getIsOk()) {
-                    $this->cacheService->saveOutput($event->output, $siteUri);
+                    $this->generateCache->saveOutput($event->output, $siteUri);
                 }
             }
         );
@@ -245,22 +247,22 @@ class Blitz extends Plugin
         // Invalidate elements
         Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
             function(ElementEvent $event) {
-                $this->refreshService->addElement($event->element);
+                $this->refreshCache->addElement($event->element);
             }
         );
         Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
             function(MoveElementEvent $event) {
-                $this->refreshService->addElement($event->element);
+                $this->refreshCache->addElement($event->element);
             }
         );
         Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
             function(ElementEvent $event) {
-                $this->refreshService->addElement($event->element);
+                $this->refreshCache->addElement($event->element);
             }
         );
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(ElementEvent $event) {
-                $this->refreshService->addElement($event->element);
+                $this->refreshCache->addElement($event->element);
             }
         );
     }
@@ -274,7 +276,7 @@ class Blitz extends Plugin
         Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
             function(ExecEvent $event) {
                 if ($event->job instanceof ResaveElements) {
-                    $this->refreshService->batchMode = true;
+                    $this->refreshCache->batchMode = true;
                 }
             }
         );
@@ -283,14 +285,14 @@ class Blitz extends Plugin
         Event::on(Queue::class, Queue::EVENT_AFTER_EXEC,
             function(ExecEvent $event) {
                 if ($event->job instanceof ResaveElements) {
-                    $this->refreshService->refreshCache();
+                    $this->refreshCache->refresh();
                 }
             }
         );
         Event::on(Queue::class, Queue::EVENT_AFTER_ERROR,
             function(ExecEvent $event) {
                 if ($event->job instanceof ResaveElements) {
-                    $this->refreshService->refreshCache();
+                    $this->refreshCache->refresh();
                 }
             }
         );
@@ -306,7 +308,7 @@ class Blitz extends Plugin
                 $event->options[] = [
                     'key' => 'blitz',
                     'label' => Craft::t('blitz', 'Blitz cache'),
-                    'action' => [Blitz::$plugin->refreshService, 'clearCache'],
+                    'action' => [Blitz::$plugin->clearCache, 'clearAll'],
                 ];
             }
         );
@@ -319,7 +321,7 @@ class Blitz extends Plugin
     {
         Event::on(Gc::class, Gc::EVENT_RUN,
             function() {
-                $this->clearService->runGarbageCollection();
+                $this->clearCache->runGarbageCollection();
             }
         );
     }

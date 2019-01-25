@@ -11,7 +11,7 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 
-class ClearService extends Component
+class ClearCacheService extends Component
 {
     // Constants
     // =========================================================================
@@ -25,11 +25,11 @@ class ClearService extends Component
     // =========================================================================
 
     /**
-     * Clears the cache.
+     * Clears the entire cache.
      *
      * @param bool $flush
      */
-    public function clearCache(bool $flush = false)
+    public function clearAll(bool $flush = false)
     {
         Blitz::$plugin->cacheStorage->deleteAll();
 

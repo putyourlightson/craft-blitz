@@ -6,10 +6,15 @@
 namespace putyourlightson\blitz\services;
 
 use Craft;
+use craft\web\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 
-class RequestService
+/**
+ * @property bool $isCacheableRequest
+ * @property SiteUriModel $requestedSiteUri
+ */
+class RequestService extends Request
 {
     // Public Methods
     // =========================================================================
@@ -21,11 +26,13 @@ class RequestService
      */
     public function getIsCacheableRequest(): bool
     {
-        $request = Craft::$app->getRequest();
-        $response = Craft::$app->getResponse();
-
-        // Ensure this is a front-end get that is not a console request or an action request or live preview and returns status 200
-        if (!$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsActionRequest() || $request->getIsLivePreview() || !$response->getIsOk()) {
+        // Ensure this is a front-end get request that is not a console request or an action request or live preview
+        if (!$this->getIsSiteRequest() || !$this->getIsGet() || $this->getIsConsoleRequest() || $this->getIsActionRequest() || $this->getIsLivePreview() || !$response->getIsOk()) {
+            return false;
+        }
+        
+        // Ensure the response is not an error
+        if (!Craft::$app->getResponse()->getIsOk()) {
             return false;
         }
 
@@ -40,7 +47,7 @@ class RequestService
             return false;
         }
 
-        if (!Blitz::$plugin->settings->queryStringCaching === 0 && $request->getQueryStringWithoutPath() !== '') {
+        if (!Blitz::$plugin->settings->queryStringCaching === 0 && $this->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
@@ -55,7 +62,7 @@ class RequestService
     public function getRequestedSiteUri(): SiteUriModel
     {
         $site = Craft::$app->getSites()->getCurrentSite();
-        $url = Craft::$app->getRequest()->getAbsoluteUrl();
+        $url = $this->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching == 2) {
@@ -73,28 +80,5 @@ class RequestService
             'siteId' => $site->id,
             'uri' => $uri,
         ]);
-    }
-
-    /**
-     * Outputs a given value.
-     *
-     * @param string $value
-     *
-     * @return string
-     */
-    public function output(string $value)
-    {
-        // Update powered by header
-        header_remove('X-Powered-By');
-
-        if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
-            header('X-Powered-By: '.$header.'Blitz');
-        }
-
-        // Update cache control header
-        header('Cache-Control: '.Blitz::$plugin->settings->cacheControlHeader);
-
-        exit($value.'<!-- Served by Blitz -->');
     }
 }

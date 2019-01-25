@@ -9,6 +9,7 @@ use Craft;
 use craft\helpers\App;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 
 class RefreshCacheJob extends BaseJob
 {
@@ -43,7 +44,7 @@ class RefreshCacheJob extends BaseJob
         App::maxPowerCaptain();
 
         if (!empty($this->elementIds)) {
-            $this->cacheIds = Blitz::$plugin->refreshService->getRefreshableCacheIds(
+            $this->cacheIds = Blitz::$plugin->refreshCache->getRefreshableCacheIds(
                 $this->cacheIds, $this->elementIds, $this->elementTypes
             );
         }
@@ -56,10 +57,10 @@ class RefreshCacheJob extends BaseJob
         $this->setProgress($queue, 0.5);
 
         // Get cached site URIs from cache IDs
-        $siteUris = Blitz::$plugin->refreshService->getCachedSiteUris($this->cacheIds);
+        $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
         // Delete cache records so we get fresh caches
-        Blitz::$plugin->clearService->deleteCacheIds($this->cacheIds);
+        Blitz::$plugin->clearCache->deleteCacheIds($this->cacheIds);
 
         // Clear cached URIs so we get a fresh version
         Blitz::$plugin->cacheStorage->deleteValues($siteUris);
@@ -68,7 +69,7 @@ class RefreshCacheJob extends BaseJob
         Blitz::$plugin->cachePurger->purgeUris($siteUris);
 
         // Trigger afterRefreshCache events
-        Blitz::$plugin->refreshService->afterRefreshCache($siteUris);
+        Blitz::$plugin->refreshCache->afterRefresh($siteUris);
     }
 
     // Protected Methods

@@ -17,21 +17,28 @@ use putyourlightson\blitz\jobs\WarmCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\log\Logger;
 
-class WarmService extends Component
+class WarmCacheService extends Component
 {
     // Public Methods
     // =========================================================================
 
     /**
-     * Warms the cache.
+     * Warms the entire cache.
+     */
+    public function warmAll()
+    {
+        $this->warmUris(SiteUriHelper::getAllSiteUris());
+    }
+
+    /**
+     * Warms the cache using the provided URIs.
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function warmCache(array $siteUris)
+    public function warmUris(array $siteUris)
     {
         Craft::$app->getQueue()->push(new WarmCacheJob([
             'urls' => SiteUriHelper::getUrls($siteUris),
-            'concurrency' => Blitz::$plugin->settings->concurrency,
         ]));
     }
 
@@ -39,12 +46,12 @@ class WarmService extends Component
      * Requests the provided URLs concurrently.
      *
      * @param string[] $urls
-     * @param array $setProgressHandler
+     * @param callable $setProgressHandler
      * @param QueueInterface|null $queue
      *
      * @return int
      */
-    public function requestUrls(array $urls, array $setProgressHandler, $queue = null): int
+    public function requestUrls(array $urls, callable $setProgressHandler, $queue = null): int
     {
         $success = 0;
 

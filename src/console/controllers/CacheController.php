@@ -27,7 +27,7 @@ class CacheController extends Controller
      */
     public function actionClear(): int
     {
-        Blitz::$plugin->clearService->clearCache(false);
+        Blitz::$plugin->clearCache->clearAll(false);
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
 
@@ -41,25 +41,9 @@ class CacheController extends Controller
      */
     public function actionFlush(): int
     {
-        Blitz::$plugin->clearService->clearCache(true);
+        Blitz::$plugin->clearCache->clearAll(true);
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
-
-        return ExitCode::OK;
-    }
-
-    /**
-     * Refreshes expired cache.
-     *
-     * @return int
-     */
-    public function actionRefreshExpired(): int
-    {
-        Blitz::$plugin->refreshService->refreshExpiredCache();
-
-        Craft::$app->getQueue()->run();
-
-        $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }
@@ -80,9 +64,9 @@ class CacheController extends Controller
         $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
         // Get cached site URIs before flushing the cache
-        $siteUris = Blitz::$plugin->refreshService->getAllCachedSiteUris();
+        $siteUris = SiteUriHelper::getAllSiteUris();
 
-        Blitz::$plugin->clearService->clearCache(true);
+        Blitz::$plugin->clearCache->clearAll(true);
 
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
@@ -90,12 +74,28 @@ class CacheController extends Controller
         $total = count($urls);
         Console::startProgress(0, $total, '', 0.8);
 
-        $success = Blitz::$plugin->warmService->requestUrls($urls, [$this, 'setRequestsProgress']);
+        $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestsProgress']);
 
         Console::updateProgress($total, $total);
         Console::endProgress();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Refreshes expired cache.
+     *
+     * @return int
+     */
+    public function actionRefreshExpired(): int
+    {
+        Blitz::$plugin->refreshCache->refreshExpiredCache();
+
+        Craft::$app->getQueue()->run();
+
+        $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }

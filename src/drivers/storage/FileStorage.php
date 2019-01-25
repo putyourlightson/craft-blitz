@@ -26,7 +26,7 @@ class FileStorage extends BaseCacheStorage
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Blitz File Driver (recommended)');
+        return Craft::t('blitz', 'Blitz File Storage (recommended)');
     }
 
     // Properties
@@ -185,7 +185,7 @@ class FileStorage extends BaseCacheStorage
             }
         }
 
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/file/utility', [
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/utility', [
             'sites' => $sites,
         ]);
     }
@@ -195,7 +195,7 @@ class FileStorage extends BaseCacheStorage
      */
     public function getSettingsHtml()
     {
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/file/settings', [
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/settings', [
             'driver' => $this,
         ]);
     }

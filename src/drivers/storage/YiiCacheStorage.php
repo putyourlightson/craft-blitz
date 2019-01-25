@@ -32,7 +32,7 @@ class YiiCacheStorage extends BaseCacheStorage
     {
         $name = get_class(Craft::$app->getCache());
 
-        return Craft::t('blitz', 'Yii Cache Driver [{name}]', ['name' => $name]);
+        return Craft::t('blitz', 'Yii Cache Storage [{name}]', ['name' => $name]);
     }
 
     // Public Methods
@@ -95,7 +95,7 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function getSettingsHtml()
     {
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/yii-cache/settings', [
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/yii-cache/settings', [
             'driver' => $this,
         ]);
     }

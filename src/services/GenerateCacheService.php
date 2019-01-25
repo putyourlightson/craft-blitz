@@ -19,11 +19,7 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\Exception;
 
-/**
- *
- * @property string[] $nonCacheableElementTypes
- */
-class CacheService extends Component
+class GenerateCacheService extends Component
 {
     // Properties
     // =========================================================================
@@ -47,11 +43,11 @@ class CacheService extends Component
     // =========================================================================
 
     /**
-     * Adds an element cache.
+     * Adds an element to cache.
      *
      * @param ElementInterface $element
      */
-    public function addElementCache(ElementInterface $element)
+    public function addElement(ElementInterface $element)
     {
         // Don't proceed if element caching is disabled
         if (!Blitz::$plugin->settings->cacheElements) {
@@ -73,12 +69,12 @@ class CacheService extends Component
     }
 
     /**
-     * Adds an element query cache.
+     * Adds an element query to cache.
      *
      * @param ElementQuery $elementQuery
      * @throws Exception
      */
-    public function addElementQueryCache(ElementQuery $elementQuery)
+    public function addElementQuery(ElementQuery $elementQuery)
     {
         // Don't proceed if element query caching is disabled
         if (!Blitz::$plugin->settings->cacheElementQueries) {

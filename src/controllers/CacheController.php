@@ -68,7 +68,7 @@ class CacheController extends Controller
      */
     public function actionClear(): Response
     {
-        Blitz::$plugin->clearService->clearCache(false);
+        Blitz::$plugin->clearCache->clearAll(false);
 
         return $this->_getResponse('Blitz cache successfully cleared.');
     }
@@ -80,7 +80,7 @@ class CacheController extends Controller
      */
     public function actionFlush(): Response
     {
-        Blitz::$plugin->clearService->clearCache(true);
+        Blitz::$plugin->clearCache->clearAll(true);
 
         return $this->_getResponse('Blitz cache successfully flushed.');
     }
@@ -96,12 +96,10 @@ class CacheController extends Controller
             return $this->_getResponse('Blitz caching is disabled.');
         }
 
-        // Get cached site URIs before flushing the cache
-        $siteUris = Blitz::$plugin->refreshService->getAllCachedSiteUris();
+        // Create warm cache job before flushing the cache
+        Blitz::$plugin->warmCache->warmAll();
 
-        Blitz::$plugin->clearService->clearCache(true);
-
-        Blitz::$plugin->warmService->warmCache($siteUris);
+        Blitz::$plugin->clearCache->clearAll(true);
 
         return $this->_getResponse('Blitz cache successfully queued for warming.');
     }
@@ -113,7 +111,7 @@ class CacheController extends Controller
      */
     public function actionRefreshExpired(): Response
     {
-        Blitz::$plugin->refreshService->refreshExpiredCache();
+        Blitz::$plugin->refreshCache->refreshExpiredCache();
 
         return $this->_getResponse('Expired Blitz cache successfully refreshed.');
     }

@@ -113,7 +113,7 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function getSettingsHtml()
     {
-        return Craft::$app->getView()->renderTemplate('blitz/_purgers/cloudflare/settings', [
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/purgers/cloudflare/settings', [
             'purger' => $this,
         ]);
     }
