@@ -12,7 +12,7 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\CacheHelper;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\WarmCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\log\Logger;
@@ -30,7 +30,7 @@ class WarmService extends Component
     public function warmCache(array $siteUris)
     {
         Craft::$app->getQueue()->push(new WarmCacheJob([
-            'urls' => CacheHelper::getUrls($siteUris),
+            'urls' => SiteUriHelper::getUrls($siteUris),
             'concurrency' => Blitz::$plugin->settings->concurrency,
         ]));
     }

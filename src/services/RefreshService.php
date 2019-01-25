@@ -370,7 +370,7 @@ class RefreshService extends Component
             ->all();
 
         foreach ($siteUris as $siteUri) {
-            $siteUriModels = new SiteUriModel($siteUri);
+            $siteUriModels[] = new SiteUriModel($siteUri);
         }
 
         return $siteUriModels;

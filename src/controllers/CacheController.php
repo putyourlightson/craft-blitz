@@ -96,12 +96,12 @@ class CacheController extends Controller
             return $this->_getResponse('Blitz caching is disabled.');
         }
 
-        // Get URLs before flushing the cache
-        $urls = Blitz::$plugin->refreshService->getAllCachedSiteUris();
+        // Get site URIs before flushing the cache
+        $siteUris = Blitz::$plugin->refreshService->getAllCachedSiteUris();
 
         Blitz::$plugin->clearService->clearCache(true);
 
-        Blitz::$plugin->warmService->warmCache(['urls' => $urls]);
+        Blitz::$plugin->warmService->warmCache($siteUris);
 
         return $this->_getResponse('Blitz cache successfully queued for warming.');
     }

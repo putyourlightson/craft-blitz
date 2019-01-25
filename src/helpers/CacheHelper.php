@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\helpers;
 
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
-use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
 class CacheHelper
@@ -50,23 +49,5 @@ class CacheHelper
         self::$_nonCacheableElementTypes = $event->elementTypes;
 
         return self::$_nonCacheableElementTypes;
-    }
-
-    /**
-     * Returns non cacheable element types.
-     *
-     * @param SiteUriModel[] $siteUris
-     *
-     * @return string[]
-     */
-    public static function getUrls(array $siteUris): array
-    {
-        $urls = [];
-
-        foreach ($siteUris as $siteUri) {
-            $urls[] = $siteUri->getUrl();
-        }
-
-        return $urls;
     }
 }

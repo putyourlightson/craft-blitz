@@ -180,7 +180,7 @@ class FileDriver extends BaseDriver
                 }
 
                 if (strpos($otherSite['path'], $site['path']) === 0) {
-                    $site['count'] -= is_dir($otherSite['path']) ? $sites[$site->id]['count'] : 0;
+                    $site['count'] = $site['count'] - (is_dir($otherSite['path']) ? $sites[$otherSiteId]['count'] : 0);
                 }
             }
         }

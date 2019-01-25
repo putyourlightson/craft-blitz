@@ -9,7 +9,7 @@ use Craft;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
-use putyourlightson\blitz\helpers\CacheHelper;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 
 /**
  * @property mixed $settingsHtml
@@ -80,7 +80,7 @@ class CloudflarePurger extends BasePurger
     public function purgeUris(array $siteUris)
     {
         $this->_sendRequest('delete', 'purge_cache', [
-            'files' => CacheHelper::getUrls($siteUris)
+            'files' => SiteUriHelper::getUrls($siteUris)
         ]);
     }
 
