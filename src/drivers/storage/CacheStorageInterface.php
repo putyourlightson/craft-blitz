@@ -31,7 +31,7 @@ interface CacheStorageInterface
      * @param string $value
      * @param SiteUriModel $siteUri
      */
-    public function save(string $value, SiteUriModel $siteUri);
+    public function saveValue(string $value, SiteUriModel $siteUri);
 
     /**
      * Deletes all cached values.

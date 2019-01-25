@@ -57,7 +57,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function save(string $value, SiteUriModel $siteUri)
+    public function saveValue(string $value, SiteUriModel $siteUri)
     {
         // Append timestamp
         $value .= '<!-- Cached by Blitz on '.date('c').' -->';
