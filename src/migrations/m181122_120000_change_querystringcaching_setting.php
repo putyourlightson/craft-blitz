@@ -4,6 +4,7 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
+use craft\db\Query;
 use craft\helpers\Json;
 use craft\records\Plugin;
 use putyourlightson\blitz\Blitz;
@@ -18,19 +19,22 @@ class m181122_120000_change_querystringcaching_setting extends Migration
      */
     public function safeUp()
     {
-        // Get old setting from plugin record
-        $pluginRecord = Plugin::find()
-            ->where(['handle' => 'blitz'])
-            ->one();
-
-        if ($pluginRecord === null || empty($pluginRecord->settings)) {
+        // Only for Craft 3.0
+        if (version_compare(Craft::$app->getInfo()->version, '3.1', '>=')) {
             return;
         }
 
-        /** @var Plugin $pluginRecord */
-        /** @var string $oldSettingsRaw */
-        $oldSettingsRaw = $pluginRecord->settings;
-        $pluginSettings = Json::decode($oldSettingsRaw);
+        // Get old setting from database
+        $plugin = (new Query())->from(Plugin::tableName())
+            ->where(['handle' => 'blitz'])
+            ->one();
+
+        if ($plugin === null || empty($plugin['settings'])) {
+            return;
+        }
+
+        $pluginSettings = Json::decodeIfJson($plugin['settings']);
+
         $queryStringCachingEnabled = $pluginSettings['queryStringCachingEnabled'];
 
         // Update and save settings with new setting

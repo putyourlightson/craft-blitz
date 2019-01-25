@@ -9,12 +9,14 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
+use craft\elements\db\ElementQuery;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
-use putyourlightson\blitz\jobs\WarmCacheJob;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
@@ -23,9 +25,9 @@ use yii\db\ActiveQuery;
 use yii\db\Exception;
 
 /**
- * @property string[] $allCachedUrls
+ * @property SiteUriModel[] $allCachedSiteUris
  */
-class InvalidateService extends Component
+class RefreshService extends Component
 {
     // Constants
     // =========================================================================
@@ -34,11 +36,6 @@ class InvalidateService extends Component
      * @event RefreshCacheEvent
      */
     const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
-
-    /**
-     * @event Event
-     */
-    const EVENT_AFTER_CLEAR_CACHE = 'afterClearCache';
 
     // Properties
     // =========================================================================
@@ -67,26 +64,13 @@ class InvalidateService extends Component
     // =========================================================================
 
     /**
-     * Returns all cached URLs.
+     * Returns all cached site URIs.
      *
-     * @return string[]
-     * @throws \yii\base\Exception
+     * @return SiteUriModel[]
      */
-    public function getAllCachedUrls(): array
+    public function getAllCachedSiteUris(): array
     {
-        $urls = [];
-
-        // Get URLs from all cache records
-        $cacheRecords = CacheRecord::find()
-            ->select(['siteId', 'uri'])
-            ->all();
-
-        /** @var CacheRecord $cacheRecord */
-        foreach ($cacheRecords as $cacheRecord) {
-            if (Blitz::$plugin->request->getIsCacheableUri($cacheRecord->siteId, $cacheRecord->uri)) {
-                $urls[] = Blitz::$plugin->request->getSiteUrl($cacheRecord->siteId, $cacheRecord->uri);
-            }
-        }
+        $siteUris = $this->_getCachedSiteUris();
 
         // Get URLs from all element types
         $elementTypes = Craft::$app->getElements()->getAllElementTypes();
@@ -98,26 +82,41 @@ class InvalidateService extends Component
                 $sites = Craft::$app->getSites()->getAllSites();
 
                 foreach ($sites as $site) {
-                    $elements = $elementType::find()->siteId($site->id)->all();
+                    $elements = $elementType::find()
+                        ->siteId($site->id)
+                        ->all();
 
                     /** @var Element $element */
                     foreach ($elements as $element) {
                         $uri = trim($element->uri, '/');
                         $uri = ($uri == '__home__' ? '' : $uri);
 
-                        if ($uri !== null && Blitz::$plugin->request->getIsCacheableUri($site->id, $uri)) {
-                            $url = $element->getUrl();
+                        $siteUri = new SiteUriModel([
+                            'siteId' => $site->id,
+                            'uri' => $uri,
+                        ]);
 
-                            if ($url !== null && !in_array($url, $urls, true)) {
-                                $urls[] = $url;
-                            }
+                        if (!in_array($siteUri, $siteUris, true) && $siteUri->getIsCacheableUri()) {
+                            $siteUris[] = $siteUri;
                         }
                     }
                 }
             }
         }
 
-        return $urls;
+        return $siteUris;
+    }
+
+    /**
+     * Returns cached site URIs given an array of cache IDs.
+     *
+     * @param int[] $cacheIds
+     *
+     * @return SiteUriModel[]
+     */
+    public function getCachedSiteUris(array $cacheIds): array
+    {
+        return $this->_getCachedSiteUris(['id' => $cacheIds]);
     }
 
     /**
@@ -191,22 +190,6 @@ class InvalidateService extends Component
     }
 
     /**
-     * Returns cached URIs given an array of cache IDs.
-     *
-     * @param int[] $cacheIds
-     *
-     * @return array
-     */
-    public function getCachedSiteUris(array $cacheIds): array
-    {
-        return CacheRecord::find()
-            ->select(['siteId', 'uri'])
-            ->where(['id' => $cacheIds])
-            ->asArray(true)
-            ->all();
-    }
-
-    /**
      * Adds an element to invalidate.
      *
      * @param ElementInterface $element
@@ -217,10 +200,10 @@ class InvalidateService extends Component
     {
         // Clear and the cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
-            $this->clearCache();
+            Blitz::$plugin->clearService->clearCache();
 
             if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically && Blitz::$plugin->settings->warmCacheAutomaticallyForGlobals) {
-                $this->warmCache($this->getAllCachedUrls());
+                Blitz::$plugin->warmService->warmCache($this->getAllCachedSiteUris());
             }
 
             return;
@@ -230,7 +213,7 @@ class InvalidateService extends Component
         $elementType = get_class($element);
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array($elementType, Blitz::$plugin->cache->getNonCacheableElementTypes(), true)) {
+        if (in_array($elementType, CacheHelper::getNonCacheableElementTypes(), true)) {
             return;
         }
 
@@ -321,33 +304,20 @@ class InvalidateService extends Component
     /**
      * Performs actions after the cache is refreshed.
      *
-     * @param string[] $urls
+     * @param SiteUriModel[] $siteUris
      */
-    public function afterRefreshCache(array $urls)
+    public function afterRefreshCache(array $siteUris)
     {
         // Fire an 'afterRefreshCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, new RefreshCacheEvent([
-                'urls' => $urls,
+                'siteUris' => $siteUris,
             ]));
         }
 
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            $this->warmCache($urls);
+            Blitz::$plugin->warmService->warmCache($siteUris);
         }
-    }
-
-    /**
-     * Warms the cache.
-     *
-     * @param string[] $urls
-     */
-    public function warmCache(array $urls)
-    {
-        Craft::$app->getQueue()->push(new WarmCacheJob([
-            'urls' => $urls,
-            'concurrency' => Blitz::$plugin->settings->concurrency,
-        ]));
     }
 
     /**
@@ -379,58 +349,30 @@ class InvalidateService extends Component
         }
     }
 
-    /**
-     * Clears cache records for a given site and URI.
-     *
-     * @param int $siteId
-     * @param string $uri
-     */
-    public function clearCacheRecords(int $siteId, string $uri)
-    {
-        CacheRecord::deleteAll([
-            'siteId' => $siteId,
-            'uri' => $uri,
-        ]);
-    }
+    // Private Methods
+    // =========================================================================
 
     /**
-     * Clears the cache.
+     * Returns cached site URIs given a condition.
      *
-     * @param bool $flush
+     * @param array $condition
+     *
+     * @return SiteUriModel[]
      */
-    public function clearCache(bool $flush = false)
+    private function _getCachedSiteUris(array $condition = []): array
     {
-        // Clear the cache
-        Blitz::$plugin->driver->clearCache();
+        $siteUriModels = [];
 
-        // Purge all cache
-        Blitz::$plugin->purger->purgeAll();
+        $siteUris = CacheRecord::find()
+            ->select(['siteId', 'uri'])
+            ->where($condition)
+            ->asArray(true)
+            ->all();
 
-        if ($flush) {
-            // Delete all cache records
-            CacheRecord::deleteAll();
-
-            $this->runGarbageCollection();
+        foreach ($siteUris as $siteUri) {
+            $siteUriModels = new SiteUriModel($siteUri);
         }
 
-        // Fire an 'afterClearCache' event
-        if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_CLEAR_CACHE);
-        }
-    }
-
-    /**
-     * Runs garbage collection.
-     */
-    public function runGarbageCollection()
-    {
-        // Get and delete element query records without an associated element query cache
-        $elementQueryRecordIds = ElementQueryRecord::find()
-            ->select('id')
-            ->joinWith('elementQueryCaches')
-            ->where(['cacheId' => null])
-            ->column();
-
-        ElementQueryRecord::deleteAll(['id' => $elementQueryRecordIds]);
+        return $siteUriModels;
     }
 }

@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers;
 
 use Craft;
+use putyourlightson\blitz\models\SiteUriModel;
 
 /**
  *
@@ -13,6 +14,14 @@ use Craft;
  */
 class YiiCacheDriver extends BaseDriver
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @const string
+     */
+    const KEY_PREFIX = 'blitz';
+
     // Static
     // =========================================================================
 
@@ -32,9 +41,11 @@ class YiiCacheDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function getCachedUri(int $siteId, string $uri): string
+    public function getCachedUri(SiteUriModel $siteUri): string
     {
-        $value = Craft::$app->getCache()->get(['blitz', $siteId, $uri]);
+        $value = Craft::$app->getCache()->get([
+            self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+        ]);
 
         if ($value === false) {
             return '';
@@ -46,16 +57,7 @@ class YiiCacheDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function getCacheCount(int $siteId): int
-    {
-        // TODO: investigate if this is possible
-        return 0;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function saveCache(string $value, int $siteId, string $uri)
+    public function saveCache(string $value, SiteUriModel $siteUri)
     {
         // Append timestamp
         $value .= '<!-- Cached by Blitz on '.date('c').' -->';
@@ -63,7 +65,9 @@ class YiiCacheDriver extends BaseDriver
         // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
         $value = "\xEF\xBB\xBF".$value;
 
-        Craft::$app->getCache()->set(['blitz', $siteId, $uri], $value);
+        Craft::$app->getCache()->set([
+            self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+        ], $value);
     }
 
     /**
@@ -77,9 +81,13 @@ class YiiCacheDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function clearCachedUri(int $siteId, string $uri)
+    public function clearCachedUris(array $siteUris)
     {
-        Craft::$app->getCache()->delete([$siteId, $uri]);
+        foreach ($siteUris as $siteUri) {
+            Craft::$app->getCache()->delete([
+                self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+            ]);
+        }
     }
 
     /**

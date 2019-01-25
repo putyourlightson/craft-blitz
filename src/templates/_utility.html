@@ -23,22 +23,7 @@
     },
 ] %}
 
-<h1>Cached Sites</h1>
-
-<table class="data fullwidth collapsible">
-    <thead>
-        <th scope="col">{{ 'Site'|t('blitz') }}</th>
-        <th scope="col">{{ 'Cached URIs'|t('blitz') }}</th>
-    </thead>
-    <tbody>
-        {% for site in sites %}
-            <tr>
-                <td>{{ site.name }}</td>
-                <td>{{ site.count }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{{ driverHtml|raw }}
 
 {% for utility in utilities %}
     <br/>

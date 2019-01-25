@@ -26,7 +26,7 @@ class DummyPurger extends BasePurger
     /**
      * @inheritdoc
      */
-    public function purgeUrls(array $urls) { }
+    public function purgeUris(array $siteUris) { }
 
     /**
      * @inheritdoc

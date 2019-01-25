@@ -5,35 +5,33 @@
 
 namespace putyourlightson\blitz\drivers;
 
+use putyourlightson\blitz\models\SiteUriModel;
+
 interface DriverInterface
 {
     /**
-     * Returns the cached value for a given site and URI.
+     * Returns the cached value for the provided site and URI.
      *
-     * @param int $siteId
-     * @param string $uri
+     * @param SiteUriModel $siteUri
      *
      * @return string
      */
-    public function getCachedUri(int $siteId, string $uri): string;
+    public function getCachedUri(SiteUriModel $siteUri): string;
 
     /**
-     * Returns the cache count for a given site.
+     * Returns the utility HTML.
      *
-     * @param int $siteId
-     *
-     * @return int
+     * @return string
      */
-    public function getCacheCount(int $siteId): int;
+    public function getUtilityHtml(): string;
 
     /**
-     * Saves the cache value for a given site and URI.
+     * Saves the cache value for the provided site and URI.
      *
      * @param string $value
-     * @param int $siteId
-     * @param string $uri
+     * @param SiteUriModel $siteUri
      */
-    public function saveCache(string $value, int $siteId, string $uri);
+    public function saveCache(string $value, SiteUriModel $siteUri);
 
     /**
      * Clears the cache.
@@ -41,10 +39,9 @@ interface DriverInterface
     public function clearCache();
 
     /**
-     * Clears the cache for a given site and URI.
+     * Clears the cache for the provided site URIs.
      *
-     * @param int $siteId
-     * @param string $uri
+     * @param SiteUriModel[]
      */
-    public function clearCachedUri(int $siteId, string $uri);
+    public function clearCachedUris(array $siteUris);
 }

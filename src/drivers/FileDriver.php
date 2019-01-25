@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\drivers;
 
 use Craft;
 use craft\helpers\FileHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 use Symfony\Component\Filesystem\Exception\IOException;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
@@ -44,17 +45,7 @@ class FileDriver extends BaseDriver
     /**
      * @var array|null
      */
-    private $_siteCacheCount;
-
-    /**
-     * @var array|null
-     */
     private $_sitePaths;
-
-    /**
-     * @var array|null
-     */
-    private $_filePaths;
 
     // Public Methods
     // =========================================================================
@@ -86,11 +77,11 @@ class FileDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function getCachedUri(int $siteId, string $uri): string
+    public function getCachedUri(SiteUriModel $siteUri): string
     {
         $value = '';
 
-        $filePath = $this->getFilePath($siteId, $uri);
+        $filePath = $this->_getFilePath($siteUri);
 
         if (is_file($filePath)) {
             $value = file_get_contents($filePath);
@@ -102,42 +93,9 @@ class FileDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function getCacheCount(int $siteId): int
+    public function saveCache(string $value, SiteUriModel $siteUri)
     {
-        if (!empty($this->_siteCacheCount[$siteId])) {
-            return $this->_siteCacheCount[$siteId];
-        }
-
-        $sitePath = $this->getSitePath($siteId);
-
-        $count = is_dir($sitePath) ? count(FileHelper::findFiles($sitePath)) : 0;
-
-        // Check if other site counts should be reduced from this site
-        $sites = Craft::$app->getSites()->getAllSites();
-
-        foreach ($sites as $site) {
-            if ($site->id == $siteId) {
-                continue;
-            }
-
-            $otherPath = $this->getSitePath($site->id);
-
-            if (strpos($otherPath, $sitePath) === 0) {
-                $count = $count - (is_dir($otherPath) ? $this->getCacheCount($site->id) : 0);
-            }
-        }
-
-        $this->_siteCacheCount[$siteId] = $count;
-
-        return $count;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function saveCache(string $value, int $siteId, string $uri)
-    {
-        $filePath = $this->getFilePath($siteId, $uri);
+        $filePath = $this->_getFilePath($siteUri);
 
         if (!empty($filePath)) {
             // Append timestamp
@@ -181,14 +139,55 @@ class FileDriver extends BaseDriver
     /**
      * @inheritdoc
      */
-    public function clearCachedUri(int $siteId, string $uri)
+    public function clearCachedUris(array $siteUris)
     {
-        $filePath = $this->getFilePath($siteId, $uri);
+        foreach ($siteUris as $siteUri) {
+            $filePath = $this->_getFilePath($siteUri);
 
-        // Delete file if it exists
-        if (is_file($filePath)) {
-            @unlink($filePath);
+            // Delete file if it exists
+            if (is_file($filePath)) {
+                @unlink($filePath);
+            }
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUtilityHtml(): string
+    {
+        $sites = [];
+
+        $allSites = Craft::$app->getSites()->getAllSites();
+
+        foreach ($allSites as $site) {
+            $sitePath = $this->_getSitePath($site->id);
+            $relativePath = trim(str_replace(Craft::getAlias('@webroot'), '', $sitePath), '/');
+
+            $sites[$site->id] = [
+                'name' => $site->name,
+                'path' => $sitePath,
+                'relativePath' =>  $relativePath,
+                'count' => is_dir($sitePath) ? count(FileHelper::findFiles($sitePath)) : 0,
+            ];
+        }
+
+        foreach ($sites as $siteId => &$site) {
+            // Check if other site counts should be reduced from this site
+            foreach ($sites as $otherSiteId => $otherSite) {
+                if ($otherSiteId == $siteId) {
+                    continue;
+                }
+
+                if (strpos($otherSite['path'], $site['path']) === 0) {
+                    $site['count'] -= is_dir($otherSite['path']) ? $sites[$site->id]['count'] : 0;
+                }
+            }
+        }
+
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/file/utility', [
+            'sites' => $sites,
+        ]);
     }
 
     /**
@@ -201,38 +200,31 @@ class FileDriver extends BaseDriver
         ]);
     }
 
-    // Helper Methods
+    // Private Methods
     // =========================================================================
 
     /**
      * Returns file path from provided site ID and URI.
      *
-     * @param int $siteId
-     * @param string $uri
+     * @param SiteUriModel $siteUri
      *
      * @return string
      */
-    public function getFilePath(int $siteId, string $uri): string
+    private function _getFilePath(SiteUriModel $siteUri): string
     {
-        if (!empty($this->_filePaths[$siteId][$uri])) {
-            return $this->_filePaths[$siteId][$uri];
-        }
-
-        $sitePath = $this->getSitePath($siteId);
+        $sitePath = $this->_getSitePath($siteUri->siteId);
 
         if ($sitePath == '') {
             return '';
         }
 
-        // Replace __home__ with blank string
-        $uri = ($uri == '__home__' ? '' : $uri);
-
         // Replace ? with / in URI
-        $uri = str_replace('?', '/', $uri);
+        $uri = str_replace('?', '/', $siteUri->uri);
 
-        $this->_filePaths[$siteId][$uri] = FileHelper::normalizePath($sitePath.'/'.$uri.'/index.html');
+        // Create normalized file path
+        $filePath = FileHelper::normalizePath($sitePath.'/'.$uri.'/index.html');
 
-        return $this->_filePaths[$siteId][$uri];
+        return $filePath;
     }
 
     /**
@@ -242,7 +234,7 @@ class FileDriver extends BaseDriver
      *
      * @return string
      */
-    public function getSitePath(int $siteId): string
+    private function _getSitePath(int $siteId): string
     {
         if (!empty($this->_sitePaths[$siteId])) {
             return $this->_sitePaths[$siteId];

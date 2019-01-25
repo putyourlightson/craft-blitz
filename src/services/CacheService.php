@@ -11,7 +11,8 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
+use putyourlightson\blitz\helpers\CacheHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
@@ -24,21 +25,8 @@ use yii\db\Exception;
  */
 class CacheService extends Component
 {
-    // Constants
-    // =========================================================================
-
-    /**
-     * @event RegisterNonCacheableElementTypesEvent
-     */
-    const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
-
     // Properties
     // =========================================================================
-
-    /**
-     * @var string[]|null
-     */
-    private $_nonCacheableElementTypes;
 
     /**
      * @var int[]
@@ -59,27 +47,6 @@ class CacheService extends Component
     // =========================================================================
 
     /**
-     * Returns non cacheable element types.
-     *
-     * @return string[]
-     */
-    public function getNonCacheableElementTypes(): array
-    {
-        if ($this->_nonCacheableElementTypes !== null) {
-            return $this->_nonCacheableElementTypes;
-        };
-
-        $event = new RegisterNonCacheableElementTypesEvent([
-            'elementTypes' => Blitz::$plugin->settings->nonCacheableElementTypes,
-        ]);
-        $this->trigger(self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
-
-        $this->_nonCacheableElementTypes = $event->elementTypes;
-
-        return $this->_nonCacheableElementTypes;
-    }
-
-    /**
      * Adds an element cache.
      *
      * @param ElementInterface $element
@@ -92,7 +59,7 @@ class CacheService extends Component
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array(get_class($element), $this->getNonCacheableElementTypes(), true)) {
+        if (in_array(get_class($element), CacheHelper::getNonCacheableElementTypes(), true)) {
             return;
         }
 
@@ -119,7 +86,7 @@ class CacheService extends Component
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array($elementQuery->elementType, $this->getNonCacheableElementTypes(), true)) {
+        if (in_array($elementQuery->elementType, CacheHelper::getNonCacheableElementTypes(), true)) {
             return;
         }
 
@@ -166,20 +133,16 @@ class CacheService extends Component
      * Saves the output to a URI.
      *
      * @param string $output
-     * @param int $siteId
-     * @param string $uri
+     * @param SiteUriModel $siteUri
+     *
      * @throws Exception
      */
-    public function saveOutput(string $output, int $siteId, string $uri)
+    public function saveOutput(string $output, SiteUriModel $siteUri)
     {
         // Use DB connection so we can batch insert and exclude audit columns
         $db = Craft::$app->getDb();
 
-        // Get cache record or create one if it does not exist
-        $values = [
-            'siteId' => $siteId,
-            'uri' => $uri,
-        ];
+        $values = $siteUri->toArray();
 
         $cacheId = CacheRecord::find()
             ->select('id')
@@ -222,7 +185,7 @@ class CacheService extends Component
                 false)
             ->execute();
 
-        Blitz::$plugin->driver->saveCache($output, $siteId, $uri);
+        Blitz::$plugin->driver->saveCache($output, $siteUri);
     }
 
     // Private Methods

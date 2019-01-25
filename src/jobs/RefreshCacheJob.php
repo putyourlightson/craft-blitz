@@ -6,14 +6,9 @@
 namespace putyourlightson\blitz\jobs;
 
 use Craft;
-use craft\base\ElementInterface;
-use craft\elements\db\ElementQuery;
 use craft\helpers\App;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\records\CacheRecord;
-use putyourlightson\blitz\records\ElementQueryRecord;
-use yii\db\ActiveQuery;
 
 class RefreshCacheJob extends BaseJob
 {
@@ -48,7 +43,7 @@ class RefreshCacheJob extends BaseJob
         App::maxPowerCaptain();
 
         if (!empty($this->elementIds)) {
-            $this->cacheIds = Blitz::$plugin->invalidate->getRefreshableCacheIds(
+            $this->cacheIds = Blitz::$plugin->refreshService->getRefreshableCacheIds(
                 $this->cacheIds, $this->elementIds, $this->elementTypes
             );
         }
@@ -60,30 +55,20 @@ class RefreshCacheJob extends BaseJob
         // Half time
         $this->setProgress($queue, 0.5);
 
-        // Get site URIs to clear from cache IDs
-        $siteUris = Blitz::$plugin->invalidate->getCachedSiteUris($this->cacheIds);
-
-        $urls = [];
-
-        foreach ($siteUris as $siteUri) {
-            // Extracts variables from array
-            $siteId = $siteUri['siteId'];
-            $uri = $siteUri['uri'];
-
-            $urls[] = Blitz::$plugin->request->getSiteUrl($siteId, $uri);
-
-            // Clear cached URI so we get a fresh file version
-            Blitz::$plugin->driver->clearCachedUri($siteId, $uri);
-        }
+        // Get cached site URIs from cache IDs
+        $siteUris = Blitz::$plugin->refreshService->getCachedSiteUris($this->cacheIds);
 
         // Delete cache records so we get fresh caches
-        CacheRecord::deleteAll(['id' => $this->cacheIds]);
+        Blitz::$plugin->clearService->deleteCacheByCacheIds($this->cacheIds);
+
+        // Clear cached URIs so we get a fresh version
+        Blitz::$plugin->driver->clearCachedUris($siteUris);
 
         // Purge the cache
-        Blitz::$plugin->purger->purgeUrls($urls);
+        Blitz::$plugin->purger->purgeUris($siteUris);
 
         // Trigger afterRefreshCache events
-        Blitz::$plugin->invalidate->afterRefreshCache($urls);
+        Blitz::$plugin->refreshService->afterRefreshCache($siteUris);
     }
 
     // Protected Methods

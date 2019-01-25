@@ -6,9 +6,8 @@
 namespace putyourlightson\blitz\services;
 
 use Craft;
-use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
-use yii\base\Exception;
+use putyourlightson\blitz\models\SiteUriModel;
 
 class RequestService
 {
@@ -41,7 +40,7 @@ class RequestService
             return false;
         }
 
-        if (Blitz::$plugin->settings->queryStringCaching == 0 && $request->getQueryStringWithoutPath() !== '') {
+        if (!Blitz::$plugin->settings->queryStringCaching === 0 && $request->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
@@ -49,116 +48,31 @@ class RequestService
     }
 
     /**
-     * Returns whether the URI is cacheable.
+     * Gets the requested site URI.
      *
-     * @param int $siteId
-     * @param string $uri
-     *
-     * @return bool
+     * @return SiteUriModel
      */
-    public function getIsCacheableUri(int $siteId, string $uri): bool
-    {
-        // Ignore URIs that contain index.php
-        if (strpos($uri, 'index.php') !== false) {
-            return false;
-        }
-
-        // Excluded URI patterns take priority
-        if (is_array(Blitz::$plugin->settings->excludedUriPatterns)) {
-            if (self::matchesUriPattern(Blitz::$plugin->settings->excludedUriPatterns, $siteId, $uri)) {
-                return false;
-            }
-        }
-
-        if (is_array(Blitz::$plugin->settings->includedUriPatterns)) {
-            if (self::matchesUriPattern(Blitz::$plugin->settings->includedUriPatterns, $siteId, $uri)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns a URL given a site ID and URI.
-     *
-     * @param int $siteId
-     * @param string $uri
-     *
-     * @return string
-     * @throws Exception
-     */
-    public function getSiteUrl(int $siteId, string $uri): string
-    {
-        return UrlHelper::siteUrl($uri, null, null, $siteId);
-    }
-
-    /**
-     * Matches a URI pattern in a set of patterns.
-     *
-     * @param array $patterns
-     * @param int $siteId
-     * @param string $uri
-     *
-     * @return bool
-     */
-    public function matchesUriPattern(array $patterns, int $siteId, string $uri): bool
-    {
-        foreach ($patterns as $pattern) {
-            // Don't proceed if site is not empty and does not match the provided site ID
-            if (!empty($pattern[1]) && $pattern[1] != $siteId) {
-                continue;
-            }
-
-            $uriPattern = $pattern[0];
-
-            // Replace a blank string with the homepage
-            if ($uriPattern == '') {
-                $uriPattern = '^$';
-            }
-
-            // Replace "*" with 0 or more characters as otherwise it'll throw an error
-            if ($uriPattern == '*') {
-                $uriPattern = '.*';
-            }
-
-            // Trim slashes
-            $uriPattern = trim($uriPattern, '/');
-
-            // Escape hash symbols
-            $uriPattern = str_replace('#', '\#', $uriPattern);
-
-            if (preg_match('#'.$uriPattern.'#', trim($uri, '/'))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Gets the requested URI.
-     *
-     * @return string
-     */
-    public function getCurrentUri(): string
+    public function getRequestedSiteUri(): SiteUriModel
     {
         $site = Craft::$app->getSites()->getCurrentSite();
-        $uri = Craft::$app->getRequest()->getAbsoluteUrl();
+        $url = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching == 2) {
-            $uri = preg_replace('/\?.*/', '', $uri);
+            $url = preg_replace('/\?.*/', '', $url);
         }
 
         // Remove site base URL
         $baseUrl = trim(Craft::getAlias($site->baseUrl), '/');
-        $uri = str_replace($baseUrl, '', $uri);
+        $uri = str_replace($baseUrl, '', $url);
 
         // Trim slashes from the beginning and end of the URI
         $uri = trim($uri, '/');
 
-        return $uri;
+        return new SiteUriModel([
+            'siteId' => $site->id,
+            'uri' => $uri,
+        ]);
     }
 
     /**

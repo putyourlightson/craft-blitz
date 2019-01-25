@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\events;
 
+use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
 class RefreshCacheEvent extends Event
@@ -13,7 +14,7 @@ class RefreshCacheEvent extends Event
     // =========================================================================
 
     /**
-     * @var string[]
+     * @var SiteUriModel[]
      */
-    public $urls = [];
+    public $siteUris = [];
 }

@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\console\controllers;
 use Craft;
 use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
-use yii\base\Exception;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -27,7 +26,7 @@ class CacheController extends Controller
      */
     public function actionClear(): int
     {
-        Blitz::$plugin->invalidate->clearCache(false);
+        Blitz::$plugin->clearService->clearCache(false);
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
 
@@ -41,7 +40,7 @@ class CacheController extends Controller
      */
     public function actionFlush(): int
     {
-        Blitz::$plugin->invalidate->clearCache(true);
+        Blitz::$plugin->clearService->clearCache(true);
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
 
@@ -55,7 +54,7 @@ class CacheController extends Controller
      */
     public function actionRefreshExpired(): int
     {
-        Blitz::$plugin->invalidate->refreshExpiredCache();
+        Blitz::$plugin->refreshService->refreshExpiredCache();
 
         Craft::$app->getQueue()->run();
 
@@ -68,7 +67,6 @@ class CacheController extends Controller
      * Flushes and warms the entire cache.
      *
      * @return int
-     * @throws Exception
      */
     public function actionWarm(): int
     {
@@ -79,20 +77,18 @@ class CacheController extends Controller
         }
 
         // Get warm cache URLS
-        $urls = Blitz::$plugin->invalidate->getAllCachedUrls();
+        $urls = Blitz::$plugin->refreshService->getAllCachedSiteUris();
 
         $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
-        Blitz::$plugin->invalidate->clearCache(true);
+        Blitz::$plugin->clearService->clearCache(true);
 
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
         $total = count($urls);
         Console::startProgress(0, $total, '', 0.8);
 
-        $success = Blitz::$plugin->client->requestUrls($urls, [$this, 'setRequestsProgress']);
-
-        Blitz::$plugin->invalidate->runGarbageCollection();
+        $success = Blitz::$plugin->warmService->requestUrls($urls, [$this, 'setRequestsProgress']);
 
         Console::updateProgress($total, $total);
         Console::endProgress();

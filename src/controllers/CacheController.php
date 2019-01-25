@@ -9,7 +9,6 @@ use Craft;
 use craft\web\Controller;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
-use yii\base\Exception;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
@@ -69,7 +68,7 @@ class CacheController extends Controller
      */
     public function actionClear(): Response
     {
-        Blitz::$plugin->invalidate->clearCache(false);
+        Blitz::$plugin->clearService->clearCache(false);
 
         return $this->_getResponse('Blitz cache successfully cleared.');
     }
@@ -81,7 +80,7 @@ class CacheController extends Controller
      */
     public function actionFlush(): Response
     {
-        Blitz::$plugin->invalidate->clearCache(true);
+        Blitz::$plugin->clearService->clearCache(true);
 
         return $this->_getResponse('Blitz cache successfully flushed.');
     }
@@ -90,7 +89,6 @@ class CacheController extends Controller
      * Warms the cache.
      *
      * @return Response
-     * @throws Exception
      */
     public function actionWarm(): Response
     {
@@ -99,11 +97,11 @@ class CacheController extends Controller
         }
 
         // Get URLs before flushing the cache
-        $urls = Blitz::$plugin->invalidate->getAllCachedUrls();
+        $urls = Blitz::$plugin->refreshService->getAllCachedSiteUris();
 
-        Blitz::$plugin->invalidate->clearCache(true);
+        Blitz::$plugin->clearService->clearCache(true);
 
-        Blitz::$plugin->invalidate->warmCache(['urls' => $urls]);
+        Blitz::$plugin->warmService->warmCache(['urls' => $urls]);
 
         return $this->_getResponse('Blitz cache successfully queued for warming.');
     }
@@ -115,7 +113,7 @@ class CacheController extends Controller
      */
     public function actionRefreshExpired(): Response
     {
-        Blitz::$plugin->invalidate->refreshExpiredCache();
+        Blitz::$plugin->refreshService->refreshExpiredCache();
 
         return $this->_getResponse('Expired Blitz cache successfully refreshed.');
     }

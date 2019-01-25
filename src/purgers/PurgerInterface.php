@@ -5,14 +5,16 @@
 
 namespace putyourlightson\blitz\purgers;
 
+use putyourlightson\blitz\models\SiteUriModel;
+
 interface PurgerInterface
 {
     /**
      * Purges the cache given an array of URLs.
      *
-     * @param array $urls
+     * @param SiteUriModel[] $siteUris
      */
-    public function purgeUrls(array $urls);
+    public function purgeUris(array $siteUris);
 
     /**
      * Purges the entire cache.
