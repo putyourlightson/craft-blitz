@@ -60,7 +60,7 @@ class RefreshCacheJob extends BaseJob
         $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
         // Delete cache records so we get fresh caches
-        Blitz::$plugin->clearCache->deleteCacheIds($this->cacheIds);
+        Blitz::$plugin->flushCache->deleteCacheIds($this->cacheIds);
 
         // Clear cached URIs so we get a fresh version
         Blitz::$plugin->cacheStorage->deleteValues($siteUris);

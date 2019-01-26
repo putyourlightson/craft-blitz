@@ -6,7 +6,6 @@
 namespace putyourlightson\blitz\services;
 
 use Craft;
-use craft\web\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 
@@ -14,7 +13,7 @@ use putyourlightson\blitz\models\SiteUriModel;
  * @property bool $isCacheableRequest
  * @property SiteUriModel $requestedSiteUri
  */
-class RequestService extends Request
+class RequestHelper
 {
     // Public Methods
     // =========================================================================
@@ -24,10 +23,12 @@ class RequestService extends Request
      *
      * @return bool
      */
-    public function getIsCacheableRequest(): bool
+    public static function getIsCacheableRequest(): bool
     {
+        $request = Craft::$app->getRequest();
+
         // Ensure this is a front-end get request that is not a console request or an action request or live preview
-        if (!$this->getIsSiteRequest() || !$this->getIsGet() || $this->getIsConsoleRequest() || $this->getIsActionRequest() || $this->getIsLivePreview()) {
+        if (!$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsConsoleRequest() || $request->getIsActionRequest() || $request->getIsLivePreview()) {
             return false;
         }
 
@@ -47,7 +48,7 @@ class RequestService extends Request
             return false;
         }
 
-        if (!Blitz::$plugin->settings->queryStringCaching === 0 && $this->getQueryStringWithoutPath() !== '') {
+        if (!Blitz::$plugin->settings->queryStringCaching === 0 && $request->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
@@ -59,10 +60,10 @@ class RequestService extends Request
      *
      * @return SiteUriModel
      */
-    public function getRequestedSiteUri(): SiteUriModel
+    public static function getRequestedSiteUri(): SiteUriModel
     {
         $site = Craft::$app->getSites()->getCurrentSite();
-        $url = $this->getAbsoluteUrl();
+        $url = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching == 2) {

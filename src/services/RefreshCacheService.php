@@ -136,14 +136,12 @@ class RefreshCacheService extends Component
      * Adds an element to refresh.
      *
      * @param ElementInterface $element
-     * @throws Exception
-     * @throws \yii\base\Exception
      */
     public function addElement(ElementInterface $element)
     {
-        // Clear and the cache if this is a global set element as they are populated on every request
+        // Clear the cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
-            Blitz::$plugin->clearCache->clearAll();
+            Blitz::$plugin->clearCache->clear();
 
             if (Blitz::$plugin->settings->cachingEnabled
                 && Blitz::$plugin->settings->warmCacheAutomatically
@@ -190,39 +188,7 @@ class RefreshCacheService extends Component
         }
 
         // Check if element has a future post or expiry date
-        $expiryDate = null;
-        $now = new \DateTime();
-
-        if (!empty($element->postDate) && $element->postDate > $now) {
-            $expiryDate = $element->postDate;
-        }
-        else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
-            $expiryDate = $element->expiryDate;
-        }
-
-        if ($expiryDate !== null) {
-            $expiryDate = Db::prepareDateForDb($expiryDate);
-
-            /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
-            $elementExpiryDateRecord = ElementExpiryDateRecord::find()
-                ->where(['elementId' => $elementId])
-                ->one();
-
-            if ($elementExpiryDateRecord !== null && $elementExpiryDateRecord->expiryDate < $expiryDate) {
-                $expiryDate = $elementExpiryDateRecord->expiryDate;
-            }
-
-            /** @noinspection MissedFieldInspection */
-            Craft::$app->getDb()->createCommand()
-                ->upsert(ElementExpiryDateRecord::tableName(), [
-                        'elementId' => $elementId,
-                        'expiryDate' => $expiryDate,
-                    ],
-                    ['expiryDate' => $expiryDate],
-                    [],
-                    false)
-                ->execute();
-        }
+        $this->_addExpiryDates($element);
 
         // Refresh the cache if not in batch mode
         if ($this->batchMode === false) {
@@ -292,5 +258,51 @@ class RefreshCacheService extends Component
                 $this->addElement($element);
             }
         }
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Adds expiry dates for a given element.
+     *
+     * @param Element $element
+     */
+    private function _addExpiryDates(Element $element)
+    {
+        $now = new \DateTime();
+
+        if (!empty($element->postDate) && $element->postDate > $now) {
+            $expiryDate = $element->postDate;
+        }
+        else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
+            $expiryDate = $element->expiryDate;
+        }
+
+        if (empty($expiryDate)) {
+            return;
+        }
+
+        $expiryDate = Db::prepareDateForDb($expiryDate);
+
+        /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
+        $elementExpiryDateRecord = ElementExpiryDateRecord::find()
+            ->where(['elementId' => $element->id])
+            ->one();
+
+        if ($elementExpiryDateRecord !== null && $elementExpiryDateRecord->expiryDate < $expiryDate) {
+            $expiryDate = $elementExpiryDateRecord->expiryDate;
+        }
+
+        /** @noinspection MissedFieldInspection */
+        Craft::$app->getDb()->createCommand()
+            ->upsert(ElementExpiryDateRecord::tableName(), [
+                    'elementId' => $element->id,
+                    'expiryDate' => $expiryDate,
+                ],
+                ['expiryDate' => $expiryDate],
+                [],
+                false)
+            ->execute();
     }
 }

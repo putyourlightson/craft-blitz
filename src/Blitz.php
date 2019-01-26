@@ -33,12 +33,13 @@ use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
+use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
 use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\OutputCacheService;
 use putyourlightson\blitz\services\WarmCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
-use putyourlightson\blitz\services\RequestService;
+use putyourlightson\blitz\services\RequestHelper;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
@@ -47,10 +48,10 @@ use yii\queue\ExecEvent;
 /**
  *
  * @property ClearCacheService $clearCache
+ * @property FlushCacheService $flushCache
  * @property GenerateCacheService $generateCache
  * @property OutputCacheService $outputCache
  * @property RefreshCacheService $refreshCache
- * @property RequestService $request
  * @property WarmCacheService $warmCache
  * @property BaseCacheStorage $cacheStorage
  * @property BaseCachePurger $cachePurger
@@ -143,8 +144,8 @@ class Blitz extends Plugin
      */
     private function _processCacheableRequest(): bool
     {
-        if ($this->request->getIsCacheableRequest()) {
-            $siteUri = $this->request->getRequestedSiteUri();
+        if (RequestHelper::getIsCacheableRequest()) {
+            $siteUri = RequestHelper::getRequestedSiteUri();
 
             if ($siteUri->getIsCacheableUri()) {
                 $value = $this->cacheStorage->getValue($siteUri);
@@ -170,13 +171,19 @@ class Blitz extends Plugin
     private function _registerComponents()
     {
         $this->setComponents([
-            'generateCache' => GenerateCacheService::class,
             'clearCache' => ClearCacheService::class,
+            'flushCache' => FlushCacheService::class,
+            'generateCache' => GenerateCacheService::class,
             'refreshCache' => RefreshCacheService::class,
-            'request' => RequestService::class,
             'warmCache' => WarmCacheService::class,
-            'cacheStorage' => array_merge(['class' => $this->settings->cacheStorageType], $this->settings->cacheStorageSettings),
-            'cachePurger' => array_merge(['class' => $this->settings->cachePurgerType], $this->settings->cachePurgerSettings),
+            'cacheStorage' => array_merge(
+                ['class' => $this->settings->cacheStorageType],
+                $this->settings->cacheStorageSettings
+            ),
+            'cachePurger' => array_merge(
+                ['class' => $this->settings->cachePurgerType],
+                $this->settings->cachePurgerSettings
+            ),
         ]);
     }
 
@@ -227,7 +234,7 @@ class Blitz extends Plugin
         // Register template page render events
         Event::on(View::class, View::EVENT_BEFORE_RENDER_PAGE_TEMPLATE,
             function() use ($siteUri) {
-                $this->clearCache->deleteSiteUri($siteUri);
+                $this->flushCache->deleteSiteUri($siteUri);
             }
         );
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
@@ -308,7 +315,7 @@ class Blitz extends Plugin
                 $event->options[] = [
                     'key' => 'blitz',
                     'label' => Craft::t('blitz', 'Blitz cache'),
-                    'action' => [Blitz::$plugin->clearCache, 'clearAll'],
+                    'action' => [Blitz::$plugin->clearCache, 'clear'],
                 ];
             }
         );
@@ -321,7 +328,7 @@ class Blitz extends Plugin
     {
         Event::on(Gc::class, Gc::EVENT_RUN,
             function() {
-                $this->clearCache->runGarbageCollection();
+                $this->flushCache->runGarbageCollection();
             }
         );
     }
