@@ -207,8 +207,9 @@
         {{ forms.autosuggestField({
             label: "API Key"|t('blitz'),
             instructions: "An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters)."|t('blitz'),
-            name: 'settings[apiKey]',
+            suggestEnvVars: true,
             suggestions: craft.cp.getEnvSuggestions(),
+            name: 'settings[apiKey]',
             value: settings.apiKey,
             errors: settings.getErrors('apiKey'),
         }) }}
