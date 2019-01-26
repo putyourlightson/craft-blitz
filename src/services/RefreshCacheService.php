@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
-use craft\elements\db\ElementQuery;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
@@ -21,7 +20,6 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\ActiveQuery;
-use yii\db\Exception;
 
 /**
  * @property SiteUriModel[] $allSiteUris
@@ -63,73 +61,56 @@ class RefreshCacheService extends Component
     // =========================================================================
 
     /**
-     * Returns refreshable cache IDs from the provided element IDs and types without the cache IDs.
+     * Returns cache IDs for an array of elements.
      *
-     * @param int[] $cacheIds
      * @param int[] $elementIds
-     * @param string[] $elementTypes
+     * @param int[] $ignoreCacheIds
      *
      * @return int[]
      */
-    public function getRefreshableCacheIds(array $cacheIds, array $elementIds, array $elementTypes): array
+    public function getElementCacheIds(array $elementIds, array $ignoreCacheIds = []): array
+    {
+        return ElementCacheRecord::find()
+            ->select('cacheId')
+            ->where(['elementId' => $elementIds])
+            ->andWhere(['not', ['cacheId' => $ignoreCacheIds]])
+            ->groupBy('cacheId')
+            ->column();
+    }
+
+    /**
+     * Returns cache IDs from entry queries of the provided element types that
+     * contain the provided element IDs, ignoring the provided cache IDs.
+     *
+     * @param string[] $elementTypes
+     * @param int[] $ignoreCacheIds
+     *
+     * @return ElementQueryRecord[]
+     */
+    public function getElementTypeQueries(array $elementTypes, array $ignoreCacheIds): array
     {
         // Get element query records of the provided element types without the cache IDs and without eager loading
-        $elementQueryRecords = ElementQueryRecord::find()
+        return ElementQueryRecord::find()
             ->select(['id', 'type', 'params'])
             ->where(['type' => $elementTypes])
             ->innerJoinWith([
-                'elementQueryCaches' => function(ActiveQuery $query) use ($cacheIds) {
-                    $query->where(['not', ['cacheId' => $cacheIds]]);
+                'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
+                    $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
                 }
             ], false)
             ->all();
+    }
 
-        foreach ($elementQueryRecords as $elementQueryRecord) {
-            // Ensure class still exists as a plugin may have been removed since being saved
-            if (!class_exists($elementQueryRecord->type)) {
-                continue;
-            }
-
-            /** @var ElementInterface $elementType */
-            $elementType = $elementQueryRecord->type;
-
-            /** @var ElementQuery $elementQuery */
-            $elementQuery = $elementType::find();
-
-            $params = json_decode($elementQueryRecord->params, true);
-
-            // If json decode failed
-            if (!is_array($params)) {
-                continue;
-            }
-
-            foreach ($params as $key => $val) {
-                $elementQuery->{$key} = $val;
-            }
-
-            // If the element query has an offset then add it to the limit and make it null
-            if ($elementQuery->offset) {
-                if ($elementQuery->limit) {
-                    $elementQuery->limit($elementQuery->limit + $elementQuery->offset);
-                }
-                $elementQuery->offset(null);
-            }
-
-            // If one or more of the element IDs are in the query's results
-            if (!empty(array_intersect($elementIds, $elementQuery->ids()))) {
-                // Get related element query cache records
-                $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
-
-                // Add cache IDs to the array that do not already exist
-                foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
-                    if (!in_array($elementQueryCacheRecord->cacheId, $cacheIds, true)) {
-                        $cacheIds[] = $elementQueryCacheRecord->cacheId;
-                    }
-                }
-            }
-        }
-
-        return $cacheIds;
+    /**
+     * Adds cache IDs to refresh given an element.
+     *
+     * @param ElementInterface $element
+     */
+    public function addCacheIds(ElementInterface $element)
+    {
+        $this->_cacheIds = array_merge($this->_cacheIds,
+            $this->getElementCacheIds([$element->getId()])
+        );
     }
 
     /**
@@ -161,7 +142,7 @@ class RefreshCacheService extends Component
         }
 
         // Cast ID to integer to ensure the strict type check below works
-        $elementId = (int)$element->id;
+        $elementId = (int)$element->getId();
 
         // Don't proceed if this entry has already been added
         if (in_array($elementId, $this->_elementIds, true)) {
@@ -174,26 +155,55 @@ class RefreshCacheService extends Component
             $this->_elementTypes[] = $elementType;
         }
 
-        // Get the element cache IDs to clear now as we may not be able to detect it later in a job (if the element was deleted for example)
-        $cacheIds = ElementCacheRecord::find()
-            ->select('cacheId')
-            ->where(['elementId' => $elementId])
-            ->groupBy('cacheId')
-            ->column();
+        $this->addExpiryDates($element);
 
-        foreach ($cacheIds as $cacheId) {
-            if (!in_array($cacheId, $this->_cacheIds, true)) {
-                $this->_cacheIds[] = $cacheId;
-            }
-        }
-
-        // Check if element has a future post or expiry date
-        $this->_addExpiryDates($element);
-
-        // Refresh the cache if not in batch mode
+        // If batch mode is on then the refresh will be triggered later
         if ($this->batchMode === false) {
             $this->refresh();
         }
+    }
+
+    /**
+     * Adds expiry dates for a given element.
+     *
+     * @param Element $element
+     */
+    public function addExpiryDates(Element $element)
+    {
+        $now = new \DateTime();
+
+        if (!empty($element->postDate) && $element->postDate > $now) {
+            $expiryDate = $element->postDate;
+        }
+        else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
+            $expiryDate = $element->expiryDate;
+        }
+
+        if (empty($expiryDate)) {
+            return;
+        }
+
+        $expiryDate = Db::prepareDateForDb($expiryDate);
+
+        /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
+        $elementExpiryDateRecord = ElementExpiryDateRecord::find()
+            ->where(['elementId' => $element->id])
+            ->one();
+
+        if ($elementExpiryDateRecord !== null && $elementExpiryDateRecord->expiryDate < $expiryDate) {
+            $expiryDate = $elementExpiryDateRecord->expiryDate;
+        }
+
+        /** @noinspection MissedFieldInspection */
+        Craft::$app->getDb()->createCommand()
+            ->upsert(ElementExpiryDateRecord::tableName(), [
+                    'elementId' => $element->id,
+                    'expiryDate' => $expiryDate,
+                ],
+                ['expiryDate' => $expiryDate],
+                [],
+                false)
+            ->execute();
     }
 
     /**
@@ -258,51 +268,5 @@ class RefreshCacheService extends Component
                 $this->addElement($element);
             }
         }
-    }
-
-    // Private Methods
-    // =========================================================================
-
-    /**
-     * Adds expiry dates for a given element.
-     *
-     * @param Element $element
-     */
-    private function _addExpiryDates(Element $element)
-    {
-        $now = new \DateTime();
-
-        if (!empty($element->postDate) && $element->postDate > $now) {
-            $expiryDate = $element->postDate;
-        }
-        else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
-            $expiryDate = $element->expiryDate;
-        }
-
-        if (empty($expiryDate)) {
-            return;
-        }
-
-        $expiryDate = Db::prepareDateForDb($expiryDate);
-
-        /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
-        $elementExpiryDateRecord = ElementExpiryDateRecord::find()
-            ->where(['elementId' => $element->id])
-            ->one();
-
-        if ($elementExpiryDateRecord !== null && $elementExpiryDateRecord->expiryDate < $expiryDate) {
-            $expiryDate = $elementExpiryDateRecord->expiryDate;
-        }
-
-        /** @noinspection MissedFieldInspection */
-        Craft::$app->getDb()->createCommand()
-            ->upsert(ElementExpiryDateRecord::tableName(), [
-                    'elementId' => $element->id,
-                    'expiryDate' => $expiryDate,
-                ],
-                ['expiryDate' => $expiryDate],
-                [],
-                false)
-            ->execute();
     }
 }

@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\drivers\storage;
 use Craft;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\models\SiteUriModel;
-use Symfony\Component\Filesystem\Exception\IOException;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
 use yii\log\Logger;
@@ -131,9 +130,6 @@ class FileStorage extends BaseCacheStorage
         catch (ErrorException $e) {
             Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
         }
-        catch (IOException $e) {
-            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
-        }
     }
 
     /**
@@ -146,7 +142,7 @@ class FileStorage extends BaseCacheStorage
 
             // Delete file if it exists
             if (is_file($filePath)) {
-                @unlink($filePath);
+                unlink($filePath);
             }
         }
     }

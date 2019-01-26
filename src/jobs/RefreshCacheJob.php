@@ -9,6 +9,7 @@ use Craft;
 use craft\helpers\App;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
 class RefreshCacheJob extends BaseJob
@@ -43,10 +44,26 @@ class RefreshCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
+        // Merge in element cache IDs
+        $this->cacheIds = array_merge($this->cacheIds,
+            Blitz::$plugin->refreshCache->getElementCacheIds(
+                $this->elementIds, $this->cacheIds
+            )
+        );
+
         if (!empty($this->elementIds)) {
-            $this->cacheIds = Blitz::$plugin->refreshCache->getRefreshableCacheIds(
-                $this->cacheIds, $this->elementIds, $this->elementTypes
+            $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
+                $this->elementTypes, $this->cacheIds
             );
+
+            foreach ($elementQueryRecords as $elementQueryRecord) {
+                // Merge in element query cache IDs
+                $this->cacheIds = array_merge($this->cacheIds,
+                    RefreshCacheHelper::getElementQueryCacheIds(
+                        $elementQueryRecord, $this->elementIds, $this->cacheIds
+                    )
+                );
+            }
         }
 
         if (empty($this->cacheIds)) {

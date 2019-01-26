@@ -3,9 +3,10 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\services;
+namespace putyourlightson\blitz\helpers;
 
 use Craft;
+use craft\elements\User;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 
@@ -37,6 +38,7 @@ class RequestHelper
             return false;
         }
 
+        /** @var User|null $user */
         $user = Craft::$app->getUser()->getIdentity();
 
         // Ensure that if user is logged in then debug toolbar is not enabled
@@ -48,7 +50,7 @@ class RequestHelper
             return false;
         }
 
-        if (!Blitz::$plugin->settings->queryStringCaching === 0 && $request->getQueryStringWithoutPath() !== '') {
+        if (Blitz::$plugin->settings->queryStringCaching === 0 && $request->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
@@ -66,7 +68,7 @@ class RequestHelper
         $url = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
-        if (Blitz::$plugin->settings->queryStringCaching == 2) {
+        if (Blitz::$plugin->settings->queryStringCaching === 2) {
             $url = preg_replace('/\?.*/', '', $url);
         }
 

@@ -30,6 +30,7 @@ use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
+use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
@@ -39,7 +40,6 @@ use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\OutputCacheService;
 use putyourlightson\blitz\services\WarmCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
-use putyourlightson\blitz\services\RequestHelper;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
@@ -174,6 +174,7 @@ class Blitz extends Plugin
             'clearCache' => ClearCacheService::class,
             'flushCache' => FlushCacheService::class,
             'generateCache' => GenerateCacheService::class,
+            'outputCache' => OutputCacheService::class,
             'refreshCache' => RefreshCacheService::class,
             'warmCache' => WarmCacheService::class,
             'cacheStorage' => array_merge(
@@ -269,6 +270,7 @@ class Blitz extends Plugin
         );
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(ElementEvent $event) {
+                $this->refreshCache->addCacheIds($event->element);
                 $this->refreshCache->addElement($event->element);
             }
         );
