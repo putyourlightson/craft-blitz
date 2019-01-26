@@ -26,10 +26,8 @@ class RequestHelper
      */
     public static function getIsCacheableRequest(): bool
     {
-        $request = Craft::$app->getRequest();
-
-        // Ensure this is a front-end get request that is not a console request or an action request or live preview
-        if (!$request->getIsSiteRequest() || !$request->getIsGet() || $request->getIsConsoleRequest() || $request->getIsActionRequest() || $request->getIsLivePreview()) {
+        // Ensure this is a cacheable site request
+        if (!self::_getIsCacheableSiteRequest()) {
             return false;
         }
 
@@ -50,7 +48,8 @@ class RequestHelper
             return false;
         }
 
-        if (Blitz::$plugin->settings->queryStringCaching === 0 && $request->getQueryStringWithoutPath() !== '') {
+        if (Blitz::$plugin->settings->queryStringCaching === 0
+            && Craft::$app->getRequest()->getQueryStringWithoutPath() !== '') {
             return false;
         }
 
@@ -83,5 +82,18 @@ class RequestHelper
             'siteId' => $site->id,
             'uri' => $uri,
         ]);
+    }
+
+    /**
+     * Returns whether the request is cacheable site request.
+     *
+     * @return bool
+     */
+    private static function _getIsCacheableSiteRequest(): bool
+    {
+        $request = Craft::$app->getRequest();
+
+        // Ensure this is a front-end get request that is not a console request or an action request or live preview
+        return ($request->getIsSiteRequest() && $request->getIsGet() && !$request->getIsConsoleRequest() && !$request->getIsActionRequest() && !$request->getIsLivePreview());
     }
 }

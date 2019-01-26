@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\helpers;
 
 use craft\base\Element;
 use craft\elements\db\ElementQuery;
+use craft\helpers\Json;
 use putyourlightson\blitz\records\ElementQueryRecord;
 
 class RefreshCacheHelper
@@ -39,7 +40,7 @@ class RefreshCacheHelper
         /** @var ElementQuery $elementQuery */
         $elementQuery = $elementType::find();
 
-        $params = json_decode($elementQueryRecord->params, true);
+        $params = Json::decodeIfJson($elementQueryRecord->params);
 
         // If json decode failed
         if (!is_array($params)) {
@@ -55,6 +56,7 @@ class RefreshCacheHelper
             if ($elementQuery->limit) {
                 $elementQuery->limit($elementQuery->limit + $elementQuery->offset);
             }
+
             $elementQuery->offset(null);
         }
 

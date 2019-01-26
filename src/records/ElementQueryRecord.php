@@ -12,7 +12,7 @@ use yii\db\ActiveQueryInterface;
  * @property int $id
  * @property int $index
  * @property string $type
- * @property string|array $params
+ * @property string $params
  * @property ElementQueryCacheRecord[] $elementQueryCaches
  */
 class ElementQueryRecord extends ActiveRecord

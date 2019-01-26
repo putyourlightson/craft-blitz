@@ -174,8 +174,7 @@ class RefreshCacheService extends Component
 
         if (!empty($element->postDate) && $element->postDate > $now) {
             $expiryDate = $element->postDate;
-        }
-        else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
+        } else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
             $expiryDate = $element->expiryDate;
         }
 
@@ -183,6 +182,17 @@ class RefreshCacheService extends Component
             return;
         }
 
+        $this->addExpiryDate($element, $expiryDate);
+    }
+
+    /**
+     * Adds an expiry date for a given element.
+     *
+     * @param Element $element
+     * @param \DateTime $expiryDate
+     */
+    public function addExpiryDate(Element $element, \DateTime $expiryDate)
+    {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
         /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
@@ -261,7 +271,7 @@ class RefreshCacheService extends Component
         foreach ($elementExpiryDates as $elementExpiryDate) {
             $element = $elements->getElementById($elementExpiryDate->elementId);
 
-            // This should happen before invalidating the element so that other expire dates will be saved
+            // This should happen before invalidating the element so that other expiry dates will be saved
             $elementExpiryDate->delete();
 
             if ($element !== null) {

@@ -37,6 +37,8 @@ class CacheController extends Controller
 
     /**
      * @inheritdoc
+     *
+     * @throws ForbiddenHttpException
      */
     public function beforeAction($action)
     {
