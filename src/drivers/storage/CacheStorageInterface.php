@@ -16,14 +16,7 @@ interface CacheStorageInterface
      *
      * @return string
      */
-    public function getValue(SiteUriModel $siteUri): string;
-
-    /**
-     * Returns the utility HTML.
-     *
-     * @return string
-     */
-    public function getUtilityHtml(): string;
+    public function get(SiteUriModel $siteUri): string;
 
     /**
      * Saves the cache value for the provided site and URI.
@@ -31,7 +24,21 @@ interface CacheStorageInterface
      * @param string $value
      * @param SiteUriModel $siteUri
      */
-    public function saveValue(string $value, SiteUriModel $siteUri);
+    public function save(string $value, SiteUriModel $siteUri);
+
+    /**
+     * Deletes the cache value for the provided site URI.
+     *
+     * @param SiteUriModel $siteUri
+     */
+    public function delete(SiteUriModel $siteUri);
+
+    /**
+     * Deletes the cache values for the provided site URIs.
+     *
+     * @param SiteUriModel[] $siteUris
+     */
+    public function deleteValues(array $siteUris);
 
     /**
      * Deletes all cached values.
@@ -39,9 +46,9 @@ interface CacheStorageInterface
     public function deleteAll();
 
     /**
-     * Deletes the cache values for the provided site URIs.
+     * Returns the utility HTML.
      *
-     * @param SiteUriModel[]
+     * @return string
      */
-    public function deleteValues(array $siteUris);
+    public function getUtilityHtml(): string;
 }

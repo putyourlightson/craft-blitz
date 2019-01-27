@@ -10,6 +10,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Http\Message\ResponseInterface;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 
 /**
  * @property mixed $settingsHtml
@@ -72,6 +73,16 @@ class CloudflarePurger extends BaseCachePurger
         return [
             [['apiKey', 'email', 'zoneId'], 'required'],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function purge(SiteUriModel $siteUri)
+    {
+        $this->_sendRequest('delete', 'purge_cache', [
+            'files' => [$siteUri->getUrl()]
+        ]);
     }
 
     /**

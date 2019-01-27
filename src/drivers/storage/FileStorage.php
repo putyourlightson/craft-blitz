@@ -76,7 +76,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function getValue(SiteUriModel $siteUri): string
+    public function get(SiteUriModel $siteUri): string
     {
         $value = '';
 
@@ -92,7 +92,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function saveValue(string $value, SiteUriModel $siteUri)
+    public function save(string $value, SiteUriModel $siteUri)
     {
         $filePath = $this->_getFilePath($siteUri);
 
@@ -118,6 +118,19 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
+    public function delete(SiteUriModel $siteUri)
+    {
+        $filePath = $this->_getFilePath($siteUri);
+
+        // Delete file if it exists
+        if (is_file($filePath)) {
+            unlink($filePath);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function deleteAll()
     {
         if (empty($this->_cacheFolderPath)) {
@@ -129,21 +142,6 @@ class FileStorage extends BaseCacheStorage
         }
         catch (ErrorException $e) {
             Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function deleteValues(array $siteUris)
-    {
-        foreach ($siteUris as $siteUri) {
-            $filePath = $this->_getFilePath($siteUri);
-
-            // Delete file if it exists
-            if (is_file($filePath)) {
-                unlink($filePath);
-            }
         }
     }
 

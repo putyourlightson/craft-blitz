@@ -181,7 +181,7 @@ class GenerateCacheService extends Component
                 false)
             ->execute();
 
-        Blitz::$plugin->cacheStorage->saveValue($output, $siteUri);
+        Blitz::$plugin->cacheStorage->save($output, $siteUri);
     }
 
     // Private Methods

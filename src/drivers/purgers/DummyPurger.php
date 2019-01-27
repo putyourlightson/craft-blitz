@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
+use putyourlightson\blitz\models\SiteUriModel;
 
 class DummyPurger extends BaseCachePurger
 {
@@ -26,7 +27,7 @@ class DummyPurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function purgeUris(array $siteUris) { }
+    public function purge(SiteUriModel $siteUri) { }
 
     /**
      * @inheritdoc

@@ -41,7 +41,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function getValue(SiteUriModel $siteUri): string
+    public function get(SiteUriModel $siteUri): string
     {
         $value = Craft::$app->getCache()->get([
             self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
@@ -57,7 +57,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function saveValue(string $value, SiteUriModel $siteUri)
+    public function save(string $value, SiteUriModel $siteUri)
     {
         // Append timestamp
         $value .= '<!-- Cached by Blitz on '.date('c').' -->';
@@ -73,21 +73,19 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function deleteAll()
+    public function delete(SiteUriModel $siteUri)
     {
-        Craft::$app->getCache()->flush();
+        Craft::$app->getCache()->delete([
+            self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+        ]);
     }
 
     /**
      * @inheritdoc
      */
-    public function deleteValues(array $siteUris)
+    public function deleteAll()
     {
-        foreach ($siteUris as $siteUri) {
-            Craft::$app->getCache()->delete([
-                self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
-            ]);
-        }
+        Craft::$app->getCache()->flush();
     }
 
     /**

@@ -10,16 +10,23 @@ use putyourlightson\blitz\models\SiteUriModel;
 interface CachePurgerInterface
 {
     /**
-     * Purges the cache given an array of URLs.
+     * Purges the entire cache.
+     */
+    public function purgeAll();
+
+    /**
+     * Purges the cache given a site URI.
+     *
+     * @param SiteUriModel $siteUri
+     */
+    public function purge(SiteUriModel $siteUri);
+
+    /**
+     * Purges the cache given an array of site URIs.
      *
      * @param SiteUriModel[] $siteUris
      */
     public function purgeUris(array $siteUris);
-
-    /**
-     * Purges the entire cache.
-     */
-    public function purgeAll();
 
     /**
      * Tests the purge settings.

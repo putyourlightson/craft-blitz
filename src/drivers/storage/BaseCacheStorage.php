@@ -15,6 +15,16 @@ abstract class BaseCacheStorage extends SavableComponent implements CacheStorage
     /**
      * @inheritdoc
      */
+    public function deleteValues(array $siteUris)
+    {
+        foreach ($siteUris as $siteUri) {
+            $this->delete($siteUri);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getUtilityHtml(): string
     {
         return '';
