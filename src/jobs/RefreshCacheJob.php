@@ -83,7 +83,7 @@ class RefreshCacheJob extends BaseJob
         Blitz::$plugin->flushCache->deleteCacheIds($this->cacheIds);
 
         // Delete cached values so we get a fresh version
-        Blitz::$plugin->cacheStorage->deleteValues($siteUris);
+        Blitz::$plugin->cacheStorage->deleteUris($siteUris);
 
         // Purge the cache
         Blitz::$plugin->cachePurger->purgeUris($siteUris);

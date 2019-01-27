@@ -38,7 +38,7 @@ interface CacheStorageInterface
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function deleteValues(array $siteUris);
+    public function deleteUris(array $siteUris);
 
     /**
      * Deletes all cached values.
