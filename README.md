@@ -2,10 +2,10 @@
 
 # Blitz Plugin for Craft CMS 3
 
-> This is the Blitz v2 branch which is currently in public beta. For the stable version, use the v1 branch. It can be installed using composer as follows.
+> This is the Blitz v2 branch which is currently in public beta. For the stable version, please visit the stable [v1 branch](https://github.com/putyourlightson/craft-blitz/tree/v1). The beta version can be installed using composer as follows.
 
 ```
-composer require putyourlightson/craft-blitz:2.0.0-beta.5
+composer require putyourlightson/craft-blitz:2.0.0-beta.5.1
 ```
 
 The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
@@ -41,7 +41,7 @@ Install the plugin from the Craft Plugin Store in your site’s control panel or
 composer require putyourlightson/craft-blitz
 ```
 
-After installing the plugin, go to the plugin settings.
+After installing the plugin, get set up using the following steps.
 
 1. Turn “Enable Caching” on.
 2. Add at least one row to “Included URI Patterns” such as `.*` to cache the entire site.
@@ -59,15 +59,18 @@ Craft’s template caching `{% cache %}` tag doesn’t play well with the cache 
 
 ## Settings
 
-### Query String Caching
+### Enable Caching
 
-URLs with query strings will be cached according to the selected option in the “Query String Caching” setting  as follows:
+With this setting enabled, Blitz will begin caching pages according to your include/exclude URI patterns. Disable this setting to prevent Blitz from caching any new pages.
 
-- `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
-- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
-- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
+### Warm Cache Automatically
 
-### URI Patterns
+
+Whether the cache should automatically be warmed after clearing. With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. Disabling this setting may make sense if your site is very large and has many related elements.
+
+### Included/Excluded URI Patterns
+
+The URI patterns to include or exclude when caching. Blitz will only cache pages whose URI matches the UIR patterns, giving you fine-grain control over what is cached.
 
 URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
@@ -84,11 +87,47 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `^entries/entry$` matches an exact URI.
 - `^entries/\w+$` matches anything beginning with “entries/” followed by at least 1 word character.
 
+### Cache Storage
+
+The storage type to use for storing cached pages. The default and recommended storage type is “Blitz File Storage”. This stores cached pages as static HTML files in the specified “Folder Path”.
+
+A “Yii Cache Storage” type is also available and will use whatever cache component Craft is set up to use. You can configure Craft to use alternative cache storage (MemCache, Redis, etc.) by overriding the cache application component from `config/app.php` as [explained in the docs](https://docs.craftcms.com/v3/config/app.html#cache-component).
+
+### Reverse Proxy Purger
+
+
+A purger to use for clearing cache in a reverse proxy. This allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge (clear) the appropriate pages whenever they are updated.
+
+### Query String Caching
+
+URLs with query strings will be cached according to the selected option in the “Query String Caching” setting  as follows:
+
+#### Do not cache URLs with query strings
+
+URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
+
+#### Cache URLs with query strings as unique pages
+
+URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
+
+#### Cache URLs with query strings as the same page
+
+URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
+
+### Concurrency
+
+The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
+
+### API Key
+
+
+An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
+
+![Settings](./docs/images/settings-2.0.0.png)
+
 ### Config Settings
 
 Blitz comes with a config file for a multi-environment way to set the plugin settings. The config file also provides more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
-
-![Settings](./docs/images/settings-2.0.0.png)
 
 ## How It Works
 
