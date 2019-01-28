@@ -47,7 +47,7 @@
 
         {{ forms.lightswitchField({
             label: "Caching Enabled"|t('blitz'),
-            instructions: "Whether static file caching should be enabled."|t('blitz'),
+            instructions: "Whether caching should be enabled."|t('blitz'),
             warning: (config.cachingEnabled is defined ? configWarning('cachingEnabled')),
             name: 'settings[cachingEnabled]',
             on: settings.cachingEnabled,
@@ -106,7 +106,7 @@
         <input type="hidden" name="includedUriPatterns" value="" />
         {{ forms.editableTableField({
             label: "Included URI Patterns"|t('blitz'),
-            instructions: "The URI patterns to include in static file caching."|t('blitz'),
+            instructions: "The URI patterns to include in caching."|t('blitz'),
             warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
             name: 'settings[includedUriPatterns]',
             id: 'includedUriPatterns',
@@ -118,7 +118,7 @@
         <input type="hidden" name="excludedUriPatterns" value="" />
         {{ forms.editableTableField({
             label: "Excluded URI Patterns"|t('blitz'),
-            instructions: "The URI patterns to exclude from static file caching (overrides any matching patterns to include)."|t('blitz'),
+            instructions: "The URI patterns to exclude from caching (overrides any matching patterns to include)."|t('blitz'),
             warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
             name: 'settings[excludedUriPatterns]',
             id: 'excludedUriPatterns',
