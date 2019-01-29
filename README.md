@@ -120,14 +120,13 @@ The max number of multiple concurrent requests to use when warming the cache. Th
 
 ### API Key
 
-
 An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
-
-![Settings](./docs/images/settings-2.0.0.png)
 
 ### Config Settings
 
 Blitz comes with a config file for a multi-environment way to set the plugin settings. The config file also provides more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
+
+![Settings](./docs/images/settings-2.0.0.png)
 
 ## How It Works
 
