@@ -102,11 +102,11 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `^entries/entry$` matches an exact URI.
 - `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character.
 
-![Settings](./docs/images/settings-1.8.0b.png)
-
 ### Config Settings
 
 Blitz comes with a config file for a multi-environment way to set the plugin settings. The config file also provides more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
+
+![Settings](./docs/images/settings-1.8.0b.png)
 
 ## How It Works
 
