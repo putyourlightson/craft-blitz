@@ -10,9 +10,11 @@ composer require putyourlightson/craft-blitz:2.0.0-beta.5.1
 
 The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
-It can highly improve a site’s performance by reducing the time to first byte (TTFB). This reduces the load time of the site as well as the load on the server. Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
+- Reduces page load times (TTFB) and load on the server significantly. 
+- Makes your site available even when performing updates and maintenance.
+- Makes it possible to have your site served by a content delivery network (CDN).
 
-Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency).
+Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency). Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
 
 ![TTFB](./docs/images/ttfb-2.0.0-b5.png)  
 
