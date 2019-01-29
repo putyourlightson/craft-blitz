@@ -287,8 +287,6 @@ If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Pow
 
 ## Credits
 
-Blitz is actively developed and maintained by [PutYourLightsOn](https://putyourlightson.com/), yet it has had a tremendous amount of support from the Craft CMS community. A few people worth mentioning are:
+Blitz is actively developed and maintained by [PutYourLightsOn](https://putyourlightson.com/), yet it has had a tremendous amount of support from the Craft CMS community. 
 
-- Oliver Stark
-- Andrew Welch
-- Ben Parizek
+A few people worth mentioning are: Oliver Stark; Andrew Welch; Ben Parizek.
