@@ -23,6 +23,7 @@ Although the performance gains depend on the individual site and server setup, t
 - [Usage](#usage)
 - [Settings](#settings)
 - [How It Works](#how-it-works)
+- [Credits](#credits)
 
 ## License
 
@@ -120,11 +121,11 @@ The max number of multiple concurrent requests to use when warming the cache. Th
 
 ### API Key
 
-An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
+An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters). The individual URLs are displayed below the field after a value has been saved.
 
 ### Config Settings
 
-Blitz comes with a config file for a multi-environment way to set the plugin settings. The config file also provides more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
+Blitz comes with a config file for a multi-environment way to set the plugin settings, as well as more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
 
 ![Settings](./docs/images/settings-2.0.0.png)
 
@@ -284,4 +285,10 @@ Note that if your HTML is minified then all comments will be removed from the ma
 
 If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Powered-By: Blitz` header will be sent.
 
-<small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>
+## Credits
+
+Blitz is actively developed and maintained by [PutYourLightsOn](https://putyourlightson.com/), yet it has had a tremendous amount of support from the Craft CMS community. A few people worth mentioning are:
+
+- Oliver Stark
+- Andrew Welch
+- Ben Parizek
