@@ -1,18 +1,16 @@
-<p align="center"><img height="120" src="./src/icon.svg"></p>
+<p align="center"><img height="180" src="./src/icon.svg"></p>
 
 # Blitz Plugin for Craft CMS 3
+
+> Blitz v2 is currently in public beta. To use it for testing, please visit the [v2 branch](https://github.com/putyourlightson/craft-blitz/tree/v2). 
 
 The Blitz plugin provides intelligent static file caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
 It can highly improve a site’s performance by reducing the time to first byte (TTFB). This reduces the load time of the site as well as the load on the server. Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
 
-Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency):
+Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency).
 
-- 650ms (without caching enabled) 
-- 400ms (with caching enabled, without server rewrite) 
-- 120ms (with caching enabled and server rewrite)
-
-![TTFB](./docs/images/ttfb-1.2.2.png)  
+![TTFB](./docs/images/ttfb-2.0.0-b5.png)  
 
 ## Contents
 
@@ -21,7 +19,6 @@ Although the performance gains depend on the individual site and server setup, t
 - [Usage](#usage)
 - [Settings](#settings)
 - [How It Works](#how-it-works)
-- [Roadmap](#roadmap)
 
 ## License
 
@@ -58,15 +55,37 @@ Craft’s template caching `{% cache %}` tag doesn’t play well with the cache 
 
 ## Settings
 
+### Enable Caching
+
+With this setting enabled, Blitz will begin caching pages according to your include/exclude URI patterns. Disable this setting to prevent Blitz from caching any new pages.
+
+### Warm Cache Automatically
+
+Whether the cache should automatically be warmed after clearing. With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. Disabling this setting may make sense if your site is very large and has many related elements.
+
 ### Query String Caching
 
-URLs with query strings will be cached according to the selected option in the "Query String Caching" setting  as follows:
+URLs with query strings will be cached according to the selected option in the “Query String Caching” setting as follows:
 
-- `Do not cache URLs with query strings`: URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
-- `Cache URLs with query strings as unique pages`: URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
-- `Cache URLs with query strings as the same page`: URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
+#### Do not cache URLs with query strings
 
-### URI Patterns
+URLs with query strings (anything following a `?` in a URL) will not be cached. Use when query parameters dynamically affect a page's output and should therefore never be cached.
+
+#### Cache URLs with query strings as unique pages
+
+URLs with query strings will be cached as unique pages, so `domain.com/`, `domain.com/?=1` and `domain.com/?p=2` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
+
+#### Cache URLs with query strings as the same page
+
+URLs with query strings will be cached as the same page, so `domain.com/`, `domain.com/?&utm_source=twitter` and `domain.com/?&utm_source=facebook` will all be cached with the output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
+
+### Concurrency
+
+The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
+
+### Included/Excluded URI Patterns
+
+The URI patterns to include or exclude when caching. Blitz will only cache pages whose URI matches the UIR patterns, giving you fine-grain control over what is cached.
 
 URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
 
@@ -83,19 +102,21 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `^entries/entry$` matches an exact URI.
 - `^entries/\w+$` matches anything beginning with "entries/" followed by at least 1 word character.
 
+![Settings](./docs/images/settings-1.8.0b.png)
+
 ### Config Settings
 
 Blitz comes with a config file for a multi-environment way to set the plugin settings. The config file also provides more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
 
-![Settings](./docs/images/settings-1.8.0b.png)
-
 ## How It Works
 
-When a URL on the site is visited that matches an included URI pattern, Blitz will serve a static cached HTML file if it exists, otherwise it will cache the template output to a HTML file. Excluded URI patterns will override any matching included URI patterns. 
+When a URL on the site is visited that matches an included URI pattern, Blitz will serve a cached version of the page if it exists, otherwise it will display and cache the template output. Excluded URI patterns will override any matching included URI patterns.
 
-Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached file content (provided the server rewrite, if used, checks for GET requests only).
+When an element is created, updated or deleted, any cached URLs that used that element are deleted. If the “Warm Cache Automatically” setting is enabled the a job is queued to warm the cleared cache. 
 
-If a global is saved then Blitz will clear and warm the entire cache if the "Warm Cache Automatically" setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
+Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached content (provided the server rewrite, if used, checks for GET requests only).
+
+If a global is saved then Blitz will clear and warm the entire cache if the “Warm Cache Automatically” setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
 
 ### Dynamic Content
 
@@ -125,11 +146,9 @@ Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
 
 In the case above it would make sense to add `ajax/.*` as an excluded URI pattern in the plugin settings.
 
-### Cache Invalidation
+### Cache Utility
 
-When an element is created, updated or deleted, any cached template files that used that element are deleted. If the “Warm Cache Automatically” setting is enabled the a job is  queued to warm the cleared cache files.
-
-The Blitz Cache Utility displays the number of cached URIs for each site. It also provides the following functionality:
+The Blitz utility at “Utilities → Blitz Cache” displays the number of cached URIs for each site. It also provides the following functionality.
 
 #### Clear Blitz Cache
 Clearing the cache will delete all cached files.
@@ -244,10 +263,5 @@ If the HTML file was served by the plugin rather than with a server rewrite then
 Note that if your HTML is minified then all comments will be removed from the markup, including the comments above.
 
 If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Powered-By: Blitz` header will be sent.
-
-## Roadmap
-
-- Add better control of local caching of dynamically loaded content.
-- Add Blitz to `clear-caches` console command ([#3588](https://github.com/craftcms/cms/pull/3588)).
 
 <small>Created by [PutYourLightsOn](https://putyourlightson.com/).</small>
