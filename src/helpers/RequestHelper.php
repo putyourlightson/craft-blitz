@@ -84,6 +84,9 @@ class RequestHelper
         ]);
     }
 
+    // Private Methods
+    // =========================================================================
+
     /**
      * Returns whether the request is cacheable site request.
      *

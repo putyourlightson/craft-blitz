@@ -13,6 +13,7 @@ use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\purgers\CachePurgerInterface;
+use putyourlightson\blitz\drivers\purgers\KeyCdnPurger;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
@@ -41,6 +42,7 @@ class CachePurgerHelper
         $purgerTypes = [
             DummyPurger::class,
             CloudflarePurger::class,
+            KeyCdnPurger::class,
         ];
 
         $purgerTypes = array_unique(array_merge(
