@@ -50,6 +50,20 @@ class CacheController extends Controller
     }
 
     /**
+     * Purges the cache (using reverse proxy purger).
+     *
+     * @return int
+     */
+    public function actionPurge(): int
+    {
+        Blitz::$plugin->cachePurger->purgeAll();
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully purged.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
      * Flushes and warms the entire cache.
      *
      * @return int
