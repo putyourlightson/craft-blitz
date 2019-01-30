@@ -147,19 +147,19 @@ class CloudflarePurger extends BaseCachePurger
 
         $client = Craft::createGuzzleClient();
 
+        $uri = 'zones/'.$this->zoneId.'/'.$action;
+        $options = [
+            'base_uri' => self::API_ENDPOINT,
+            'headers'  => [
+                'Content-Type' => 'application/json',
+                'X-Auth-Email' => $this->email,
+                'X-Auth-Key'   => $this->apiKey,
+            ],
+            'json' => $params,
+        ];
+
         try {
-            $response = $client->request(
-                $method,
-                self::API_ENDPOINT.'zones/'.$this->zoneId.'/'.$action,
-                [
-                    'headers'  => [
-                        'Content-Type' => 'application/json',
-                        'X-Auth-Email' => $this->email,
-                        'X-Auth-Key'   => $this->apiKey,
-                    ],
-                    'json' => $params,
-                ]
-            );
+            $response = $client->request($method, $uri, $options);
         }
         catch (BadResponseException $e) { }
         catch (GuzzleException $e) { }

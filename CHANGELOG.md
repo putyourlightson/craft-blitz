@@ -2,8 +2,8 @@
 
 ## 2.0.0 - Unreleased
 ### Added
-- Added Yii cache driver.
-- Added Cloudflare reverse proxy purger.
+- Added replaceable cache drivers (File, Yii cache.
+- Added replaceable reverse proxy purgers (Cloudflare, KeyCDN).
 - Added environment variables to file driver field.
 - Added garbage collection to element query records.
 - Added welcome screen that appears after install.
