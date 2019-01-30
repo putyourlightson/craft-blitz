@@ -31,7 +31,7 @@ class WarmCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
-        Blitz::$plugin->warmCache->requestUrls($this->urls, [$this, 'setRequestsProgress'], $queue);
+        Blitz::$plugin->warmCache->requestUrls($this->urls, [$this, 'setRequestProgress'], $queue);
     }
 
     /**
@@ -41,7 +41,7 @@ class WarmCacheJob extends BaseJob
      * @param int $total
      * @param QueueInterface $queue
      */
-    public function setRequestsProgress(int $count, int $total, QueueInterface $queue)
+    public function setRequestProgress(int $count, int $total, QueueInterface $queue)
     {
         $this->setProgress($queue, $count / $total);
     }

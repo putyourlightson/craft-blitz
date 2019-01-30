@@ -47,6 +47,9 @@ class RefreshCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
+        // First quarter
+        $this->setProgress($queue, 0.25);
+
         // Merge in element cache IDs
         $this->cacheIds = array_merge($this->cacheIds,
             Blitz::$plugin->refreshCache->getElementCacheIds(
@@ -73,8 +76,8 @@ class RefreshCacheJob extends BaseJob
             return;
         }
 
-        // Half time
-        $this->setProgress($queue, 0.5);
+        // Third quarter (cheat!)
+        $this->setProgress($queue, 0.75);
 
         // Get cached site URIs from cache IDs
         $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
