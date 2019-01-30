@@ -4,8 +4,9 @@
 {{ forms.autosuggestField({
     label: "Email"|t('blitz'),
     instructions: "The email address associated with your Cloudflare account."|t('blitz'),
-    name: 'email',
+    suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
+    name: 'email',
     value: purger.email,
     errors: purger.getErrors('email'),
     required: true,
@@ -14,8 +15,9 @@
 {{ forms.autosuggestField({
     label: "Global API Key"|t('blitz'),
     instructions: "The global API key for your Cloudflare account. This can be found under “My Profile” in your Cloudflare account."|t('blitz'),
-    name: 'apiKey',
+    suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
+    name: 'apiKey',
     value: purger.apiKey,
     errors: purger.getErrors('apiKey'),
     required: true,
@@ -24,8 +26,9 @@
 {{ forms.autosuggestField({
     label: "Zone ID"|t('blitz'),
     instructions: "The zone ID of your Cloudflare account. This is available on the “Overview” screen of your domain in your Cloudflare account."|t('blitz'),
-    name: 'zoneId',
+    suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
+    name: 'zoneId',
     value: purger.zoneId,
     errors: purger.getErrors('zoneId'),
     required: true,

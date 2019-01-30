@@ -4,8 +4,9 @@
 {{ forms.autosuggestField({
     label: "API Key"|t('blitz'),
     instructions: "The API key for your Key CDN account."|t('blitz'),
-    name: 'apiKey',
+    suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
+    name: 'apiKey',
     value: purger.apiKey,
     errors: purger.getErrors('apiKey'),
     required: true,
@@ -14,8 +15,9 @@
 {{ forms.autosuggestField({
     label: "Zone ID"|t('blitz'),
     instructions: "The zone ID of your Key CDN account."|t('blitz'),
-    name: 'zoneId',
+    suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
+    name: 'zoneId',
     value: purger.zoneId,
     errors: purger.getErrors('zoneId'),
     required: true,

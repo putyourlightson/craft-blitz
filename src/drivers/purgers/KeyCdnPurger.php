@@ -142,11 +142,11 @@ class KeyCdnPurger extends BaseCachePurger
             'base_uri' => self::API_ENDPOINT,
             'headers'  => [
                 'Content-Type' => 'application/json',
-                'Authorization' => 'Basic '.base64_encode($this->apiKey.':'),
+                'Authorization' => 'Basic '.base64_encode(Craft::parseEnv($this->apiKey).':'),
             ]
         ]);
 
-        $uri = 'zones/'.($action ? $action.'/' : '').$this->zoneId.'.json';
+        $uri = 'zones/'.($action ? $action.'/' : '').Craft::parseEnv($this->zoneId).'.json';
         $options = !empty($params) ? ['json' => $params] : [];
 
         try {

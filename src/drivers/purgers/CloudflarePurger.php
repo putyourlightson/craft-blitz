@@ -146,12 +146,12 @@ class CloudflarePurger extends BaseCachePurger
             'base_uri' => self::API_ENDPOINT,
             'headers'  => [
                 'Content-Type' => 'application/json',
-                'X-Auth-Email' => $this->email,
-                'X-Auth-Key'   => $this->apiKey,
+                'X-Auth-Email' => Craft::parseEnv($this->email),
+                'X-Auth-Key'   => Craft::parseEnv($this->apiKey),
             ]
         ]);
 
-        $uri = 'zones/'.$this->zoneId.'/'.$action;
+        $uri = 'zones/'.Craft::parseEnv($this->zoneId).'/'.$action;
 
         $requests = [];
 
