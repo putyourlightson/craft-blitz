@@ -138,20 +138,16 @@ class KeyCdnPurger extends BaseCachePurger
     {
         $response = '';
 
-        $client = Craft::createGuzzleClient();
-
-        $uri = 'zones/'.($action ? $action.'/' : '').$this->zoneId.'.json';
-        $options = [
+        $client = Craft::createGuzzleClient([
             'base_uri' => self::API_ENDPOINT,
             'headers'  => [
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Basic '.base64_encode($this->apiKey.':'),
             ]
-        ];
+        ]);
 
-        if (!empty($params)) {
-            $options['json'] = $params;
-        }
+        $uri = 'zones/'.($action ? $action.'/' : '').$this->zoneId.'.json';
+        $options = !empty($params) ? ['json' => $params] : [];
 
         try {
             $response = $client->request($method, $uri, $options);

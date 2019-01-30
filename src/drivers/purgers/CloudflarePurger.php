@@ -6,9 +6,9 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
-use GuzzleHttp\Exception\BadResponseException;
-use GuzzleHttp\Exception\GuzzleException;
-use Psr\Http\Message\ResponseInterface;
+use GuzzleHttp\Pool;
+use GuzzleHttp\Psr7\Request;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 
@@ -21,6 +21,7 @@ class CloudflarePurger extends BaseCachePurger
     // =========================================================================
 
     const API_ENDPOINT = 'https://api.cloudflare.com/client/v4/';
+    const API_URL_LIMIT = 30;
 
     // Properties
     // =========================================================================
@@ -112,11 +113,7 @@ class CloudflarePurger extends BaseCachePurger
     {
         $response = $this->_sendRequest('get');
 
-        if (!$response) {
-            return false;
-        }
-
-        return $response->getStatusCode() == 200;
+        return $response;
     }
 
     /**
@@ -139,30 +136,50 @@ class CloudflarePurger extends BaseCachePurger
      * @param string|null $action
      * @param array|null $params
      *
-     * @return ResponseInterface|string
+     * @return bool
      */
     private function _sendRequest(string $method, string $action = '', array $params = [])
     {
-        $response = '';
+        $response = false;
 
-        $client = Craft::createGuzzleClient();
-
-        $uri = 'zones/'.$this->zoneId.'/'.$action;
-        $options = [
+        $client = Craft::createGuzzleClient([
             'base_uri' => self::API_ENDPOINT,
             'headers'  => [
                 'Content-Type' => 'application/json',
                 'X-Auth-Email' => $this->email,
                 'X-Auth-Key'   => $this->apiKey,
-            ],
-            'json' => $params,
-        ];
+            ]
+        ]);
 
-        try {
-            $response = $client->request($method, $uri, $options);
+        $uri = 'zones/'.$this->zoneId.'/'.$action;
+
+        $requests = [];
+
+        // If files requested then create requests from chunks to respect Cloudflare's limit
+        if (!empty($params['files'])) {
+            $files = $params['files'];
+            $batches = array_chunk($files, self::API_URL_LIMIT);
+
+            foreach ($batches as $batch) {
+                $requests[] = new Request($method, $uri, [],
+                    json_encode(['files' => $batch])
+                );
+            }
         }
-        catch (BadResponseException $e) { }
-        catch (GuzzleException $e) { }
+        else {
+            $requests[] = new Request($method, $uri, $params);
+        }
+
+        // Create a pool of requests for sending multiple concurrent requests
+        $pool = new Pool($client, $requests, [
+            'concurrency' => Blitz::$plugin->settings->concurrency,
+            'fulfilled' => function() use (&$response) {
+                $response = true;
+            },
+        ]);
+
+        // Initiate the transfers and wait for the pool of requests to complete
+        $pool->promise()->wait();
 
         return $response;
     }

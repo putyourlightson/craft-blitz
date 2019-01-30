@@ -239,15 +239,17 @@ class RefreshCacheService extends Component
      */
     public function afterRefresh(array $siteUris)
     {
+        Blitz::$plugin->cachePurger->purgeUris($siteUris);
+
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+            Blitz::$plugin->warmCache->warmUris($siteUris);
+        }
+
         // Fire an 'afterRefreshCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, new RefreshCacheEvent([
                 'siteUris' => $siteUris,
             ]));
-        }
-
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->warmCache->warmUris($siteUris);
         }
     }
 
