@@ -75,13 +75,15 @@ class CacheController extends Controller
 
             return ExitCode::OK;
         }
-
-        $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
-
         // Get cached site URIs before flushing the cache
         $siteUris = SiteUriHelper::getAllSiteUris();
 
+        $this->stdout(Craft::t('blitz', 'Clearing Blitz cache.').PHP_EOL, Console::FG_GREEN);
+
         Blitz::$plugin->clearCache->clear();
+
+        $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
+
         Blitz::$plugin->flushCache->flush();
 
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);

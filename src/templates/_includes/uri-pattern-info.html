@@ -1,0 +1,11 @@
+{{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. See the [documentation]({url}).'|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#includedexcluded-uri-patterns'})|raw }}
+
+- A blank field matches the homepage.
+- `.*` matches any character 0 or more times (use this to include everything).
+- `.+` matches any character 1 or more times.
+- `.` matches any character.
+- `\d` matches any digit.
+- `\w` matches any word character.
+- `entries` matches anything containing "entries".
+- `^entries` matches anything beginning with "entries".
+- `^entries/entry$` matches an exact URI.

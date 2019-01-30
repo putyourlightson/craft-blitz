@@ -63,19 +63,9 @@
             required: true,
         }) }}
 
-        {% set info %}
-{{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#includedexcluded-uri-patterns" target="_blank">here</a>'})|raw }}
-
-- A blank field matches the homepage.
-- `.*` matches any character 0 or more times (use this to include everything).
-- `.+` matches any character 1 or more times.
-- `.` matches any character.
-- `\d` matches any digit.
-- `\w` matches any word character.
-- `entries` matches anything containing "entries".
-- `^entries` matches anything beginning with "entries".
-- `^entries/entry$` matches an exact URI.
-        {% endset %}
+        {% set info -%}
+            {% include 'blitz/_includes/uri-pattern-info' %}
+        {%- endset %}
 
         {% set cols = [
             {
@@ -173,7 +163,7 @@
 
     <div id="advanced" class="hidden">
         {% set info %}
-            <span class="info">{{ "Depending on the option selected, the server rewrite may need to be modified ([see the docs]({url}))."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
+            <span class="info">{{ "This setting determines how URLs with query strings will be cached. See the [documentation]({url})."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Query String Caching"|t('blitz'),
