@@ -64,17 +64,17 @@
         }) }}
 
         {% set info %}
-        {{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#uri-patterns" target="_blank">here</a>'})|raw }}
+{{ 'The URI pattern relative to the site’s base URL. Regular expressions can be used for pattern matching. Find more examples {here}.'|t('blitz', {'here': '<a href="https://github.com/putyourlightson/craft-blitz#includedexcluded-uri-patterns" target="_blank">here</a>'})|raw }}
 
-        - A blank field matches the homepage.
-        - `.*` matches any character 0 or more times (use this to include everything).
-        - `.+` matches any character 1 or more times.
-        - `.` matches any character.
-        - `\d` matches any digit.
-        - `\w` matches any word character.
-        - `entries` matches anything containing "entries".
-        - `^entries` matches anything beginning with "entries".
-        - `^entries/entry$` matches an exact URI.
+- A blank field matches the homepage.
+- `.*` matches any character 0 or more times (use this to include everything).
+- `.+` matches any character 1 or more times.
+- `.` matches any character.
+- `\d` matches any digit.
+- `\w` matches any word character.
+- `entries` matches anything containing "entries".
+- `^entries` matches anything beginning with "entries".
+- `^entries/entry$` matches an exact URI.
         {% endset %}
 
         {% set cols = [
@@ -206,7 +206,7 @@
 
         {{ forms.autosuggestField({
             label: "API Key"|t('blitz'),
-            instructions: "An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters)."|t('blitz'),
+            instructions: "An API key that can be used to clear, flush, purge, warm, or refresh expired cache through a URL (min. 16 characters)."|t('blitz'),
             suggestEnvVars: true,
             suggestions: craft.cp.getEnvSuggestions(),
             name: 'settings[apiKey]',
@@ -215,34 +215,7 @@
         }) }}
 
         {% if settings.apiKey and not settings.getErrors('apiKey') %}
-            <table class="shadow-box editable">
-                <tbody>
-                    <tr>
-                        <th class="thin">{{ 'Clear Cache' }}</th>
-                        <td class="textual code">
-                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: parsedApiKey }) }}</textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="thin">{{ 'Flush Cache' }}</th>
-                        <td class="textual code">
-                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: parsedApiKey }) }}</textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="thin">{{ 'Warm Cache' }}</th>
-                        <td class="textual code">
-                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: parsedApiKey }) }}</textarea>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th class="thin">{{ 'Refresh Expired Cache' }}</th>
-                        <td class="textual code">
-                            <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: parsedApiKey }) }}</textarea>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            {% include 'blitz/_includes/api-urls' %}
         {% endif %}
     </div>
 
