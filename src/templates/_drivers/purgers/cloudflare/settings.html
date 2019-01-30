@@ -25,7 +25,7 @@
 
 {{ forms.autosuggestField({
     label: "Zone ID"|t('blitz'),
-    instructions: "The zone ID of your Cloudflare account. This is available on the “Overview” screen of your domain in your Cloudflare account."|t('blitz'),
+    instructions: "The zone ID of your Cloudflare account. This can be found on the “Overview” screen of your domain in your Cloudflare account."|t('blitz'),
     suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
     name: 'zoneId',

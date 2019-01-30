@@ -3,7 +3,7 @@
 
 {{ forms.autosuggestField({
     label: "API Key"|t('blitz'),
-    instructions: "The API key for your Key CDN account."|t('blitz'),
+    instructions: "The API key for your Key CDN account. This can be found under “Account Settings → Authentication” in your KeyCDN account."|t('blitz'),
     suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
     name: 'apiKey',
@@ -14,7 +14,7 @@
 
 {{ forms.autosuggestField({
     label: "Zone ID"|t('blitz'),
-    instructions: "The zone ID of your Key CDN account."|t('blitz'),
+    instructions: "The pull zone ID of your Key CDN account. This can be found under “Zones” in your KeyCDN account."|t('blitz'),
     suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
     name: 'zoneId',
