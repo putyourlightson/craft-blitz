@@ -13,7 +13,7 @@
 - Added an API key that can be used to clear, flush, purge, warm, or refresh expired cache through a URL.
 
 ### Changed
-- Minimum requirement of Craft has been changed to version 3.1.0.
+- Changed minimum requirement of Craft to version 3.1.0.
 - Cache is invalidated when elements are updated through non control panel requests.
 - Neo blocks are now considered non cacheable element types.
 

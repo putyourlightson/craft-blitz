@@ -105,6 +105,7 @@ class Blitz extends Plugin
         if (Craft::$app->getRequest()->getIsCpRequest()) {
             $this->_registerCpUrlRules();
             $this->_registerUtilities();
+            $this->_registerRedirectAfterInstall();
 
             if (Craft::$app->getEdition() === Craft::Pro) {
                 $this->_registerUserPermissions();
@@ -360,6 +361,25 @@ class Blitz extends Plugin
             function(RegisterComponentTypesEvent $event) {
                 if (Craft::$app->getUser()->checkPermission('blitz:cache-utility')) {
                     $event->types[] = CacheUtility::class;
+                }
+            }
+        );
+    }
+
+    /**
+     * Registers redirect after install
+     */
+    private function _registerRedirectAfterInstall()
+    {
+        Event::on(Plugins::class, Plugins::EVENT_AFTER_INSTALL_PLUGIN,
+            function (PluginEvent $event) {
+                if ($event->plugin === $this) {
+                    // Redirect to settings page with welcome
+                    Craft::$app->getResponse()->redirect(
+                        UrlHelper::cpUrl('settings/plugins/blitz', [
+                            'welcome' => 1
+                        ])
+                    )->send();
                 }
             }
         );
