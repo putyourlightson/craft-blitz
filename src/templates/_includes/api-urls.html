@@ -1,33 +1,35 @@
+{% set apiKey = settings.apiKey|replace('$', '') %}
+
 <table class="shadow-box editable">
     <tbody>
         <tr>
             <th class="thin">{{ 'Clear Cache' }}</th>
             <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: parsedApiKey }) }}</textarea>
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: apiKey }) }}</textarea>
             </td>
         </tr>
         <tr>
             <th class="thin">{{ 'Flush Cache' }}</th>
             <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: parsedApiKey }) }}</textarea>
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: apiKey }) }}</textarea>
             </td>
         </tr>
         <tr>
             <th class="thin">{{ 'Purge Cache' }}</th>
             <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/purge', { key: parsedApiKey }) }}</textarea>
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/purge', { key: apiKey }) }}</textarea>
             </td>
         </tr>
         <tr>
             <th class="thin">{{ 'Warm Cache' }}</th>
             <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: parsedApiKey }) }}</textarea>
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: apiKey }) }}</textarea>
             </td>
         </tr>
         <tr>
             <th class="thin">{{ 'Refresh Expired Cache' }}</th>
             <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: parsedApiKey }) }}</textarea>
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }) }}</textarea>
             </td>
         </tr>
     </tbody>

@@ -53,7 +53,6 @@ class SettingsController extends Controller
 
         return $this->renderTemplate('blitz/_settings', [
             'settings' => Blitz::$plugin->settings,
-            'parsedApiKey' => Craft::parseEnv(Blitz::$plugin->settings->apiKey),
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
             'storageDriver' => $storageDriver,
             'storageDrivers' => $storageDrivers,

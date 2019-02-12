@@ -68,7 +68,6 @@ With this setting enabled, Blitz will begin caching pages according to your incl
 
 ### Warm Cache Automatically
 
-
 Whether the cache should automatically be warmed after clearing. With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. Disabling this setting may make sense if your site is very large and has many related elements.
 
 ### Included/Excluded URI Patterns
@@ -97,7 +96,6 @@ The storage type to use for storing cached pages. The default and recommended st
 A “Yii Cache Storage” type is also available and will use whatever cache component Craft is set up to use. You can configure Craft to use alternative cache storage (MemCache, Redis, etc.) by overriding the cache application component from `config/app.php` as [explained in the docs](https://docs.craftcms.com/v3/config/app.html#cache-component).
 
 ### Reverse Proxy Purger
-
 
 A purger to use for clearing cache in a reverse proxy. This allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge (clear) the appropriate pages whenever they are updated.
 
