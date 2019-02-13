@@ -229,23 +229,29 @@ In Nginx this is achieved by adding a location handler to the configuration file
 If the "Query String Caching" setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
 ```
-# Blitz cache rewrite
-location / {
-  try_files /cache/blitz/$http_host/$uri/$args/index.html;
+set $cache_path false;
+
+if ($request_method = GET) {
+    set $cache_path /cache/blitz/$host/$uri/$args/index.html;
 }
 
-# Send would-be 404 requests to Craft
+location ~ ^(.*)$ {
+    try_files $cache_path $uri $uri/ /index.php?p=$uri&$args;
+}
 ```
 
 If the "Query String Caching" setting is set to `Cache URLs with query strings as the same page` then use the following code.
 
 ```
-# Blitz cache rewrite
-location / {
-  try_files /cache/blitz/$http_host/$uri/index.html;
+set $cache_path false;
+
+if ($request_method = GET) {
+    set $cache_path /cache/blitz/$host/$uri/index.html;
 }
 
-# Send would-be 404 requests to Craft
+location ~ ^(.*)$ {
+    try_files $cache_path $uri $uri/ /index.php?p=$uri&$args;
+}
 ```
 
 ### Debugging
