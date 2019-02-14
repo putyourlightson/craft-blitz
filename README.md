@@ -5,7 +5,7 @@
 > The Blitz v2 branch is currently in public beta and is not recommended for use in production environments. For the stable version, please visit the [v1 branch](https://github.com/putyourlightson/craft-blitz/tree/v1). The beta version can be installed using composer as follows.
 
 ```
-composer require putyourlightson/craft-blitz:2.0.0-beta.6
+composer require putyourlightson/craft-blitz:2.0.0-beta.6.1
 ```
 
 The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
