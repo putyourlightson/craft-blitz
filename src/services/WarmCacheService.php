@@ -58,6 +58,8 @@ class WarmCacheService extends Component
         $client = Craft::createGuzzleClient();
         $requests = [];
 
+        $urls = array_unique($urls);
+
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http
             if (strpos($url, 'http') === 0) {
