@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 1.11.5 - 2019-02-14
+### Fixed
+- Fixed refreshing of expired cache when run through a console command.  
+
 ## 1.11.4 - 2019-01-23
 ### Fixed
 - Fixed error which could appear when query params were longer than the available column size.  

@@ -431,6 +431,9 @@ class CacheService extends Component
             'elementIds' => $this->_invalidateElementIds,
             'elementTypes' => $this->_invalidateElementTypes,
         ]));
+
+        $this->_invalidateCacheIds = [];
+        $this->_invalidateElementIds = [];
     }
 
     /**
@@ -460,6 +463,8 @@ class CacheService extends Component
                 $this->invalidateElement($element);
             }
         }
+
+        $this->invalidateCache();
     }
 
     /**
