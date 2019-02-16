@@ -24,11 +24,28 @@ class FlushCacheService extends Component
     // =========================================================================
 
     /**
-     * Flushes the cache.
+     * Flushes the entire cache.
      */
-    public function flush()
+    public function flushAll()
     {
         CacheRecord::deleteAll();
+
+        $this->runGarbageCollection();
+
+        // Fire an 'afterFlushCache' event
+        if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_FLUSH_CACHE);
+        }
+    }
+
+    /**
+     * Flushes the cache for a given site.
+     *
+     * @param int $siteId
+     */
+    public function flushSite(int $siteId)
+    {
+        CacheRecord::deleteAll(['siteId' => $siteId]);
 
         $this->runGarbageCollection();
 

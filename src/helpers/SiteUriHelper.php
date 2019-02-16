@@ -19,7 +19,28 @@ class SiteUriHelper
      */
     public static function getAllSiteUris(): array
     {
-        $siteUris = self::_getCachedSiteUris();
+        $siteUris = [];
+
+        // Loop through all sites to ensure we warm all site element URLs
+        $sites = Craft::$app->getSites()->getAllSites();
+
+        foreach ($sites as $site) {
+            $siteUris = array_merge($siteUris, self::getSiteSiteUris($site->id));
+        }
+
+        return $siteUris;
+    }
+
+    /**
+     * Returns site URIs for a given site.
+     *
+     * @param int $siteId
+     *
+     * @return SiteUriModel[]
+     */
+    public static function getSiteSiteUris(int $siteId): array
+    {
+        $siteUris = self::_getCachedSiteUris(['siteId' => $siteId]);
 
         // Get URLs from all element types
         $elementTypes = Craft::$app->getElements()->getAllElementTypes();
@@ -27,27 +48,22 @@ class SiteUriHelper
         /** @var Element $elementType */
         foreach ($elementTypes as $elementType) {
             if ($elementType::hasUris()) {
-                // Loop through all sites to ensure we warm all site element URLs
-                $sites = Craft::$app->getSites()->getAllSites();
+                $elements = $elementType::find()
+                    ->siteId($siteId)
+                    ->all();
 
-                foreach ($sites as $site) {
-                    $elements = $elementType::find()
-                        ->siteId($site->id)
-                        ->all();
+                /** @var Element $element */
+                foreach ($elements as $element) {
+                    $uri = trim($element->uri, '/');
+                    $uri = ($uri == '__home__' ? '' : $uri);
 
-                    /** @var Element $element */
-                    foreach ($elements as $element) {
-                        $uri = trim($element->uri, '/');
-                        $uri = ($uri == '__home__' ? '' : $uri);
+                    $siteUri = new SiteUriModel([
+                        'siteId' => $siteId,
+                        'uri' => $uri,
+                    ]);
 
-                        $siteUri = new SiteUriModel([
-                            'siteId' => $site->id,
-                            'uri' => $uri,
-                        ]);
-
-                        if (!in_array($siteUri, $siteUris, true) && $siteUri->getIsCacheableUri()) {
-                            $siteUris[] = $siteUri;
-                        }
+                    if (!in_array($siteUri, $siteUris, true) && $siteUri->getIsCacheableUri()) {
+                        $siteUris[] = $siteUri;
                     }
                 }
             }

@@ -31,6 +31,16 @@ class WarmCacheService extends Component
     }
 
     /**
+     * Warms the cache of the provided site.
+     *
+     * @param int $siteId
+     */
+    public function warmSite(int $siteId)
+    {
+        $this->warmUris(SiteUriHelper::getSiteSiteUris($siteId));
+    }
+
+    /**
      * Warms the cache using the provided URIs.
      *
      * @param SiteUriModel[] $siteUris

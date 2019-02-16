@@ -27,7 +27,7 @@ class CacheController extends Controller
      */
     public function actionClear(): int
     {
-        Blitz::$plugin->clearCache->clear();
+        Blitz::$plugin->clearCache->clearAll();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
 
@@ -41,8 +41,8 @@ class CacheController extends Controller
      */
     public function actionFlush(): int
     {
-        Blitz::$plugin->clearCache->clear();
-        Blitz::$plugin->flushCache->flush();
+        Blitz::$plugin->clearCache->clearAll();
+        Blitz::$plugin->flushCache->flushAll();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
 
@@ -75,16 +75,17 @@ class CacheController extends Controller
 
             return ExitCode::OK;
         }
+
         // Get cached site URIs before flushing the cache
         $siteUris = SiteUriHelper::getAllSiteUris();
 
         $this->stdout(Craft::t('blitz', 'Clearing Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
-        Blitz::$plugin->clearCache->clear();
+        Blitz::$plugin->clearCache->clearAll();
 
         $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
-        Blitz::$plugin->flushCache->flush();
+        Blitz::$plugin->flushCache->flushAll();
 
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
