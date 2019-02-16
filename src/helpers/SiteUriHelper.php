@@ -19,14 +19,17 @@ class SiteUriHelper
      */
     public static function getAllSiteUris(): array
     {
-        $siteUris = [];
+        // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
+        $siteUriSets = [[]];
 
         // Loop through all sites to ensure we warm all site element URLs
         $sites = Craft::$app->getSites()->getAllSites();
 
         foreach ($sites as $site) {
-            $siteUris = array_merge($siteUris, self::getSiteSiteUris($site->id));
+            $siteUriSets[] = self::getSiteSiteUris($site->id);
         }
+
+        $siteUris = array_merge(...$siteUriSets);
 
         return $siteUris;
     }

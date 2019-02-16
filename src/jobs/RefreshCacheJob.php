@@ -62,14 +62,19 @@ class RefreshCacheJob extends BaseJob
                 $this->elementTypes, $this->cacheIds
             );
 
+            // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
+            $elementQueryCacheIdSets = [[]];
+
             foreach ($elementQueryRecords as $elementQueryRecord) {
                 // Merge in element query cache IDs
-                $this->cacheIds = array_merge($this->cacheIds,
-                    $this->_getElementQueryCacheIds(
-                        $elementQueryRecord, $this->elementIds, $this->cacheIds
-                    )
+                $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
+                    $elementQueryRecord, $this->elementIds, $this->cacheIds
                 );
             }
+
+            $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
+
+            $this->cacheIds = array_merge($this->cacheIds, $elementQueryCacheIds);
         }
 
         if (empty($this->cacheIds)) {
