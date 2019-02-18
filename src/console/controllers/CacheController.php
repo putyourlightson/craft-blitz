@@ -95,7 +95,6 @@ class CacheController extends Controller
 
         $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestsProgress']);
 
-        Console::updateProgress($total, $total);
         Console::endProgress();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);

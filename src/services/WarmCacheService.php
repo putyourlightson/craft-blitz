@@ -68,6 +68,7 @@ class WarmCacheService extends Component
         $client = Craft::createGuzzleClient();
         $requests = [];
 
+        // Ensure URLs are unique
         $urls = array_unique($urls);
 
         foreach ($urls as $url) {

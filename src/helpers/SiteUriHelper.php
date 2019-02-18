@@ -43,9 +43,14 @@ class SiteUriHelper
      */
     public static function getSiteSiteUris(int $siteId): array
     {
-        $siteUris = self::_getCachedSiteUris(['siteId' => $siteId]);
+        $siteUris = [];
 
-        // Get URLs from all element types
+        $uris = CacheRecord::find()
+            ->select('uri')
+            ->where(['siteId' => $siteId])
+            ->column();
+
+        // Get URIs from all element types
         $elementTypes = Craft::$app->getElements()->getAllElementTypes();
 
         /** @var Element $elementType */
@@ -60,15 +65,21 @@ class SiteUriHelper
                     $uri = trim($element->uri, '/');
                     $uri = ($uri == '__home__' ? '' : $uri);
 
-                    $siteUri = new SiteUriModel([
-                        'siteId' => $siteId,
-                        'uri' => $uri,
-                    ]);
-
-                    if (!in_array($siteUri, $siteUris, true) && $siteUri->getIsCacheableUri()) {
-                        $siteUris[] = $siteUri;
+                    if (!in_array($uri, $uris, true)) {
+                        $uris[] = $uri;
                     }
                 }
+            }
+        }
+
+        foreach ($uris as $uri) {
+            $siteUri = new SiteUriModel([
+                'siteId' => $siteId,
+                'uri' => $uri,
+            ]);
+
+            if ($siteUri->getIsCacheableUri()) {
+                $siteUris[] = $siteUri;
             }
         }
 
@@ -84,7 +95,19 @@ class SiteUriHelper
      */
     public static function getCachedSiteUris(array $cacheIds): array
     {
-        return self::_getCachedSiteUris(['id' => $cacheIds]);
+        $siteUriModels = [];
+
+        $siteUris = CacheRecord::find()
+            ->select(['siteId', 'uri'])
+            ->where(['id' => $cacheIds])
+            ->asArray(true)
+            ->all();
+
+        foreach ($siteUris as $siteUri) {
+            $siteUriModels[] = new SiteUriModel($siteUri);
+        }
+
+        return $siteUriModels;
     }
 
     /**
@@ -99,36 +122,13 @@ class SiteUriHelper
         $urls = [];
 
         foreach ($siteUris as $siteUri) {
-            $urls[] = $siteUri->getUrl();
+            $url = $siteUri->getUrl();
+
+            if (!in_array($url, $urls)) {
+                $urls[] = $url;
+            }
         }
 
         return $urls;
-    }
-
-    // Private Methods
-    // =========================================================================
-
-    /**
-     * Returns cached site URIs given a condition.
-     *
-     * @param array $condition
-     *
-     * @return SiteUriModel[]
-     */
-    private static function _getCachedSiteUris(array $condition = []): array
-    {
-        $siteUriModels = [];
-
-        $siteUris = CacheRecord::find()
-            ->select(['siteId', 'uri'])
-            ->where($condition)
-            ->asArray(true)
-            ->all();
-
-        foreach ($siteUris as $siteUri) {
-            $siteUriModels[] = new SiteUriModel($siteUri);
-        }
-
-        return $siteUriModels;
     }
 }
