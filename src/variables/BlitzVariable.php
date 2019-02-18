@@ -8,6 +8,8 @@ namespace putyourlightson\blitz\variables;
 use Craft;
 use craft\helpers\Template;
 use craft\web\View;
+use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use Twig_Markup;
 
 class BlitzVariable
@@ -42,6 +44,16 @@ class BlitzVariable
         $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/input';
 
         return $this->_getScript($uri);
+    }
+
+    /**
+     * Returns whether a purger is registered.
+     *
+     * @return bool
+     */
+    public function hasPurger(): bool
+    {
+        return !(Blitz::$plugin->cachePurger instanceof DummyPurger);
     }
 
     // Private Methods

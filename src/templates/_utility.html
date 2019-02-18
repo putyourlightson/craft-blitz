@@ -10,12 +10,20 @@
         action: 'flush',
         title: 'Flush Blitz Cache',
         instructions: 'Flushing the cache will clear the cache and remove all records from the database.',
-    },
-    {
-        action: 'purge',
-        title: 'Purge Blitz Cache',
-        instructions: 'Purging the cache will delete all cached pages in the reverse proxy purger.',
-    },
+    }
+] %}
+
+{% if craft.blitz.hasPurger() %}
+    {% set utilities = utilities|merge([
+        {
+            action: 'purge',
+            title: 'Purge Blitz Cache',
+            instructions: 'Purging the cache will delete all cached pages in the reverse proxy purger.',
+        }
+    ]) %}
+{% endif %}
+
+{% set utilities = utilities|merge([
     {
         action: 'warm',
         title: 'Warm Blitz Cache',
@@ -25,8 +33,8 @@
         action: 'refresh-expired',
         title: 'Refresh Expired Blitz Cache',
         instructions: 'Refreshing the expired cache will refresh all elements that have expired since they were cached.',
-    },
-] %}
+    }
+]) %}
 
 {{ driverHtml|raw }}
 

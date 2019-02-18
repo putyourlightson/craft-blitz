@@ -97,7 +97,7 @@ class CacheController extends Controller
 
         Console::endProgress();
 
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} files.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} pages.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }
