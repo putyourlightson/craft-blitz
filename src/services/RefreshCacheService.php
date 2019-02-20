@@ -16,6 +16,7 @@ use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
@@ -155,7 +156,7 @@ class RefreshCacheService extends Component
             $this->_elementTypes[] = $elementType;
         }
 
-        $this->addExpiryDates($element);
+        $this->addElementExpiryDates($element);
 
         // If batch mode is on then the refresh will be triggered later
         if ($this->batchMode === false) {
@@ -168,13 +169,14 @@ class RefreshCacheService extends Component
      *
      * @param Element $element
      */
-    public function addExpiryDates(Element $element)
+    public function addElementExpiryDates(Element $element)
     {
         $now = new \DateTime();
 
         if (!empty($element->postDate) && $element->postDate > $now) {
             $expiryDate = $element->postDate;
-        } else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
+        }
+        else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
             $expiryDate = $element->expiryDate;
         }
 
@@ -182,7 +184,7 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $this->addExpiryDate($element, $expiryDate);
+        $this->addElementExpiryDate($element, $expiryDate);
     }
 
     /**
@@ -191,7 +193,7 @@ class RefreshCacheService extends Component
      * @param Element $element
      * @param \DateTime $expiryDate
      */
-    public function addExpiryDate(Element $element, \DateTime $expiryDate)
+    public function addElementExpiryDate(Element $element, \DateTime $expiryDate)
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
@@ -258,7 +260,15 @@ class RefreshCacheService extends Component
      */
     public function refreshExpiredCache()
     {
-        // Check for expired elements and invalidate them
+        // Check for expired caches to invalidate
+        $cacheIds = CacheRecord::find()
+            ->select('id')
+            ->where(['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())])
+            ->column();
+
+        $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
+
+        // Check for expired elements to invalidate
         $elementExpiryDates = ElementExpiryDateRecord::find()
             ->where(['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())])
             ->all();

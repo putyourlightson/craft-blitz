@@ -151,7 +151,7 @@ class GenerateCacheService extends Component
      */
     public function saveOutput(string $output, SiteUriModel $siteUri)
     {
-        if (!$this->options->cache) {
+        if (!$this->options->cachingEnabled) {
             return;
         }
 

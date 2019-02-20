@@ -15,7 +15,7 @@ class GenerateCacheOptionsModel extends Model
     /**
      * @var bool
      */
-    public $cache = true;
+    public $cachingEnabled = true;
 
     /**
      * @var bool
@@ -46,7 +46,7 @@ class GenerateCacheOptionsModel extends Model
     public function rules(): array
     {
         return [
-            [['cache', 'cacheElements', 'cacheElementQueries'], 'bool'],
+            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'bool'],
         ];
     }
 }
