@@ -10,6 +10,7 @@ use craft\helpers\Template;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
+use putyourlightson\blitz\models\GenerateCacheOptionsModel;
 use Twig_Markup;
 
 class BlitzVariable
@@ -44,6 +45,43 @@ class BlitzVariable
         $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/input';
 
         return $this->_getScript($uri);
+    }
+
+    /**
+     * Sets options for the current page cache.
+     *
+     * @param array
+     */
+    public function options(array $params)
+    {
+        $options = Blitz::$plugin->generateCache->options;
+
+        if (!empty($params['for'])) {
+            $for = explode(' ', $params['for']);
+            $num = $for[0] ?? 0;
+            $unit = $for[1] ?? '';
+
+            // Add support for "+1 week" http://www.php.net/manual/en/datetime.formats.relative.php
+            if ($unit === 'week') {
+                if ($num == 1) {
+                    $num = 7;
+                    $unit = 'days';
+                }
+                else {
+                    $unit = 'weeks';
+                }
+            }
+
+            $expiryDate = new \DateTime('+'.$num.' '.$unit);
+
+            $options->expiryDate = $expiryDate;
+        }
+
+        $options->setAttributes($params);
+
+        if ($options->validate()) {
+            Blitz::$plugin->generateCache->options = $options;
+        }
     }
 
     /**

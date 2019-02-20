@@ -12,6 +12,7 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheHelper;
+use putyourlightson\blitz\models\GenerateCacheOptionsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -23,6 +24,11 @@ class GenerateCacheService extends Component
 {
     // Properties
     // =========================================================================
+
+    /**
+     * @var GenerateCacheOptionsModel
+     */
+    public $options = null;
 
     /**
      * @var int[]
@@ -43,6 +49,16 @@ class GenerateCacheService extends Component
     // =========================================================================
 
     /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        $this->options = new GenerateCacheOptionsModel();
+    }
+
+    /**
      * Adds an element to cache.
      *
      * @param ElementInterface $element
@@ -50,7 +66,7 @@ class GenerateCacheService extends Component
     public function addElement(ElementInterface $element)
     {
         // Don't proceed if element caching is disabled
-        if (!Blitz::$plugin->settings->cacheElements) {
+        if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
             return;
         }
 
@@ -77,7 +93,7 @@ class GenerateCacheService extends Component
     public function addElementQuery(ElementQuery $elementQuery)
     {
         // Don't proceed if element query caching is disabled
-        if (!Blitz::$plugin->settings->cacheElementQueries) {
+        if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
             return;
         }
 
@@ -135,6 +151,10 @@ class GenerateCacheService extends Component
      */
     public function saveOutput(string $output, SiteUriModel $siteUri)
     {
+        if (!$this->options->cache) {
+            return;
+        }
+
         // Use DB connection so we can batch insert and exclude audit columns
         $db = Craft::$app->getDb();
 
@@ -157,12 +177,22 @@ class GenerateCacheService extends Component
         $values = [];
 
         foreach ($this->_elementCaches as $elementId) {
-            $values[] = [$cacheId, $elementId];
+            $values[] = [
+                $cacheId,
+                $elementId,
+                $this->options->flag,
+                $this->options->expiryDate
+            ];
         }
 
         $db->createCommand()
             ->batchInsert(ElementCacheRecord::tableName(),
-                ['cacheId', 'elementId'],
+                [
+                    'cacheId',
+                    'elementId',
+                    'flag',
+                    'expiryDate'
+                ],
                 $values,
                 false)
             ->execute();
