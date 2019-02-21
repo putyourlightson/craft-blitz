@@ -92,6 +92,11 @@ class SettingsModel extends Model
     public $cacheElementQueries = true;
 
     /**
+     * @var int|null
+     */
+    public $cacheDuration = null;
+
+    /**
      * @var string[]
      */
     public $nonCacheableElementTypes = [
@@ -142,6 +147,7 @@ class SettingsModel extends Model
             [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
             [['concurrency'], 'integer', 'min' => 1],
             [['apiKey'], 'string', 'length' => [16]],
+            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
         ];
     }
 

@@ -5,7 +5,7 @@
 > The Blitz v2 branch is currently in public beta and is not recommended for use in production environments. For the stable version, please visit the [v1 branch](https://github.com/putyourlightson/craft-blitz/tree/v1). The beta version can be installed using composer as follows.
 
 ```
-composer require putyourlightson/craft-blitz:2.0.0-beta.6.2
+composer require putyourlightson/craft-blitz:2.0.0-beta.7
 ```
 
 The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
@@ -62,7 +62,7 @@ Craft’s template caching `{% cache %}` tag doesn’t play well with the cache 
 
 ## Settings
 
-### Enable Caching
+### Caching Enabled
 
 With this setting enabled, Blitz will begin caching pages according to your include/exclude URI patterns. Disable this setting to prevent Blitz from caching any new pages.
 
@@ -115,11 +115,11 @@ URLs with query strings will be cached as unique pages, so `domain.com/about`, `
 
 URLs with query strings will be cached as the same page, so `domain.com/about`, `domain.com/about?utm_source=twitter` and `domain.com/about?utm_source=facebook` will all be cached with the same output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
 
-### Concurrency
+#### Concurrency
 
 The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
 
-### API Key
+#### API Key
 
 An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters). The individual URLs are displayed below the field after a value has been saved.
 
@@ -138,6 +138,59 @@ When an element is created, updated or deleted, any cached URLs that used that e
 Blitz is compatible with live preview. It will detect when it is being used and will not cache its output or display cached content (provided the server rewrite, if used, checks for GET requests only).
 
 If a global is saved then Blitz will clear and warm the entire cache if the “Warm Cache Automatically” setting is enabled (and the `warmCacheAutomaticallyForGlobals` config setting has not been set to `false`). This is because globals are available on every page of every site and therefore can potentially affect every cached page. Globals should therefore be used sparingly, only in situations where the global value needs to be accessible from multiple pages. For anything else, consider using entries or categories over globals.
+
+### Template Specific Options
+
+It is possible to set template specific caching options by passing an object into the `options` function. All parameters are optional.
+
+```
+{% do craft.blitz.options({
+	cachingEnabled: true,
+	cacheElements: true,
+    cacheElementQueries: true,
+    cacheDuration: '3 days',
+    flag: 'listing',
+    expiryDate: entry.eventDate
+})
+```
+
+#### Caching Enabled
+
+Setting this option to false will disable caching of this page.
+
+#### Cache Elements
+
+Setting this option to false will disable caching the elements used on this page in the database (used for cache invalidation).
+
+#### Cache Element Queries
+
+Setting this option to false will disable caching the element queries used on this page in the database (used for cache invalidation).
+
+#### Cache Duration
+
+The amount of time after which the cache should expire. The “Refresh Expired Cache” utility or controller action must be triggered to invalidate expired cache. 
+
+The accepted duration units are:
+
+`sec`(`s`)
+`second`(`s`)
+`min`(`s`)
+`minute`(`s`)
+`hour`(`s`)
+`day`(`s`)
+`week`(`s`)
+`fortnight`(`s`)
+`forthnight`(`s`)
+`month`(`s`)
+`year`(`s`)
+
+#### Flag
+
+A flag (string) that will be associated with this page and that can can later be used to refresh flagged cache.
+
+#### Expiry Date
+
+A [DateTime](http://php.net/manual/en/class.datetime.php) object that will define when the cache should expire. The “Refresh Expired Cache” utility or controller action must be triggered to invalidate expired cache. 
 
 ### Dynamic Content
 
@@ -183,17 +236,21 @@ Warming the cache will flush the cache and add a job to the queue to recache all
 #### Refresh Expired Blitz Cache
 Refreshing the expired cache will refresh all cached URIs that contain elements that have expired since they were cached, specifically entries with future post and expiry dates.
 
-Create a cron job with the following console command to refresh expired cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
+Create a cron job with the following console command to refresh expired or flagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
 
 ```
+// Refresh expired cache every hour at 5 minutes past the hour.
 5 * * * * /usr/bin/php /path/to/craft blitz/cache/refresh-expired
+
+// Refresh cache flagged with the flag “listing” every day at 6am.
+0 6 * * * /usr/bin/php /path/to/craft blitz/cache/refresh-flagged listing
 ```
 
-![Utility](./docs/images/utility-2.0.0.png)
+![Utility](./docs/images/utility-2.0.0-beta.7.png)
 
 ### Clearing Cache with a URL
 
-If an API key is set in “Settings → Advanced” then  it is possible to clear, flush, warm, or refresh expired cache through a URL. The available URLs are displayed under the API key field after the setting has been saved. 
+If an API key is set in “Settings → Advanced” then  it is possible to clear, flush, warm, refresh expired or refresh flagged cache through a URL. The available URLs are displayed under the API key field after the setting has been saved. 
 
 ### Console Commands
 
@@ -206,10 +263,10 @@ The following console commands with the functionality described above are also a
     ./craft blitz/cache/warm
     
     ./craft blitz/cache/refresh-expired
+    
+    ./craft blitz/cache/refresh-flagged {flag}
 
 ![Console commands](./docs/images/console-2.0.0.png)
-
-Note that if the `@web` alias, or any other method that requires a web request, is used to determine the site URL then it cannot be included in cache warming with the console command. Using an absolute site URL is therefore recommended.
 
 ### Server Rewrite
 

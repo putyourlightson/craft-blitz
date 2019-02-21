@@ -66,6 +66,10 @@ return [
     // Whether element queries should be cached in the database.
     //'cacheElementQueries' => true,
 
+    // The amount of time after which the cache should expire (if not 0). See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
+    //'cacheDuration' => 0,
+
+    //
     // Element types that should not be cached.
     //'nonCacheableElementTypes' => [
     //    'craft\elements\GlobalSet',

@@ -10,6 +10,7 @@ use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
+use craft\helpers\ConfigHelper;
 use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheHelper;
@@ -57,6 +58,16 @@ class GenerateCacheService extends Component
         parent::init();
 
         $this->options = new GenerateCacheOptionsModel();
+
+        // Set default cache duration if greater than 0
+        $cacheDuration = ConfigHelper::durationInSeconds(Blitz::$plugin->settings->cacheDuration);
+
+        if ($cacheDuration > 0) {
+            $cacheDuration += time();
+
+            // Prepend with @ symbol to specify a timestamp
+            $this->options->expiryDate = new \DateTime('@'.$cacheDuration);
+        }
     }
 
     /**

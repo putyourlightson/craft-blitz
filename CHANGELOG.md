@@ -2,15 +2,17 @@
 
 ## 2.0.0 - Unreleased
 ### Added
-- Added replaceable cache drivers (File, Yii cache.
+- Added replaceable cache drivers (File, Yii cache).
 - Added replaceable reverse proxy purgers (Cloudflare, KeyCDN).
-- Added purge cache action to utility.
+- Added twig tag for setting template specific cache options including flags and expiry dates.
+- Added refresh flagged cache action to utility and controllers.
+- Added purge cache action to utility and controllers.
 - Added environment variables to file driver field.
 - Added garbage collection to element query records.
 - Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
-- Added `cacheControlHeader` config setting.
 - Added an API key that can be used to clear, flush, purge, warm, or refresh expired cache through a URL.
+- Added `cacheControlHeader` config setting.
 
 ### Changed
 - Changed minimum requirement of Craft to version 3.1.0.
