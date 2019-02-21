@@ -172,17 +172,17 @@ The amount of time after which the cache should expire. The “Refresh Expired C
 
 The accepted duration units are:
 
-`sec`(`s`)
-`second`(`s`)
-`min`(`s`)
-`minute`(`s`)
-`hour`(`s`)
-`day`(`s`)
-`week`(`s`)
-`fortnight`(`s`)
-`forthnight`(`s`)
-`month`(`s`)
-`year`(`s`)
+- `sec`(`s`)
+- `second`(`s`)
+- `min`(`s`)
+- `minute`(`s`)
+- `hour`(`s`)
+- `day`(`s`)
+- `week`(`s`)
+- `fortnight`(`s`)
+- `forthnight`(`s`)
+- `month`(`s`)
+- `year`(`s`)
 
 #### Flag
 
@@ -234,9 +234,13 @@ Flushing the cache will clear the cache and remove all records from the database
 Warming the cache will flush the cache and add a job to the queue to recache all of the pages.
 
 #### Refresh Expired Blitz Cache
-Refreshing the expired cache will refresh all cached URIs that contain elements that have expired since they were cached, specifically entries with future post and expiry dates.
+Refreshing expired cache will refresh all cached pages that have expired, or that contain elements that have expired (applies to elements with future post and expiry dates). Cache duration and expiry dates can be specified in the [config settings](config-settings) and the [template specific options](#template-specific-options).
 
-Create a cron job with the following console command to refresh expired or flagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
+#### Refresh Flagged Blitz Cache
+Refreshing flagged cache will refresh all cached pages that were associated with the provided flag using the `flag` parameter in the [template specific options](#template-specific-options).
+
+#### Cron Jobs
+Create cron jobs using the following console commands to refresh expired or flagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
 
 ```
 // Refresh expired cache every hour at 5 minutes past the hour.
@@ -248,7 +252,7 @@ Create a cron job with the following console command to refresh expired or flagg
 
 ![Utility](./docs/images/utility-2.0.0-beta.7.png)
 
-### Clearing Cache with a URL
+### Refreshing Cache with a URL
 
 If an API key is set in “Settings → Advanced” then  it is possible to clear, flush, warm, refresh expired or refresh flagged cache through a URL. The available URLs are displayed under the API key field after the setting has been saved. 
 

@@ -32,5 +32,11 @@
                 <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }) }}</textarea>
             </td>
         </tr>
+        <tr>
+            <th class="thin">{{ 'Refresh Flagged Cache' }}</th>
+            <td class="textual code">
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-flagged', { key: apiKey, flag: 'FLAG' }) }}</textarea>
+            </td>
+        </tr>
     </tbody>
 </table>
