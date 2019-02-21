@@ -145,12 +145,19 @@ It is possible to set template specific caching options by passing an object int
 
 ```
 {% do craft.blitz.options({
-	cachingEnabled: true,
-	cacheElements: true,
+    cachingEnabled: true,
+    cacheElements: true,
     cacheElementQueries: true,
-    cacheDuration: '3 days',
+    cacheDuration: 'P1D',
     flag: 'listing',
     expiryDate: entry.eventDate
+})
+```
+
+An alternative notation is to use method chaining on the model that the `options` function returns.
+ 
+```
+{% do craft.blitz.options.cacheDuration(P1D).flag('listing')
 })
 ```
 
@@ -168,21 +175,13 @@ Setting this option to false will disable caching the element queries used on th
 
 #### Cache Duration
 
-The amount of time after which the cache should expire. The “Refresh Expired Cache” utility or controller action must be triggered to invalidate expired cache. 
+The amount of time after which the cache should expire. If set to 0 then the cache will not get an expiry date. See [ConfigHelper::durationInSeconds()](https://docs.craftcms.com/api/v3/craft-helpers-conf) for a list of supported value types. 
 
-The accepted duration units are:
-
-- `sec`(`s`)
-- `second`(`s`)
-- `min`(`s`)
-- `minute`(`s`)
-- `hour`(`s`)
-- `day`(`s`)
-- `week`(`s`)
-- `fortnight`(`s`)
-- `forthnight`(`s`)
-- `month`(`s`)
-- `year`(`s`)
+[Duration intervals](https://en.wikipedia.org/wiki/ISO_8601#Durations) are a convenient way to set durations. Some common examples:
+- PT1H (1 hour)
+- P1D (1 day)
+- P1W (1 week)
+- P1M (1 month)
 
 #### Flag
 

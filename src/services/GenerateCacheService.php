@@ -10,11 +10,10 @@ use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
-use craft\helpers\ConfigHelper;
 use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheHelper;
-use putyourlightson\blitz\models\GenerateCacheOptionsModel;
+use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -28,7 +27,7 @@ class GenerateCacheService extends Component
     // =========================================================================
 
     /**
-     * @var GenerateCacheOptionsModel
+     * @var CacheOptionsModel
      */
     public $options = null;
 
@@ -57,17 +56,10 @@ class GenerateCacheService extends Component
     {
         parent::init();
 
-        $this->options = new GenerateCacheOptionsModel();
+        $this->options = new CacheOptionsModel();
 
-        // Set default cache duration if greater than 0
-        $cacheDuration = ConfigHelper::durationInSeconds(Blitz::$plugin->settings->cacheDuration);
-
-        if ($cacheDuration > 0) {
-            $cacheDuration += time();
-
-            // Prepend with @ symbol to specify a timestamp
-            $this->options->expiryDate = new \DateTime('@'.$cacheDuration);
-        }
+        // Set default attributes from the plugin settings
+        $this->options->setAttributes(Blitz::$plugin->settings->getAttributes(), false);
     }
 
     /**

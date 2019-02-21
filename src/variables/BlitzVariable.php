@@ -9,6 +9,7 @@ use Craft;
 use craft\helpers\Template;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\models\CacheOptionsModel;
 use Twig_Markup;
 
 class BlitzVariable
@@ -46,31 +47,18 @@ class BlitzVariable
     }
 
     /**
-     * Sets options for the current page cache.
+     * Returns options for the current page cache, first setting any parameters provided.
      *
-     * @param array
+     * @param array|null
+     *
+     * @return CacheOptionsModel
      */
-    public function options(array $params)
+    public function options(array $params = []): CacheOptionsModel
     {
         $options = Blitz::$plugin->generateCache->options;
 
-        if (!empty($params['cacheDuration'])) {
-            $cacheDuration = explode(' ', $params['cacheDuration']);
-            $num = $cacheDuration[0] ?? 0;
-            $unit = $cacheDuration[1] ?? '';
-
-            // Add support for "+1 week" http://www.php.net/manual/en/datetime.formats.relative.php
-            if ($unit === 'week') {
-                if ($num == 1) {
-                    $num = 7;
-                    $unit = 'days';
-                }
-                else {
-                    $unit = 'weeks';
-                }
-            }
-
-            $options->expiryDate = new \DateTime('+'.$num.' '.$unit);
+        if (isset($params['cacheDuration'])) {
+            $options->cacheDuration($params['cacheDuration']);
         }
 
         $options->setAttributes($params, false);
@@ -78,6 +66,8 @@ class BlitzVariable
         if ($options->validate()) {
             Blitz::$plugin->generateCache->options = $options;
         }
+
+        return Blitz::$plugin->generateCache->options;
     }
 
     // Private Methods
