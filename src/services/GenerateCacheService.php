@@ -10,6 +10,7 @@ use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
+use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheHelper;
 use putyourlightson\blitz\models\GenerateCacheOptionsModel;
@@ -161,7 +162,7 @@ class GenerateCacheService extends Component
         $values = $siteUri->toArray();
         $optionValues = [
             'flag' => $this->options->flag,
-            'expiryDate' => $this->options->expiryDate,
+            'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
         ];
 
         // Update/insert cache record values

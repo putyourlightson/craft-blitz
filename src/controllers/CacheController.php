@@ -140,7 +140,11 @@ class CacheController extends Controller
      */
     public function actionRefreshFlagged(): Response
     {
-        $flag = Craft::$app->getRequest()->getRequiredParam('flag');
+        $flag = Craft::$app->getRequest()->getParam('flag');
+
+        if (empty($flag)) {
+            return $this->_getResponse('A flag must be provided.', [], false);
+        }
 
         Blitz::$plugin->refreshCache->refreshFlaggedCache($flag);
 
@@ -155,22 +159,28 @@ class CacheController extends Controller
      *
      * @param string $message
      * @param array $params
+     * @param bool $success
      *
      * @return Response
      */
-    private function _getResponse(string $message, array $params = [])
+    private function _getResponse(string $message, array $params = [], bool $success = true)
     {
         $request = Craft::$app->getRequest();
 
         // If front-end site or JSON request
         if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE || $request->getAcceptsJson()) {
             return $this->asJson([
-                'success' => true,
+                'success' => $success,
                 'message' => Craft::t('blitz', $message, $params),
             ]);
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('blitz', $message, $params));
+        if ($success) {
+            Craft::$app->getSession()->setNotice(Craft::t('blitz', $message, $params));
+        }
+        else {
+            Craft::$app->getSession()->setError(Craft::t('blitz', $message, $params));
+        }
 
         return $this->redirectToPostedUrl();
     }

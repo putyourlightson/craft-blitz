@@ -54,10 +54,10 @@ class BlitzVariable
     {
         $options = Blitz::$plugin->generateCache->options;
 
-        if (!empty($params['for'])) {
-            $for = explode(' ', $params['for']);
-            $num = $for[0] ?? 0;
-            $unit = $for[1] ?? '';
+        if (!empty($params['duration'])) {
+            $duration = explode(' ', $params['duration']);
+            $num = $duration[0] ?? 0;
+            $unit = $duration[1] ?? '';
 
             // Add support for "+1 week" http://www.php.net/manual/en/datetime.formats.relative.php
             if ($unit === 'week') {
@@ -70,9 +70,7 @@ class BlitzVariable
                 }
             }
 
-            $expiryDate = new \DateTime('+'.$num.' '.$unit);
-
-            $options->expiryDate = $expiryDate;
+            $options->expiryDate = new \DateTime('+'.$num.' '.$unit);
         }
 
         $options->setAttributes($params, false);

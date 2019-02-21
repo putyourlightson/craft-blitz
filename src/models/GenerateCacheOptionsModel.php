@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\models;
 
 use craft\base\Model;
+use craft\validators\DateTimeValidator;
 
 class GenerateCacheOptionsModel extends Model
 {
@@ -47,6 +48,8 @@ class GenerateCacheOptionsModel extends Model
     {
         return [
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
+            [['flag'], 'string'],
+            [['expiryDate'], DateTimeValidator::class],
         ];
     }
 }

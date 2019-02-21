@@ -58,7 +58,7 @@ class CacheController extends Controller
      */
     public function actionIndex(): int
     {
-        $this->stdout("The following actions can be taken:\n\n", Console::FG_YELLOW);
+        $this->stdout(Craft::t('blitz','The following actions can be taken:').PHP_EOL.PHP_EOL, Console::FG_YELLOW);
 
         $actions = CacheUtility::getActions();
 
@@ -71,7 +71,7 @@ class CacheController extends Controller
         foreach ($actions as $action) {
             $this->stdout('- ');
             $this->stdout(str_pad($action['id'], $maxLength, ' '), Console::FG_YELLOW);
-            $this->stdout($action['instructions'] . PHP_EOL);
+            $this->stdout('  '.$action['instructions'].PHP_EOL);
         }
 
         $this->stdout(PHP_EOL);
