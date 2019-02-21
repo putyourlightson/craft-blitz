@@ -157,37 +157,34 @@ It is possible to set template specific caching options by passing an object int
 An alternative notation is to use method chaining on the model that the `options` function returns.
  
 ```
-{% do craft.blitz.options.cacheDuration(P1D).flag('listing')
-})
+{% do craft.blitz.options.cacheDuration(P1D).flag('listing') %}
 ```
 
-#### Caching Enabled
+#### `cachingEnabled`
 
 Setting this option to false will disable caching of this page.
 
-#### Cache Elements
+#### `cacheElements`
 
 Setting this option to false will disable caching the elements used on this page in the database (used for cache invalidation).
 
-#### Cache Element Queries
+#### `cacheElementQueries`
 
 Setting this option to false will disable caching the element queries used on this page in the database (used for cache invalidation).
 
-#### Cache Duration
+#### `cacheDuration`
 
-The amount of time after which the cache should expire. If set to 0 then the cache will not get an expiry date. See [ConfigHelper::durationInSeconds()](https://docs.craftcms.com/api/v3/craft-helpers-conf) for a list of supported value types. 
-
-[Duration intervals](https://en.wikipedia.org/wiki/ISO_8601#Durations) are a convenient way to set durations. Some common examples:
+The amount of time after which the cache should expire. If set to 0 then the cache will not get an expiry date. See [ConfigHelper::durationInSeconds()](https://docs.craftcms.com/api/v3/craft-helpers-conf) for a list of supported value types. [Duration intervals](https://en.wikipedia.org/wiki/ISO_8601#Durations) are a convenient way to set durations. Some common examples include:
 - PT1H (1 hour)
 - P1D (1 day)
 - P1W (1 week)
 - P1M (1 month)
 
-#### Flag
+#### `flag`
 
-A flag (string) that will be associated with this page and that can can later be used to refresh flagged cache.
+A string (without spaces) that will be associated with this page and that can can later be used to refresh flagged cache.
 
-#### Expiry Date
+#### `expiryDate`
 
 A [DateTime](http://php.net/manual/en/class.datetime.php) object that will define when the cache should expire. The “Refresh Expired Cache” utility or controller action must be triggered to invalidate expired cache. 
 
