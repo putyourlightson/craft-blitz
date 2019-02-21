@@ -5,7 +5,6 @@ namespace putyourlightson\blitz\migrations;
 use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\records\CacheRecord;
-use putyourlightson\blitz\records\ElementCacheRecord;
 
 class m190220_120000_add_flag_expirydate_columns extends Migration
 {

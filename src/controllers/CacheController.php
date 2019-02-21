@@ -133,6 +133,20 @@ class CacheController extends Controller
         return $this->_getResponse('Expired Blitz cache successfully refreshed.');
     }
 
+    /**
+     * Refreshes flagged cache.
+     *
+     * @return Response
+     */
+    public function actionRefreshFlagged(): Response
+    {
+        $flag = Craft::$app->getRequest()->getRequiredParam('flag');
+
+        Blitz::$plugin->refreshCache->refreshFlaggedCache($flag);
+
+        return $this->_getResponse('Blitz cache flagged as “{flag}” successfully refreshed.', ['flag' => $flag]);
+    }
+
     // Private Methods
     // =========================================================================
 
@@ -140,10 +154,11 @@ class CacheController extends Controller
      * Returns a response.
      *
      * @param string $message
+     * @param array $params
      *
      * @return Response
      */
-    private function _getResponse(string $message)
+    private function _getResponse(string $message, array $params = [])
     {
         $request = Craft::$app->getRequest();
 
@@ -151,11 +166,11 @@ class CacheController extends Controller
         if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE || $request->getAcceptsJson()) {
             return $this->asJson([
                 'success' => true,
-                'message' => $message,
+                'message' => Craft::t('blitz', $message, $params),
             ]);
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('blitz', $message));
+        Craft::$app->getSession()->setNotice(Craft::t('blitz', $message, $params));
 
         return $this->redirectToPostedUrl();
     }

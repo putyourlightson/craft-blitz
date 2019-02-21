@@ -260,6 +260,8 @@ class RefreshCacheService extends Component
      */
     public function refreshExpiredCache()
     {
+        $this->batchMode = true;
+
         // Check for expired caches to invalidate
         $cacheIds = CacheRecord::find()
             ->select('id')
@@ -273,22 +275,42 @@ class RefreshCacheService extends Component
             ->where(['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())])
             ->all();
 
-        if (empty($elementExpiryDates)) {
-            return;
-        }
+        if (!empty($elementExpiryDates)) {
+            $elements = Craft::$app->getElements();
 
-        $elements = Craft::$app->getElements();
+            /** @var ElementExpiryDateRecord $elementExpiryDate */
+            foreach ($elementExpiryDates as $elementExpiryDate) {
+                $element = $elements->getElementById($elementExpiryDate->elementId);
 
-        /** @var ElementExpiryDateRecord $elementExpiryDate */
-        foreach ($elementExpiryDates as $elementExpiryDate) {
-            $element = $elements->getElementById($elementExpiryDate->elementId);
+                // This should happen before invalidating the element so that other expiry dates will be saved
+                $elementExpiryDate->delete();
 
-            // This should happen before invalidating the element so that other expiry dates will be saved
-            $elementExpiryDate->delete();
-
-            if ($element !== null) {
-                $this->addElement($element);
+                if ($element !== null) {
+                    $this->addElement($element);
+                }
             }
         }
+
+        $this->refresh();
+    }
+
+    /**
+     * Refreshes flagged cache.
+     *
+     * @param string $flag
+     */
+    public function refreshFlaggedCache(string $flag)
+    {
+        $this->batchMode = true;
+
+        // Check for flagged caches to invalidate
+        $cacheIds = CacheRecord::find()
+            ->select('id')
+            ->where(['flag' => $flag])
+            ->column();
+
+        $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
+
+        $this->refresh();
     }
 }

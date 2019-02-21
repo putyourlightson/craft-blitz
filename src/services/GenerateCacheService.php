@@ -159,40 +159,40 @@ class GenerateCacheService extends Component
         $db = Craft::$app->getDb();
 
         $values = $siteUri->toArray();
+        $optionValues = [
+            'flag' => $this->options->flag,
+            'expiryDate' => $this->options->expiryDate,
+        ];
+
+        // Update/insert cache record values
+        $db->createCommand()
+            ->upsert(CacheRecord::tableName(),
+                array_merge($values, $optionValues),
+                $optionValues,
+                [],
+                false
+            )
+            ->execute();
 
         $cacheId = CacheRecord::find()
             ->select('id')
             ->where($values)
             ->scalar();
 
-        if (!$cacheId) {
-            $db->createCommand()
-                ->insert(CacheRecord::tableName(), $values, false)
-                ->execute();
-
-            $cacheId = $db->getLastInsertID();
+        if (empty($cacheId)) {
+            return;
         }
 
         // Add element caches to database
         $values = [];
 
         foreach ($this->_elementCaches as $elementId) {
-            $values[] = [
-                $cacheId,
-                $elementId,
-                $this->options->flag,
-                $this->options->expiryDate
-            ];
+            $values[] = [$cacheId, $elementId];
         }
 
         $db->createCommand()
             ->batchInsert(ElementCacheRecord::tableName(),
-                [
-                    'cacheId',
-                    'elementId',
-                    'flag',
-                    'expiryDate'
-                ],
+                ['cacheId', 'elementId'],
                 $values,
                 false)
             ->execute();

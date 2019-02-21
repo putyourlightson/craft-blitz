@@ -1,53 +1,28 @@
 {% import "_includes/forms" as forms %}
 
-{% set utilities = [
-    {
-        action: 'clear',
-        title: 'Clear Blitz Cache',
-        instructions: 'Clearing the cache will delete all cached pages.',
-    },
-    {
-        action: 'flush',
-        title: 'Flush Blitz Cache',
-        instructions: 'Flushing the cache will clear the cache and remove all records from the database.',
-    }
-] %}
-
-{% if craft.blitz.hasPurger() %}
-    {% set utilities = utilities|merge([
-        {
-            action: 'purge',
-            title: 'Purge Blitz Cache',
-            instructions: 'Purging the cache will delete all cached pages in the reverse proxy purger.',
-        }
-    ]) %}
-{% endif %}
-
-{% set utilities = utilities|merge([
-    {
-        action: 'warm',
-        title: 'Warm Blitz Cache',
-        instructions: 'Warming the cache will flush the cache and add a job to the queue to recache all of the pages.',
-    },
-    {
-        action: 'refresh-expired',
-        title: 'Refresh Expired Blitz Cache',
-        instructions: 'Refreshing the expired cache will refresh all elements that have expired since they were cached.',
-    }
-]) %}
-
 {{ driverHtml|raw }}
 
-{% for utility in utilities %}
+{% for action in actions %}
     <form class="utility" method="post" accept-charset="UTF-8">
-        <input type="hidden" name="action" value="blitz/cache/{{ utility.action }}">
+        <input type="hidden" name="action" value="blitz/cache/{{ action.id }}">
         <input type="hidden" name="utility" value="1">
+
         {{ redirectInput('utilities/blitz-cache') }}
         {{ csrfInput() }}
-        <p class="light">{{ utility.instructions|t('blitz') }}</p>
-        <input type="submit" class="btn submit" value="{{ utility.title|t('blitz') }}" />
+
+        <p class="light">{{ action.instructions|t('blitz') }}</p>
+
+        {% if action.id == 'refresh-flagged' %}
+            {{ forms.autosuggest({
+                name: 'flag',
+                placeholder: 'flag',
+                suggestions: flagSuggestions,
+                instructions: action.instructions|t('blitz'),
+            }) }}
+            <br/>
+        {% endif %}
+
+        <input type="submit" class="btn submit" value="{{ action.label|t('blitz') }}" />
     </form>
-    {% if not loop.last %}
-        <br/>
-    {% endif %}
+    <br>
 {% endfor %}

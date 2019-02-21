@@ -9,6 +9,7 @@ use Craft;
 use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\utilities\CacheUtility;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
@@ -17,8 +18,66 @@ use yii\console\ExitCode;
  */
 class CacheController extends Controller
 {
+    // Properties
+    // =========================================================================
+
+    /**
+     * @var string|null
+     */
+    public $flag = null;
+
+    /**
+     * @var array
+     */
+    private $_actions = [];
+
     // Public Methods
     // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        parent::init();
+
+        foreach (CacheUtility::getActions() as $action) {
+            $this->_actions[$action['id']] = $action;
+        }
+    }
+
+    public function getActionHelp($action)
+    {
+        return $this->_actions[$action->id]['instructions'] ?? parent::getActionHelp($action);
+    }
+
+    /**
+     * Lists the actions that can be taken.
+     *
+     * @return int
+     */
+    public function actionIndex(): int
+    {
+        $this->stdout("The following actions can be taken:\n\n", Console::FG_YELLOW);
+
+        $actions = CacheUtility::getActions();
+
+        $lengths = [];
+        foreach ($actions as $action) {
+            $lengths[] = strlen($action['id']);
+        }
+        $maxLength = max($lengths);
+
+        foreach ($actions as $action) {
+            $this->stdout('- ');
+            $this->stdout(str_pad($action['id'], $maxLength, ' '), Console::FG_YELLOW);
+            $this->stdout($action['instructions'] . PHP_EOL);
+        }
+
+        $this->stdout(PHP_EOL);
+
+        return ExitCode::OK;
+    }
 
     /**
      * Clears the cache (pages only).
@@ -114,6 +173,30 @@ class CacheController extends Controller
         Craft::$app->getQueue()->run();
 
         $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Refreshes flagged cache.
+     *
+     * @param string
+     *
+     * @return int
+     */
+    public function actionRefreshFlagged(string $flag = null): int
+    {
+        if ($flag === null) {
+            $this->stderr(Craft::t('blitz', 'A flag must be provided as an argument.').PHP_EOL, Console::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        Blitz::$plugin->refreshCache->refreshFlaggedCache($flag);
+
+        Craft::$app->getQueue()->run();
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache flagged as “{flag}” successfully refreshed.', ['flag' => $flag]).PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }

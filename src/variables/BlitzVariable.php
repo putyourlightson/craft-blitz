@@ -9,8 +9,6 @@ use Craft;
 use craft\helpers\Template;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\purgers\DummyPurger;
-use putyourlightson\blitz\models\GenerateCacheOptionsModel;
 use Twig_Markup;
 
 class BlitzVariable
@@ -77,21 +75,11 @@ class BlitzVariable
             $options->expiryDate = $expiryDate;
         }
 
-        $options->setAttributes($params);
+        $options->setAttributes($params, false);
 
         if ($options->validate()) {
             Blitz::$plugin->generateCache->options = $options;
         }
-    }
-
-    /**
-     * Returns whether a purger is registered.
-     *
-     * @return bool
-     */
-    public function hasPurger(): bool
-    {
-        return !(Blitz::$plugin->cachePurger instanceof DummyPurger);
     }
 
     // Private Methods

@@ -46,7 +46,7 @@ class GenerateCacheOptionsModel extends Model
     public function rules(): array
     {
         return [
-            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'bool'],
+            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
         ];
     }
 }
