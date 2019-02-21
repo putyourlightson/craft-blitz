@@ -121,7 +121,7 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element)
     {
-        // Clear the cache if this is a global set element as they are populated on every request
+        // Clear the site cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
             Blitz::$plugin->clearCache->clearSite($element->siteId);
 

@@ -162,15 +162,15 @@ An alternative notation is to use method chaining on the model that the `options
 
 #### `cachingEnabled`
 
-Setting this option to false will disable caching of this page.
+Setting this option to `false` will disable caching of this page.
 
 #### `cacheElements`
 
-Setting this option to false will disable caching the elements used on this page in the database (used for cache invalidation).
+Setting this option to `false` will disable caching the elements used on this page in the database (used for cache invalidation).
 
 #### `cacheElementQueries`
 
-Setting this option to false will disable caching the element queries used on this page in the database (used for cache invalidation).
+Setting this option to `false` will disable caching the element queries used on this page in the database (used for cache invalidation).
 
 #### `cacheDuration`
 
@@ -182,11 +182,11 @@ The amount of time after which the cache should expire. If set to 0 then the cac
 
 #### `flag`
 
-A string (without spaces) that will be associated with this page and that can can later be used to refresh flagged cache.
+A flag (string without spaces) that will be associated with this page. The “Refresh Flagged Cache” [utility](#refresh-flagged-blitz-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
 
 #### `expiryDate`
 
-A [DateTime](http://php.net/manual/en/class.datetime.php) object that will define when the cache should expire. The “Refresh Expired Cache” utility or controller action must be triggered to invalidate expired cache. 
+A [DateTime](http://php.net/manual/en/class.datetime.php) object that will define when the cache should expire. The “Refresh Expired Cache” [utility](#refresh-expired-blitz-cache) or [console command](#console-commands) must be used to invalidate expired cache. 
 
 ### Dynamic Content
 
@@ -352,4 +352,5 @@ If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Pow
 
 Blitz is actively developed and maintained by [PutYourLightsOn](https://putyourlightson.com/), yet it has had a tremendous amount of support from the Craft CMS community. 
 
-A few people worth mentioning are: Oliver Stark; Andrew Welch; Ben Parizek.
+A few people worth mentioning for their valuable input are:  
+Oliver Stark; Andrew Welch; Ben Parizek.
