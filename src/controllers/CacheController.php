@@ -142,7 +142,7 @@ class CacheController extends Controller
     {
         $flag = Craft::$app->getRequest()->getParam('flag');
 
-        if (empty($flag)) {
+        if (empty($flag) || !is_string($flag)) {
             return $this->_getResponse('A flag must be provided.', [], false);
         }
 
