@@ -57,7 +57,7 @@ class RequestHelper
     }
 
     /**
-     * Gets the requested site URI.
+     * Returns the requested site URI.
      *
      * @return SiteUriModel
      */
@@ -82,6 +82,20 @@ class RequestHelper
             'siteId' => $site->id,
             'uri' => $uri,
         ]);
+    }
+
+    /**
+     * Returns whether the user can access the site.
+     *
+     * @return bool
+     */
+    public static function getCanAccessSite(): bool
+    {
+        if (Craft::$app->getIsLive()) {
+            return true;
+        }
+
+        return Craft::$app->getUser()->checkPermission('accessSiteWhenSystemIsOff');
     }
 
     // Private Methods

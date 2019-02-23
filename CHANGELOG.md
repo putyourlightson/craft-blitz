@@ -18,7 +18,8 @@
 - Changed minimum requirement of Craft to version 3.1.0.
 - Cache is invalidated when elements are updated through non control panel requests.
 - Global set updates only clear the cache of the site that they belong to.
-- Neo blocks are now considered non cacheable element types.
+- Neo blocks are now considered non-cacheable element types.
+- Cached pages are not output to users who cannot access the site when the system is off. 
 
 ## 1.11.5 - 2019-02-14
 ### Fixed
