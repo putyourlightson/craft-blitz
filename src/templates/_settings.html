@@ -54,15 +54,6 @@
             required: true,
         }) }}
 
-        {{ forms.lightswitchField({
-            label: "Warm Cache Automatically"|t('blitz'),
-            instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz'),
-            warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
-            name: 'settings[warmCacheAutomatically]',
-            on: settings.warmCacheAutomatically,
-            required: true,
-        }) }}
-
         {% set info -%}
             {% include 'blitz/_includes/uri-pattern-info' %}
         {%- endset %}
@@ -162,20 +153,12 @@
     </div>
 
     <div id="advanced" class="hidden">
-        {% set info %}
-            <span class="info">{{ "This setting determines how URLs with query strings will be cached. See the [documentation]({url})."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
-        {% endset %}
-        {{ forms.selectField({
-            label: "Query String Caching"|t('blitz'),
-            instructions: "Whether URLs with query strings should cached and how."|t('blitz') ~ info,
-            warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
-            name: 'settings[queryStringCaching]',
-            options: {
-                0: "Do not cache URLs with query strings"|t('blitz'),
-                1: "Cache URLs with unique query strings as unique pages"|t('blitz'),
-                2: "Cache URLs with unique query strings as the same page"|t('blitz'),
-            },
-            value: settings.queryStringCaching,
+        {{ forms.lightswitchField({
+            label: "Warm Cache Automatically"|t('blitz'),
+            instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz'),
+            warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
+            name: 'settings[warmCacheAutomatically]',
+            on: settings.warmCacheAutomatically,
             required: true,
         }) }}
 
@@ -191,6 +174,23 @@
             name: 'settings[concurrency]',
             value: settings.concurrency,
             errors: settings.getErrors('concurrency'),
+            required: true,
+        }) }}
+
+        {% set info %}
+            <span class="info">{{ "This setting determines how URLs with query strings will be cached. See the [documentation]({url})."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
+        {% endset %}
+        {{ forms.selectField({
+            label: "Query String Caching"|t('blitz'),
+            instructions: "Whether URLs with query strings should cached and how."|t('blitz') ~ info,
+            warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
+            name: 'settings[queryStringCaching]',
+            options: {
+                0: "Do not cache URLs with query strings"|t('blitz'),
+                1: "Cache URLs with unique query strings as unique pages"|t('blitz'),
+                2: "Cache URLs with unique query strings as the same page"|t('blitz'),
+            },
+            value: settings.queryStringCaching,
             required: true,
         }) }}
 

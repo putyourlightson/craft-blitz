@@ -21,9 +21,6 @@ return [
     // Whether static file caching should be enabled.
     //'cachingEnabled' => false,
 
-    // Whether the cache should automatically be warmed after clearing.
-    //'warmCacheAutomatically' => true,
-
     // The URI patterns to include in static file caching. The second variable represents a site ID, or a blank string for all sites.
     //'includedUriPatterns' => [['pages/.*', '1'], ['articles/.*', '2']],
 
@@ -48,14 +45,17 @@ return [
     // The purger type classes to add to the plugin’s default purger types.
     //'purgerTypes' => [],
 
+    // Whether the cache should automatically be warmed after clearing.
+    //'warmCacheAutomatically' => true,
+
+    // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
+    //'concurrency' => 5,
+
     // Whether URLs with query strings should cached and how.
     // 0: Do not cache URLs with query strings
     // 1: Cache URLs with query strings as unique pages
     // 2: Cache URLs with query strings as the same page
     //'queryStringCaching' => 0,
-
-    // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
-    //'concurrency' => 5,
 
     // An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
     //'apiKey' => '',

@@ -66,10 +66,6 @@ Craft’s template caching `{% cache %}` tag doesn’t play well with the cache 
 
 With this setting enabled, Blitz will begin caching pages according to your include/exclude URI patterns. Disable this setting to prevent Blitz from caching any new pages.
 
-### Warm Cache Automatically
-
-Whether the cache should automatically be warmed after clearing. With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. Disabling this setting may make sense if your site is very large and has many related elements.
-
 ### Included/Excluded URI Patterns
 
 The URI patterns to include or exclude when caching. Blitz will only cache pages whose URI matches the UIR patterns, giving you fine-grain control over what is cached.
@@ -99,6 +95,14 @@ A “Yii Cache Storage” type is also available and will use whatever cache com
 
 A purger to use for clearing cache in a reverse proxy. This allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge (clear) the appropriate pages whenever they are updated.
 
+### Warm Cache Automatically
+
+Whether the cache should automatically be warmed after clearing. With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. Disabling this setting may make sense if your site is very large and has many related elements.
+
+### Concurrency
+
+The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
+
 ### Query String Caching
 
 URLs with query strings will be cached according to the selected option in the “Query String Caching” setting  as follows:
@@ -115,11 +119,7 @@ URLs with query strings will be cached as unique pages, so `domain.com/about`, `
 
 URLs with query strings will be cached as the same page, so `domain.com/about`, `domain.com/about?utm_source=twitter` and `domain.com/about?utm_source=facebook` will all be cached with the same output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
 
-#### Concurrency
-
-The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
-
-#### API Key
+### API Key
 
 An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters). The individual URLs are displayed below the field after a value has been saved.
 
