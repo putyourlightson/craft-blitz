@@ -13,7 +13,7 @@ use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
-use putyourlightson\blitz\helpers\CacheHelper;
+use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
@@ -138,7 +138,7 @@ class RefreshCacheService extends Component
         $elementType = get_class($element);
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array($elementType, CacheHelper::getNonCacheableElementTypes(), true)) {
+        if (in_array($elementType, ElementTypeHelper::getNonCacheableElementTypes(), true)) {
             return;
         }
 

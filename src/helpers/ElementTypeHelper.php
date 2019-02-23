@@ -9,7 +9,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use yii\base\Event;
 
-class CacheHelper
+class ElementTypeHelper
 {
     // Constants
     // =========================================================================

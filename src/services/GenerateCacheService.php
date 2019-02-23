@@ -12,7 +12,7 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\CacheHelper;
+use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
@@ -75,7 +75,7 @@ class GenerateCacheService extends Component
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array(get_class($element), CacheHelper::getNonCacheableElementTypes(), true)) {
+        if (in_array(get_class($element), ElementTypeHelper::getNonCacheableElementTypes(), true)) {
             return;
         }
 
@@ -102,7 +102,7 @@ class GenerateCacheService extends Component
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array($elementQuery->elementType, CacheHelper::getNonCacheableElementTypes(), true)) {
+        if (in_array($elementQuery->elementType, ElementTypeHelper::getNonCacheableElementTypes(), true)) {
             return;
         }
 
