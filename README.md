@@ -151,13 +151,13 @@ It is possible to set template specific caching options by passing an object int
     cacheDuration: 'P1D',
     flag: 'listing',
     expiryDate: entry.eventDate
-})
+}) %}
 ```
 
 An alternative notation is to use method chaining on the model that the `options` function returns.
  
 ```
-{% do craft.blitz.options.cacheDuration(P1D).flag('listing') %}
+{% do craft.blitz.options.cacheDuration('P1D').flag('listing') %}
 ```
 
 #### `cachingEnabled`
