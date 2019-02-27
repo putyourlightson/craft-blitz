@@ -5,8 +5,9 @@ namespace putyourlightson\blitz\migrations;
 use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\CacheFlagRecord;
 
-class m190220_120000_add_flag_expirydate_columns extends Migration
+class m190227_120000_add_cacheflags_table extends Migration
 {
     // Public Methods
     // =========================================================================
@@ -16,16 +17,17 @@ class m190220_120000_add_flag_expirydate_columns extends Migration
      */
     public function safeUp()
     {
-        $table = CacheRecord::tableName();
+        $table = CacheFlagRecord::tableName();
 
-        if (!$this->db->columnExists($table, 'flag')) {
-            $this->addColumn($table, 'flag', $this->string()->after('uri'));
+        if (!$this->db->tableExists($table)) {
+            $this->createTable($table, [
+                'cacheId' => $this->integer()->notNull(),
+                'flag' => $this->string()->notNull(),
+            ]);
+
             $this->createIndex(null, $table, 'flag', false);
-        }
 
-        if (!$this->db->columnExists($table, 'expiryDate')) {
-            $this->addColumn($table, 'expiryDate', $this->dateTime()->after('flag'));
-            $this->createIndex(null, $table, 'expiryDate', false);
+            $this->addForeignKey(null, $table, 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         }
 
         // Refresh the db schema caches

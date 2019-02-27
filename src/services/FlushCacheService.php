@@ -66,16 +66,6 @@ class FlushCacheService extends Component
     }
 
     /**
-     * Deletes cache records given a site URI.
-     *
-     * @param SiteUriModel $siteUri
-     */
-    public function deleteSiteUri(SiteUriModel $siteUri)
-    {
-        CacheRecord::deleteAll($siteUri->toArray());
-    }
-
-    /**
      * Runs garbage collection.
      */
     public function runGarbageCollection()

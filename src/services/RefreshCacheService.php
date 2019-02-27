@@ -11,6 +11,7 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
+use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
@@ -20,6 +21,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\CacheFlagRecord;
 use yii\db\ActiveQuery;
 
 /**
@@ -297,16 +299,21 @@ class RefreshCacheService extends Component
     /**
      * Refreshes flagged cache.
      *
-     * @param string $flag
+     * @param string[]|string $flags
      */
-    public function refreshFlaggedCache(string $flag)
+    public function refreshFlaggedCache($flags)
     {
         $this->batchMode = true;
 
+        if (is_string($flags)) {
+            $flags = StringHelper::split($flags);
+        }
+
         // Check for flagged caches to invalidate
-        $cacheIds = CacheRecord::find()
-            ->select('id')
-            ->where(['flag' => $flag])
+        $cacheIds = CacheFlagRecord::find()
+            ->select('cacheId')
+            ->where(['flag' => $flags])
+            ->groupBy('cacheId')
             ->column();
 
         $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);

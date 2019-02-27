@@ -239,7 +239,7 @@ class Blitz extends Plugin
         // Register template page render events
         Event::on(View::class, View::EVENT_BEFORE_RENDER_PAGE_TEMPLATE,
             function() use ($siteUri) {
-                $this->flushCache->deleteSiteUri($siteUri);
+                //$this->flushCache->deleteSiteUri($siteUri);
             }
         );
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,

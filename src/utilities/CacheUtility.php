@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Utility;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
+use putyourlightson\blitz\records\CacheFlagRecord;
 use putyourlightson\blitz\records\CacheRecord;
 
 class CacheUtility extends Utility
@@ -96,7 +97,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh-flagged',
             'label' => Craft::t('blitz', 'Refresh Flagged Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing flagged cache will refresh all pages that are associated with the given flag.'),
+            'instructions' => Craft::t('blitz', 'Refreshing flagged cache will refresh all pages that are associated with the given flags (separated by commas).'),
         ];
 
         return $actions;
@@ -109,9 +110,8 @@ class CacheUtility extends Utility
      */
     public static function getFlagSuggestions(): array
     {
-        $flags = CacheRecord::find()
+        $flags = CacheFlagRecord::find()
             ->select('flag')
-            ->where(['not', ['flag' => null]])
             ->groupBy('flag')
             ->column();
 

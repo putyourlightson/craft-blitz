@@ -14,6 +14,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\CacheFlagRecord;
 
 class Install extends Migration
 {
@@ -46,6 +47,7 @@ class Install extends Migration
         $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementCacheRecord::tableName());
         $this->dropTableIfExists(ElementExpiryDateRecord::tableName());
+        $this->dropTableIfExists(CacheFlagRecord::tableName());
         $this->dropTableIfExists(CacheRecord::tableName());
 
         return true;
@@ -101,6 +103,13 @@ class Install extends Migration
             ]);
         }
 
+        if (!$this->db->tableExists(CacheFlagRecord::tableName())) {
+            $this->createTable(CacheFlagRecord::tableName(), [
+                'cacheId' => $this->integer()->notNull(),
+                'flag' => $this->string()->notNull(),
+            ]);
+        }
+
         return true;
     }
 
@@ -117,6 +126,7 @@ class Install extends Migration
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
+        $this->createIndex(null, CacheFlagRecord::tableName(), 'flag', false);
     }
 
     /**
@@ -132,5 +142,6 @@ class Install extends Migration
         $this->addForeignKey(null, ElementExpiryDateRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, CacheFlagRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
     }
 }

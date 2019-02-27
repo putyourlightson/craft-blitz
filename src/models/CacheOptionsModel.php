@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\models;
 
 use craft\base\Model;
 use craft\helpers\ConfigHelper;
+use craft\helpers\StringHelper;
 use craft\validators\DateTimeValidator;
 
 class CacheOptionsModel extends Model
@@ -30,9 +31,9 @@ class CacheOptionsModel extends Model
     public $cacheElementQueries = true;
 
     /**
-     * @var string|null
+     * @var string[]|string|null
      */
-    public $flag = null;
+    public $flags = null;
 
     /**
      * @var \DateTime|null
@@ -51,6 +52,9 @@ class CacheOptionsModel extends Model
             case 'cacheDuration':
                 $this->cacheDuration($value);
                 break;
+            case 'flags':
+                $this->flags($value);
+                break;
             default:
                 parent::__set($name, $value);
         }
@@ -63,7 +67,6 @@ class CacheOptionsModel extends Model
     {
         return [
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
-            [['flag'], 'string'],
             [['expiryDate'], DateTimeValidator::class],
         ];
     }
@@ -125,13 +128,15 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param string|null
+     * @param string[]|string|null
      *
      * @return static self reference
      */
-    public function flag($value)
+    public function flags($value)
     {
-        $this->flag = $value;
+        if (is_string($value)) {
+            $this->flags = StringHelper::split($value);
+        }
 
         return $this;
     }

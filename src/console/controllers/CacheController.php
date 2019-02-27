@@ -180,23 +180,23 @@ class CacheController extends Controller
     /**
      * Refreshes flagged cache.
      *
-     * @param string
+     * @param string[]|string
      *
      * @return int
      */
-    public function actionRefreshFlagged(string $flag = null): int
+    public function actionRefreshFlagged($flags = null): int
     {
-        if ($flag === null) {
-            $this->stderr(Craft::t('blitz', 'A flag must be provided as an argument.').PHP_EOL, Console::FG_RED);
+        if ($flags === null) {
+            $this->stderr(Craft::t('blitz', 'At least one flag must be provided as an argument.').PHP_EOL, Console::FG_RED);
 
             return ExitCode::OK;
         }
 
-        Blitz::$plugin->refreshCache->refreshFlaggedCache($flag);
+        Blitz::$plugin->refreshCache->refreshFlaggedCache($flags);
 
         Craft::$app->getQueue()->run();
 
-        $this->stdout(Craft::t('blitz', 'Blitz cache flagged as “{flag}” successfully refreshed.', ['flag' => $flag]).PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Flagged Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }

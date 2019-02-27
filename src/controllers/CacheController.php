@@ -140,15 +140,15 @@ class CacheController extends Controller
      */
     public function actionRefreshFlagged(): Response
     {
-        $flag = Craft::$app->getRequest()->getParam('flag');
+        $flags = Craft::$app->getRequest()->getParam('flags');
 
-        if (empty($flag) || !is_string($flag)) {
-            return $this->_getResponse('A flag must be provided.', [], false);
+        if (empty($flags)) {
+            return $this->_getResponse('At least one flag must be provided.', false);
         }
 
-        Blitz::$plugin->refreshCache->refreshFlaggedCache($flag);
+        Blitz::$plugin->refreshCache->refreshFlaggedCache($flags);
 
-        return $this->_getResponse('Blitz cache flagged as “{flag}” successfully refreshed.', ['flag' => $flag]);
+        return $this->_getResponse('Flagged Blitz cache successfully refreshed.');
     }
 
     // Private Methods
@@ -158,12 +158,11 @@ class CacheController extends Controller
      * Returns a response.
      *
      * @param string $message
-     * @param array $params
      * @param bool $success
      *
      * @return Response
      */
-    private function _getResponse(string $message, array $params = [], bool $success = true)
+    private function _getResponse(string $message, bool $success = true)
     {
         $request = Craft::$app->getRequest();
 
@@ -171,15 +170,15 @@ class CacheController extends Controller
         if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE || $request->getAcceptsJson()) {
             return $this->asJson([
                 'success' => $success,
-                'message' => Craft::t('blitz', $message, $params),
+                'message' => Craft::t('blitz', $message),
             ]);
         }
 
         if ($success) {
-            Craft::$app->getSession()->setNotice(Craft::t('blitz', $message, $params));
+            Craft::$app->getSession()->setNotice(Craft::t('blitz', $message));
         }
         else {
-            Craft::$app->getSession()->setError(Craft::t('blitz', $message, $params));
+            Craft::$app->getSession()->setError(Craft::t('blitz', $message));
         }
 
         return $this->redirectToPostedUrl();

@@ -14,8 +14,8 @@
 
         {% if action.id == 'refresh-flagged' %}
             {{ forms.autosuggest({
-                name: 'flag',
-                placeholder: 'flag',
+                name: 'flags',
+                placeholder: 'flag1,flag2,flag3',
                 suggestions: flagSuggestions,
                 instructions: action.instructions|t('blitz'),
             }) }}

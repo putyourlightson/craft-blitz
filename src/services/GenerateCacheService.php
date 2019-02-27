@@ -19,6 +19,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\CacheFlagRecord;
 use yii\db\Exception;
 
 class GenerateCacheService extends Component
@@ -163,29 +164,22 @@ class GenerateCacheService extends Component
         $db = Craft::$app->getDb();
 
         $values = $siteUri->toArray();
-        $optionValues = [
-            'flag' => $this->options->flag,
-            'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
-        ];
+
+        // Delete all cache records so we get a fresh cache
+        CacheRecord::deleteAll($values);
+
+        if (!empty($this->options->expiryDate)) {
+            $values = array_merge($values, [
+                'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
+            ]);
+        }
 
         // Update/insert cache record values
         $db->createCommand()
-            ->upsert(CacheRecord::tableName(),
-                array_merge($values, $optionValues),
-                $optionValues,
-                [],
-                false
-            )
+            ->insert(CacheRecord::tableName(), $values, false)
             ->execute();
 
-        $cacheId = CacheRecord::find()
-            ->select('id')
-            ->where($values)
-            ->scalar();
-
-        if (empty($cacheId)) {
-            return;
-        }
+        $cacheId = $db->getLastInsertID();
 
         // Add element caches to database
         $values = [];
@@ -214,6 +208,22 @@ class GenerateCacheService extends Component
                 $values,
                 false)
             ->execute();
+
+        // Add flag caches to database
+        if (!empty($this->options->flags)) {
+            $values = [];
+
+            foreach ($this->options->flags as $flag) {
+                $values[] = [$cacheId, $flag];
+            }
+
+            $db->createCommand()
+                ->batchInsert(CacheFlagRecord::tableName(),
+                    ['cacheId', 'flag'],
+                    $values,
+                    false)
+                ->execute();
+        }
 
         Blitz::$plugin->cacheStorage->save($output, $siteUri);
     }
