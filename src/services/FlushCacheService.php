@@ -6,7 +6,6 @@
 namespace putyourlightson\blitz\services;
 
 use craft\base\Component;
-use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 

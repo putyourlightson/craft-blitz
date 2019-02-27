@@ -20,7 +20,7 @@ class OutputCacheService extends Component
     // =========================================================================
 
     /**
-     * Outputs a given value and exits.
+     * Outputs a given value using native headers and exits.
      *
      * @param string $value
      *
@@ -32,7 +32,7 @@ class OutputCacheService extends Component
         header_remove('X-Powered-By');
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? 'Craft CMS, ' : '';
+            $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? Craft::$app->name.', ' : '';
             header('X-Powered-By: '.$header.'Blitz');
         }
 
