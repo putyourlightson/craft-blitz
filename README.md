@@ -5,7 +5,7 @@
 > The Blitz v2 branch is currently in public beta and is not recommended for use in production environments. For the stable version, please visit the [v1 branch](https://github.com/putyourlightson/craft-blitz/tree/v1). The beta version can be installed using composer as follows.
 
 ```
-composer require putyourlightson/craft-blitz:2.0.0-beta.7
+composer require putyourlightson/craft-blitz:2.0.0-beta.8
 ```
 
 The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
@@ -149,7 +149,7 @@ It is possible to set template specific caching options by passing an object int
     cacheElements: true,
     cacheElementQueries: true,
     cacheDuration: 'P1D',
-    flag: 'listing',
+    flags: 'home,listing',
     expiryDate: entry.eventDate
 }) %}
 ```
@@ -157,7 +157,7 @@ It is possible to set template specific caching options by passing an object int
 An alternative notation is to use method chaining on the model that the `options` function returns.
  
 ```
-{% do craft.blitz.options.cacheDuration('P1D').flag('listing') %}
+{% do craft.blitz.options.cacheDuration('P1D').flags('home,listing') %}
 ```
 
 #### `cachingEnabled`
@@ -180,9 +180,9 @@ The amount of time after which the cache should expire. If set to 0 then the cac
 - P1W (1 week)
 - P1M (1 month)
 
-#### `flag`
+#### `flags`
 
-A flag (string without spaces) that will be associated with this page. The “Refresh Flagged Cache” [utility](#refresh-flagged-blitz-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
+One or more flags (array or string separated by commas) that will be associated with this page. The “Refresh Flagged Cache” [utility](#refresh-flagged-blitz-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
 
 #### `expiryDate`
 
@@ -233,7 +233,7 @@ Warming the cache will flush the cache and add a job to the queue to recache all
 Refreshing expired cache will refresh all cached pages that have expired, or that contain elements that have expired (applies to elements with future post and expiry dates). Cache duration and expiry dates can be specified in the [config settings](config-settings) and the [template specific options](#template-specific-options).
 
 #### Refresh Flagged Blitz Cache
-Refreshing flagged cache will refresh all cached pages that were associated with the provided flag using the `flag` parameter in the [template specific options](#template-specific-options).
+Refreshing flagged cache will refresh all cached pages that were associated with the provided flags using the `flags` parameter in the [template specific options](#template-specific-options).
 
 #### Cron Jobs
 Create cron jobs using the following console commands to refresh expired or flagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
@@ -242,8 +242,8 @@ Create cron jobs using the following console commands to refresh expired or flag
 // Refresh expired cache every hour at 5 minutes past the hour.
 5 * * * * /usr/bin/php /path/to/craft blitz/cache/refresh-expired
 
-// Refresh cache flagged with the flag “listing” every day at 6am.
-0 6 * * * /usr/bin/php /path/to/craft blitz/cache/refresh-flagged listing
+// Refresh cache flagged with the flags “home” and “listing” every day at 6am.
+0 6 * * * /usr/bin/php /path/to/craft blitz/cache/refresh-flagged home,listing
 ```
 
 ![Utility](./docs/images/utility-2.0.0-beta.7.png)

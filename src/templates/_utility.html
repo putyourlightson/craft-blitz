@@ -24,5 +24,8 @@
 
         <input type="submit" class="btn submit" value="{{ action.label|t('blitz') }}" />
     </form>
-    <br>
+
+    {% if not loop.last %}
+        <br>
+    {% endif %}
 {% endfor %}
