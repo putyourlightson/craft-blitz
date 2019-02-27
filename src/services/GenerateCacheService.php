@@ -225,6 +225,11 @@ class GenerateCacheService extends Component
                 ->execute();
         }
 
+        if (Blitz::$plugin->settings->outputComments) {
+            // Append timestamp
+            $output .= '<!-- Cached by Blitz on '.date('c').' -->';
+        }
+
         Blitz::$plugin->cacheStorage->save($output, $siteUri);
     }
 

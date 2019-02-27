@@ -97,9 +97,6 @@ class FileStorage extends BaseCacheStorage
         $filePath = $this->_getFilePath($siteUri);
 
         if (!empty($filePath)) {
-            // Append timestamp
-            $value .= '<!-- Cached by Blitz on '.date('c').' -->';
-
             // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
             $value = "\xEF\xBB\xBF".$value;
 

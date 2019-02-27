@@ -118,6 +118,11 @@ class SettingsModel extends Model
     /**
      * @var bool
      */
+    public $outputComments = true;
+
+    /**
+     * @var bool
+     */
     public $warmCacheAutomaticallyForGlobals = true;
 
     // Public Methods

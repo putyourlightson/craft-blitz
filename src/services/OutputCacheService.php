@@ -39,6 +39,11 @@ class OutputCacheService extends Component
         // Update cache control header
         header('Cache-Control: '.Blitz::$plugin->settings->cacheControlHeader);
 
-        exit($value.'<!-- Served by Blitz -->');
+        // Append served by comment
+        if (Blitz::$plugin->settings->outputComments) {
+            $value .= '<!-- Served by Blitz -->';
+        }
+
+        exit($value);
     }
 }

@@ -82,6 +82,9 @@ return [
     // Whether an `X-Powered-By: Craft CMS, Blitz` header should be sent.
     //'sendPoweredByHeader' => true,
 
+    // Whether the timestamp and served by comments should be appended to the cached output.
+    //'outputComments' => true,
+
     // Whether the cache should automatically be warmed after clearing globals.
     //'warmCacheAutomaticallyForGlobals' => true,
 ];

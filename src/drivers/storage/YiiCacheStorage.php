@@ -59,9 +59,6 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function save(string $value, SiteUriModel $siteUri)
     {
-        // Append timestamp
-        $value .= '<!-- Cached by Blitz on '.date('c').' -->';
-
         // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
         $value = "\xEF\xBB\xBF".$value;
 

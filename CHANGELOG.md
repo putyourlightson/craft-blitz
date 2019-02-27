@@ -13,6 +13,7 @@
 - Added logging of file and request exceptions.
 - Added an API key that can be used to clear, flush, purge, warm, or refresh expired cache through a URL.
 - Added `cacheControlHeader` config setting.
+- Added `outputComments` config setting.
 
 ### Changed
 - Changed minimum requirement of Craft to version 3.1.0.
