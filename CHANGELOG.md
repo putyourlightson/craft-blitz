@@ -2,7 +2,7 @@
 
 ## 2.0.0 - Unreleased
 ### Added
-- Added replaceable cache drivers (File, Yii cache).
+- Added replaceable cache drivers (File storage, Yii cache).
 - Added replaceable reverse proxy purgers (Cloudflare, KeyCDN).
 - Added twig tag for setting template specific cache options including flags and expiry dates.
 - Added refresh flagged cache action to utility and controllers.
@@ -11,7 +11,7 @@
 - Added garbage collection to element query records.
 - Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
-- Added an API key that can be used to clear, flush, purge, warm, or refresh expired cache through a URL.
+- Added an API key that can be used to clear, flush, purge, warm, or refresh cache through a URL.
 - Added `cacheControlHeader` config setting.
 - Added `outputComments` config setting.
 
