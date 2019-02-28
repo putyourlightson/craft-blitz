@@ -62,18 +62,6 @@ class CacheUtility extends Utility
         $actions = [];
 
         $actions[] = [
-            'id' => 'refresh-flagged',
-            'label' => Craft::t('blitz', 'Refresh Flagged Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing flagged cache will refresh all pages that are associated with the given flags (separated by commas).'),
-        ];
-
-        $actions[] = [
-            'id' => 'refresh-expired',
-            'label' => Craft::t('blitz', 'Refresh Expired Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing expired cache will refresh all elements that have expired since they were cached.'),
-        ];
-
-        $actions[] = [
             'id' => 'clear',
             'label' => Craft::t('blitz', Craft::t('blitz', 'Clear Cache')),
             'instructions' => Craft::t('blitz', 'Clearing the cache will delete all cached pages.'),
@@ -97,6 +85,18 @@ class CacheUtility extends Utility
             'id' => 'warm',
             'label' => Craft::t('blitz', 'Warm Cache'),
             'instructions' => Craft::t('blitz', 'Warming the cache will flush the cache and add a job to the queue to recache all of the pages.'),
+        ];
+
+        $actions[] = [
+            'id' => 'refresh-expired',
+            'label' => Craft::t('blitz', 'Refresh Expired Cache'),
+            'instructions' => Craft::t('blitz', 'Refreshing expired cache will refresh all elements that have expired since they were cached.'),
+        ];
+
+        $actions[] = [
+            'id' => 'refresh-flagged',
+            'label' => Craft::t('blitz', 'Refresh Flagged Cache'),
+            'instructions' => Craft::t('blitz', 'Refreshing flagged cache will refresh all pages that are associated with the given flags (separated by commas).'),
         ];
 
         return $actions;

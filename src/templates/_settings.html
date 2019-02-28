@@ -154,6 +154,15 @@
 
     <div id="advanced" class="hidden">
         {{ forms.lightswitchField({
+            label: "Clear Cache Automatically"|t('blitz'),
+            instructions: "Whether the cache should automatically be cleared when elements are updated."|t('blitz'),
+            warning: (config.clearCacheAutomatically is defined ? configWarning('clearCacheAutomatically')),
+            name: 'settings[clearCacheAutomatically]',
+            on: settings.clearCacheAutomatically,
+            required: true,
+        }) }}
+
+        {{ forms.lightswitchField({
             label: "Warm Cache Automatically"|t('blitz'),
             instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz'),
             warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),

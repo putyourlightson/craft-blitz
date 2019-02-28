@@ -12,6 +12,7 @@
 - Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
 - Added an API key that can be used to clear, flush, purge, warm, or refresh cache through a URL.
+- Added `clearCacheAutomatically` setting.
 - Added `cacheControlHeader` config setting.
 - Added `outputComments` config setting.
 

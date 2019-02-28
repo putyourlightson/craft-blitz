@@ -55,11 +55,11 @@ class FlushCacheService extends Component
     }
 
     /**
-     * Deletes cache records given an array of cache IDs.
+     * Flushes cache records given an array of cache IDs.
      *
      * @param int[] $cacheIds
      */
-    public function deleteCacheIds(array $cacheIds)
+    public function flushCacheIds(array $cacheIds)
     {
         CacheRecord::deleteAll(['id' => $cacheIds]);
     }

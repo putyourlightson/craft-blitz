@@ -35,6 +35,11 @@ class RefreshCacheJob extends BaseJob
      */
     public $elementTypes = [];
 
+    /**
+     * @var bool
+     */
+    public $forceClear = false;
+
     // Public Methods
     // =========================================================================
 
@@ -47,8 +52,8 @@ class RefreshCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
-        // First quarter
-        $this->setProgress($queue, 0.25);
+        // Step 1
+        $this->setProgress($queue, 1/3);
 
         // Merge in element cache IDs
         $this->cacheIds = array_merge($this->cacheIds,
@@ -81,20 +86,26 @@ class RefreshCacheJob extends BaseJob
             return;
         }
 
-        // Third quarter (cheat!)
-        $this->setProgress($queue, 0.75);
+        // Step 2
+        $this->setProgress($queue, 2/3);
 
-        // Get cached site URIs from cache IDs
-        $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
+        // If clear automatically is enabled or if force clear
+        if (Blitz::$plugin->settings->clearCacheAutomatically || $this->forceClear) {
+            // Get cached site URIs from cache IDs
+            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
-        // Delete cache records so we get fresh caches
-        Blitz::$plugin->flushCache->deleteCacheIds($this->cacheIds);
+            // Delete cache records so we get fresh caches
+            Blitz::$plugin->flushCache->flushCacheIds($this->cacheIds);
 
-        // Delete cached values so we get a fresh version
-        Blitz::$plugin->cacheStorage->deleteUris($siteUris);
+            // Delete cached values so we get a fresh version
+            Blitz::$plugin->cacheStorage->deleteUris($siteUris);
 
-        // Trigger afterRefreshCache events
-        Blitz::$plugin->refreshCache->afterRefresh($siteUris);
+            // Trigger afterRefreshCache events
+            Blitz::$plugin->refreshCache->afterRefresh($siteUris);
+        }
+        else {
+            Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
+        }
     }
 
     // Protected Methods

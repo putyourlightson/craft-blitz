@@ -3,18 +3,6 @@
 <table class="shadow-box editable">
     <tbody>
         <tr>
-            <th class="thin">{{ 'Refresh Flagged Cache' }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-flagged', { key: apiKey, flags: 'flag' }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ 'Refresh Expired Cache' }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
             <th class="thin">{{ 'Clear Cache' }}</th>
             <td class="textual code">
                 <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: apiKey }) }}</textarea>
@@ -36,6 +24,18 @@
             <th class="thin">{{ 'Warm Cache' }}</th>
             <td class="textual code">
                 <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: apiKey }) }}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <th class="thin">{{ 'Refresh Expired Cache' }}</th>
+            <td class="textual code">
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }) }}</textarea>
+            </td>
+        </tr>
+        <tr>
+            <th class="thin">{{ 'Refresh Flagged Cache' }}</th>
+            <td class="textual code">
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-flagged', { key: apiKey, flags: 'flag' }) }}</textarea>
             </td>
         </tr>
     </tbody>

@@ -22,11 +22,6 @@ class SettingsModel extends Model
     public $cachingEnabled = false;
 
     /**
-     * @var bool
-     */
-    public $warmCacheAutomatically = true;
-
-    /**
      * @var array
      */
     public $includedUriPatterns = [];
@@ -65,6 +60,16 @@ class SettingsModel extends Model
      * @var array
      */
     public $cachePurgerTypes = [];
+
+    /**
+     * @var bool
+     */
+    public $clearCacheAutomatically = true;
+
+    /**
+     * @var bool
+     */
+    public $warmCacheAutomatically = true;
 
     /**
      * @var int

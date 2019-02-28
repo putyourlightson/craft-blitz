@@ -165,7 +165,7 @@ class GenerateCacheService extends Component
 
         $values = $siteUri->toArray();
 
-        // Delete all cache records so we get a fresh cache
+        // Delete cache records so we get a fresh cache
         CacheRecord::deleteAll($values);
 
         if (!empty($this->options->expiryDate)) {

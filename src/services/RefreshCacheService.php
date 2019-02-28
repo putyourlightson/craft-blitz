@@ -221,9 +221,34 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes the cache.
+     * Adds an expiry date for the given cache IDs.
+     *
+     * @param int[] $cacheIds
+     * @param \DateTime|null $expiryDate
      */
-    public function refresh()
+    public function expireCacheIds(array $cacheIds, \DateTime $expiryDate = null)
+    {
+        if ($expiryDate === null) {
+            $expiryDate = new \DateTime();
+        }
+
+        $expiryDate = Db::prepareDateForDb($expiryDate);
+
+        Craft::$app->getDb()->createCommand()
+            ->update(CacheRecord::tableName(),
+                ['expiryDate' => $expiryDate],
+                ['id' => $cacheIds],
+                [],
+                false)
+            ->execute();
+    }
+
+    /**
+     * Refreshes the cache.
+     *
+     * @param bool $forceClear
+     */
+    public function refresh(bool $forceClear = false)
     {
         if (empty($this->_cacheIds) && empty($this->_elementIds)) {
             return;
@@ -233,11 +258,12 @@ class RefreshCacheService extends Component
             'cacheIds' => $this->_cacheIds,
             'elementIds' => $this->_elementIds,
             'elementTypes' => $this->_elementTypes,
+            'forceClear' => $forceClear,
         ]));
     }
 
     /**
-     * Performs actions after the cache is refreshed.
+     * Performs actions to finalise the refresh.
      *
      * @param SiteUriModel[] $siteUris
      */
@@ -278,11 +304,11 @@ class RefreshCacheService extends Component
             ->all();
 
         if (!empty($elementExpiryDates)) {
-            $elements = Craft::$app->getElements();
+            $elementsService = Craft::$app->getElements();
 
             /** @var ElementExpiryDateRecord $elementExpiryDate */
             foreach ($elementExpiryDates as $elementExpiryDate) {
-                $element = $elements->getElementById($elementExpiryDate->elementId);
+                $element = $elementsService->getElementById($elementExpiryDate->elementId);
 
                 // This should happen before invalidating the element so that other expiry dates will be saved
                 $elementExpiryDate->delete();
@@ -293,7 +319,7 @@ class RefreshCacheService extends Component
             }
         }
 
-        $this->refresh();
+        $this->refresh(true);
     }
 
     /**
@@ -318,6 +344,6 @@ class RefreshCacheService extends Component
 
         $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
 
-        $this->refresh();
+        $this->refresh(true);
     }
 }
