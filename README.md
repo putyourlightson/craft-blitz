@@ -182,7 +182,7 @@ The amount of time after which the cache should expire. If set to 0 then the cac
 
 #### `flags`
 
-One or more flags (array or string separated by commas) that will be associated with this page. The “Refresh Flagged Cache” [utility](#refresh-flagged-blitz-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
+One or more flags (array or string separated by commas) that will be associated with this page. Flags should not contain spaces. The “Refresh Flagged Cache” [utility](#refresh-flagged-blitz-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
 
 #### `expiryDate`
 

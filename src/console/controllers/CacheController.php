@@ -180,14 +180,14 @@ class CacheController extends Controller
     /**
      * Refreshes flagged cache.
      *
-     * @param string[]|string
+     * @param string
      *
      * @return int
      */
-    public function actionRefreshFlagged($flags = null): int
+    public function actionRefreshFlagged(string $flags = null): int
     {
         if ($flags === null) {
-            $this->stderr(Craft::t('blitz', 'At least one flag must be provided as an argument.').PHP_EOL, Console::FG_RED);
+            $this->stderr(Craft::t('blitz', 'One or more flags must be provided as an argument.').PHP_EOL, Console::FG_RED);
 
             return ExitCode::OK;
         }
