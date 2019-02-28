@@ -95,13 +95,17 @@ A “Yii Cache Storage” type is also available and will use whatever cache com
 
 A purger to use for clearing cache in a reverse proxy. This allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge (clear) the appropriate pages whenever they are updated.
 
+### Clear Cache Automatically
+
+Whether the cache should automatically be cleared after elements are updated. With this setting disabled, Blitz will mark affected cached pages as expired but not actually delete them. In order to delete them, the “Refresh Expired Cache” [utility](#refresh-expired-blitz-cache) or [console command](#console-commands) should be used. Disabling this setting may make sense if your site gets heavy traffic and clearing cache should be limited to specific times or intervals.
+
 ### Warm Cache Automatically
 
 Whether the cache should automatically be warmed after clearing. With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. Disabling this setting may make sense if your site is very large and has many related elements.
 
 ### Concurrency
 
-The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 20 is recommended.
+The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 10 is recommended.
 
 ### Query String Caching
 

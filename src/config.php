@@ -45,6 +45,9 @@ return [
     // The purger type classes to add to the plugin’s default purger types.
     //'purgerTypes' => [],
 
+    // Whether the cache should automatically be cleared when elements are updated.
+    //'clearCacheAutomatically' => true,
+
     // Whether the cache should automatically be warmed after clearing.
     //'warmCacheAutomatically' => true,
 
