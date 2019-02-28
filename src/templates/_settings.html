@@ -18,10 +18,10 @@
 {% set title = 'Blitz' %}
 
 {% set tabs = {
-    general: {label: 'General'|t('blitz'), url: '#general'},
+    general: {label: 'General Settings'|t('blitz'), url: '#general'},
     storage: {label: 'Cache Storage'|t('blitz'), url: '#storage'},
     purger: {label: 'Reverse Proxy Purger'|t('blitz'), url: '#purger'},
-    advanced: {label: 'Advanced'|t('blitz'), url: '#advanced'},
+    advanced: {label: 'Advanced Settings'|t('blitz'), url: '#advanced'},
 } %}
 
 {% set fullPageForm = true %}
@@ -110,9 +110,12 @@
     </div>
 
     <div id="storage" class="hidden">
+        {% set info %}
+            <span class="info">{{ 'Read more about storage types and how to add other storage types in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#cache-storage'})|raw }}</span>
+        {% endset %}
         {{ forms.selectField({
             label: "Cache Storage"|t('blitz'),
-            instructions: "The storage type to use for storing cached pages."|t('blitz'),
+            instructions: "The storage type to use for storing cached pages."|t('blitz') ~ info,
             warning: (config.cacheStorageType is defined ? configWarning('cacheStorageType')),
             name: 'settings[cacheStorageType]',
             options: storageTypeOptions,
@@ -132,9 +135,12 @@
     </div>
 
     <div id="purger" class="hidden">
+        {% set info %}
+            <span class="info">{{ 'Read more about reverse proxy purgers and how to add other purgers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#reverse-proxy-purger'})|raw }}</span>
+        {% endset %}
         {{ forms.selectField({
             label: "Reverse Proxy Purger"|t('blitz'),
-            instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz'),
+            instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz') ~ info,
             warning: (config.cachePurgerType is defined ? configWarning('cachePurgerType')),
             name: 'settings[cachePurgerType]',
             options: purgerTypeOptions,
@@ -216,6 +222,11 @@
         {% if settings.apiKey and not settings.getErrors('apiKey') %}
             {% include 'blitz/_includes/api-urls' %}
         {% endif %}
+
+        <br>
+        <p class="light">
+            {{ 'More advanced settings are available using config settings. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#config-settings'})|raw }}
+        </p>
     </div>
 
 {% endblock %}
