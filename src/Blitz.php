@@ -240,7 +240,7 @@ class Blitz extends Plugin
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
             function(TemplateEvent $event) use ($response, $siteUri) {
                 if ($response->getIsOk()) {
-                    $this->generateCache->saveOutput($event->output, $siteUri);
+                    $this->generateCache->save($event->output, $siteUri);
                 }
             }
         );

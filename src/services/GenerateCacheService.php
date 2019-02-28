@@ -107,7 +107,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has a value set for ID or an `elements.id` value set for where (used when eager loading elements)
+        // Don't proceed if the query has fixed IDs
         if ($elementQuery->id || !empty($elementQuery->where['elements.id'])) {
             return;
         }
@@ -147,14 +147,14 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves the output to a URI.
+     * Saves the cache and output for a site URI.
      *
      * @param string $output
      * @param SiteUriModel $siteUri
      *
      * @throws Exception
      */
-    public function saveOutput(string $output, SiteUriModel $siteUri)
+    public function save(string $output, SiteUriModel $siteUri)
     {
         if (!$this->options->cachingEnabled) {
             return;
