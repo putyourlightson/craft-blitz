@@ -64,7 +64,7 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Adds an element to cache.
+     * Adds an element to be cached.
      *
      * @param ElementInterface $element
      */
@@ -90,7 +90,7 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Adds an element query to cache.
+     * Adds an element query to be cached.
      *
      * @param ElementQuery $elementQuery
      * @throws Exception
@@ -174,7 +174,6 @@ class GenerateCacheService extends Component
             ]);
         }
 
-        // Update/insert cache record values
         $db->createCommand()
             ->insert(CacheRecord::tableName(), $values, false)
             ->execute();
