@@ -25,7 +25,7 @@ class FileStorage extends BaseCacheStorage
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Blitz File Storage (recommended)');
+        return Craft::t('blitz', 'Blitz File Storage');
     }
 
     // Properties
@@ -96,19 +96,21 @@ class FileStorage extends BaseCacheStorage
     {
         $filePath = $this->_getFilePath($siteUri);
 
-        if (!empty($filePath)) {
-            // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
-            $value = "\xEF\xBB\xBF".$value;
+        if (empty($filePath)) {
+            return;
+        }
 
-            try {
-                FileHelper::writeToFile($filePath, $value);
-            }
-            catch (ErrorException $e) {
-                Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
-            }
-            catch (InvalidArgumentException $e) {
-                Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
-            }
+        // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
+        $value = "\xEF\xBB\xBF".$value;
+
+        try {
+            FileHelper::writeToFile($filePath, $value);
+        }
+        catch (ErrorException $e) {
+            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+        }
+        catch (InvalidArgumentException $e) {
+            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
         }
     }
 
@@ -214,6 +216,11 @@ class FileStorage extends BaseCacheStorage
 
         // Create normalized file path
         $filePath = FileHelper::normalizePath($sitePath.'/'.$uri.'/index.html');
+
+        // Ensure that file path is a sub path of the site path
+        if (strpos($filePath, $sitePath) === false) {
+            return '';
+        }
 
         return $filePath;
     }

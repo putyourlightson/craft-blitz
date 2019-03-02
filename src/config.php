@@ -28,22 +28,22 @@ return [
     //'excludedUriPatterns' => [['contact', '']],
 
     // The driver type to use.
-    //'driverType' => FileDriver::class,
+    //'cacheDriverType' => \putyourlightson\blitz\drivers\storage\FileStorage::class,
 
     // The driver settings.
-    //'driverSettings' => ['folderPath' => 'cache/blitz'],
+    //'cacheDriverSettings' => ['folderPath' => 'cache/blitz'],
 
     // The driver type classes to add to the plugin’s default driver types.
-    //'driverTypes' => [],
+    //'extraCacheDriverTypes' => [],
 
     // The purger type to use.
-    //'purgerType' => DummyPurger::class,
+    //'cachePurgerType' => \putyourlightson\blitz\drivers\purgers\DummyPurger::class,
 
     // The purger settings.
-    //'purgerSettings' => [],
+    //'cachePurgerSettings' => [],
 
     // The purger type classes to add to the plugin’s default purger types.
-    //'purgerTypes' => [],
+    //'extraCachePurgerTypes' => [\putyourlightson\blitz\drivers\purgers\CloudflarePurger::class],
 
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,
@@ -72,7 +72,6 @@ return [
     // The amount of time after which the cache should expire (if not 0). See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
     //'cacheDuration' => 0,
 
-    //
     // Element types that should not be cached.
     //'nonCacheableElementTypes' => [
     //    'craft\elements\GlobalSet',

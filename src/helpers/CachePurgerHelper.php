@@ -10,10 +10,8 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
-use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\purgers\CachePurgerInterface;
-use putyourlightson\blitz\drivers\purgers\KeyCdnPurger;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
@@ -41,13 +39,11 @@ class CachePurgerHelper
 
         $purgerTypes = [
             DummyPurger::class,
-            CloudflarePurger::class,
-            KeyCdnPurger::class,
         ];
 
         $purgerTypes = array_unique(array_merge(
             $purgerTypes,
-            Blitz::$plugin->settings->cachePurgerTypes
+            Blitz::$plugin->settings->extraCachePurgerTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([

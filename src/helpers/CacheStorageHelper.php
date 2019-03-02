@@ -43,7 +43,7 @@ class CacheStorageHelper
 
         $storageTypes = array_unique(array_merge(
             $storageTypes,
-            Blitz::$plugin->settings->cacheStorageTypes
+            Blitz::$plugin->settings->extraCacheStorageTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([

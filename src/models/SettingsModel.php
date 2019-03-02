@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
+use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 
@@ -44,7 +45,7 @@ class SettingsModel extends Model
     /**
      * @var array
      */
-    public $cacheStorageTypes = [];
+    public $extraCacheStorageTypes = [];
 
     /**
      * @var string
@@ -59,7 +60,7 @@ class SettingsModel extends Model
     /**
      * @var array
      */
-    public $cachePurgerTypes = [];
+    public $extraCachePurgerTypes = [CloudflarePurger::class];
 
     /**
      * @var bool
