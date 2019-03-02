@@ -64,7 +64,7 @@ Craft’s template caching `{% cache %}` tag doesn’t play well with the cache 
 
 ### Caching Enabled
 
-With this setting enabled, Blitz will begin caching pages according to your include/exclude URI patterns. Disable this setting to prevent Blitz from caching any new pages.
+With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
 
 ### Included/Excluded URI Patterns
 
