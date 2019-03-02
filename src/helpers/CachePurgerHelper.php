@@ -43,7 +43,7 @@ class CachePurgerHelper
 
         $purgerTypes = array_unique(array_merge(
             $purgerTypes,
-            Blitz::$plugin->settings->extraCachePurgerTypes
+            Blitz::$plugin->settings->cachePurgerTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([

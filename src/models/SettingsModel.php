@@ -45,7 +45,7 @@ class SettingsModel extends Model
     /**
      * @var array
      */
-    public $extraCacheStorageTypes = [];
+    public $cacheStorageTypes = [];
 
     /**
      * @var string
@@ -60,7 +60,7 @@ class SettingsModel extends Model
     /**
      * @var array
      */
-    public $extraCachePurgerTypes = [CloudflarePurger::class];
+    public $cachePurgerTypes = [CloudflarePurger::class];
 
     /**
      * @var bool
@@ -114,7 +114,7 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $cacheControlHeader = 'public, s-maxage=604800';
+    public $cacheControlHeader = 'public, s-maxage=0';
 
     /**
      * @var bool

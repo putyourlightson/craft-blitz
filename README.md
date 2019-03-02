@@ -105,7 +105,7 @@ Whether the cache should automatically be warmed after clearing. With this setti
 
 ### Concurrency
 
-The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 5 and 10 is recommended.
+The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 1 and 5 is recommended.
 
 ### Query String Caching
 
