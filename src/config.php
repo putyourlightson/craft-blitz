@@ -43,7 +43,10 @@ return [
     //'cachePurgerSettings' => [],
 
     // The purger type classes to add to the plugin’s default purger types.
-    //'cachePurgerTypes' => [\putyourlightson\blitz\drivers\purgers\CloudflarePurger::class],
+    //'cachePurgerTypes' => [
+    //  \putyourlightson\blitz\drivers\purgers\CloudflarePurger::class,
+    //  \putyourlightson\blitz\drivers\purgers\KeyCdnPurger::class,
+    //],
 
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,

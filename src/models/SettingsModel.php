@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
+use putyourlightson\blitz\drivers\purgers\KeyCdnPurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 
@@ -60,7 +61,10 @@ class SettingsModel extends Model
     /**
      * @var array
      */
-    public $cachePurgerTypes = [CloudflarePurger::class];
+    public $cachePurgerTypes = [
+        CloudflarePurger::class,
+        KeyCdnPurger::class,
+    ];
 
     /**
      * @var bool
