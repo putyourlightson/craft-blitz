@@ -43,10 +43,7 @@ return [
     //'cachePurgerSettings' => [],
 
     // The purger type classes to add to the plugin’s default purger types.
-    //'cachePurgerTypes' => [
-    //  \putyourlightson\blitz\drivers\purgers\CloudflarePurger::class,
-    //  \putyourlightson\blitz\drivers\purgers\KeyCdnPurger::class,
-    //],
+    //'cachePurgerTypes' => [\putyourlightson\blitz\drivers\purgers\CloudflarePurger::class],
 
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,
@@ -55,7 +52,7 @@ return [
     //'warmCacheAutomatically' => true,
 
     // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 1 and 5 is recommended.
-    //'concurrency' => 5,
+    //'concurrency' => 3,
 
     // Whether URLs with query strings should cached and how.
     // 0: Do not cache URLs with query strings

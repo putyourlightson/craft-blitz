@@ -108,7 +108,12 @@ class GenerateCacheService extends Component
         }
 
         // Don't proceed if the query has fixed IDs
-        if ($elementQuery->id || !empty($elementQuery->where['elements.id'])) {
+        if (!empty($elementQuery->id) || !empty($elementQuery->where['elements.id'])) {
+            return;
+        }
+
+        // Don't proceed if the query has a join
+        if (!empty($elementQuery->join)) {
             return;
         }
 

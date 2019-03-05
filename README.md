@@ -315,8 +315,8 @@ if ($request_method = GET) {
     set $cache_path /cache/blitz/$host/$uri/$args/index.html;
 }
 
-location ~ ^(.*)$ {
-    try_files $cache_path $uri $uri/ /index.php?p=$uri&$args;
+location / {
+    try_files $cache_path $uri $uri/ /index.php?p=$args;
 }
 ```
 
@@ -329,8 +329,8 @@ if ($request_method = GET) {
     set $cache_path /cache/blitz/$host/$uri/index.html;
 }
 
-location ~ ^(.*)$ {
-    try_files $cache_path $uri $uri/ /index.php?p=$uri&$args;
+location / {
+    try_files $cache_path $uri $uri/ /index.php?p=$args;
 }
 ```
 

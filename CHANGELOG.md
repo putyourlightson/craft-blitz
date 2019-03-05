@@ -3,7 +3,7 @@
 ## 2.0.0 - Unreleased
 ### Added
 - Added replaceable cache drivers (File storage, Yii cache).
-- Added replaceable reverse proxy purgers (Cloudflare, KeyCDN).
+- Added replaceable reverse proxy purgers (Cloudflare).
 - Added twig tag for setting template specific cache options including flags and expiry dates.
 - Added refresh flagged cache action to utility and controllers.
 - Added purge cache action to utility and controllers.
