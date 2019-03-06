@@ -48,7 +48,7 @@ class RequestHelper
             return false;
         }
 
-        if (Blitz::$plugin->settings->queryStringCaching === 0
+        if (Blitz::$plugin->settings->queryStringCaching == 0
             && Craft::$app->getRequest()->getQueryStringWithoutPath() !== '') {
             return false;
         }
@@ -67,7 +67,7 @@ class RequestHelper
         $url = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
-        if (Blitz::$plugin->settings->queryStringCaching === 2) {
+        if (Blitz::$plugin->settings->queryStringCaching == 2) {
             $url = preg_replace('/\?.*/', '', $url);
         }
 
