@@ -31,6 +31,10 @@ class BlitzVariable
      */
     public function getUri(string $uri): Twig_Markup
     {
+        // Append no-cache query parameter
+        $uri .= strpos($uri, '?') === false ? '?' : '&';
+        $uri .= 'no-cache=1';
+
         return $this->_getScript($uri);
     }
 

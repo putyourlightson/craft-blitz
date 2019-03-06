@@ -11,6 +11,7 @@
 - Added garbage collection to element query records.
 - Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
+- Added prevention of caching dynamically injected content.
 - Added an API key that can be used to clear, flush, purge, warm, or refresh cache through a URL.
 - Added `clearCacheAutomatically` setting.
 - Added `cacheControlHeader` config setting.
