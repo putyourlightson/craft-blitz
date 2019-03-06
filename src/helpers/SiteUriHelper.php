@@ -19,13 +19,23 @@ class SiteUriHelper
      */
     public static function getAllSiteUris(): array
     {
+        $sitesService = Craft::$app->getSites();
+
+        // Begin with the primary site
+        $primarySite = $sitesService->getPrimarySite();
+
         // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
-        $siteUriSets = [[]];
+        $siteUriSets = [self::getSiteSiteUris($primarySite->id)];
 
         // Loop through all sites to ensure we warm all site element URLs
-        $sites = Craft::$app->getSites()->getAllSites();
+        $sites = $sitesService->getAllSites();
 
         foreach ($sites as $site) {
+            // Ignore primary site as we have already added it
+            if ($site->id == $primarySite->id) {
+                continue;
+            }
+
             $siteUriSets[] = self::getSiteSiteUris($site->id);
         }
 
