@@ -5,7 +5,6 @@ namespace putyourlightson\blitz\migrations;
 use Craft;
 use craft\records\Element;
 use craft\db\Migration;
-use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 
 class m190105_120000_add_elementexpirydates_table extends Migration
@@ -30,12 +29,6 @@ class m190105_120000_add_elementexpirydates_table extends Migration
             $this->createIndex(null, $table, 'expiryDate', false);
 
             $this->addForeignKey(null, $table, 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
-        }
-
-        $table = ElementCacheRecord::tableName();
-
-        if ($this->db->columnExists($table, 'expiryDate')) {
-            $this->dropColumn($table, 'expiryDate');
         }
 
         // Refresh the db schema caches

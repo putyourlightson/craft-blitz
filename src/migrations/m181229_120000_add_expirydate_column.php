@@ -4,7 +4,7 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
-use putyourlightson\blitz\records\ElementCacheRecord;
+use putyourlightson\blitz\records\CacheRecord;
 
 class m181229_120000_add_expirydate_column extends Migration
 {
@@ -16,10 +16,10 @@ class m181229_120000_add_expirydate_column extends Migration
      */
     public function safeUp()
     {
-        $table = ElementCacheRecord::tableName();
+        $table = CacheRecord::tableName();
 
         if (!$this->db->columnExists($table, 'expiryDate')) {
-            $this->addColumn($table, 'expiryDate', $this->dateTime()->after('elementId'));
+            $this->addColumn($table, 'expiryDate', $this->dateTime()->after('uri'));
             $this->createIndex(null, $table, 'expiryDate', false);
         }
 
