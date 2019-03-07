@@ -5,9 +5,11 @@
 
 namespace putyourlightson\blitz\services;
 
+use Craft;
 use craft\base\Component;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use yii\db\Exception;
 
 class FlushCacheService extends Component
 {
@@ -77,5 +79,43 @@ class FlushCacheService extends Component
             ->column();
 
         ElementQueryRecord::deleteAll(['id' => $elementQueryRecordIds]);
+
+        // Check if auto increment values should be reset
+        if (CacheRecord::find()->count() == 0) {
+            $this->_resetAutoIncrement(CacheRecord::tableName());
+        }
+
+        if (ElementQueryRecord::find()->count() == 0) {
+            $this->_resetAutoIncrement(ElementQueryRecord::tableName());
+        }
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Resets auto increment values of the given table.
+     *
+     * @param string $table
+     */
+    private function _resetAutoIncrement(string $table)
+    {
+        $db = Craft::$app->getDb();
+        $dbDriver = $db->getDriverName();
+        $sql = '';
+
+        if ($dbDriver == 'mysql') {
+            $sql = 'ALTER TABLE '.$table.' AUTO_INCREMENT = 1';
+        }
+        else if ($dbDriver == 'postgres') {
+            $sql = 'ALTER SEQUENCE '.$table.'_id_seq RESTART WITH 1';
+        }
+
+        if ($sql) {
+            try {
+                $db->createCommand($sql)->execute();
+            }
+            catch (Exception $e) { }
+        }
     }
 }

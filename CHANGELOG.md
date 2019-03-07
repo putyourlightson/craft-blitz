@@ -8,7 +8,7 @@
 - Added refresh flagged cache action to utility and controllers.
 - Added purge cache action to utility and controllers.
 - Added environment variables to file driver field.
-- Added garbage collection to element query records.
+- Added garbage collection to cache records and element query records.
 - Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
 - Added prevention of caching dynamically injected content.
