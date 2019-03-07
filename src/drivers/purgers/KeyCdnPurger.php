@@ -152,7 +152,7 @@ class KeyCdnPurger extends BaseCachePurger
         try {
             $response = $client->request($method, $uri, $options);
         }
-        catch (BadResponseException $e) { Craft::dd($e); }
+        catch (BadResponseException $e) { }
         catch (GuzzleException $e) { }
 
         return $response;

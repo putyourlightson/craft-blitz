@@ -6,11 +6,13 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\log\Logger;
 
 /**
  * @property mixed $settingsHtml
@@ -167,7 +169,7 @@ class CloudflarePurger extends BaseCachePurger
             }
         }
         else {
-            $requests[] = new Request($method, $uri, $params);
+            $requests[] = new Request($method, $uri, [], json_encode($params));
         }
 
         // Create a pool of requests for sending multiple concurrent requests
@@ -175,6 +177,16 @@ class CloudflarePurger extends BaseCachePurger
             'concurrency' => Blitz::$plugin->settings->concurrency,
             'fulfilled' => function() use (&$response) {
                 $response = true;
+            },
+            'rejected' => function($reason) {
+                if ($reason instanceof RequestException) {
+                    /** RequestException $reason */
+                    preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
+
+                    if (!empty($matches[1])) {
+                        Craft::getLogger()->log(trim($matches[1], ':'), Logger::LEVEL_ERROR, 'blitz');
+                    }
+                }
             },
         ]);
 
