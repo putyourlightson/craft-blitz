@@ -6,7 +6,7 @@ use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\records\CacheRecord;
 
-class m181229_120000_add_expirydate_column extends Migration
+class m181229_120000_add_cache_expirydate_column extends Migration
 {
     // Public Methods
     // =========================================================================
