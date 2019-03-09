@@ -309,28 +309,28 @@ In Nginx this is achieved by adding a location handler to the configuration file
 If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
 ```
+# BLITZ SERVER REWRITE
 set $cache_path false;
-
 if ($request_method = GET) {
     set $cache_path /cache/blitz/$host/$uri/$args/index.html;
 }
 
 location / {
-    try_files $cache_path $uri $uri/ /index.php?p=$args;
+    try_files $cache_path $uri $uri/ /index.php?$query_string;
 }
 ```
 
 If the “Query String Caching” setting is set to `Cache URLs with query strings as the same page` then use the following code.
 
 ```
+# BLITZ SERVER REWRITE
 set $cache_path false;
-
 if ($request_method = GET) {
     set $cache_path /cache/blitz/$host/$uri/index.html;
 }
 
 location / {
-    try_files $cache_path $uri $uri/ /index.php?p=$args;
+    try_files $cache_path $uri $uri/ /index.php?$query_string;
 }
 ```
 
