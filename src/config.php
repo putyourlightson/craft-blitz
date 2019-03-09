@@ -28,7 +28,7 @@ return [
     //'excludedUriPatterns' => [['contact', '']],
 
     // The driver type to use.
-    //'cacheDriverType' => \putyourlightson\blitz\drivers\storage\FileStorage::class,
+    //'cacheDriverType' => putyourlightson\blitz\drivers\storage\FileStorage::class,
 
     // The driver settings.
     //'cacheDriverSettings' => ['folderPath' => 'cache/blitz'],
@@ -37,13 +37,13 @@ return [
     //'cacheStorageTypes' => [],
 
     // The purger type to use.
-    //'cachePurgerType' => \putyourlightson\blitz\drivers\purgers\DummyPurger::class,
+    //'cachePurgerType' => putyourlightson\blitz\drivers\purgers\DummyPurger::class,
 
     // The purger settings.
     //'cachePurgerSettings' => [],
 
     // The purger type classes to add to the plugin’s default purger types.
-    //'cachePurgerTypes' => [\putyourlightson\blitz\drivers\purgers\CloudflarePurger::class],
+    //'cachePurgerTypes' => [putyourlightson\blitz\drivers\purgers\CloudflarePurger::class],
 
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,

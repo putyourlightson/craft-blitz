@@ -5,7 +5,7 @@
 > The Blitz v2 branch is currently in a release candidate phase. For the stable version, please visit the [v1 branch](https://github.com/putyourlightson/craft-blitz/tree/v1). The beta version can be installed using composer as follows.
 
 ```
-composer require putyourlightson/craft-blitz:2.0.0-RC1
+composer require putyourlightson/craft-blitz:2.0.0-RC1.1
 ```
 
 The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
@@ -50,11 +50,11 @@ After installing the plugin, get set up using the following steps.
 2. Add at least one row to “Included URI Patterns” such as `.*` to cache the entire site.
 3. Save the settings and visit the site or warm the cache in the [Blitz Utility](#cache-invalidation).
 
-Using a [server rewrite](#server-rewrite) will avoid unnecessary PHP processing and will increase performance even further.
+If using “Blitz File Storage” as the cache storage type then adding a [server rewrite](#server-rewrite) will avoid unnecessary PHP processing and will increase performance even further.
 
 Creating a cron job to [refresh expired cache](#refresh-expired-blitz-cache) (see below) will ensure that URIs that contain elements that have expired since they were cached are automatically refreshed when necessary.
 
-Craft’s template caching `{% cache %}` tag doesn’t play well with the cache invalidation feature in Blitz. Template caching also becomes redundant with pull page caching, so it is best to either remove all template caching from URLs that Blitz will cache or to simply disable template caching completely in the `config/general.php` file:
+Craft’s template caching `{% cache %}` tag doesn’t always play well with the cache invalidation feature in Blitz. Template caching also becomes mostly redundant with pull page caching, so it is best to either remove all template caching from URLs that Blitz will cache or to simply disable template caching completely in the `config/general.php` file:
 
 ```
 'enableTemplateCaching' => false,
@@ -87,9 +87,9 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 
 ### Cache Storage
 
-The storage type to use for storing cached pages. The default and recommended storage type is “Blitz File Storage”. This stores cached pages as static HTML files in the specified “Folder Path”.
+The storage type to use for storing cached pages. The default and recommended storage type for most sites is “Blitz File Storage”. This stores cached pages as static HTML files in the specified “Folder Path” and is extremely performant.
 
-A “Yii Cache Storage” type is also available and will use whatever cache component Craft is set up to use. You can configure Craft to use alternative cache storage (MemCache, Redis, etc.) by overriding the cache application component from `config/app.php` as [explained in the docs](https://docs.craftcms.com/v3/config/app.html#cache-component).
+A “Yii Cache Storage” type is also available and will use whatever cache component Craft is set up to use. You can configure Craft to use alternative cache storage (MemCache, Redis, etc.) by overriding the cache application component from `config/app.php` as [explained in the docs](https://docs.craftcms.com/v3/config/app.html#cache-component). This is the recommended storage type for load balanced web servers and cloud platforms such as [Heroku](https://www.heroku.com/).
 
 ### Reverse Proxy Purger
 
@@ -159,7 +159,7 @@ It is possible to set template specific caching options by passing an object int
 ```
 
 An alternative notation is to use method chaining on the model that the `options` function returns.
- 
+
 ```
 {% do craft.blitz.options.cacheDuration('P1D').flags('home,listing') %}
 ```
@@ -351,6 +351,87 @@ If the HTML was served by the plugin rather than with a server rewrite then an a
 Note that if your HTML is minified then all comments will be removed from the markup, including the comments above.
 
 If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Powered-By: Blitz` header will be sent.
+
+## Extending Blitz
+
+### Custom Cache Storage Types
+
+In addition to the provided cache storage types, you can write your own by extending the `BaseCacheStorage` abstract class. See the implementation of the `putyourlightson\blitz\drivers\storage\FileStorage` class.
+
+```php
+<?php
+namespace vendor\package;
+
+use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
+
+class MyCacheStorage extends BaseCacheStorage
+{
+```
+
+To add your cache storage type to Blitz, you can create a stand-alone composer package for it. Install the package with `composer require` and then add the class to the `cacheStorageTypes` [config setting](#config-setting) in `config/blitz.php`.
+
+```php
+// The storage type classes to add to the plugin’s default storage types.
+'cacheStorageTypes' => [
+    vendor\package\MyCacheStorage::class
+],
+```
+
+If you prefer to write your cache storage type as a module or plugin, then register it by listening for the `EVENT_REGISTER_STORAGE_TYPES` event and adding the class to the `$event->types` array.
+
+```php
+use craft\events\RegisterComponentTypesEvent;
+use putyourlightson\blitz\helpers\CacheStorageHelper;
+use vendor\package\drivers\storage\MyCacheStorage;
+use yii\base\Event;
+
+Event::on(CacheStorageHelper::class, 
+     CacheStorageHelper::EVENT_REGISTER_STORAGE_TYPES,
+     function(RegisterComponentTypesEvent $event) {
+         $event->types[] = MyCacheStorage::class;
+     }
+);
+```
+
+### Custom Reverse Proxy Purgers
+
+In addition to the provided reverse proxy purgers, you can write your own by extending the `BaseCachePurger` abstract class. See the implementation of the `putyourlightson\blitz\drivers\purgers\CloudflarePurger` class.
+
+```php
+<?php
+namespace vendor\package;
+
+use putyourlightson\blitz\drivers\storage\BaseCachePurger;
+
+class MyCachePurger extends BaseCachePurger
+{
+```
+
+To add your cache purger to Blitz, you can create a stand-alone composer package for it. Install the package with `composer require` and then add the class to the `cachePurgerTypes` [config setting](#config-setting) in `config/blitz.php`.
+
+```php
+// The purger type classes to add to the plugin’s default purger types.
+'cachePurgerTypes' => [
+    putyourlightson\blitz\drivers\purgers\CloudflarePurger::class,
+    vendor\package\MyCachePurger::class,
+],
+```
+
+If you prefer to write your cache purger as a module or plugin, then register it by listening for the `EVENT_REGISTER_PURGER_TYPES` event and adding the class to the `$event->types` array.
+
+```php
+use craft\events\RegisterComponentTypesEvent;
+use putyourlightson\blitz\helpers\CachePurgerHelper;
+use vendor\package\drivers\purgers\MyCachePurger;
+use yii\base\Event;
+
+Event::on(CachePurgerHelper::class, 
+     CachePurgerHelper::EVENT_REGISTER_PURGER_TYPES,
+     function(RegisterComponentTypesEvent $event) {
+         $event->types[] = MyCachePurger::class;
+     }
+);
+```
 
 ## Credits
 
