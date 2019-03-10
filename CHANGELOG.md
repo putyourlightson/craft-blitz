@@ -19,6 +19,7 @@
 
 ### Changed
 - Changed minimum requirement of Craft to version 3.1.0.
+- Cache header tags are added on the first render of a cacheable page.
 - Cache is invalidated when elements are updated through non control panel requests.
 - The primary site is now warmed first.
 - Global set updates only clear the cache of the site that they belong to.

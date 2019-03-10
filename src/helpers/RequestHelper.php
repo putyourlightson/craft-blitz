@@ -26,6 +26,10 @@ class RequestHelper
      */
     public static function getIsCacheableRequest(): bool
     {
+        if (!Blitz::$plugin->settings->cachingEnabled) {
+            return false;
+        }
+
         // Ensure this is a cacheable site request
         if (!self::_getIsCacheableSiteRequest()) {
             return false;
@@ -39,12 +43,13 @@ class RequestHelper
         /** @var User|null $user */
         $user = Craft::$app->getUser()->getIdentity();
 
-        // Ensure that if user is logged in then debug toolbar is not enabled
-        if ($user !== null && $user->getPreference('enableDebugToolbarForSite')) {
+        // Ensure that if the site is not live that the has permission to access it
+        if (!Craft::$app->getIsLive() && !$user->can('accessSiteWhenSystemIsOff')) {
             return false;
         }
 
-        if (!Blitz::$plugin->settings->cachingEnabled) {
+        // Ensure that if user is logged in then debug toolbar is not enabled
+        if ($user !== null && $user->getPreference('enableDebugToolbarForSite')) {
             return false;
         }
 
@@ -115,7 +120,11 @@ class RequestHelper
     {
         $request = Craft::$app->getRequest();
 
-        // Ensure this is a front-end get request that is not a console request or an action request or live preview
-        return ($request->getIsSiteRequest() && $request->getIsGet() && !$request->getIsConsoleRequest() && !$request->getIsActionRequest() && !$request->getIsLivePreview());
+        return ($request->getIsSiteRequest()
+            && $request->getIsGet()
+            && !$request->getIsConsoleRequest()
+            && !$request->getIsActionRequest()
+            && !$request->getIsLivePreview()
+        );
     }
 }

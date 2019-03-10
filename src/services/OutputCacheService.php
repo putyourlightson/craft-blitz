@@ -20,13 +20,28 @@ class OutputCacheService extends Component
     // =========================================================================
 
     /**
-     * Outputs a given value using native headers and exits.
+     * Outputs a given site URI if cached.
+     *
+     * @param SiteUriModel $siteUri
+     */
+    public function output(SiteUriModel $siteUri)
+    {
+        // Update cache control header
+        header('Cache-Control: '.Blitz::$plugin->settings->cacheControlHeader);
+
+        $value = Blitz::$plugin->cacheStorage->get($siteUri);
+
+        if ($value) {
+            $this->outputValue($value);
+        }
+    }
+
+    /**
+     * Outputs a given value and exits.
      *
      * @param string $value
-     *
-     * @return string
      */
-    public function output(string $value)
+    public function outputValue(string $value)
     {
         // Update powered by header
         header_remove('X-Powered-By');
@@ -35,9 +50,6 @@ class OutputCacheService extends Component
             $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? Craft::$app->name.', ' : '';
             header('X-Powered-By: '.$header.'Blitz');
         }
-
-        // Update cache control header
-        header('Cache-Control: '.Blitz::$plugin->settings->cacheControlHeader);
 
         // Append served by comment
         if (Blitz::$plugin->settings->outputComments) {

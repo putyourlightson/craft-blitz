@@ -151,13 +151,7 @@ class Blitz extends Plugin
             $siteUri = RequestHelper::getRequestedSiteUri();
 
             if ($siteUri->getIsCacheableUri()) {
-                $value = $this->cacheStorage->get($siteUri);
-
-                // If cached value exists and user can access the site
-                if ($value && RequestHelper::getCanAccessSite()) {
-                    // Output the cached value (assuming this has not already been done server-side)
-                    $this->outputCache->output($value);
-                }
+                $this->outputCache->output($siteUri);
 
                 $this->_registerCacheableRequestEvents($siteUri);
 
