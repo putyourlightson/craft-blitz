@@ -94,20 +94,6 @@ class RequestHelper
         ]);
     }
 
-    /**
-     * Returns whether the user can access the site.
-     *
-     * @return bool
-     */
-    public static function getCanAccessSite(): bool
-    {
-        if (Craft::$app->getIsLive()) {
-            return true;
-        }
-
-        return Craft::$app->getUser()->checkPermission('accessSiteWhenSystemIsOff');
-    }
-
     // Private Methods
     // =========================================================================
 

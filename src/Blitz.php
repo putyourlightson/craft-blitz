@@ -85,17 +85,11 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
-        // Register components
         $this->_registerComponents();
 
-        // Register variable
         $this->_registerVariable();
 
-        // Process cacheable requests
-        if ($this->_processCacheableRequest()) {
-            // Stop execution
-            return;
-        }
+        $this->_processCacheableRequest();
 
         // Register events
         $this->_registerElementEvents();
@@ -141,26 +135,20 @@ class Blitz extends Plugin
     // =========================================================================
 
     /**
-     * Processes cacheable requests.
-     *
-     * @return bool
+     * Processes cacheable request.
      */
-    private function _processCacheableRequest(): bool
+    private function _processCacheableRequest()
     {
         if (RequestHelper::getIsCacheableRequest()) {
             $siteUri = RequestHelper::getRequestedSiteUri();
 
             if ($siteUri->getIsCacheableUri()) {
+                // If output then the script will exit
                 $this->outputCache->output($siteUri);
 
                 $this->_registerCacheableRequestEvents($siteUri);
-
-                // Stop execution
-                return true;
             }
         }
-
-        return false;
     }
 
     /**
