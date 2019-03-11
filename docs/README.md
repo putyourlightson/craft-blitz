@@ -82,6 +82,8 @@ Refreshing expired cache will refresh all cached pages that have expired, or tha
 ### Refresh Flagged Cache
 Refreshing flagged cache will refresh all cached pages that were associated with the provided flags using the `flags` parameter in the [template specific options](#template-specific-options).
 
+![Utility](images/utility-2.0.0-beta.7.png)
+
 ---
 
 # Settings
@@ -139,15 +141,15 @@ The max number of multiple concurrent requests to use when warming the cache. Th
 
 URLs with query strings will be cached according to the selected option in the “Query String Caching” setting  as follows:
 
-#### Do not cache URLs with query strings
+#### `Do not cache URLs with query strings`
 
 URLs with query strings (anything following a `?` in a URL) will not be cached. Use this if query parameters dynamically affect a page’s output and should therefore never be cached.
 
-#### Cache URLs with query strings as unique pages
+#### `Cache URLs with query strings as unique pages`
 
 URLs with query strings will be cached as unique pages, so `domain.com/about`, `domain.com/about?utm_source=twitter` and `domain.com/about?utm_source=facebook` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
 
-#### Cache URLs with query strings as the same page
+#### `Cache URLs with query strings as the same page`
 
 URLs with query strings will be cached as the same page, so `domain.com/about`, `domain.com/about?utm_source=twitter` and `domain.com/about?utm_source=facebook` will all be cached with the same output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
 
@@ -184,19 +186,19 @@ An alternative notation is to use method chaining on the model that the `options
 {% do craft.blitz.options.cacheDuration('P1D').flags('home,listing') %}
 ```
 
-#### `cachingEnabled`
+### `cachingEnabled`
 
 Setting this option to `false` will disable caching of this page.
 
-#### `cacheElements`
+### `cacheElements`
 
 Setting this option to `false` will disable caching the elements used on this page in the database (used for cache invalidation).
 
-#### `cacheElementQueries`
+### `cacheElementQueries`
 
 Setting this option to `false` will disable caching the element queries used on this page in the database (used for cache invalidation).
 
-#### `cacheDuration`
+### `cacheDuration`
 
 The amount of time after which the cache should expire. If set to 0 then the cache will not get an expiry date. See [ConfigHelper::durationInSeconds()](https://docs.craftcms.com/api/v3/craft-helpers-conf) for a list of supported value types. [Duration intervals](https://en.wikipedia.org/wiki/ISO_8601#Durations) are a convenient way to set durations. Some common examples include:
 - PT1H (1 hour)
@@ -204,11 +206,11 @@ The amount of time after which the cache should expire. If set to 0 then the cac
 - P1W (1 week)
 - P1M (1 month)
 
-#### `flags`
+### `flags`
 
 One or more flags (array or string separated by commas) that will be associated with this page. Flags should not contain spaces. The “Refresh Flagged Cache” [utility](#refresh-flagged-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
 
-#### `expiryDate`
+### `expiryDate`
 
 A [DateTime](http://php.net/manual/en/class.datetime.php) object that will define when the cache should expire. The “Refresh Expired Cache” [utility](#refresh-expired-cache) or [console command](#console-commands) must be used to invalidate expired cache. 
 
@@ -218,11 +220,11 @@ When a URL is cached, a cached version of the page will be served up on all subs
 
 Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
 
-#### `{{ craft.blitz.getUri('/template/name') }}`
+### `{{ craft.blitz.getUri('/template/name') }}`
 
 Returns a script that injects the contents of the URI provided in place of the twig tag. 
 
-#### `{{ craft.blitz.csrfInput() }}`
+### `{{ craft.blitz.csrfInput() }}`
 
 Returns a script that injects a CSRF input field in place of the twig tag.
 
@@ -248,8 +250,6 @@ Create cron jobs using the following console commands to refresh expired or flag
 // Refresh cache flagged with the flags “home” and “listing” every day at 6am.
 0 6 * * * /usr/bin/php /path/to/craft blitz/cache/refresh-flagged home,listing
 ```
-
-![Utility](images/utility-2.0.0-beta.7.png)
 
 ## Refreshing Cache with a URL
 
@@ -346,13 +346,13 @@ location / {
 
 Cached HTML pages are timestamped with a comment at the end of the page. 
 
-```
+```html
 <!-- Cached by Blitz on 2018-06-27T10:05:00+02:00 -->
 ```
 
 If the HTML was served by the plugin rather than with a server rewrite then an additional comment is added.
 
-```
+```html
 <!-- Served by Blitz -->
 ```
 
