@@ -1,3 +1,2 @@
-- [Plugin Store](https://plugins.craftcms.com/blitz)
+- [Craft Plugin Store](https://plugins.craftcms.com/blitz)
 - [PutYourLightsOn](https://putyourlightson.com/)
-- [Github](https://github.com/putyourlightson/craft-blitz/)

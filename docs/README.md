@@ -1,6 +1,6 @@
-# Blitz Plugin for Craft CMS 3
+# Blitz Plugin Documentation
 
-The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
+The Blitz plugin provides intelligent full page caching for creating lightning-fast sites with [Craft CMS 3](https://craftcms.com/).
 
 - Reduces page load times (TTFB) and load on the server significantly. 
 - Makes your site available even when performing updates and maintenance.
@@ -12,18 +12,22 @@ Although the performance gains depend on the individual site and server setup, t
 
 ## License
 
-This plugin requires a commercial license which can be purchased through the Craft Plugin Store.  
+This plugin requires a commercial license which can be purchased through the [Craft Plugin Store](https://plugins.craftcms.com/blitz).  
 The license fee is $59 plus $29 per subsequent year for updates (optional).
 
 ## Requirements
 
-This plugin requires Craft CMS 3.1.0 or later.
+This plugin requires [Craft CMS](https://craftcms.com/) 3.1.0 or later.
 
 ## Credits
 
 Blitz is actively developed and maintained by [PutYourLightsOn](https://putyourlightson.com/), yet it has had a tremendous amount of support from the Craft CMS community. 
 
 A few people worth mentioning for their valuable input are: Oliver Stark; Andrew Welch; Ben Parizek.
+
+---
+
+# Getting Started
 
 ## Basic Usage
 
@@ -37,15 +41,15 @@ After installing the plugin, get set up using the following steps.
 
 1. Turn “Enable Caching” on.
 2. Add at least one row to “Included URI Patterns” such as `.*` to cache the entire site.
-3. Save the settings and visit the site or warm the cache in the [Blitz Utility](#cache-invalidation).
+3. Save the settings and visit the site or warm the cache in the [Blitz cache utility](#cache-utility).
 
 If using “Blitz File Storage” as the cache storage type then adding [server rewrites](#server-rewrites) will avoid unnecessary PHP processing and will increase performance even further.
 
-Creating a cron job to [refresh expired cache](#refresh-expired-blitz-cache) (see below) will ensure that URIs that contain elements that have expired since they were cached are automatically refreshed when necessary.
+Creating a cron job to [refresh expired cache](#refresh-expired-cache) (see below) will ensure that URIs that contain elements that have expired since they were cached are automatically refreshed when necessary.
 
 Craft’s template caching `{% cache %}` tag doesn’t always play well with the cache invalidation feature in Blitz. Template caching also becomes mostly redundant with pull page caching, so it is best to either remove all template caching from URLs that Blitz will cache or to simply disable template caching completely in the `config/general.php` file:
 
-```
+```php
 'enableTemplateCaching' => false,
 ```
 
@@ -63,20 +67,26 @@ If a global is saved then Blitz will clear and warm the entire cache if the “W
 
 The Blitz cache utility at “Utilities → Blitz Cache” displays the number of cached URIs for each site. It also provides the following functionality:
 
-### Clear Blitz Cache
+### Clear Cache
 Clearing the cache will delete all cached pages.
 
-### Flush Blitz Cache
+### Flush Cache
 Flushing the cache will clear the cache and remove all records from the database.
 
-### Warm Blitz Cache
+### Warm Cache
 Warming the cache will flush the cache and add a job to the queue to recache all of the pages.
 
-### Refresh Expired Blitz Cache
-Refreshing expired cache will refresh all cached pages that have expired, or that contain elements that have expired (applies to elements with future post and expiry dates). Cache duration and expiry dates can be specified in the [config settings](config-settings) and the [template specific options](#template-specific-options).
+### Refresh Expired Cache
+Refreshing expired cache will refresh all cached pages that have expired, or that contain elements that have expired (applies to elements with future post and expiry dates). Cache duration and expiry dates can be specified in the [config settings](#config-settings) and the [template specific options](#template-specific-options).
 
-### Refresh Flagged Blitz Cache
+### Refresh Flagged Cache
 Refreshing flagged cache will refresh all cached pages that were associated with the provided flags using the `flags` parameter in the [template specific options](#template-specific-options).
+
+---
+
+# Settings
+
+![Settings](images/settings-2.0.0.png)
 
 ## Control Panel Settings
 
@@ -115,7 +125,7 @@ A purger to use for clearing cache in a reverse proxy. This allows you to use a 
 
 ### Clear Cache Automatically
 
-Whether the cache should automatically be cleared after elements are updated. With this setting disabled, Blitz will mark affected cached pages as expired but not actually delete them. In order to delete them, the “Refresh Expired Cache” [utility](#refresh-expired-blitz-cache) or [console command](#console-commands) should be used. Disabling this setting may make sense if your site gets heavy traffic and clearing cache should be limited to specific times or intervals.
+Whether the cache should automatically be cleared after elements are updated. With this setting disabled, Blitz will mark affected cached pages as expired but not actually delete them. In order to delete them, the “Refresh Expired Cache” [utility](#refresh-expired-cache) or [console command](#console-commands) should be used. Disabling this setting may make sense if your site gets heavy traffic and clearing cache should be limited to specific times or intervals.
 
 ### Warm Cache Automatically
 
@@ -129,15 +139,15 @@ The max number of multiple concurrent requests to use when warming the cache. Th
 
 URLs with query strings will be cached according to the selected option in the “Query String Caching” setting  as follows:
 
-### Do not cache URLs with query strings
+#### Do not cache URLs with query strings
 
 URLs with query strings (anything following a `?` in a URL) will not be cached. Use this if query parameters dynamically affect a page’s output and should therefore never be cached.
 
-### Cache URLs with query strings as unique pages
+#### Cache URLs with query strings as unique pages
 
 URLs with query strings will be cached as unique pages, so `domain.com/about`, `domain.com/about?utm_source=twitter` and `domain.com/about?utm_source=facebook` will be cached separately. Use when query parameters affect a page’s output in a deterministic way and can therefore be cached as unique pages.
 
-### Cache URLs with query strings as the same page
+#### Cache URLs with query strings as the same page
 
 URLs with query strings will be cached as the same page, so `domain.com/about`, `domain.com/about?utm_source=twitter` and `domain.com/about?utm_source=facebook` will all be cached with the same output. Use when query parameters do not affect a page’s output and can therefore be cached as the same page.
 
@@ -149,7 +159,9 @@ An API key that can be used to clear, flush, warm, or refresh expired cache thro
 
 Blitz comes with a config file for a multi-environment way to set the plugin settings, as well as more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
 
-![Settings](images/settings-2.0.0.png)
+---
+
+# Advanced Usage
 
 ## Template Specific Options
 
@@ -172,19 +184,19 @@ An alternative notation is to use method chaining on the model that the `options
 {% do craft.blitz.options.cacheDuration('P1D').flags('home,listing') %}
 ```
 
-### `cachingEnabled`
+#### `cachingEnabled`
 
 Setting this option to `false` will disable caching of this page.
 
-### `cacheElements`
+#### `cacheElements`
 
 Setting this option to `false` will disable caching the elements used on this page in the database (used for cache invalidation).
 
-### `cacheElementQueries`
+#### `cacheElementQueries`
 
 Setting this option to `false` will disable caching the element queries used on this page in the database (used for cache invalidation).
 
-### `cacheDuration`
+#### `cacheDuration`
 
 The amount of time after which the cache should expire. If set to 0 then the cache will not get an expiry date. See [ConfigHelper::durationInSeconds()](https://docs.craftcms.com/api/v3/craft-helpers-conf) for a list of supported value types. [Duration intervals](https://en.wikipedia.org/wiki/ISO_8601#Durations) are a convenient way to set durations. Some common examples include:
 - PT1H (1 hour)
@@ -192,13 +204,13 @@ The amount of time after which the cache should expire. If set to 0 then the cac
 - P1W (1 week)
 - P1M (1 month)
 
-### `flags`
+#### `flags`
 
-One or more flags (array or string separated by commas) that will be associated with this page. Flags should not contain spaces. The “Refresh Flagged Cache” [utility](#refresh-flagged-blitz-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
+One or more flags (array or string separated by commas) that will be associated with this page. Flags should not contain spaces. The “Refresh Flagged Cache” [utility](#refresh-flagged-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
 
-### `expiryDate`
+#### `expiryDate`
 
-A [DateTime](http://php.net/manual/en/class.datetime.php) object that will define when the cache should expire. The “Refresh Expired Cache” [utility](#refresh-expired-blitz-cache) or [console command](#console-commands) must be used to invalidate expired cache. 
+A [DateTime](http://php.net/manual/en/class.datetime.php) object that will define when the cache should expire. The “Refresh Expired Cache” [utility](#refresh-expired-cache) or [console command](#console-commands) must be used to invalidate expired cache. 
 
 ## Dynamic Content
 
@@ -206,17 +218,17 @@ When a URL is cached, a cached version of the page will be served up on all subs
 
 Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
 
-### `{{ craft.blitz.getUri('/template/name') }}`
+#### `{{ craft.blitz.getUri('/template/name') }}`
 
 Returns a script that injects the contents of the URI provided in place of the twig tag. 
 
-### `{{ craft.blitz.csrfInput() }}`
+#### `{{ craft.blitz.csrfInput() }}`
 
 Returns a script that injects a CSRF input field in place of the twig tag.
 
 Below is an example of how you might use the tags to create a page containing dynamic content and a form that can be cached by Blitz.
 
-```html
+```twig
 Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
 
 <form method="post">
@@ -225,8 +237,6 @@ Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
  
  </form>
 ```
-
-In the case above it would make sense to add `ajax/.*` as an excluded URI pattern in the plugin settings.
 
 ## Cron Jobs
 Create cron jobs using the following console commands to refresh expired or flagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
@@ -349,6 +359,10 @@ If the HTML was served by the plugin rather than with a server rewrite then an a
 Note that if your HTML is minified then all comments will be removed from the markup, including the comments above.
 
 If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Powered-By: Blitz` header will be sent.
+
+--- 
+
+# Extending Blitz
 
 ## Cache Storage Types
 
