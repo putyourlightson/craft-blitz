@@ -65,7 +65,7 @@ If a global is saved then Blitz will clear and warm the entire cache if the “W
 
 ## Cache Utility
 
-The Blitz cache utility at “Utilities → Blitz Cache” displays the number of cached URIs for each site. It also provides the following functionality:
+The Blitz cache utility at “Utilities → Blitz Cache” displays the number of cached URIs for each site (Blitz File Storage only). It also provides the following functionality.
 
 ### Clear Cache
 Clearing the cache will delete all cached pages.
@@ -83,6 +83,26 @@ Refreshing expired cache will refresh all cached pages that have expired, or tha
 Refreshing flagged cache will refresh all cached pages that were associated with the provided flags using the `flags` parameter in the [template specific options](#template-specific-options).
 
 ![Utility](images/utility-2.0.0-beta.7.png)
+
+## Console Commands
+
+The following console commands with the functionality described above are also available.
+
+    ./craft blitz/cache/clear
+    
+    ./craft blitz/cache/flush
+    
+    ./craft blitz/cache/warm
+    
+    ./craft blitz/cache/refresh-expired
+    
+    ./craft blitz/cache/refresh-flagged {flag}
+
+![Console commands](images/console-2.0.0.png)
+
+## Refreshing Cache with a URL
+
+If an API key is set in “Settings → Advanced” then  it is possible to clear, flush, warm, refresh expired or refresh flagged cache through a URL. The available URLs are displayed under the API key field after the setting has been saved. 
 
 ---
 
@@ -165,6 +185,32 @@ Blitz comes with a config file for a multi-environment way to set the plugin set
 
 # Advanced Usage
 
+## Dynamic Content
+
+When a URL is cached, a cached version of the page will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+
+Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
+
+### `{{ craft.blitz.getUri('/template/name') }}`
+
+Returns a script that injects the contents of the URI provided in place of the twig tag. 
+
+### `{{ craft.blitz.csrfInput() }}`
+
+Returns a script that injects a CSRF input field in place of the twig tag.
+
+Below is an example of how you might use the tags to create a page containing dynamic content and a form page that can be cached by Blitz.
+
+```twig
+Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
+
+<form method="post">
+   {{ craft.blitz.csrfInput() }}
+   ...
+ 
+ </form>
+```
+
 ## Template Specific Options
 
 It is possible to set template specific caching options by passing an object into the `options` function. All parameters are optional.
@@ -175,15 +221,15 @@ It is possible to set template specific caching options by passing an object int
     cacheElements: true,
     cacheElementQueries: true,
     cacheDuration: 'P1D',
-    flags: 'home,listing',
-    expiryDate: entry.eventDate
+    expiryDate: entry.eventDate,
+    flags: 'home,listing'
 }) %}
 ```
 
 An alternative notation is to use method chaining on the model that the `options` function returns.
 
 ```twig
-{% do craft.blitz.options.cacheDuration('P1D').flags('home,listing') %}
+{% do craft.blitz.options.cacheDuration('P1D').flags(['home', 'listing']) %}
 ```
 
 ### `cachingEnabled`
@@ -206,39 +252,13 @@ The amount of time after which the cache should expire. If set to 0 then the cac
 - P1W (1 week)
 - P1M (1 month)
 
-### `flags`
-
-One or more flags (array or string separated by commas) that will be associated with this page. Flags should not contain spaces. The “Refresh Flagged Cache” [utility](#refresh-flagged-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
-
 ### `expiryDate`
 
 A [DateTime](http://php.net/manual/en/class.datetime.php) object that will define when the cache should expire. The “Refresh Expired Cache” [utility](#refresh-expired-cache) or [console command](#console-commands) must be used to invalidate expired cache. 
 
-## Dynamic Content
+### `flags`
 
-When a URL is cached, a cached version of the page will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
-
-Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
-
-### `{{ craft.blitz.getUri('/template/name') }}`
-
-Returns a script that injects the contents of the URI provided in place of the twig tag. 
-
-### `{{ craft.blitz.csrfInput() }}`
-
-Returns a script that injects a CSRF input field in place of the twig tag.
-
-Below is an example of how you might use the tags to create a page containing dynamic content and a form that can be cached by Blitz.
-
-```twig
-Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
-
-<form method="post">
-   {{ craft.blitz.csrfInput() }}
-   ...
- 
- </form>
-```
+One or more flags (array or string separated by commas) that will be associated with this page. Flags should not contain spaces. The “Refresh Flagged Cache” [utility](#refresh-flagged-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
 
 ## Cron Jobs
 Create cron jobs using the following console commands to refresh expired or flagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
@@ -250,26 +270,6 @@ Create cron jobs using the following console commands to refresh expired or flag
 // Refresh cache flagged with the flags “home” and “listing” every day at 6am.
 0 6 * * * /usr/bin/php /path/to/craft blitz/cache/refresh-flagged home,listing
 ```
-
-## Refreshing Cache with a URL
-
-If an API key is set in “Settings → Advanced” then  it is possible to clear, flush, warm, refresh expired or refresh flagged cache through a URL. The available URLs are displayed under the API key field after the setting has been saved. 
-
-## Console Commands
-
-The following console commands with the functionality described above are also available.
-
-    ./craft blitz/cache/clear
-    
-    ./craft blitz/cache/flush
-    
-    ./craft blitz/cache/warm
-    
-    ./craft blitz/cache/refresh-expired
-    
-    ./craft blitz/cache/refresh-flagged {flag}
-
-![Console commands](images/console-2.0.0.png)
 
 ## Server Rewrites
 
