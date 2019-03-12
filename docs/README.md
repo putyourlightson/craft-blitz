@@ -4,7 +4,7 @@ The Blitz plugin provides intelligent full page caching for creating lightning-f
 
 - Reduces page load times (TTFB) and load on the server significantly. 
 - Makes your site available even when performing updates and maintenance.
-- Makes it possible to have your site served by a reverse proxy content delivery network (CDN).
+- Makes it possible to have your site served by a reverse proxy (CDN).
 
 Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency). Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
 
@@ -150,6 +150,10 @@ A purger to use for clearing cache in a reverse proxy. This allows you to use a 
 You can extend Blitz to add your own [custom reverse proxy purgers](#custom-reverse-proxy-purgers).
 
 ![Settings Purger](images/settings-purger-2.0.0.png)
+
+Cloudflare does not cache HTML by default. To enable static page caching, create a new page rule in the “Page Rules” page of the domain in your account (you get 3 page rules with a free plan). Enter a URL pattern such as `domain.com/*` and add a “Cache Level” setting with a value of “Cache Everything”. Click “Save and Deploy” and then visit your site. With dev tools open you should see a cache response (`HIT`, `MISS`, etc.) in the `CF-Cache-Status` header.
+
+![Cloudflare Page Rule](images/cloudflare-page-rule-2.0.0.png)
 
 ### Clear Cache Automatically
 
