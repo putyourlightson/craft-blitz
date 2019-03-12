@@ -4,11 +4,11 @@ The Blitz plugin provides intelligent full page caching for creating lightning-f
 
 - Reduces page load times (TTFB) and load on the server significantly. 
 - Makes your site available even when performing updates and maintenance.
-- Makes it possible to have your site served by a content delivery network (CDN).
+- Makes it possible to have your site served by a reverse proxy content delivery network (CDN).
 
 Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency). Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
 
-![TTFB](images/ttfb-2.0.0-b5.png)  
+![TTFB](images/ttfb-2.0.0.png)  
 
 ## License
 
@@ -80,7 +80,7 @@ Refreshing expired cache will refresh all cached pages that have expired, or tha
 ### Refresh Flagged Cache
 Refreshing flagged cache will refresh all cached pages that were associated with the provided flags using the `flags` parameter in the [template specific options](#template-specific-options).
 
-![Utility](images/utility-2.0.0-beta.7.png)
+![Utility](images/utility-2.0.0.png)
 
 ## Console Commands
 
@@ -105,8 +105,6 @@ The following console commands with the functionality described above are also a
 If an API key is set in “Settings → Advanced” then  it is possible to clear, flush, warm, refresh expired or refresh flagged cache through a URL. The available URLs are displayed under the API key field after the setting has been saved. 
 
 # Settings
-
-![Settings](images/settings-2.0.0.png)
 
 ## Control Panel Settings
 
@@ -133,15 +131,25 @@ URI patterns use PCRE regular expressions. Below are some common use cases. You 
 - `^entries/entry$` matches an exact URI.
 - `^entries/\w+$` matches anything beginning with “entries/” followed by at least 1 word character.
 
+![Settings General](images/settings-general-2.0.0.png)
+
 ### Cache Storage
 
 The storage type to use for storing cached pages. The default and recommended storage type for most sites is “Blitz File Storage”. This stores cached pages as static HTML files in the specified “Folder Path” and is extremely performant, especially when used with [server rewrites](#server-rewrites).
 
 A “Yii Cache Storage” type is also available and will use whatever cache component Craft is set up to use. You can configure Craft to use alternative cache storage (MemCache, Redis, etc.) by overriding the cache application component from `config/app.php` as [explained in the docs](https://docs.craftcms.com/v3/config/app.html#cache-component). This is the recommended storage type for load balanced web servers and cloud platforms such as [Heroku](https://www.heroku.com/).
 
+You can extend Blitz to add your own [custom cache storage types](#custom-cache-storage-types).
+
+![Settings Storage](images/settings-storage-2.0.0.png)
+
 ### Reverse Proxy Purger
 
 A purger to use for clearing cache in a reverse proxy. This allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge (clear) the appropriate pages whenever they are updated.
+
+You can extend Blitz to add your own [custom reverse proxy purgers](#custom-reverse-proxy-purgers).
+
+![Settings Purger](images/settings-purger-2.0.0.png)
 
 ### Clear Cache Automatically
 
@@ -174,6 +182,8 @@ URLs with query strings will be cached as the same page, so `domain.com/about`, 
 ### API Key
 
 An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters). The individual URLs are displayed below the field after a value has been saved.
+
+![Settings Advanced](images/settings-advanced-2.0.0.png)
 
 ## Config Settings
 
@@ -358,7 +368,7 @@ If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Pow
 
 # Extending Blitz
 
-## Cache Storage Types
+## Custom Cache Storage Types
 
 In addition to the provided cache storage types, you can write your own by extending the `BaseCacheStorage` abstract class. See the implementation of the `putyourlightson\blitz\drivers\storage\FileStorage` class.
 
@@ -399,7 +409,7 @@ Event::on(CacheStorageHelper::class,
 );
 ```
 
-## Reverse Proxy Purgers
+## Custom Reverse Proxy Purgers
 
 In addition to the provided reverse proxy purgers, you can write your own by extending the `BaseCachePurger` abstract class. See the implementation of the `putyourlightson\blitz\drivers\purgers\CloudflarePurger` class.
 

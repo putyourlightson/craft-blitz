@@ -26,6 +26,7 @@
 
 {% set fullPageForm = true %}
 
+{% set docs = 'https://putyourlightson.com/craft-plugins/blitz/docs#/?id=' %}
 
 {% block actionButton %}
 
@@ -42,7 +43,7 @@
     <div id="general">
 
         {% if craft.app.request.getParam('welcome') %}
-            {% include 'blitz/_includes/welcome' %}
+            {% include 'blitz/_includes/welcome' with {docs: docs} %}
         {% endif %}
 
         {% set info %}
@@ -58,7 +59,7 @@
         }) }}
 
         {% set info -%}
-            {% include 'blitz/_includes/uri-pattern-info' %}
+            {% include 'blitz/_includes/uri-pattern-info' with {docs: docs} %}
         {%- endset %}
 
         {% set cols = [
@@ -114,7 +115,7 @@
 
     <div id="storage" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about storage types and how to add other storage types in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#cache-storage'})|raw }}</span>
+            <span class="info">{{ 'Read more about storage types and how to add other storage types in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-storage'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Storage"|t('blitz'),
@@ -139,7 +140,7 @@
 
     <div id="purger" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about reverse proxy purgers and how to add other purgers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#reverse-proxy-purger'})|raw }}</span>
+            <span class="info">{{ 'Read more about reverse proxy purgers and how to add other purgers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'reverse-proxy-purger'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Reverse Proxy Purger"|t('blitz'),
@@ -202,7 +203,7 @@
         }) }}
 
         {% set info %}
-            <span class="info">{{ "This setting determines how URLs with query strings will be cached. See the [documentation]({url})."|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#server-rewrite'}) }}</span>
+            <span class="info">{{ "This setting determines how URLs with query strings will be cached. See the [documentation]({url})."|t('blitz', {url: docs ~ 'server-rewrites'}) }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Query String Caching"|t('blitz'),
@@ -229,12 +230,12 @@
         }) }}
 
         {% if settings.apiKey and not settings.getErrors('apiKey') %}
-            {% include 'blitz/_includes/api-urls' %}
+            {% include 'blitz/_includes/api-urls' with {docs: docs} %}
+            <br>
         {% endif %}
 
-        <br>
         <p class="light">
-            {{ 'More advanced settings are available using config settings. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://github.com/putyourlightson/craft-blitz#config-settings'})|raw }}
+            {{ 'More advanced settings are available using config settings. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'config-settings'})|raw }}
         </p>
     </div>
 
