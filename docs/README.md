@@ -20,7 +20,7 @@ Blitz version 2 builds on the initial version’s incredible performance and eas
 
 **Predictability:** Many more config settings have been added that allow you to control when and how cached pages are invalidated. Template specific options allow you to set flags, cache durations and expiry dates. An API key and console commands are available to trigger actions at scheduled intervals.
 
-BVisit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
+Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
 ## License
 
