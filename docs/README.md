@@ -10,6 +10,16 @@ Although the performance gains depend on the individual site and server setup, t
 
 ![TTFB](images/ttfb-2.0.0.png)  
 
+## Whats New in Version 2
+
+Blitz version 2 builds on the initial version’s incredible performance and ease of use, this time with a focus on *scalability*, *extensibility* and *predictability*.
+
+**Scalability:** Cache invalidation logic has been optimised to be faster and require less space in the database. Yii cache is now available as a storage type so you can use MemCache or Redis for load balanced web servers and cloud platforms such as [Heroku](https://www.heroku.com/). 
+
+**Extensibility:** Reverse proxy purgers can be added, allowing your cached pages to be served by a CDN while Blitz takes care of invalidation. Cloudflare comes by default and custom purgers can be added.
+
+**Predictability:** Many more config settings have been added that allow you to control when and how cached pages are invalidated. Template specific options allow you to set flags, cache durations and expiry dates. An API key and console commands are available to trigger actions at scheduled intervals.
+
 ## License
 
 This plugin requires a commercial license which can be purchased through the [Craft Plugin Store](https://plugins.craftcms.com/blitz).  
