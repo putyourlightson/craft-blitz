@@ -2,7 +2,7 @@
 
 # Blitz Plugin for Craft CMS 3
 
-The Blitz plugin provides intelligent full page caching (static file or in-memory) for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
+The Blitz plugin provides intelligent full page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
 - Reduces page load times (TTFB) and load on the server significantly. 
 - Makes your site available even when performing updates and maintenance.

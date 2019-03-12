@@ -185,32 +185,6 @@ Blitz comes with a config file for a multi-environment way to set the plugin set
 
 # Advanced Usage
 
-## Dynamic Content
-
-When a URL is cached, a cached version of the page will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
-
-Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
-
-### `{{ craft.blitz.getUri('/template/name') }}`
-
-Returns a script that injects the contents of the URI provided in place of the twig tag. 
-
-### `{{ craft.blitz.csrfInput() }}`
-
-Returns a script that injects a CSRF input field in place of the twig tag.
-
-Below is an example of how you might use the tags to create a page containing dynamic content and a form page that can be cached by Blitz.
-
-```twig
-Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
-
-<form method="post">
-   {{ craft.blitz.csrfInput() }}
-   ...
- 
- </form>
-```
-
 ## Template Specific Options
 
 It is possible to set template specific caching options by passing an object into the `options` function. All parameters are optional.
@@ -259,6 +233,32 @@ A [DateTime](http://php.net/manual/en/class.datetime.php) object that will defin
 ### `flags`
 
 One or more flags (array or string separated by commas) that will be associated with this page. Flags should not contain spaces. The “Refresh Flagged Cache” [utility](#refresh-flagged-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
+
+## Dynamic Content
+
+When a URL is cached, a cached version of the page will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+
+Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
+
+### `{{ craft.blitz.getUri('/template/name') }}`
+
+Returns a script that injects the contents of the URI provided in place of the twig tag. 
+
+### `{{ craft.blitz.csrfInput() }}`
+
+Returns a script that injects a CSRF input field in place of the twig tag.
+
+Below is an example of how you might use the tags to create a page containing dynamic content and a form page that can be cached by Blitz.
+
+```twig
+Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
+
+<form method="post">
+   {{ craft.blitz.csrfInput() }}
+   ...
+ 
+ </form>
+```
 
 ## Cron Jobs
 Create cron jobs using the following console commands to refresh expired or flagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
