@@ -25,8 +25,6 @@ Blitz is actively developed and maintained by [PutYourLightsOn](https://putyourl
 
 A few people worth mentioning for their valuable input are: Oliver Stark; Andrew Welch; Ben Parizek.
 
----
-
 # Basic Usage
 
 ## Getting Started
@@ -106,8 +104,6 @@ The following console commands with the functionality described above are also a
 
 If an API key is set in “Settings → Advanced” then  it is possible to clear, flush, warm, refresh expired or refresh flagged cache through a URL. The available URLs are displayed under the API key field after the setting has been saved. 
 
----
-
 # Settings
 
 ![Settings](images/settings-2.0.0.png)
@@ -183,9 +179,33 @@ An API key that can be used to clear, flush, warm, or refresh expired cache thro
 
 Blitz comes with a config file for a multi-environment way to set the plugin settings, as well as more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
 
----
-
 # Advanced Usage
+
+## Dynamic Content
+
+When a URL is cached, a cached version of the page will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+
+Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
+
+### `{{ craft.blitz.getUri('/template/name') }}`
+
+Returns a script that injects the contents of the URI provided in place of the twig tag. 
+
+### `{{ craft.blitz.csrfInput() }}`
+
+Returns a script that injects a CSRF input field in place of the twig tag.
+
+Below is an example of how you might use the tags to create a page containing dynamic content and a form page that can be cached by Blitz.
+
+```twig
+Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
+
+<form method="post">
+   {{ craft.blitz.csrfInput() }}
+   ...
+ 
+ </form>
+```
 
 ## Template Specific Options
 
@@ -236,32 +256,6 @@ A [DateTime](http://php.net/manual/en/class.datetime.php) object that will defin
 
 One or more flags (array or string separated by commas) that will be associated with this page. Flags should not contain spaces. The “Refresh Flagged Cache” [utility](#refresh-flagged-cache) or [console command](#console-commands) can be used to invalidate flagged cache.
 
-## Dynamic Content
-
-When a URL is cached, a cached version of the page will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
-
-Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
-
-### `{{ craft.blitz.getUri('/template/name') }}`
-
-Returns a script that injects the contents of the URI provided in place of the twig tag. 
-
-### `{{ craft.blitz.csrfInput() }}`
-
-Returns a script that injects a CSRF input field in place of the twig tag.
-
-Below is an example of how you might use the tags to create a page containing dynamic content and a form page that can be cached by Blitz.
-
-```twig
-Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
-
-<form method="post">
-   {{ craft.blitz.csrfInput() }}
-   ...
- 
- </form>
-```
-
 ## Cron Jobs
 Create cron jobs using the following console commands to refresh expired or flagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
 
@@ -279,7 +273,7 @@ For improved performance when using the “Blitz File Storage” type, adding a 
 
 ### Apache
 
-In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the virtual host `.conf` file (this [article](https://nystudio107.com/blog/stop-using-htaccess-files-no-really) explains how), or the root `.htaccess` file if you must, just before the rewrites provided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the virtual host `.conf` file ([this article](https://nystudio107.com/blog/stop-using-htaccess-files-no-really) explains how), or the root `.htaccess` file if you must, just before the rewrites provided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
 
 If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
@@ -361,8 +355,6 @@ If the HTML was served by the plugin rather than with a server rewrite then an a
 Note that if your HTML is minified then all comments will be removed from the markup, including the comments above.
 
 If the `sendPoweredByHeader` config setting is not set to `false` then an `X-Powered-By: Blitz` header will be sent.
-
----
 
 # Extending Blitz
 
