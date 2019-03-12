@@ -88,15 +88,17 @@ Refreshing flagged cache will refresh all cached pages that were associated with
 
 The following console commands with the functionality described above are also available.
 
-    ./craft blitz/cache/clear
-    
-    ./craft blitz/cache/flush
-    
-    ./craft blitz/cache/warm
-    
-    ./craft blitz/cache/refresh-expired
-    
-    ./craft blitz/cache/refresh-flagged {flag}
+```
+./craft blitz/cache/clear
+
+./craft blitz/cache/flush
+
+./craft blitz/cache/warm
+
+./craft blitz/cache/refresh-expired
+
+./craft blitz/cache/refresh-flagged flag1,flag2,flag3
+```
 
 ![Console commands](images/console-2.0.0.png)
 
@@ -281,7 +283,7 @@ In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the vi
 
 If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
-```
+```apacheconf
 # Blitz cache rewrite
 RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.html -s
 RewriteCond %{REQUEST_METHOD} GET
@@ -292,7 +294,7 @@ RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.ht
 
 If the “Query String Caching” setting is set to `Cache URLs with query strings as the same page` then the `/%{QUERY_STRING}` segment should be removed.
 
-```
+```apacheconf
 # Blitz cache rewrite
 RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -s
 RewriteCond %{REQUEST_METHOD} GET
@@ -307,7 +309,7 @@ In Nginx this is achieved by adding a location handler to the configuration file
 
 If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
-```
+```nginx
 # Blitz cache rewrite
 set $cache_path false;
 if ($request_method = GET) {
@@ -326,7 +328,7 @@ location / {
 
 If the “Query String Caching” setting is set to `Cache URLs with query strings as the same page` then the `/$query_string` segment should be removed.
 
-```
+```nginx
 # Blitz cache rewrite
 set $cache_path false;
 if ($request_method = GET) {
