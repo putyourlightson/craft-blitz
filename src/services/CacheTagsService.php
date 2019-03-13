@@ -7,10 +7,12 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheTagRecord;
 
+/**
+ * @property string[] $allTags
+ */
 class CacheTagsService extends Component
 {
     // Public Methods

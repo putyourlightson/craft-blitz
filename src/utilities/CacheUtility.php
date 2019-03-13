@@ -8,8 +8,6 @@ namespace putyourlightson\blitz\utilities;
 use Craft;
 use craft\base\Utility;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\purgers\DummyPurger;
-use putyourlightson\blitz\records\CacheTagRecord;
 
 class CacheUtility extends Utility
 {

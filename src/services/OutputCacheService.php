@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Component;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\records\CacheTagRecord;
 
 /**
  * @property bool $isCacheableRequest

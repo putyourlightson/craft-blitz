@@ -5,10 +5,6 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use Craft;
-use craft\base\Element;
-use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\campaign\helpers\StringHelper;
 
 class CacheTagHelper

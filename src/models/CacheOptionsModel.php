@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\models;
 
 use craft\base\Model;
 use craft\helpers\ConfigHelper;
-use craft\helpers\StringHelper;
 use craft\validators\DateTimeValidator;
 use putyourlightson\blitz\helpers\CacheTagHelper;
 
