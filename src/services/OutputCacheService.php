@@ -33,7 +33,7 @@ class OutputCacheService extends Component
         // Add cache tag header if set
         $tags = Blitz::$plugin->cacheTags->getSiteUriTags($siteUri);
 
-        if (!empty($tags) && !Blitz::$plugin->cachePurger->isDummy && Blitz::$plugin->cachePurger->tagHeaderName) {
+        if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
             $value = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
             header(Blitz::$plugin->cachePurger->tagHeaderName.': '.$value);
         }
