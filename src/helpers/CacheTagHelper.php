@@ -5,7 +5,7 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use putyourlightson\campaign\helpers\StringHelper;
+use craft\helpers\StringHelper;
 
 class CacheTagHelper
 {
