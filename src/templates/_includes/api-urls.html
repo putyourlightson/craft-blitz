@@ -27,6 +27,12 @@
             </td>
         </tr>
         <tr>
+            <th class="thin">{{ 'Refresh Entire Cache' }}</th>
+            <td class="textual code">
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh', { key: apiKey }) }}</textarea>
+            </td>
+        </tr>
+        <tr>
             <th class="thin">{{ 'Refresh Expired Cache' }}</th>
             <td class="textual code">
                 <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }) }}</textarea>

@@ -9,6 +9,7 @@ use Craft;
 use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\utilities\CacheUtility;
 use yii\console\Controller;
 use yii\console\ExitCode;
@@ -86,24 +87,19 @@ class CacheController extends Controller
      */
     public function actionClear(): int
     {
-        Blitz::$plugin->clearCache->clearAll();
-
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
+        $this->_clearCache();
 
         return ExitCode::OK;
     }
 
     /**
-     * Flushes the cache (pages and database records).
+     * Flushes the cache (database records only).
      *
      * @return int
      */
     public function actionFlush(): int
     {
-        Blitz::$plugin->clearCache->clearAll();
-        Blitz::$plugin->flushCache->flushAll();
-
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
+        $this->_flushCache();
 
         return ExitCode::OK;
     }
@@ -115,15 +111,13 @@ class CacheController extends Controller
      */
     public function actionPurge(): int
     {
-        Blitz::$plugin->cachePurger->purgeAll();
-
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully purged.').PHP_EOL, Console::FG_GREEN);
+        $this->_purgeCache();
 
         return ExitCode::OK;
     }
 
     /**
-     * Flushes and warms the entire cache.
+     * Warms the entire cache.
      *
      * @return int
      */
@@ -135,28 +129,32 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
+        $this->_warmCache(SiteUriHelper::getAllSiteUris());
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Refreshes the entire cache.
+     *
+     * @return int
+     */
+    public function actionRefresh(): int
+    {
+        if (!Blitz::$plugin->settings->cachingEnabled) {
+            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
+
+            return ExitCode::OK;
+        }
+
         // Get cached site URIs before flushing the cache
         $siteUris = SiteUriHelper::getAllSiteUris();
 
-        $this->stdout(Craft::t('blitz', 'Clearing Blitz cache.').PHP_EOL, Console::FG_GREEN);
+        $this->_clearCache();
+        $this->_flushCache();
+        $this->_purgeCache();
 
-        Blitz::$plugin->clearCache->clearAll();
-
-        $this->stdout(Craft::t('blitz', 'Flushing Blitz cache.').PHP_EOL, Console::FG_GREEN);
-
-        Blitz::$plugin->flushCache->flushAll();
-
-        $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);
-
-        $urls = SiteUriHelper::getUrls($siteUris);
-        $total = count($urls);
-        Console::startProgress(0, $total, '', 0.8);
-
-        $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestsProgress']);
-
-        Console::endProgress();
-
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} pages.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+        $this->_warmCache($siteUris);
 
         return ExitCode::OK;
     }
@@ -211,4 +209,47 @@ class CacheController extends Controller
     {
         Console::updateProgress($count, $total);
     }
+
+    // Private Methods
+    // =========================================================================
+
+    private function _clearCache()
+    {
+        Blitz::$plugin->clearCache->clearAll();
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
+    }
+
+    private function _flushCache()
+    {
+        Blitz::$plugin->flushCache->flushAll();
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
+    }
+
+    private function _purgeCache()
+    {
+        Blitz::$plugin->cachePurger->purgeAll();
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully purged.').PHP_EOL, Console::FG_GREEN);
+    }
+
+    /**
+     * @param SiteUriModel[] $siteUris
+     */
+    private function _warmCache(array $siteUris)
+    {
+        $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);
+
+        $urls = SiteUriHelper::getUrls($siteUris);
+        $total = count($urls);
+        Console::startProgress(0, $total, '', 0.8);
+
+        $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestsProgress']);
+
+        Console::endProgress();
+
+        $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} pages.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+    }
+
 }

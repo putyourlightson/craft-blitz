@@ -70,7 +70,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'flush',
             'label' => Craft::t('blitz', 'Flush Cache'),
-            'instructions' => Craft::t('blitz', 'Flushing the cache will clear the cache and remove all records from the database.'),
+            'instructions' => Craft::t('blitz', 'Flushing the cache will delete all cache records from the database.'),
         ];
 
         if (!(Blitz::$plugin->cachePurger instanceof DummyPurger)) {
@@ -84,7 +84,13 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'warm',
             'label' => Craft::t('blitz', 'Warm Cache'),
-            'instructions' => Craft::t('blitz', 'Warming the cache will flush the cache and add a job to the queue to recache all of the pages.'),
+            'instructions' => Craft::t('blitz', 'Warming the cache will add a job to the queue to warm all of the pages.'),
+        ];
+
+        $actions[] = [
+            'id' => 'refresh',
+            'label' => Craft::t('blitz', 'Refresh Entire Cache'),
+            'instructions' => Craft::t('blitz', 'Refreshing the cache will clear, flush, purge and warm the entire cached.'),
         ];
 
         $actions[] = [

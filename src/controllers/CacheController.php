@@ -82,7 +82,6 @@ class CacheController extends Controller
      */
     public function actionFlush(): Response
     {
-        Blitz::$plugin->clearCache->clearAll();
         Blitz::$plugin->flushCache->flushAll();
 
         return $this->_getResponse('Blitz cache successfully flushed.');
@@ -111,6 +110,22 @@ class CacheController extends Controller
             return $this->_getResponse('Blitz caching is disabled.');
         }
 
+        Blitz::$plugin->warmCache->warmAll();
+
+        return $this->_getResponse('Blitz cache successfully queued for warming.');
+    }
+
+    /**
+     * Refreshes the entire cache.
+     *
+     * @return Response
+     */
+    public function actionRefresh(): Response
+    {
+        if (!Blitz::$plugin->settings->cachingEnabled) {
+            return $this->_getResponse('Blitz caching is disabled.');
+        }
+
         Blitz::$plugin->clearCache->clearAll();
 
         // Create warm cache job before flushing the cache
@@ -118,7 +133,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->flushCache->flushAll();
 
-        return $this->_getResponse('Blitz cache successfully queued for warming.');
+        return $this->_getResponse('Blitz cache successfully refreshed and queued for warming.');
     }
 
     /**

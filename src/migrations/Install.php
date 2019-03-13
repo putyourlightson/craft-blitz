@@ -43,6 +43,9 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
+        // TODO: Remove in 2.1.0
+        $this->dropTableIfExists('{{%blitz_cacheflags}}');
+
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
         $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementCacheRecord::tableName());
