@@ -42,7 +42,7 @@ This plugin requires [Craft CMS](https://craftcms.com/) 3.1.0 or later.
 
 Install the plugin from the Craft Plugin Store in your site’s control panel or manually using composer.
 
-```
+```shell
 composer require putyourlightson/craft-blitz
 ```
 
@@ -103,7 +103,7 @@ Refreshing tagged cache will refresh all cached pages that were associated with 
 
 Every cache utility function above is also available as a console command.
 
-```
+```shell
 ./craft blitz/cache/clear
 
 ./craft blitz/cache/flush
@@ -296,7 +296,7 @@ Create cron jobs using the following console commands to refresh expired or tagg
 
 > Entering `which php` in the console will give you the full path to PHP in most environments.
 
-```
+```shell
 // Refresh expired cache every hour at 5 minutes past the hour.
 5 * * * * /usr/bin/php /path/to/craft blitz/cache/refresh-expired
 
