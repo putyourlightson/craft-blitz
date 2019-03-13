@@ -9,6 +9,7 @@ use craft\base\Model;
 use craft\helpers\ConfigHelper;
 use craft\helpers\StringHelper;
 use craft\validators\DateTimeValidator;
+use putyourlightson\blitz\helpers\CacheTagHelper;
 
 class CacheOptionsModel extends Model
 {
@@ -31,7 +32,7 @@ class CacheOptionsModel extends Model
     public $cacheElementQueries = true;
 
     /**
-     * @var string[]|string|null
+     * @var string[]|null
      */
     public $tags = null;
 
@@ -128,15 +129,13 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param string[]|string|null
+     * @param string|string[]|null
      *
      * @return static self reference
      */
     public function tags($value)
     {
-        if (is_string($value)) {
-            $this->tags = StringHelper::split($value);
-        }
+        $this->tags = CacheTagHelper::getTags($value);
 
         return $this;
     }

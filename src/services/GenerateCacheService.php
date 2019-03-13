@@ -215,7 +215,7 @@ class GenerateCacheService extends Component
 
         // Add tag caches to database
         if (!empty($this->options->tags)) {
-            Blitz::$plugin->cacheTags->save($this->options->tags, $cacheId);
+            Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
         if (Blitz::$plugin->settings->outputComments) {

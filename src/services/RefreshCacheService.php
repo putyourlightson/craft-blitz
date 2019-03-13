@@ -11,7 +11,6 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
-use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
@@ -21,7 +20,6 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use putyourlightson\blitz\records\CacheTagRecord;
 use yii\db\ActiveQuery;
 
 /**
@@ -325,15 +323,11 @@ class RefreshCacheService extends Component
     /**
      * Refreshes tagged cache.
      *
-     * @param string|string[] $tags
+     * @param string[] $tags
      */
-    public function refreshTaggedCache($tags)
+    public function refreshTaggedCache(array $tags)
     {
         $this->batchMode = true;
-
-        if (is_string($tags)) {
-            $tags = StringHelper::split($tags);
-        }
 
         // Check for tagged cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);

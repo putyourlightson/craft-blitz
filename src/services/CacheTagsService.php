@@ -49,11 +49,11 @@ class CacheTagsService extends Component
     /**
      * Returns cache IDs for the given tags.
      *
-     * @param string|string[] $tags
+     * @param string[] $tags
      *
      * @return int[]
      */
-    public function getCacheIds($tags): array
+    public function getCacheIds(array $tags): array
     {
         return CacheTagRecord::find()
             ->select('cacheId')
@@ -65,15 +65,11 @@ class CacheTagsService extends Component
     /**
      * Saves one or more tags given a cache ID.
      *
-     * @param string|string[] $tags
+     * @param string[] $tags
      * @param int $cacheId
      */
-    public function save($tags, int $cacheId)
+    public function saveTags(array $tags, int $cacheId)
     {
-        if (!is_array($tags)) {
-            $tags = [$tags];
-        }
-
         $values = [];
 
         foreach ($tags as $tag) {
