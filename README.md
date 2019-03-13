@@ -16,7 +16,7 @@ The Blitz plugin provides intelligent full page caching for creating lightning-f
 
 Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency). Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server). 
 
-![TTFB](./docs/images/ttfb-2.0.0a.png)  
+![TTFB](./docs/images/ttfb-2.0.0b.png)  
 
 ## Documentation
 

@@ -102,7 +102,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh-tagged',
             'label' => Craft::t('blitz', 'Refresh Tagged Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing tagged cache will refresh all pages that are tagged with the provided comma-separated tags.'),
+            'instructions' => Craft::t('blitz', 'Refreshing tagged cache will refresh all pages that were tagged with the provided comma-separated tags when cached.'),
         ];
 
         return $actions;
