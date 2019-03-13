@@ -244,8 +244,8 @@ class CacheController extends Controller
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache.').PHP_EOL, Console::FG_GREEN);
 
         $urls = SiteUriHelper::getUrls($siteUris);
-        $total = count($urls);
-        Console::startProgress(0, $total, '', 0.8);
+
+        Console::startProgress(0, count($urls), '', 0.8);
 
         $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestsProgress']);
 
