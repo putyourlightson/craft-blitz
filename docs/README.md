@@ -25,6 +25,8 @@ Fine tune invalidation settings with expanded options for controlling when and h
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
+![Paths](images/paths-2.0.0.png)
+
 ## License
 
 This plugin requires a commercial license which can be purchased through the [Craft Plugin Store](https://plugins.craftcms.com/blitz).  
