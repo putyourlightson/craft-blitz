@@ -12,7 +12,8 @@
 - Added welcome screen that appears after install.
 - Added logging of file and request exceptions.
 - Added prevention of caching dynamically injected content.
-- Added an API key that can be used to clear, flush, purge, warm, or refresh cache through a URL.
+- Added an API key that can be used to clear, flush, purge, warm and refresh cache via a URL.
+- Added cache tag header when reverse proxy purger is enabled.
 - Added `clearCacheAutomatically` setting.
 - Added `cacheControlHeader` config setting.
 - Added `outputComments` config setting.

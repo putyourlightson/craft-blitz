@@ -335,7 +335,7 @@ class RefreshCacheService extends Component
             $tags = StringHelper::split($tags);
         }
 
-        // Check for tagged caches to invalidate
+        // Check for tagged cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
         $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);

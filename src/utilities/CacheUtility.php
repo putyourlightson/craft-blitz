@@ -73,7 +73,7 @@ class CacheUtility extends Utility
             'instructions' => Craft::t('blitz', 'Flushing the cache will delete all cache records from the database.'),
         ];
 
-        if (!(Blitz::$plugin->cachePurger instanceof DummyPurger)) {
+        if (!(Blitz::$plugin->cachePurger->isDummy)) {
             $actions[] = [
                 'id' => 'purge',
                 'label' => Craft::t('blitz', 'Purge Cache'),
