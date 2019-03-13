@@ -36,6 +36,7 @@ use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
+use putyourlightson\blitz\services\CacheTagsService;
 use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
 use putyourlightson\blitz\services\ClearCacheService;
@@ -49,6 +50,7 @@ use yii\queue\ExecEvent;
 
 /**
  *
+ * @property CacheTagsService $cacheTags
  * @property ClearCacheService $clearCache
  * @property FlushCacheService $flushCache
  * @property GenerateCacheService $generateCache
@@ -157,6 +159,7 @@ class Blitz extends Plugin
     private function _registerComponents()
     {
         $this->setComponents([
+            'cacheTags' => CacheTagsService::class,
             'clearCache' => ClearCacheService::class,
             'flushCache' => FlushCacheService::class,
             'generateCache' => GenerateCacheService::class,

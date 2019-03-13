@@ -115,10 +115,7 @@ class CacheUtility extends Utility
      */
     public static function getTagSuggestions(): array
     {
-        $tags = CacheTagRecord::find()
-            ->select('tag')
-            ->groupBy('tag')
-            ->column();
+        $tags = Blitz::$plugin->cacheTags->getAllTags();
 
         $data = [];
 

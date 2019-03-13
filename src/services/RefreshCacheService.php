@@ -336,11 +336,7 @@ class RefreshCacheService extends Component
         }
 
         // Check for tagged caches to invalidate
-        $cacheIds = CacheTagRecord::find()
-            ->select('cacheId')
-            ->where(['tag' => $tags])
-            ->groupBy('cacheId')
-            ->column();
+        $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
         $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
 

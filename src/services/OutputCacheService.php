@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Component;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\records\CacheTagRecord;
 
 /**
  * @property bool $isCacheableRequest
@@ -28,6 +29,13 @@ class OutputCacheService extends Component
     {
         // Update cache control header
         header('Cache-Control: '.Blitz::$plugin->settings->cacheControlHeader);
+
+        // Add cache tag header if set
+        $tags = Blitz::$plugin->cacheTags->getSiteUriTags($siteUri);
+
+        if (!empty($tags)) {
+            header('Cache-Tag: '.Blitz::$plugin->settings->cacheControlHeader);
+        }
 
         $value = Blitz::$plugin->cacheStorage->get($siteUri);
 
