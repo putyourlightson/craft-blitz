@@ -95,7 +95,7 @@ Refreshing expired cache will refresh all cached pages that have expired, or tha
 ### Refresh Tagged Cache
 Refreshing tagged cache will refresh all cached pages that were associated with the provided tags using the `tags` parameter in the [template specific options](#template-specific-options).
 
-![Utility](images/utility-2.0.0.png)
+![Utility](images/utility-2.0.0a.png)
 
 ## Console Commands
 
@@ -121,7 +121,7 @@ Every cache utility function above is also available as a console command.
 
 Once you have created an API key in *Settings → Advanced*, you can trigger each of the cache utilities through a URL. Those URLs are displayed under the API key field after the setting has been saved.
 
-![API key](images/api-key-2.0.0.png)
+![API key](images/api-key-2.0.0a.png)
 
 # Settings
 
