@@ -21,7 +21,7 @@ Cache invalidation is faster and lighter with fewer database needs. Blitz 2 can 
 Enjoy effortless full-page caching right at the edge with new reverse proxy purgers. [Cloudflare](https://www.cloudflare.com/) support is included, and you can add your own purgers for services like [Fastly](https://www.fastly.com/), [KeyCDN](https://www.keycdn.com/), and [Akamai](https://www.akamai.com). Blitz will take care of invalidation for you.
 
 **Predictability**  
-Fine tune invalidation settings with expanded options for controlling when and how cached pages are handled. Set template-specific tags, cache durations and expiry dates. Use an API key and console commands to trigger actions on a schedule.
+Fine tune invalidation settings with expanded options for controlling when and how cached pages are handled. Set [template-specific tags](#template-specific-options), cache durations and expiry dates. Use an API key and console commands to trigger actions on a schedule.
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
@@ -64,9 +64,9 @@ Craft’s `{% cache %}` tag doesn't always play well with Blitz cache invalidati
 
 ## How It Works
 
-When a URL visited on the site matches an included URI pattern, Blitz will serve a cached version of the page if it has one. Otherwise, it will display and cache the template output. Excluded URI patterns will override any matching included URI patterns.
+When a page is visited that matches an included URI pattern, Blitz will serve a cached version of the page if it has one. Otherwise, it will display and cache the template output. Excluded URI patterns will override any matching included URI patterns.
 
-When an element is created, updated or deleted, any cached URLs that used that element are deleted. If the “Warm Cache Automatically” setting is enabled, a job is queued to warm the cleared cache.
+When an element is created, updated or deleted, any cached pages that used that element are deleted. If a reverse proxy purger such a Cloudflare is selected, the pages are purged. If the “Warm Cache Automatically” setting is enabled, a job is queued to warm the cleared cache.
 
 Blitz is compatible with Craft’s Live Preview. It will detect when it is being used and not cache its output or display cached content.
 
@@ -135,20 +135,20 @@ With this setting enabled, Blitz will begin caching pages according to the inclu
 
 The URI patterns to include or exclude when caching. Blitz will only cache pages whose URI matches the URI patterns, giving you fine-grain control over what is cached.
 
-URI patterns use PCRE regular expressions. Below are some common use cases. You can reference the full syntax [here](http://php.net/manual/en/reference.pcre.pattern.syntax.php).
+URI patterns use PCRE regular expressions ([cheat sheet](https://www.debuggex.com/cheatsheet/regex/pcre)). Below are some common use cases.
 
-- A blank field matches the homepage.
-- `.*` matches any character 0 or more times (use this to include everything).
-- `.+` matches any character 1 or more times.
-- `.` matches any character.
-- `\d` matches any digit.
-- `\d{4}` matches any four digits.
-- `\w` matches any word character.
-- `\w+` matches any word character 1 or more times.
-- `entries` matches anything containing “entries”.
-- `^entries` matches anything beginning with “entries”.
-- `^entries/entry$` matches an exact URI.
-- `^entries/\w+$` matches anything beginning with “entries/” followed by at least 1 word character.
+| Pattern           | Description                                 |
+| ----------------- | ------------------------------------------- |
+| `.`               | Matches any character.                      |
+| `.*`              | Matches any character 0 or more times.      |
+| `.+`              | Matches any character 1 or more times.      |
+| `\d`              | Matches any digit.                          |
+| `\d{4}`           | Matches any four digits.                    |
+| `\w`              | Matches any word character.                 |
+| `\w+`             | Matches any word character 1 or more times. |
+| `entries`         | Matches anything containing `entries`.      |
+| `^entries`        | Matches anything beginning with `entries`.  |
+| `^entries/entry$` | Matches the exact URI `entries/entry`.      |
 
 ![Settings General](images/settings-general-2.0.0.png)
 
@@ -164,7 +164,7 @@ You can extend Blitz to add your own [custom cache storage types](#custom-cache-
 
 ### Reverse Proxy Purger
 
-A purger to use for clearing cache in a reverse proxy. This allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge (clear) the appropriate pages whenever they are updated.
+A purger to use for clearing cache in a reverse proxy. This allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated.
 
 You can extend Blitz to add your own [custom reverse proxy purgers](#custom-reverse-proxy-purgers).
 
@@ -176,7 +176,7 @@ Cloudflare does not cache HTML by default. To enable static page caching, create
 
 ### Clear Cache Automatically
 
-Whether the cache should automatically be cleared after elements are updated. With this setting disabled, Blitz will mark affected cached pages as expired but not actually delete them. In order to delete them, the “Refresh Expired Cache” [utility](#refresh-expired-cache) or [console command](#console-commands) should be used. Disabling this setting may make sense if your site gets heavy traffic and clearing cache should be limited to specific times or intervals.
+Whether the cache should automatically be cleared after elements are updated. With this setting disabled, Blitz will mark affected page caches as expired without actually delete them. In order to delete them, the “Refresh Expired Cache” [utility](#refresh-expired-cache) or [console command](#console-commands) should be used. Disabling this setting may make sense if your site gets heavy traffic and clearing cache should be limited to specific times or intervals.
 
 ### Warm Cache Automatically
 
@@ -184,7 +184,7 @@ Whether the cache should automatically be warmed after clearing. With this setti
 
 ### Concurrency
 
-The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 1 and 5 is recommended.
+The max number of concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed but the more server processing will be required. A number between 1 and 5 is recommended.
 
 ### Query String Caching
 
@@ -216,7 +216,7 @@ Blitz comes with a config file for a multi-environment way to set the plugin set
 
 ## Dynamic Content
 
-When a URL is cached, a cached version of the page will be served up on all subsequent requests. Therefore you should ensure that only pages that do not contain any content that needs to dynamically changed per individual request are cached. The easiest way to do this is to add excluded URI patterns for such pages. 
+When a page is cached, the cached version of that page will be served up on all subsequent requests. You should therefore avoid caching pages whose entire content changes per individual request. The easiest way to do this is to add excluded URI patterns for such pages. 
 
 Blitz offers a workaround for injecting dynamic content into a cached page using a Javascript XHR (AJAX) request. The following template tags are available for doing so.
 
@@ -275,11 +275,11 @@ Setting this option to `false` will disable caching the element queries used on 
 
 ### `cacheDuration`
 
-The amount of time after which the cache should expire. If set to 0 then the cache will not get an expiry date. See [ConfigHelper::durationInSeconds()](https://docs.craftcms.com/api/v3/craft-helpers-conf) for a list of supported value types. [Duration intervals](https://en.wikipedia.org/wiki/ISO_8601#Durations) are a convenient way to set durations. Some common examples include:
-- PT1H (1 hour)
-- P1D (1 day)
-- P1W (1 week)
-- P1M (1 month)
+The amount of time after which the cache should expire. If set to 0 then the cache will not get an expiry date. See [ConfigHelper::durationInSeconds()](https://docs.craftcms.com/api/v3/craft-helpers-conf) for a list of supported value types. [Duration intervals](https://en.wikipedia.org/wiki/ISO_8601#Durations) are a convenient way to set durations. Common examples include:
+- `PT1H` (1 hour)
+- `P1D` (1 day)
+- `P1W` (1 week)
+- `P1M` (1 month)
 
 ### `expiryDate`
 
@@ -291,6 +291,8 @@ One or more tags (array or string separated by commas) that will be associated w
 
 ## Cron Jobs
 Create cron jobs using the following console commands to refresh expired or tagged cache on a scheduled basis. If entries are generally posted or expire on the hour then a good schedule might be every hour at 5 minutes past the hour. Change `/usr/bin/php` to the PHP path (if different).
+
+> Entering `which php` in the console will give you the full path to PHP in most environments.
 
 ```
 // Refresh expired cache every hour at 5 minutes past the hour.
@@ -306,7 +308,9 @@ For improved performance when using the “Blitz File Storage” type, adding a 
 
 ### Apache
 
-In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the virtual host `.conf` file ([this article](https://nystudio107.com/blog/stop-using-htaccess-files-no-really) explains how), or the root `.htaccess` file if you must, just before the rewrites provided by Craft. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the virtual host `.conf` file ([this article](https://nystudio107.com/blog/stop-using-htaccess-files-no-really) explains how), or the root `.htaccess` file if you must, just before the rewrites provided by Craft. 
+
+> Change `cache/blitz` to the cache folder path designated in the plugin settings.
 
 If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
@@ -332,7 +336,9 @@ RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
 
 ### Nginx
 
-In Nginx this is achieved by adding a location handler to the configuration file. Change `cache/blitz` to whatever the cache folder path is set to in the plugin settings.
+In Nginx this is achieved by adding a location handler to the configuration file. 
+
+> Change `cache/blitz` to the cache folder path designated in the plugin settings.
 
 If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
@@ -340,7 +346,7 @@ If the “Query String Caching” setting is set to `Do not cache URLs with quer
 # Blitz cache rewrite
 set $cache_path false;
 if ($request_method = GET) {
-    set $cache_path /cache/blitz/$host/$uri/$query_string/index.html;
+    set $cache_path /cache/blitz/$host/$uri/$args/index.html;
 }
 location / {
     try_files $cache_path;
@@ -353,7 +359,7 @@ location / {
 
 ```
 
-If the “Query String Caching” setting is set to `Cache URLs with query strings as the same page` then the `/$query_string` segment should be removed.
+If the “Query String Caching” setting is set to `Cache URLs with query strings as the same page` then the `/$args` segment should be removed.
 
 ```nginx
 # Blitz cache rewrite
@@ -478,7 +484,7 @@ Event::on(CachePurgerHelper::class,
 
 ## Support
 
-Support is provided primarily through GitHub [issues](https://github.com/putyourlightson/craft-blitz/issues) and email at info@putyourlightson.net.
+Support is provided through GitHub [issues](https://github.com/putyourlightson/craft-blitz/issues) and by email at info@putyourlightson.net.
 
 ## Credits
 

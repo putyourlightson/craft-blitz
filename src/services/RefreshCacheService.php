@@ -325,7 +325,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes tagged cache.
      *
-     * @param string[]|string $tags
+     * @param string|string[] $tags
      */
     public function refreshTaggedCache($tags)
     {
