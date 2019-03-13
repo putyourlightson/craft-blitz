@@ -80,10 +80,14 @@ The Blitz cache utility at *Utilities → Blitz Cache* displays the number of ca
 Clearing the cache will delete all cached pages.
 
 ### Flush Cache
-Flushing the cache will clear the cache and remove all records from the database.
+Flushing the cache will delete all records from the database.
 
 ### Warm Cache
-Warming the cache will flush the cache and add a job to the queue to recache all of the pages.
+Warming the cache will warm all of the pages.
+
+### Refresh Entire Cache
+
+Refreshing the cache will clear, flush, purge and warm all of the pages.
 
 ### Refresh Expired Cache
 Refreshing expired cache will refresh all cached pages that have expired, or that contain Elements that have expired (applies to Elements with future post and expiry dates). Cache duration and expiry dates can be specified in the [config settings](#config-settings) and the [template specific options](#template-specific-options).
@@ -103,6 +107,8 @@ Every cache utility function above is also available as a console command.
 ./craft blitz/cache/flush
 
 ./craft blitz/cache/warm
+
+./craft blitz/cache/refresh
 
 ./craft blitz/cache/refresh-expired
 
@@ -198,7 +204,7 @@ URLs with query strings will be cached as the same page, so `domain.com/about`, 
 
 ### API Key
 
-An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters). The individual URLs are displayed below the field after a value has been saved.
+An API key that can be used to clear, flush, warm, or refresh cache through a URL (min. 16 characters). The individual URLs are displayed below the field after a value has been saved.
 
 ![Settings Advanced](images/settings-advanced-2.0.0.png)
 

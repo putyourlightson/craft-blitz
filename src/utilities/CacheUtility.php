@@ -84,25 +84,25 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'warm',
             'label' => Craft::t('blitz', 'Warm Cache'),
-            'instructions' => Craft::t('blitz', 'Warming the cache will add a job to the queue to warm all of the pages.'),
+            'instructions' => Craft::t('blitz', 'Warming the cache will warm all of the pages.'),
         ];
 
         $actions[] = [
             'id' => 'refresh',
             'label' => Craft::t('blitz', 'Refresh Entire Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing the cache will clear, flush, purge and warm the entire cached.'),
+            'instructions' => Craft::t('blitz', 'Refreshing the cache will clear, flush, purge and warm all of the pages.'),
         ];
 
         $actions[] = [
             'id' => 'refresh-expired',
             'label' => Craft::t('blitz', 'Refresh Expired Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing expired cache will refresh all elements that have expired since they were cached.'),
+            'instructions' => Craft::t('blitz', 'Refreshing expired cache will refresh all pages and elements that have expired since they were cached.'),
         ];
 
         $actions[] = [
             'id' => 'refresh-tagged',
             'label' => Craft::t('blitz', 'Refresh Tagged Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing tagged cache will refresh all pages that are associated with the given tags (separated by commas).'),
+            'instructions' => Craft::t('blitz', 'Refreshing tagged cache will refresh all pages that are tagged with the provided comma-separated tags.'),
         ];
 
         return $actions;
