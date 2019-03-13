@@ -15,7 +15,7 @@ Although the performance gains depend on the individual site and server setup, t
 Blitz 2 is still fast and easy to use, enhanced to be more *scalable*, *extensible*, and *predictable*.
 
 **Scalability**  
-Cache invalidation is faster and lighter with fewer database needs. Blitz 2 can also use Yii’s cache interface to tap into in-memory caches like [Memcache](https://memcached.org/) and [Redis](https://redis.io/). This makes Blitz a great fit for powerful, multi-node cloud platforms like [Docker](https://www.docker.com/), [Heroku](https://www.heroku.com/) and [fortrabbit](https://www.fortrabbit.com/).
+Cache invalidation is faster and lighter with fewer database needs. Blitz 2 can also use Yii’s cache interface to tap into in-memory caches like [Memcache](https://memcached.org/) and [Redis](https://redis.io/). This makes Blitz a great fit for multi-node cloud platforms like [Docker](https://www.docker.com/), [Heroku](https://www.heroku.com/) and [fortrabbit](https://www.fortrabbit.com/).
 
 **Extensibility**  
 Enjoy effortless full-page caching right at the edge with new reverse proxy purgers. [Cloudflare](https://www.cloudflare.com/) support is included, and you can add your own purgers for services like [Fastly](https://www.fastly.com/), [KeyCDN](https://www.keycdn.com/), and [Akamai](https://www.akamai.com). Blitz will take care of invalidation for you.
@@ -156,7 +156,7 @@ URI patterns use PCRE regular expressions ([cheat sheet](https://www.debuggex.co
 
 The storage type to use for storing cached pages. The default and recommended storage type for most sites is “Blitz File Storage”. This stores cached pages as static HTML files in the specified “Folder Path” and is extremely performant, especially when used with [server rewrites](#server-rewrites).
 
-A “Yii Cache Storage” type is also available and will use whatever cache component Craft is set up to use. You can configure Craft to use alternative cache storage (Memcache, Redis, etc.) by overriding the cache application component from `config/app.php` as [explained in the docs](https://docs.craftcms.com/v3/config/app.html#cache-component). This is the recommended storage type for load balanced web servers and cloud platforms such as [Heroku](https://www.heroku.com/).
+A “Yii Cache Storage” type is also available and will use whatever cache component Craft is set up to use. You can configure Craft to use alternative cache storage (Memcache, Redis, etc.) by overriding the cache application component from `config/app.php` as explained in the [Craft docs](https://docs.craftcms.com/v3/config/app.html#cache-component). This is the recommended storage type for multi-node cloud platforms like [Docker](https://www.docker.com/), [Heroku](https://www.heroku.com/) and [fortrabbit](https://www.fortrabbit.com/).
 
 You can extend Blitz to add your own [custom cache storage types](#custom-cache-storage-types).
 
