@@ -14,13 +14,13 @@ Although the performance gains depend on the individual site and server setup, t
 
 Blitz 2 is still fast and easy to use, enhanced to be more *scalable*, *extensible*, and *predictable*.
 
-**Scalability**
-Cache invalidation is faster and lighter with fewer database needs. Blitz 2 can also use Yii’s cache interface to tap into in-memory caches like Memcache and Redis. This makes Blitz a great fit for powerful, multi-node cloud platforms like [Docker](https://www.docker.com/), [Heroku](https://www.heroku.com/) and [fortrabbit](https://www.fortrabbit.com/).
+**Scalability**  
+Cache invalidation is faster and lighter with fewer database needs. Blitz 2 can also use Yii’s cache interface to tap into in-memory caches like [Memcache](https://memcached.org/) and [Redis](https://redis.io/). This makes Blitz a great fit for powerful, multi-node cloud platforms like [Docker](https://www.docker.com/), [Heroku](https://www.heroku.com/) and [fortrabbit](https://www.fortrabbit.com/).
 
-**Extensibility**
-Enjoy effortless full-page caching right at the edge with new reverse proxy purgers. Cloudflare support is included, and you can add your own purgers for services like Fastly, KeyCDN, and Akamai. Blitz will take care of invalidation for you.
+**Extensibility **  
+Enjoy effortless full-page caching right at the edge with new reverse proxy purgers. [Cloudflare](https://www.cloudflare.com/) support is included, and you can add your own purgers for services like [Fastly](https://www.fastly.com/), [KeyCDN](https://www.keycdn.com/), and [Akamai](https://www.akamai.com). Blitz will take care of invalidation for you.
 
-**Predictability**
+**Predictability**  
 Fine tune invalidation settings with expanded options for controlling when and how cached pages are handled. Set template-specific tags, cache durations and expiry dates. Use an API key and console commands to trigger actions on a schedule.
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
