@@ -13,7 +13,7 @@ use yii\db\ActiveQueryInterface;
  * @property int $elementId
  * @property CacheRecord $cache
  */
-class CacheFlagRecord extends ActiveRecord
+class CacheTagRecord extends ActiveRecord
 {
     // Public Static Methods
     // =========================================================================
@@ -25,7 +25,7 @@ class CacheFlagRecord extends ActiveRecord
      */
     public static function tableName(): string
     {
-        return '{{%blitz_cacheflags}}';
+        return '{{%blitz_cachetags}}';
     }
 
     /**

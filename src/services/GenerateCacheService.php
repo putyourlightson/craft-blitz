@@ -19,7 +19,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use putyourlightson\blitz\records\CacheFlagRecord;
+use putyourlightson\blitz\records\CacheTagRecord;
 use yii\db\Exception;
 
 class GenerateCacheService extends Component
@@ -213,17 +213,17 @@ class GenerateCacheService extends Component
                 false)
             ->execute();
 
-        // Add flag caches to database
-        if (!empty($this->options->flags)) {
+        // Add tag caches to database
+        if (!empty($this->options->tags)) {
             $values = [];
 
-            foreach ($this->options->flags as $flag) {
-                $values[] = [$cacheId, $flag];
+            foreach ($this->options->tags as $tag) {
+                $values[] = [$cacheId, $tag];
             }
 
             $db->createCommand()
-                ->batchInsert(CacheFlagRecord::tableName(),
-                    ['cacheId', 'flag'],
+                ->batchInsert(CacheTagRecord::tableName(),
+                    ['cacheId', 'tag'],
                     $values,
                     false)
                 ->execute();

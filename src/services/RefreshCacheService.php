@@ -21,7 +21,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use putyourlightson\blitz\records\CacheFlagRecord;
+use putyourlightson\blitz\records\CacheTagRecord;
 use yii\db\ActiveQuery;
 
 /**
@@ -323,22 +323,22 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes flagged cache.
+     * Refreshes tagged cache.
      *
-     * @param string[]|string $flags
+     * @param string[]|string $tags
      */
-    public function refreshFlaggedCache($flags)
+    public function refreshTaggedCache($tags)
     {
         $this->batchMode = true;
 
-        if (is_string($flags)) {
-            $flags = StringHelper::split($flags);
+        if (is_string($tags)) {
+            $tags = StringHelper::split($tags);
         }
 
-        // Check for flagged caches to invalidate
-        $cacheIds = CacheFlagRecord::find()
+        // Check for tagged caches to invalidate
+        $cacheIds = CacheTagRecord::find()
             ->select('cacheId')
-            ->where(['flag' => $flags])
+            ->where(['tag' => $tags])
             ->groupBy('cacheId')
             ->column();
 

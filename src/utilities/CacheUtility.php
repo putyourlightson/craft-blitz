@@ -9,7 +9,7 @@ use Craft;
 use craft\base\Utility;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
-use putyourlightson\blitz\records\CacheFlagRecord;
+use putyourlightson\blitz\records\CacheTagRecord;
 
 class CacheUtility extends Utility
 {
@@ -48,7 +48,7 @@ class CacheUtility extends Utility
         return Craft::$app->getView()->renderTemplate('blitz/_utility', [
             'driverHtml' => Blitz::$plugin->cacheStorage->getUtilityHtml(),
             'actions' => self::getActions(),
-            'flagSuggestions' => self::getFlagSuggestions(),
+            'tagSuggestions' => self::getTagSuggestions(),
         ]);
     }
 
@@ -94,36 +94,36 @@ class CacheUtility extends Utility
         ];
 
         $actions[] = [
-            'id' => 'refresh-flagged',
-            'label' => Craft::t('blitz', 'Refresh Flagged Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing flagged cache will refresh all pages that are associated with the given flags (separated by commas).'),
+            'id' => 'refresh-tagged',
+            'label' => Craft::t('blitz', 'Refresh Tagged Cache'),
+            'instructions' => Craft::t('blitz', 'Refreshing tagged cache will refresh all pages that are associated with the given tags (separated by commas).'),
         ];
 
         return $actions;
     }
 
     /**
-     * Returns flag suggestions.
+     * Returns tag suggestions.
      *
      * @return array
      */
-    public static function getFlagSuggestions(): array
+    public static function getTagSuggestions(): array
     {
-        $flags = CacheFlagRecord::find()
-            ->select('flag')
-            ->groupBy('flag')
+        $tags = CacheTagRecord::find()
+            ->select('tag')
+            ->groupBy('tag')
             ->column();
 
         $data = [];
 
-        foreach ($flags as $flag) {
+        foreach ($tags as $tag) {
             $data[] = [
-                'name' => $flag,
+                'name' => $tag,
             ];
         }
 
         return [[
-            'label' => Craft::t('blitz', 'Flags'),
+            'label' => Craft::t('blitz', 'Tags'),
             'data' => $data,
         ]];
     }

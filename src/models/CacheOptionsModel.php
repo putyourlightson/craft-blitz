@@ -33,7 +33,7 @@ class CacheOptionsModel extends Model
     /**
      * @var string[]|string|null
      */
-    public $flags = null;
+    public $tags = null;
 
     /**
      * @var \DateTime|null
@@ -52,8 +52,8 @@ class CacheOptionsModel extends Model
             case 'cacheDuration':
                 $this->cacheDuration($value);
                 break;
-            case 'flags':
-                $this->flags($value);
+            case 'tags':
+                $this->tags($value);
                 break;
             default:
                 parent::__set($name, $value);
@@ -132,10 +132,10 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function flags($value)
+    public function tags($value)
     {
         if (is_string($value)) {
-            $this->flags = StringHelper::split($value);
+            $this->tags = StringHelper::split($value);
         }
 
         return $this;

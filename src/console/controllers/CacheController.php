@@ -24,7 +24,7 @@ class CacheController extends Controller
     /**
      * @var string|null
      */
-    public $flag = null;
+    public $tag = null;
 
     /**
      * @var array
@@ -178,25 +178,25 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes flagged cache.
+     * Refreshes tagged cache.
      *
      * @param string
      *
      * @return int
      */
-    public function actionRefreshFlagged(string $flags = null): int
+    public function actionRefreshTagged(string $tags = null): int
     {
-        if ($flags === null) {
-            $this->stderr(Craft::t('blitz', 'One or more flags must be provided as an argument.').PHP_EOL, Console::FG_RED);
+        if ($tags === null) {
+            $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.').PHP_EOL, Console::FG_RED);
 
             return ExitCode::OK;
         }
 
-        Blitz::$plugin->refreshCache->refreshFlaggedCache($flags);
+        Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
 
         Craft::$app->getQueue()->run();
 
-        $this->stdout(Craft::t('blitz', 'Flagged Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Tagged Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }

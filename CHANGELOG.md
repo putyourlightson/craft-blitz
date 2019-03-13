@@ -4,8 +4,8 @@
 ### Added
 - Added replaceable cache drivers (File storage, Yii cache).
 - Added replaceable reverse proxy purgers (Cloudflare).
-- Added twig tag for setting template specific cache options including flags and expiry dates.
-- Added refresh flagged cache action to utility and controllers.
+- Added twig tag for setting template specific cache options including tags and expiry dates.
+- Added refresh tagged cache action to utility and controllers.
 - Added purge cache action to utility and controllers.
 - Added environment variables to file driver field.
 - Added garbage collection to cache records and element query records.

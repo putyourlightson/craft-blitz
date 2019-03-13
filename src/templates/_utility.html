@@ -12,11 +12,11 @@
 
         <p class="light">{{ action.instructions|t('blitz') }}</p>
 
-        {% if action.id == 'refresh-flagged' %}
+        {% if action.id == 'refresh-tagged' %}
             {{ forms.autosuggest({
-                name: 'flags',
-                placeholder: 'flag1,flag2,flag3',
-                suggestions: flagSuggestions,
+                name: 'tags',
+                placeholder: 'tag1,tag2,tag3',
+                suggestions: tagSuggestions,
                 instructions: action.instructions|t('blitz'),
             }) }}
             <br/>

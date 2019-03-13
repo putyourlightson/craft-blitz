@@ -130,25 +130,25 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
 
-        return $this->_getResponse('Expired Blitz cache successfully refreshed.');
+        return $this->_getResponse('Expired cache successfully refreshed.');
     }
 
     /**
-     * Refreshes flagged cache.
+     * Refreshes tagged cache.
      *
      * @return Response
      */
-    public function actionRefreshFlagged(): Response
+    public function actionRefreshTagged(): Response
     {
-        $flags = Craft::$app->getRequest()->getParam('flags');
+        $tags = Craft::$app->getRequest()->getParam('tags');
 
-        if (empty($flags)) {
-            return $this->_getResponse('At least one flag must be provided.', false);
+        if (empty($tags)) {
+            return $this->_getResponse('At least one tag must be provided.', false);
         }
 
-        Blitz::$plugin->refreshCache->refreshFlaggedCache($flags);
+        Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
 
-        return $this->_getResponse('Flagged Blitz cache successfully refreshed.');
+        return $this->_getResponse('Tagged cache successfully refreshed.');
     }
 
     // Private Methods
