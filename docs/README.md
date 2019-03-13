@@ -115,7 +115,7 @@ Every cache utility function above is also available as a console command.
 ./craft blitz/cache/refresh-tagged tag1,tag2,tag3
 ```
 
-![Console commands](images/console-2.0.0.png)
+![Console commands](images/console-2.0.0a.png)
 
 ## Refreshing Cache via URL
 
