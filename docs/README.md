@@ -4,7 +4,7 @@ The Blitz plugin provides intelligent full page caching for creating lightning-f
 
 - Reduces server response time (TTFB) and load on the server significantly. 
 - Makes your site available even when performing updates and maintenance.
-- Makes it possible to have your site served by a reverse proxy (CDN).
+- Makes it possible to have your site served by a reverse proxy CDN.
 
 Although the performance gains depend on the individual site and server setup, the following results are not uncommon (on a 5 Mbps cable connection with 28ms of latency). Google recommends a server response time of [200ms or less](https://developers.google.com/speed/docs/insights/Server#recommendations). 
 
@@ -25,7 +25,7 @@ Fine tune invalidation settings with expanded options for controlling when and h
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
-![Paths](images/paths-2.0.0b.png)
+![Paths](images/paths-2.0.1.png)
 
 ## License
 
