@@ -253,7 +253,7 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} pages.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
 
-        // Check if there are URLs beginning with `@web`
+        // Check if there are any URLs beginning with `@web`
         if (!empty(preg_grep('/@web/i', $urls))) {
             $this->stderr(Craft::t('blitz', 'One or more sites use `@web` in their base URL which cannot be parsed by console commands.').PHP_EOL, Console::FG_RED);
         }

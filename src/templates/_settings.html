@@ -55,6 +55,7 @@
             warning: (config.cachingEnabled is defined ? configWarning('cachingEnabled')),
             name: 'settings[cachingEnabled]',
             on: settings.cachingEnabled,
+            warning: (craft.blitz.getWebAliasExists() ? "One or more sites use `@web` in their base URL. The `@web` alias is not recommended if it is determined automatically."|t('blitz')),
             required: true,
         }) }}
 

@@ -23,6 +23,24 @@ class BlitzVariable
     // =========================================================================
 
     /**
+     * Returns whether the `@web` alias is used in any site's base URL.
+     *
+     * @return bool
+     */
+    public static function getWebAliasExists(): bool
+    {
+        $sites = Craft::$app->getSites()->getAllSites();
+
+        foreach ($sites as $site) {
+            if (strpos($site->baseUrl, '@web') !== false) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Returns script to get the output of a URI.
      *
      * @param string $uri

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.0.2 - Unreleased
+### Added
+- Added a warning in the settings if the `@web` alias is used in a site’s base URL.
+
 ## 2.0.1 - 2019-03-14
 ### Added
 - Added `refreshAll()` method to `RefreshCacheService`.
