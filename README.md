@@ -4,7 +4,7 @@
 
 The Blitz plugin provides intelligent full page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
-- Reduces page load times (TTFB) and load on the server significantly. 
+- Reduces server response time (TTFB) and load on the server significantly. 
 - Makes your site available even when performing updates and maintenance.
 - Makes it possible to have your site served by a reverse proxy (CDN).
 
@@ -31,7 +31,7 @@ Fine tune invalidation settings with expanded options for controlling when and h
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
-![Paths](/Users/ben/Sites/plugins/craft-blitz/docs/images/paths-2.0.0a.png)
+![Paths](/Users/ben/Sites/plugins/craft-blitz/docs/images/paths-2.0.0b.png)
 
 ## License
 
