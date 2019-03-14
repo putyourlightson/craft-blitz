@@ -12,20 +12,20 @@ Although the performance gains depend on the individual site and server setup, t
 
 ## What’s New in Version 2
 
-Blitz 2 is still fast, easy to use and enhanced to be even more *scalable*, *extensible* and *predictable*.
+Blitz 2 is fast, easy to use and enhanced to be even more *scalable*, *extensible* and *predictable*.
 
 **Scalable**  
 Cache invalidation is faster and lighter with fewer database needs. Blitz 2 can also use Yii’s cache interface to tap into in-memory caches like [Memcache](https://memcached.org/) and [Redis](https://redis.io/). This makes Blitz a great fit for multi-node cloud platforms like [Docker](https://www.docker.com/), [Heroku](https://www.heroku.com/) and [fortrabbit](https://www.fortrabbit.com/).
 
 **Extensible**  
-Enjoy effortless full-page caching right at the edge with new reverse proxy purgers. [Cloudflare](https://www.cloudflare.com/) support is included, and you can add your own purgers for services like [Fastly](https://www.fastly.com/), [KeyCDN](https://www.keycdn.com/), and [Akamai](https://www.akamai.com). Blitz will take care of invalidation for you.
+Enjoy effortless full-page caching right at the edge with new reverse proxy purgers. Serve statically geneterate HTML pages from the [Cloudflare](https://www.cloudflare.com/) CDN and let Blitz take care of invalidation. You can add your own purgers for services like [Fastly](https://www.fastly.com/), [KeyCDN](https://www.keycdn.com/), and [Akamai](https://www.akamai.com).
 
 **Predictable**  
-Fine tune invalidation settings with expanded options for controlling when and how cached pages are handled. Set [template-specific tags](#template-specific-options), cache durations and expiry dates. Use an API key and console commands to trigger actions on a schedule.
+Fine tune invalidation settings with expanded options for controlling when and how cached pages are handled. Set [page specific options](#page-specific-options) such as tags, cache durations and expiry dates. Use an API key and console commands to trigger actions on a schedule.
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
-![Paths](images/paths-2.0.0.png)
+![Paths](images/paths-2.0.0a.png)
 
 ## License
 
@@ -92,10 +92,10 @@ Warming the cache will warm all of the pages.
 Refreshing the cache will clear, flush, purge and warm all of the pages.
 
 ### Refresh Expired Cache
-Refreshing expired cache will refresh all cached pages that have expired, or that contain Elements that have expired (applies to Elements with future post and expiry dates). Cache duration and expiry dates can be specified in the [config settings](#config-settings) and the [template specific options](#template-specific-options).
+Refreshing expired cache will refresh all cached pages that have expired, or that contain Elements that have expired (applies to Elements with future post and expiry dates). Cache duration and expiry dates can be specified in the [config settings](#config-settings) and the [page specific options](#page-specific-options).
 
 ### Refresh Tagged Cache
-Refreshing tagged cache will refresh all cached pages that were associated with the provided tags using the `tags` parameter in the [template specific options](#template-specific-options).
+Refreshing tagged cache will refresh all cached pages that were associated with the provided tags using the `tags` parameter in the [page specific options](#page-specific-options).
 
 ![Utility](images/utility-2.0.0a.png)
 
@@ -242,9 +242,9 @@ Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
  </form>
 ```
 
-## Template Specific Options
+## Page Specific Options
 
-It is possible to set template specific caching options by passing an object into the `options` function. All parameters are optional.
+It is possible to set page specific caching options in your twig templates by passing an object into the `craft.blitz.options()` function. All parameters are optional.
 
 ```twig
 {% do craft.blitz.options({
@@ -257,10 +257,10 @@ It is possible to set template specific caching options by passing an object int
 }) %}
 ```
 
-An alternative notation is to use method chaining on the model that the `options` function returns.
+An alternative notation is to use method chaining on the model that the `craft.blitz.options()` function returns.
 
 ```twig
-{% do craft.blitz.options.cacheDuration('P1D').tags(['home', 'listing']) %}
+{% do craft.blitz.options().cacheDuration('P1D').tags(['home', 'listing']) %}
 ```
 
 ### `cachingEnabled`

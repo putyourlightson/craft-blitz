@@ -2,12 +2,6 @@
 
 # Blitz Plugin for Craft CMS 3
 
-> The Blitz v2 branch is currently in a release candidate phase. For the stable version, please visit the [v1 branch](https://github.com/putyourlightson/craft-blitz/tree/v1). The beta version can be installed using composer as follows.
-
-```
-composer require putyourlightson/craft-blitz:2.0.0-RC3.2
-```
-
 The Blitz plugin provides intelligent full page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
 - Reduces page load times (TTFB) and load on the server significantly. 
@@ -24,20 +18,20 @@ Read the documentation at [putyourlightson.com/craft-plugins/blitz/docs](https:/
 
 ## What’s New in Version 2
 
-Blitz 2 is still fast, easy to use and enhanced to be even more *scalable*, *extensible* and *predictable*.
+Blitz 2 is fast, easy to use and enhanced to be even more *scalable*, *extensible* and *predictable*.
 
 **Scalable**  
 Cache invalidation is faster and lighter with fewer database needs. Blitz 2 can also use Yii’s cache interface to tap into in-memory caches like [Memcache](https://memcached.org/) and [Redis](https://redis.io/). This makes Blitz a great fit for multi-node cloud platforms like [Docker](https://www.docker.com/), [Heroku](https://www.heroku.com/) and [fortrabbit](https://www.fortrabbit.com/).
 
 **Extensible**  
-Enjoy effortless full-page caching right at the edge with new reverse proxy purgers. [Cloudflare](https://www.cloudflare.com/) support is included, and you can add your own purgers for services like [Fastly](https://www.fastly.com/), [KeyCDN](https://www.keycdn.com/), and [Akamai](https://www.akamai.com). Blitz will take care of invalidation for you.
+Enjoy effortless full-page caching right at the edge with new reverse proxy purgers. Serve statically geneterate HTML pages from the [Cloudflare](https://www.cloudflare.com/) CDN and let Blitz take care of invalidation. You can add your own purgers for services like [Fastly](https://www.fastly.com/), [KeyCDN](https://www.keycdn.com/), and [Akamai](https://www.akamai.com).
 
 **Predictable**  
-Fine tune invalidation settings with expanded options for controlling when and how cached pages are handled. Set [template-specific tags](#template-specific-options), cache durations and expiry dates. Use an API key and console commands to trigger actions on a schedule.
+Fine tune invalidation settings with expanded options for controlling when and how cached pages are handled. Set [page specific options](#page-specific-options) such as tags, cache durations and expiry dates. Use an API key and console commands to trigger actions on a schedule.
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
-![Paths](docs/images/paths-2.0.0.png)
+![Paths](/Users/ben/Sites/plugins/craft-blitz/docs/images/paths-2.0.0a.png)
 
 ## License
 
