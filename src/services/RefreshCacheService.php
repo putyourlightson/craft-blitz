@@ -282,6 +282,20 @@ class RefreshCacheService extends Component
     }
 
     /**
+     * Refreshes the entire cache.
+     */
+    public function refreshAll()
+    {
+        Blitz::$plugin->clearCache->clearAll();
+
+        // Create warm cache job before flushing the cache
+        Blitz::$plugin->warmCache->warmAll();
+
+        Blitz::$plugin->flushCache->flushAll();
+        Blitz::$plugin->cachePurger->purgeAll();
+    }
+
+    /**
      * Refreshes expired cache.
      */
     public function refreshExpiredCache()

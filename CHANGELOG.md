@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.0.1 - 2019-03-14
+### Added
+- Added `refreshAll()` method to `RefreshCacheService`.
+
 ## 2.0.0 - 2019-03-14
 ### Added
 - Added replaceable cache drivers (File storage, Yii cache).

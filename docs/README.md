@@ -84,8 +84,12 @@ Clearing the cache will delete all cached pages.
 ### Flush Cache
 Flushing the cache will delete all records from the database.
 
+> Flushing the cache does *not* clear the cache, as it did in Blitz 1.
+
 ### Warm Cache
-Warming the cache will warm all of the pages.
+Warming the cache will warm all of the pages by creating a queue job to visit each of them.
+
+>  Warming the cache does *not* clear and flush the cache, as it did in Blitz 1.
 
 ### Refresh Entire Cache
 
