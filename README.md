@@ -31,7 +31,7 @@ Fine tune invalidation settings with expanded options for controlling when and h
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
-![Paths](/Users/ben/Sites/plugins/craft-blitz/docs/images/paths-2.0.0b.png)
+![Paths](docs/images/paths-2.0.0b.png)
 
 ## License
 
