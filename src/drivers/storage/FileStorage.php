@@ -244,7 +244,7 @@ class FileStorage extends BaseCacheStorage
 
         // Get the site host and path from the site's base URL
         $site = Craft::$app->getSites()->getSiteById($siteId);
-        $siteUrl = Craft::getAlias($site->baseUrl);
+        $siteUrl = Craft::getAlias($site->getBaseUrl());
         $siteHostPath = preg_replace('/^(http|https):\/\//i', '', $siteUrl);
 
         $this->_sitePaths[$siteId] = FileHelper::normalizePath($this->_cacheFolderPath.'/'.$siteHostPath);

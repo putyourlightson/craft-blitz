@@ -4,6 +4,9 @@
 ### Added
 - Added `refreshAll()` method to `RefreshCacheService`.
 
+### Fixed
+- Fixed site base URL when it contains an environment variable ([#80](https://github.com/putyourlightson/craft-blitz/issues/80)).  
+
 ## 2.0.0 - 2019-03-14
 ### Added
 - Added replaceable cache drivers (File storage, Yii cache).
@@ -36,7 +39,7 @@
 
 ## 1.11.5 - 2019-02-14
 ### Fixed
-- Fixed refreshing of expired cache when run through a console command.  
+- Fixed refreshing of expired cache when run through a console command.
 
 ## 1.11.4 - 2019-01-23
 ### Fixed

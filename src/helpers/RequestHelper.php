@@ -82,7 +82,7 @@ class RequestHelper
         }
 
         // Remove site base URL
-        $baseUrl = trim(Craft::getAlias($site->baseUrl), '/');
+        $baseUrl = trim(Craft::getAlias($site->getBaseUrl()), '/');
         $uri = str_replace($baseUrl, '', $url);
 
         // Trim slashes from the beginning and end of the URI

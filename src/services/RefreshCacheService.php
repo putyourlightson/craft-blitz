@@ -14,6 +14,7 @@ use craft\helpers\Db;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
@@ -286,13 +287,13 @@ class RefreshCacheService extends Component
      */
     public function refreshAll()
     {
+        // Get cached site URIs before flushing the cache
+        $siteUris = SiteUriHelper::getAllSiteUris();
+
         Blitz::$plugin->clearCache->clearAll();
-
-        // Create warm cache job before flushing the cache
-        Blitz::$plugin->warmCache->warmAll();
-
         Blitz::$plugin->flushCache->flushAll();
         Blitz::$plugin->cachePurger->purgeAll();
+        Blitz::$plugin->warmCache->warmUris($siteUris);
     }
 
     /**
