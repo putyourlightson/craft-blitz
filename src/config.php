@@ -27,23 +27,23 @@ return [
     // The URI patterns to exclude from static file caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
     //'excludedUriPatterns' => [['contact', '']],
 
-    // The driver type to use.
-    //'cacheDriverType' => putyourlightson\blitz\drivers\storage\FileStorage::class,
+    // The storage type to use.
+    //'cacheStorageType' => 'putyourlightson\blitz\drivers\storage\FileStorage',
 
-    // The driver settings.
-    //'cacheDriverSettings' => ['folderPath' => 'cache/blitz'],
+    // The storage settings.
+    //'cacheStorageSettings' => ['folderPath' => 'cache/blitz'],
 
     // The storage type classes to add to the plugin’s default storage types.
     //'cacheStorageTypes' => [],
 
     // The purger type to use.
-    //'cachePurgerType' => putyourlightson\blitz\drivers\purgers\DummyPurger::class,
+    //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\DummyPurger',
 
     // The purger settings.
     //'cachePurgerSettings' => [],
 
     // The purger type classes to add to the plugin’s default purger types.
-    //'cachePurgerTypes' => [putyourlightson\blitz\drivers\purgers\CloudflarePurger::class],
+    //'cachePurgerTypes' => ['putyourlightson\blitz\drivers\purgers\CloudflarePurger'],
 
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,
