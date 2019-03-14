@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 2.0.0 - Unreleased
+## 2.0.0 - 2019-03-14
 ### Added
 - Added replaceable cache drivers (File storage, Yii cache).
 - Added replaceable reverse proxy purgers (Cloudflare).
