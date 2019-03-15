@@ -1,4 +1,4 @@
-<p align="center"><img height="180" src="src/icon.svg"></p>
+<p align="center"><img height="150" src="src/icon.svg"></p>
 
 # Blitz Plugin for Craft CMS 3
 

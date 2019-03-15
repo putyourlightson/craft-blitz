@@ -16,6 +16,14 @@ class m190105_120000_alter_index_column extends Migration
      */
     public function safeUp()
     {
+        // Don't make the same config changes twice
+        $projectConfig = Craft::$app->getProjectConfig();
+        $schemaVersion = $projectConfig->get('plugins.blitz.schemaVersion', true);
+
+        if (version_compare($schemaVersion, '2.0.0', '>=')) {
+            return;
+        }
+
         $table = ElementQueryRecord::tableName();
 
         if ($this->db->columnExists($table, 'index')) {

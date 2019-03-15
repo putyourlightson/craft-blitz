@@ -16,6 +16,14 @@ class m181229_120000_add_cache_expirydate_column extends Migration
      */
     public function safeUp()
     {
+        // Don't make the same config changes twice
+        $projectConfig = Craft::$app->getProjectConfig();
+        $schemaVersion = $projectConfig->get('plugins.blitz.schemaVersion', true);
+
+        if (version_compare($schemaVersion, '2.0.0', '>=')) {
+            return;
+        }
+
         $table = CacheRecord::tableName();
 
         if (!$this->db->columnExists($table, 'expiryDate')) {
