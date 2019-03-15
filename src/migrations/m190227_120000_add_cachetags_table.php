@@ -17,14 +17,6 @@ class m190227_120000_add_cachetags_table extends Migration
      */
     public function safeUp()
     {
-        // Don't make the same config changes twice
-        $projectConfig = Craft::$app->getProjectConfig();
-        $schemaVersion = $projectConfig->get('plugins.blitz.schemaVersion', true);
-
-        if (version_compare($schemaVersion, '2.0.0', '>=')) {
-            return;
-        }
-
         $table = CacheTagRecord::tableName();
 
         if (!$this->db->tableExists($table)) {
