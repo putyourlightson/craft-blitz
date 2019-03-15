@@ -1,6 +1,6 @@
 # Blitz Plugin Documentation
 
-The Blitz plugin provides intelligent full page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
+The Blitz plugin provides intelligent static page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
 - Reduces server response time (TTFB) and load on the server significantly. 
 - Makes your site available even when performing updates and maintenance.
@@ -487,6 +487,14 @@ Event::on(CachePurgerHelper::class,
 ```
 
 # More
+
+## Common Issues
+
+**”The site is not being cached when I visit it”.**
+Ensure that the *Caching Enabled* setting is switched on and that the page you are visiting matches an *included URI pattern* (and not an *excluded URI pattern*). Blitz will not cache pages that display the debug toolbar so check that you are *not* logged in as an admin with the debug toolbar enabled on the front-end.
+
+**“The refresh cache queue job is stalling”.**
+This is likely due to PHP timing out or running out of memory and is a [common issue](https://craftcms.com/guides/resolving-stalled-background-tasks) in Craft. For large sites  we recommend increasing `max_execution_time` to `300` and `memory_limit` to at least `1024M`.  The [Async Queue](https://plugins.craftcms.com/async-queue) plugin can help prevent timeouts and memory issues by running jobs as background tasks and the [Queue Manager](https://plugins.craftcms.com/queue-manager) plugin allows you to see what jobs are in the queue and manipulate them.
 
 ## Support
 

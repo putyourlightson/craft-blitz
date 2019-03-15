@@ -18,13 +18,13 @@
  */
 
 return [
-    // Whether static file caching should be enabled.
+    // Whether caching should be enabled. With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
     //'cachingEnabled' => false,
 
-    // The URI patterns to include in static file caching. The second variable represents a site ID, or a blank string for all sites.
+    // The URI patterns to include in caching. The second variable represents a site ID, or a blank string for all sites.
     //'includedUriPatterns' => [['pages/.*', '1'], ['articles/.*', '2']],
 
-    // The URI patterns to exclude from static file caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
+    // The URI patterns to exclude from caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
     //'excludedUriPatterns' => [['contact', '']],
 
     // The storage type to use.
