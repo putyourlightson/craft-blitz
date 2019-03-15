@@ -25,7 +25,7 @@ Fine tune invalidation settings with expanded options for controlling when and h
 
 Visit and browse [craftcodingchallenge.com](https://craftcodingchallenge.com/) to see how fast a Blitz powered site really is.
 
-![Paths](images/paths-2.0.1.png)
+![Paths](images/paths-2.0.3.png)
 
 ## License
 
@@ -216,7 +216,7 @@ An API key that can be used to clear, flush, warm, or refresh cache through a UR
 
 ## Config Settings
 
-Blitz comes with a config file for a multi-environment way to set the plugin settings, as well as more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change.
+Blitz comes with a config file for a multi-environment way to set the plugin settings, as well as more advanced plugin configuration settings. To use it, copy the `config.php` to your project’s main `config` directory as `blitz.php` and uncomment any settings you wish to change. All of the available settings are listed and documented in the [config file](https://github.com/putyourlightson/craft-blitz/blob/v2/src/config.php).
 
 # Advanced Usage
 
