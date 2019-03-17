@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.0.4 - Unreleased
+### Changed
+- Changed use of database transaction with mutex when generating and saving cache in database.
+
 ## 2.0.3 - 2019-03-15
 ### Changed
 - Reverted changes to migrations to only run if schema version in `project.yaml` has not already been updated (red herring).
@@ -10,7 +14,7 @@
 
 ### Changed
 - Changed migrations only run if schema version in `project.yaml` has not already been updated. 
-- Changed how database rows are inserted in bulk to prevent .
+- Changed how database rows are inserted in bulk to prevent integrity constraint violation errors.
 
 ## 2.0.1 - 2019-03-14
 ### Added

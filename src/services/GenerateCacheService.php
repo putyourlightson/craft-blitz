@@ -155,12 +155,17 @@ class GenerateCacheService extends Component
      *
      * @param string $output
      * @param SiteUriModel $siteUri
-     *
-     * @throws Exception
      */
     public function save(string $output, SiteUriModel $siteUri)
     {
         if (!$this->options->cachingEnabled) {
+            return;
+        }
+
+        $mutex = Craft::$app->getMutex();
+        $lockName = 'blitz:'.$siteUri->siteId.'-'.$siteUri->uri;
+
+        if (!$mutex->acquire($lockName)) {
             return;
         }
 
@@ -178,62 +183,54 @@ class GenerateCacheService extends Component
             ]);
         }
 
-        // Use a transaction to catch integrity constraint violation errors
-        $transaction = Craft::$app->getDb()->beginTransaction();
+        $db->createCommand()
+            ->insert(CacheRecord::tableName(), $values, false)
+            ->execute();
 
-        try {
-            $db->createCommand()
-                ->insert(CacheRecord::tableName(), $values, false)
-                ->execute();
+        $cacheId = $db->getLastInsertID();
 
-            $cacheId = $db->getLastInsertID();
+        // Add element caches to database
+        $values = [];
 
-            // Add element caches to database
-            $values = [];
-
-            foreach ($this->_elementCaches as $elementId) {
-                $values[] = [$cacheId, $elementId];
-            }
-
-            $db->createCommand()
-                ->batchInsert(ElementCacheRecord::tableName(),
-                    ['cacheId', 'elementId'],
-                    $values,
-                    false)
-                ->execute();
-
-            // Add element query caches to database
-            $values = [];
-
-            foreach ($this->_elementQueryCaches as $queryId) {
-                $values[] = [$cacheId, $queryId];
-            }
-
-            $db->createCommand()
-                ->batchInsert(ElementQueryCacheRecord::tableName(),
-                    ['cacheId', 'queryId'],
-                    $values,
-                    false)
-                ->execute();
-
-            // Add tag caches to database
-            if (!empty($this->options->tags)) {
-                Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
-            }
-
-            // Commit the transaction
-            $transaction->commit();
-
-            if (Blitz::$plugin->settings->outputComments) {
-                // Append timestamp
-                $output .= '<!-- Cached by Blitz on '.date('c').' -->';
-            }
-
-            Blitz::$plugin->cacheStorage->save($output, $siteUri);
+        foreach ($this->_elementCaches as $elementId) {
+            $values[] = [$cacheId, $elementId];
         }
-        catch (\Throwable $e) {
-            $transaction->rollBack();
+
+        $db->createCommand()
+            ->batchInsert(ElementCacheRecord::tableName(),
+                ['cacheId', 'elementId'],
+                $values,
+                false)
+            ->execute();
+
+        // Add element query caches to database
+        $values = [];
+
+        foreach ($this->_elementQueryCaches as $queryId) {
+            $values[] = [$cacheId, $queryId];
         }
+
+        $db->createCommand()
+            ->batchInsert(ElementQueryCacheRecord::tableName(),
+                ['cacheId', 'queryId'],
+                $values,
+                false)
+            ->execute();
+
+        // Add tag caches to database
+        if (!empty($this->options->tags)) {
+            Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
+        }
+
+        // Commit the transaction
+        $transaction->commit();
+
+        if (Blitz::$plugin->settings->outputComments) {
+            // Append timestamp
+            $output .= '<!-- Cached by Blitz on '.date('c').' -->';
+        }
+
+        Blitz::$plugin->cacheStorage->save($output, $siteUri);
     }
 
     // Private Methods
