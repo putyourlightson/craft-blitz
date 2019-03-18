@@ -23,7 +23,6 @@ class m181101_120000_delete_globalset_matrixblock_rows extends Migration
 
         // Delete element cache records
         $records = ElementCacheRecord::find()
-            ->joinWith('element')
             ->where(['type' => GlobalSet::class])
             ->orWhere(['type' => MatrixBlock::class])
             ->all();

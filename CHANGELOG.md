@@ -1,8 +1,12 @@
 # Release Notes for Blitz
 
-## 2.0.4 - Unreleased
+## 2.0.4 - 2019-03-18
 ### Changed
 - Changed use of database transaction with mutex when generating and saving cache in database.
+
+### Fixed
+- Fixed redirect after install to only be called on web requests.
+- Fixed error that could occur when migrating from Blitz version 1.  
 
 ## 2.0.3 - 2019-03-15
 ### Changed
