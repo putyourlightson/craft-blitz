@@ -15,6 +15,7 @@ use craft\events\PluginEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
+use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
@@ -32,6 +33,7 @@ use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
+use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -101,6 +103,7 @@ class Blitz extends Plugin
 
         // Register control panel events
         if (Craft::$app->getRequest()->getIsCpRequest()) {
+            $this->_registerCpTemplateRoots();
             $this->_registerCpUrlRules();
             $this->_registerUtilities();
             $this->_registerRedirectAfterInstall();
@@ -304,6 +307,22 @@ class Blitz extends Plugin
         Event::on(Gc::class, Gc::EVENT_RUN,
             function() {
                 $this->flushCache->runGarbageCollection();
+            }
+        );
+    }
+
+    /**
+     * Registers CP template roots event
+     */
+    private function _registerCpTemplateRoots()
+    {
+        Event::on(View::class, View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
+            function(RegisterTemplateRootsEvent $event) {
+                $purgerDrivers = CachePurgerHelper::getAllDrivers();
+
+                foreach ($purgerDrivers as $purgerDriver) {
+                    $event->roots = array_merge($event->roots, $purgerDriver::getTemplatesRoot());
+                }
             }
         );
     }

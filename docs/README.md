@@ -424,7 +424,7 @@ To add your cache storage type to Blitz, you can create a stand-alone composer p
 ```php
 // The storage type classes to add to the plugin’s default storage types.
 'cacheStorageTypes' => [
-    vendor\package\MyCacheStorage::class
+    'vendor\package\MyCacheStorage'
 ],
 ```
 
@@ -465,10 +465,14 @@ To add your cache purger to Blitz, you can create a stand-alone composer package
 ```php
 // The purger type classes to add to the plugin’s default purger types.
 'cachePurgerTypes' => [
-    putyourlightson\blitz\drivers\purgers\CloudflarePurger::class,
-    vendor\package\MyCachePurger::class,
+    'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
+    'vendor\package\MyCachePurger',
 ],
 ```
+
+Cache purger packages:
+
+- [KeyCDN](https://github.com/putyourlightson/craft-blitz-keycdn) (PutYourLightsOn)
 
 If you prefer to write your cache purger as a module or plugin, then register it by listening for the `EVENT_REGISTER_PURGER_TYPES` event and adding the class to the `$event->types` array.
 

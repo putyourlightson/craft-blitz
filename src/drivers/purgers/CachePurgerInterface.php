@@ -5,10 +5,22 @@
 
 namespace putyourlightson\blitz\drivers\purgers;
 
+use craft\base\SavableComponentInterface;
 use putyourlightson\blitz\models\SiteUriModel;
 
-interface CachePurgerInterface
+interface CachePurgerInterface extends SavableComponentInterface
 {
+    // Static Methods
+    // =========================================================================
+
+    /**
+     * Returns the template roots.
+     */
+    public static function getTemplatesRoot(): array;
+
+    // Public Methods
+    // =========================================================================
+
     /**
      * Purges the entire cache.
      */
