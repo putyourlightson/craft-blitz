@@ -222,9 +222,6 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        // Commit the transaction
-        $transaction->commit();
-
         if (Blitz::$plugin->settings->outputComments) {
             // Append timestamp
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
