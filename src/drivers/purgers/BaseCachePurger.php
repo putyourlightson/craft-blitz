@@ -6,8 +6,6 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use craft\base\SavableComponent;
-use craft\helpers\FileHelper;
-use craft\helpers\StringHelper;
 
 abstract class BaseCachePurger extends SavableComponent implements CachePurgerInterface
 {
