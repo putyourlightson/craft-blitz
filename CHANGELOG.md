@@ -4,6 +4,9 @@
 ### Changed
 - Optimised how element site URIs are fetched from database.
 
+### Fixed
+- Fixed check for cacheable request when system is turned off.
+
 ## 2.0.5 - 2019-03-18
 ### Added
 - Added CP template roots for custom cache purgers.

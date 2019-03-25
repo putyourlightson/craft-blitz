@@ -44,7 +44,9 @@ class RequestHelper
         $user = Craft::$app->getUser()->getIdentity();
 
         // Ensure that if the site is not live that the has permission to access it
-        if (!Craft::$app->getIsLive() && !$user->can('accessSiteWhenSystemIsOff')) {
+        if (!Craft::$app->getIsLive()
+            && $user !== null
+            && !$user->can('accessSiteWhenSystemIsOff')) {
             return false;
         }
 
