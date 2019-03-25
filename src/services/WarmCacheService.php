@@ -27,7 +27,7 @@ class WarmCacheService extends Component
      */
     public function warmAll()
     {
-        $this->warmUris(SiteUriHelper::getAllSiteUris());
+        $this->warmUris(SiteUriHelper::getAllSiteUris(true));
     }
 
     /**
@@ -37,7 +37,7 @@ class WarmCacheService extends Component
      */
     public function warmSite(int $siteId)
     {
-        $this->warmUris(SiteUriHelper::getSiteSiteUris($siteId));
+        $this->warmUris(SiteUriHelper::getSiteSiteUris($siteId, true));
     }
 
     /**

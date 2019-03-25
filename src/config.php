@@ -76,6 +76,7 @@ return [
     //'nonCacheableElementTypes' => [
     //    'craft\elements\GlobalSet',
     //    'craft\elements\MatrixBlock',
+    //    'benf\neo\elements\Block',
     //],
 
     // The value to send in the cache control header.

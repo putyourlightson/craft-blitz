@@ -7,6 +7,8 @@ namespace putyourlightson\blitz\helpers;
 
 use Craft;
 use craft\base\Element;
+use craft\db\Query;
+use craft\db\Table;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 
@@ -15,9 +17,11 @@ class SiteUriHelper
     /**
      * Returns all site URIs.
      *
+     * @param bool $cacheableOnly
+     *
      * @return SiteUriModel[]
      */
-    public static function getAllSiteUris(): array
+    public static function getAllSiteUris(bool $cacheableOnly = false): array
     {
         $sitesService = Craft::$app->getSites();
 
@@ -36,7 +40,7 @@ class SiteUriHelper
                 continue;
             }
 
-            $siteUriSets[] = self::getSiteSiteUris($site->id);
+            $siteUriSets[] = self::getSiteSiteUris($site->id, $cacheableOnly);
         }
 
         $siteUris = array_merge(...$siteUriSets);
@@ -48,39 +52,29 @@ class SiteUriHelper
      * Returns site URIs for a given site.
      *
      * @param int $siteId
+     * @param bool $cacheableOnly
      *
      * @return SiteUriModel[]
      */
-    public static function getSiteSiteUris(int $siteId): array
+    public static function getSiteSiteUris(int $siteId, bool $cacheableOnly = false): array
     {
         $siteUris = [];
 
-        $uris = CacheRecord::find()
+        $cachedUris = CacheRecord::find()
             ->select('uri')
             ->where(['siteId' => $siteId])
             ->column();
 
-        // Get URIs from all element types
-        $elementTypes = Craft::$app->getElements()->getAllElementTypes();
+        // Get URIs from all elements in the site
+        $elementUris = (new Query())
+            ->select('uri')
+            ->from(Table::ELEMENTS_SITES)
+            ->where(['siteId' => $siteId])
+            ->andWhere(['not', ['uri' => null]])
+            ->column();
 
-        /** @var Element $elementType */
-        foreach ($elementTypes as $elementType) {
-            if ($elementType::hasUris()) {
-                $elements = $elementType::find()
-                    ->siteId($siteId)
-                    ->all();
-
-                /** @var Element $element */
-                foreach ($elements as $element) {
-                    $uri = trim($element->uri, '/');
-                    $uri = ($uri == '__home__' ? '' : $uri);
-
-                    if (!in_array($uri, $uris, true)) {
-                        $uris[] = $uri;
-                    }
-                }
-            }
-        }
+        // Merge arrays and keep unique values only
+        $uris = array_unique(array_merge($cachedUris, $elementUris));
 
         foreach ($uris as $uri) {
             $siteUri = new SiteUriModel([
@@ -88,7 +82,7 @@ class SiteUriHelper
                 'uri' => $uri,
             ]);
 
-            if ($siteUri->getIsCacheableUri()) {
+            if (!$cacheableOnly || $siteUri->getIsCacheableUri()) {
                 $siteUris[] = $siteUri;
             }
         }

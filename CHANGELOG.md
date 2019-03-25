@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.0.6 - 2019-03-25
+### Changed
+- Optimised how element site URIs are fetched from database.
+
 ## 2.0.5 - 2019-03-18
 ### Added
 - Added CP template roots for custom cache purgers.
