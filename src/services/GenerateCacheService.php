@@ -75,16 +75,13 @@ class GenerateCacheService extends Component
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array(get_class($element), ElementTypeHelper::getNonCacheableElementTypes(), true)) {
+        if (in_array(get_class($element), ElementTypeHelper::getNonCacheableElementTypes())) {
             return;
         }
 
-        // Cast ID to integer to ensure the strict type check below works
         /** @var Element $element */
-        $elementId = (int)$element->id;
-
-        if (!in_array($elementId, $this->_elementCaches, true)) {
-            $this->_elementCaches[] = $elementId;
+        if (!in_array($element->id, $this->_elementCaches)) {
+            $this->_elementCaches[] = $element->id;
         }
     }
 
@@ -102,7 +99,7 @@ class GenerateCacheService extends Component
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (in_array($elementQuery->elementType, ElementTypeHelper::getNonCacheableElementTypes(), true)) {
+        if (in_array($elementQuery->elementType, ElementTypeHelper::getNonCacheableElementTypes())) {
             return;
         }
 
@@ -120,6 +117,13 @@ class GenerateCacheService extends Component
 
         // Create a unique index from the element type and parameters for quicker indexing and less storage
         $index = sprintf('%u', crc32($elementQuery->elementType.$params));
+
+        $mutex = Craft::$app->getMutex();
+        $lockName = 'blitz:query:'.$index;
+
+        if (!$mutex->acquire($lockName)) {
+            return;
+        }
 
         // Use DB connection so we can insert and exclude audit columns
         $db = Craft::$app->getDb();
@@ -142,12 +146,11 @@ class GenerateCacheService extends Component
             $queryId = $db->getLastInsertID();
         }
 
-        // Cast ID to integer to ensure the strict type check below works
-        $queryId = (int)$queryId;
-
-        if (!in_array($queryId, $this->_elementQueryCaches, true)) {
+        if (!in_array($queryId, $this->_elementQueryCaches)) {
             $this->_elementQueryCaches[] = $queryId;
         }
+
+        $mutex->release($lockName);
     }
 
     /**
@@ -163,7 +166,7 @@ class GenerateCacheService extends Component
         }
 
         $mutex = Craft::$app->getMutex();
-        $lockName = 'blitz:'.$siteUri->siteId.'-'.$siteUri->uri;
+        $lockName = 'blitz:save:'.$siteUri->siteId.'-'.$siteUri->uri;
 
         if (!$mutex->acquire($lockName)) {
             return;
@@ -228,6 +231,8 @@ class GenerateCacheService extends Component
         }
 
         Blitz::$plugin->cacheStorage->save($output, $siteUri);
+
+        $mutex->release($lockName);
     }
 
     // Private Methods

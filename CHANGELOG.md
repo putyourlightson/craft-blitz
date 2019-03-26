@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.0.7 - 2019-03-26
+### Changed
+- Implemented extra preventative measures to help avoid integrity constraint violations when writing to the database.
+
 ## 2.0.6 - 2019-03-25
 ### Changed
 - Optimised how element site URIs are fetched from database.
