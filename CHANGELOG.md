@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.0.8 - Unreleased
+### Changed
+- Removed prepending of BOM characters to cached values to force UTF8 encoding ([#89](https://github.com/putyourlightson/craft-blitz/issues/89)).
+
 ## 2.0.7 - 2019-03-26
 ### Changed
 - Implemented extra preventative measures to help avoid integrity constraint violations when writing to the database.

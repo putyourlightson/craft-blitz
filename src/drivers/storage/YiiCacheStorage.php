@@ -59,9 +59,6 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function save(string $value, SiteUriModel $siteUri)
     {
-        // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
-        $value = "\xEF\xBB\xBF".$value;
-
         Craft::$app->getCache()->set([
             self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
         ], $value);

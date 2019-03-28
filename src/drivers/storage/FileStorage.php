@@ -100,9 +100,6 @@ class FileStorage extends BaseCacheStorage
             return;
         }
 
-        // Force UTF8 encoding by adding BOM as per https://stackoverflow.com/a/9047876
-        $value = "\xEF\xBB\xBF".$value;
-
         try {
             FileHelper::writeToFile($filePath, $value);
         }
