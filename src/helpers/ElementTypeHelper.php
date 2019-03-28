@@ -39,7 +39,7 @@ class ElementTypeHelper
     {
         if (self::$_nonCacheableElementTypes !== null) {
             return self::$_nonCacheableElementTypes;
-        };
+        }
 
         $event = new RegisterNonCacheableElementTypesEvent([
             'elementTypes' => Blitz::$plugin->settings->nonCacheableElementTypes,

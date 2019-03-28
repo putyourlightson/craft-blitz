@@ -71,7 +71,7 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['apiKey', 'email', 'zoneId'], 'required'],
@@ -140,7 +140,7 @@ class CloudflarePurger extends BaseCachePurger
      *
      * @return bool
      */
-    private function _sendRequest(string $method, string $action = '', array $params = [])
+    private function _sendRequest(string $method, string $action = '', array $params = []): bool
     {
         $response = false;
 

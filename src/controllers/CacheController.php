@@ -41,7 +41,7 @@ class CacheController extends Controller
      *
      * @throws ForbiddenHttpException
      */
-    public function beforeAction($action)
+    public function beforeAction($action): bool
     {
         parent::beforeAction($action);
 
@@ -174,7 +174,7 @@ class CacheController extends Controller
      *
      * @return Response
      */
-    private function _getResponse(string $message, bool $success = true)
+    private function _getResponse(string $message, bool $success = true): Response
     {
         $request = Craft::$app->getRequest();
 

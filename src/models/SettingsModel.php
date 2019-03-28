@@ -100,7 +100,7 @@ class SettingsModel extends Model
     /**
      * @var int|null
      */
-    public $cacheDuration = null;
+    public $cacheDuration;
 
     /**
      * @var string[]
@@ -137,7 +137,7 @@ class SettingsModel extends Model
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'parser' => [

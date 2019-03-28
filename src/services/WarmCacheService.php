@@ -87,11 +87,11 @@ class WarmCacheService extends Component
             'fulfilled' => function() use (&$success, &$count, $total, $setProgressHandler, $queue) {
                 $success++;
                 $count++;
-                call_user_func_array($setProgressHandler, [$count, $total, $queue]);
+                $setProgressHandler($count, $total, $queue);
             },
             'rejected' => function($reason) use (&$count, $total, $setProgressHandler, $queue) {
                 $count++;
-                call_user_func_array($setProgressHandler, [$count, $total, $queue]);
+                $setProgressHandler($count, $total, $queue);
 
                 if ($reason instanceof RequestException) {
                     /** RequestException $reason */

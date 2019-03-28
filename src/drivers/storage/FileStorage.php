@@ -66,7 +66,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['folderPath'], 'required'],
@@ -100,7 +100,7 @@ class FileStorage extends BaseCacheStorage
             return;
         }
 
-        // Force UTF8 encoding as per https://stackoverflow.com/a/9047876
+        // Force UTF8 encoding by adding BOM as per https://stackoverflow.com/a/9047876
         $value = "\xEF\xBB\xBF".$value;
 
         try {
@@ -173,7 +173,7 @@ class FileStorage extends BaseCacheStorage
                 }
 
                 if (strpos($otherSite['path'], $site['path']) === 0) {
-                    $site['count'] = $site['count'] - (is_dir($otherSite['path']) ? $sites[$otherSiteId]['count'] : 0);
+                    $site['count'] -= is_dir($otherSite['path']) ? $sites[$otherSiteId]['count'] : 0;
                 }
             }
         }

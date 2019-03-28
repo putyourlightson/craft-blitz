@@ -320,9 +320,14 @@ class Blitz extends Plugin
             function(RegisterTemplateRootsEvent $event) {
                 $purgerDrivers = CachePurgerHelper::getAllDrivers();
 
+                // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
+                $templateRootSets = [$event->roots];
+
                 foreach ($purgerDrivers as $purgerDriver) {
-                    $event->roots = array_merge($event->roots, $purgerDriver::getTemplatesRoot());
+                    $templateRootSets[] = $purgerDriver::getTemplatesRoot();
                 }
+
+                $event->roots = array_merge(...$templateRootSets);
             }
         );
     }

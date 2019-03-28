@@ -33,12 +33,12 @@ class CacheOptionsModel extends Model
     /**
      * @var string[]|null
      */
-    public $tags = null;
+    public $tags;
 
     /**
      * @var \DateTime|null
      */
-    public $expiryDate = null;
+    public $expiryDate;
 
     // Public Methods
     // =========================================================================

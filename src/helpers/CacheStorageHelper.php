@@ -64,7 +64,7 @@ class CacheStorageHelper
         $drivers = [];
 
         /** @var BaseCacheStorage $class */
-        foreach (CacheStorageHelper::getAllTypes() as $class) {
+        foreach (self::getAllTypes() as $class) {
             if ($class::isSelectable()) {
                 $driver = self::createDriver($class);
 

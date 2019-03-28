@@ -132,7 +132,7 @@ class RefreshCacheJob extends BaseJob
      *
      * @return int[]
      */
-    private static function _getElementQueryCacheIds(ElementQueryRecord $elementQueryRecord, array $elementIds, array $ignoreCacheIds): array
+    private function _getElementQueryCacheIds(ElementQueryRecord $elementQueryRecord, array $elementIds, array $ignoreCacheIds): array
     {
         $cacheIds = [];
 

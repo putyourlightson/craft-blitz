@@ -29,7 +29,7 @@ class GenerateCacheService extends Component
     /**
      * @var CacheOptionsModel
      */
-    public $options = null;
+    public $options;
 
     /**
      * @var int[]

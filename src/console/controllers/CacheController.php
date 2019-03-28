@@ -24,11 +24,6 @@ class CacheController extends Controller
     // =========================================================================
 
     /**
-     * @var string|null
-     */
-    public $tag = null;
-
-    /**
      * @var array
      */
     private $_actions = [];
@@ -48,7 +43,7 @@ class CacheController extends Controller
         }
     }
 
-    public function getActionHelp($action)
+    public function getActionHelp($action): string
     {
         return $this->_actions[$action->id]['instructions'] ?? parent::getActionHelp($action);
     }
