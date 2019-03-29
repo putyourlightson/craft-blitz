@@ -40,7 +40,11 @@ return [
     //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\DummyPurger',
 
     // The purger settings.
-    //'cachePurgerSettings' => [],
+    //'cachePurgerSettings' => [
+    //    'email' => '',
+    //    'apiKey' => '',
+    //    'zoneId' => '',
+    //],
 
     // The purger type classes to add to the plugin’s default purger types.
     //'cachePurgerTypes' => ['putyourlightson\blitz\drivers\purgers\CloudflarePurger'],
