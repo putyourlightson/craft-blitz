@@ -11,9 +11,11 @@ use craft\elements\db\ElementQuery;
 use craft\helpers\App;
 use craft\helpers\Json;
 use craft\queue\BaseJob;
+use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use Throwable;
 
 class RefreshCacheJob extends BaseJob
 {
@@ -45,8 +47,8 @@ class RefreshCacheJob extends BaseJob
 
     /**
      * @inheritdoc
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception
+     * @throws Throwable
      */
     public function execute($queue)
     {

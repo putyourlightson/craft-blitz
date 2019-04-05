@@ -15,6 +15,7 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
+use Throwable;
 
 class Install extends Migration
 {
@@ -39,7 +40,7 @@ class Install extends Migration
 
     /**
      * @return boolean
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function safeDown(): bool
     {

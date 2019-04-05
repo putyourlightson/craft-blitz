@@ -11,6 +11,7 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
+use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
@@ -302,7 +303,7 @@ class GenerateCacheService extends Component
         }
 
         // Convert DateTime objects to Unix timestamp
-        if ($value instanceof \DateTime) {
+        if ($value instanceof DateTime) {
             $value = $value->getTimestamp();
         }
     }

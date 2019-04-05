@@ -10,6 +10,7 @@ use craft\helpers\Template;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
+use Twig\Markup;
 
 class BlitzVariable
 {
@@ -44,9 +45,9 @@ class BlitzVariable
      *
      * @param string $uri
      *
-     * @return \Twig\Markup
+     * @return Markup
      */
-    public function getUri(string $uri): \Twig\Markup
+    public function getUri(string $uri): Markup
     {
         // Append no-cache query parameter
         $uri .= strpos($uri, '?') === false ? '?' : '&';
@@ -58,9 +59,9 @@ class BlitzVariable
     /**
      * Returns a script to get a CSRF input field.
      *
-     * @return \Twig\Markup
+     * @return Markup
      */
-    public function csrfInput(): \Twig\Markup
+    public function csrfInput(): Markup
     {
         $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/input';
 
@@ -99,9 +100,9 @@ class BlitzVariable
      *
      * @param string $uri
      *
-     * @return \Twig\Markup
+     * @return Markup
      */
-    private function _getScript(string $uri): \Twig\Markup
+    private function _getScript(string $uri): Markup
     {
         $view = Craft::$app->getView();
 

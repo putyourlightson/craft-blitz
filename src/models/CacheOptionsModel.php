@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\models;
 use craft\base\Model;
 use craft\helpers\ConfigHelper;
 use craft\validators\DateTimeValidator;
+use DateTime;
 use putyourlightson\blitz\helpers\CacheTagHelper;
 
 class CacheOptionsModel extends Model
@@ -36,7 +37,7 @@ class CacheOptionsModel extends Model
     public $tags;
 
     /**
-     * @var \DateTime|null
+     * @var DateTime|null
      */
     public $expiryDate;
 
@@ -121,7 +122,7 @@ class CacheOptionsModel extends Model
             $cacheDuration += time();
 
             // Prepend with @ symbol to specify a timestamp
-            $this->expiryDate = new \DateTime('@'.$cacheDuration);
+            $this->expiryDate = new DateTime('@'.$cacheDuration);
         }
 
         return $this;
@@ -140,7 +141,7 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param \DateTime|null
+     * @param DateTime|null
      *
      * @return static self reference
      */
