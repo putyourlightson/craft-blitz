@@ -37,9 +37,9 @@ return [
     //'cacheStorageTypes' => [],
 
     // The purger type to use.
-    //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\DummyPurger',
+    //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
 
-    // The purger settings.
+    // The purger settings (each purger can have its own unique settings).
     //'cachePurgerSettings' => [
     //    'email' => '',
     //    'apiKey' => '',
@@ -52,8 +52,14 @@ return [
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,
 
+    // Whether the cache should automatically be cleared after clearing globals.
+    //'clearCacheAutomaticallyForGlobals' => true,
+
     // Whether the cache should automatically be warmed after clearing.
     //'warmCacheAutomatically' => true,
+
+    // Whether the cache should automatically be warmed after clearing globals.
+    //'warmCacheAutomaticallyForGlobals' => true,
 
     // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 1 and 5 is recommended.
     //'concurrency' => 3,
@@ -91,7 +97,4 @@ return [
 
     // Whether the timestamp and served by comments should be appended to the cached output.
     //'outputComments' => true,
-
-    // Whether the cache should automatically be warmed after clearing globals.
-    //'warmCacheAutomaticallyForGlobals' => true,
 ];

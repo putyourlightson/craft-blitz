@@ -11,6 +11,7 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
+use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
@@ -124,7 +125,9 @@ class RefreshCacheService extends Component
     {
         // Clear the site cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
-            Blitz::$plugin->clearCache->clearSite($element->siteId);
+            if (Blitz::$plugin->settings->clearCacheAutomaticallyForGlobals) {
+                Blitz::$plugin->clearCache->clearSite($element->siteId);
+            }
 
             if (Blitz::$plugin->settings->cachingEnabled
                 && Blitz::$plugin->settings->warmCacheAutomatically
@@ -172,7 +175,7 @@ class RefreshCacheService extends Component
      */
     public function addElementExpiryDates(Element $element)
     {
-        $now = new \DateTime();
+        $now = new DateTime();
 
         if (!empty($element->postDate) && $element->postDate > $now) {
             $expiryDate = $element->postDate;
@@ -192,9 +195,9 @@ class RefreshCacheService extends Component
      * Adds an expiry date for a given element.
      *
      * @param Element $element
-     * @param \DateTime $expiryDate
+     * @param DateTime $expiryDate
      */
-    public function addElementExpiryDate(Element $element, \DateTime $expiryDate)
+    public function addElementExpiryDate(Element $element, DateTime $expiryDate)
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
@@ -223,12 +226,12 @@ class RefreshCacheService extends Component
      * Adds an expiry date for the given cache IDs.
      *
      * @param int[] $cacheIds
-     * @param \DateTime|null $expiryDate
+     * @param DateTime|null $expiryDate
      */
-    public function expireCacheIds(array $cacheIds, \DateTime $expiryDate = null)
+    public function expireCacheIds(array $cacheIds, DateTime $expiryDate = null)
     {
         if ($expiryDate === null) {
-            $expiryDate = new \DateTime();
+            $expiryDate = new DateTime();
         }
 
         $expiryDate = Db::prepareDateForDb($expiryDate);
@@ -306,14 +309,14 @@ class RefreshCacheService extends Component
         // Check for expired caches to invalidate
         $cacheIds = CacheRecord::find()
             ->select('id')
-            ->where(['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())])
+            ->where(['<', 'expiryDate', Db::prepareDateForDb(new DateTime())])
             ->column();
 
         $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
 
         // Check for expired elements to invalidate
         $elementExpiryDates = ElementExpiryDateRecord::find()
-            ->where(['<', 'expiryDate', Db::prepareDateForDb(new \DateTime())])
+            ->where(['<', 'expiryDate', Db::prepareDateForDb(new DateTime())])
             ->all();
 
         if (!empty($elementExpiryDates)) {

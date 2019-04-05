@@ -70,7 +70,17 @@ class SettingsModel extends Model
     /**
      * @var bool
      */
+    public $clearCacheAutomaticallyForGlobals = true;
+
+    /**
+     * @var bool
+     */
     public $warmCacheAutomatically = true;
+
+    /**
+     * @var bool
+     */
+    public $warmCacheAutomaticallyForGlobals = true;
 
     /**
      * @var int
@@ -125,11 +135,6 @@ class SettingsModel extends Model
      * @var bool
      */
     public $outputComments = true;
-
-    /**
-     * @var bool
-     */
-    public $warmCacheAutomaticallyForGlobals = true;
 
     // Public Methods
     // =========================================================================

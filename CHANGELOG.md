@@ -1,8 +1,12 @@
 # Release Notes for Blitz
 
 ## 2.0.8 - Unreleased
+### Added
+- Added `clearCacheAutomaticallyForGlobals` config setting.
+
 ### Changed
 - Removed prepending of BOM characters to cached values to force UTF8 encoding ([#89](https://github.com/putyourlightson/craft-blitz/issues/89)).
+- Changed default `cachePurgerSettings` to reflect Cloudflare purger in `config.php`.
 
 ## 2.0.7 - 2019-03-26
 ### Changed
