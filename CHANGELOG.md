@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 2.0.8 - Unreleased
+## 2.0.8 - 2019-04-05
 ### Added
 - Added `clearCacheAutomaticallyForGlobals` config setting.
 
