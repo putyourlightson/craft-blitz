@@ -58,7 +58,7 @@ If you are using “Blitz File Storage” as the cache storage type, you can add
 
 You can reduce the likelihood of visitors hitting un-cached pages by automatically keeping those caches warm. One way to do this is to create a cron job to [refresh expired cache](#refresh-expired-cache) regularly and automatically.
 
-Craft’s `{% cache %}` tag doesn't always play well with Blitz cache invalidation. Since template caching becomes redundant with full page caching, it is best to remove {% cache %} tags from templates Blitz caches, or simply disable template caching from `config/general.php`:
+Craft’s `{% cache %}` tag doesn't always play well with Blitz cache invalidation. Since template caching becomes redundant with full page caching, it is best to remove `{% cache %}` tags from templates Blitz caches, or simply disable template caching from `config/general.php`:
 
 ```php
 'enableTemplateCaching' => false,

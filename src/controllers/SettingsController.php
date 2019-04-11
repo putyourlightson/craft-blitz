@@ -122,18 +122,15 @@ class SettingsController extends Controller
             return null;
         }
 
-        if (!$purgerDriver->test()) {
-            Craft::$app->getSession()->setError(Craft::t('blitz', 'Purger connection failed.'));
-
-            Craft::$app->getUrlManager()->setRouteParams($variables);
-
-            return null;
-        }
-
         // Save it
         Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
 
-        Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Plugin settings saved.'));
+        if (!$purgerDriver->test()) {
+            Craft::$app->getSession()->setError(Craft::t('blitz', 'Plugin settings saved. Purger connection failed.'));
+        }
+        else {
+            Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Plugin settings saved.'));
+        }
 
         return $this->redirectToPostedUrl();
     }
