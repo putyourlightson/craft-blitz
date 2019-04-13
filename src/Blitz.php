@@ -7,6 +7,7 @@ namespace putyourlightson\blitz;
 
 use Craft;
 use craft\base\Plugin;
+use craft\console\controllers\ResaveController;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
 use craft\events\ElementEvent;
@@ -20,8 +21,6 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
-use craft\queue\jobs\ResaveElements;
-use craft\queue\Queue;
 use craft\services\Elements;
 use craft\services\Gc;
 use craft\services\Plugins;
@@ -48,7 +47,6 @@ use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
-use yii\queue\ExecEvent;
 
 /**
  *
@@ -98,6 +96,7 @@ class Blitz extends Plugin
         // Register events
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
+        $this->_registerPluginEvents();
         $this->_registerClearCaches();
         $this->_registerGarbageCollection();
 
@@ -234,8 +233,8 @@ class Blitz extends Plugin
                 $this->refreshCache->addElement($event->element);
             }
         );
-        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
-            function(MoveElementEvent $event) {
+        Event::on(Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENT,
+            function(ElementEvent $event) {
                 $this->refreshCache->addElement($event->element);
             }
         );
@@ -244,6 +243,13 @@ class Blitz extends Plugin
                 $this->refreshCache->addElement($event->element);
             }
         );
+        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
+            function(MoveElementEvent $event) {
+                $this->refreshCache->addElement($event->element);
+            }
+        );
+
+        // Add cache IDs before deleting an element so we can refresh it
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(ElementEvent $event) {
                 $this->refreshCache->addCacheIds($event->element);
@@ -257,30 +263,53 @@ class Blitz extends Plugin
      */
     private function _registerResaveElementEvents()
     {
+        // TODO: Add events for propagating elements
         // Turn on batch mode
-        Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
-                    $this->refreshCache->batchMode = true;
-                }
+        Event::on(Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS,
+            function() {
+                $this->refreshCache->batchMode = true;
+            }
+        );
+        Event::on(ResaveController::class, ResaveController::EVENT_BEFORE_ACTION,
+            function() {
+                $this->refreshCache->batchMode = true;
             }
         );
 
         // Refresh the cache
-        Event::on(Queue::class, Queue::EVENT_AFTER_EXEC,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
-                    $this->refreshCache->refresh();
-                }
+        Event::on(Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS,
+            function() {
+                $this->refreshCache->refresh();
             }
         );
-        Event::on(Queue::class, Queue::EVENT_AFTER_ERROR,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
-                    $this->refreshCache->refresh();
-                }
+        Event::on(ResaveController::class, ResaveController::EVENT_AFTER_ACTION,
+            function() {
+                $this->refreshCache->refresh();
             }
         );
+
+    }
+
+    /**
+     * Registers plugin events
+     */
+    private function _registerPluginEvents()
+    {
+        // SEOmatic
+        $class = 'nystudio107\seomatic\Seomatic';
+
+        if (class_exists($class) && Craft::$app->getPlugins()->isPluginInstalled('seomatic')) {
+            $metaContainers = $class::$plugin->metaContainers ?? null;
+
+            if ($metaContainers && defined($metaContainers::EVENT_INVALIDATE_CONTAINER_CACHES)) {
+                Event::on($metaContainers, $metaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
+                    function(nystudio107\seomatic\events\InvalidateContainerCachesEvent $event) {
+                        $this->refreshCache->addCacheIds($event->element);
+                        $this->refreshCache->refresh();
+                    }
+                );
+            }
+        };
     }
 
     /**

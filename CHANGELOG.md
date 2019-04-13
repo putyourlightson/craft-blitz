@@ -1,5 +1,12 @@
 # Release Notes for Blitz
 
+## 2.1.0 - Unreleased
+### Added
+- Added new events to detect when elements are being resaved or propagated.
+
+### Changed
+- Changed minimum requirement of Craft to version 3.2.0.
+
 ## 2.0.9 - Unreleased
 ### Changed
 - Settings are saved with warning message even if purger test fails.
