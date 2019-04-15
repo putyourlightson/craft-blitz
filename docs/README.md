@@ -470,8 +470,9 @@ To add your cache purger to Blitz, you can create a stand-alone composer package
 ],
 ```
 
-Cache purger packages:
+Available cache purger packages:
 
+- [CloudFront](https://github.com/putyourlightson/craft-blitz-cloudfront) (PutYourLightsOn)
 - [KeyCDN](https://github.com/putyourlightson/craft-blitz-keycdn) (PutYourLightsOn)
 
 If you prefer to write your cache purger as a module or plugin, then register it by listening for the `EVENT_REGISTER_PURGER_TYPES` event and adding the class to the `$event->types` array.
