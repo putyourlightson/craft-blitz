@@ -499,6 +499,10 @@ Event::on(CachePurgerHelper::class,
 
 Ensure that the *Caching Enabled* setting is switched on and that the page you are visiting matches an *Included URI Pattern* (and not an *Excluded URI Pattern*). Blitz will not cache pages that display the debug toolbar so check that you are *not* logged in as an admin with the debug toolbar enabled on the front-end.
 
+> “The site is not being cached when using console commands.”
+
+Ensure that the site's *Base URL* does not use the `@web` alias and is not determined by a web request. A console request doesn’t come in through a URL so there will be nothing to detect so it is best to provide an absolute URL where possible. Ensure also that your site is switched on and publicly accessible.
+
 > “The refresh cache queue job is stalling.”
 
 This is likely due to PHP timing out or running out of memory and is a [common issue](https://craftcms.com/guides/resolving-stalled-background-tasks) in Craft. For large sites  we recommend increasing `max_execution_time` to `300` and `memory_limit` to at least `1024M`.  The [Async Queue](https://plugins.craftcms.com/async-queue) plugin can help prevent timeouts and memory issues by running jobs as background tasks and the [Queue Manager](https://plugins.craftcms.com/queue-manager) plugin allows you to see what jobs are in the queue and manipulate them.
