@@ -2,10 +2,11 @@
 
 ## 2.1.0 - Unreleased
 ### Added
-- Added new events to detect when elements are being resaved or propagated.
+- Added new events to detect when elements are being resaved and prevent multiple refresh cache jobs from being created.
 
 ### Changed
 - Changed minimum requirement of Craft to version 3.2.0.
+- Added optimisations to detect when elements are being propagated.
 
 ## 2.0.9 - Unreleased
 ### Changed

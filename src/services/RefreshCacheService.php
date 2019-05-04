@@ -123,16 +123,26 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element)
     {
-        // Clear the site cache if this is a global set element as they are populated on every request
+        // Return if not an Element
+        if (!($element instanceof Element)) {
+            return;
+        }
+
+        // Return if propagating
+        if ($element->propagating) {
+            return;
+        }
+
+        // Clear the entire cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
             if (Blitz::$plugin->settings->clearCacheAutomaticallyForGlobals) {
-                Blitz::$plugin->clearCache->clearSite($element->siteId);
+                Blitz::$plugin->clearCache->clearAll();
             }
 
             if (Blitz::$plugin->settings->cachingEnabled
                 && Blitz::$plugin->settings->warmCacheAutomatically
                 && Blitz::$plugin->settings->warmCacheAutomaticallyForGlobals) {
-                Blitz::$plugin->warmCache->warmSite($element->siteId);
+                Blitz::$plugin->warmCache->warmAll();
             }
 
             return;
