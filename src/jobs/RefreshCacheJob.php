@@ -54,9 +54,6 @@ class RefreshCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
-        // Step 1
-        $this->setProgress($queue, 1/3);
-
         // Merge in element cache IDs
         $this->cacheIds = array_merge($this->cacheIds,
             Blitz::$plugin->refreshCache->getElementCacheIds(
@@ -69,6 +66,10 @@ class RefreshCacheJob extends BaseJob
                 $this->elementTypes, $this->cacheIds
             );
 
+            // Set progress total to number of query records plus one
+            $total = count($elementQueryRecords) + 1;
+            $count = 0;
+
             // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
             $elementQueryCacheIdSets = [[]];
 
@@ -77,6 +78,9 @@ class RefreshCacheJob extends BaseJob
                 $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
                     $elementQueryRecord, $this->elementIds, $this->cacheIds
                 );
+
+                $count++;
+                $this->setProgress($queue, $count / $total);
             }
 
             $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
@@ -87,9 +91,6 @@ class RefreshCacheJob extends BaseJob
         if (empty($this->cacheIds)) {
             return;
         }
-
-        // Step 2
-        $this->setProgress($queue, 2/3);
 
         // If clear automatically is enabled or if force clear
         if (Blitz::$plugin->settings->clearCacheAutomatically || $this->forceClear) {
