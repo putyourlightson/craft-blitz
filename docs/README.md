@@ -501,7 +501,7 @@ Ensure that the *Caching Enabled* setting is switched on and that the page you a
 
 > “The site is not being cached when using console commands.”
 
-Ensure that the site's *Base URL* does not use the `@web` alias and is not determined by a web request. A console request doesn’t come in through a URL so there will be nothing to detect so it is best to provide an absolute URL where possible. Ensure also that your site is switched on and publicly accessible.
+Ensure that the site’s *Base URL* does not use the `@web` alias and is not determined by a web request. A console request doesn’t come in through a URL so there will be nothing to detect so it is best to provide an absolute URL where possible. Ensure also that your site is switched on and publicly accessible.
 
 > “The refresh cache queue job is stalling.”
 
