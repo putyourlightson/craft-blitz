@@ -6,10 +6,7 @@
 
 ### Changed
 - Changed minimum requirement of Craft to version 3.2.0.
-- Added optimisations to detect when elements are being propagated.
-
-## 2.0.9 - Unreleased
-### Changed
+- Improved queue job progress feedback when refreshing and warming the cache.
 - Settings are saved with warning message even if purger test fails.
 
 ## 2.0.8 - 2019-04-05
