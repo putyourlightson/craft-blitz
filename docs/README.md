@@ -470,8 +470,9 @@ To add your cache purger to Blitz, you can create a stand-alone composer package
 ],
 ```
 
-Cache purger packages:
+Available cache purger packages:
 
+- [CloudFront](https://github.com/putyourlightson/craft-blitz-cloudfront) (PutYourLightsOn)
 - [KeyCDN](https://github.com/putyourlightson/craft-blitz-keycdn) (PutYourLightsOn)
 
 If you prefer to write your cache purger as a module or plugin, then register it by listening for the `EVENT_REGISTER_PURGER_TYPES` event and adding the class to the `$event->types` array.
@@ -497,6 +498,10 @@ Event::on(CachePurgerHelper::class,
 > “The site is not being cached when I visit it.”
 
 Ensure that the *Caching Enabled* setting is switched on and that the page you are visiting matches an *Included URI Pattern* (and not an *Excluded URI Pattern*). Blitz will not cache pages that display the debug toolbar so check that you are *not* logged in as an admin with the debug toolbar enabled on the front-end.
+
+> “The site is not being cached when using console commands.”
+
+Ensure that the site’s *Base URL* does not use the `@web` alias and is not determined by a web request. A console request doesn’t come in through a URL so there will be nothing to detect so it is best to provide an absolute URL where possible. Ensure also that your site is switched on and publicly accessible.
 
 > “The refresh cache queue job is stalling.”
 
