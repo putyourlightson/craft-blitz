@@ -7,7 +7,8 @@
 ### Changed
 - Changed minimum requirement of Craft to version 3.2.0.
 - Improved queue job progress feedback when refreshing and warming the cache.
-- Settings are saved with warning message even if purger test fails.
+- Assets that are being indexed no longer trigger refresh cache jobs. 
+- Settings are now saved with a warning message even if purger test fails.
 
 ## 2.0.8 - 2019-04-05
 ### Added

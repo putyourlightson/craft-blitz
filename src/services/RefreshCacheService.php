@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
+use craft\elements\Asset;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use DateTime;
@@ -123,13 +124,18 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element)
     {
-        // Return if not an Element
+        // Don't proceed if not an Element
         if (!($element instanceof Element)) {
             return;
         }
 
-        // Return if propagating
+        // Don't proceed if propagating
         if ($element->propagating) {
+            return;
+        }
+
+        // Don't proceed if this element is an asset that is being indexed
+        if ($element instanceof Asset && $element->getScenario() == Asset::SCENARIO_INDEX) {
             return;
         }
 
