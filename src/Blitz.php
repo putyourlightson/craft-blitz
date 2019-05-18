@@ -384,9 +384,7 @@ class Blitz extends Plugin
     {
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function(RegisterComponentTypesEvent $event) {
-                if (Craft::$app->getUser()->checkPermission('blitz:cache-utility')) {
-                    $event->types[] = CacheUtility::class;
-                }
+                $event->types[] = CacheUtility::class;
             }
         );
     }
@@ -418,7 +416,24 @@ class Blitz extends Plugin
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {
                 $event->permissions['Blitz'] = [
-                    'blitz:cache-utility' => ['label' => Craft::t('blitz', 'Access cache utility')],
+                    'blitz:clear' => [
+                        'label' => Craft::t('blitz', 'Clear cache')
+                    ],
+                    'blitz:flush' => [
+                        'label' => Craft::t('blitz', 'Flush cache')
+                    ],
+                    'blitz:purge' => [
+                        'label' => Craft::t('blitz', 'Purge cache')
+                    ],
+                    'blitz:warm' => [
+                        'label' => Craft::t('blitz', 'Warm cache')
+                    ],
+                    'blitz:refresh-expired' => [
+                        'label' => Craft::t('blitz', 'Refresh entire cache')
+                    ],
+                    'blitz:refresh-tagged' => [
+                        'label' => Craft::t('blitz', 'Refresh tagged cache')
+                    ],
                 ];
             }
         );

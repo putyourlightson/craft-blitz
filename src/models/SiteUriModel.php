@@ -60,7 +60,7 @@ class SiteUriModel extends Model
         }
 
         // Ignore URIs that are longer than the max URI length
-        if (count($this->uri) > self::MAX_URI_LENGTH) {
+        if (strlen($this->uri) > self::MAX_URI_LENGTH) {
             return false;
         }
 

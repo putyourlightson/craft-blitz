@@ -2,14 +2,15 @@
 
 ## 2.1.0 - Unreleased
 ### Added
-- Added new events to detect when elements are being resaved and prevent multiple refresh cache jobs from being created.
+- Added new events to detect when elements are being resaved and prevent multiple refresh cache jobs from being created ([#98](https://github.com/putyourlightson/craft-blitz/issues/98)).
+- Added user group permissions for each of the available functions in the Blitz cache utility ([#104](https://github.com/putyourlightson/craft-blitz/issues/104)).
 
 ### Changed
 - Changed minimum requirement of Craft to version 3.2.0.
 - Improved queue job progress feedback when refreshing and warming the cache.
 - Assets that are being indexed no longer trigger refresh cache jobs. 
 - Settings are now saved with a warning message even if purger test fails.
-- Changed maximum length of URIs to 500 characters.
+- Changed maximum length of URIs to 500 characters([#105](https://github.com/putyourlightson/craft-blitz/issues/105)).
 
 ## 2.0.8 - 2019-04-05
 ### Added
