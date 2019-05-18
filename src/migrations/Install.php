@@ -9,6 +9,7 @@ use Craft;
 use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
@@ -71,7 +72,7 @@ class Install extends Migration
             $this->createTable(CacheRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string()->notNull(),
+                'uri' => $this->string(SiteUriModel::MAX_URI_LENGTH)->notNull(),
                 'expiryDate' => $this->dateTime(),
             ]);
         }

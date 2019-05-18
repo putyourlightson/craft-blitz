@@ -9,6 +9,7 @@
 - Improved queue job progress feedback when refreshing and warming the cache.
 - Assets that are being indexed no longer trigger refresh cache jobs. 
 - Settings are now saved with a warning message even if purger test fails.
+- Changed maximum length of URIs to 500 characters.
 
 ## 2.0.8 - 2019-04-05
 ### Added
