@@ -66,11 +66,6 @@ class RefreshCacheJob extends BaseJob
         $cacheIds = array_merge($this->cacheIds, $elementCacheIds);
 
         if (count($this->elementIds)) {
-            // Set progress label
-            $this->setProgress($queue, 0,
-                Craft::t('blitz', 'Finding element query matches.')
-            );
-
             $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
                 $this->elementTypes, $cacheIds
             );
@@ -90,7 +85,12 @@ class RefreshCacheJob extends BaseJob
                     );
 
                     $count++;
-                    $this->setProgress($queue, $count / $total);
+                    $this->setProgress($queue, $count / $total,
+                        Craft::t('blitz', 'Checked {count} of {total} element queries.', [
+                            'count' => $count,
+                            'total' => $total,
+                        ])
+                    );
                 }
 
                 $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
@@ -102,13 +102,15 @@ class RefreshCacheJob extends BaseJob
             return;
         }
 
-        // Set progress label
-        $this->setProgress($queue, 1,
-            Craft::t('blitz', 'Clearing cached pages.')
-        );
-
         // If clear automatically is enabled or if force clear
         if (Blitz::$plugin->settings->clearCacheAutomatically || $this->forceClear) {
+            // Set progress label
+            $this->setProgress($queue, 1,
+                Craft::t('blitz', 'Clearing {total} cached pages.', [
+                    'total' => count($cacheIds)
+                ])
+            );
+
             Blitz::$plugin->refreshCache->refreshCacheIds($cacheIds);
         }
         else {

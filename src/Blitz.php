@@ -11,7 +11,6 @@ use craft\console\controllers\ResaveController;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
 use craft\events\DeleteElementEvent;
-use craft\events\ElementEvent;
 use craft\events\MoveElementEvent;
 use craft\events\PluginEvent;
 use craft\events\PopulateElementEvent;
@@ -249,7 +248,7 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on($event[0], $event[1],
-                function(ElementEvent $event) {
+                function(Event $event) {
                     $this->refreshCache->addElement($event->element);
                 }
             );
