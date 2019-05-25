@@ -13,7 +13,6 @@ use craft\helpers\Json;
 use craft\queue\BaseJob;
 use Exception;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use Throwable;
 
@@ -54,60 +53,66 @@ class RefreshCacheJob extends BaseJob
     {
         App::maxPowerCaptain();
 
-        // Merge in element cache IDs
-        $this->cacheIds = array_merge($this->cacheIds,
-            Blitz::$plugin->refreshCache->getElementCacheIds(
-                $this->elementIds, $this->cacheIds
-            )
+        // Set progress label
+        $this->setProgress($queue, 0,
+            Craft::t('blitz', 'Finding cached pages.')
         );
 
-        if (!empty($this->elementIds)) {
-            $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
-                $this->elementTypes, $this->cacheIds
+        // Merge in element cache IDs
+        $elementCacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
+            $this->elementIds, $this->cacheIds
+        );
+
+        $cacheIds = array_merge($this->cacheIds, $elementCacheIds);
+
+        if (count($this->elementIds)) {
+            // Set progress label
+            $this->setProgress($queue, 0,
+                Craft::t('blitz', 'Finding element query matches.')
             );
 
-            // Set progress total to number of query records plus one
-            $total = count($elementQueryRecords) + 1;
-            $count = 0;
+            $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
+                $this->elementTypes, $cacheIds
+            );
 
-            // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
-            $elementQueryCacheIdSets = [[]];
+            if (count($elementQueryRecords)) {
+                // Set progress total to number of query records plus one to avoid dividing by zero
+                $total = count($elementQueryRecords) + 1;
+                $count = 0;
 
-            foreach ($elementQueryRecords as $elementQueryRecord) {
-                // Merge in element query cache IDs
-                $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
-                    $elementQueryRecord, $this->elementIds, $this->cacheIds
-                );
+                // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
+                $elementQueryCacheIdSets = [[]];
 
-                $count++;
-                $this->setProgress($queue, $count / $total);
+                foreach ($elementQueryRecords as $elementQueryRecord) {
+                    // Merge in element query cache IDs
+                    $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
+                        $elementQueryRecord, $this->elementIds, $cacheIds
+                    );
+
+                    $count++;
+                    $this->setProgress($queue, $count / $total);
+                }
+
+                $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
+                $cacheIds = array_merge($cacheIds, $elementQueryCacheIds);
             }
-
-            $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
-
-            $this->cacheIds = array_merge($this->cacheIds, $elementQueryCacheIds);
         }
 
-        if (empty($this->cacheIds)) {
+        if (empty($cacheIds)) {
             return;
         }
 
+        // Set progress label
+        $this->setProgress($queue, 1,
+            Craft::t('blitz', 'Clearing cached pages.')
+        );
+
         // If clear automatically is enabled or if force clear
         if (Blitz::$plugin->settings->clearCacheAutomatically || $this->forceClear) {
-            // Get cached site URIs from cache IDs
-            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
-
-            // Delete cache records so we get fresh caches
-            Blitz::$plugin->flushCache->flushCacheIds($this->cacheIds);
-
-            // Delete cached values so we get a fresh version
-            Blitz::$plugin->cacheStorage->deleteUris($siteUris);
-
-            // Trigger afterRefreshCache events
-            Blitz::$plugin->refreshCache->afterRefresh($siteUris);
+            Blitz::$plugin->refreshCache->refreshCacheIds($cacheIds);
         }
         else {
-            Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
+            Blitz::$plugin->refreshCache->expireCacheIds($cacheIds);
         }
     }
 

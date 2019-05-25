@@ -6,7 +6,6 @@
 namespace putyourlightson\blitz;
 
 use Craft;
-use craft\base\Element;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
 use craft\elements\db\ElementQuery;
@@ -271,13 +270,13 @@ class Blitz extends Plugin
     {
         // Enable batch mode
         $events = [
-            Elements::class => Elements::EVENT_BEFORE_RESAVE_ELEMENTS,
-            Elements::class => Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS,
-            ResaveController::class => ResaveController::EVENT_BEFORE_ACTION,
+            [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
+            [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
+            [ResaveController::class, ResaveController::EVENT_BEFORE_ACTION],
         ];
 
-        foreach ($events as $class => $event) {
-            Event::on($class, $event,
+        foreach ($events as $event) {
+            Event::on($event[0], $event[1],
                 function() {
                     $this->refreshCache->batchMode = true;
                 }
@@ -286,13 +285,13 @@ class Blitz extends Plugin
 
         // Refresh the cache
         $events = [
-            Elements::class => Elements::EVENT_AFTER_RESAVE_ELEMENTS,
-            Elements::class => Elements::EVENT_AFTER_PROPAGATE_ELEMENTS,
-            ResaveController::class => ResaveController::EVENT_AFTER_ACTION,
+            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
+            [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
+            [ResaveController::class, ResaveController::EVENT_AFTER_ACTION],
         ];
 
-        foreach ($events as $class => $event) {
-            Event::on($class, $event,
+        foreach ($events as $event) {
+            Event::on($event[0], $event[1],
                 function() {
                     $this->refreshCache->refresh();
                 }
