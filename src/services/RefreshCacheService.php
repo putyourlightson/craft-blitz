@@ -129,6 +129,11 @@ class RefreshCacheService extends Component
             return;
         }
 
+        // Don't proceed if draft or revision
+        if ($element->draftId !== null || $element->revisionId !== null) {
+            return;
+        }
+
         // Don't proceed if propagating
         if ($element->propagating) {
             return;

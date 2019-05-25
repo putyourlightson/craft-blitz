@@ -6,10 +6,12 @@
 namespace putyourlightson\blitz;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
+use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
 use craft\events\MoveElementEvent;
 use craft\events\PluginEvent;
@@ -87,10 +89,11 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
+        // Register services and variable before processing the request
         $this->_registerComponents();
-
         $this->_registerVariable();
 
+        // Process the request
         $this->_processCacheableRequest();
 
         // Register events
@@ -128,7 +131,7 @@ class Blitz extends Plugin
     // =========================================================================
 
     /**
-     * Processes cacheable request.
+     * Processes cacheable request
      */
     private function _processCacheableRequest()
     {
@@ -227,32 +230,35 @@ class Blitz extends Plugin
      */
     private function _registerElementEvents()
     {
-        // Invalidate elements
-        Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->refreshCache->addElement($event->element);
-            }
-        );
-        Event::on(Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->refreshCache->addElement($event->element);
-            }
-        );
-        Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
-            function(ElementEvent $event) {
-                $this->refreshCache->addElement($event->element);
-            }
-        );
-        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
-            function(MoveElementEvent $event) {
-                $this->refreshCache->addElement($event->element);
+        // Add cache IDs before hard deleting elements so we can refresh them
+        Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
+            function(DeleteElementEvent $event) {
+                if ($event->hardDelete) {
+                    $this->refreshCache->addCacheIds($event->element);
+                }
             }
         );
 
-        // Add cache IDs before deleting an element so we can refresh it
-        Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->refreshCache->addCacheIds($event->element);
+        // Invalidate elements
+        $events = [
+            [Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT],
+            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENT],
+            [Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI],
+            [Elements::class, Elements::EVENT_AFTER_DELETE_ELEMENT],
+            [Elements::class, Elements::EVENT_AFTER_RESTORE_ELEMENT],
+        ];
+
+        foreach ($events as $event) {
+            Event::on($event[0], $event[1],
+                function(ElementEvent $event) {
+                    $this->refreshCache->addElement($event->element);
+                }
+            );
+        }
+
+        // TODO: use the events as above when MoveElementEvent extends ElementEvent
+        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
+            function(MoveElementEvent $event) {
                 $this->refreshCache->addElement($event->element);
             }
         );
@@ -263,31 +269,35 @@ class Blitz extends Plugin
      */
     private function _registerResaveElementEvents()
     {
-        // TODO: Add events for propagating elements
-        // Turn on batch mode
-        Event::on(Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS,
-            function() {
-                $this->refreshCache->batchMode = true;
-            }
-        );
-        Event::on(ResaveController::class, ResaveController::EVENT_BEFORE_ACTION,
-            function() {
-                $this->refreshCache->batchMode = true;
-            }
-        );
+        // Enable batch mode
+        $events = [
+            Elements::class => Elements::EVENT_BEFORE_RESAVE_ELEMENTS,
+            Elements::class => Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS,
+            ResaveController::class => ResaveController::EVENT_BEFORE_ACTION,
+        ];
+
+        foreach ($events as $class => $event) {
+            Event::on($class, $event,
+                function() {
+                    $this->refreshCache->batchMode = true;
+                }
+            );
+        }
 
         // Refresh the cache
-        Event::on(Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS,
-            function() {
-                $this->refreshCache->refresh();
-            }
-        );
-        Event::on(ResaveController::class, ResaveController::EVENT_AFTER_ACTION,
-            function() {
-                $this->refreshCache->refresh();
-            }
-        );
+        $events = [
+            Elements::class => Elements::EVENT_AFTER_RESAVE_ELEMENTS,
+            Elements::class => Elements::EVENT_AFTER_PROPAGATE_ELEMENTS,
+            ResaveController::class => ResaveController::EVENT_AFTER_ACTION,
+        ];
 
+        foreach ($events as $class => $event) {
+            Event::on($class, $event,
+                function() {
+                    $this->refreshCache->refresh();
+                }
+            );
+        }
     }
 
     /**

@@ -2,7 +2,8 @@
 
 ## 2.1.0 - Unreleased
 ### Added
-- Added new events to detect when elements are being resaved and prevent multiple refresh cache jobs from being created ([#98](https://github.com/putyourlightson/craft-blitz/issues/98)).
+- Added compatibility for drafts and revisions in Craft 3.2.0.
+- Added new events to detect when elements are being resaved and propagated in order to prevent multiple refresh cache jobs from being unnecessarilty created ([#98](https://github.com/putyourlightson/craft-blitz/issues/98)).
 - Added user group permissions for each of the available functions in the Blitz cache utility ([#104](https://github.com/putyourlightson/craft-blitz/issues/104)).
 
 ### Changed
