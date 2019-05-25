@@ -4,6 +4,7 @@
 ### Added
 - Added compatibility for drafts and revisions in Craft 3.2.0.
 - Added queue job progress labels when refreshing and warming the cache.
+- Added Campaign plugin contacts as non cacheable element type.
 - Added new events to detect when elements are being resaved and propagated in order to prevent multiple refresh cache jobs from being unnecessarily created ([#98](https://github.com/putyourlightson/craft-blitz/issues/98)).
 - Added user group permissions for each of the available functions in the Blitz cache utility ([#104](https://github.com/putyourlightson/craft-blitz/issues/104)).
 

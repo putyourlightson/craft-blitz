@@ -87,6 +87,7 @@ return [
     //    'craft\elements\GlobalSet',
     //    'craft\elements\MatrixBlock',
     //    'benf\neo\elements\Block',
+    //    'putyourlightson\campaign\elements\ContactElement',
     //],
 
     // The value to send in the cache control header.

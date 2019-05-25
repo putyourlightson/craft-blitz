@@ -119,6 +119,7 @@ class SettingsModel extends Model
         'craft\elements\GlobalSet',
         'craft\elements\MatrixBlock',
         'benf\neo\elements\Block',
+        'putyourlightson\campaign\elements\ContactElement',
     ];
 
     /**
