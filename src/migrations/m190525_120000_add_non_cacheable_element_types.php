@@ -6,8 +6,6 @@ use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
-use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\records\CacheRecord;
 
 class m190525_120000_add_non_cacheable_element_types extends Migration
 {
