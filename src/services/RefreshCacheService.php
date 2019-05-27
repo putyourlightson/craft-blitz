@@ -286,16 +286,13 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes cache IDs.
+     * Refreshes site URIs.
      *
-     * @param array $cacheIds
+     * @param SiteUriModel[] $siteUris
      */
-    public function refreshCacheIds(array $cacheIds)
+    public function refreshSiteUris(array $siteUris)
     {
-        // Get cached site URIs before flushing the cache
-        $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
-
-        Blitz::$plugin->flushCache->flushCacheIds($cacheIds);
+        Blitz::$plugin->flushCache->flushUris($siteUris);
         Blitz::$plugin->cacheStorage->deleteUris($siteUris);
         Blitz::$plugin->cachePurger->purgeUris($siteUris);
 

@@ -33,6 +33,7 @@ use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
+use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -97,7 +98,7 @@ class Blitz extends Plugin
         // Register events
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
-        $this->_registerPluginEvents();
+        $this->_registerIntegrations();
         $this->_registerClearCaches();
         $this->_registerGarbageCollection();
 
@@ -299,25 +300,17 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers plugin events
+     * Registers integrations
      */
-    private function _registerPluginEvents()
+    private function _registerIntegrations()
     {
-        // SEOmatic
-        $class = 'nystudio107\seomatic\Seomatic';
-
-        if (class_exists($class) && Craft::$app->getPlugins()->isPluginInstalled('seomatic')) {
-            $metaContainers = $class::$plugin->metaContainers ?? null;
-
-            if ($metaContainers && defined($metaContainers::EVENT_INVALIDATE_CONTAINER_CACHES)) {
-                Event::on($metaContainers, $metaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
-                    function(nystudio107\seomatic\events\InvalidateContainerCachesEvent $event) {
-                        $this->refreshCache->addCacheIds($event->element);
-                        $this->refreshCache->refresh();
-                    }
-                );
+        Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
+            function () {
+                foreach (IntegrationHelper::getAllIntegrations() as $integration) {
+                    Craft::createObject($integration);
+                }
             }
-        };
+        );
     }
 
     /**

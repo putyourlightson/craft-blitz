@@ -111,7 +111,9 @@ class RefreshCacheJob extends BaseJob
                 ])
             );
 
-            Blitz::$plugin->refreshCache->refreshCacheIds($cacheIds);
+            $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
+            
+            Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
         }
         else {
             Blitz::$plugin->refreshCache->expireCacheIds($cacheIds);
