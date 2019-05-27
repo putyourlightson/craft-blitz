@@ -112,7 +112,7 @@ class RefreshCacheJob extends BaseJob
             );
 
             $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
-            
+
             Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
         }
         else {

@@ -34,7 +34,18 @@ class SeomaticIntegration extends Component
 
         Event::on(MetaContainers::class, MetaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
             function(InvalidateContainerCachesEvent $event) {
-                if ($event->uri !== null) {
+                if ($event->uri === null && $event->siteId === null && $event->sourceId === null) {
+                    // Refresh all cache
+                    Blitz::$plugin->refreshCache->refreshAll();
+                }
+                elseif ($event->sourceId !== null) {
+                    // Refresh cache for source
+                    $siteUris = $this->_getSourceSiteUris($event->sourceId);
+
+                    Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
+                }
+                elseif ($event->uri !== null && $event->siteId !== null) {
+                    // Refresh site URI
                     $siteUri = new SiteUriModel([
                         'siteId' => $event->siteId,
                         'uri' => $event->uri,
@@ -44,5 +55,24 @@ class SeomaticIntegration extends Component
                 }
             }
         );
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Returns the site URIs for the given source ID
+     *
+     * @param int $sourceId
+     *
+     * @return SiteUriModel[]
+     */
+    private function _getSourceSiteUris(int $sourceId): array
+    {
+        $siteUris = [];
+
+        // fetch
+
+        return $siteUris;
     }
 }
