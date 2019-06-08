@@ -94,6 +94,7 @@ return [
 
     // The integrations to initialise.
     //'integrations' => [
+    //    'putyourlightson\blitz\drivers\integrations\FeedMeIntegration',
     //    'putyourlightson\blitz\drivers\integrations\SeomaticIntegration',
     //],
 

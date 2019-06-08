@@ -5,15 +5,13 @@
 
 namespace putyourlightson\blitz\drivers\integrations;
 
-use Craft;
-use craft\base\Component;
 use nystudio107\seomatic\events\InvalidateContainerCachesEvent;
 use nystudio107\seomatic\services\MetaContainers;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
-class SeomaticIntegration extends Component
+class SeomaticIntegration extends BasePluginIntegration
 {
     // Constants
     // =========================================================================
@@ -28,7 +26,7 @@ class SeomaticIntegration extends Component
      */
     public function init()
     {
-        if (Craft::$app->getPlugins()->getPlugin(self::PLUGIN_HANDLE) === null) {
+        if (!$this->isPluginInstalled()) {
             return;
         }
 

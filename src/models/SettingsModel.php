@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
+use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
@@ -129,6 +130,7 @@ class SettingsModel extends Model
      * @var string[]
      */
     public $integrations = [
+        FeedMeIntegration::class,
         SeomaticIntegration::class,
     ];
 
