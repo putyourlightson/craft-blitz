@@ -9,25 +9,24 @@ use craft\feedme\services\Process;
 use putyourlightson\blitz\Blitz;
 use yii\base\Event;
 
-class FeedMeIntegration extends BasePluginIntegration
+class FeedMeIntegration extends BaseIntegration
 {
-    // Constants
-    // =========================================================================
-
-    const PLUGIN_HANDLE = 'feed-me';
-
-    // Public Methods
+    // Static Methods
     // =========================================================================
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public static function getRequiredPluginHandles(): array
     {
-        if (!$this->isPluginInstalled()) {
-            return;
-        }
+        return ['feed-me'];
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public static function registerEvents()
+    {
         Event::on(Process::class, Process::EVENT_BEFORE_PROCESS_FEED,
             function() {
                 Blitz::$plugin->refreshCache->batchMode = true;

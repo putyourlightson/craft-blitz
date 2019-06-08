@@ -11,25 +11,24 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
-class SeomaticIntegration extends BasePluginIntegration
+class SeomaticIntegration extends BaseIntegration
 {
-    // Constants
-    // =========================================================================
-
-    const PLUGIN_HANDLE = 'seomatic';
-
-    // Public Methods
+    // Static Methods
     // =========================================================================
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public static function getRequiredPluginHandles(): array
     {
-        if (!$this->isPluginInstalled()) {
-            return;
-        }
+        return ['seomatic'];
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public static function registerEvents()
+    {
         Event::on(MetaContainers::class, MetaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
             function(InvalidateContainerCachesEvent $event) {
                 if ($event->uri === null && $event->siteId === null && $event->sourceId === null) {

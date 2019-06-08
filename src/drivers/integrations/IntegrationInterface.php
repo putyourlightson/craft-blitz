@@ -14,13 +14,20 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
-interface PluginIntegrationInterface extends ComponentInterface
+interface IntegrationInterface
 {
     // Public Methods
     // =========================================================================
 
     /**
-     * Returns whether the plugin is installed.
+     * Returns the handles of required plugins.
+     *
+     * @return string[]
      */
-    public function isPluginInstalled(): bool;
+    public static function getRequiredPluginHandles(): array;
+
+    /**
+     * Registers events.
+     */
+    public static function registerEvents();
 }

@@ -98,7 +98,7 @@ class Blitz extends Plugin
         // Register events
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
-        $this->_registerIntegrations();
+        $this->_registerIntegrationEvents();
         $this->_registerClearCaches();
         $this->_registerGarbageCollection();
 
@@ -300,14 +300,20 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers integrations
+     * Registers integration events
      */
-    private function _registerIntegrations()
+    private function _registerIntegrationEvents()
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
             function () {
                 foreach (IntegrationHelper::getAllIntegrations() as $integration) {
-                    Craft::createObject($integration);
+                    foreach ($integration::getRequiredPluginHandles() as $handle) {
+                        if (!Craft::$app->getPlugins()->isPluginInstalled($handle)) {
+                            return;
+                        }
+                    }
+
+                    $integration::registerEvents();
                 }
             }
         );
