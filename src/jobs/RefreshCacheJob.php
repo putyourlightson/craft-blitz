@@ -13,6 +13,7 @@ use craft\helpers\Json;
 use craft\queue\BaseJob;
 use Exception;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use Throwable;
 
@@ -51,8 +52,6 @@ class RefreshCacheJob extends BaseJob
      */
     public function execute($queue)
     {
-        App::maxPowerCaptain();
-
         // Set progress label
         $this->setProgress($queue, 0,
             Craft::t('blitz', 'Finding cached pages.')
