@@ -312,6 +312,8 @@ Create cron jobs using the following console commands to refresh expired or tagg
 
 For improved performance when using the “Blitz File Storage” type, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. This leads to extremely performant loading of cached pages.
 
+> Note that the server rewrite code below was updated as of Blitz version 3.2.  
+
 ### Apache
 
 In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the virtual host `.conf` file ([this article](https://nystudio107.com/blog/stop-using-htaccess-files-no-really) explains how), or the root `.htaccess` file if you must, just before the rewrites provided by Craft. 
@@ -324,6 +326,8 @@ If the “Query String Caching” setting is set to `Do not cache URLs with quer
 # Blitz cache rewrite
 RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.html -s
 RewriteCond %{REQUEST_METHOD} GET
+# Required as of version 2.1.0
+RewriteCond %{QUERY_STRING} !^token=([^&]+) [NC]
 RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.html [L]
 
 # Send would-be 404 requests to Craft
@@ -335,6 +339,8 @@ If the “Query String Caching” setting is set to `Cache URLs with query strin
 # Blitz cache rewrite
 RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -s
 RewriteCond %{REQUEST_METHOD} GET
+# Required as of version 2.1.0
+RewriteCond %{QUERY_STRING} !^token=([^&]+) [NC]
 RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
 
 # Send would-be 404 requests to Craft
@@ -354,6 +360,10 @@ set $cache_path false;
 if ($request_method = GET) {
     set $cache_path /cache/blitz/$host/$uri/$args/index.html;
 }
+# Required as of version 2.1.0
+if ($args ~ "token=") {
+    set $cache_path false;
+}
 location / {
     try_files $cache_path;
 }
@@ -372,6 +382,10 @@ If the “Query String Caching” setting is set to `Cache URLs with query strin
 set $cache_path false;
 if ($request_method = GET) {
     set $cache_path /cache/blitz/$host/$uri/index.html;
+}
+# Required as of version 2.1.0
+if ($args ~ "token=") {
+    set $cache_path false;
 }
 location / {
     try_files $cache_path;
