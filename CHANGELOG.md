@@ -17,7 +17,7 @@
 - Settings are now saved with a warning message even if purger test fails.
 - Changed maximum length of URIs to 500 characters([#105](https://github.com/putyourlightson/craft-blitz/issues/105)).
 
-> {note} This release requires some changes to the server rewrite code. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
+> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
 
 ## 2.0.8 - 2019-04-05
 ### Added

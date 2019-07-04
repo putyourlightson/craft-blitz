@@ -62,6 +62,10 @@ class RequestHelper
             return false;
         }
 
+        if (!empty($request->getParam('token'))) {
+            return false;
+        }
+
         if (Blitz::$plugin->settings->queryStringCaching == 0 && !empty($request->getQueryStringWithoutPath())) {
             return false;
         }

@@ -318,7 +318,7 @@ For improved performance when using the “Blitz File Storage” type, adding a 
 
 In Apache this is achieved with `mod_rewrite` by adding a rewrite rule to the virtual host `.conf` file ([this article](https://nystudio107.com/blog/stop-using-htaccess-files-no-really) explains how), or the root `.htaccess` file if you must, just before the rewrites provided by Craft. 
 
-> Change `cache/blitz` to the cache folder path designated in the plugin settings.
+> Change `cache/blitz` to the cache folder path designated in the plugin settings (if different).
 
 If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
@@ -327,7 +327,7 @@ If the “Query String Caching” setting is set to `Do not cache URLs with quer
 RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.html -s
 RewriteCond %{REQUEST_METHOD} GET
 # Required as of version 2.1.0
-RewriteCond %{QUERY_STRING} !^token=([^&]+) [NC]
+RewriteCond %{QUERY_STRING} !token= [NC]
 RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/%{QUERY_STRING}/index.html [L]
 
 # Send would-be 404 requests to Craft
@@ -340,7 +340,7 @@ If the “Query String Caching” setting is set to `Cache URLs with query strin
 RewriteCond %{DOCUMENT_ROOT}/cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html -s
 RewriteCond %{REQUEST_METHOD} GET
 # Required as of version 2.1.0
-RewriteCond %{QUERY_STRING} !^token=([^&]+) [NC]
+RewriteCond %{QUERY_STRING} !token= [NC]
 RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
 
 # Send would-be 404 requests to Craft
@@ -350,7 +350,7 @@ RewriteRule .* /cache/blitz/%{HTTP_HOST}/%{REQUEST_URI}/index.html [L]
 
 In Nginx this is achieved by adding a location handler to the configuration file. 
 
-> Change `cache/blitz` to the cache folder path designated in the plugin settings.
+> Change `cache/blitz` to the cache folder path designated in the plugin settings (if different).
 
 If the “Query String Caching” setting is set to `Do not cache URLs with query strings` or `Cache URLs with query strings as unique pages` then use the following code.
 
