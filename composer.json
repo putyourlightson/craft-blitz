@@ -16,7 +16,7 @@
         "speed"
     ],
     "require": {
-        "craftcms/cms": "^3.2.0-alpha.3",
+        "craftcms/cms": "^3.2.0-RC3",
         "ext-json": "*"
     },
     "autoload": {
