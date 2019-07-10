@@ -11,7 +11,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
-class SeomaticIntegration extends BaseIntegration
+class SeomaticIntegration implements IntegrationInterface
 {
     // Static Methods
     // =========================================================================
@@ -22,6 +22,14 @@ class SeomaticIntegration extends BaseIntegration
     public static function getRequiredPluginHandles(): array
     {
         return ['seomatic'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getRequiredClasses(): array
+    {
+        return ['nystudio107\seomatic\services\MetaContainers'];
     }
 
     /**

@@ -298,13 +298,7 @@ class Blitz extends Plugin
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
             function () {
-                foreach (IntegrationHelper::getAllIntegrations() as $integration) {
-                    foreach ($integration::getRequiredPluginHandles() as $handle) {
-                        if (!Craft::$app->getPlugins()->isPluginInstalled($handle)) {
-                            return;
-                        }
-                    }
-
+                foreach (IntegrationHelper::getActiveIntegrations() as $integration) {
                     $integration::registerEvents();
                 }
             }

@@ -9,7 +9,7 @@ use craft\feedme\services\Process;
 use putyourlightson\blitz\Blitz;
 use yii\base\Event;
 
-class FeedMeIntegration extends BaseIntegration
+class FeedMeIntegration implements IntegrationInterface
 {
     // Static Methods
     // =========================================================================
@@ -20,6 +20,14 @@ class FeedMeIntegration extends BaseIntegration
     public static function getRequiredPluginHandles(): array
     {
         return ['feed-me'];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getRequiredClasses(): array
+    {
+        return ['craft\feedme\services\Process'];
     }
 
     /**
