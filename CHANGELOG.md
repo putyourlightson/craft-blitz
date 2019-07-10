@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 2.1.0 - Unreleased
+## 2.1.0 - 2019-07-10
 ### Added
 - Added compatibility for drafts and revisions in Craft 3.2.0.
 - Added integrations with Feed Me and SEOmatic ([#93](https://github.com/putyourlightson/craft-blitz/issues/93)).
