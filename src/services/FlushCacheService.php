@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\Exception;
@@ -57,13 +58,18 @@ class FlushCacheService extends Component
     }
 
     /**
-     * Flushes cache records given an array of cache IDs.
+     * Flushes cache records given an array of site URIs.
      *
-     * @param int[] $cacheIds
+     * @param SiteUriModel[] $siteUris
      */
-    public function flushCacheIds(array $cacheIds)
+    public function flushUris(array $siteUris)
     {
-        CacheRecord::deleteAll(['id' => $cacheIds]);
+        foreach ($siteUris as $siteUri) {
+            CacheRecord::deleteAll([
+                'siteId' => $siteUri->siteId,
+                'uri' => $siteUri->uri,
+            ]);
+        }
     }
 
     /**

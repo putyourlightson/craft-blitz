@@ -47,7 +47,9 @@ return [
     //],
 
     // The purger type classes to add to the plugin’s default purger types.
-    //'cachePurgerTypes' => ['putyourlightson\blitz\drivers\purgers\CloudflarePurger'],
+    //'cachePurgerTypes' => [
+    //    'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
+    //],
 
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,
@@ -87,6 +89,13 @@ return [
     //    'craft\elements\GlobalSet',
     //    'craft\elements\MatrixBlock',
     //    'benf\neo\elements\Block',
+    //    'putyourlightson\campaign\elements\ContactElement',
+    //],
+
+    // The integrations to initialise.
+    //'integrations' => [
+    //    'putyourlightson\blitz\drivers\integrations\FeedMeIntegration',
+    //    'putyourlightson\blitz\drivers\integrations\SeomaticIntegration',
     //],
 
     // The value to send in the cache control header.

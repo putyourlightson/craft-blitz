@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\helpers;
 
 use Craft;
 use craft\elements\User;
+use craft\errors\SiteNotFoundException;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 
@@ -43,25 +44,29 @@ class RequestHelper
         /** @var User|null $user */
         $user = Craft::$app->getUser()->getIdentity();
 
-        // Ensure that if the site is not live that the has permission to access it
-        if (!Craft::$app->getIsLive()
-            && $user !== null
-            && !$user->can('accessSiteWhenSystemIsOff')) {
-            return false;
-        }
+        if ($user !== null) {
+            // Ensure that if the site is not live that the user has permission to access it
+            if (!Craft::$app->getIsLive() && !$user->can('accessSiteWhenSystemIsOff')) {
+                return false;
+            }
 
-        // Ensure that if user is logged in then debug toolbar is not enabled
-        if ($user !== null && $user->getPreference('enableDebugToolbarForSite')) {
-            return false;
+            // Ensure that if user is logged in then debug toolbar is not enabled
+            if ($user->getPreference('enableDebugToolbarForSite')) {
+                return false;
+            }
         }
 
         $request = Craft::$app->getRequest();
 
-        if (Blitz::$plugin->settings->queryStringCaching == 0 && $request->getQueryStringWithoutPath() !== '') {
+        if (!empty($request->getParam('no-cache'))) {
             return false;
         }
 
-        if (!empty($request->getParam('no-cache'))) {
+        if (!empty($request->getParam('token'))) {
+            return false;
+        }
+
+        if (Blitz::$plugin->settings->queryStringCaching == 0 && !empty($request->getQueryStringWithoutPath())) {
             return false;
         }
 
@@ -72,6 +77,7 @@ class RequestHelper
      * Returns the requested site URI.
      *
      * @return SiteUriModel
+     * @throws SiteNotFoundException
      */
     public static function getRequestedSiteUri(): SiteUriModel
     {

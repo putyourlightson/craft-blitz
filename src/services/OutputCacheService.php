@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\services;
 use Craft;
 use craft\base\Component;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\OutputEvent;
 use putyourlightson\blitz\models\SiteUriModel;
 
 /**
@@ -16,6 +17,14 @@ use putyourlightson\blitz\models\SiteUriModel;
  */
 class OutputCacheService extends Component
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event OutputEvent
+     */
+    const EVENT_BEFORE_OUTPUT = 'beforeOutput';
+
     // Public Methods
     // =========================================================================
 
@@ -26,37 +35,34 @@ class OutputCacheService extends Component
      */
     public function output(SiteUriModel $siteUri)
     {
+        $value = Blitz::$plugin->cacheStorage->get($siteUri);
+
+        $event = new OutputEvent([
+            'value' => $value,
+        ]);
+        $this->trigger(self::EVENT_BEFORE_OUTPUT, $event);
+
+        if (!$event->isValid || !$value) {
+            return;
+        }
+
         // Update cache control header
         header('Cache-Control: '.Blitz::$plugin->settings->cacheControlHeader);
 
-        // Add cache tag header if set
-        $tags = Blitz::$plugin->cacheTags->getSiteUriTags($siteUri);
-
-        if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
-            $value = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
-            header(Blitz::$plugin->cachePurger->tagHeaderName.': '.$value);
-        }
-
-        $value = Blitz::$plugin->cacheStorage->get($siteUri);
-
-        if ($value) {
-            $this->outputValue($value);
-        }
-    }
-
-    /**
-     * Outputs a given value and exits.
-     *
-     * @param string $value
-     */
-    public function outputValue(string $value)
-    {
         // Update powered by header
         header_remove('X-Powered-By');
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
             $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? Craft::$app->name.', ' : '';
             header('X-Powered-By: '.$header.'Blitz');
+        }
+
+        // Add cache tag header if set
+        $tags = Blitz::$plugin->cacheTags->getSiteUriTags($siteUri);
+
+        if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
+            $header = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
+            header(Blitz::$plugin->cachePurger->tagHeaderName.': '.$header);
         }
 
         // Append served by comment

@@ -43,7 +43,12 @@ class WarmCacheJob extends BaseJob
      */
     public function setRequestProgress(int $count, int $total, QueueInterface $queue)
     {
-        $this->setProgress($queue, $count / $total);
+        $this->setProgress($queue, $count / $total,
+            Craft::t('blitz', 'Warming {count} of {total} pages.', [
+                'count' => $count,
+                'total' => $total,
+            ])
+        );
     }
 
     // Protected Methods

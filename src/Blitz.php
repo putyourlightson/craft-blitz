@@ -7,10 +7,11 @@ namespace putyourlightson\blitz;
 
 use Craft;
 use craft\base\Plugin;
+use craft\console\controllers\ResaveController;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
+use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
-use craft\events\MoveElementEvent;
 use craft\events\PluginEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\RegisterCacheOptionsEvent;
@@ -20,12 +21,9 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
-use craft\queue\jobs\ResaveElements;
-use craft\queue\Queue;
 use craft\services\Elements;
 use craft\services\Gc;
 use craft\services\Plugins;
-use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
@@ -34,6 +32,7 @@ use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
+use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -48,7 +47,6 @@ use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Event;
-use yii\queue\ExecEvent;
 
 /**
  *
@@ -89,15 +87,17 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
+        // Register services and variable before processing the request
         $this->_registerComponents();
-
         $this->_registerVariable();
 
+        // Process the request
         $this->_processCacheableRequest();
 
         // Register events
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
+        $this->_registerIntegrationEvents();
         $this->_registerClearCaches();
         $this->_registerGarbageCollection();
 
@@ -129,7 +129,7 @@ class Blitz extends Plugin
     // =========================================================================
 
     /**
-     * Processes cacheable request.
+     * Processes cacheable request
      */
     private function _processCacheableRequest()
     {
@@ -228,28 +228,31 @@ class Blitz extends Plugin
      */
     private function _registerElementEvents()
     {
-        // Invalidate elements
-        Event::on(Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->refreshCache->addElement($event->element);
-            }
-        );
-        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
-            function(MoveElementEvent $event) {
-                $this->refreshCache->addElement($event->element);
-            }
-        );
-        Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
-            function(ElementEvent $event) {
-                $this->refreshCache->addElement($event->element);
-            }
-        );
+        // Add cache IDs before hard deleting elements so we can refresh them
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
-            function(ElementEvent $event) {
-                $this->refreshCache->addCacheIds($event->element);
-                $this->refreshCache->addElement($event->element);
+            function(DeleteElementEvent $event) {
+                if ($event->hardDelete) {
+                    $this->refreshCache->addCacheIds($event->element);
+                }
             }
         );
+
+        // Invalidate elements
+        $events = [
+            [Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT],
+            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENT],
+            [Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI],
+            [Elements::class, Elements::EVENT_AFTER_DELETE_ELEMENT],
+            [Elements::class, Elements::EVENT_AFTER_RESTORE_ELEMENT],
+        ];
+
+        foreach ($events as $event) {
+            Event::on($event[0], $event[1],
+                function(ElementEvent $event) {
+                    $this->refreshCache->addElement($event->element);
+                }
+            );
+        }
     }
 
     /**
@@ -257,27 +260,52 @@ class Blitz extends Plugin
      */
     private function _registerResaveElementEvents()
     {
-        // Turn on batch mode
-        Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
+        // Enable batch mode
+        $events = [
+            [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
+            [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
+            [ResaveController::class, ResaveController::EVENT_BEFORE_ACTION],
+        ];
+
+        foreach ($events as $event) {
+            Event::on($event[0], $event[1],
+                function() {
                     $this->refreshCache->batchMode = true;
                 }
-            }
-        );
+            );
+        }
 
         // Refresh the cache
-        Event::on(Queue::class, Queue::EVENT_AFTER_EXEC,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
+        $events = [
+            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
+            [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
+            [ResaveController::class, ResaveController::EVENT_AFTER_ACTION],
+        ];
+
+        foreach ($events as $event) {
+            Event::on($event[0], $event[1],
+                function() {
                     $this->refreshCache->refresh();
                 }
-            }
-        );
-        Event::on(Queue::class, Queue::EVENT_AFTER_ERROR,
-            function(ExecEvent $event) {
-                if ($event->job instanceof ResaveElements) {
-                    $this->refreshCache->refresh();
+            );
+        }
+    }
+
+    /**
+     * Registers integration events
+     */
+    private function _registerIntegrationEvents()
+    {
+        Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
+            function () {
+                foreach (IntegrationHelper::getAllIntegrations() as $integration) {
+                    foreach ($integration::getRequiredPluginHandles() as $handle) {
+                        if (!Craft::$app->getPlugins()->isPluginInstalled($handle)) {
+                            return;
+                        }
+                    }
+
+                    $integration::registerEvents();
                 }
             }
         );
@@ -339,6 +367,7 @@ class Blitz extends Plugin
     {
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
+                // Merge so that settings controller action is first (!important)
                 $event->rules = array_merge([
                         'settings/plugins/blitz' => 'blitz/settings/edit',
                     ],
@@ -355,9 +384,7 @@ class Blitz extends Plugin
     {
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function(RegisterComponentTypesEvent $event) {
-                if (Craft::$app->getUser()->checkPermission('blitz:cache-utility')) {
-                    $event->types[] = CacheUtility::class;
-                }
+                $event->types[] = CacheUtility::class;
             }
         );
     }
@@ -389,7 +416,24 @@ class Blitz extends Plugin
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {
                 $event->permissions['Blitz'] = [
-                    'blitz:cache-utility' => ['label' => Craft::t('blitz', 'Access cache utility')],
+                    'blitz:clear' => [
+                        'label' => Craft::t('blitz', 'Clear cache')
+                    ],
+                    'blitz:flush' => [
+                        'label' => Craft::t('blitz', 'Flush cache')
+                    ],
+                    'blitz:purge' => [
+                        'label' => Craft::t('blitz', 'Purge cache')
+                    ],
+                    'blitz:warm' => [
+                        'label' => Craft::t('blitz', 'Warm cache')
+                    ],
+                    'blitz:refresh-expired' => [
+                        'label' => Craft::t('blitz', 'Refresh entire cache')
+                    ],
+                    'blitz:refresh-tagged' => [
+                        'label' => Craft::t('blitz', 'Refresh tagged cache')
+                    ],
                 ];
             }
         );

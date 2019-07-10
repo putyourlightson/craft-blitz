@@ -3,29 +3,31 @@
 {{ driverHtml|raw }}
 
 {% for action in actions %}
-    <form class="utility" method="post" accept-charset="UTF-8">
-        <input type="hidden" name="action" value="blitz/cache/{{ action.id }}">
-        <input type="hidden" name="utility" value="1">
+    {% if currentUser.can('blitz:' ~ action.id) %}
+        <form class="utility" method="post" accept-charset="UTF-8">
+            <input type="hidden" name="action" value="blitz/cache/{{ action.id }}">
+            <input type="hidden" name="utility" value="1">
 
-        {{ redirectInput('utilities/blitz-cache') }}
-        {{ csrfInput() }}
+            {{ redirectInput('utilities/blitz-cache') }}
+            {{ csrfInput() }}
 
-        <p class="light">{{ action.instructions|t('blitz') }}</p>
+            <p class="light">{{ action.instructions|t('blitz') }}</p>
 
-        {% if action.id == 'refresh-tagged' %}
-            {{ forms.autosuggest({
-                name: 'tags',
-                placeholder: 'tag1,tag2,tag3',
-                suggestions: tagSuggestions,
-                instructions: action.instructions|t('blitz'),
-            }) }}
-            <br/>
+            {% if action.id == 'refresh-tagged' %}
+                {{ forms.autosuggest({
+                    name: 'tags',
+                    placeholder: 'tag1,tag2,tag3',
+                    suggestions: tagSuggestions,
+                    instructions: action.instructions|t('blitz'),
+                }) }}
+                <br/>
+            {% endif %}
+
+            <input type="submit" class="btn submit" value="{{ action.label|t('blitz') }}" />
+        </form>
+
+        {% if not loop.last %}
+            <br>
         {% endif %}
-
-        <input type="submit" class="btn submit" value="{{ action.label|t('blitz') }}" />
-    </form>
-
-    {% if not loop.last %}
-        <br>
     {% endif %}
 {% endfor %}

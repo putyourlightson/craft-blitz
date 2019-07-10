@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
+use craft\elements\Asset;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use DateTime;
@@ -123,16 +124,36 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element)
     {
-        // Clear the site cache if this is a global set element as they are populated on every request
+        // Don't proceed if not an Element
+        if (!($element instanceof Element)) {
+            return;
+        }
+
+        // Don't proceed if draft or revision
+        if ($element->draftId !== null || $element->revisionId !== null) {
+            return;
+        }
+
+        // Don't proceed if propagating
+        if ($element->propagating) {
+            return;
+        }
+
+        // Don't proceed if this element is an asset that is being indexed
+        if ($element instanceof Asset && $element->getScenario() == Asset::SCENARIO_INDEX) {
+            return;
+        }
+
+        // Clear the entire cache if this is a global set element as they are populated on every request
         if ($element instanceof GlobalSet) {
             if (Blitz::$plugin->settings->clearCacheAutomaticallyForGlobals) {
-                Blitz::$plugin->clearCache->clearSite($element->siteId);
+                Blitz::$plugin->clearCache->clearAll();
             }
 
             if (Blitz::$plugin->settings->cachingEnabled
                 && Blitz::$plugin->settings->warmCacheAutomatically
                 && Blitz::$plugin->settings->warmCacheAutomaticallyForGlobals) {
-                Blitz::$plugin->warmCache->warmSite($element->siteId);
+                Blitz::$plugin->warmCache->warmAll();
             }
 
             return;
@@ -265,14 +286,17 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Performs actions to finalise the refresh.
+     * Refreshes site URIs.
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function afterRefresh(array $siteUris)
+    public function refreshSiteUris(array $siteUris)
     {
+        Blitz::$plugin->flushCache->flushUris($siteUris);
+        Blitz::$plugin->cacheStorage->deleteUris($siteUris);
         Blitz::$plugin->cachePurger->purgeUris($siteUris);
 
+        // Warm the cache if enabled
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
             Blitz::$plugin->warmCache->warmUris($siteUris);
         }

@@ -15,6 +15,14 @@ use putyourlightson\blitz\Blitz;
  */
 class SiteUriModel extends Model
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @const int
+     */
+    const MAX_URI_LENGTH = 500;
+
     // Public Properties
     // =========================================================================
 
@@ -48,6 +56,11 @@ class SiteUriModel extends Model
     {
         // Ignore URIs that contain index.php
         if (strpos($this->uri, 'index.php') !== false) {
+            return false;
+        }
+
+        // Ignore URIs that are longer than the max URI length
+        if (strlen($this->uri) > self::MAX_URI_LENGTH) {
             return false;
         }
 

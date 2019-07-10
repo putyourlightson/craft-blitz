@@ -8,6 +8,8 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
+use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
+use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
@@ -58,9 +60,11 @@ class SettingsModel extends Model
     public $cachePurgerSettings = [];
 
     /**
-     * @var array
+     * @var string[]
      */
-    public $cachePurgerTypes = [CloudflarePurger::class];
+    public $cachePurgerTypes = [
+        CloudflarePurger::class,
+    ];
 
     /**
      * @var bool
@@ -119,6 +123,15 @@ class SettingsModel extends Model
         'craft\elements\GlobalSet',
         'craft\elements\MatrixBlock',
         'benf\neo\elements\Block',
+        'putyourlightson\campaign\elements\ContactElement',
+    ];
+
+    /**
+     * @var string[]
+     */
+    public $integrations = [
+        FeedMeIntegration::class,
+        SeomaticIntegration::class,
     ];
 
     /**

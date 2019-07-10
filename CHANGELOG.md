@@ -1,8 +1,23 @@
 # Release Notes for Blitz
 
-## 2.0.9 - Unreleased
+## 2.1.0 - Unreleased
+### Added
+- Added compatibility for drafts and revisions in Craft 3.2.0.
+- Added integrations with Feed Me and SEOmatic ([#93](https://github.com/putyourlightson/craft-blitz/issues/93)).
+- Added queue job progress labels when refreshing and warming the cache.
+- Added Campaign plugin contacts as non cacheable element type.
+- Added new events to detect when elements are being resaved and propagated in order to prevent multiple refresh cache jobs from being unnecessarily created ([#98](https://github.com/putyourlightson/craft-blitz/issues/98)).
+- Added user group permissions for each of the available functions in the Blitz cache utility ([#104](https://github.com/putyourlightson/craft-blitz/issues/104)).
+- Added `beforeOutput` event ([#112](https://github.com/putyourlightson/craft-blitz/issues/112)).
+
 ### Changed
-- Settings are saved with warning message even if purger test fails.
+- Changed minimum requirement of Craft to version 3.2.0.
+- Improved queue job progress feedback when refreshing and warming the cache.
+- Assets that are being indexed no longer trigger refresh cache jobs. 
+- Settings are now saved with a warning message even if purger test fails.
+- Changed maximum length of URIs to 500 characters([#105](https://github.com/putyourlightson/craft-blitz/issues/105)).
+
+> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
 
 ## 2.0.8 - 2019-04-05
 ### Added

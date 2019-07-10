@@ -49,7 +49,7 @@ class CacheController extends Controller
 
         // Require permission if posted from utility
         if ($request->getIsPost() && $request->getParam('utility')) {
-            $this->requirePermission('blitz:cache-utility');
+            $this->requirePermission('blitz:'.$action->id);
         }
         else {
             // Verify API key
