@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\jobs;
 use Craft;
 use craft\base\Element;
 use craft\elements\db\ElementQuery;
-use craft\helpers\App;
 use craft\helpers\Json;
 use craft\queue\BaseJob;
 use Exception;

@@ -5,11 +5,9 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use craft\base\Component;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\integrations\IntegrationInterface;
-use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use yii\base\Event;
 
 class IntegrationHelper

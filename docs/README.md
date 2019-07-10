@@ -312,7 +312,7 @@ Create cron jobs using the following console commands to refresh expired or tagg
 
 For improved performance when using the “Blitz File Storage” type, adding a server rewrite will avoid the request from ever being processed by Craft once it has been cached. This leads to extremely performant loading of cached pages.
 
-> Note that the server rewrite code below was updated as of Blitz version 3.2.  
+> Note that the server rewrite code below was updated as of Blitz version 2.1.0.  
 
 ### Apache
 

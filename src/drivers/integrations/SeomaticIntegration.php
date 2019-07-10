@@ -36,10 +36,13 @@ class SeomaticIntegration extends BaseIntegration
                     Blitz::$plugin->refreshCache->refreshAll();
                 }
                 elseif ($event->sourceId !== null) {
+                    // TODO: implement refreshing cache for source URIs
                     // Refresh cache for source
-                    $siteUris = $this->_getSourceSiteUris($event->sourceId);
+                    //$siteUris = $this->_getSourceSiteUris($event->sourceId);
+                    //Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
 
-                    Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
+                    // Refresh all cache
+                    Blitz::$plugin->refreshCache->refreshAll();
                 }
                 elseif ($event->uri !== null && $event->siteId !== null) {
                     // Refresh site URI
@@ -64,11 +67,9 @@ class SeomaticIntegration extends BaseIntegration
      *
      * @return SiteUriModel[]
      */
-    private function _getSourceSiteUris(int $sourceId): array
+    private static function _getSourceSiteUris(int $sourceId): array
     {
         $siteUris = [];
-
-        // fetch
 
         return $siteUris;
     }
