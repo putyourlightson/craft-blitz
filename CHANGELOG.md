@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 2.1.1 - Unreleased
+
+### Fixed
+- Fixed plugin integrations to only be loaded if the required classes exist.
+
 ## 2.1.0 - 2019-07-10
 
 > {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
