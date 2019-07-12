@@ -61,8 +61,8 @@ class IntegrationHelper
                 $version = 0;
 
                 if (is_array($handle)) {
-                    $version = $handle['version'] ?? null;
-                    $handle = $handle['handle'] ?? null;
+                    $version = $handle['version'] ?? $version;
+                    $handle = $handle['handle'] ?? '';
                 }
 
                 $plugin = $pluginsService->getPlugin($handle);
