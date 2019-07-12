@@ -73,7 +73,7 @@ class IntegrationHelper
                 }
 
                 if (version_compare($plugin->getVersion(), $version, '<')) {
-                    //$enabled = false;
+                    $enabled = false;
                     break;
                 }
             }
