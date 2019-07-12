@@ -6,11 +6,13 @@
 namespace putyourlightson\blitz\records;
 
 use craft\db\ActiveRecord;
+use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
  * @property int $siteId
  * @property string $uri
+ * @property ActiveQueryInterface $elements
  */
 class CacheRecord extends ActiveRecord
 {
@@ -25,5 +27,15 @@ class CacheRecord extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%blitz_caches}}';
+    }
+
+    /**
+     * Returns the associated elements
+     *
+     * @return ActiveQueryInterface
+     */
+    public function getElements(): ActiveQueryInterface
+    {
+        return $this->hasMany(ElementCacheRecord::class, ['cacheId' => 'id']);
     }
 }

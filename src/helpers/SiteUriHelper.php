@@ -98,6 +98,10 @@ class SiteUriHelper
      */
     public static function getCachedSiteUris(array $cacheIds): array
     {
+        if (empty($cacheIds)) {
+            return [];
+        }
+
         $siteUriModels = [];
 
         $siteUris = CacheRecord::find()
@@ -108,6 +112,38 @@ class SiteUriHelper
 
         foreach ($siteUris as $siteUri) {
             $siteUriModels[] = new SiteUriModel($siteUri);
+        }
+
+        return $siteUriModels;
+    }
+
+    /**
+     * Returns refreshable site URIs given an array of element IDs.
+     *
+     * @param int[] $elementIds
+     *
+     * @return SiteUriModel[]
+     */
+    public static function getElementSiteUris(array $elementIds): array
+    {
+        if (empty($elementIds)) {
+            return [];
+        }
+
+        $siteUriModels = [];
+
+        $siteUris = CacheRecord::find()
+            // The `id` attribute is required to make the `elements` relation work
+            ->select(['id', 'siteId', 'uri'])
+            ->where(['elementId' => $elementIds])
+            ->joinWith('elements')
+            ->all();
+
+        foreach ($siteUris as $siteUri) {
+            $siteUriModels[] = new SiteUriModel(
+                // Convert to array here to remove the `id` attribute
+                $siteUri->toArray(['siteId', 'uri'])
+            );
         }
 
         return $siteUriModels;

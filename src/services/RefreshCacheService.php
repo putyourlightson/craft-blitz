@@ -130,7 +130,7 @@ class RefreshCacheService extends Component
         }
 
         // Don't proceed if draft or revision
-        if ($element->draftId !== null || $element->revisionId !== null) {
+        if ($element->getIsDraft() || $element->getIsRevision()) {
             return;
         }
 

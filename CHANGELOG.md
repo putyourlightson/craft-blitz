@@ -1,9 +1,13 @@
 # Release Notes for Blitz
 
 ## 2.1.1 - Unreleased
+### Changed
+
+- Changed SEOmatic integration to require version 3.2.14. 
 
 ### Fixed
-- Fixed plugin integrations to only be loaded if the required classes exist.
+- Fixed MySQL database error that could occur with `innodb_large_prefix` disabled when installing or updating the plugin.
+- Fixed plugin integrations to only be loaded if the required plugin version is met.
 
 ## 2.1.0 - 2019-07-10
 

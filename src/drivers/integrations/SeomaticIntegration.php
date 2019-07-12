@@ -6,8 +6,10 @@
 namespace putyourlightson\blitz\drivers\integrations;
 
 use nystudio107\seomatic\events\InvalidateContainerCachesEvent;
+use nystudio107\seomatic\Seomatic;
 use nystudio107\seomatic\services\MetaContainers;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
@@ -19,17 +21,11 @@ class SeomaticIntegration implements IntegrationInterface
     /**
      * @inheritdoc
      */
-    public static function getRequiredPluginHandles(): array
+    public static function getRequiredPlugins(): array
     {
-        return ['seomatic'];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getRequiredClasses(): array
-    {
-        return ['nystudio107\seomatic\services\MetaContainers'];
+        return [
+            ['handle' => 'seomatic', 'version' => '1']
+        ];
     }
 
     /**
@@ -39,18 +35,14 @@ class SeomaticIntegration implements IntegrationInterface
     {
         Event::on(MetaContainers::class, MetaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
             function(InvalidateContainerCachesEvent $event) {
-                if ($event->uri === null && $event->siteId === null && $event->sourceId === null) {
+                if ($event->uri === null && $event->siteId === null) {
                     // Refresh all cache
-                    Blitz::$plugin->refreshCache->refreshAll();
+                    //Blitz::$plugin->refreshCache->refreshAll();
                 }
-                elseif ($event->sourceId !== null) {
-                    // TODO: implement refreshing cache for source URIs
+                elseif ($event->siteId !== null && $event->sourceId !== null && $event->sourceType) {
                     // Refresh cache for source
-                    //$siteUris = $this->_getSourceSiteUris($event->sourceId);
-                    //Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
-
-                    // Refresh all cache
-                    Blitz::$plugin->refreshCache->refreshAll();
+                    $siteUris = self::_getSourceSiteUris($event->siteId, $event->sourceId, $event->sourceType);
+                    Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
                 }
                 elseif ($event->uri !== null && $event->siteId !== null) {
                     // Refresh site URI
@@ -71,13 +63,25 @@ class SeomaticIntegration implements IntegrationInterface
     /**
      * Returns the site URIs for the given source ID
      *
+     * @param int $siteId
      * @param int $sourceId
+     * @param string $sourceType
      *
      * @return SiteUriModel[]
      */
-    private static function _getSourceSiteUris(int $sourceId): array
+    private static function _getSourceSiteUris(int $siteId, int $sourceId, string $sourceType): array
     {
-        $siteUris = [];
+        $metaBundle = Seomatic::$plugin->metaBundles->getMetaBundleBySourceId(
+            $sourceType,
+            $sourceId,
+            $siteId
+        );
+
+        $seoElement = Seomatic::$plugin->seoElements->getSeoElementByMetaBundleType($metaBundle->sourceBundleType);
+        $query = $seoElement::sitemapElementsQuery($metaBundle);
+        $elementIds = $query->ids();
+
+        $siteUris = SiteUriHelper::getElementSiteUris($elementIds);
 
         return $siteUris;
     }

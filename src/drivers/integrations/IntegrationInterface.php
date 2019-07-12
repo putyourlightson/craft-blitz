@@ -11,18 +11,17 @@ interface IntegrationInterface
     // =========================================================================
 
     /**
-     * Returns the handles of required plugins.
+     * Returns the required plugins.
      *
-     * @return string[]
-     */
-    public static function getRequiredPluginHandles(): array;
-
-    /**
-     * Returns the class names of required classes.
+     * Should return an array whose values can be either plugin handles or arrays
+     * containing plugin handles and optionally version numbers. For example:
      *
-     * @return string[]
+     * - ['feed-me', 'seomatic']
+     * - [['handle' => 'feed-me', 'version' => '4.0.0'], 'seomatic']
+     *
+     * @return string[]|array
      */
-    public static function getRequiredClasses(): array;
+    public static function getRequiredPlugins(): array;
 
     /**
      * Registers events.

@@ -17,17 +17,11 @@ class FeedMeIntegration implements IntegrationInterface
     /**
      * @inheritdoc
      */
-    public static function getRequiredPluginHandles(): array
+    public static function getRequiredPlugins(): array
     {
-        return ['feed-me'];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public static function getRequiredClasses(): array
-    {
-        return ['craft\feedme\services\Process'];
+        return [
+            ['handle' => 'feed-me', 'version' => '4.0.0']
+        ];
     }
 
     /**

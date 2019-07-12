@@ -54,23 +54,31 @@ class IntegrationHelper
         $pluginsService = Craft::$app->getPlugins();
 
         foreach (self::getAllIntegrations() as $integration) {
-            $active = true;
+            $enabled = true;
 
-            foreach ($integration::getRequiredPluginHandles() as $handle) {
-                if (!$pluginsService->isPluginInstalled($handle)) {
-                    $active = false;
+            // Ensure all required plugins are enabled at the provided version or above
+            foreach ($integration::getRequiredPlugins() as $handle) {
+                $version = 0;
+
+                if (is_array($handle)) {
+                    $version = $handle['version'] ?? null;
+                    $handle = $handle['handle'] ?? null;
+                }
+
+                $plugin = $pluginsService->getPlugin($handle);
+
+                if ($plugin === null) {
+                    $enabled = false;
+                    break;
+                }
+
+                if (version_compare($plugin->getVersion(), $version, '<')) {
+                    //$enabled = false;
                     break;
                 }
             }
 
-            foreach ($integration::getRequiredClasses() as $class) {
-                if (!class_exists($class)) {
-                    $active = false;
-                    break;
-                }
-            }
-
-            if ($active) {
+            if ($enabled) {
                 $integrations[] = $integration;
             }
         }
