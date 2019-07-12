@@ -24,7 +24,7 @@ class SeomaticIntegration implements IntegrationInterface
     public static function getRequiredPlugins(): array
     {
         return [
-            ['handle' => 'seomatic', 'version' => '1']
+            ['handle' => 'seomatic', 'version' => '3.2.14']
         ];
     }
 
