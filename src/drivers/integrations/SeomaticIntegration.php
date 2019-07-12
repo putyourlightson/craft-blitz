@@ -37,7 +37,7 @@ class SeomaticIntegration implements IntegrationInterface
             function(InvalidateContainerCachesEvent $event) {
                 if ($event->uri === null && $event->siteId === null) {
                     // Refresh all cache
-                    //Blitz::$plugin->refreshCache->refreshAll();
+                    Blitz::$plugin->refreshCache->refreshAll();
                 }
                 elseif ($event->siteId !== null && $event->sourceId !== null && $event->sourceType) {
                     // Refresh cache for source

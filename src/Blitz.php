@@ -297,7 +297,7 @@ class Blitz extends Plugin
     private function _registerIntegrationEvents()
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
-            function () {
+            function() {
                 foreach (IntegrationHelper::getActiveIntegrations() as $integration) {
                     $integration::registerEvents();
                 }
@@ -389,7 +389,7 @@ class Blitz extends Plugin
     private function _registerRedirectAfterInstall()
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-            function (PluginEvent $event) {
+            function(PluginEvent $event) {
                 if ($event->plugin === $this) {
                     // Redirect to settings page with welcome
                     Craft::$app->getResponse()->redirect(

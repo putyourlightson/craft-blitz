@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\integrations\IntegrationInterface;
 use yii\base\Event;
 
 class IntegrationHelper
@@ -27,7 +26,7 @@ class IntegrationHelper
     /**
      * Returns all integrations.
      *
-     * @return IntegrationInterface[]
+     * @return string[]
      */
     public static function getAllIntegrations(): array
     {
@@ -46,7 +45,7 @@ class IntegrationHelper
     /**
      * Returns active integrations.
      *
-     * @return IntegrationInterface[]
+     * @return string[]
      */
     public static function getActiveIntegrations(): array
     {

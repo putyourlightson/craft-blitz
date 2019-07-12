@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.1.3 - 2019-07-12
+### Fixed
+- Fixed commented code in SEOmatic integration. 😈  
+
 ## 2.1.2 - 2019-07-12
 ### Fixed
 - Fixed minimum required SEOmatic version number.  
