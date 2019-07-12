@@ -21,7 +21,7 @@ class SiteUriModel extends Model
     /**
      * @const int
      */
-    const MAX_URI_LENGTH = 500;
+    const MAX_URI_LENGTH = 255;
 
     // Public Properties
     // =========================================================================
