@@ -17,6 +17,13 @@ class m190525_120000_add_non_cacheable_element_types extends Migration
      */
     public function safeUp()
     {
+        $schemaVersion = Craft::$app->projectConfig
+            ->get('plugins.blitz.schemaVersion', true);
+
+        if (!version_compare($schemaVersion, '2.1.0', '<')) {
+            return true;
+        }
+
         // Replace nonCacheableElementTypes with new value
         $newSettingsModel = new SettingsModel();
         $newNonCacheableElementTypes = $newSettingsModel->nonCacheableElementTypes;

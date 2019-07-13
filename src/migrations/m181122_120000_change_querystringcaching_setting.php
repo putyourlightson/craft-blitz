@@ -20,7 +20,7 @@ class m181122_120000_change_querystringcaching_setting extends Migration
     public function safeUp()
     {
         // Only for Craft 3.0
-        if (version_compare(Craft::$app->getInfo()->version, '3.1', '>=')) {
+        if (!version_compare(Craft::$app->getInfo()->version, '3.1', '<')) {
             return;
         }
 

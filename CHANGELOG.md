@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.1.4 - Unreleased
+### Fixed
+- Fixed a migration that could throw an error when updating with `allowAdminChanges` disabled.
+
 ## 2.1.3 - 2019-07-12
 ### Fixed
 - Fixed commented code in SEOmatic integration. 😈  
