@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use craft\base\BlockElementInterface;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use yii\base\Event;
@@ -29,6 +30,28 @@ class ElementTypeHelper
 
     // Static
     // =========================================================================
+
+    /**
+     * Returns whether the element type is cacheable.
+     *
+     * @param string $elementType
+     *
+     * @return bool
+     */
+    public static function getIsCacheableElementType(string $elementType): bool
+    {
+        // Don't proceed if this is a block element type
+        if (is_subclass_of($elementType, BlockElementInterface::class)) {
+            return false;
+        }
+
+        // Don't proceed if this is a non cacheable element type
+        if (!in_array($elementType, self::getNonCacheableElementTypes(), true)) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Returns non cacheable element types.

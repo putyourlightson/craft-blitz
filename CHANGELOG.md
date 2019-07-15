@@ -2,6 +2,7 @@
 
 ## 2.1.4 - Unreleased
 ### Fixed
+- Fixed an issue in which Block element types were being treated as elements.
 - Fixed a migration that could throw an error when updating with `allowAdminChanges` disabled.
 
 ## 2.1.3 - 2019-07-12

@@ -12,6 +12,7 @@ use craft\base\ElementInterface;
 use craft\elements\Asset;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
+use craft\helpers\ElementHelper;
 use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
@@ -129,8 +130,8 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Don't proceed if draft or revision
-        if ($element->getIsDraft() || $element->getIsRevision()) {
+        // Don't proceed if element is draft or revision
+        if (ElementHelper::isDraftOrRevision($element)) {
             return;
         }
 
@@ -159,11 +160,10 @@ class RefreshCacheService extends Component
             return;
         }
 
-        /** @var Element $element */
         $elementType = get_class($element);
 
-        // Don't proceed if this is a non cacheable element type
-        if (in_array($elementType, ElementTypeHelper::getNonCacheableElementTypes(), true)) {
+        // Don't proceed if not a cacheable element type
+        if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
             return;
         }
 

@@ -75,8 +75,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if this is a non cacheable element type
-        if (in_array(get_class($element), ElementTypeHelper::getNonCacheableElementTypes())) {
+        // Don't proceed if not a cacheable element type
+        if (!ElementTypeHelper::getIsCacheableElementType(get_class($element))) {
             return;
         }
 
@@ -99,8 +99,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if this is a non cacheable element type
-        if (in_array($elementQuery->elementType, ElementTypeHelper::getNonCacheableElementTypes())) {
+        // Don't proceed if not a cacheable element type
+        if (!ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)) {
             return;
         }
 

@@ -32,6 +32,8 @@ class m190525_120000_add_non_cacheable_element_types extends Migration
         $settings->nonCacheableElementTypes = $newNonCacheableElementTypes;
 
         Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
+
+        return true;
     }
 
     /**
