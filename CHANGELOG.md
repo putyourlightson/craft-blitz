@@ -23,7 +23,7 @@
 
 ## 2.1.0 - 2019-07-10
 
-> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
+> {warning} This release adds compatibility for drafts and revisions introduced in Craft 3.2. For best results, update Blitz via composer before running the Craft 3.2 migrations. This release also requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
 
 ### Added
 - Added compatibility for drafts and revisions in Craft 3.2.0.
