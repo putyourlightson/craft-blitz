@@ -27,7 +27,6 @@
 - Fixed plugin integrations to only be loaded if the required plugin version is met.
 
 ## 2.1.0 - 2019-07-10
-
 > {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
 
 ### Added
@@ -45,6 +44,13 @@
 - Assets that are being indexed no longer trigger refresh cache jobs. 
 - Settings are now saved with a warning message even if purger test fails.
 - Changed maximum length of URIs to 500 characters([#105](https://github.com/putyourlightson/craft-blitz/issues/105)).
+
+## 2.0.9 - 2019-07-16
+> {note} This release adds better handling of drafts and revisions and is recommended to install before updating to Craft 3.2.
+
+### Added
+- Added better handling of drafts and revisions for the update process to Craft 3.2.
+- Added Super Table elements and Campaign plugin contacts as non cacheable element types.
 
 ## 2.0.8 - 2019-04-05
 ### Added
@@ -155,6 +161,8 @@
 - Fixed bug when refreshing expired cache.
 
 ## 1.11.0 - 2019-01-01
+> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
+
 ### Added
 - Added expiry date to elements, specifically to entries with future post dates or expiry dates.
 - Added utility and console command to refresh elements with expiry dates.
@@ -163,8 +171,6 @@
 
 ### Changed
 - Replaced ability to clear sites in utility with table of cached sites.
-
-> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
 
 ## 1.10.2 - 2018-12-19
 ### Added
@@ -179,6 +185,8 @@
 - Fixed error when clearing the cache from the utility.
 
 ## 1.10.0 - 2018-12-17
+> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
+
 ### Added
 - Added optimisations to make the caching process faster and more performant.
 - Added `afterRefreshCache` event for third-party plugins to use.
@@ -190,8 +198,6 @@
 
 ### Fixed
 - Fixed config warnings that were not being displayed on settings page.
-
-> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
 
 ## 1.9.2 - 2018-12-10
 ### Added
@@ -205,13 +211,17 @@
 - Fixed a bug that prevented the CSRF field being shown to anonymous users.
 
 ## 1.9.0 - 2018-12-04
+> {tip} You can now inject dynamic content into cached pages using the new twig tags.
+
 ### Added
 - Added a twig tag to dynamically inject the content of a URI into a cached page.
 - Added a twig tag to dynamically inject a CSRF input field into a cached page.
 
-> {tip} You can now inject dynamic content into cached pages using the new twig tags.
-
 ## 1.8.0 - 2018-11-28
+> {tip} A new `concurrency` setting is available in the plugin settings for faster cache warming.
+
+> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
+
 ### Added 
 - Added multiple concurrent requests when warming the cache with a new plugin setting.
 - Added new option to cache URLs with unique query strings as the same page ([#40](https://github.com/putyourlightson/craft-blitz/issues/40)).
@@ -224,10 +234,6 @@
 
 ### Fixed
 - Fixed bug where warm cache job fails if a server error is encountered ([#42](https://github.com/putyourlightson/craft-blitz/issues/42)).
-
-> {tip} A new `concurrency` setting is available in the plugin settings for faster cache warming.
-
-> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
 
 ## 1.7.1 - 2018-11-20
 ### Fixed 
