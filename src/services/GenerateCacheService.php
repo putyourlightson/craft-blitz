@@ -100,7 +100,7 @@ class GenerateCacheService extends Component
         }
 
         // Don't proceed if not a cacheable element type
-        if (!ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)) {
+        if (empty($elementQuery->elementType) || !ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)) {
             return;
         }
 
