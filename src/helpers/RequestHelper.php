@@ -76,12 +76,17 @@ class RequestHelper
     /**
      * Returns the requested site URI.
      *
-     * @return SiteUriModel
-     * @throws SiteNotFoundException
+     * @return SiteUriModel|null
      */
-    public static function getRequestedSiteUri(): SiteUriModel
+    public static function getRequestedSiteUri()
     {
-        $site = Craft::$app->getSites()->getCurrentSite();
+        try {
+            $site = Craft::$app->getSites()->getCurrentSite();
+        }
+        catch (SiteNotFoundException $e) {
+            return null;
+        }
+
         $url = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
@@ -118,6 +123,9 @@ class RequestHelper
             && $request->getIsGet()
             && !$request->getIsConsoleRequest()
             && !$request->getIsActionRequest()
+            && !$request->getIsPreview()
+            // TODO: remove in 3.0.0
+            // Keep this even if deprecated to support plugins that still sure it
             && !$request->getIsLivePreview()
         );
     }

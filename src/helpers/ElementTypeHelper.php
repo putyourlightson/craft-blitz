@@ -20,6 +20,15 @@ class ElementTypeHelper
      */
     const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
 
+    /**
+     * @const string[]
+     */
+    const NON_CACHEABLE_ELEMENT_TYPES = [
+        'craft\elements\GlobalSet',
+        'benf\neo\elements\Block',
+        'putyourlightson\campaign\elements\ContactElement',
+    ];
+
     // Properties
     // =========================================================================
 
@@ -46,7 +55,7 @@ class ElementTypeHelper
         }
 
         // Don't proceed if this is a non cacheable element type
-        if (!in_array($elementType, self::getNonCacheableElementTypes(), true)) {
+        if (in_array($elementType, self::getNonCacheableElementTypes(), true)) {
             return false;
         }
 
@@ -69,7 +78,10 @@ class ElementTypeHelper
         ]);
         Event::trigger(self::class, self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
 
-        self::$_nonCacheableElementTypes = $event->elementTypes;
+        self::$_nonCacheableElementTypes = array_merge(
+            self::NON_CACHEABLE_ELEMENT_TYPES,
+            $event->elementTypes
+        );
 
         return self::$_nonCacheableElementTypes;
     }

@@ -33,6 +33,7 @@ class SeomaticIntegration implements IntegrationInterface
      */
     public static function registerEvents()
     {
+        // Set up invalidate container caches event listeners
         Event::on(MetaContainers::class, MetaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
             function(InvalidateContainerCachesEvent $event) {
                 if ($event->uri === null && $event->siteId === null) {
@@ -43,15 +44,6 @@ class SeomaticIntegration implements IntegrationInterface
                     // Refresh cache for source
                     $siteUris = self::_getSourceSiteUris($event->siteId, $event->sourceId, $event->sourceType);
                     Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
-                }
-                elseif ($event->uri !== null && $event->siteId !== null) {
-                    // Refresh site URI
-                    $siteUri = new SiteUriModel([
-                        'siteId' => $event->siteId,
-                        'uri' => $event->uri,
-                    ]);
-
-                    Blitz::$plugin->refreshCache->refreshSiteUris([$siteUri]);
                 }
             }
         );

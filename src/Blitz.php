@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
 use craft\elements\db\ElementQuery;
+use craft\events\BatchElementActionEvent;
 use craft\events\CancelableEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
@@ -136,7 +137,7 @@ class Blitz extends Plugin
         if (RequestHelper::getIsCacheableRequest()) {
             $siteUri = RequestHelper::getRequestedSiteUri();
 
-            if ($siteUri->getIsCacheableUri()) {
+            if ($siteUri !== null && $siteUri->getIsCacheableUri()) {
                 // If output then the script will exit
                 $this->outputCache->output($siteUri);
 
@@ -196,7 +197,7 @@ class Blitz extends Plugin
         // Register element populate event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
             function(PopulateElementEvent $event) use ($response) {
-                if ($response->getIsOk()) {
+                if ($response->getIsOk() && $event->element !== null) {
                     $this->generateCache->addElement($event->element);
                 }
             }
@@ -231,7 +232,7 @@ class Blitz extends Plugin
         // Add cache IDs before hard deleting elements so we can refresh them
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(DeleteElementEvent $event) {
-                if ($event->hardDelete) {
+                if ($event->hardDelete && $event->element !== null) {
                     $this->refreshCache->addCacheIds($event->element);
                 }
             }
@@ -248,8 +249,11 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on($event[0], $event[1],
-                function(ElementEvent $event) {
-                    $this->refreshCache->addElement($event->element);
+                function(Event $event) {
+                    /** @var ElementEvent|BatchElementActionEvent $event */
+                    if ($event->element !== null) {
+                        $this->refreshCache->addElement($event->element);
+                    }
                 }
             );
         }

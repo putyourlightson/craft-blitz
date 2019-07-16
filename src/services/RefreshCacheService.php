@@ -130,13 +130,13 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Don't proceed if element is draft or revision
-        if (ElementHelper::isDraftOrRevision($element)) {
+        // Don't proceed if propagating
+        if ($element->propagating) {
             return;
         }
 
-        // Don't proceed if propagating
-        if ($element->propagating) {
+        // Don't proceed if element is draft or revision
+        if (ElementHelper::isDraftOrRevision($element)) {
             return;
         }
 
@@ -170,17 +170,20 @@ class RefreshCacheService extends Component
         // Cast ID to integer to ensure the strict type check below works
         $elementId = (int)$element->getId();
 
-        // Don't proceed if this entry has already been added
+        // Don't proceed if element has already been added
         if (in_array($elementId, $this->_elementIds, true)) {
             return;
         }
 
+        // Add element
         $this->_elementIds[] = $elementId;
 
+        // Add element type
         if (!in_array($elementType, $this->_elementTypes, true)) {
             $this->_elementTypes[] = $elementType;
         }
 
+        // Add element expiry dates
         $this->addElementExpiryDates($element);
 
         // If batch mode is on then the refresh will be triggered later
@@ -346,8 +349,8 @@ class RefreshCacheService extends Component
         if (!empty($elementExpiryDates)) {
             $elementsService = Craft::$app->getElements();
 
-            /** @var ElementExpiryDateRecord $elementExpiryDate */
             foreach ($elementExpiryDates as $elementExpiryDate) {
+                /** @var ElementExpiryDateRecord $elementExpiryDate */
                 $element = $elementsService->getElementById($elementExpiryDate->elementId);
 
                 // This should happen before invalidating the element so that other expiry dates will be saved

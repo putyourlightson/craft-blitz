@@ -1,9 +1,14 @@
 # Release Notes for Blitz
 
-## 2.1.4 - Unreleased
+## 2.1.4 - 2019-07-16
+### Changed
+- Changed minimum requirement of Craft to version 3.2.1 for detecting preview requests.
+- Improved SEOmatic integration when resaving elements.
+
 ### Fixed
 - Fixed an issue in which Block element types were being treated as elements.
-- Fixed a migration that could throw an error when updating with `allowAdminChanges` disabled.
+- Fixed a migration that could throw an error when updating with `allowAdminChanges` disabled ([#114](https://github.com/putyourlightson/craft-blitz/issues/114)).
+- Fixed an error that was being thrown when running the resave entries console command ([#115](https://github.com/putyourlightson/craft-blitz/issues/115)).
 
 ## 2.1.3 - 2019-07-12
 ### Fixed
@@ -23,7 +28,7 @@
 
 ## 2.1.0 - 2019-07-10
 
-> {warning} This release adds compatibility for drafts and revisions introduced in Craft 3.2. For best results, update Blitz via composer before running the Craft 3.2 migrations. This release also requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
+> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
 
 ### Added
 - Added compatibility for drafts and revisions in Craft 3.2.0.

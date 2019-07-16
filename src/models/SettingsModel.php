@@ -119,12 +119,7 @@ class SettingsModel extends Model
     /**
      * @var string[]
      */
-    public $nonCacheableElementTypes = [
-        'craft\elements\GlobalSet',
-        'craft\elements\MatrixBlock',
-        'benf\neo\elements\Block',
-        'putyourlightson\campaign\elements\ContactElement',
-    ];
+    public $nonCacheableElementTypes = [];
 
     /**
      * @var string[]
