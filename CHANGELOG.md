@@ -1,5 +1,13 @@
 # Release Notes for Blitz
 
+## 2.0.9 - 2019-07-16
+
+> {note} This release adds better handling of drafts and revisions and is recommended to install before updating to Craft 3.2.
+
+### Added
+- Added better handling of drafts and revisions for the update process to Craft 3.2.
+- Added Super Table elements and Campaign plugin contacts as non cacheable element types.
+
 ## 2.0.8 - 2019-04-05
 ### Added
 - Added `clearCacheAutomaticallyForGlobals` config setting.

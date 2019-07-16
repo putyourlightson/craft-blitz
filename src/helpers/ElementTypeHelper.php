@@ -5,6 +5,8 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use Craft;
+use craft\elements\Entry;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use yii\base\Event;
@@ -19,6 +21,17 @@ class ElementTypeHelper
      */
     const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
 
+    /**
+     * @const string[]
+     */
+    const NON_CACHEABLE_ELEMENT_TYPES = [
+        'craft\elements\GlobalSet',
+        'craft\elements\MatrixBlock',
+        'benf\neo\elements\Block',
+        'verbb\supertable\elements\SuperTableBlockElement',
+        'putyourlightson\campaign\elements\ContactElement',
+    ];
+
     // Properties
     // =========================================================================
 
@@ -29,6 +42,23 @@ class ElementTypeHelper
 
     // Static
     // =========================================================================
+
+    /**
+     * Returns whether the element type is cacheable.
+     *
+     * @param string $elementType
+     *
+     * @return bool
+     */
+    public static function getIsCacheableElementType(string $elementType): bool
+    {
+        // Don't proceed if this is a non cacheable element type
+        if (in_array($elementType, self::getNonCacheableElementTypes(), true)) {
+            return false;
+        }
+
+        return true;
+    }
 
     /**
      * Returns non cacheable element types.

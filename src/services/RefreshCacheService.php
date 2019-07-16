@@ -141,8 +141,15 @@ class RefreshCacheService extends Component
         /** @var Element $element */
         $elementType = get_class($element);
 
-        // Don't proceed if this is a non cacheable element type
-        if (in_array($elementType, ElementTypeHelper::getNonCacheableElementTypes(), true)) {
+        // Don't proceed if not a cacheable element type
+        if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
+            return;
+        }
+
+        // Don't proceed if element is a draft or revision in Craft 3.2
+        if (version_compare(Craft::$app->getVersion(), '3.2.0', '>=')
+            && ($element->getIsDraft() || $element->getIsRevision())
+        ) {
             return;
         }
 
