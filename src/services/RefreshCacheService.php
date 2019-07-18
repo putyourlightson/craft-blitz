@@ -353,18 +353,19 @@ class RefreshCacheService extends Component
     public function refreshExpiredCache()
     {
         $this->batchMode = true;
+        $now = Db::prepareDateForDb(new DateTime());
 
         // Check for expired caches to invalidate
         $cacheIds = CacheRecord::find()
             ->select('id')
-            ->where(['<', 'expiryDate', Db::prepareDateForDb(new DateTime())])
+            ->where(['<', 'expiryDate', $now])
             ->column();
 
         $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
 
         // Check for expired elements to invalidate
         $elementExpiryDates = ElementExpiryDateRecord::find()
-            ->where(['<', 'expiryDate', Db::prepareDateForDb(new DateTime())])
+            ->where(['<', 'expiryDate', $now])
             ->all();
 
         if (!empty($elementExpiryDates)) {
