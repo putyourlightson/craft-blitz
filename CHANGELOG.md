@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.1.5 - 2019-07-XX
+### Added
+- Added the ability to dynamically get the CSRF param and a CSRF token with the `craft.blitz.csrfParam` and `craft.blitz.csrfToken` template tags and the `CsrfController::actionParam` and `CsrfController::actionToken` controller actions.
+
 ## 2.1.4 - 2019-07-16
 ### Changed
 - Changed minimum requirement of Craft to version 3.2.1 for detecting preview requests.

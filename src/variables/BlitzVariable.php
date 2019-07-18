@@ -69,6 +69,30 @@ class BlitzVariable
     }
 
     /**
+     * Returns a script to get the CSRF param.
+     *
+     * @return Markup
+     */
+    public function csrfParam(): Markup
+    {
+        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/param';
+
+        return $this->_getScript($uri);
+    }
+
+    /**
+     * Returns a script to get a CSRF token.
+     *
+     * @return Markup
+     */
+    public function csrfToken(): Markup
+    {
+        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/token';
+
+        return $this->_getScript($uri);
+    }
+
+    /**
      * Returns options for the current page cache, first setting any parameters provided.
      *
      * @param array|null
