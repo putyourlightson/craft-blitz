@@ -123,6 +123,12 @@ Every cache utility function above is also available as a console command.
 
 ![Console commands](images/console-2.0.0b.png)
 
+A console command also exists that generates entry expiry dates and stores them to enable refreshing expired cache. This happens automatically when entries are saved since Blitz version 2.0.0 but this command allows sites that recently updated to generate expiry dates for all of their entries. 
+
+```shell
+./craft blitz/cache/generate-expiry-dates
+```
+
 ## Refreshing Cache via URL
 
 Once you have created an API key in *Settings → Advanced*, you can trigger each of the cache utilities through a URL. Those URLs are displayed under the API key field after the setting has been saved.

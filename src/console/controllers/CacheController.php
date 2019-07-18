@@ -59,6 +59,12 @@ class CacheController extends Controller
 
         $actions = CacheUtility::getActions();
 
+        $actions[] = [
+            'id' => 'generate-expiry-dates',
+            'label' => Craft::t('blitz', 'Generate Expiry Dates'),
+            'instructions' => Craft::t('blitz', 'Generates entry expiry dates and stores them to enable refreshing expired cache (this generally happens automatically).'),
+        ];
+
         $lengths = [];
         foreach ($actions as $action) {
             $lengths[] = strlen($action['id']);
@@ -197,12 +203,28 @@ class CacheController extends Controller
     }
 
     /**
+     * Generates entry expiry dates.
+     *
+     * @return int
+     */
+    public function actionGenerateExpiryDates(): int
+    {
+        Blitz::$plugin->refreshCache->generateExpiryDates();
+
+        Craft::$app->getQueue()->run();
+
+        $this->stdout(Craft::t('blitz', 'Entry expiry dates successfully generated.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
      * Sets the request progress.
      *
      * @param int $count
      * @param int $total
      */
-    public function setRequestsProgress(int $count, int $total)
+    public function setRequestProgress(int $count, int $total)
     {
         Console::updateProgress($count, $total);
     }
@@ -242,7 +264,7 @@ class CacheController extends Controller
 
         Console::startProgress(0, count($urls), '', 0.8);
 
-        $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestsProgress']);
+        $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestProgress']);
 
         Console::endProgress();
 
@@ -253,5 +275,4 @@ class CacheController extends Controller
             $this->stderr(Craft::t('blitz', 'One or more sites use `@web` in their base URL which cannot be parsed by console commands.').PHP_EOL, Console::FG_RED);
         }
     }
-
 }
