@@ -344,7 +344,11 @@ class RefreshCacheService extends Component
         Blitz::$plugin->clearCache->clearAll();
         Blitz::$plugin->flushCache->flushAll();
         Blitz::$plugin->cachePurger->purgeAll();
-        Blitz::$plugin->warmCache->warmUris($siteUris);
+
+        // Warm the cache if enabled
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+            Blitz::$plugin->warmCache->warmUris($siteUris);
+        }
     }
 
     /**

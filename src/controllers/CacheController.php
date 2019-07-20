@@ -108,7 +108,7 @@ class CacheController extends Controller
     public function actionWarm(): Response
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            return $this->_getResponse('Blitz caching is disabled.');
+            return $this->_getResponse('Blitz caching is disabled.', false);
         }
 
         Blitz::$plugin->warmCache->warmAll();
@@ -123,13 +123,15 @@ class CacheController extends Controller
      */
     public function actionRefresh(): Response
     {
-        if (!Blitz::$plugin->settings->cachingEnabled) {
-            return $this->_getResponse('Blitz caching is disabled.');
-        }
-
         Blitz::$plugin->refreshCache->refreshAll();
 
-        return $this->_getResponse('Blitz cache successfully refreshed and queued for warming.');
+        $message = 'Blitz cache successfully refreshed and queued for warming.';
+
+        if (!Blitz::$plugin->settings->cachingEnabled && !Blitz::$plugin->settings->warmCacheAutomatically) {
+            $message = 'Blitz cache successfully refreshed.';
+        }
+
+        return $this->_getResponse($message);
     }
 
     /**

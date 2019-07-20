@@ -143,12 +143,6 @@ class CacheController extends Controller
      */
     public function actionRefresh(): int
     {
-        if (!Blitz::$plugin->settings->cachingEnabled) {
-            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
-
-            return ExitCode::OK;
-        }
-
         // Get cached site URIs before flushing the cache
         $siteUris = SiteUriHelper::getAllSiteUris();
 
@@ -156,7 +150,9 @@ class CacheController extends Controller
         $this->_flushCache();
         $this->_purgeCache();
 
-        $this->_warmCache($siteUris);
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+            $this->_warmCache($siteUris);
+        }
 
         return ExitCode::OK;
     }
