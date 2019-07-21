@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\console\controllers;
 use Craft;
 use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\CacheTagHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\utilities\CacheUtility;
@@ -176,19 +175,18 @@ class CacheController extends Controller
     /**
      * Refreshes tagged cache.
      *
-     * @param string
+     * @param array
      *
      * @return int
      */
-    public function actionRefreshTagged(string $tags = null): int
+    public function actionRefreshTagged(array $tags): int
     {
-        if ($tags === null) {
+        if (empty($tags)) {
             $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.').PHP_EOL, Console::FG_RED);
 
             return ExitCode::OK;
         }
 
-        $tags = CacheTagHelper::getTags($tags);
         Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
 
         Craft::$app->getQueue()->run();

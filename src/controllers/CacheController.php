@@ -6,10 +6,10 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\CacheTagHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
@@ -159,7 +159,8 @@ class CacheController extends Controller
             return $this->_getResponse('At least one tag must be provided.', false);
         }
 
-        $tags = CacheTagHelper::getTags($tags);
+        $tags = is_string($tags) ? StringHelper::split($tags) : $tags;
+
         Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
 
         return $this->_getResponse('Tagged cache successfully refreshed.');

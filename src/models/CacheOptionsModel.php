@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\models;
 
 use craft\base\Model;
 use craft\helpers\ConfigHelper;
+use craft\helpers\StringHelper;
 use craft\validators\DateTimeValidator;
 use DateTime;
 use putyourlightson\blitz\helpers\CacheTagHelper;
@@ -135,7 +136,7 @@ class CacheOptionsModel extends Model
      */
     public function tags($value)
     {
-        $this->tags = CacheTagHelper::getTags($value);
+        $this->tags = is_string($value) ? StringHelper::split($value) : $value;
 
         return $this;
     }

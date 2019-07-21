@@ -196,9 +196,9 @@ class RefreshCacheService extends Component
     /**
      * Adds expiry dates for a given element.
      *
-     * @param Element $element
+     * @param ElementInterface $element
      */
-    public function addElementExpiryDates(Element $element)
+    public function addElementExpiryDates(ElementInterface $element)
     {
         $expiryDate = null;
         $now = new DateTime();
@@ -218,16 +218,16 @@ class RefreshCacheService extends Component
     /**
      * Adds an expiry date for a given element.
      *
-     * @param Element $element
+     * @param ElementInterface $element
      * @param DateTime $expiryDate
      */
-    public function addElementExpiryDate(Element $element, DateTime $expiryDate)
+    public function addElementExpiryDate(ElementInterface $element, DateTime $expiryDate)
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
         /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
         $elementExpiryDateRecord = ElementExpiryDateRecord::find()
-            ->where(['elementId' => $element->id])
+            ->where(['elementId' => $element->getId()])
             ->one();
 
         if ($elementExpiryDateRecord !== null && $elementExpiryDateRecord->expiryDate < $expiryDate) {
@@ -237,7 +237,7 @@ class RefreshCacheService extends Component
         /** @noinspection MissedFieldInspection */
         Craft::$app->getDb()->createCommand()
             ->upsert(ElementExpiryDateRecord::tableName(), [
-                    'elementId' => $element->id,
+                    'elementId' => $element->getId(),
                     'expiryDate' => $expiryDate,
                 ],
                 ['expiryDate' => $expiryDate],
@@ -270,13 +270,20 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Generates entry expiry dates.
+     * Generates element expiry dates.
+     *
+     * @param string|null $elementType
      */
-    public function generateExpiryDates()
+    public function generateExpiryDates(string $elementType = null)
     {
+        if ($elementType === null) {
+            $elementType = Entry::class;
+        }
+
         $now = Db::prepareDateForDb(new DateTime());
 
-        $entries = Entry::find()
+        /** @var Element $elementType */
+        $elements = $elementType::find()
             ->where([
                 'or',
                 ['>', 'postDate', $now],
@@ -285,8 +292,8 @@ class RefreshCacheService extends Component
             ->anyStatus()
             ->all();
 
-        foreach ($entries as $entry) {
-            $this->addElementExpiryDates($entry);
+        foreach ($elements as $element) {
+            $this->addElementExpiryDates($element);
         }
     }
 
