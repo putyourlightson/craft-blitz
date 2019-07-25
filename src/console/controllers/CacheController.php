@@ -59,6 +59,12 @@ class CacheController extends Controller
 
         $actions = CacheUtility::getActions();
 
+        $actions[] = [
+            'id' => 'generate-expiry-dates',
+            'label' => Craft::t('blitz', 'Generate Expiry Dates'),
+            'instructions' => Craft::t('blitz', 'Generates expiry dates for entries and stores them to enable refreshing expired cache (this generally happens automatically).'),
+        ];
+
         $lengths = [];
         foreach ($actions as $action) {
             $lengths[] = strlen($action['id']);
@@ -192,6 +198,22 @@ class CacheController extends Controller
         Craft::$app->getQueue()->run();
 
         $this->stdout(Craft::t('blitz', 'Tagged Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Generates expiry dates for entries.
+     *
+     * @return int
+     */
+    public function actionGenerateExpiryDates(): int
+    {
+        Blitz::$plugin->refreshCache->generateExpiryDates();
+
+        Craft::$app->getQueue()->run();
+
+        $this->stdout(Craft::t('blitz', 'Entry expiry dates successfully generated.').PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }

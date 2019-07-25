@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
+use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use DateTime;
@@ -182,6 +183,7 @@ class RefreshCacheService extends Component
      */
     public function addElementExpiryDates(Element $element)
     {
+        $expiryDate = null;
         $now = new DateTime();
 
         if (!empty($element->postDate) && $element->postDate > $now) {
@@ -191,11 +193,9 @@ class RefreshCacheService extends Component
             $expiryDate = $element->expiryDate;
         }
 
-        if (empty($expiryDate)) {
-            return;
+        if ($expiryDate !== null) {
+            $this->addElementExpiryDate($element, $expiryDate);
         }
-
-        $this->addElementExpiryDate($element, $expiryDate);
     }
 
     /**
@@ -227,6 +227,27 @@ class RefreshCacheService extends Component
                 [],
                 false)
             ->execute();
+    }
+
+    /**
+     * Generates entry expiry dates.
+     */
+    public function generateExpiryDates()
+    {
+        $now = Db::prepareDateForDb(new DateTime());
+
+        $entries = Entry::find()
+            ->where([
+                'or',
+                ['>', 'postDate', $now],
+                ['>', 'expiryDate', $now],
+            ])
+            ->anyStatus()
+            ->all();
+
+        foreach ($entries as $entry) {
+            $this->addElementExpiryDates($entry);
+        }
     }
 
     /**

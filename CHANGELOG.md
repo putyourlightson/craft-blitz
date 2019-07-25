@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.0.10 - 2019-07-26
+### Added
+- Added the `blitz/cache/generate-expiry-dates` console command that generates entry expiry dates and stores them to enable refreshing expired cache (this generally happens automatically)
+
 ## 2.0.9 - 2019-07-16
 
 > {note} This release adds better handling of drafts and revisions and is recommended to install before updating to Craft 3.2.
