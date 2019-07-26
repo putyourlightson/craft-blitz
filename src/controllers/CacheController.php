@@ -6,10 +6,10 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\CacheTagHelper;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
@@ -108,7 +108,7 @@ class CacheController extends Controller
     public function actionWarm(): Response
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            return $this->_getResponse('Blitz caching is disabled.');
+            return $this->_getResponse('Blitz caching is disabled.', false);
         }
 
         Blitz::$plugin->warmCache->warmAll();
@@ -123,13 +123,15 @@ class CacheController extends Controller
      */
     public function actionRefresh(): Response
     {
-        if (!Blitz::$plugin->settings->cachingEnabled) {
-            return $this->_getResponse('Blitz caching is disabled.');
-        }
-
         Blitz::$plugin->refreshCache->refreshAll();
 
-        return $this->_getResponse('Blitz cache successfully refreshed and queued for warming.');
+        $message = 'Blitz cache successfully refreshed and queued for warming.';
+
+        if (!Blitz::$plugin->settings->cachingEnabled && !Blitz::$plugin->settings->warmCacheAutomatically) {
+            $message = 'Blitz cache successfully refreshed.';
+        }
+
+        return $this->_getResponse($message);
     }
 
     /**
@@ -157,7 +159,8 @@ class CacheController extends Controller
             return $this->_getResponse('At least one tag must be provided.', false);
         }
 
-        $tags = CacheTagHelper::getTags($tags);
+        $tags = is_string($tags) ? StringHelper::split($tags) : $tags;
+
         Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
 
         return $this->_getResponse('Tagged cache successfully refreshed.');

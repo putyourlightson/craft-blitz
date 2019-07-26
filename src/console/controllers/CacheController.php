@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\console\controllers;
 use Craft;
 use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\CacheTagHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\utilities\CacheUtility;
@@ -58,6 +57,12 @@ class CacheController extends Controller
         $this->stdout(Craft::t('blitz','The following actions can be taken:').PHP_EOL.PHP_EOL, Console::FG_YELLOW);
 
         $actions = CacheUtility::getActions();
+
+        $actions[] = [
+            'id' => 'generate-expiry-dates',
+            'label' => Craft::t('blitz', 'Generate Expiry Dates'),
+            'instructions' => Craft::t('blitz', 'Generates entry expiry dates and stores them to enable refreshing expired cache (this generally happens automatically).'),
+        ];
 
         $lengths = [];
         foreach ($actions as $action) {
@@ -137,12 +142,6 @@ class CacheController extends Controller
      */
     public function actionRefresh(): int
     {
-        if (!Blitz::$plugin->settings->cachingEnabled) {
-            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
-
-            return ExitCode::OK;
-        }
-
         // Get cached site URIs before flushing the cache
         $siteUris = SiteUriHelper::getAllSiteUris();
 
@@ -150,7 +149,9 @@ class CacheController extends Controller
         $this->_flushCache();
         $this->_purgeCache();
 
-        $this->_warmCache($siteUris);
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+            $this->_warmCache($siteUris);
+        }
 
         return ExitCode::OK;
     }
@@ -174,19 +175,18 @@ class CacheController extends Controller
     /**
      * Refreshes tagged cache.
      *
-     * @param string
+     * @param array
      *
      * @return int
      */
-    public function actionRefreshTagged(string $tags = null): int
+    public function actionRefreshTagged(array $tags): int
     {
-        if ($tags === null) {
+        if (empty($tags)) {
             $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.').PHP_EOL, Console::FG_RED);
 
             return ExitCode::OK;
         }
 
-        $tags = CacheTagHelper::getTags($tags);
         Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
 
         Craft::$app->getQueue()->run();
@@ -197,12 +197,28 @@ class CacheController extends Controller
     }
 
     /**
+     * Generates entry expiry dates.
+     *
+     * @return int
+     */
+    public function actionGenerateExpiryDates(): int
+    {
+        Blitz::$plugin->refreshCache->generateExpiryDates();
+
+        Craft::$app->getQueue()->run();
+
+        $this->stdout(Craft::t('blitz', 'Entry expiry dates successfully generated.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
      * Sets the request progress.
      *
      * @param int $count
      * @param int $total
      */
-    public function setRequestsProgress(int $count, int $total)
+    public function setRequestProgress(int $count, int $total)
     {
         Console::updateProgress($count, $total);
     }
@@ -242,7 +258,7 @@ class CacheController extends Controller
 
         Console::startProgress(0, count($urls), '', 0.8);
 
-        $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestsProgress']);
+        $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestProgress']);
 
         Console::endProgress();
 
@@ -253,5 +269,4 @@ class CacheController extends Controller
             $this->stderr(Craft::t('blitz', 'One or more sites use `@web` in their base URL which cannot be parsed by console commands.').PHP_EOL, Console::FG_RED);
         }
     }
-
 }

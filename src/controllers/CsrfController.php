@@ -17,7 +17,7 @@ class CsrfController extends Controller
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = ['input'];
+    protected $allowAnonymous = true;
 
     // Public Methods
     // =========================================================================
@@ -29,14 +29,30 @@ class CsrfController extends Controller
      */
     public function actionInput(): Response
     {
-        $generalConfig = Craft::$app->getConfig()->getGeneral();
+        $request = Craft::$app->getRequest();
 
-        if (!$generalConfig->enableCsrfProtection) {
-            return $this->asRaw('');
-        }
-
-        $input = '<input type="hidden" name="'.$generalConfig->csrfTokenName.'" value="'.Craft::$app->getRequest()->getCsrfToken().'">';
+        $input = '<input type="hidden" name="'.$request->csrfParam.'" value="'.$request->getCsrfToken().'">';
 
         return $this->asRaw($input);
+    }
+
+    /**
+     * Returns the CSRF param.
+     *
+     * @return Response
+     */
+    public function actionParam(): Response
+    {
+        return $this->asRaw(Craft::$app->getRequest()->csrfParam);
+    }
+
+    /**
+     * Returns a CSRF token.
+     *
+     * @return Response
+     */
+    public function actionToken(): Response
+    {
+        return $this->asRaw(Craft::$app->getRequest()->getCsrfToken());
     }
 }

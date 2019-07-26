@@ -123,6 +123,12 @@ Every cache utility function above is also available as a console command.
 
 ![Console commands](images/console-2.0.0b.png)
 
+A console command also exists that generates entry expiry dates and stores them to enable refreshing expired cache. This happens automatically when entries are saved since Blitz version 2.0.0 but this command allows sites that recently updated to generate expiry dates for all of their entries. 
+
+```shell
+./craft blitz/cache/generate-expiry-dates
+```
+
 ## Refreshing Cache via URL
 
 Once you have created an API key in *Settings → Advanced*, you can trigger each of the cache utilities through a URL. Those URLs are displayed under the API key field after the setting has been saved.
@@ -232,7 +238,7 @@ Returns a script that injects the contents of the URI provided in place of the t
 
 ### `{{ craft.blitz.csrfInput() }}`
 
-Returns a script that injects a CSRF input field in place of the twig tag.
+Returns a script that injects a CSRF input field in place of the twig tag. 
 
 Below is an example of how you might use the tags to create a page containing dynamic content and a form page that can be cached by Blitz.
 
@@ -244,6 +250,24 @@ Your cart: {{ craft.blitz.getUri('/ajax/cart-items') }}
    ...
  
  </form>
+```
+
+### `{{ craft.blitz.csrfParam() }}`
+
+Returns a script that injects the CSRF param in place of the twig tag. 
+
+### `{{ craft.blitz.csrfToken() }}`
+
+Returns a script that injects a CSRF token in place of the twig tag. 
+
+### CSRF Controller Actions
+
+The controller action `blitz/csrf/input` can be used to fetch the input field dynamically using AJAX, for example. The `blitz/csrf/param` and `blitz/csrf/token` controller actions are also available for fetching the CSRF param and a token respectively.
+
+```javascript
+$.get('/actions/blitz/csrf/token', function(data) {
+    csrfToken = data;
+};
 ```
 
 ## Page Specific Options
