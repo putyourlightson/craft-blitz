@@ -45,6 +45,10 @@
 - Settings are now saved with a warning message even if purger test fails.
 - Changed maximum length of URIs to 500 characters([#105](https://github.com/putyourlightson/craft-blitz/issues/105)).
 
+## 2.0.10 - 2019-07-26
+### Added
+- Added the `blitz/cache/generate-expiry-dates` console command that generates entry expiry dates and stores them to enable refreshing expired cache (this generally happens automatically)
+
 ## 2.0.9 - 2019-07-16
 > {note} This release adds better handling of drafts and revisions and is recommended to install before updating to Craft 3.2.
 
