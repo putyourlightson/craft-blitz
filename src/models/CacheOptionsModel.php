@@ -10,7 +10,6 @@ use craft\helpers\ConfigHelper;
 use craft\helpers\StringHelper;
 use craft\validators\DateTimeValidator;
 use DateTime;
-use putyourlightson\blitz\helpers\CacheTagHelper;
 
 class CacheOptionsModel extends Model
 {

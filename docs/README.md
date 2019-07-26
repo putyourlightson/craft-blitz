@@ -262,7 +262,7 @@ Returns a script that injects a CSRF token in place of the twig tag.
 
 ### CSRF Controller Actions
 
-The controller action `blitz/csrf/input` can be used to fetch the input field dynamically using AJAX, for example. The `blitz/csrf/param` and `blitz/csrf/token` controller actions are also available for fetching the CSRF token param and a token value respectively.
+The controller action `blitz/csrf/input` can be used to fetch the input field dynamically using AJAX, for example. The `blitz/csrf/param` and `blitz/csrf/token` controller actions are also available for fetching the CSRF param and a token respectively.
 
 ```javascript
 $.get('/actions/blitz/csrf/token', function(data) {

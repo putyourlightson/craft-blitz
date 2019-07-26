@@ -3,7 +3,7 @@
 ## 2.1.5 - 2019-07-26
 ### Added
 - Added the ability to dynamically fetch the CSRF param and a CSRF token with the `craft.blitz.csrfParam` and `craft.blitz.csrfToken` template tags and the `CsrfController::actionParam` and `CsrfController::actionToken` controller actions.
-- Added the `blitz/cache/generate-expiry-dates` console command that generates entry expiry dates and stores them to enable refreshing expired cache (this generally happens automatically).
+- Added the `blitz/cache/generate-expiry-dates` console command that generates expiry dates for entries and stores them to enable refreshing expired cache (this generally happens automatically).
 
 ### Fixed
 - Fixed an issue in which the cache could be warmed even when caching was disabled.
