@@ -52,9 +52,12 @@ class OutputCacheService extends Component
         // Update powered by header
         header_remove('X-Powered-By');
 
+        if (Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader) {
+            header('X-Powered-By: '.Craft::$app->name, false);
+        }
+
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $header = Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader ? Craft::$app->name.', ' : '';
-            header('X-Powered-By: '.$header.'Blitz');
+            header('X-Powered-By: Blitz', false);
         }
 
         // Add cache tag header if set
@@ -70,6 +73,9 @@ class OutputCacheService extends Component
             $value .= '<!-- Served by Blitz -->';
         }
 
-        exit($value);
+        // Create and send response
+        $response = Craft::$app->getResponse();
+        $response->data = $value;
+        Craft::$app->end(0, $response);
     }
 }
