@@ -140,6 +140,7 @@ class BlitzVariable
                         }
                     };
                     xhr.open("GET", uri);
+                    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
                     xhr.send();
                 }
             ', View::POS_END);

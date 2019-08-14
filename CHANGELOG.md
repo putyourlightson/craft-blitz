@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.1.6 - Unreleased
+### Added
+- Added `X-Requested-With: XMLHttpRequest` header to dynamic content AJAX requests.
+
 ## 2.1.5 - 2019-07-26
 ### Added
 - Added the ability to dynamically fetch the CSRF param and a CSRF token with the `craft.blitz.csrfParam` and `craft.blitz.csrfToken` template tags and the `CsrfController::actionParam` and `CsrfController::actionToken` controller actions.
