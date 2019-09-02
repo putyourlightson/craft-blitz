@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\drivers\storage;
 
 use Craft;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\caching\CacheInterface;
 
 /**
  *
@@ -22,6 +23,19 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     const KEY_PREFIX = 'blitz';
 
+    // Properties
+    // =========================================================================
+
+    /**
+     * @var string
+     */
+    public $cacheComponent = 'cache';
+
+    /**
+     * @var CacheInterface|null
+     */
+    private $_cache;
+
     // Static
     // =========================================================================
 
@@ -30,9 +44,7 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public static function displayName(): string
     {
-        $name = get_class(Craft::$app->getCache());
-
-        return Craft::t('blitz', 'Yii Cache Storage [{name}]', ['name' => $name]);
+        return Craft::t('blitz', 'Yii Cache Storage');
     }
 
     // Public Methods
@@ -41,9 +53,23 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        parent::init();
+
+        $this->_cache = Craft::$app->get($this->cacheComponent, false);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function get(SiteUriModel $siteUri): string
     {
-        $value = Craft::$app->getCache()->get([
+        if ($this->_cache === null) {
+            return '';
+        }
+
+        $value = $this->_cache->get([
             self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
         ]);
 
@@ -59,7 +85,11 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function save(string $value, SiteUriModel $siteUri)
     {
-        Craft::$app->getCache()->set([
+        if ($this->_cache === null) {
+            return;
+        }
+
+        $this->_cache->set([
             self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
         ], $value);
     }
@@ -69,7 +99,11 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function delete(SiteUriModel $siteUri)
     {
-        Craft::$app->getCache()->delete([
+        if ($this->_cache === null) {
+            return;
+        }
+
+        $this->_cache->delete([
             self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
         ]);
     }
@@ -79,7 +113,11 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function deleteAll()
     {
-        Craft::$app->getCache()->flush();
+        if ($this->_cache === null) {
+            return;
+        }
+
+        $this->_cache->flush();
     }
 
     /**
