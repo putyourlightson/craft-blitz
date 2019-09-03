@@ -3,6 +3,10 @@
 ## 2.1.6 - Unreleased
 ### Added
 - Added `X-Requested-With: XMLHttpRequest` header to dynamic content AJAX requests.
+- Added a `$cacheComponent` setting to `YiiCacheStorage` ([#128](https://github.com/putyourlightson/craft-blitz/issues/128)).
+
+### Fixed
+- Fixed the warning about the `cachingEnabled` config setting that was not appearing.
 
 ## 2.1.5 - 2019-07-26
 ### Added
