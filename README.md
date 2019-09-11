@@ -14,7 +14,7 @@ Although the performance gains depend on the individual site and server setup, t
 
 ## Documentation
 
-Read the documentation at [putyourlightson.com/craft-plugins/blitz/docs](https://putyourlightson.com/craft-plugins/blitz/docs).
+Read the documentation at [putyourlightson.com/plugins/blitz](https://putyourlightson.com/plugins/blitz).
 
 ## What’s New in Version 2
 
