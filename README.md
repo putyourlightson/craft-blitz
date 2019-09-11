@@ -10,7 +10,8 @@ The Blitz plugin provides intelligent static page caching for creating lightning
 
 ## Documentation
 
-Read the documentation at [putyourlightson.com/plugins/blitz](https://putyourlightson.com/plugins/blitz).
+Read the documentation at [putyourlightson.com/plugins/blitz »
+](https://putyourlightson.com/plugins/blitz)
 
 ![TTFB](docs/images/ttfb-2.0.0b.png)  
 
