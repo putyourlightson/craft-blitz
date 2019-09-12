@@ -17,7 +17,7 @@ Learn more and read the documentation at [putyourlightson.com/plugins/blitz »](
 ## License
 
 This plugin requires a commercial license which can be purchased through the [Craft Plugin Store](https://plugins.craftcms.com/blitz).  
-The license fee is $59 plus $29 per subsequent year for updates (optional).
+The license fee is **$59** plus **$29** per subsequent year for updates (optional).
 
 ## Requirements
 
