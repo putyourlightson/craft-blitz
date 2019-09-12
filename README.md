@@ -23,4 +23,12 @@ The license fee is **$59** plus **$29** per subsequent year for updates (optiona
 
 This plugin requires [Craft CMS](https://craftcms.com/) 3.1.0 or later.
 
+## Installation
+
+To install the plugin, search for "Blitz" in the Craft Plugin Store, or install manually using composer.
+
+```
+composer require putyourlightson/craft-blitz
+```
+
 Created by [PutYourLightsOn](https://putyourlightson.com/).
