@@ -214,7 +214,7 @@ class Blitz extends Plugin
             }
         );
 
-        // Register template page render event
+        // Register after render page template event
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
             function(TemplateEvent $event) use ($response, $siteUri) {
                 if ($response->getIsOk()) {

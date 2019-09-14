@@ -1,9 +1,13 @@
 # Release Notes for Blitz
 
-## 2.1.6 - Unreleased
+## 2.2.0 - Unreleased
 ### Added
 - Added `X-Requested-With: XMLHttpRequest` header to dynamic content AJAX requests.
 - Added a `$cacheComponent` setting to `YiiCacheStorage` ([#128](https://github.com/putyourlightson/craft-blitz/issues/128)).
+
+### Changed
+- Pages are no longer cached if there are any transform generation URLs in the body ([#125](https://github.com/putyourlightson/craft-blitz/issues/125)).
+- Improved tracking of element queries in the database.
 
 ### Fixed
 - Fixed the warning about the `cachingEnabled` config setting that was not appearing.

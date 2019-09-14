@@ -12,12 +12,11 @@ The Blitz plugin provides intelligent static page caching for creating lightning
 
 Learn more and read the documentation at [putyourlightson.com/plugins/blitz »](https://putyourlightson.com/plugins/blitz)
 
-![TTFB](docs/images/ttfb-2.0.0b.png)  
+![TTFB](https://putyourlightson.com/assets/images/plugins/blitz/ttfb.png)  
 
 ## License
 
-This plugin requires a commercial license which can be purchased through the [Craft Plugin Store](https://plugins.craftcms.com/blitz).  
-The license fee is **$59** plus **$29** per subsequent year for updates (optional).
+This plugin requires a commercial license pur­chas­able through the [Craft Plugin Store](https://plugins.craftcms.com/blitz). The license fee is **$59** plus **$29** per subsequent year for updates (optional).
 
 ## Requirements
 

@@ -11,6 +11,7 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
+use craft\helpers\StringHelper;
 use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
@@ -166,6 +167,12 @@ class GenerateCacheService extends Component
             return;
         }
 
+        // Don't cache if there are any transform generation URLs in the body
+        // https://github.com/putyourlightson/craft-blitz/issues/125
+        if (StringHelper::contains(stripslashes($output), 'assets/generate-transform')) {
+            return;
+        }
+
         $mutex = Craft::$app->getMutex();
         $lockName = 'blitz:save:'.$siteUri->siteId.'-'.$siteUri->uri;
 
@@ -284,6 +291,14 @@ class GenerateCacheService extends Component
             }
         }
 
+        $ignoreEmptyParams = ['structureId', 'orderBy'];
+
+        foreach ($ignoreEmptyParams as $key) {
+            if (empty($elementQuery->{$key})) {
+                unset($elementQuery->{$key});
+            }
+        }
+
         // Convert the query parameter values recursively
         array_walk_recursive($params, [$this, '_convertQueryParams']);
 
@@ -297,7 +312,7 @@ class GenerateCacheService extends Component
      */
     private function _convertQueryParams(&$value)
     {
-        // Convert element parameters to their ID
+        // Convert elements to their ID
         if ($value instanceof Element) {
             $value = $value->id;
         }
