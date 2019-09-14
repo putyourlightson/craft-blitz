@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 2.2.0 - Unreleased
+## 2.2.0 - 2019-09-14
 ### Added
 - Added `X-Requested-With: XMLHttpRequest` header to dynamic content AJAX requests.
 - Added a `$cacheComponent` setting to `YiiCacheStorage` ([#128](https://github.com/putyourlightson/craft-blitz/issues/128)).
