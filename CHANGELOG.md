@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.2.1 - 2019-09-15
+### Changed
+- Improved the performance of warming the entire site by excluding irrelevant URLs.
+
 ## 2.2.0 - 2019-09-14
 ### Added
 - Added `X-Requested-With: XMLHttpRequest` header to dynamic content AJAX requests.

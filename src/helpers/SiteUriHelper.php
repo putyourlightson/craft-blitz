@@ -8,6 +8,8 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\db\Query;
 use craft\db\Table;
+use craft\records\Element;
+use craft\records\Element_SiteSettings;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 
@@ -65,11 +67,19 @@ class SiteUriHelper
             ->column();
 
         // Get URIs from all elements in the site
-        $elementUris = (new Query())
-            ->select('uri')
-            ->from(Table::ELEMENTS_SITES)
-            ->where(['siteId' => $siteId])
+        $elementUris = Element_SiteSettings::find()
+            ->select(['uri'])
+            ->where([
+                'siteId' => $siteId,
+                'draftId' => null,
+                'revisionId' => null,
+                'dateDeleted' => null,
+                'archived' => false,
+                Element_SiteSettings::tableName().'.enabled' => true,
+                Element::tableName().'.enabled' => true,
+            ])
             ->andWhere(['not', ['uri' => null]])
+            ->joinWith('element')
             ->column();
 
         // Merge arrays and keep unique values only
@@ -78,7 +88,7 @@ class SiteUriHelper
         foreach ($uris as $uri) {
             $siteUri = new SiteUriModel([
                 'siteId' => $siteId,
-                'uri' => $uri,
+                'uri' => str_replace('__home__', '', $uri),
             ]);
 
             if (!$cacheableOnly || $siteUri->getIsCacheableUri()) {
