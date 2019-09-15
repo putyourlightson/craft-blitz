@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 2.2.3 - Unreleased
+## 2.2.3 - 2019-09-15
 ### Changed
 - Improved tracking of element queries in the database.
 
