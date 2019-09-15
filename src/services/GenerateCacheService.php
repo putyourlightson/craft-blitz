@@ -294,7 +294,7 @@ class GenerateCacheService extends Component
         $ignoreEmptyParams = ['structureId', 'orderBy'];
 
         foreach ($ignoreEmptyParams as $key) {
-            if (empty($elementQuery->{$key})) {
+            if (isset($elementQuery->{$key}) && empty($elementQuery->{$key})) {
                 unset($elementQuery->{$key});
             }
         }

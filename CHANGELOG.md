@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.2.2 - 2019-09-15
+### Fixed
+- Fixed bug introduced in 2.2.0.
+
 ## 2.2.1 - 2019-09-15
 ### Changed
 - Improved the performance of warming the entire site by excluding irrelevant URLs.
