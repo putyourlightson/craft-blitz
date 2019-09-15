@@ -291,13 +291,13 @@ class GenerateCacheService extends Component
             }
         }
 
-        $ignoreEmptyParams = ['structureId', 'orderBy'];
-
-        foreach ($ignoreEmptyParams as $key) {
-            if (isset($elementQuery->{$key}) && empty($elementQuery->{$key})) {
-                unset($elementQuery->{$key});
-            }
-        }
+//        $ignoreEmptyParams = ['structureId', 'orderBy'];
+//
+//        foreach ($ignoreEmptyParams as $key) {
+//            if (isset($elementQuery->{$key}) && empty($elementQuery->{$key})) {
+//                unset($elementQuery->__get(){$key});
+//            }
+//        }
 
         // Convert the query parameter values recursively
         array_walk_recursive($params, [$this, '_convertQueryParams']);
