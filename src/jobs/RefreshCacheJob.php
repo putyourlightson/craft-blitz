@@ -63,6 +63,7 @@ class RefreshCacheJob extends BaseJob
 
         $cacheIds = array_merge($this->cacheIds, $elementCacheIds);
 
+        // If we have element IDs then loop through element queries to check for matches
         if (count($this->elementIds)) {
             $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
                 $this->elementTypes, $cacheIds
@@ -148,7 +149,7 @@ class RefreshCacheJob extends BaseJob
 
         // Ensure class still exists as a plugin may have been removed since being saved
         if (!class_exists($elementQueryRecord->type)) {
-            return $cacheIds;
+            return [];
         }
 
         /** @var Element $elementType */
