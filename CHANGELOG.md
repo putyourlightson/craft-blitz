@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.3.0 - Unreleased
+### Fixed
+- Fixed warming of cache URLs that should be excluded from caching ([#130](https://github.com/putyourlightson/craft-blitz/issues/130)).
+
 ## 2.2.3 - 2019-09-15
 ### Changed
 - Improved tracking of element queries in the database.

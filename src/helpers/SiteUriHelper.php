@@ -30,7 +30,7 @@ class SiteUriHelper
         $primarySite = $sitesService->getPrimarySite();
 
         // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
-        $siteUriSets = [self::getSiteSiteUris($primarySite->id)];
+        $siteUriSets = [self::getSiteSiteUris($primarySite->id, $cacheableOnly)];
 
         // Loop through all sites to ensure we warm all site element URLs
         $sites = $sitesService->getAllSites();
