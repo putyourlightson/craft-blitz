@@ -47,7 +47,7 @@ class TemplatesControllerTest extends BaseControllerTest
         Craft::$app->getView()->setTemplateMode('site');
 
         $response = $this->runActionWithParams('templates/get', [
-            'template' => Craft::$app->getSecurity()->hashData('_permitted'),
+            'template' => Craft::$app->getSecurity()->hashData('_hidden'),
         ]);
 
         $this->assertInstanceOf(Response::class, $response);
