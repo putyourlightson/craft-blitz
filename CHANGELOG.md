@@ -3,6 +3,8 @@
 ## 2.3.0 - Unreleased
 ### Added
 - Added the ability to dynamically get templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).
+- Added unique zone IDs for each site in the Cloudflare reverse proxy purger settings.
+- Added unit tests to the plugin.
 
 ### Fixed
 - Fixed warming of cache URLs that should be excluded from caching ([#130](https://github.com/putyourlightson/craft-blitz/issues/130)).

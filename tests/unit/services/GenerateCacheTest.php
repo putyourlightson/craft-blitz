@@ -9,7 +9,7 @@ namespace putyourlightson\blitztests\unit;
 use Codeception\Test\Unit;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
-use UnitTester;;
+use UnitTester;
 
 /**
  * @author    PutYourLightsOn
@@ -17,7 +17,7 @@ use UnitTester;;
  * @since     2.3.0
  */
 
-class GenerateCacheUnitTest extends Unit
+class GenerateCacheTest extends Unit
 {
     // Properties
     // =========================================================================
