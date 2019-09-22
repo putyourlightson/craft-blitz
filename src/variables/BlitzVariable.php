@@ -11,6 +11,7 @@ use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use Twig\Markup;
+use yii\web\NotFoundHttpException;
 
 class BlitzVariable
 {
@@ -52,6 +53,28 @@ class BlitzVariable
         // Append no-cache query parameter
         $uri .= strpos($uri, '?') === false ? '?' : '&';
         $uri .= 'no-cache=1';
+
+        return $this->_getScript($uri);
+    }
+
+    /**
+     * Returns script to get the output of a template.
+     *
+     * @param string $uri
+     *
+     * @return Markup
+     */
+    public function getTemplate(string $template): Markup
+    {
+        // Ensure template exists
+        if (!Craft::$app->getView()->resolveTemplate($template)) {
+            throw new NotFoundHttpException('Template not found: ' . $template);
+        }
+
+        // Hash the template
+        $template = Craft::$app->getSecurity()->hashData($template);
+
+        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/templates/get?template='.$template;
 
         return $this->_getScript($uri);
     }

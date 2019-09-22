@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
 ## 2.3.0 - Unreleased
+### Added
+- Added the ability to dynamically get templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).
+
 ### Fixed
 - Fixed warming of cache URLs that should be excluded from caching ([#130](https://github.com/putyourlightson/craft-blitz/issues/130)).
 
