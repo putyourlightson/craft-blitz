@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
+use craft\models\Site;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
@@ -39,9 +40,9 @@ class CloudflarePurger extends BaseCachePurger
     public $apiKey;
 
     /**
-     * @var string
+     * @var array
      */
-    public $zoneId;
+    public $zoneIds = [];
 
     // Static
     // =========================================================================
@@ -64,7 +65,7 @@ class CloudflarePurger extends BaseCachePurger
     {
         return [
             'apiKey' => Craft::t('blitz', 'API Key'),
-            'zoneId' => Craft::t('blitz', 'Zone ID'),
+            'zoneIds' => Craft::t('blitz', 'Zone IDs'),
         ];
     }
 
@@ -74,7 +75,7 @@ class CloudflarePurger extends BaseCachePurger
     public function rules(): array
     {
         return [
-            [['apiKey', 'email', 'zoneId'], 'required'],
+            [['apiKey', 'email'], 'required'],
         ];
     }
 
@@ -83,7 +84,7 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function purge(SiteUriModel $siteUri)
     {
-        $this->_sendRequest('delete', 'purge_cache', [
+        $this->_sendRequest('delete', 'purge_cache', $siteUri->siteId, [
             'files' => [$siteUri->getUrl()]
         ]);
     }
@@ -93,9 +94,11 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function purgeUris(array $siteUris)
     {
-        $this->_sendRequest('delete', 'purge_cache', [
-            'files' => SiteUriHelper::getUrls($siteUris)
-        ]);
+        if (count($siteUris)) {
+            $this->_sendRequest('delete', 'purge_cache', $siteUris[0]->siteId, [
+                'files' => SiteUriHelper::getUrls($siteUris)
+            ]);
+        }
     }
 
     /**
@@ -103,9 +106,13 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function purgeAll()
     {
-        $this->_sendRequest('delete', 'purge_cache', [
-            'purge_everything' => true
-        ]);
+        $sites = Craft::$app->getSites()->getAllSites();
+
+        foreach ($sites as $site) {
+            $this->_sendRequest('delete', 'purge_cache', $site->id, [
+                'purge_everything' => true
+            ]);
+        }
     }
 
     /**
@@ -140,7 +147,7 @@ class CloudflarePurger extends BaseCachePurger
      *
      * @return bool
      */
-    private function _sendRequest(string $method, string $action = '', array $params = []): bool
+    private function _sendRequest(string $method, string $action = '', int $siteId, array $params = []): bool
     {
         $response = false;
 
@@ -153,7 +160,17 @@ class CloudflarePurger extends BaseCachePurger
             ]
         ]);
 
-        $uri = 'zones/'.Craft::parseEnv($this->zoneId).'/'.$action;
+        $site = Craft::$app->getSites()->getSiteById($siteId);
+
+        if ($site === null) {
+            return false;
+        }
+
+        if (empty($this->zoneIds[$site->handle]) || empty($this->zoneIds[$site->handle]['zoneId'])) {
+            return false;
+        }
+
+        $uri = 'zones/'.Craft::parseEnv($this->zoneIds[$site->handle]['zoneId']).'/'.$action;
 
         $requests = [];
 
