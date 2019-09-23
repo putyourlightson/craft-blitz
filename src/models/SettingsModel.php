@@ -144,6 +144,16 @@ class SettingsModel extends Model
      */
     public $outputComments = true;
 
+    /**
+     * @var int|null
+     */
+    public $refreshCacheJobPriority = 10;
+
+    /**
+     * @var int|null
+     */
+    public $warmCacheJobPriority = 100;
+
     // Public Methods
     // =========================================================================
 

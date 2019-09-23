@@ -322,12 +322,15 @@ class RefreshCacheService extends Component
 
         // If we have element IDs then create a job to refresh cache queries
         if (count($this->_elementIds)) {
-            Craft::$app->getQueue()->push(new RefreshCacheJob([
-                'cacheIds' => $this->_cacheIds,
-                'elementIds' => $this->_elementIds,
-                'elementTypes' => $this->_elementTypes,
-                'forceClear' => $forceClear,
-            ]));
+            // Add job to queue with a priority
+            Craft::$app->getQueue()
+                ->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
+                ->push(new RefreshCacheJob([
+                    'cacheIds' => $this->_cacheIds,
+                    'elementIds' => $this->_elementIds,
+                    'elementTypes' => $this->_elementTypes,
+                    'forceClear' => $forceClear,
+                ]));
         }
     }
 

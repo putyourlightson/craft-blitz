@@ -106,4 +106,10 @@ return [
 
     // Whether the timestamp and served by comments should be appended to the cached output.
     //'outputComments' => true,
+
+    // The priority to give the refresh cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
+    //'refreshCacheJobPriority' => 10,
+
+    // The priority to give the warm cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
+    //'warmCacheJobPriority' => 100,
 ];

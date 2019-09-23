@@ -2,9 +2,10 @@
 
 ## 2.3.0 - Unreleased
 ### Added
-- Added the ability to dynamically get templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).
+- Added the ability to dynamically get and inject templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).
 - Added unique zone IDs for each site to the Cloudflare reverse proxy purger settings.
 - Added warm cache delay setting to the Cloudflare reverse proxy purger settings.
+- Added the `refreshCacheJobPriority` and `warmCacheJobPriority` config settings to change the priority of the respective cache jobs.
 - Added unit tests to the plugin.
 
 ### Changed

@@ -48,7 +48,10 @@ class WarmCacheService extends Component
      */
     public function warmUris(array $siteUris, int $delay = null)
     {
-        Craft::$app->getQueue()->delay($delay)
+        // Add job to queue with a priority and delay if provided
+        Craft::$app->getQueue()
+            ->priority(Blitz::$plugin->settings->warmCacheJobPriority)
+            ->delay($delay)
             ->push(new WarmCacheJob([
                 'urls' => SiteUriHelper::getUrls($siteUris),
             ]));
