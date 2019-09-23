@@ -26,10 +26,10 @@
 {% set rows = [] %}
 {% for site in craft.app.sites.getAllSites() %}
     {% set rows = rows|merge({
-        (site.handle): {
+        (site.uid): {
             heading: site.name|t('site')|e,
             zoneId: {
-                value: purger.zoneIds[site.handle] is defined ? purger.zoneIds[site.handle]['zoneId'],
+                value: purger.zoneIds[site.uid] is defined ? purger.zoneIds[site.uid]['zoneId'],
             },
         }
     }) %}
@@ -49,13 +49,29 @@
 
 {{ forms.editableTableField({
     label: "Zone IDs"|t('blitz'),
-    instructions: "The zone IDs for your sites. These can be found on the “Overview” screen of your domains in your Cloudflare account."|t('blitz'),
+    instructions: "Choose which sites should be purged by entering their zone IDs. These can be found on the “Overview” screen of your domains in your Cloudflare account."|t('blitz'),
     name: 'zoneIds',
     id: 'zoneIds',
     cols: cols,
     rows: rows,
     staticRows: true,
     errors: purger.getErrors('zoneIds'),
+    required: true,
+}) }}
+
+{% set info %}
+    <span class="info">{{ "According to Cloudflare, it can take up to 30 seconds for cached files to be purged across all of its edge nodes. Adding a delay between purging the cache and warming it can help to ensure that the updated pages really are warmed."|t('blitz') }}</span>
+{% endset %}
+{{ forms.textField({
+    type: 'number',
+    min: 0,
+    unit: "seconds"|t('blitz'),
+    label: "Warm Cache Delay"|t('blitz'),
+    instructions: "The number of seconds to wait after purging the cache before warming the cache should begin."|t('blitz') ~ info,
+    name: 'warmCacheDelay',
+    value: purger.warmCacheDelay,
+    errors: purger.getErrors('warmCacheDelay'),
+    required: true,
 }) }}
 
 {% set helpText %}

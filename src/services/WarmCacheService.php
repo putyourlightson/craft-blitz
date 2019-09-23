@@ -45,11 +45,12 @@ class WarmCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function warmUris(array $siteUris)
+    public function warmUris(array $siteUris, int $delay = null)
     {
-        Craft::$app->getQueue()->push(new WarmCacheJob([
-            'urls' => SiteUriHelper::getUrls($siteUris),
-        ]));
+        Craft::$app->getQueue()->delay($delay)
+            ->push(new WarmCacheJob([
+                'urls' => SiteUriHelper::getUrls($siteUris),
+            ]));
     }
 
     /**

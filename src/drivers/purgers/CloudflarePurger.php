@@ -24,6 +24,7 @@ class CloudflarePurger extends BaseCachePurger
     // =========================================================================
 
     const API_ENDPOINT = 'https://api.cloudflare.com/client/v4/';
+
     const API_URL_LIMIT = 30;
 
     // Properties
@@ -75,7 +76,8 @@ class CloudflarePurger extends BaseCachePurger
     public function rules(): array
     {
         return [
-            [['apiKey', 'email'], 'required'],
+            [['apiKey', 'email', 'warmCacheDelay'], 'required'],
+            [['warmCacheDelay'], 'integer']
         ];
     }
 
@@ -120,9 +122,21 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function test(): bool
     {
-        $response = $this->_sendRequest('get');
+        foreach ($this->zoneIds as $siteUid => $value) {
+            if ($value['zoneId']) {
+                $site = Craft::$app->getSites()->getSiteByUid($siteUid);
 
-        return $response;
+                if ($site !== null) {
+                    $response = $this->_sendRequest('get', '', $site->id);
+
+                    if ($response === false) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -147,7 +161,7 @@ class CloudflarePurger extends BaseCachePurger
      *
      * @return bool
      */
-    private function _sendRequest(string $method, string $action = '', int $siteId, array $params = []): bool
+    private function _sendRequest(string $method, string $action, int $siteId, array $params = []): bool
     {
         $response = false;
 
@@ -166,11 +180,11 @@ class CloudflarePurger extends BaseCachePurger
             return false;
         }
 
-        if (empty($this->zoneIds[$site->handle]) || empty($this->zoneIds[$site->handle]['zoneId'])) {
+        if (empty($this->zoneIds[$site->uid]) || empty($this->zoneIds[$site->uid]['zoneId'])) {
             return false;
         }
 
-        $uri = 'zones/'.Craft::parseEnv($this->zoneIds[$site->handle]['zoneId']).'/'.$action;
+        $uri = 'zones/'.Craft::parseEnv($this->zoneIds[$site->uid]['zoneId']).'/'.$action;
 
         $requests = [];
 

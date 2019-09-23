@@ -327,9 +327,9 @@ class RefreshCacheService extends Component
         Blitz::$plugin->cacheStorage->deleteUris($siteUris);
         Blitz::$plugin->cachePurger->purgeUris($siteUris);
 
-        // Warm the cache if enabled
+        // Warm the cache if enabled providing the cache purger's warm cache delay setting
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->warmCache->warmUris($siteUris);
+            Blitz::$plugin->warmCache->warmUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
         }
 
         // Fire an 'afterRefreshCache' event
@@ -354,7 +354,7 @@ class RefreshCacheService extends Component
 
         // Warm the cache if enabled
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->warmCache->warmUris($siteUris);
+            Blitz::$plugin->warmCache->warmUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
         }
     }
 

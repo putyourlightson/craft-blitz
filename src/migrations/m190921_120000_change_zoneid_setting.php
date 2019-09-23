@@ -33,7 +33,7 @@ class m190921_120000_change_zoneid_setting extends Migration
             $primarySite = Craft::$app->getSites()->getPrimarySite();
 
             if (isset($settings->cachePurgerSettings['zoneId'])) {
-                $settings->cachePurgerSettings['zoneIds'][$primarySite->handle]['zoneId'] =
+                $settings->cachePurgerSettings['zoneIds'][$primarySite->uid]['zoneId'] =
                     $settings->cachePurgerSettings['zoneId'];
 
                 unset($settings->cachePurgerSettings['zoneId']);

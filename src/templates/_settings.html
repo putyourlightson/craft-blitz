@@ -193,7 +193,7 @@
         {% endset %}
         {{ forms.textField({
             type: 'number',
-            unit: "concurrent requests."|t('blitz'),
+            unit: "concurrent requests"|t('blitz'),
             label: "Concurrency"|t('blitz'),
             instructions: "The max number of concurrent requests to use when warming the cache."|t('blitz') ~ info,
             warning: (config.concurrency is defined ? configWarning('concurrency')),

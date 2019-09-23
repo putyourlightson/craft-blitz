@@ -25,4 +25,8 @@ trait CachePurgerTrait
      */
     public $tagHeaderDelimiter = ',';
 
+    /**
+     * @var int
+     */
+    public $warmCacheDelay = 0;
 }
