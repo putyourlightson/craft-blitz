@@ -67,21 +67,23 @@ class RefreshCacheService extends Component
     // =========================================================================
 
     /**
-     * Returns cache IDs for an array of elements.
+     * Returns an array of unique cache IDs given an array of elements and cache IDs.
      *
      * @param int[] $elementIds
-     * @param int[] $ignoreCacheIds
+     * @param int[] $cacheIds
      *
      * @return int[]
      */
-    public function getElementCacheIds(array $elementIds, array $ignoreCacheIds = []): array
+    public function getElementCacheIds(array $elementIds, array $cacheIds = []): array
     {
-        return ElementCacheRecord::find()
+        $elementCacheIds = ElementCacheRecord::find()
             ->select('cacheId')
             ->where(['elementId' => $elementIds])
-            ->andWhere(['not', ['cacheId' => $ignoreCacheIds]])
+            ->andWhere(['not', ['cacheId' => $cacheIds]])
             ->groupBy('cacheId')
             ->column();
+
+        return array_merge($cacheIds, $elementCacheIds);
     }
 
     /**
@@ -114,9 +116,7 @@ class RefreshCacheService extends Component
      */
     public function addCacheIds(ElementInterface $element)
     {
-        $this->_cacheIds = array_merge($this->_cacheIds,
-            $this->getElementCacheIds([$element->getId()])
-        );
+        $this->_cacheIds = $this->getElementCacheIds([$element->getId()], $this->_cacheIds);
     }
 
     /**
@@ -308,30 +308,15 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // If clear automatically is enabled or if force clear then clear the site URIs now
-        if (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear) {
-            $cacheIds = array_merge(
-                $this->_cacheIds,
-                $this->getElementCacheIds($this->_elementIds, $this->_cacheIds)
-            );
-
-            $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
-
-            Blitz::$plugin->clearCache->clearUris($siteUris);
-        }
-
-        // If we have element IDs then create a job to refresh cache queries
-        if (count($this->_elementIds)) {
-            // Add job to queue with a priority
-            Craft::$app->getQueue()
-                ->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
-                ->push(new RefreshCacheJob([
-                    'cacheIds' => $this->_cacheIds,
-                    'elementIds' => $this->_elementIds,
-                    'elementTypes' => $this->_elementTypes,
-                    'forceClear' => $forceClear,
-                ]));
-        }
+        // Add job to queue with a priority
+        Craft::$app->getQueue()
+            ->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
+            ->push(new RefreshCacheJob([
+                'cacheIds' => $this->_cacheIds,
+                'elementIds' => $this->_elementIds,
+                'elementTypes' => $this->_elementTypes,
+                'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
+            ]));
     }
 
     /**

@@ -39,7 +39,7 @@ class RefreshCacheJob extends BaseJob
     /**
      * @var bool
      */
-    public $forceClear = false;
+    public $clearCache = false;
 
     // Public Methods
     // =========================================================================
@@ -53,15 +53,18 @@ class RefreshCacheJob extends BaseJob
     {
         // Set progress label
         $this->setProgress($queue, 0,
-            Craft::t('blitz', 'Finding cached pages.')
+            Craft::t('blitz', 'Clearing cached pages.')
         );
 
         // Merge in element cache IDs
-        $elementCacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            $this->elementIds, $this->cacheIds
-        );
+        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($this->elementIds, $this->cacheIds);
 
-        $cacheIds = array_merge($this->cacheIds, $elementCacheIds);
+        // If clear cache is enabled then clear the site URIs now
+        if ($this->clearCache) {
+            $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
+
+            Blitz::$plugin->clearCache->clearUris($siteUris);
+        }
 
         // If we have element IDs then loop through element queries to check for matches
         if (count($this->elementIds)) {
@@ -85,7 +88,7 @@ class RefreshCacheJob extends BaseJob
 
                     $count++;
                     $this->setProgress($queue, $count / $total,
-                        Craft::t('blitz', 'Checked {count} of {total} element queries.', [
+                        Craft::t('blitz', 'Checking {count} of {total} element queries.', [
                             'count' => $count,
                             'total' => $total,
                         ])
@@ -101,13 +104,11 @@ class RefreshCacheJob extends BaseJob
             return;
         }
 
-        // If clear automatically is enabled or if force clear
-        if (Blitz::$plugin->settings->clearCacheAutomatically || $this->forceClear) {
+        // If clear cache is enabled
+        if ($this->clearCache) {
             // Set progress label
             $this->setProgress($queue, 1,
-                Craft::t('blitz', 'Clearing {total} cached pages.', [
-                    'total' => count($cacheIds)
-                ])
+                Craft::t('blitz', 'Clearing cached pages.')
             );
 
             $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);

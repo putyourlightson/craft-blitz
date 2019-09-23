@@ -9,7 +9,7 @@
 - Added unit tests to the plugin.
 
 ### Changed
-- Cached pages that Blitz knows about are now cleared as soon as an element is updated without having to wait for the refresh cache job to execute.
+- Cached pages that Blitz knows about are now cleared earlier in the refresh cache job process.
 
 ### Fixed
 - Fixed warming of cache URLs that should be excluded from caching ([#130](https://github.com/putyourlightson/craft-blitz/issues/130)).
