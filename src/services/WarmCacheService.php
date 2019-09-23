@@ -44,6 +44,7 @@ class WarmCacheService extends Component
      * Warms the cache using the provided URIs.
      *
      * @param SiteUriModel[] $siteUris
+     * @param int|null $delay
      */
     public function warmUris(array $siteUris, int $delay = null)
     {

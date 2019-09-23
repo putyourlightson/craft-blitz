@@ -4,9 +4,6 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
-use craft\db\Query;
-use craft\helpers\Json;
-use craft\records\Plugin;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 
@@ -24,7 +21,7 @@ class m190921_120000_change_zoneid_setting extends Migration
             ->get('plugins.blitz.schemaVersion', true);
 
         if (!version_compare($schemaVersion, '2.3.0', '<')) {
-            //return true;
+            return true;
         }
 
         $settings = Blitz::$plugin->settings;

@@ -70,6 +70,13 @@ class FlushCacheService extends Component
                 'uri' => $siteUri->uri,
             ]);
         }
+
+        $this->runGarbageCollection();
+
+        // Fire an 'afterFlushCache' event
+        if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_FLUSH_CACHE);
+        }
     }
 
     /**

@@ -6,8 +6,6 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
-use craft\db\Query;
-use craft\db\Table;
 use craft\records\Element;
 use craft\records\Element_SiteSettings;
 use putyourlightson\blitz\models\SiteUriModel;

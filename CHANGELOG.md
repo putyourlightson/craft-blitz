@@ -7,6 +7,9 @@
 - Added warm cache delay setting to the Cloudflare reverse proxy purger settings.
 - Added unit tests to the plugin.
 
+### Changed
+- Cached pages that Blitz knows about are now cleared as soon as an element is updated without having to wait for the refresh cache job to execute.
+
 ### Fixed
 - Fixed warming of cache URLs that should be excluded from caching ([#130](https://github.com/putyourlightson/craft-blitz/issues/130)).
 

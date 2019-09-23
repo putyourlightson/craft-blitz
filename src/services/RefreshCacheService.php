@@ -308,12 +308,27 @@ class RefreshCacheService extends Component
             return;
         }
 
-        Craft::$app->getQueue()->push(new RefreshCacheJob([
-            'cacheIds' => $this->_cacheIds,
-            'elementIds' => $this->_elementIds,
-            'elementTypes' => $this->_elementTypes,
-            'forceClear' => $forceClear,
-        ]));
+        // If clear automatically is enabled or if force clear then clear the site URIs now
+        if (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear) {
+            $cacheIds = array_merge(
+                $this->_cacheIds,
+                $this->getElementCacheIds($this->_elementIds, $this->_cacheIds)
+            );
+
+            $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
+
+            Blitz::$plugin->clearCache->clearUris($siteUris);
+        }
+
+        // If we have element IDs then create a job to refresh cache queries
+        if (count($this->_elementIds)) {
+            Craft::$app->getQueue()->push(new RefreshCacheJob([
+                'cacheIds' => $this->_cacheIds,
+                'elementIds' => $this->_elementIds,
+                'elementTypes' => $this->_elementTypes,
+                'forceClear' => $forceClear,
+            ]));
+        }
     }
 
     /**
@@ -324,8 +339,8 @@ class RefreshCacheService extends Component
     public function refreshSiteUris(array $siteUris)
     {
         Blitz::$plugin->flushCache->flushUris($siteUris);
-        Blitz::$plugin->cacheStorage->deleteUris($siteUris);
-        Blitz::$plugin->cachePurger->purgeUris($siteUris);
+
+        Blitz::$plugin->clearCache->clearUris($siteUris);
 
         // Warm the cache if enabled providing the cache purger's warm cache delay setting
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
@@ -348,8 +363,8 @@ class RefreshCacheService extends Component
         // Get cached site URIs before flushing the cache
         $siteUris = SiteUriHelper::getAllSiteUris();
 
-        Blitz::$plugin->clearCache->clearAll();
         Blitz::$plugin->flushCache->flushAll();
+        Blitz::$plugin->clearCache->clearAll();
         Blitz::$plugin->cachePurger->purgeAll();
 
         // Warm the cache if enabled

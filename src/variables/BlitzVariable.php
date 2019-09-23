@@ -60,7 +60,7 @@ class BlitzVariable
     /**
      * Returns script to get the output of a template.
      *
-     * @param string $uri
+     * @param string $template
      *
      * @return Markup
      */

@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\services;
 use craft\base\Component;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 
 class ClearCacheService extends Component
 {
@@ -46,6 +47,23 @@ class ClearCacheService extends Component
     {
         $siteUris = SiteUriHelper::getSiteSiteUris($siteId);
 
+        Blitz::$plugin->cacheStorage->deleteUris($siteUris);
+
+        Blitz::$plugin->cachePurger->purgeUris($siteUris);
+
+        // Fire an 'afterClearCache' event
+        if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_CLEAR_CACHE);
+        }
+    }
+
+    /**
+     * Clears the cache given an array of site URIs.
+     *
+     * @param SiteUriModel[] $siteUris
+     */
+    public function clearUris(array $siteUris)
+    {
         Blitz::$plugin->cacheStorage->deleteUris($siteUris);
 
         Blitz::$plugin->cachePurger->purgeUris($siteUris);

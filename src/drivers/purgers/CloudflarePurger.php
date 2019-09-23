@@ -6,7 +6,6 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
-use craft\models\Site;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
@@ -156,7 +155,8 @@ class CloudflarePurger extends BaseCachePurger
      * Sends a request to the API.
      *
      * @param string $method
-     * @param string|null $action
+     * @param string $action
+     * @param int $siteId
      * @param array|null $params
      *
      * @return bool
