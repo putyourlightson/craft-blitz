@@ -12,9 +12,12 @@
     required: true,
 }) }}
 
+{% set info %}
+    <span class="info">{{ "The global API key can be found under “My Profile” in your Cloudflare account."|t('blitz') }}</span>
+{% endset %}
 {{ forms.autosuggestField({
     label: "Global API Key"|t('blitz'),
-    instructions: "The global API key for your Cloudflare account. This can be found under “My Profile” in your Cloudflare account."|t('blitz'),
+    instructions: "The global API key for your Cloudflare account."|t('blitz') ~ info,
     suggestEnvVars: true,
     suggestions: craft.cp.getEnvSuggestions(),
     name: 'apiKey',
@@ -47,9 +50,14 @@
     },
 } %}
 
+{% set info %}
+    <span class="info">{{ "The zone IDs can be found on the “Overview” screen of your domains in your Cloudflare account."|t('blitz') }}</span>
+{% endset %}
 {{ forms.editableTableField({
     label: "Zone IDs"|t('blitz'),
-    instructions: "Choose which sites should be purged by entering their zone IDs. These can be found on the “Overview” screen of your domains in your Cloudflare account."|t('blitz'),
+    instructions: "Choose which sites should be purged by entering their zone IDs (environment variables allowed)."|t('blitz') ~ info,
+    suggestEnvVars: true,
+    suggestions: craft.cp.getEnvSuggestions(),
     name: 'zoneIds',
     id: 'zoneIds',
     cols: cols,
@@ -60,7 +68,7 @@
 }) }}
 
 {% set info %}
-    <span class="info">{{ "According to Cloudflare, it can take up to 30 seconds for cached files to be purged across all of its edge nodes. Adding a delay between purging the cache and warming it can help to ensure that the updated pages really are warmed."|t('blitz') }}</span>
+    <span class="info">{{ "According to Cloudflare, it can take up to 30 seconds for cached files to be purged across all of its edge nodes. Adding a delay between purging the cache and warming it will slow down the process but may help to ensure that the updated pages really are warmed."|t('blitz') }}</span>
 {% endset %}
 {{ forms.textField({
     type: 'number',
