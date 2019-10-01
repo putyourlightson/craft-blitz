@@ -20,6 +20,7 @@
 {% set tabs = {
     general: {label: 'General Settings'|t('blitz'), url: '#general'},
     storage: {label: 'Cache Storage'|t('blitz'), url: '#storage'},
+    warmer: {label: 'Cache Warmer'|t('blitz'), url: '#warmer'},
     purger: {label: 'Reverse Proxy Purger'|t('blitz'), url: '#purger'},
     advanced: {label: 'Advanced Settings'|t('blitz'), url: '#advanced'},
 } %}
@@ -139,6 +140,31 @@
         {% endfor %}
     </div>
 
+    <div id="warmer" class="hidden">
+        {% set info %}
+            <span class="info">{{ 'Read more about cache warmers and how to add other warmers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-warmers'})|raw }}</span>
+        {% endset %}
+        {{ forms.selectField({
+            label: "Cache Warmer"|t('blitz'),
+            instructions: "The warmer type to use for warming the cache."|t('blitz') ~ info,
+            warning: (config.cacheWarmerType is defined ? configWarning('cacheWarmerType')),
+            name: 'settings[cacheWarmerType]',
+            options: warmerTypeOptions,
+            value: className(warmerDriver),
+            required: true,
+            toggle: true,
+        }) }}
+
+        {% for driver in warmerDrivers %}
+            {% set isCurrent = (className(driver) == className(warmerDriver)) %}
+            <div id="{{ className(driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+                {% namespace 'cacheWarmerSettings[' ~ className(driver) ~ ']' %}
+                    {{ (isCurrent ? warmerDriver : driver).getSettingsHtml()|raw }}
+                {% endnamespace %}
+            </div>
+        {% endfor %}
+    </div>
+
     <div id="purger" class="hidden">
         {% set info %}
             <span class="info">{{ 'Read more about reverse proxy purgers and how to add other purgers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'reverse-proxy-purger'})|raw }}</span>
@@ -150,6 +176,7 @@
             name: 'settings[cachePurgerType]',
             options: purgerTypeOptions,
             value: className(purgerDriver),
+            required: true,
             toggle: true,
         }) }}
 
@@ -185,21 +212,6 @@
             warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
             name: 'settings[warmCacheAutomatically]',
             on: settings.warmCacheAutomatically,
-            required: true,
-        }) }}
-
-        {% set info %}
-            <span class="info">{{ "The higher the number, the faster the cache will be warmed but the more server processing will be required. A number between 1 and 5 is recommended."|t('blitz') }}</span>
-        {% endset %}
-        {{ forms.textField({
-            type: 'number',
-            unit: "concurrent requests"|t('blitz'),
-            label: "Concurrency"|t('blitz'),
-            instructions: "The max number of concurrent requests to use when warming the cache."|t('blitz') ~ info,
-            warning: (config.concurrency is defined ? configWarning('concurrency')),
-            name: 'settings[concurrency]',
-            value: settings.concurrency,
-            errors: settings.getErrors('concurrency'),
             required: true,
         }) }}
 

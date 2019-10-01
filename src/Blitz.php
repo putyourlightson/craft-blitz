@@ -32,6 +32,7 @@ use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
+use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RequestHelper;
@@ -60,6 +61,7 @@ use yii\base\Event;
  * @property WarmCacheService $warmCache
  * @property BaseCacheStorage $cacheStorage
  * @property BaseCachePurger $cachePurger
+ * @property BaseCacheWarmer $cacheWarmer
  * @property SettingsModel $settings
  * @property mixed $settingsResponse
  * @property array $cpRoutes
@@ -166,6 +168,10 @@ class Blitz extends Plugin
             'cachePurger' => array_merge(
                 ['class' => $this->settings->cachePurgerType],
                 $this->settings->cachePurgerSettings
+            ),
+            'cacheWarmer' => array_merge(
+                ['class' => $this->settings->cacheWarmerType],
+                $this->settings->cacheWarmerSettings
             ),
         ]);
     }

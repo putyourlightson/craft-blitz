@@ -23,24 +23,6 @@ class WarmCacheService extends Component
     // =========================================================================
 
     /**
-     * Warms the entire cache.
-     */
-    public function warmAll()
-    {
-        $this->warmUris(SiteUriHelper::getAllSiteUris(true));
-    }
-
-    /**
-     * Warms the cache of the provided site.
-     *
-     * @param int $siteId
-     */
-    public function warmSite(int $siteId)
-    {
-        $this->warmUris(SiteUriHelper::getSiteSiteUris($siteId, true));
-    }
-
-    /**
      * Warms the cache using the provided URIs.
      *
      * @param SiteUriModel[] $siteUris
@@ -48,14 +30,26 @@ class WarmCacheService extends Component
      */
     public function warmUris(array $siteUris, int $delay = null)
     {
-        // Add job to queue with a priority and delay if provided
-        Craft::$app->getQueue()
-            ->priority(Blitz::$plugin->settings->warmCacheJobPriority)
-            ->delay($delay)
-            ->push(new WarmCacheJob([
-                'urls' => SiteUriHelper::getUrls($siteUris),
-            ]));
+        Blitz::$plugin->cacheWarmer->warmUris($siteUris, $delay);
     }
+    /**
+     * Warms the cache of the provided site.
+     *
+     * @param int $siteId
+     */
+    public function warmSite(int $siteId)
+    {
+        Blitz::$plugin->cacheWarmer->warmUris(SiteUriHelper::getSiteSiteUris($siteId, true));
+    }
+
+    /**
+     * Warms the entire cache.
+     */
+    public function warmAll()
+    {
+        Blitz::$plugin->cacheWarmer->warmAll();
+    }
+
 
     /**
      * Requests the provided URLs concurrently.
@@ -66,52 +60,8 @@ class WarmCacheService extends Component
      *
      * @return int
      */
-    public function requestUrls(array $urls, callable $setProgressHandler, $queue = null): int
+    public function requestUrls(array $urls, callable $setProgressHandler): int
     {
-        $success = 0;
-
-        $client = Craft::createGuzzleClient();
-        $requests = [];
-
-        // Ensure URLs are unique
-        $urls = array_unique($urls);
-
-        foreach ($urls as $url) {
-            // Ensure URL is an absolute URL starting with http
-            if (strpos($url, 'http') === 0) {
-                $requests[] = new Request('GET', $url);
-            }
-        }
-
-        $count = 0;
-        $total = count($urls);
-
-        // Create a pool of requests for sending multiple concurrent requests
-        $pool = new Pool($client, $requests, [
-            'concurrency' => Blitz::$plugin->settings->concurrency,
-            'fulfilled' => function() use (&$success, &$count, $total, $setProgressHandler, $queue) {
-                $success++;
-                $count++;
-                $setProgressHandler($count, $total, $queue);
-            },
-            'rejected' => function($reason) use (&$count, $total, $setProgressHandler, $queue) {
-                $count++;
-                $setProgressHandler($count, $total, $queue);
-
-                if ($reason instanceof RequestException) {
-                    /** RequestException $reason */
-                    preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
-
-                    if (!empty($matches[1])) {
-                        Craft::getLogger()->log(trim($matches[1], ':'), Logger::LEVEL_ERROR, 'blitz');
-                    }
-                }
-            },
-        ]);
-
-        // Initiate the transfers and wait for the pool of requests to complete
-        $pool->promise()->wait();
-
-        return $success;
+        return Blitz::$plugin->cacheWarmer->requestUrls($urls, $setProgressHandler);
     }
 }

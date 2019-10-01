@@ -13,6 +13,8 @@ use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
+use putyourlightson\blitz\drivers\warmers\DefaultWarmer;
+use putyourlightson\blitz\drivers\warmers\StaticSiteGenerator;
 
 class SettingsModel extends Model
 {
@@ -67,6 +69,23 @@ class SettingsModel extends Model
     ];
 
     /**
+     * @var string
+     */
+    public $cacheWarmerType = DefaultWarmer::class;
+
+    /**
+     * @var array
+     */
+    public $cacheWarmerSettings = [];
+
+    /**
+     * @var string[]
+     */
+    public $cacheWarmerTypes = [
+        StaticSiteGenerator::class,
+    ];
+
+    /**
      * @var bool
      */
     public $clearCacheAutomatically = true;
@@ -90,11 +109,6 @@ class SettingsModel extends Model
      * @var int
      */
     public $queryStringCaching = 0;
-
-    /**
-     * @var int
-     */
-    public $concurrency = 3;
 
     /**
      * @var string
@@ -176,10 +190,9 @@ class SettingsModel extends Model
     public function rules(): array
     {
         return [
-            [['cacheStorageType', 'queryStringCaching', 'concurrency'], 'required'],
-            [['cacheStorageType', 'cachePurgerType'], 'string', 'max' => 255],
+            [['cacheStorageType', 'queryStringCaching'], 'required'],
+            [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType'], 'string', 'max' => 255],
             [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
-            [['concurrency'], 'integer', 'min' => 1],
             [['apiKey'], 'string', 'length' => [16]],
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
         ];

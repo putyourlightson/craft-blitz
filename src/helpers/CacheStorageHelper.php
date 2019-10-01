@@ -61,44 +61,6 @@ class CacheStorageHelper
      */
     public static function getAllDrivers(): array
     {
-        $drivers = [];
-
-        /** @var BaseCacheStorage $class */
-        foreach (self::getAllTypes() as $class) {
-            if ($class::isSelectable()) {
-                $driver = self::createDriver($class);
-
-                if ($driver !== null) {
-                    $drivers[] = $driver;
-                }
-            }
-        }
-
-        return $drivers;
-    }
-
-    /**
-     * Creates a storage driver of the provided type with the optional settings.
-     *
-     * @param string $type
-     * @param array|null $settings
-     *
-     * @return CacheStorageInterface|null
-     */
-    public static function createDriver(string $type, array $settings = null)
-    {
-        $driver = null;
-
-        try {
-            /** @var CacheStorageInterface $driver */
-            $driver = Component::createComponent([
-                'type' => $type,
-                'settings' => $settings ?? [],
-            ], CacheStorageInterface::class);
-        }
-        catch (InvalidConfigException $e) {}
-        catch (MissingComponentException $e) {}
-
-        return $driver;
+        return CacheDriverHelper::createDrivers(self::getAllTypes());
     }
 }

@@ -5,17 +5,14 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use craft\errors\MissingComponentException;
 use craft\events\RegisterComponentTypesEvent;
-use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
-use putyourlightson\blitz\drivers\purgers\DummyPurger;
-use putyourlightson\blitz\drivers\purgers\CachePurgerInterface;
+use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
+use putyourlightson\blitz\drivers\warmers\DummyWarmer;
+use putyourlightson\blitz\drivers\warmers\DefaultWarmer;
 use yii\base\Event;
-use yii\base\InvalidConfigException;
 
-class CachePurgerHelper
+class CacheWarmerHelper
 {
     // Constants
     // =========================================================================
@@ -23,39 +20,40 @@ class CachePurgerHelper
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_PURGER_TYPES = 'registerPurgerTypes';
+    const EVENT_REGISTER_WARMER_TYPES = 'registerWarmerTypes';
 
     // Static
     // =========================================================================
 
     /**
-     * Returns all purger types.
+     * Returns all warmer types.
      *
      * @return string[]
      */
     public static function getAllTypes(): array
     {
-        $purgerTypes = [
-            DummyPurger::class,
+        $warmerTypes = [
+            DummyWarmer::class,
+            DefaultWarmer::class,
         ];
 
-        $purgerTypes = array_unique(array_merge(
-            $purgerTypes,
-            Blitz::$plugin->settings->cachePurgerTypes
+        $warmerTypes = array_unique(array_merge(
+            $warmerTypes,
+            Blitz::$plugin->settings->cacheWarmerTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([
-            'types' => $purgerTypes,
+            'types' => $warmerTypes,
         ]);
-        Event::trigger(static::class, self::EVENT_REGISTER_PURGER_TYPES, $event);
+        Event::trigger(static::class, self::EVENT_REGISTER_WARMER_TYPES, $event);
 
         return $event->types;
     }
 
     /**
-     * Returns all purger drivers.
+     * Returns all warmer drivers.
      *
-     * @return BaseCachePurger[]
+     * @return BaseCacheWarmer[]
      */
     public static function getAllDrivers(): array
     {

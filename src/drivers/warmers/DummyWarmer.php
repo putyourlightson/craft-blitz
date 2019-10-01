@@ -3,12 +3,12 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\drivers\purgers;
+namespace putyourlightson\blitz\drivers\warmers;
 
 use Craft;
 use putyourlightson\blitz\models\SiteUriModel;
 
-class DummyPurger extends BaseCachePurger
+class DummyWarmer extends BaseCacheWarmer
 {
     // Static
     // =========================================================================
@@ -35,22 +35,15 @@ class DummyPurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function purge(SiteUriModel $siteUri)
+    public function warm(SiteUriModel $siteUri, int $delay = null)
     {
     }
 
     /**
      * @inheritdoc
      */
-    public function purgeAll()
+    public function requestUrls(array $urls, callable $setProgressHandler): int
     {
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function test(): bool
-    {
-        return true;
+        return 0;
     }
 }

@@ -203,9 +203,8 @@ class CloudflarePurger extends BaseCachePurger
             $requests[] = new Request($method, $uri, [], json_encode($params));
         }
 
-        // Create a pool of requests for sending multiple concurrent requests
+        // Create a pool of requests
         $pool = new Pool($client, $requests, [
-            'concurrency' => Blitz::$plugin->settings->concurrency,
             'fulfilled' => function() use (&$response) {
                 $response = true;
             },

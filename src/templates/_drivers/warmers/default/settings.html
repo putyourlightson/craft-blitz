@@ -1,0 +1,18 @@
+{% import "_includes/forms" as forms %}
+
+
+{% set info %}
+    <span class="info">{{ "The higher the number, the faster the cache will be warmed but the more server processing will be required. A number between 1 and 5 is recommended."|t('blitz') }}</span>
+{% endset %}
+{{ forms.textField({
+    type: 'number',
+    unit: "concurrent requests"|t('blitz'),
+    label: "Concurrency"|t('blitz'),
+    instructions: "The max number of concurrent requests to use when warming the cache."|t('blitz') ~ info,
+    name: 'concurrency',
+    value: warmer.concurrency,
+    errors: warmer.getErrors('concurrency'),
+    required: true,
+}) }}
+
+
