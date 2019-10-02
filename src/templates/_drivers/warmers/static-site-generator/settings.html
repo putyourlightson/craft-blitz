@@ -16,6 +16,65 @@
 }) }}
 
 
+{% set rows = [] %}
+{% for site in craft.app.sites.getAllSites() %}
+    {% set rows = rows|merge({
+        (site.uid): {
+            heading: site.name|t('site')|e,
+            repositoryPath: {
+                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['repositoryPath'],
+            },
+            commitMessage: {
+                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['commitMessage'],
+            },
+            branch: {
+                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['branch'],
+            },
+        }
+    }) %}
+{% endfor %}
+
+{% set cols = {
+    heading: {
+        type: 'heading',
+        heading: "Site"|t('blitz'),
+        thin: true,
+    },
+    repositoryPath: {
+        type: 'singleline',
+        heading: "Repository Path"|t('blitz'),
+        placeholder: "/path/to/repository",
+        code: true,
+    },
+    commitMessage: {
+        type: 'singleline',
+        heading: "Commit Message"|t('blitz'),
+        placeholder: "Blitz auto commit."|t('blitz'),
+        code: true,
+    },
+    branch: {
+        type: 'singleline',
+        heading: "Branch"|t('blitz'),
+        placeholder: "master",
+        code: true,
+    },
+} %}
+
+{% set info %}
+    <span class="info">{{ "Warmed pages will be commited and pushed to the Git repositories using the settings specified below."|t('blitz') }}</span>
+{% endset %}
+{{ forms.editableTableField({
+    label: "Git Settings"|t('blitz'),
+    instructions: "Choose which sites should be commited and pushed by entering their details."|t('blitz') ~ info,
+    name: 'gitSettings',
+    id: 'gitSettings',
+    cols: cols,
+    rows: rows,
+    staticRows: true,
+    errors: warmer.getErrors('gitSettings'),
+}) }}
+
+
 {% set cols = [
     {
         type: 'singleline',
@@ -33,58 +92,4 @@
     cols: cols,
     rows: warmer.customUrls,
     addRowLabel: "Add a custom URL"|t('blitz'),
-}) }}
-
-
-{% set rows = [] %}
-{% for site in craft.app.sites.getAllSites() %}
-    {% set rows = rows|merge({
-        (site.uid): {
-            heading: site.name|t('site')|e,
-            repositoryPath: {
-                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['repositoryPath'],
-            },
-            commitMessage: {
-                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['commitMessage'] : 'Blitz auto commit.'|t('blitz'),
-            },
-            branch: {
-                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['branch'] : 'master',
-            },
-        }
-    }) %}
-{% endfor %}
-
-{% set cols = {
-    heading: {
-        type: 'heading',
-        heading: "Site"|t('blitz'),
-        thin: true,
-    },
-    repositoryPath: {
-        type: 'singleline',
-        heading: "Repository Path"|t('blitz'),
-        code: true,
-    },
-    commitMessage: {
-        type: 'singleline',
-        heading: "Commit Message"|t('blitz'),
-    },
-    branch: {
-        type: 'singleline',
-        heading: "Branch"|t('blitz'),
-    },
-} %}
-
-{% set info %}
-    <span class="info">{{ "Warmed pages will be commited and pushed to the Git repositories specified below."|t('blitz') }}</span>
-{% endset %}
-{{ forms.editableTableField({
-    label: "Git Settings"|t('blitz'),
-    instructions: "Choose which sites should be commited and pushed by entering their details."|t('blitz') ~ info,
-    name: 'gitSettings',
-    id: 'gitSettings',
-    cols: cols,
-    rows: rows,
-    staticRows: true,
-    errors: warmer.getErrors('gitSettings'),
 }) }}

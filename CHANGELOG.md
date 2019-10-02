@@ -1,7 +1,8 @@
 # Release Notes for Blitz
 
-## 2.3.0 - Unreleased
+## 3.0.0 - Unreleased
 ### Added
+- Added replaceable cache warmers including a static site generator.
 - Added the ability to dynamically get and inject templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).
 - Added unique zone IDs for each site to the Cloudflare reverse proxy purger settings.
 - Added warm cache delay setting to the Cloudflare reverse proxy purger settings.
@@ -13,6 +14,7 @@
 
 ### Fixed
 - Fixed warming of cache URLs that should be excluded from caching ([#130](https://github.com/putyourlightson/craft-blitz/issues/130)).
+- Fixed links to sections in the documentation.
 
 ## 2.2.3 - 2019-09-15
 ### Changed
