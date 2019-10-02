@@ -7,13 +7,13 @@
         (site.uid): {
             heading: site.name|t('site')|e,
             repositoryPath: {
-                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['repositoryPath'],
+                value: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['repositoryPath'],
             },
             commitMessage: {
-                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['commitMessage'],
+                value: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['commitMessage'],
             },
             branch: {
-                value: warmer.gitSettings[site.uid] is defined ? warmer.gitSettings[site.uid]['branch'],
+                value: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['branch'],
             },
         }
     }) %}
