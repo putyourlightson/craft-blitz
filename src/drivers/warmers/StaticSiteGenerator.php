@@ -26,24 +26,14 @@ class StaticSiteGenerator extends DefaultWarmer
     // =========================================================================
 
     /**
-     * @var string|null
+     * @var array
      */
-    public $gitPath;
-
-    /**
-     * @var string
-     */
-    public $gitCommitMessage = 'Blitz auto commit.';
-
-    /**
-     * @var string
-     */
-    public $gitBranch = 'master';
+    public $gitSettings = [];
 
     /**
      * @var string[]
      */
-    public $extraUrls = [];
+    public $customUrls = [];
 
     // Static
     // =========================================================================
@@ -66,8 +56,8 @@ class StaticSiteGenerator extends DefaultWarmer
     {
         $urls = array_unique(array_merge(
             SiteUriHelper::getAllSiteUris(true),
-            $this->extraUrls
-        ));
+            $this->customUrls
+        ), SORT_REGULAR);
 
         $this->warmUris($urls);
     }
@@ -106,10 +96,13 @@ class StaticSiteGenerator extends DefaultWarmer
     {
         require_once('Git.php');
 
-        $repo = Git::open($this->gitPath);
-
-        $repo->add('.');
-        $repo->commit($this->gitCommitMessage);
-        $repo->push('origin', $this->gitBranch);
+        foreach ($this->gitSettings as $gitSettings) {
+            if (!empty($gitSettings['path'])) {
+                $repo = Git::open($gitSettings['repositoryPath']);
+                $repo->add('.');
+                $repo->commit($gitSettings['commitMessage']);
+                $repo->push('origin', $gitSettings['branch']);
+            }
+        }
     }
 }

@@ -56,15 +56,12 @@
 {{ forms.editableTableField({
     label: "Zone IDs"|t('blitz'),
     instructions: "Choose which sites should be purged by entering their zone IDs (environment variables allowed)."|t('blitz') ~ info,
-    suggestEnvVars: true,
-    suggestions: craft.cp.getEnvSuggestions(),
     name: 'zoneIds',
     id: 'zoneIds',
     cols: cols,
     rows: rows,
     staticRows: true,
     errors: purger.getErrors('zoneIds'),
-    required: true,
 }) }}
 
 {% set info %}
@@ -79,7 +76,6 @@
     name: 'warmCacheDelay',
     value: purger.warmCacheDelay,
     errors: purger.getErrors('warmCacheDelay'),
-    required: true,
 }) }}
 
 {% set helpText %}
