@@ -10,7 +10,7 @@ use craft\errors\MissingComponentException;
 use craft\helpers\Component;
 use yii\base\InvalidConfigException;
 
-class CacheDriverHelper
+class BaseDriverHelper
 {
     // Static
     // =========================================================================

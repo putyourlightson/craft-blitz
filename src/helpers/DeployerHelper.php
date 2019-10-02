@@ -7,11 +7,11 @@ namespace putyourlightson\blitz\helpers;
 
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
-use putyourlightson\blitz\drivers\warmers\LocalWarmer;
+use putyourlightson\blitz\drivers\deployers\DummyDeployer;
+use putyourlightson\blitz\drivers\purgers\BasePurger;
 use yii\base\Event;
 
-class CacheWarmerHelper extends BaseDriverHelper
+class DeployerHelper extends BaseDriverHelper
 {
     // Constants
     // =========================================================================
@@ -19,39 +19,39 @@ class CacheWarmerHelper extends BaseDriverHelper
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_WARMER_TYPES = 'registerWarmerTypes';
+    const EVENT_REGISTER_DEPLOYER_TYPES = 'registerDeployerTypes';
 
     // Static
     // =========================================================================
 
     /**
-     * Returns all warmer types.
+     * Returns all deployer types.
      *
      * @return string[]
      */
     public static function getAllTypes(): array
     {
-        $warmerTypes = [
-            LocalWarmer::class,
+        $deployerTypes = [
+            DummyDeployer::class,
         ];
 
-        $warmerTypes = array_unique(array_merge(
-            $warmerTypes,
-            Blitz::$plugin->settings->cacheWarmerTypes
+        $deployerTypes = array_unique(array_merge(
+            $deployerTypes,
+            Blitz::$plugin->settings->deployerTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([
-            'types' => $warmerTypes,
+            'types' => $deployerTypes,
         ]);
-        Event::trigger(static::class, self::EVENT_REGISTER_WARMER_TYPES, $event);
+        Event::trigger(static::class, self::EVENT_REGISTER_DEPLOYER_TYPES, $event);
 
         return $event->types;
     }
 
     /**
-     * Returns all warmer drivers.
+     * Returns all deployer drivers.
      *
-     * @return BaseCacheWarmer[]
+     * @return BasePurger[]
      */
     public static function getAllDrivers(): array
     {

@@ -8,7 +8,7 @@ namespace putyourlightson\blitz\drivers\purgers;
 use craft\base\SavableComponentInterface;
 use putyourlightson\blitz\models\SiteUriModel;
 
-interface CachePurgerInterface extends SavableComponentInterface
+interface PurgerInterface extends SavableComponentInterface
 {
     // Static Methods
     // =========================================================================

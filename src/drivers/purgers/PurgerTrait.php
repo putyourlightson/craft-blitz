@@ -5,7 +5,7 @@
 
 namespace putyourlightson\blitz\drivers\purgers;
 
-trait CachePurgerTrait
+trait PurgerTrait
 {
     // Properties
     // =========================================================================

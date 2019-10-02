@@ -150,7 +150,7 @@ class CacheController extends Controller
         $this->_purgeCache();
 
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
+            $warmCacheDelay = Blitz::$plugin->purger->warmCacheDelay;
 
             if ($warmCacheDelay) {
                 $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) for the cache to be purged...', ['seconds' => $warmCacheDelay]).PHP_EOL, Console::FG_YELLOW);
@@ -250,7 +250,7 @@ class CacheController extends Controller
 
     private function _purgeCache()
     {
-        Blitz::$plugin->cachePurger->purgeAll();
+        Blitz::$plugin->purger->purgeAll();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully purged.').PHP_EOL, Console::FG_GREEN);
     }

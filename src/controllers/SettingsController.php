@@ -10,13 +10,15 @@ use craft\base\ComponentInterface;
 use craft\errors\MissingComponentException;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\deployers\BaseDeployer;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
-use putyourlightson\blitz\helpers\CacheDriverHelper;
+use putyourlightson\blitz\helpers\BaseDriverHelper;
 use putyourlightson\blitz\helpers\CacheStorageHelper;
-use putyourlightson\blitz\helpers\CachePurgerHelper;
-use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
+use putyourlightson\blitz\helpers\PurgerHelper;
+use putyourlightson\blitz\drivers\purgers\BasePurger;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
+use putyourlightson\blitz\helpers\DeployerHelper;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -33,7 +35,7 @@ class SettingsController extends Controller
     public function actionEdit()
     {
         /** @var BaseCacheStorage $storageDriver */
-        $storageDriver = CacheDriverHelper::createDriver(
+        $storageDriver = BaseDriverHelper::createDriver(
             Blitz::$plugin->settings->cacheStorageType,
             Blitz::$plugin->settings->cacheStorageSettings
         );
@@ -44,7 +46,7 @@ class SettingsController extends Controller
         $storageDrivers = CacheStorageHelper::getAllDrivers();
 
         /** @var BaseCacheWarmer $warmerDriver */
-        $warmerDriver = CacheDriverHelper::createDriver(
+        $warmerDriver = BaseDriverHelper::createDriver(
             Blitz::$plugin->settings->cacheWarmerType,
             Blitz::$plugin->settings->cacheWarmerSettings
         );
@@ -54,16 +56,27 @@ class SettingsController extends Controller
 
         $warmerDrivers = CacheWarmerHelper::getAllDrivers();
 
-        /** @var BaseCachePurger $purgerDriver */
-        $purgerDriver = CacheDriverHelper::createDriver(
-            Blitz::$plugin->settings->cachePurgerType,
-            Blitz::$plugin->settings->cachePurgerSettings
+        /** @var BasePurger $purgerDriver */
+        $purgerDriver = BaseDriverHelper::createDriver(
+            Blitz::$plugin->settings->purgerType,
+            Blitz::$plugin->settings->purgerSettings
         );
 
         // Validate the purger so that any errors will be displayed
         $purgerDriver->validate();
 
-        $purgerDrivers = CachePurgerHelper::getAllDrivers();
+        $purgerDrivers = PurgerHelper::getAllDrivers();
+
+        /** @var BaseDeployer $deployerDriver */
+        $deployerDriver = BaseDriverHelper::createDriver(
+            Blitz::$plugin->settings->deployerType,
+            Blitz::$plugin->settings->deployerSettings
+        );
+
+        // Validate the deployer so that any errors will be displayed
+        $deployerDriver->validate();
+
+        $deployerDrivers = DeployerHelper::getAllDrivers();
 
         return $this->renderTemplate('blitz/_settings', [
             'settings' => Blitz::$plugin->settings,
@@ -77,6 +90,9 @@ class SettingsController extends Controller
             'purgerDriver' => $purgerDriver,
             'purgerDrivers' => $purgerDrivers,
             'purgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgerDrivers),
+            'deployerDriver' => $deployerDriver,
+            'deployerDrivers' => $deployerDrivers,
+            'deployerTypeOptions' => array_map([$this, '_getSelectOption'], $deployerDrivers),
         ]);
     }
 
@@ -96,7 +112,8 @@ class SettingsController extends Controller
         $postedSettings = $request->getBodyParam('settings', []);
         $storageSettings = $request->getBodyParam('cacheStorageSettings', []);
         $warmerSettings = $request->getBodyParam('cacheWarmerSettings', []);
-        $purgerSettings = $request->getBodyParam('cachePurgerSettings', []);
+        $purgerSettings = $request->getBodyParam('purgerSettings', []);
+        $deployerSettings = $request->getBodyParam('deployerSettings', []);
 
         $settings = Blitz::$plugin->settings;
         $settings->setAttributes($postedSettings, false);
@@ -106,7 +123,7 @@ class SettingsController extends Controller
 
         // Create the storage driver so that we can validate it
         /* @var BaseCacheStorage $storageDriver */
-        $storageDriver = CacheDriverHelper::createDriver(
+        $storageDriver = BaseDriverHelper::createDriver(
             $settings->cacheStorageType,
             $settings->cacheStorageSettings
         );
@@ -116,19 +133,29 @@ class SettingsController extends Controller
 
         // Create the warmer driver so that we can validate it
         /* @var BaseCacheWarmer $storageDriver */
-        $warmerDriver = CacheDriverHelper::createDriver(
+        $warmerDriver = BaseDriverHelper::createDriver(
             $settings->cacheWarmerType,
             $settings->cacheWarmerSettings
         );
 
         // Apply purger settings excluding type
-        $settings->cachePurgerSettings = $purgerSettings[$settings->cachePurgerType] ?? [];
+        $settings->purgerSettings = $purgerSettings[$settings->purgerType] ?? [];
 
         // Create the purger driver so that we can validate it
-        /* @var BaseCachePurger $purgerDriver */
-        $purgerDriver = CacheDriverHelper::createDriver(
-            $settings->cachePurgerType,
-            $settings->cachePurgerSettings
+        /* @var BasePurger $purgerDriver */
+        $purgerDriver = BaseDriverHelper::createDriver(
+            $settings->purgerType,
+            $settings->purgerSettings
+        );
+
+        // Apply deployer settings excluding type
+        $settings->deployerSettings = $deployerSettings[$settings->deployerType] ?? [];
+
+        // Create the deployer driver so that we can validate it
+        /* @var BaseDeployer $deployerDriver */
+        $deployerDriver = BaseDriverHelper::createDriver(
+            $settings->deployerType,
+            $settings->deployerSettings
         );
 
         $variables = [
@@ -136,6 +163,7 @@ class SettingsController extends Controller
             'storageDriver' => $storageDriver,
             'warmerDriver' => $warmerDriver,
             'purgerDriver' => $purgerDriver,
+            'deployerDriver' => $deployerDriver,
         ];
 
         // Validate
@@ -143,8 +171,9 @@ class SettingsController extends Controller
         $storageDriver->validate();
         $warmerDriver->validate();
         $purgerDriver->validate();
+        $deployerDriver->validate();
 
-        if ($settings->hasErrors() || $storageDriver->hasErrors() || $warmerDriver->hasErrors() || $purgerDriver->hasErrors()) {
+        if ($settings->hasErrors() || $storageDriver->hasErrors() || $warmerDriver->hasErrors() || $purgerDriver->hasErrors() || $deployerDriver->hasErrors()) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
 
             Craft::$app->getUrlManager()->setRouteParams($variables);

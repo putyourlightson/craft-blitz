@@ -3,12 +3,11 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\drivers\purgers;
+namespace putyourlightson\blitz\drivers\deployers;
 
 use Craft;
-use putyourlightson\blitz\models\SiteUriModel;
 
-class DummyPurger extends BasePurger
+class DummyDeployer extends BaseDeployer
 {
     // Static
     // =========================================================================

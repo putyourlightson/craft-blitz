@@ -17,7 +17,7 @@ use yii\log\Logger;
 /**
  * @property mixed $settingsHtml
  */
-class CloudflarePurger extends BaseCachePurger
+class CloudflarePurger extends BasePurger
 {
     // Constants
     // =========================================================================

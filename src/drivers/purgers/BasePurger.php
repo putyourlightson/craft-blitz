@@ -6,13 +6,14 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use craft\base\SavableComponent;
+use putyourlightson\blitz\models\SiteUriModel;
 
-abstract class BaseCachePurger extends SavableComponent implements CachePurgerInterface
+abstract class BasePurger extends SavableComponent implements PurgerInterface
 {
     // Traits
     // =========================================================================
 
-    use CachePurgerTrait;
+    use PurgerTrait;
 
     // Static Methods
     // =========================================================================
@@ -31,10 +32,29 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     /**
      * @inheritdoc
      */
+    public function purge(SiteUriModel $siteUri)
+    {
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function purgeUris(array $siteUris)
     {
-        foreach ($siteUris as $siteUri) {
-            $this->purge($siteUri);
-        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function purgeAll()
+    {
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function test(): bool
+    {
+        return true;
     }
 }

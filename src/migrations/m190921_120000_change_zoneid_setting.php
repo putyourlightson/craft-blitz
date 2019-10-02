@@ -26,14 +26,14 @@ class m190921_120000_change_zoneid_setting extends Migration
 
         $settings = Blitz::$plugin->settings;
 
-        if ($settings->cachePurgerType == CloudflarePurger::class) {
+        if ($settings->purgerType == CloudflarePurger::class) {
             $primarySite = Craft::$app->getSites()->getPrimarySite();
 
-            if (isset($settings->cachePurgerSettings['zoneId'])) {
-                $settings->cachePurgerSettings['zoneIds'][$primarySite->uid]['zoneId'] =
-                    $settings->cachePurgerSettings['zoneId'];
+            if (isset($settings->purgerSettings['zoneId'])) {
+                $settings->purgerSettings['zoneIds'][$primarySite->uid]['zoneId'] =
+                    $settings->purgerSettings['zoneId'];
 
-                unset($settings->cachePurgerSettings['zoneId']);
+                unset($settings->purgerSettings['zoneId']);
 
                 Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
             }

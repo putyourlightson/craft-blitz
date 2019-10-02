@@ -31,14 +31,15 @@ use craft\utilities\ClearCaches;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
+use putyourlightson\blitz\drivers\deployers\BaseDeployer;
+use putyourlightson\blitz\drivers\purgers\BasePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
-use putyourlightson\blitz\helpers\CachePurgerHelper;
+use putyourlightson\blitz\helpers\PurgerHelper;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\services\CacheTagsService;
 use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
@@ -60,8 +61,9 @@ use yii\base\Event;
  * @property RefreshCacheService $refreshCache
  * @property WarmCacheService $warmCache
  * @property BaseCacheStorage $cacheStorage
- * @property BaseCachePurger $cachePurger
  * @property BaseCacheWarmer $cacheWarmer
+ * @property BasePurger $purger
+ * @property BaseDeployer $deployer
  * @property SettingsModel $settings
  * @property mixed $settingsResponse
  * @property array $cpRoutes
@@ -165,13 +167,17 @@ class Blitz extends Plugin
                 ['class' => $this->settings->cacheStorageType],
                 $this->settings->cacheStorageSettings
             ),
-            'cachePurger' => array_merge(
-                ['class' => $this->settings->cachePurgerType],
-                $this->settings->cachePurgerSettings
-            ),
             'cacheWarmer' => array_merge(
                 ['class' => $this->settings->cacheWarmerType],
                 $this->settings->cacheWarmerSettings
+            ),
+            'purger' => array_merge(
+                ['class' => $this->settings->purgerType],
+                $this->settings->purgerSettings
+            ),
+            'deployer' => array_merge(
+                ['class' => $this->settings->deployerType],
+                $this->settings->deployerSettings
             ),
         ]);
     }
@@ -350,7 +356,7 @@ class Blitz extends Plugin
     {
         Event::on(View::class, View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
-                $purgerDrivers = CachePurgerHelper::getAllDrivers();
+                $purgerDrivers = PurgerHelper::getAllDrivers();
 
                 // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
                 $templateRootSets = [$event->roots];

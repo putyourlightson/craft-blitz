@@ -8,13 +8,14 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
+use putyourlightson\blitz\drivers\deployers\GitDeployer;
 use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
+use putyourlightson\blitz\drivers\purgers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
-use putyourlightson\blitz\drivers\warmers\DefaultWarmer;
-use putyourlightson\blitz\drivers\warmers\StaticSiteGenerator;
+use putyourlightson\blitz\drivers\warmers\LocalWarmer;
 
 class SettingsModel extends Model
 {
@@ -54,7 +55,7 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $cacheWarmerType = DefaultWarmer::class;
+    public $cacheWarmerType = LocalWarmer::class;
 
     /**
      * @var array
@@ -69,18 +70,35 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $cachePurgerType = DummyPurger::class;
+    public $purgerType = DummyPurger::class;
 
     /**
      * @var array
      */
-    public $cachePurgerSettings = [];
+    public $purgerSettings = [];
 
     /**
      * @var string[]
      */
-    public $cachePurgerTypes = [
+    public $purgerTypes = [
         CloudflarePurger::class,
+    ];
+
+    /**
+     * @var string
+     */
+    public $deployerType = DummyDeployer::class;
+
+    /**
+     * @var array
+     */
+    public $deployerSettings = [];
+
+    /**
+     * @var string[]
+     */
+    public $deployerTypes = [
+        GitDeployer::class,
     ];
 
     /**
@@ -189,7 +207,7 @@ class SettingsModel extends Model
     {
         return [
             [['cacheStorageType', 'queryStringCaching'], 'required'],
-            [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType'], 'string', 'max' => 255],
+            [['cacheStorageType', 'cacheWarmerType', 'purgerType', 'deployerType'], 'string', 'max' => 255],
             [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
             [['apiKey'], 'string', 'length' => [16]],
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],

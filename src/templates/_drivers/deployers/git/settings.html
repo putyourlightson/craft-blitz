@@ -1,21 +1,6 @@
 {% import "_includes/forms" as forms %}
 
 
-{% set info %}
-    <span class="info">{{ "The higher the number, the faster the cache will be warmed but the more server processing will be required. A number between 1 and 5 is recommended."|t('blitz') }}</span>
-{% endset %}
-{{ forms.textField({
-    type: 'number',
-    unit: "concurrent requests"|t('blitz'),
-    label: "Concurrency"|t('blitz'),
-    instructions: "The max number of concurrent requests to use when warming the cache."|t('blitz') ~ info,
-    name: 'concurrency',
-    value: warmer.concurrency,
-    errors: warmer.getErrors('concurrency'),
-    required: true,
-}) }}
-
-
 {% set rows = [] %}
 {% for site in craft.app.sites.getAllSites() %}
     {% set rows = rows|merge({
@@ -44,52 +29,29 @@
         type: 'singleline',
         heading: "Repository Path"|t('blitz'),
         placeholder: "/path/to/repository",
-        code: true,
     },
     commitMessage: {
         type: 'singleline',
         heading: "Commit Message"|t('blitz'),
         placeholder: "Blitz auto commit."|t('blitz'),
-        code: true,
     },
     branch: {
         type: 'singleline',
         heading: "Branch"|t('blitz'),
         placeholder: "master",
-        code: true,
     },
 } %}
 
 {% set info %}
-    <span class="info">{{ "Warmed pages will be commited and pushed to the Git repositories using the settings specified below."|t('blitz') }}</span>
+    <span class="info">{{ "Warmed pages will be commited and pushed to the Git repositories using the settings specified below. Git must already be installed on the server."|t('blitz') }}</span>
 {% endset %}
 {{ forms.editableTableField({
     label: "Git Settings"|t('blitz'),
-    instructions: "Choose which sites should be commited and pushed by entering their details."|t('blitz') ~ info,
+    instructions: "Choose which sites to commit and push to by entering their details."|t('blitz') ~ info,
     name: 'gitSettings',
     id: 'gitSettings',
     cols: cols,
     rows: rows,
     staticRows: true,
-    errors: warmer.getErrors('gitSettings'),
-}) }}
-
-
-{% set cols = [
-    {
-        type: 'singleline',
-        heading: 'URL'|t('blitz'),
-        code: true,
-    }
-] %}
-
-<input type="hidden" name="customUrls" value="" />
-{{ forms.editableTableField({
-    label: "Custom URLs"|t('blitz'),
-    instructions: "Custom URLs to include when warming the entire cache."|t('blitz'),
-    name: 'customUrls',
-    id: 'customUrls',
-    cols: cols,
-    rows: warmer.customUrls,
-    addRowLabel: "Add a custom URL"|t('blitz'),
+    errors: deployer.getErrors('gitSettings'),
 }) }}

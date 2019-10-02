@@ -16,7 +16,7 @@ use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
-class CacheStorageHelper
+class CacheStorageHelper extends BaseDriverHelper
 {
     // Constants
     // =========================================================================
@@ -61,6 +61,6 @@ class CacheStorageHelper
      */
     public static function getAllDrivers(): array
     {
-        return CacheDriverHelper::createDrivers(self::getAllTypes());
+        return self::createDrivers(self::getAllTypes());
     }
 }

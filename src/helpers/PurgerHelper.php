@@ -9,13 +9,13 @@ use craft\errors\MissingComponentException;
 use craft\events\RegisterComponentTypesEvent;
 use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
+use putyourlightson\blitz\drivers\purgers\BasePurger;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
-use putyourlightson\blitz\drivers\purgers\CachePurgerInterface;
+use putyourlightson\blitz\drivers\purgers\PurgerInterface;
 use yii\base\Event;
 use yii\base\InvalidConfigException;
 
-class CachePurgerHelper
+class PurgerHelper extends BaseDriverHelper
 {
     // Constants
     // =========================================================================
@@ -41,7 +41,7 @@ class CachePurgerHelper
 
         $purgerTypes = array_unique(array_merge(
             $purgerTypes,
-            Blitz::$plugin->settings->cachePurgerTypes
+            Blitz::$plugin->settings->purgerTypes
         ), SORT_REGULAR);
 
         $event = new RegisterComponentTypesEvent([
@@ -55,10 +55,10 @@ class CachePurgerHelper
     /**
      * Returns all purger drivers.
      *
-     * @return BaseCachePurger[]
+     * @return BasePurger[]
      */
     public static function getAllDrivers(): array
     {
-        return CacheDriverHelper::createDrivers(self::getAllTypes());
+        return self::createDrivers(self::getAllTypes());
     }
 }

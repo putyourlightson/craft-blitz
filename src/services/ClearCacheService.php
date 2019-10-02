@@ -30,7 +30,7 @@ class ClearCacheService extends Component
     {
         Blitz::$plugin->cacheStorage->deleteAll();
 
-        Blitz::$plugin->cachePurger->purgeAll();
+        Blitz::$plugin->purger->purgeAll();
 
         // Fire an 'afterClearCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
@@ -49,7 +49,7 @@ class ClearCacheService extends Component
 
         Blitz::$plugin->cacheStorage->deleteUris($siteUris);
 
-        Blitz::$plugin->cachePurger->purgeUris($siteUris);
+        Blitz::$plugin->purger->purgeUris($siteUris);
 
         // Fire an 'afterClearCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
@@ -66,7 +66,7 @@ class ClearCacheService extends Component
     {
         Blitz::$plugin->cacheStorage->deleteUris($siteUris);
 
-        Blitz::$plugin->cachePurger->purgeUris($siteUris);
+        Blitz::$plugin->purger->purgeUris($siteUris);
 
         // Fire an 'afterClearCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {

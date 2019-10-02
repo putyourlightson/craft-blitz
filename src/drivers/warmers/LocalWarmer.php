@@ -6,7 +6,6 @@
 namespace putyourlightson\blitz\drivers\warmers;
 
 use Craft;
-use craft\queue\QueueInterface;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
@@ -19,7 +18,7 @@ use yii\log\Logger;
 /**
  * @property mixed $settingsHtml
  */
-class DefaultWarmer extends BaseCacheWarmer
+class LocalWarmer extends BaseCacheWarmer
 {
     // Properties
     // =========================================================================
@@ -29,6 +28,11 @@ class DefaultWarmer extends BaseCacheWarmer
      */
     public $concurrency = 3;
 
+    /**
+     * @var string[]
+     */
+    public $customUrls = [];
+
     // Static
     // =========================================================================
 
@@ -37,7 +41,7 @@ class DefaultWarmer extends BaseCacheWarmer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Default Warmer');
+        return Craft::t('blitz', 'Local Warmer');
     }
 
     // Public Methods
@@ -68,6 +72,19 @@ class DefaultWarmer extends BaseCacheWarmer
     public function warmUris(array $siteUris, int $delay = null)
     {
         $this->addWarmCacheJob($siteUris, $delay);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function warmAll()
+    {
+        $urls = array_unique(array_merge(
+            SiteUriHelper::getAllSiteUris(true),
+            $this->customUrls
+        ), SORT_REGULAR);
+
+        $this->warmUris($urls);
     }
 
     /**
@@ -127,7 +144,7 @@ class DefaultWarmer extends BaseCacheWarmer
      */
     public function getSettingsHtml()
     {
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/default/settings', [
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/local/settings', [
             'warmer' => $this,
         ]);
     }

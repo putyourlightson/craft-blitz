@@ -36,20 +36,38 @@ return [
     // The storage type classes to add to the plugin’s default storage types.
     //'cacheStorageTypes' => [],
 
+    // The warmer type to use.
+    //'cacheWarmerType' => 'putyourlightson\blitz\drivers\warmers\DefaultWarmer',
+
+    // The warmer settings.
+    //'cacheWarmerSettings' => ['concurrency' => 3],
+
+    // The warmer type classes to add to the plugin’s default warmer types.
+    //'cacheWarmerTypes' => [],
+
     // The purger type to use.
-    //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
+    //'purgerType' => 'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
 
     // The purger settings (each purger can have its own unique settings).
-    //'cachePurgerSettings' => [
+    //'purgerSettings' => [
     //    'email' => '',
     //    'apiKey' => '',
     //    'zoneId' => '',
     //],
 
     // The purger type classes to add to the plugin’s default purger types.
-    //'cachePurgerTypes' => [
+    //'purgerTypes' => [
     //    'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
     //],
+
+    // The deployer type to use.
+    //'deployerType' => 'putyourlightson\blitz\drivers\deployers\DummyDeployer',
+
+    // The deployer settings.
+    //'deployerSettings' => [],
+
+    // The deployer type classes to add to the plugin’s default deployer types.
+    //'deployerTypes' => [],
 
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,

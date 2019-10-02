@@ -16,3 +16,21 @@
 }) }}
 
 
+{% set cols = [
+    {
+        type: 'singleline',
+        heading: 'URL'|t('blitz'),
+        placeholder: "https://domain.com/custom-url",
+    }
+] %}
+
+<input type="hidden" name="customUrls" value="" />
+{{ forms.editableTableField({
+    label: "Custom URLs"|t('blitz'),
+    instructions: "Custom URLs to include when warming the entire cache."|t('blitz'),
+    name: 'customUrls',
+    id: 'customUrls',
+    cols: cols,
+    rows: warmer.customUrls,
+    addRowLabel: "Add a custom URL"|t('blitz'),
+}) }}
