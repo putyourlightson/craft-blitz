@@ -15,4 +15,31 @@
     required: true,
 }) }}
 
+<hr>
+
+{{ forms.autosuggestField({
+    label: "Git Path"|t('blitz'),
+    instructions: "The path of the Git repository to commit and push to."|t('blitz'),
+    suggestEnvVars: true,
+    suggestions: craft.cp.getEnvSuggestions(),
+    name: 'gitPath',
+    value: warmer.gitPath,
+    errors: warmer.getErrors('gitPath'),
+}) }}
+
+{{ forms.textField({
+    label: "Git Commit Message"|t('blitz'),
+    instructions: "The commit message to use."|t('blitz'),
+    name: 'gitCommitMessage',
+    value: warmer.gitCommitMessage,
+    errors: warmer.getErrors('gitCommitMessage'),
+}) }}
+
+{{ forms.textField({
+    label: "Git Branch"|t('blitz'),
+    instructions: "The origin branch to push to."|t('blitz'),
+    name: 'gitBranch',
+    value: warmer.gitBranch,
+    errors: warmer.getErrors('gitBranch'),
+}) }}
 

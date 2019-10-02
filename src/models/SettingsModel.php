@@ -54,6 +54,21 @@ class SettingsModel extends Model
     /**
      * @var string
      */
+    public $cacheWarmerType = DefaultWarmer::class;
+
+    /**
+     * @var array
+     */
+    public $cacheWarmerSettings = [];
+
+    /**
+     * @var string[]
+     */
+    public $cacheWarmerTypes = [];
+
+    /**
+     * @var string
+     */
     public $cachePurgerType = DummyPurger::class;
 
     /**
@@ -66,23 +81,6 @@ class SettingsModel extends Model
      */
     public $cachePurgerTypes = [
         CloudflarePurger::class,
-    ];
-
-    /**
-     * @var string
-     */
-    public $cacheWarmerType = DefaultWarmer::class;
-
-    /**
-     * @var array
-     */
-    public $cacheWarmerSettings = [];
-
-    /**
-     * @var string[]
-     */
-    public $cacheWarmerTypes = [
-        StaticSiteGenerator::class,
     ];
 
     /**

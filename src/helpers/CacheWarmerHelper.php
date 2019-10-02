@@ -10,6 +10,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\drivers\warmers\DummyWarmer;
 use putyourlightson\blitz\drivers\warmers\DefaultWarmer;
+use putyourlightson\blitz\drivers\warmers\StaticSiteGenerator;
 use yii\base\Event;
 
 class CacheWarmerHelper
@@ -33,8 +34,8 @@ class CacheWarmerHelper
     public static function getAllTypes(): array
     {
         $warmerTypes = [
-            DummyWarmer::class,
             DefaultWarmer::class,
+            StaticSiteGenerator::class,
         ];
 
         $warmerTypes = array_unique(array_merge(

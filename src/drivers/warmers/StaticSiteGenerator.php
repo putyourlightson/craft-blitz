@@ -26,6 +26,21 @@ class StaticSiteGenerator extends DefaultWarmer
     // =========================================================================
 
     /**
+     * @var string|null
+     */
+    public $gitPath;
+
+    /**
+     * @var string
+     */
+    public $gitCommitMessage = 'Blitz auto commit.';
+
+    /**
+     * @var string
+     */
+    public $gitBranch = 'master';
+
+    /**
      * @var string[]
      */
     public $extraUrls = [];
@@ -60,10 +75,41 @@ class StaticSiteGenerator extends DefaultWarmer
     /**
      * @inheritdoc
      */
+    public function requestUrls(array $urls, callable $setProgressHandler): int
+    {
+        $success = parent::requestUrls($urls, $setProgressHandler);
+
+        if ($success > 0 && $this->gitPath) {
+            $this->gitCommitPush();
+        }
+
+        return $success;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSettingsHtml()
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/static-site-generator/settings', [
             'warmer' => $this,
         ]);
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * Commits and pushes a git repository.
+     */
+    protected function gitCommitPush()
+    {
+        require_once('Git.php');
+
+        $repo = Git::open($this->gitPath);
+
+        $repo->add('.');
+        $repo->commit($this->gitCommitMessage);
+        $repo->push('origin', $this->gitBranch);
     }
 }
