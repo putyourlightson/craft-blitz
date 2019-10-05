@@ -52,7 +52,6 @@ return [
     //'cachePurgerSettings' => [
     //    'email' => '',
     //    'apiKey' => '',
-    //    'zoneId' => '',
     //],
 
     // The purger type classes to add to the plugin’s default purger types.
