@@ -2,10 +2,10 @@
 
 ## 3.0.0 - Unreleased
 ### Added
-- Added replaceable cache warmers (Local warmer).
+- Added replaceable cache warmers (Guzzle warmer).
 - Added replaceable deployers (Git deployer).
 - Added the ability to specify custom site URIs to be warmed.
-- Added `beforeClearCache`, `beforeFlushCache`, `beforeWarmCache` and `afterWarmCache` events. 
+- Added `beforeClearCache`, `beforeFlushCache`, `beforeRefreshCache`, `beforeWarmCache`, `afterWarmCache` events. 
 
 ### Changed
 - Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.

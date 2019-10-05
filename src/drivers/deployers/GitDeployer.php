@@ -14,8 +14,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use Symfony\Component\Process\Exception\LogicException;
-use Symfony\Component\Process\Exception\RuntimeException as RuntimeExceptionAlias;
+use putyourlightson\blitz\models\SiteUriModel;
 use Symfony\Component\Process\Process;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
@@ -33,6 +32,16 @@ class GitDeployer extends BaseDeployer
      * @var array
      */
     public $gitSettings = [];
+
+    /**
+     * @var string
+     */
+    public $defaultCommitMessage = 'Blitz auto commit';
+
+    /**
+     * @var string
+     */
+    public $defaultBranch = 'master';
 
     // Static
     // =========================================================================
@@ -135,7 +144,7 @@ class GitDeployer extends BaseDeployer
      * Deploys site URIs to the site repository.
      *
      * @param int $siteId
-     * @param array $siteUris
+     * @param SiteUriModel[] $siteUris
      *
      * @return int
      */
@@ -168,30 +177,51 @@ class GitDeployer extends BaseDeployer
                 continue;
             }
 
-            $this->save($siteUri, $repositoryPath);
+            $filePath = FileHelper::normalizePath($repositoryPath.'/'.$siteUri->uri.'/index.html');
+            $this->save($value, $filePath);
 
             $success++;
         }
 
         // Commit and push repository
-        $cwd = realpath(CRAFT_BASE_PATH);
+        $commitMessage = $this->gitSettings[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
+        $commitMessage = addslashes($commitMessage);
+        $branch = $this->gitSettings[$siteUid]['branch'] ?: $this->defaultBranch;
 
-        $process = new Process(['git commit', '-a', '', $cwd]);
-        $process->run();
-
-        $process = new Process(['git push origin master', '', '', $cwd]);
-        $process->run();
+        $this->runCommands([
+            'git add -A',
+            'git commit -a --message="'.$commitMessage.'"',
+            'git push origin '.$branch,
+        ], $repositoryPath);
 
         return $success;
     }
 
     /**
+     * Runs an array of commands in a given working directory.
+     *
+     * @param string[] $commands
+     * @param string $cwd
+     */
+    protected function runCommands(array $commands, string $cwd)
+    {
+        foreach ($commands as $command) {
+            $process = new Process($command, $cwd);
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                Craft::getLogger()->log($process->getErrorOutput(), Logger::LEVEL_ERROR, 'blitz');
+            }
+        }
+    }
+
+    /**
      * Saves a value to a file path.
      *
-     * @param string $filePath
      * @param string $value
+     * @param string $filePath
      */
-    public function save(string $value, string $filePath)
+    protected function save(string $value, string $filePath)
     {
         try {
             FileHelper::writeToFile($filePath, $value);

@@ -133,11 +133,11 @@ class FlushCacheService extends Component
     /**
      * Fires an onBeforeFlush event.
      *
-     * @param array $config
+     * @param array|null $config
      *
      * @return RefreshCacheEvent
      */
-    protected function onBeforeFlush(array $config)
+    protected function onBeforeFlush(array $config = [])
     {
         $event = new RefreshCacheEvent($config);
         $this->trigger(self::EVENT_BEFORE_FLUSH_CACHE, $event);

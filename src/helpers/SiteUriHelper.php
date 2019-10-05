@@ -187,7 +187,7 @@ class SiteUriHelper
     /**
      * Returns site URIs grouped by site.
      *
-     * @param SiteUriModel[] $siteUris
+     * @param array $siteUris
      *
      * @return array
      */
@@ -196,6 +196,11 @@ class SiteUriHelper
         $groupedSiteUris = [];
 
         foreach ($siteUris as $siteUri) {
+            // Convert to a SiteUriModel if it is an array
+            if (is_array($siteUri)) {
+                $siteUri = new SiteUriModel($siteUri);
+            }
+
             $groupedSiteUris[$siteUri->siteId][] = $siteUri;
         }
 

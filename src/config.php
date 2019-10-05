@@ -37,7 +37,7 @@ return [
     //'cacheStorageTypes' => [],
 
     // The warmer type to use.
-    //'cacheWarmerType' => 'putyourlightson\blitz\drivers\warmers\DefaultWarmer',
+    //'cacheWarmerType' => 'putyourlightson\blitz\drivers\warmers\GuzzleWarmer',
 
     // The warmer settings.
     //'cacheWarmerSettings' => ['concurrency' => 3],

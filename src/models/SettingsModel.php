@@ -15,7 +15,7 @@ use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
-use putyourlightson\blitz\drivers\warmers\LocalWarmer;
+use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
 
 class SettingsModel extends Model
 {
@@ -55,7 +55,7 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $cacheWarmerType = LocalWarmer::class;
+    public $cacheWarmerType = GuzzleWarmer::class;
 
     /**
      * @var array

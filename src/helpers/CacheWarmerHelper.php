@@ -8,7 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
-use putyourlightson\blitz\drivers\warmers\LocalWarmer;
+use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
 use putyourlightson\blitz\jobs\DriverJob;
 use yii\base\Event;
 
@@ -33,7 +33,7 @@ class CacheWarmerHelper extends BaseDriverHelper
     public static function getAllTypes(): array
     {
         $warmerTypes = [
-            LocalWarmer::class,
+            GuzzleWarmer::class,
         ];
 
         $warmerTypes = array_unique(array_merge(

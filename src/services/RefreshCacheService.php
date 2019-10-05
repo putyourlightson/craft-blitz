@@ -331,20 +331,28 @@ class RefreshCacheService extends Component
      */
     public function refreshSiteUris(array $siteUris)
     {
+        $event = $this->onBeforeRefresh(['siteUris' => $siteUris]);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        $siteUris = $event->siteUris;
+
         Blitz::$plugin->flushCache->flushUris($siteUris);
 
         Blitz::$plugin->clearCache->clearUris($siteUris);
 
-        // Warm the cache if enabled providing the purger's warm cache delay setting
+        // Warm and deploy if enabled
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
+
+            Blitz::$plugin->deployer->deployUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
         }
 
         // Fire an 'afterRefreshCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, new RefreshCacheEvent([
-                'siteUris' => $siteUris,
-            ]));
+            $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
         }
     }
 
@@ -353,6 +361,12 @@ class RefreshCacheService extends Component
      */
     public function refreshAll()
     {
+        $event = $this->onBeforeRefresh();
+
+        if (!$event->isValid) {
+            return;
+        }
+
         // Get cached site URIs before flushing the cache
         $siteUris = SiteUriHelper::getAllSiteUris();
 
@@ -360,9 +374,16 @@ class RefreshCacheService extends Component
         Blitz::$plugin->clearCache->clearAll();
         Blitz::$plugin->cachePurger->purgeAll();
 
-        // Warm the cache if enabled
+        // Warm and deploy if enabled
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
+
+            Blitz::$plugin->deployer->deployUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
+        }
+
+        // Fire an 'afterRefreshCache' event
+        if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
         }
     }
 
@@ -427,13 +448,13 @@ class RefreshCacheService extends Component
     // =========================================================================
 
     /**
-     * Triggers the on before event.
+     * Fires an onBeforeRefresh event.
      *
-     * @param array $config
+     * @param array|null $config
      *
      * @return RefreshCacheEvent
      */
-    protected function onBeforeRefresh(array $config)
+    protected function onBeforeRefresh(array $config = [])
     {
         $event = new RefreshCacheEvent($config);
 

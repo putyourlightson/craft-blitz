@@ -9,7 +9,6 @@ use Craft;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
@@ -18,7 +17,7 @@ use yii\log\Logger;
 /**
  * @property mixed $settingsHtml
  */
-class LocalWarmer extends BaseCacheWarmer
+class GuzzleWarmer extends BaseCacheWarmer
 {
     // Properties
     // =========================================================================
@@ -36,29 +35,17 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Local Warmer');
+        return Craft::t('blitz', 'Guzzle Warmer');
     }
 
     // Public Methods
     // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    public function rules(): array
-    {
-        return [
-            [['concurrency'], 'required'],
-            [['concurrency'], 'integer', 'min' => 1],
-        ];
-    }
-
     /**
      * @inheritdoc
      */
     public function warmUris(array $siteUris, int $delay = null)
     {
-        $this->addDriverJob($event->siteUris, $delay);
+        $this->addDriverJob($siteUris, $delay);
     }
 
     /**
@@ -73,7 +60,7 @@ class LocalWarmer extends BaseCacheWarmer
         $this->trigger(self::EVENT_BEFORE_WARM_CACHE, $event);
 
         if (!$event->isValid) {
-            return 0;
+            return;
         }
 
         $success = 0;
@@ -126,9 +113,17 @@ class LocalWarmer extends BaseCacheWarmer
         if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_CACHE)) {
             $this->trigger(self::EVENT_AFTER_WARM_CACHE, $event);
         }
+    }
 
-        // Deploy the site URIs
-        Blitz::$plugin->deployer->deployUris($event->siteUris);
+    /**
+     * @inheritdoc
+     */
+    public function rules(): array
+    {
+        return [
+            [['concurrency'], 'required'],
+            [['concurrency'], 'integer', 'min' => 1],
+        ];
     }
 
     /**
@@ -136,7 +131,7 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public function getSettingsHtml()
     {
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/local/settings', [
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/guzzle/settings', [
             'warmer' => $this,
         ]);
     }
