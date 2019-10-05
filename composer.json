@@ -34,6 +34,7 @@
         "handle": "blitz",
         "developer": "PutYourLightsOn",
         "developerUrl": "https://putyourlightson.com/",
+        "documentationUrl": "https://putyourlightson.com/plugins/blitz",
         "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v2/CHANGELOG.md",
         "class": "putyourlightson\\blitz\\Blitz",
         "schemaVersion": "2.3.0",
