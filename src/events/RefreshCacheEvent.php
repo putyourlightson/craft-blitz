@@ -5,16 +5,21 @@
 
 namespace putyourlightson\blitz\events;
 
+use craft\events\CancelableEvent;
 use putyourlightson\blitz\models\SiteUriModel;
-use yii\base\Event;
 
-class RefreshCacheEvent extends Event
+class RefreshCacheEvent extends CancelableEvent
 {
     // Properties
     // =========================================================================
 
     /**
-     * @var SiteUriModel[]
+     * @var SiteUriModel[]|null
      */
-    public $siteUris = [];
+    public $siteUris;
+
+    /**
+     * @var int|null $siteId
+     */
+    public $siteId;
 }

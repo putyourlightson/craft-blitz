@@ -19,6 +19,19 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
 
     use CacheWarmerTrait;
 
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_BEFORE_WARM_CACHE = 'beforeWarmCache';
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_WARM_CACHE = 'afterWarmCache';
+
     // Public Methods
     // =========================================================================
 

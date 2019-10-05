@@ -38,6 +38,11 @@ class RefreshCacheService extends Component
     /**
      * @event RefreshCacheEvent
      */
+    const EVENT_BEFORE_REFRESH_CACHE = 'beforeRefreshCache';
+
+    /**
+     * @event RefreshCacheEvent
+     */
     const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
 
     // Properties
@@ -332,7 +337,7 @@ class RefreshCacheService extends Component
 
         // Warm the cache if enabled providing the purger's warm cache delay setting
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->cacheWarmer->warmSiteUris($siteUris, Blitz::$plugin->purger->warmCacheDelay);
+            Blitz::$plugin->cacheWarmer->warmUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
         }
 
         // Fire an 'afterRefreshCache' event
@@ -353,11 +358,11 @@ class RefreshCacheService extends Component
 
         Blitz::$plugin->flushCache->flushAll();
         Blitz::$plugin->clearCache->clearAll();
-        Blitz::$plugin->purger->purgeAll();
+        Blitz::$plugin->cachePurger->purgeAll();
 
         // Warm the cache if enabled
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->cacheWarmer->warmSiteUris($siteUris, Blitz::$plugin->purger->warmCacheDelay);
+            Blitz::$plugin->cacheWarmer->warmUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
         }
     }
 
@@ -416,5 +421,26 @@ class RefreshCacheService extends Component
         $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
 
         $this->refresh(true);
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * Triggers the on before event.
+     *
+     * @param array $config
+     *
+     * @return RefreshCacheEvent
+     */
+    protected function onBeforeRefresh(array $config)
+    {
+        $event = new RefreshCacheEvent($config);
+
+        if ($this->hasEventHandlers(self::EVENT_BEFORE_REFRESH_CACHE)) {
+            $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
+        }
+
+        return $event;
     }
 }

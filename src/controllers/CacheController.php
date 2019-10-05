@@ -95,7 +95,7 @@ class CacheController extends Controller
      */
     public function actionPurge(): Response
     {
-        Blitz::$plugin->purger->purgeAll();
+        Blitz::$plugin->cachePurger->purgeAll();
 
         return $this->_getResponse('Blitz cache successfully purged.');
     }

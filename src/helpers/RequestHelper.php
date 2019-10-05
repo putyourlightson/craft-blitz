@@ -124,9 +124,6 @@ class RequestHelper
             && !$request->getIsConsoleRequest()
             && !$request->getIsActionRequest()
             && !$request->getIsPreview()
-            // TODO: remove in 3.0.0
-            // Keep this even if deprecated to support plugins that still use it
-            && !$request->getIsLivePreview()
         );
     }
 }

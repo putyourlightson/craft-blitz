@@ -185,10 +185,13 @@
             }
         } %}
 
-        <input type="hidden" name="customSiteUris" value="[]" />
+        <input type="hidden" name="customSiteUris" value="" />
+        {% set info %}
+            <span class="info">{{ 'Add any URIs that Craft doesn’t know about here and they will be warmed when either a site or the entire cache is warmed.'|t('blitz') }}</span>
+        {% endset %}
         {{ forms.editableTableField({
             label: "Custom Site URIs"|t('blitz'),
-            instructions: "Custom site URIs to include when warming the cache."|t('blitz'),
+            instructions: "Custom site URIs to include when warming the cache."|t('blitz') ~ info,
             name: 'settings[customSiteUris]',
             id: 'customSiteUris',
             cols: cols,

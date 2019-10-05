@@ -30,7 +30,7 @@ class GitDeployer extends BaseDeployer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Git Deployer');
+        return Craft::t('blitz', 'Git Repository');
     }
 
     // Public Methods

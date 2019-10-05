@@ -9,6 +9,8 @@ use Craft;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
+use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use yii\log\Logger;
@@ -56,7 +58,17 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public function warmUris(array $siteUris, int $delay = null)
     {
-        $this->addDriverJob($siteUris, $delay);
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+
+        if ($this->hasEventHandlers(self::EVENT_BEFORE_WARM_CACHE)) {
+            $this->trigger(self::EVENT_BEFORE_WARM_CACHE, $event);
+        }
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        $this->addDriverJob($event->siteUris, $delay);
     }
 
     /**
@@ -114,6 +126,16 @@ class LocalWarmer extends BaseCacheWarmer
 
         // Initiate the transfers and wait for the pool of requests to complete
         $pool->promise()->wait();
+
+        // Fire an 'afterWarmCache' event
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_WARM_CACHE, $event);
+        }
+
+        // Deploy the site URIs
+        Blitz::$plugin->deployer->deployUris($event->siteUris);
 
         return $success;
     }
