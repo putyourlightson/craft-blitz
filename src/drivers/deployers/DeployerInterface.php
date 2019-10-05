@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\deployers;
 
 use craft\base\SavableComponentInterface;
+use putyourlightson\blitz\models\SiteUriModel;
 
 interface DeployerInterface extends SavableComponentInterface
 {
@@ -13,7 +14,14 @@ interface DeployerInterface extends SavableComponentInterface
     // =========================================================================
 
     /**
-     * Performs a deploy.
+     * Deploys the cache given an array of site URIs.
+     *
+     * @param SiteUriModel[] $siteUris
      */
-    public function deploy();
+    public function deployUris(array $siteUris);
+
+    /**
+     * Deploys the entire cache.
+     */
+    public function deployAll();
 }

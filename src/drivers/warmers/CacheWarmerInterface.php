@@ -20,7 +20,7 @@ interface CacheWarmerInterface extends SavableComponentInterface
      * @param SiteUriModel[] $siteUris
      * @param int|null $delay
      */
-    public function warmSiteUris(array $siteUris, int $delay = null);
+    public function warmUris(array $siteUris, int $delay = null);
 
     /**
      * Warms the cache for a given site ID.

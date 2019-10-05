@@ -52,18 +52,6 @@ class m191001_120000_change_settings extends Migration
             $settings['cacheWarmerSettings'] = ['concurrency' => $settings['concurrency']];
         }
 
-        if (!empty($settings['cachePurgerType'])) {
-            $settings['purgerType'] = $settings['cachePurgerType'];
-        }
-
-        if (!empty($settings['cachePurgerSettings'])) {
-            $settings['purgerSettings'] = $settings['cachePurgerSettings'];
-        }
-
-        if (!empty($settings['cachePurgerTypes'])) {
-            $settings['purgerTypes'] = $settings['cachePurgerTypes'];
-        }
-
         Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings);
 
         return true;

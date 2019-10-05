@@ -32,10 +32,10 @@ use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
-use putyourlightson\blitz\drivers\purgers\BasePurger;
+use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
-use putyourlightson\blitz\helpers\PurgerHelper;
+use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SettingsModel;
@@ -60,7 +60,7 @@ use yii\base\Event;
  * @property RefreshCacheService $refreshCache
  * @property BaseCacheStorage $cacheStorage
  * @property BaseCacheWarmer $cacheWarmer
- * @property BasePurger $purger
+ * @property BaseCachePurger $cachePurger
  * @property BaseDeployer $deployer
  * @property SettingsModel $settings
  * @property mixed $settingsResponse
@@ -168,9 +168,9 @@ class Blitz extends Plugin
                 ['class' => $this->settings->cacheWarmerType],
                 $this->settings->cacheWarmerSettings
             ),
-            'purger' => array_merge(
-                ['class' => $this->settings->purgerType],
-                $this->settings->purgerSettings
+            'cachePurger' => array_merge(
+                ['class' => $this->settings->cachePurgerType],
+                $this->settings->cachePurgerSettings
             ),
             'deployer' => array_merge(
                 ['class' => $this->settings->deployerType],
@@ -353,7 +353,7 @@ class Blitz extends Plugin
     {
         Event::on(View::class, View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
-                $purgerDrivers = PurgerHelper::getAllDrivers();
+                $purgerDrivers = CachePurgerHelper::getAllDrivers();
 
                 // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
                 $templateRootSets = [$event->roots];

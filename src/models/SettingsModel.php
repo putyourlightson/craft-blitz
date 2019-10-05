@@ -11,10 +11,10 @@ use craft\behaviors\EnvAttributeParserBehavior;
 use putyourlightson\blitz\drivers\deployers\GitDeployer;
 use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
-use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
+use putyourlightson\blitz\drivers\purgers\CloudflareCachePurger;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
-use putyourlightson\blitz\drivers\purgers\DummyPurger;
+use putyourlightson\blitz\drivers\purgers\DummyCachePurger;
 use putyourlightson\blitz\drivers\warmers\LocalWarmer;
 
 class SettingsModel extends Model
@@ -75,18 +75,18 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $purgerType = DummyPurger::class;
+    public $cachePurgerType = DummyCachePurger::class;
 
     /**
      * @var array
      */
-    public $purgerSettings = [];
+    public $cachePurgerSettings = [];
 
     /**
      * @var string[]
      */
-    public $purgerTypes = [
-        CloudflarePurger::class,
+    public $cachePurgerTypes = [
+        CloudflareCachePurger::class,
     ];
 
     /**
@@ -212,7 +212,7 @@ class SettingsModel extends Model
     {
         return [
             [['cacheStorageType', 'queryStringCaching'], 'required'],
-            [['cacheStorageType', 'cacheWarmerType', 'purgerType', 'deployerType'], 'string', 'max' => 255],
+            [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
             [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
             [['apiKey'], 'string', 'length' => [16]],
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],

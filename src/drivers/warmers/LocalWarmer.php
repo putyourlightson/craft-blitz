@@ -54,7 +54,7 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warmSiteUris(array $siteUris, int $delay = null)
+    public function warmUris(array $siteUris, int $delay = null)
     {
         $this->addDriverJob($siteUris, $delay);
     }

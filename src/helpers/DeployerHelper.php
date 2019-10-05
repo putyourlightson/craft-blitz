@@ -8,7 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
-use putyourlightson\blitz\drivers\purgers\BasePurger;
+use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use yii\base\Event;
 
 class DeployerHelper extends BaseDriverHelper
@@ -51,7 +51,7 @@ class DeployerHelper extends BaseDriverHelper
     /**
      * Returns all deployer drivers.
      *
-     * @return BasePurger[]
+     * @return BaseCachePurger[]
      */
     public static function getAllDrivers(): array
     {

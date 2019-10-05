@@ -9,6 +9,9 @@ use Craft;
 use craft\base\SavableComponent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
+/**
+ * @property array $siteOptions
+ */
 abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerInterface
 {
     // Traits
@@ -28,7 +31,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($this->customSiteUris);
         $customSiteUris = $groupedSiteUris[$siteId] ?? [];
 
-        $this->warmSiteUris(array_merge(
+        $this->warmUris(array_merge(
             SiteUriHelper::getSiteSiteUris($siteId),
             $customSiteUris
         ));
@@ -39,7 +42,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      */
     public function warmAll()
     {
-        $this->warmSiteUris(array_merge(
+        $this->warmUris(array_merge(
             SiteUriHelper::getAllSiteUris(true),
             $this->customSiteUris
         ));

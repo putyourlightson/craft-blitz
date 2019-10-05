@@ -15,8 +15,8 @@ use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\helpers\BaseDriverHelper;
 use putyourlightson\blitz\helpers\CacheStorageHelper;
-use putyourlightson\blitz\helpers\PurgerHelper;
-use putyourlightson\blitz\drivers\purgers\BasePurger;
+use putyourlightson\blitz\helpers\CachePurgerHelper;
+use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use yii\web\BadRequestHttpException;
@@ -63,16 +63,16 @@ class SettingsController extends Controller
 
         $warmerDrivers = CacheWarmerHelper::getAllDrivers();
 
-        /** @var BasePurger $purgerDriver */
+        /** @var BaseCachePurger $purgerDriver */
         $purgerDriver = BaseDriverHelper::createDriver(
-            Blitz::$plugin->settings->purgerType,
-            Blitz::$plugin->settings->purgerSettings
+            Blitz::$plugin->settings->cachePurgerType,
+            Blitz::$plugin->settings->cachePurgerSettings
         );
 
         // Validate the purger so that any errors will be displayed
         $purgerDriver->validate();
 
-        $purgerDrivers = PurgerHelper::getAllDrivers();
+        $purgerDrivers = CachePurgerHelper::getAllDrivers();
 
         /** @var BaseDeployer $deployerDriver */
         $deployerDriver = BaseDriverHelper::createDriver(
@@ -95,9 +95,9 @@ class SettingsController extends Controller
             'warmerDriver' => $warmerDriver,
             'warmerDrivers' => $warmerDrivers,
             'warmerTypeOptions' => array_map([$this, '_getSelectOption'], $warmerDrivers),
-            'purgerDriver' => $purgerDriver,
-            'purgerDrivers' => $purgerDrivers,
-            'purgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgerDrivers),
+            'cachePurgerDriver' => $purgerDriver,
+            'cachePurgerDrivers' => $purgerDrivers,
+            'cachePurgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgerDrivers),
             'deployerDriver' => $deployerDriver,
             'deployerDrivers' => $deployerDrivers,
             'deployerTypeOptions' => array_map([$this, '_getSelectOption'], $deployerDrivers),
@@ -147,13 +147,13 @@ class SettingsController extends Controller
         );
 
         // Apply purger settings excluding type
-        $settings->purgerSettings = $purgerSettings[$settings->purgerType] ?? [];
+        $settings->cachePurgerSettings = $purgerSettings[$settings->cachePurgerType] ?? [];
 
         // Create the purger driver so that we can validate it
-        /* @var BasePurger $purgerDriver */
+        /* @var BaseCachePurger $purgerDriver */
         $purgerDriver = BaseDriverHelper::createDriver(
-            $settings->purgerType,
-            $settings->purgerSettings
+            $settings->cachePurgerType,
+            $settings->cachePurgerSettings
         );
 
         // Apply deployer settings excluding type

@@ -204,9 +204,9 @@
         {{ forms.selectField({
             label: "Reverse Proxy Purging"|t('blitz'),
             instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz') ~ info,
-            warning: (config.purgerType is defined ? configWarning('purgerType')),
-            name: 'settings[purgerType]',
-            options: purgerTypeOptions,
+            warning: (config.cachePurgerType is defined ? configWarning('cachePurgerType')),
+            name: 'settings[cachePurgerType]',
+            options: cachePurgerTypeOptions,
             value: className(purgerDriver),
             required: true,
             toggle: true,
