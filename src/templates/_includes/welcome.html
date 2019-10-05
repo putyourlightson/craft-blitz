@@ -8,7 +8,12 @@
     <p>
         1. {{ 'Enable caching below.'|t('blitz') }}<br/>
         2. {{ 'Include at least one URI pattern.'|t('blitz') }}<br/>
-        3. {{ 'Visit the site or warm the cache in the <a href="{url}" target="_blank">Blitz Cache Utility</a>.'|t('blitz', {url: cpUrl('utilities/blitz-cache')})|raw }}
+        3. {{ 'Visit the site or warm the cache in the <a href="{url}">Blitz Cache Utility</a>.'|t('blitz', {url: cpUrl('utilities/blitz-cache')})|raw }}
     </p>
-    <p>{{ 'Read the <a href="{url}" class="go" target="_blank">Getting Started docs</a>'|t('blitz', {url: docs ~ 'getting-started'})|raw }}</p>
+    <p>
+        {{ 'Everything else is optional.'|t('blitz') }}
+        {{ 'Read the <a href="{url}" class="go" target="_blank">Getting Started docs</a>'|t('blitz', {url: docs ~ 'getting-started'})|raw }}
+    </p>
 </div>
+
+<hr>
