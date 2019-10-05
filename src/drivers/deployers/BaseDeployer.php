@@ -16,6 +16,19 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
 
     use DeployerTrait;
 
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_BEFORE_DEPLOY = 'beforeDeploy';
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_DEPLOY = 'afterDeploy';
+
     // Public Methods
     // =========================================================================
 

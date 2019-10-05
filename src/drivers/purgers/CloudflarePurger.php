@@ -6,6 +6,8 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
+use craft\db\Table;
+use craft\helpers\Db;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
@@ -160,17 +162,17 @@ class CloudflarePurger extends BaseCachePurger
             ]
         ]);
 
-        $site = Craft::$app->getSites()->getSiteById($siteId);
+        $siteUid = Db::uidById(Table::SITES, $siteId);
 
-        if ($site === null) {
+        if ($siteUid === null) {
             return false;
         }
 
-        if (empty($this->zoneIds[$site->uid]) || empty($this->zoneIds[$site->uid]['zoneId'])) {
+        if (empty($this->zoneIds[$siteUid]) || empty($this->zoneIds[$siteUid]['zoneId'])) {
             return false;
         }
 
-        $uri = 'zones/'.Craft::parseEnv($this->zoneIds[$site->uid]['zoneId']).'/'.$action;
+        $uri = 'zones/'.Craft::parseEnv($this->zoneIds[$siteUid]['zoneId']).'/'.$action;
 
         $requests = [];
 

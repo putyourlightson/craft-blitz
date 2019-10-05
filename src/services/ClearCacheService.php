@@ -100,7 +100,7 @@ class ClearCacheService extends Component
     // =========================================================================
 
     /**
-     * Triggers the on before event.
+     * Fires an onBeforeClear event.
      *
      * @param array $config
      *
@@ -109,10 +109,7 @@ class ClearCacheService extends Component
     protected function onBeforeClear(array $config)
     {
         $event = new RefreshCacheEvent($config);
-
-        if ($this->hasEventHandlers(self::EVENT_BEFORE_CLEAR_CACHE)) {
-            $this->trigger(self::EVENT_BEFORE_CLEAR_CACHE, $event);
-        }
+        $this->trigger(self::EVENT_BEFORE_CLEAR_CACHE, $event);
 
         return $event;
     }

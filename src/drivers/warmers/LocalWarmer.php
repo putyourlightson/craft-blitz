@@ -58,16 +58,6 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public function warmUris(array $siteUris, int $delay = null)
     {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-
-        if ($this->hasEventHandlers(self::EVENT_BEFORE_WARM_CACHE)) {
-            $this->trigger(self::EVENT_BEFORE_WARM_CACHE, $event);
-        }
-
-        if (!$event->isValid) {
-            return;
-        }
-
         $this->addDriverJob($event->siteUris, $delay);
     }
 
@@ -76,17 +66,22 @@ class LocalWarmer extends BaseCacheWarmer
      *
      * @param array $siteUris
      * @param callable $setProgressHandler
-     *
-     * @return int
      */
-    public function requestSiteUris(array $siteUris, callable $setProgressHandler): int
+    public function requestSiteUris(array $siteUris, callable $setProgressHandler)
     {
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_WARM_CACHE, $event);
+
+        if (!$event->isValid) {
+            return 0;
+        }
+
         $success = 0;
 
         $client = Craft::createGuzzleClient();
         $requests = [];
 
-        $urls = SiteUriHelper::getUrls($siteUris);
+        $urls = SiteUriHelper::getUrls($event->siteUris);
 
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http
@@ -105,13 +100,13 @@ class LocalWarmer extends BaseCacheWarmer
             'fulfilled' => function() use (&$success, &$count, $total, $label, $setProgressHandler) {
                 $success++;
                 $count++;
-                $label = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-                call_user_func($setProgressHandler, $count / $total, $label);
+                $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                call_user_func($setProgressHandler, $count / $total, $progressLabel);
             },
             'rejected' => function($reason) use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
-                $label = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-                call_user_func($setProgressHandler, $count / $total, $label);
+                $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                call_user_func($setProgressHandler, $count / $total, $progressLabel);
 
                 if ($reason instanceof RequestException) {
                     /** RequestException $reason */
@@ -128,16 +123,12 @@ class LocalWarmer extends BaseCacheWarmer
         $pool->promise()->wait();
 
         // Fire an 'afterWarmCache' event
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-
         if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_CACHE)) {
             $this->trigger(self::EVENT_AFTER_WARM_CACHE, $event);
         }
 
         // Deploy the site URIs
         Blitz::$plugin->deployer->deployUris($event->siteUris);
-
-        return $success;
     }
 
     /**
