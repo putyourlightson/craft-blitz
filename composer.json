@@ -3,7 +3,7 @@
     "description": "Intelligent static page caching for creating lightning-fast sites.",
     "version": "3.0.0",
     "type": "craft-plugin",
-    "homepage": "https://putyourlightson.com/craft-plugins/blitz",
+    "homepage": "https://putyourlightson.com/plugins/blitz",
     "license": "proprietary",
     "keywords": [
         "craft",

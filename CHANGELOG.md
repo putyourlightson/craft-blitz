@@ -1,5 +1,6 @@
 # Release Notes for Blitz
 
+<<<<<<< HEAD
 ## 3.0.0 - Unreleased
 ### Added
 - Added replaceable cache warmers (Local warmer).
@@ -8,6 +9,8 @@
 ### Changed
 - Changed `cachePurgerType`, `cachePurgerSettings` and `cachePurgerTypes` config settings to `purgerType`, `purgerSettings` and `purgerTypes` respectively.
 
+=======
+>>>>>>> develop
 ## 2.3.0 - 2019-10-05
 ### Added
 - Added the ability to dynamically get and inject templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).
@@ -85,7 +88,7 @@
 - Fixed plugin integrations to only be loaded if the required plugin version is met.
 
 ## 2.1.0 - 2019-07-10
-> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
+> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/plugins/blitz#server-rewrites) for details.
 
 ### Added
 - Added compatibility for drafts and revisions in Craft 3.2.0.
