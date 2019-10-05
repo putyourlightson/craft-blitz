@@ -9,9 +9,7 @@ use Craft;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\models\SiteUriModel;
 use yii\log\Logger;
 
 /**
@@ -83,20 +81,12 @@ class CloudflarePurger extends BasePurger
     /**
      * @inheritdoc
      */
-    public function purge(SiteUriModel $siteUri)
-    {
-        $this->_sendRequest('delete', 'purge_cache', $siteUri->siteId, [
-            'files' => [$siteUri->getUrl()]
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function purgeUris(array $siteUris)
     {
-        if (count($siteUris)) {
-            $this->_sendRequest('delete', 'purge_cache', $siteUris[0]->siteId, [
+        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
+
+        foreach ($groupedSiteUris as $siteId => $siteUris) {
+            $this->_sendRequest('delete', 'purge_cache', $siteId, [
                 'files' => SiteUriHelper::getUrls($siteUris)
             ]);
         }

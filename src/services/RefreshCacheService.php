@@ -155,7 +155,7 @@ class RefreshCacheService extends Component
             if (Blitz::$plugin->settings->cachingEnabled
                 && Blitz::$plugin->settings->warmCacheAutomatically
                 && Blitz::$plugin->settings->warmCacheAutomaticallyForGlobals) {
-                Blitz::$plugin->warmCache->warmAll();
+                Blitz::$plugin->cacheWarmer->warmAll();
             }
 
             return;
@@ -332,7 +332,7 @@ class RefreshCacheService extends Component
 
         // Warm the cache if enabled providing the purger's warm cache delay setting
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->warmCache->warmUris($siteUris, Blitz::$plugin->purger->warmCacheDelay);
+            Blitz::$plugin->cacheWarmer->warmSiteUris($siteUris, Blitz::$plugin->purger->warmCacheDelay);
         }
 
         // Fire an 'afterRefreshCache' event
@@ -357,7 +357,7 @@ class RefreshCacheService extends Component
 
         // Warm the cache if enabled
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->warmCache->warmUris($siteUris, Blitz::$plugin->purger->warmCacheDelay);
+            Blitz::$plugin->cacheWarmer->warmSiteUris($siteUris, Blitz::$plugin->purger->warmCacheDelay);
         }
     }
 

@@ -160,7 +160,7 @@ class SiteUriHelper
     /**
      * Returns URLs of given site URIs.
      *
-     * @param SiteUriModel[] $siteUris
+     * @param array $siteUris
      *
      * @return string[]
      */
@@ -169,6 +169,11 @@ class SiteUriHelper
         $urls = [];
 
         foreach ($siteUris as $siteUri) {
+            // Convert to a SiteUriModel if it is an array
+            if (is_array($siteUri)) {
+                $siteUri = new SiteUriModel($siteUri);
+            }
+
             $url = $siteUri->getUrl();
 
             if (!in_array($url, $urls)) {
@@ -177,5 +182,23 @@ class SiteUriHelper
         }
 
         return $urls;
+    }
+
+    /**
+     * Returns site URIs grouped by site.
+     *
+     * @param SiteUriModel[] $siteUris
+     *
+     * @return array
+     */
+    public static function getSiteUrisGroupedBySite(array $siteUris): array
+    {
+        $groupedSiteUris = [];
+
+        foreach ($siteUris as $siteUri) {
+            $groupedSiteUris[$siteUri->siteId][] = $siteUri;
+        }
+
+        return $groupedSiteUris;
     }
 }

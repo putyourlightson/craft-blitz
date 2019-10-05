@@ -10,9 +10,8 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\jobs\WarmCacheJob;
-use putyourlightson\blitz\models\SiteUriModel;
 use yii\log\Logger;
 
 /**
@@ -27,11 +26,6 @@ class LocalWarmer extends BaseCacheWarmer
      * @var int
      */
     public $concurrency = 3;
-
-    /**
-     * @var string[]
-     */
-    public $customUrls = [];
 
     // Static
     // =========================================================================
@@ -61,44 +55,27 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warm(SiteUriModel $siteUri, int $delay = null)
+    public function warmSiteUris(array $siteUris, int $delay = null)
     {
-        $this->addWarmCacheJob([$siteUri], $delay);
+        $this->addDriverJob($siteUris, $delay);
     }
 
     /**
-     * @inheritdoc
+     * Requests the provided URLs.
+     *
+     * @param array $siteUris
+     * @param callable $setProgressHandler
+     *
+     * @return int
      */
-    public function warmUris(array $siteUris, int $delay = null)
-    {
-        $this->addWarmCacheJob($siteUris, $delay);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function warmAll()
-    {
-        $urls = array_unique(array_merge(
-            SiteUriHelper::getAllSiteUris(true),
-            $this->customUrls
-        ), SORT_REGULAR);
-
-        $this->warmUris($urls);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function requestUrls(array $urls, callable $setProgressHandler): int
+    public function requestSiteUris(array $siteUris, callable $setProgressHandler): int
     {
         $success = 0;
 
         $client = Craft::createGuzzleClient();
         $requests = [];
 
-        // Ensure URLs are unique
-        $urls = array_unique($urls);
+        $urls = SiteUriHelper::getUrls($siteUris);
 
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http
@@ -153,18 +130,19 @@ class LocalWarmer extends BaseCacheWarmer
     // =========================================================================
 
     /**
-     * Adds a warm cache job to the queue.
+     * Adds a driver job to the queue.
      *
+     * @param array $siteUris
+     * @param null $delay
      */
-    protected function addWarmCacheJob(array $siteUris, int $delay = null)
+    protected function addDriverJob(array $siteUris, $delay = null)
     {
-        // Add job to queue with a priority and delay if provided
-        Craft::$app->getQueue()
-            ->priority(Blitz::$plugin->settings->warmCacheJobPriority)
-            ->delay($delay)
-            ->push(new WarmCacheJob([
-                'urls' => SiteUriHelper::getUrls($siteUris),
-                'requestUrls' => [$this, 'requestUrls'],
-            ]));
+        // Add job to queue with a priority and delay
+        CacheWarmerHelper::addDriverJob(
+            $siteUris,
+            [$this, 'requestSiteUris'],
+            Blitz::$plugin->settings->warmCacheJobPriority,
+            $delay
+        );
     }
 }

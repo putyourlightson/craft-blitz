@@ -10,17 +10,27 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 
 abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerInterface
 {
+    // Traits
+    // =========================================================================
+
+    use CacheWarmerTrait;
+
     // Public Methods
     // =========================================================================
 
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, int $delay = null)
+    public function warmSite(int $siteId)
     {
-        foreach ($siteUris as $siteUri) {
-            $this->warm($siteUri, $delay);
-        }
+        // Get custom site URIs for the provided site only
+        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($this->customSiteUris);
+        $customSiteUris = $groupedSiteUris[$siteId] ?? [];
+
+        $this->warmSiteUris(array_merge(
+            SiteUriHelper::getSiteSiteUris($siteId),
+            $customSiteUris
+        ));
     }
 
     /**
@@ -28,6 +38,9 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      */
     public function warmAll()
     {
-        $this->warmUris(SiteUriHelper::getAllSiteUris(true));
+        $this->warmSiteUris(array_merge(
+            SiteUriHelper::getAllSiteUris(true),
+            $this->customSiteUris
+        ));
     }
 }

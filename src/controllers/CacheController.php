@@ -111,7 +111,7 @@ class CacheController extends Controller
             return $this->_getResponse('Blitz caching is disabled.', false);
         }
 
-        Blitz::$plugin->warmCache->warmAll();
+        Blitz::$plugin->cacheWarmer->warmAll();
 
         return $this->_getResponse('Blitz cache successfully queued for warming.');
     }

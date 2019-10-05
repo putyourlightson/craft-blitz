@@ -9,6 +9,7 @@ use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\drivers\warmers\LocalWarmer;
+use putyourlightson\blitz\jobs\DriverJob;
 use yii\base\Event;
 
 class CacheWarmerHelper extends BaseDriverHelper

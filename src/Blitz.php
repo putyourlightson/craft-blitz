@@ -45,7 +45,6 @@ use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
 use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\OutputCacheService;
-use putyourlightson\blitz\services\WarmCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
@@ -59,7 +58,6 @@ use yii\base\Event;
  * @property GenerateCacheService $generateCache
  * @property OutputCacheService $outputCache
  * @property RefreshCacheService $refreshCache
- * @property WarmCacheService $warmCache
  * @property BaseCacheStorage $cacheStorage
  * @property BaseCacheWarmer $cacheWarmer
  * @property BasePurger $purger
@@ -162,7 +160,6 @@ class Blitz extends Plugin
             'generateCache' => GenerateCacheService::class,
             'outputCache' => OutputCacheService::class,
             'refreshCache' => RefreshCacheService::class,
-            'warmCache' => WarmCacheService::class,
             'cacheStorage' => array_merge(
                 ['class' => $this->settings->cacheStorageType],
                 $this->settings->cacheStorageSettings

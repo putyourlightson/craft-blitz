@@ -22,13 +22,6 @@ interface PurgerInterface extends SavableComponentInterface
     // =========================================================================
 
     /**
-     * Purges the cache given a site URI.
-     *
-     * @param SiteUriModel $siteUri
-     */
-    public function purge(SiteUriModel $siteUri);
-
-    /**
      * Purges the cache given an array of site URIs.
      *
      * @param SiteUriModel[] $siteUris

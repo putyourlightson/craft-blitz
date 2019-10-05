@@ -12,7 +12,7 @@ use putyourlightson\blitz\drivers\deployers\GitDeployer;
 use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
-use putyourlightson\blitz\drivers\purgers\DummyDeployer;
+use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\warmers\LocalWarmer;

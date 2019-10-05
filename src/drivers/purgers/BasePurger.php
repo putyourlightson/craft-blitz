@@ -32,13 +32,6 @@ abstract class BasePurger extends SavableComponent implements PurgerInterface
     /**
      * @inheritdoc
      */
-    public function purge(SiteUriModel $siteUri)
-    {
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function purgeUris(array $siteUris)
     {
     }
