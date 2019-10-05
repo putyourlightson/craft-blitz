@@ -33,4 +33,14 @@ interface CacheWarmerInterface extends SavableComponentInterface
      * Warms the entire cache.
      */
     public function warmAll();
+
+    /**
+     * Callable method that requests the provided site URIs.
+     *
+     * @param array $siteUris
+     * @param callable $setProgressHandler
+     *
+     * @return int
+     */
+    public function callable(array $siteUris, callable $setProgressHandler): int;
 }

@@ -49,11 +49,14 @@ class DriverJob extends BaseJob
     /**
      * Sets the progress for the requests.
      *
-     * @param float $progress
+     * @param int $count
+     * @param int $total
      * @param string|null $label
      */
-    public function setRequestProgress(float $progress, string $label = null)
+    public function setRequestProgress(int $count, int $total, string $label = null)
     {
+        $progress = $total > 0 ? ($count / $total) : 0;
+
         $this->setProgress($this->_queue, $progress, $label);
     }
 }

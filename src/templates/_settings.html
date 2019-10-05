@@ -122,7 +122,7 @@
 
     <div id="storage" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about storage types and how to add other storage types in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-storage'})|raw }}</span>
+            <span class="info">{{ 'Read more about storage types and how to add more storage types in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-storage'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Storage"|t('blitz'),
@@ -147,7 +147,7 @@
 
     <div id="warming" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about cache warmers and how to add other warmers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-warmers'})|raw }}</span>
+            <span class="info">{{ 'Read more about cache warmers and how to add more warmers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-warmers'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Warming"|t('blitz'),
@@ -202,7 +202,7 @@
 
     <div id="purging" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about reverse proxy purgers and how to add other purgers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'reverse-proxy-purger'})|raw }}</span>
+            <span class="info">{{ 'Read more about reverse proxy purgers and how to add more purgers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'reverse-proxy-purger'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Reverse Proxy Purging"|t('blitz'),
@@ -227,7 +227,7 @@
 
     <div id="deployment" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about remote deployment and how to add other deployers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'deployers'})|raw }}</span>
+            <span class="info">{{ 'Read more about remote deployment and how to add more deployers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'deployers'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Remote Deployment"|t('blitz'),

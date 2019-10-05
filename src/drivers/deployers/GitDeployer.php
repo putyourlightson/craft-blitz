@@ -62,6 +62,12 @@ class GitDeployer extends BaseDeployer
      */
     public function deployUris(array $siteUris, int $delay = null)
     {
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $this->commitPushSiteUris($siteUris);
+
+            return;
+        }
+
         $this->addDriverJob($siteUris, $delay);
     }
 
@@ -74,40 +80,41 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
-     * Commit and push the provided site URIs.
-     *
-     * @param array $siteUris
-     * @param callable $setProgressHandler
+     * @inheritdoc
      */
-    public function commitPushSiteUris(array $siteUris, callable $setProgressHandler)
+    public function callable(array $siteUris, callable $setProgressHandler): int
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_DEPLOY, $event);
 
         if (!$event->isValid) {
-            return;
+            return 0;
         }
 
+        $success = 0;
         $count = 0;
         $total = count($event->siteUris);
         $label = 'Deploying {count} of {total} pages.';
 
         $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-        call_user_func($setProgressHandler, $count / $total, $progressLabel);
+        call_user_func($setProgressHandler, $count, $total, $progressLabel);
 
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($event->siteUris);
 
         foreach ($groupedSiteUris as $siteId => $siteUris) {
-            $count +=$this->deploySiteUris($siteId, $siteUris);
+            $count += count($siteUris);
+            $success += $this->deploySiteUris($siteId, $siteUris);
 
             $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-            call_user_func($setProgressHandler, $count / $total, $progressLabel);
+            call_user_func($setProgressHandler, $count, $total, $progressLabel);
         }
 
         // Fire an 'afterDeploy' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY)) {
             $this->trigger(self::EVENT_AFTER_DEPLOY, $event);
         }
+
+        return $success;
     }
 
     /**
@@ -134,7 +141,7 @@ class GitDeployer extends BaseDeployer
         // Add job to queue with a priority and delay
         DeployerHelper::addDriverJob(
             $siteUris,
-            [$this, 'commitPushSiteUris'],
+            [$this, 'callable'],
             Craft::t('blitz', 'Deploying cached files'),
             $delay
         );

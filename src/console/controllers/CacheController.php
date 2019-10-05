@@ -136,6 +136,24 @@ class CacheController extends Controller
     }
 
     /**
+     * Deploys everything.
+     *
+     * @return int
+     */
+    public function actionDeploy(): int
+    {
+        if (!Blitz::$plugin->settings->cachingEnabled) {
+            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        $this->_deploy(SiteUriHelper::getAllSiteUris());
+
+        return ExitCode::OK;
+    }
+
+    /**
      * Refreshes the entire cache.
      *
      * @return int
@@ -159,6 +177,7 @@ class CacheController extends Controller
             }
 
             $this->_warmCache($siteUris);
+            $this->_deploy($siteUris);
         }
 
         return ExitCode::OK;
@@ -262,19 +281,28 @@ class CacheController extends Controller
     {
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, Console::FG_YELLOW);
 
-        $urls = SiteUriHelper::getUrls($siteUris);
+        Console::startProgress(0, count($siteUris), '', 0.8);
 
-        Console::startProgress(0, count($urls), '', 0.8);
-
-        $success = Blitz::$plugin->warmCache->requestUrls($urls, [$this, 'setRequestProgress']);
+        $success = Blitz::$plugin->cacheWarmer->callable($siteUris, [$this, 'setRequestProgress']);
 
         Console::endProgress();
 
         $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} pages.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+    }
 
-        // Check if there are any URLs beginning with `@web`
-        if (!empty(preg_grep('/@web/i', $urls))) {
-            $this->stderr(Craft::t('blitz', 'One or more sites use `@web` in their base URL which cannot be parsed by console commands.').PHP_EOL, Console::FG_RED);
-        }
+    /**
+     * @param SiteUriModel[] $siteUris
+     */
+    private function _deploy(array $siteUris)
+    {
+        $this->stdout(Craft::t('blitz', 'Deploying cached pages...').PHP_EOL, Console::FG_YELLOW);
+
+        Console::startProgress(0, count($siteUris), '', 0.8);
+
+        $success = Blitz::$plugin->deployer->callable($siteUris, [$this, 'setRequestProgress']);
+
+        Console::endProgress();
+
+        $this->stdout(Craft::t('blitz', 'Blitz successfully deployed {success} pages.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
     }
 }

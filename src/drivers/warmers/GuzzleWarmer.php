@@ -40,6 +40,7 @@ class GuzzleWarmer extends BaseCacheWarmer
 
     // Public Methods
     // =========================================================================
+
     /**
      * @inheritdoc
      */
@@ -49,18 +50,15 @@ class GuzzleWarmer extends BaseCacheWarmer
     }
 
     /**
-     * Requests the provided site URIs.
-     *
-     * @param array $siteUris
-     * @param callable $setProgressHandler
+     * @inheritdoc
      */
-    public function requestSiteUris(array $siteUris, callable $setProgressHandler)
+    public function callable(array $siteUris, callable $setProgressHandler): int
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_WARM_CACHE, $event);
 
         if (!$event->isValid) {
-            return;
+            return 0;
         }
 
         $success = 0;
@@ -88,12 +86,12 @@ class GuzzleWarmer extends BaseCacheWarmer
                 $success++;
                 $count++;
                 $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-                call_user_func($setProgressHandler, $count / $total, $progressLabel);
+                call_user_func($setProgressHandler, $count, $total, $progressLabel);
             },
             'rejected' => function($reason) use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
                 $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-                call_user_func($setProgressHandler, $count / $total, $progressLabel);
+                call_user_func($setProgressHandler, $count, $total, $progressLabel);
 
                 if ($reason instanceof RequestException) {
                     /** RequestException $reason */
@@ -113,6 +111,8 @@ class GuzzleWarmer extends BaseCacheWarmer
         if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_CACHE)) {
             $this->trigger(self::EVENT_AFTER_WARM_CACHE, $event);
         }
+
+        return $success;
     }
 
     /**
@@ -150,7 +150,7 @@ class GuzzleWarmer extends BaseCacheWarmer
         // Add job to queue with a priority and delay
         CacheWarmerHelper::addDriverJob(
             $siteUris,
-            [$this, 'requestSiteUris'],
+            [$this, 'callable'],
             Craft::t('blitz', 'Warming Blitz cache'),
             $delay
         );

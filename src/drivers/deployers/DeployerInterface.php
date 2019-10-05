@@ -31,4 +31,14 @@ interface DeployerInterface extends SavableComponentInterface
      * Deploys the entire cache.
      */
     public function deployAll();
+
+    /**
+     * Callable method that copies, commits and pushes the provided site URIs.
+     *
+     * @param array $siteUris
+     * @param callable $setProgressHandler
+     *
+     * @return int
+     */
+    public function callable(array $siteUris, callable $setProgressHandler): int;
 }
