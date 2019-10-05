@@ -4,6 +4,12 @@
 ### Added
 - Added replaceable cache warmers (Local warmer).
 - Added replaceable deployers (Git deployer).
+
+### Changed
+- Changed `cachePurgerType`, `cachePurgerSettings` and `cachePurgerTypes` config settings to `purgerType`, `purgerSettings` and `purgerTypes` respectively.
+
+## 2.3.0 - 2019-10-05
+### Added
 - Added the ability to dynamically get and inject templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).
 - Added unique zone IDs for each site to the Cloudflare reverse proxy purger settings.
 - Added warm cache delay setting to the Cloudflare reverse proxy purger settings.
@@ -12,7 +18,6 @@
 
 ### Changed
 - Cached pages that Blitz knows about are now cleared earlier in the refresh cache job process.
-- Changed `cachePurgerType`, `cachePurgerSettings` and `cachePurgerTypes` config settings to `purgerType`, `purgerSettings` and `purgerTypes` respectively.
 
 ### Fixed
 - Fixed warming of cache URLs that should be excluded from caching ([#130](https://github.com/putyourlightson/craft-blitz/issues/130)).
