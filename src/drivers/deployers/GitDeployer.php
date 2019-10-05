@@ -9,11 +9,14 @@ use Craft;
 use craft\db\Table;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
+use GitElephant\Repository;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use TQ\Git\Repository\Repository;
+use Symfony\Component\Process\Exception\LogicException;
+use Symfony\Component\Process\Exception\RuntimeException as RuntimeExceptionAlias;
+use Symfony\Component\Process\Process;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
 use yii\log\Logger;
@@ -171,12 +174,13 @@ class GitDeployer extends BaseDeployer
         }
 
         // Commit and push repository
-        //$git = new Reposito($repositoryPath);
+        $cwd = realpath(CRAFT_BASE_PATH);
 
-        if ($git->isDirty()) {
-            $commitMessage = $this->gitSettings[$siteUid]['repositoryPath'] ?? '';
-            $git->commit($commitMessage);
-        }
+        $process = new Process(['git commit', '-a', '', $cwd]);
+        $process->run();
+
+        $process = new Process(['git push origin master', '', '', $cwd]);
+        $process->run();
 
         return $success;
     }

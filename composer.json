@@ -17,7 +17,7 @@
     ],
     "require": {
         "craftcms/cms": "^3.2.1",
-        "matteosister/GitElephant": "^4.0.1",
+        "symfony/process": ">=3.3",
         "ext-json": "*"
     },
     "autoload": {
