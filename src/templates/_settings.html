@@ -20,9 +20,9 @@
 {% set tabs = {
     general: {label: 'General Settings'|t('blitz'), url: '#general'},
     storage: {label: 'Cache Storage'|t('blitz'), url: '#storage'},
-    warmer: {label: 'Cache Warmer'|t('blitz'), url: '#warmer'},
-    purger: {label: 'Reverse Proxy Purger'|t('blitz'), url: '#purger'},
-    deployer: {label: 'Remote Deployer'|t('blitz'), url: '#deployer'},
+    warming: {label: 'Cache Warming'|t('blitz'), url: '#warming'},
+    purging: {label: 'Reverse Proxy Purging'|t('blitz'), url: '#purging'},
+    deployment: {label: 'Remote Deployment'|t('blitz'), url: '#deployment'},
     advanced: {label: 'Advanced Settings'|t('blitz'), url: '#advanced'},
 } %}
 
@@ -141,12 +141,12 @@
         {% endfor %}
     </div>
 
-    <div id="warmer" class="hidden">
+    <div id="warming" class="hidden">
         {% set info %}
             <span class="info">{{ 'Read more about cache warmers and how to add other warmers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-warmers'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
-            label: "Cache Warmer"|t('blitz'),
+            label: "Cache Warming"|t('blitz'),
             instructions: "The warmer type to use for warming the cache."|t('blitz') ~ info,
             warning: (config.cacheWarmerType is defined ? configWarning('cacheWarmerType')),
             name: 'settings[cacheWarmerType]',
@@ -166,12 +166,12 @@
         {% endfor %}
     </div>
 
-    <div id="purger" class="hidden">
+    <div id="purging" class="hidden">
         {% set info %}
             <span class="info">{{ 'Read more about reverse proxy purgers and how to add other purgers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'reverse-proxy-purger'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
-            label: "Reverse Proxy Purger"|t('blitz'),
+            label: "Reverse Proxy Purging"|t('blitz'),
             instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz') ~ info,
             warning: (config.purgerType is defined ? configWarning('purgerType')),
             name: 'settings[purgerType]',
@@ -191,12 +191,12 @@
         {% endfor %}
     </div>
 
-    <div id="deployer" class="hidden">
+    <div id="deployment" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about remote deployers and how to add other deployers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'deployers'})|raw }}</span>
+            <span class="info">{{ 'Read more about remote deployment and how to add other deployers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'deployers'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
-            label: "Remote Deployer"|t('blitz'),
+            label: "Remote Deployment"|t('blitz'),
             instructions: "A deployer to use for remotely deploying cached files."|t('blitz') ~ info,
             warning: (config.deployerType is defined ? configWarning('deployerType')),
             name: 'settings[deployerType]',
