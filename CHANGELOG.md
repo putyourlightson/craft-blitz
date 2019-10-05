@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 2.3.0 - Unreleased
+## 2.3.0 - 2019-10-05
 ### Added
 - Added the ability to dynamically get and inject templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).
 - Added unique zone IDs for each site to the Cloudflare reverse proxy purger settings.
@@ -13,6 +13,7 @@
 
 ### Fixed
 - Fixed warming of cache URLs that should be excluded from caching ([#130](https://github.com/putyourlightson/craft-blitz/issues/130)).
+- Fixed links to the documentation in the plugin settings.
 
 ## 2.2.3 - 2019-09-15
 ### Changed
@@ -76,7 +77,7 @@
 - Fixed plugin integrations to only be loaded if the required plugin version is met.
 
 ## 2.1.0 - 2019-07-10
-> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/craft-plugins/blitz/docs#/?id=server-rewrites) for details.
+> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/plugins/blitz#server-rewrites) for details.
 
 ### Added
 - Added compatibility for drafts and revisions in Craft 3.2.0.
