@@ -16,10 +16,10 @@ modules:
             entryScript: 'index.php'
             projectConfig: {}
             migrations: []
-#            plugins:
-#                blitz:
-#                    class: '\putyourlightson\blitz\Blitz'
-#                    handle: blitz
+            plugins:
+                blitz:
+                    class: '\putyourlightson\blitz\Blitz'
+                    handle: blitz
             cleanup: true
             transaction: true
-#            dbSetup: {clean: true, setupCraft: true}
+            dbSetup: {clean: true, setupCraft: true}
