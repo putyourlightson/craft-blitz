@@ -215,7 +215,7 @@
         {% for driver in purgerDrivers %}
             {% set isCurrent = (className(driver) == className(purgerDriver)) %}
             <div id="{{ className(driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
-                {% namespace 'purgerSettings[' ~ className(driver) ~ ']' %}
+                {% namespace 'cachePurgerSettings[' ~ className(driver) ~ ']' %}
                     {{ (isCurrent ? purgerDriver : driver).getSettingsHtml()|raw }}
                 {% endnamespace %}
             </div>
