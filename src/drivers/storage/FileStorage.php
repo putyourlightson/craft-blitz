@@ -34,7 +34,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @var string
      */
-    public $folderPath = 'cache/blitz';
+    public $folderPath = '@webroot/cache/blitz';
 
     /**
      * @var string|null
@@ -58,7 +58,7 @@ class FileStorage extends BaseCacheStorage
 
         if (!empty($this->folderPath)) {
             $this->_cacheFolderPath = FileHelper::normalizePath(
-                Craft::getAlias('@webroot').'/'.Craft::parseEnv($this->folderPath)
+                Craft::parseEnv($this->folderPath)
             );
         }
     }

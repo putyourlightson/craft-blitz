@@ -26,6 +26,10 @@ class m191001_120000_change_settings extends Migration
         $info = Craft::$app->getPlugins()->getStoredPluginInfo('blitz');
         $settings = $info ? $info['settings'] : [];
 
+        if ($settings['cacheStorageType'] == 'putyourlightson\blitz\drivers\storage\FileStorage') {
+            $settings['cacheStorageSettings']['folderPath'] = '@webroot/'.trim($settings['cacheStorageSettings']['folderPath'], '/');
+        }
+
         $includedUriPatterns = [];
         if (is_array($settings['includedUriPatterns'])) {
             foreach ($settings['includedUriPatterns'] as $includedUriPattern) {

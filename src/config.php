@@ -31,7 +31,7 @@ return [
     //'cacheStorageType' => 'putyourlightson\blitz\drivers\storage\FileStorage',
 
     // The storage settings.
-    //'cacheStorageSettings' => ['folderPath' => 'cache/blitz'],
+    //'cacheStorageSettings' => ['folderPath' => '@webroot/cache/blitz'],
 
     // The storage type classes to add to the plugin’s default storage types.
     //'cacheStorageTypes' => [],

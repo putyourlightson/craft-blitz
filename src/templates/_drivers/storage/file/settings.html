@@ -1,15 +1,18 @@
 {% import "_includes/forms" as forms %}
 
 
+{% set info %}
+    <span class="info">{{ "The path should be in the site’s public webroot if the cached files should be publicly available."|t('blitz') }}</span>
+{% endset %}
 {{ forms.autosuggestField({
     label: "Folder Path"|t('blitz'),
-    instructions: "The relative path to your cache folder from your public webroot."|t('blitz'),
+    instructions: "The path to your cache folder."|t('blitz') ~ info,
     suggestEnvVars: true,
-    suggestions: craft.cp.getEnvSuggestions(),
+    suggestAliases: true,
     name: 'folderPath',
     value: driver.folderPath,
     errors: driver.getErrors('folderPath'),
-    placeholder: 'cache/blitz',
+    placeholder: '@webroot/cache/blitz',
     required: true,
 }) }}
 
