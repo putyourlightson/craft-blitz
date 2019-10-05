@@ -21,6 +21,13 @@ interface DeployerInterface extends SavableComponentInterface
     public function deployUris(array $siteUris);
 
     /**
+     * Deploys the cache for a given site ID.
+     *
+     * @param int $siteId
+     */
+    public function deploySite(int $siteId);
+
+    /**
      * Deploys the entire cache.
      */
     public function deployAll();

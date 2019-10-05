@@ -8,7 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
-use putyourlightson\blitz\drivers\purgers\DummyCachePurger;
+use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use yii\base\Event;
 
 class CachePurgerHelper extends BaseDriverHelper
@@ -32,7 +32,7 @@ class CachePurgerHelper extends BaseDriverHelper
     public static function getAllTypes(): array
     {
         $purgerTypes = [
-            DummyCachePurger::class,
+            DummyPurger::class,
         ];
 
         $purgerTypes = array_unique(array_merge(

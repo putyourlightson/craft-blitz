@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\drivers\deployers;
 
 use Craft;
 use putyourlightson\blitz\helpers\DeployerHelper;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 
 /**
  * @property mixed $settingsHtml
@@ -38,9 +39,17 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deploySiteUris(array $siteUris, int $delay = null)
+    public function deployUris(array $siteUris, int $delay = null)
     {
         $this->addDriverJob($siteUris, $delay);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deploySite(int $siteId)
+    {
+        $this->deployUris(SiteUriHelper::getSiteSiteUris($siteId));
     }
 
     /**
@@ -83,7 +92,7 @@ class GitDeployer extends BaseDeployer
         DeployerHelper::addDriverJob(
             $siteUris,
             [$this, 'commitPushSiteUris'],
-            Craft::t('blitz', 'Deploying Blitz cache'),
+            Craft::t('blitz', 'Deploying cached files'),
             $delay
         );
     }

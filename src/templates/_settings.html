@@ -206,7 +206,7 @@
             instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz') ~ info,
             warning: (config.cachePurgerType is defined ? configWarning('cachePurgerType')),
             name: 'settings[cachePurgerType]',
-            options: cachePurgerTypeOptions,
+            options: purgerTypeOptions,
             value: className(purgerDriver),
             required: true,
             toggle: true,

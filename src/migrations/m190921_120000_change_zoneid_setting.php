@@ -5,7 +5,7 @@ namespace putyourlightson\blitz\migrations;
 use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\purgers\CloudflareCachePurger;
+use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 
 class m190921_120000_change_zoneid_setting extends Migration
 {
@@ -26,7 +26,7 @@ class m190921_120000_change_zoneid_setting extends Migration
 
         $settings = Blitz::$plugin->settings;
 
-        if ($settings->cachePurgerType == CloudflareCachePurger::class) {
+        if ($settings->cachePurgerType == CloudflarePurger::class) {
             $primarySite = Craft::$app->getSites()->getPrimarySite();
 
             if (isset($settings->cachePurgerSettings['zoneId'])) {

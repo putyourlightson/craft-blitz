@@ -11,10 +11,10 @@ use craft\behaviors\EnvAttributeParserBehavior;
 use putyourlightson\blitz\drivers\deployers\GitDeployer;
 use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
-use putyourlightson\blitz\drivers\purgers\CloudflareCachePurger;
+use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
-use putyourlightson\blitz\drivers\purgers\DummyCachePurger;
+use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\warmers\LocalWarmer;
 
 class SettingsModel extends Model
@@ -75,7 +75,7 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $cachePurgerType = DummyCachePurger::class;
+    public $cachePurgerType = DummyPurger::class;
 
     /**
      * @var array
@@ -86,7 +86,7 @@ class SettingsModel extends Model
      * @var string[]
      */
     public $cachePurgerTypes = [
-        CloudflareCachePurger::class,
+        CloudflarePurger::class,
     ];
 
     /**

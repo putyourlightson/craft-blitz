@@ -95,9 +95,9 @@ class SettingsController extends Controller
             'warmerDriver' => $warmerDriver,
             'warmerDrivers' => $warmerDrivers,
             'warmerTypeOptions' => array_map([$this, '_getSelectOption'], $warmerDrivers),
-            'cachePurgerDriver' => $purgerDriver,
-            'cachePurgerDrivers' => $purgerDrivers,
-            'cachePurgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgerDrivers),
+            'purgerDriver' => $purgerDriver,
+            'purgerDrivers' => $purgerDrivers,
+            'purgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgerDrivers),
             'deployerDriver' => $deployerDriver,
             'deployerDrivers' => $deployerDrivers,
             'deployerTypeOptions' => array_map([$this, '_getSelectOption'], $deployerDrivers),
@@ -120,7 +120,7 @@ class SettingsController extends Controller
         $postedSettings = $request->getBodyParam('settings', []);
         $storageSettings = $request->getBodyParam('cacheStorageSettings', []);
         $warmerSettings = $request->getBodyParam('cacheWarmerSettings', []);
-        $purgerSettings = $request->getBodyParam('purgerSettings', []);
+        $purgerSettings = $request->getBodyParam('cachePurgerSettings', []);
         $deployerSettings = $request->getBodyParam('deployerSettings', []);
 
         $settings = Blitz::$plugin->settings;

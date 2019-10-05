@@ -15,7 +15,7 @@ use yii\log\Logger;
 /**
  * @property mixed $settingsHtml
  */
-class CloudflareCachePurger extends BaseCachePurger
+class CloudflarePurger extends BaseCachePurger
 {
     // Constants
     // =========================================================================
@@ -95,15 +95,11 @@ class CloudflareCachePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function purgeAll()
+    public function purgeSite(int $siteId)
     {
-        $sites = Craft::$app->getSites()->getAllSites();
-
-        foreach ($sites as $site) {
-            $this->_sendRequest('delete', 'purge_cache', $site->id, [
-                'purge_everything' => true
-            ]);
-        }
+        $this->_sendRequest('delete', 'purge_cache', $siteId, [
+            'purge_everything' => true
+        ]);
     }
 
     /**

@@ -8,7 +8,7 @@ namespace putyourlightson\blitz\drivers\purgers;
 use Craft;
 use putyourlightson\blitz\models\SiteUriModel;
 
-class DummyCachePurger extends BaseCachePurger
+class DummyPurger extends BaseCachePurger
 {
     // Static
     // =========================================================================
