@@ -4,9 +4,12 @@
 ### Added
 - Added replaceable cache warmers (Local warmer).
 - Added replaceable deployers (Git deployer).
+- Added the ability to specify custom site URIs to be warmed.
 
 ### Changed
 - Changed `cachePurgerType`, `cachePurgerSettings` and `cachePurgerTypes` config settings to `purgerType`, `purgerSettings` and `purgerTypes` respectively.
+- Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
+- Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
 
 ## 2.3.0 - 2019-10-05
 ### Added

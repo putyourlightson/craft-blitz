@@ -129,5 +129,8 @@ return [
     //'refreshCacheJobPriority' => 10,
 
     // The priority to give the warm cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
-    //'warmCacheJobPriority' => 100,
+    //'warmCacheJobPriority' => 101,
+
+    // The priority to give the deploy job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
+    //'deployJobPriority' => 102,
 ];

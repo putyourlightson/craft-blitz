@@ -9,7 +9,6 @@ use Craft;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use yii\log\Logger;
@@ -61,7 +60,7 @@ class LocalWarmer extends BaseCacheWarmer
     }
 
     /**
-     * Requests the provided URLs.
+     * Requests the provided site URIs.
      *
      * @param array $siteUris
      * @param callable $setProgressHandler
@@ -86,18 +85,21 @@ class LocalWarmer extends BaseCacheWarmer
 
         $count = 0;
         $total = count($urls);
+        $label = 'Warming {count} of {total} pages.';
 
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $requests, [
             'concurrency' => $this->concurrency,
-            'fulfilled' => function() use (&$success, &$count, $total, $setProgressHandler) {
+            'fulfilled' => function() use (&$success, &$count, $total, $label, $setProgressHandler) {
                 $success++;
                 $count++;
-                call_user_func($setProgressHandler, $count, $total);
+                $label = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                call_user_func($setProgressHandler, $count / $total, $label);
             },
-            'rejected' => function($reason) use (&$count, $total, $setProgressHandler) {
+            'rejected' => function($reason) use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
-                call_user_func($setProgressHandler, $count, $total);
+                $label = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                call_user_func($setProgressHandler, $count / $total, $label);
 
                 if ($reason instanceof RequestException) {
                     /** RequestException $reason */
@@ -141,7 +143,7 @@ class LocalWarmer extends BaseCacheWarmer
         CacheWarmerHelper::addDriverJob(
             $siteUris,
             [$this, 'requestSiteUris'],
-            Blitz::$plugin->settings->warmCacheJobPriority,
+            Craft::t('blitz', 'Warming Blitz cache'),
             $delay
         );
     }

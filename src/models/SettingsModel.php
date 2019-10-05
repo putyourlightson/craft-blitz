@@ -68,6 +68,11 @@ class SettingsModel extends Model
     public $cacheWarmerTypes = [];
 
     /**
+     * @var array
+     */
+    public $customSiteUris = [];
+
+    /**
      * @var string
      */
     public $purgerType = DummyPurger::class;
@@ -182,7 +187,7 @@ class SettingsModel extends Model
     /**
      * @var int|null
      */
-    public $warmCacheJobPriority = 100;
+    public $driverJobPriority = 100;
 
     // Public Methods
     // =========================================================================

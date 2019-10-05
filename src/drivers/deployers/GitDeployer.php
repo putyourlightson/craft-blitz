@@ -6,8 +6,7 @@
 namespace putyourlightson\blitz\drivers\deployers;
 
 use Craft;
-use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\jobs\DriverJob;
+use putyourlightson\blitz\helpers\DeployerHelper;
 
 /**
  * @property mixed $settingsHtml
@@ -39,22 +38,20 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deploy()
+    public function deploySiteUris(array $siteUris, int $delay = null)
     {
-        Blitz::$plugin->cacheStorage->get();
-
-
+        $this->addDriverJob($siteUris, $delay);
     }
 
     /**
-     * Deploy the provided URLs.
+     * Commit and push the provided site URIs.
      *
-     * @param string[] $urls
+     * @param array $siteUris
      * @param callable $setProgressHandler
      *
      * @return int
      */
-    public function deployUrls(array $urls, callable $setProgressHandler): int
+    public function commitPushSiteUris(array $siteUris, callable $setProgressHandler): int
     {
         $success = 0;
 
@@ -75,17 +72,19 @@ class GitDeployer extends BaseDeployer
     // =========================================================================
 
     /**
-     * Adds a job to the queue.
+     * Adds a driver job to the queue.
      *
+     * @param array $siteUris
+     * @param null $delay
      */
-    protected function addJob(array $siteUris)
+    protected function addDriverJob(array $siteUris, $delay = null)
     {
-        // Add job to queue with a priority and delay if provided
-        Craft::$app->getQueue()
-            ->priority(Blitz::$plugin->settings->warmCacheJobPriority)
-            ->push(new DriverJob([
-                'urls' => SiteUriHelper::getUrls($siteUris),
-                'deployUrls' => [$this, 'deployUrls'],
-            ]));
+        // Add job to queue with a priority and delay
+        DeployerHelper::addDriverJob(
+            $siteUris,
+            [$this, 'commitPushSiteUris'],
+            Craft::t('blitz', 'Deploying Blitz cache'),
+            $delay
+        );
     }
 }

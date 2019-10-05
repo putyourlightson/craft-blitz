@@ -6,7 +6,7 @@ use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\Blitz;
 
-class m191001_120000_changesettings extends Migration
+class m191001_120000_change_settings extends Migration
 {
     // Public Methods
     // =========================================================================
@@ -25,6 +25,28 @@ class m191001_120000_changesettings extends Migration
 
         $info = Craft::$app->getPlugins()->getStoredPluginInfo('blitz');
         $settings = $info ? $info['settings'] : [];
+
+        $includedUriPatterns = [];
+        if (is_array($settings['includedUriPatterns'])) {
+            foreach ($settings['includedUriPatterns'] as $includedUriPattern) {
+                $includedUriPatterns[] = [
+                    'siteId' => $includedUriPattern[1] ?? '',
+                    'uriPattern' => $includedUriPattern[0] ?? '',
+                ];
+            }
+        }
+        $settings['includedUriPatterns'] = $includedUriPatterns;
+
+        $excludedUriPatterns = [];
+        if (is_array($settings['excludedUriPatterns'])) {
+            foreach ($settings['excludedUriPatterns'] as $excludedUriPattern) {
+                $excludedUriPatterns[] = [
+                    'siteId' => $excludedUriPattern[1] ?? '',
+                    'uriPattern' => $excludedUriPattern[0] ?? '',
+                ];
+            }
+        }
+        $settings['excludedUriPatterns'] = $excludedUriPatterns;
 
         if (empty($settings['cacheWarmerSettings']) && !empty($settings['concurrency'])) {
             $settings['cacheWarmerSettings'] = ['concurrency' => $settings['concurrency']];

@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\drivers\warmers;
 
+use Craft;
 use craft\base\SavableComponent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
@@ -42,5 +43,24 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
             SiteUriHelper::getAllSiteUris(true),
             $this->customSiteUris
         ));
+    }
+
+    // Protected Methods
+    // =========================================================================
+
+    /**
+     * Gets site options.
+     *
+     * @return array
+     */
+    protected function getSiteOptions(): array
+    {
+        $siteOptions = [];
+
+        foreach (Craft::$app->getSites()->getAllSites() as $site) {
+            $siteOptions[$site->id] = $site->name;
+        }
+
+        return $siteOptions;
     }
 }

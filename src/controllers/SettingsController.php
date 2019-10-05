@@ -34,6 +34,13 @@ class SettingsController extends Controller
      */
     public function actionEdit()
     {
+        // Get site options
+        $siteOptions = [];
+
+        foreach (Craft::$app->getSites()->getAllSites() as $site) {
+            $siteOptions[$site->id] = $site->name;
+        }
+
         /** @var BaseCacheStorage $storageDriver */
         $storageDriver = BaseDriverHelper::createDriver(
             Blitz::$plugin->settings->cacheStorageType,
@@ -81,6 +88,7 @@ class SettingsController extends Controller
         return $this->renderTemplate('blitz/_settings', [
             'settings' => Blitz::$plugin->settings,
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
+            'siteOptions' => $siteOptions,
             'storageDriver' => $storageDriver,
             'storageDrivers' => $storageDrivers,
             'storageTypeOptions' => array_map([$this, '_getSelectOption'], $storageDrivers),

@@ -61,40 +61,41 @@
             required: true,
         }) }}
 
+        {% set cols = [] %}
+
+        {% if craft.app.getIsMultiSite() %}
+            {% set allSiteOptions = [{value: '', label: 'All Sites'|t('blitz')}]|merge(siteOptions) %}
+
+            {% set cols = cols|merge({
+                siteId: {
+                    type: 'select',
+                    heading: 'Site'|t('blitz'),
+                    options: allSiteOptions,
+                    thin: true,
+                }
+            }) %}
+        {% endif %}
+
         {% set info -%}
             {% include 'blitz/_includes/uri-pattern-info' with {docs: docs} %}
         {%- endset %}
-
-        {% set cols = [
-            {
+        {% set cols = cols|merge({
+            uriPattern: {
                 type: 'singleline',
                 heading: 'URI Pattern'|t('blitz'),
                 placeholder: "Leave blank to match the homepage"|t('blitz'),
                 code: true,
                 info: info,
             }
-        ] %}
-
-        {% if craft.app.getIsMultiSite() %}
-            {% set siteOptions = [{value: '', label: 'All Sites'|t('blitz')}] %}
-            {% for site in craft.app.sites.getAllSites() %}
-                {% set siteOptions = siteOptions|merge([{value: site.id, label: site.name}]) %}
-            {% endfor %}
-
-            {% set cols = cols|merge([
-                {
-                    type: 'select',
-                    heading: 'Site'|t('blitz'),
-                    info: 'The site that the URI pattern should be applied to.'|t('blitz'),
-                    options: siteOptions,
-                }
-            ]) %}
-        {% endif %}
+        }) %}
 
         <input type="hidden" name="includedUriPatterns" value="" />
+        {% set info %}
+            <span class="info">{{ 'Only URIs that match the specified URI patterns will be cached.'|t('blitz') }}</span>
+        {% endset %}
         {{ forms.editableTableField({
             label: "Included URI Patterns"|t('blitz'),
-            instructions: "The URI patterns to include in caching."|t('blitz'),
+            instructions: "The URI patterns to include in caching."|t('blitz') ~ info,
             warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
             name: 'settings[includedUriPatterns]',
             id: 'includedUriPatterns',
@@ -104,9 +105,12 @@
         }) }}
 
         <input type="hidden" name="excludedUriPatterns" value="" />
+        {% set info %}
+            <span class="info">{{ 'The URI patterns specified here will override any matching patterns to include.'|t('blitz') }}</span>
+        {% endset %}
         {{ forms.editableTableField({
             label: "Excluded URI Patterns"|t('blitz'),
-            instructions: "The URI patterns to exclude from caching (overrides any matching patterns to include)."|t('blitz'),
+            instructions: "The URI patterns to exclude from caching."|t('blitz') ~ info,
             warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
             name: 'settings[excludedUriPatterns]',
             id: 'excludedUriPatterns',
@@ -164,6 +168,33 @@
                 {% endnamespace %}
             </div>
         {% endfor %}
+
+        {% set cols = {
+            siteId: {
+                type: 'select',
+                heading: 'Site'|t('blitz'),
+                options: siteOptions,
+                thin: true,
+            },
+            uri: {
+                type: 'singleline',
+                heading: 'URI'|t('blitz'),
+                placeholder: "relative/uri",
+                code: true,
+                info: 'A relative URI that belongs to the specified site.'|t('blitz'),
+            }
+        } %}
+
+        <input type="hidden" name="customSiteUris" value="[]" />
+        {{ forms.editableTableField({
+            label: "Custom Site URIs"|t('blitz'),
+            instructions: "Custom site URIs to include when warming the cache."|t('blitz'),
+            name: 'settings[customSiteUris]',
+            id: 'customSiteUris',
+            cols: cols,
+            rows: settings.customSiteUris,
+            addRowLabel: "Add a custom site URI"|t('blitz'),
+        }) }}
     </div>
 
     <div id="purging" class="hidden">

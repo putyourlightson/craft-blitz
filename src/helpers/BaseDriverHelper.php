@@ -9,6 +9,7 @@ use Craft;
 use craft\base\SavableComponentInterface;
 use craft\errors\MissingComponentException;
 use craft\helpers\Component;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\InvalidConfigException;
@@ -72,10 +73,11 @@ class BaseDriverHelper
      *
      * @param array $siteUris
      * @param callable $callable
+     * @param string|null $description
      * @param null $priority
      * @param null $delay
      */
-    public static function addDriverJob(array $siteUris, callable $callable, $priority = null, $delay = null)
+    public static function addDriverJob(array $siteUris, callable $callable, string $description = null, $delay = null)
     {
         // Convert SiteUriModels to arrays to keep the job data from getting too big
         foreach ($siteUris as &$siteUri) {
@@ -86,11 +88,12 @@ class BaseDriverHelper
 
         // Add job to queue with a priority and delay
         Craft::$app->getQueue()
-            ->priority($priority)
+            ->priority(Blitz::$plugin->settings->driverJobPriority)
             ->delay($delay)
             ->push(new DriverJob([
                 'siteUris' => $siteUris,
                 'callable' => $callable,
+                'description' => $description,
             ]));
     }
 }
