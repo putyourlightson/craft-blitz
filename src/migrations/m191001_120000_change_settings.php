@@ -26,10 +26,12 @@ class m191001_120000_change_settings extends Migration
         $info = Craft::$app->getPlugins()->getStoredPluginInfo('blitz');
         $settings = $info ? $info['settings'] : [];
 
+        // Prepend `@webroot` to folder path in cache storage
         if ($settings['cacheStorageType'] == 'putyourlightson\blitz\drivers\storage\FileStorage') {
             $settings['cacheStorageSettings']['folderPath'] = '@webroot/'.trim($settings['cacheStorageSettings']['folderPath'], '/');
         }
 
+        // Add keys to URI patterns
         $includedUriPatterns = [];
         if (is_array($settings['includedUriPatterns'])) {
             foreach ($settings['includedUriPatterns'] as $includedUriPattern) {
@@ -52,8 +54,14 @@ class m191001_120000_change_settings extends Migration
         }
         $settings['excludedUriPatterns'] = $excludedUriPatterns;
 
+        // Move concurrency setting into cache warmer settings
         if (empty($settings['cacheWarmerSettings']) && !empty($settings['concurrency'])) {
             $settings['cacheWarmerSettings'] = ['concurrency' => $settings['concurrency']];
+        }
+
+        // Set value of `deployJobPriority` to that of `warmCacheJobPriority`
+        if (!empty($settings['warmCacheJobPriority'])) {
+            $settings['deployJobPriority'] = $settings['warmCacheJobPriority'];
         }
 
         Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings);
