@@ -52,7 +52,7 @@ class GitDeployer extends BaseDeployer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Git Repository');
+        return Craft::t('blitz', 'Git Deployer');
     }
 
     // Public Methods
@@ -191,20 +191,22 @@ class GitDeployer extends BaseDeployer
             $success++;
         }
 
-        $gitWrapper = new GitWrapper();
-        $gitWrapper->setPrivateKey('~/.ssh/');
-        $git = $gitWrapper->workingCopy($repositoryPath);
-        $git->add('*');
+        $commitMessage = $this->gitSettings[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
+        $commitMessage = addslashes($commitMessage);
+        $branch = $this->gitSettings[$siteUid]['branch'] ?: $this->defaultBranch;
 
-        if ($git->hasChanges()) {
-            // Commit and push repository if there are changes
-            $commitMessage = $this->gitSettings[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
-            $commitMessage = addslashes($commitMessage);
-            $branch = $this->gitSettings[$siteUid]['branch'] ?: $this->defaultBranch;
-
-            $git->commit($commitMessage);
-            $git->push();
-        }
+        // Run git commands through symfony/process:
+        // 1. Checkout the branch
+        // 2. Add all files
+        // 3. Commit wih the message
+        // 4. Push
+        // (Git docs: https://devdocs.io/git/)
+        $this->runCommands([
+            'git checkout '.$branch,
+            'git add --all',
+            'git commit --message="'.$commitMessage.'"',
+            'git push',
+        ], $repositoryPath);
 
         return $success;
     }
@@ -219,8 +221,6 @@ class GitDeployer extends BaseDeployer
     {
         foreach ($commands as $command) {
             $process = new Process($command, $cwd);
-            $process->setPty(true);
-            $process->setTty(true);
             $process->run();
 
             if (!$process->isSuccessful()) {

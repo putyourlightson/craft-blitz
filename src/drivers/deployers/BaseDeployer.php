@@ -58,4 +58,11 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
             $this->deploySite($site->id);
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function callable(array $siteUris, callable $setProgressHandler): int
+    {
+    }
 }
