@@ -444,8 +444,8 @@ class Blitz extends Plugin
                     'blitz:refresh-expired' => [
                         'label' => Craft::t('blitz', 'Refresh expired cache')
                     ],
-                    'blitz:refresh-url' => [
-                        'label' => Craft::t('blitz', 'Refresh cached URL')
+                    'blitz:refresh-urls' => [
+                        'label' => Craft::t('blitz', 'Refresh cached URLs')
                     ],
                     'blitz:refresh-tagged' => [
                         'label' => Craft::t('blitz', 'Refresh tagged cache')

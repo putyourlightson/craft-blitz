@@ -39,6 +39,12 @@
             </td>
         </tr>
         <tr>
+            <th class="thin">{{ 'Refresh Cached URLs' }}</th>
+            <td class="textual code">
+                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-urls', { key: apiKey, urls: 'https://domain.com/page-to-refresh' }) }}</textarea>
+            </td>
+        </tr>
+        <tr>
             <th class="thin">{{ 'Refresh Tagged Cache' }}</th>
             <td class="textual code">
                 <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-tagged', { key: apiKey, tags: 'tag' }) }}</textarea>

@@ -16,7 +16,7 @@
             {% if action.id == 'refresh-urls' %}
                 {{ forms.autosuggest({
                     name: 'urls',
-                    placeholder: 'https:://domain.com/page-to-refresh',
+                    placeholder: 'https://domain.com/page-to-refresh',
                     instructions: action.instructions|t('blitz'),
                 }) }}
                 <br/>
