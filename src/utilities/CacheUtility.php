@@ -85,6 +85,14 @@ class CacheUtility extends Utility
             'instructions' => Craft::t('blitz', 'Warming the cache will warm all of the pages.'),
         ];
 
+        if (!Blitz::$plugin->deployer->isDummy) {
+            $actions[] = [
+                'id' => 'deploy',
+                'label' => Craft::t('blitz', 'Remote Deployment'),
+                'instructions' => Craft::t('blitz', 'Deploying will push any changed cached files to the selected remote location.'),
+            ];
+        }
+
         $actions[] = [
             'id' => 'refresh',
             'label' => Craft::t('blitz', 'Refresh Entire Cache'),

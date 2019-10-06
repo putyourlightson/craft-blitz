@@ -10,6 +10,7 @@ use craft\db\Table;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use GitElephant\Repository;
+use GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
@@ -190,16 +191,20 @@ class GitDeployer extends BaseDeployer
             $success++;
         }
 
-        // Commit and push repository
-        $commitMessage = $this->gitSettings[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
-        $commitMessage = addslashes($commitMessage);
-        $branch = $this->gitSettings[$siteUid]['branch'] ?: $this->defaultBranch;
+        $gitWrapper = new GitWrapper();
+        $gitWrapper->setPrivateKey('~/.ssh/');
+        $git = $gitWrapper->workingCopy($repositoryPath);
+        $git->add('*');
 
-        $this->runCommands([
-            'git add -A',
-            'git commit -a --message="'.$commitMessage.'"',
-            'git push origin '.$branch,
-        ], $repositoryPath);
+        if ($git->hasChanges()) {
+            // Commit and push repository if there are changes
+            $commitMessage = $this->gitSettings[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
+            $commitMessage = addslashes($commitMessage);
+            $branch = $this->gitSettings[$siteUid]['branch'] ?: $this->defaultBranch;
+
+            $git->commit($commitMessage);
+            $git->push();
+        }
 
         return $success;
     }
@@ -214,6 +219,8 @@ class GitDeployer extends BaseDeployer
     {
         foreach ($commands as $command) {
             $process = new Process($command, $cwd);
+            $process->setPty(true);
+            $process->setTty(true);
             $process->run();
 
             if (!$process->isSuccessful()) {

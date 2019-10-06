@@ -17,7 +17,7 @@
     ],
     "require": {
         "craftcms/cms": "^3.2.1",
-        "symfony/process": ">=3.3",
+        "cpliakas/git-wrapper": "^1.7",
         "ext-json": "*"
     },
     "autoload": {
