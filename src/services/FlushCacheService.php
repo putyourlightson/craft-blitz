@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\services;
 use Craft;
 use craft\base\Component;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
@@ -28,6 +29,16 @@ class FlushCacheService extends Component
      */
     const EVENT_AFTER_FLUSH_CACHE = 'afterFlushCache';
 
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_BEFORE_FLUSH_ALL_CACHE = 'beforeFlushAllCache';
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_FLUSH_ALL_CACHE = 'afterFlushAllCache';
+
     // Public Methods
     // =========================================================================
 
@@ -38,7 +49,8 @@ class FlushCacheService extends Component
      */
     public function flushUris(array $siteUris)
     {
-        $event = $this->onBeforeFlush(['siteUris' => $siteUris]);
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_FLUSH_CACHE, $event);
 
         if (!$event->isValid) {
             return;
@@ -53,7 +65,6 @@ class FlushCacheService extends Component
 
         $this->runGarbageCollection();
 
-        // Fire an 'afterFlushCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_FLUSH_CACHE, $event);
         }
@@ -66,20 +77,8 @@ class FlushCacheService extends Component
      */
     public function flushSite(int $siteId)
     {
-        $event = $this->onBeforeFlush(['siteId' => $siteId]);
-
-        if (!$event->isValid) {
-            return;
-        }
-
-        CacheRecord::deleteAll(['siteId' => $siteId]);
-
-        $this->runGarbageCollection();
-
-        // Fire an 'afterFlushCache' event
-        if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_FLUSH_CACHE, $event);
-        }
+        $siteUris = SiteUriHelper::getSiteSiteUris($siteId);
+        $this->flushUris($siteUris);
     }
 
     /**
@@ -87,7 +86,8 @@ class FlushCacheService extends Component
      */
     public function flushAll()
     {
-        $event = $this->onBeforeFlush();
+        $event = new RefreshCacheEvent();
+        $this->trigger(self::EVENT_BEFORE_FLUSH_ALL_CACHE, $event);
 
         if (!$event->isValid) {
             return;
@@ -97,9 +97,8 @@ class FlushCacheService extends Component
 
         $this->runGarbageCollection();
 
-        // Fire an 'afterFlushCache' event
-        if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_FLUSH_CACHE, $event);
+        if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_ALL_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_FLUSH_ALL_CACHE, $event);
         }
     }
 
@@ -125,24 +124,6 @@ class FlushCacheService extends Component
         if (ElementQueryRecord::find()->count() == 0) {
             $this->_resetAutoIncrement(ElementQueryRecord::tableName());
         }
-    }
-
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * Fires an onBeforeFlush event.
-     *
-     * @param array|null $config
-     *
-     * @return RefreshCacheEvent
-     */
-    protected function onBeforeFlush(array $config = [])
-    {
-        $event = new RefreshCacheEvent($config);
-        $this->trigger(self::EVENT_BEFORE_FLUSH_CACHE, $event);
-
-        return $event;
     }
 
     // Private Methods

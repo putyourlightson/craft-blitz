@@ -97,15 +97,17 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function delete(SiteUriModel $siteUri)
+    public function deleteUris(array $siteUris)
     {
         if ($this->_cache === null) {
             return;
         }
 
-        $this->_cache->delete([
-            self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
-        ]);
+        foreach ($siteUris as $siteUri) {
+            $this->_cache->delete([
+                self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+            ]);
+        }
     }
 
     /**

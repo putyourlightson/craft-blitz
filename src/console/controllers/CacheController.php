@@ -264,12 +264,12 @@ class CacheController extends Controller
     }
 
     /**
-     * Sets the request progress.
+     * Handles setting the progress.
      *
      * @param int $count
      * @param int $total
      */
-    public function setRequestProgress(int $count, int $total)
+    public function setProgressHandler(int $count, int $total)
     {
         Console::updateProgress($count, $total);
     }
@@ -307,11 +307,11 @@ class CacheController extends Controller
 
         Console::startProgress(0, count($siteUris), '', 0.8);
 
-        $success = Blitz::$plugin->cacheWarmer->callable($siteUris, [$this, 'setRequestProgress']);
+        Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, [$this, 'setProgressHandler']);
 
         Console::endProgress();
 
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully warmed {success} pages.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Blitz cache warming complete.').PHP_EOL, Console::FG_GREEN);
     }
 
     /**
@@ -319,14 +319,14 @@ class CacheController extends Controller
      */
     private function _deploy(array $siteUris)
     {
-        $this->stdout(Craft::t('blitz', 'Deploying cached pages...').PHP_EOL, Console::FG_YELLOW);
+        $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, Console::FG_YELLOW);
 
         Console::startProgress(0, count($siteUris), '', 0.8);
 
-        $success = Blitz::$plugin->deployer->callable($siteUris, [$this, 'setRequestProgress']);
+        Blitz::$plugin->deployer->deployUris($siteUris, null, [$this, 'setProgressHandler']);
 
         Console::endProgress();
 
-        $this->stdout(Craft::t('blitz', 'Blitz successfully deployed {success} pages.', ['success' => $success]).PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Deploying complete.').PHP_EOL, Console::FG_GREEN);
     }
 }

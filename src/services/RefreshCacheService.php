@@ -45,6 +45,16 @@ class RefreshCacheService extends Component
      */
     const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
 
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_BEFORE_REFRESH_ALL_CACHE = 'beforeRefreshAllCache';
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_REFRESH_ALL_CACHE = 'afterRefreshAllCache';
+
     // Properties
     // =========================================================================
 
@@ -331,7 +341,8 @@ class RefreshCacheService extends Component
      */
     public function refreshSiteUris(array $siteUris)
     {
-        $event = $this->onBeforeRefresh(['siteUris' => $siteUris]);
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
 
         if (!$event->isValid) {
             return;
@@ -350,7 +361,6 @@ class RefreshCacheService extends Component
             Blitz::$plugin->deployer->deployUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
         }
 
-        // Fire an 'afterRefreshCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
         }
@@ -361,7 +371,8 @@ class RefreshCacheService extends Component
      */
     public function refreshAll()
     {
-        $event = $this->onBeforeRefresh();
+        $event = new RefreshCacheEvent();
+        $this->trigger(self::EVENT_BEFORE_REFRESH_ALL_CACHE, $event);
 
         if (!$event->isValid) {
             return;
@@ -381,9 +392,8 @@ class RefreshCacheService extends Component
             Blitz::$plugin->deployer->deployUris($siteUris, Blitz::$plugin->cachePurger->warmCacheDelay);
         }
 
-        // Fire an 'afterRefreshCache' event
-        if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
+        if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_ALL_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_REFRESH_ALL_CACHE, $event);
         }
     }
 
@@ -437,22 +447,7 @@ class RefreshCacheService extends Component
         // Get site URIs from URLs
         $siteUris = SiteUriHelper::getUrlSiteUris($urls);
 
-        foreach ($siteUris as $siteUri) {
-            // Check for cache record
-            $cacheIds = CacheRecord::find()
-                ->select('id')
-                ->where([
-                    'siteId' => $siteUri->siteId,
-                    'uri' => $siteUri->uri,
-                ])
-                ->column();
-
-            if (!empty($cacheIds)) {
-                $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
-            }
-        }
-
-        $this->refresh(true);
+        $this->refreshSiteUris($siteUris);
     }
 
     /**
@@ -468,26 +463,5 @@ class RefreshCacheService extends Component
         $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
 
         $this->refresh(true);
-    }
-
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * Fires an onBeforeRefresh event.
-     *
-     * @param array|null $config
-     *
-     * @return RefreshCacheEvent
-     */
-    protected function onBeforeRefresh(array $config = [])
-    {
-        $event = new RefreshCacheEvent($config);
-
-        if ($this->hasEventHandlers(self::EVENT_BEFORE_REFRESH_CACHE)) {
-            $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
-        }
-
-        return $event;
     }
 }

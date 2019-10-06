@@ -9,8 +9,6 @@ use Craft;
 use craft\db\Table;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
-use GitElephant\Repository;
-use GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
@@ -61,61 +59,30 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deployUris(array $siteUris, int $delay = null)
-    {
-        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
-            $this->commitPushSiteUris($siteUris);
-
-            return;
-        }
-
-        $this->addDriverJob($siteUris, $delay);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function deploySite(int $siteId)
-    {
-        $this->deployUris(SiteUriHelper::getSiteSiteUris($siteId));
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function callable(array $siteUris, callable $setProgressHandler): int
+    public function deployUris(array $siteUris, int $delay = null, callable $setProgressHandler = null)
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_DEPLOY, $event);
 
         if (!$event->isValid) {
-            return 0;
+            return;
         }
 
-        $success = 0;
-        $count = 0;
-        $total = count($event->siteUris);
-        $label = 'Deploying {count} of {total} pages.';
-
-        $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-        call_user_func($setProgressHandler, $count, $total, $progressLabel);
-
-        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($event->siteUris);
-
-        foreach ($groupedSiteUris as $siteId => $siteUris) {
-            $count += count($siteUris);
-            $success += $this->deploySiteUris($siteId, $siteUris);
-
-            $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-            call_user_func($setProgressHandler, $count, $total, $progressLabel);
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $this->deployUrisWithProgress($siteUris, $setProgressHandler);
+        }
+        else {
+            DeployerHelper::addDriverJob(
+                $siteUris,
+                [$this, 'deployUrisWithProgress'],
+                Craft::t('blitz', 'Deploying pages'),
+                $delay
+            );
         }
 
-        // Fire an 'afterDeploy' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY)) {
             $this->trigger(self::EVENT_AFTER_DEPLOY, $event);
         }
-
-        return $success;
     }
 
     /**
@@ -132,83 +99,80 @@ class GitDeployer extends BaseDeployer
     // =========================================================================
 
     /**
-     * Adds a driver job to the queue.
+     * Deploys site URIs with progress.
      *
      * @param array $siteUris
-     * @param null $delay
+     * @param callable $setProgressHandler
      */
-    protected function addDriverJob(array $siteUris, $delay = null)
+    protected function deployUrisWithProgress(array $siteUris, callable $setProgressHandler)
     {
-        // Add job to queue with a priority and delay
-        DeployerHelper::addDriverJob(
-            $siteUris,
-            [$this, 'callable'],
-            Craft::t('blitz', 'Deploying cached files'),
-            $delay
-        );
-    }
+        $count = 0;
+        $total = 0;
+        $label = 'Deploying {count} of {total} pages.';
 
-    /**
-     * Deploys site URIs to the site repository.
-     *
-     * @param int $siteId
-     * @param SiteUriModel[] $siteUris
-     *
-     * @return int
-     */
-    protected function deploySiteUris(int $siteId, array $siteUris): int
-    {
-        $success = 0;
+        $deployGroupedSiteUris = [];
+        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
-        $siteUid = Db::uidById(Table::SITES, $siteId);
+        foreach ($groupedSiteUris as $siteId => $siteUris) {
+            $siteUid = Db::uidById(Table::SITES, $siteId);
 
-        if ($siteUid === null) {
-            return 0;
-        }
-
-        if (empty($this->gitSettings[$siteUid]) || empty($this->gitSettings[$siteUid]['repositoryPath'])) {
-            return 0;
-        }
-
-        $repositoryPath = FileHelper::normalizePath(
-            Craft::parseEnv($this->gitSettings[$siteUid]['repositoryPath'])
-        );
-
-        if (FileHelper::isWritable($repositoryPath) === false) {
-            return 0;
-        }
-
-        foreach ($siteUris as $siteUri) {
-            $value = Blitz::$plugin->cacheStorage->get($siteUri);
-
-            if (empty($value)) {
+            if ($siteUid === null) {
                 continue;
             }
 
-            $filePath = FileHelper::normalizePath($repositoryPath.'/'.$siteUri->uri.'/index.html');
-            $this->save($value, $filePath);
+            if (empty($this->gitSettings[$siteUid]) || empty($this->gitSettings[$siteUid]['repositoryPath'])) {
+                continue;
+            }
 
-            $success++;
+            $repositoryPath = FileHelper::normalizePath(
+                Craft::parseEnv($this->gitSettings[$siteUid]['repositoryPath'])
+            );
+
+            if (FileHelper::isWritable($repositoryPath) === false) {
+                continue;
+            }
+
+            $deployGroupedSiteUris[$siteUid] = $siteUris;
+            $total += count($siteUris);
         }
 
-        $commitMessage = $this->gitSettings[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
-        $commitMessage = addslashes($commitMessage);
-        $branch = $this->gitSettings[$siteUid]['branch'] ?: $this->defaultBranch;
+        $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+        call_user_func($setProgressHandler, $count, $total, $progressLabel);
 
-        // Run git commands through symfony/process:
-        // 1. Checkout the branch
-        // 2. Add all files
-        // 3. Commit wih the message
-        // 4. Push
-        // (Git docs: https://devdocs.io/git/)
-        $this->runCommands([
-            'git checkout '.$branch,
-            'git add --all',
-            'git commit --message="'.$commitMessage.'"',
-            'git push',
-        ], $repositoryPath);
+        foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
+            $repositoryPath = FileHelper::normalizePath(
+                Craft::parseEnv($this->gitSettings[$siteUid]['repositoryPath'])
+            );
 
-        return $success;
+            foreach ($siteUris as $siteUri) {
+                $count++;
+                $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                call_user_func($setProgressHandler, $count, $total, $progressLabel);
+
+                $value = Blitz::$plugin->cacheStorage->get($siteUri);
+
+                if (empty($value)) {
+                    continue;
+                }
+
+                $filePath = FileHelper::normalizePath($repositoryPath.'/'.$siteUri->uri.'/index.html');
+                $this->save($value, $filePath);
+            }
+
+            $commitMessage = $this->gitSettings[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
+            $commitMessage = addslashes($commitMessage);
+            $branch = $this->gitSettings[$siteUid]['branch'] ?: $this->defaultBranch;
+
+            // Run git commands through symfony/process (Git docs: https://devdocs.io/git/)
+            $this->runCommands([
+                'git checkout '.$branch,
+                'git add --all',
+                'git commit --message="'.$commitMessage.'"',
+                'git push',
+            ], $repositoryPath);
+        }
+
+        call_user_func($setProgressHandler, $total, $total, $progressLabel);
     }
 
     /**

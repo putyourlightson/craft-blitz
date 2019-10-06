@@ -17,9 +17,4 @@ class RefreshCacheEvent extends CancelableEvent
      * @var SiteUriModel[]|null
      */
     public $siteUris;
-
-    /**
-     * @var int|null $siteId
-     */
-    public $siteId;
 }

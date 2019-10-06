@@ -71,16 +71,15 @@ class BaseDriverHelper
     /**
      * Adds a driver job to the queue.
      *
-     * @param array $siteUris
-     * @param callable $callable
+     * @param SiteUriModel[] $siteUris
+     * @param callable $jobHandler
      * @param string|null $description
-     * @param null $priority
-     * @param null $delay
+     * @param int|null $delay
      */
-    public static function addDriverJob(array $siteUris, callable $callable, string $description = null, $delay = null)
+    public static function addDriverJob(array $siteUris, callable $jobHandler, string $description = null, int $delay = null)
     {
         // Convert SiteUriModels to arrays to keep the job data from getting too big
-        foreach ($siteUris as &$siteUri) {
+        foreach ($data['siteUris'] as &$siteUri) {
             if ($siteUri instanceof SiteUriModel) {
                 $siteUri = $siteUri->toArray();
             }
@@ -91,8 +90,8 @@ class BaseDriverHelper
             ->priority(Blitz::$plugin->settings->driverJobPriority)
             ->delay($delay)
             ->push(new DriverJob([
-                'siteUris' => $siteUris,
-                'callable' => $callable,
+                'si' => $data,
+                'jobHandler' => $jobHandler,
                 'description' => $description,
             ]));
     }

@@ -11,6 +11,7 @@ use craft\helpers\Db;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
+use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use yii\log\Logger;
 
@@ -85,12 +86,23 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function purgeUris(array $siteUris)
     {
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_PURGE_CACHE, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
         foreach ($groupedSiteUris as $siteId => $siteUris) {
             $this->_sendRequest('delete', 'purge_cache', $siteId, [
                 'files' => SiteUriHelper::getSiteUriUrls($siteUris)
             ]);
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_PURGE_CACHE, $event);
         }
     }
 

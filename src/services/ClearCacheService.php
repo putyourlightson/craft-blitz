@@ -26,6 +26,16 @@ class ClearCacheService extends Component
      */
     const EVENT_AFTER_CLEAR_CACHE = 'afterClearCache';
 
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_BEFORE_CLEAR_ALL_CACHE = 'beforeClearAllCache';
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_CLEAR_ALL_CACHE = 'afterClearAllCache';
+
     // Public Methods
     // =========================================================================
 
@@ -36,7 +46,8 @@ class ClearCacheService extends Component
      */
     public function clearUris(array $siteUris)
     {
-        $event = $this->onBeforeClear(['siteUris' => $siteUris]);
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_CLEAR_CACHE, $event);
 
         if (!$event->isValid) {
             return;
@@ -46,7 +57,6 @@ class ClearCacheService extends Component
 
         Blitz::$plugin->cachePurger->purgeUris($event->siteUris);
 
-        // Fire an 'afterClearCache' event
         if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
             $this->trigger(self::EVENT_AFTER_CLEAR_CACHE, $event);
         }
@@ -59,20 +69,8 @@ class ClearCacheService extends Component
      */
     public function clearSite(int $siteId)
     {
-        $event = $this->onBeforeClear(['siteId' => $siteId]);
-
-        if (!$event->isValid) {
-            return;
-        }
-
-        $siteUris = SiteUriHelper::getSiteSiteUris($event->siteId);
-
+        $siteUris = SiteUriHelper::getSiteSiteUris($siteId);
         $this->clearUris($siteUris);
-
-        // Fire an 'afterClearCache' event
-        if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_CLEAR_CACHE, $event);
-        }
     }
 
     /**
@@ -80,7 +78,8 @@ class ClearCacheService extends Component
      */
     public function clearAll()
     {
-        $event = $this->onBeforeClear();
+        $event = new RefreshCacheEvent();
+        $this->trigger(self::EVENT_BEFORE_CLEAR_ALL_CACHE, $event);
 
         if (!$event->isValid) {
             return;
@@ -90,27 +89,8 @@ class ClearCacheService extends Component
 
         Blitz::$plugin->cachePurger->purgeAll();
 
-        // Fire an 'afterClearCache' event
-        if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_CLEAR_CACHE, $event);
+        if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_ALL_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_CLEAR_ALL_CACHE, $event);
         }
-    }
-
-    // Protected Methods
-    // =========================================================================
-
-    /**
-     * Fires an onBeforeClear event.
-     *
-     * @param array|null $config
-     *
-     * @return RefreshCacheEvent
-     */
-    protected function onBeforeClear(array $config = [])
-    {
-        $event = new RefreshCacheEvent($config);
-        $this->trigger(self::EVENT_BEFORE_CLEAR_CACHE, $event);
-
-        return $event;
     }
 }

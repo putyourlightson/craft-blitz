@@ -6,7 +6,6 @@
 namespace putyourlightson\blitz\drivers\warmers;
 
 use craft\base\SavableComponentInterface;
-use craft\models\Site;
 use putyourlightson\blitz\models\SiteUriModel;
 
 interface CacheWarmerInterface extends SavableComponentInterface
@@ -19,28 +18,24 @@ interface CacheWarmerInterface extends SavableComponentInterface
      *
      * @param SiteUriModel[] $siteUris
      * @param int|null $delay
+     * @param callable|null $setProgressHandler
      */
-    public function warmUris(array $siteUris, int $delay = null);
+    public function warmUris(array $siteUris, int $delay = null, callable $setProgressHandler = null);
 
     /**
      * Warms the cache for a given site ID.
      *
      * @param int $siteId
+     * @param int|null $delay
+     * @param callable|null $setProgressHandler
      */
-    public function warmSite(int $siteId);
+    public function warmSite(int $siteId, int $delay = null, callable $setProgressHandler = null);
 
     /**
      * Warms the entire cache.
-     */
-    public function warmAll();
-
-    /**
-     * Callable method that requests the provided site URIs.
      *
-     * @param array $siteUris
-     * @param callable $setProgressHandler
-     *
-     * @return int
+     * @param int|null $delay
+     * @param callable|null $setProgressHandler
      */
-    public function callable(array $siteUris, callable $setProgressHandler): int;
+    public function warmAll(int $delay = null, callable $setProgressHandler = null);
 }

@@ -27,13 +27,6 @@ interface CacheStorageInterface
     public function save(string $value, SiteUriModel $siteUri);
 
     /**
-     * Deletes the cache value for the provided site URI.
-     *
-     * @param SiteUriModel $siteUri
-     */
-    public function delete(SiteUriModel $siteUri);
-
-    /**
      * Deletes the cache values for the provided site URIs.
      *
      * @param SiteUriModel[] $siteUris

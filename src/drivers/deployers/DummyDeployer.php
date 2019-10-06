@@ -27,4 +27,22 @@ class DummyDeployer extends BaseDeployer
      * @var bool
      */
     public $isDummy = true;
+
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    public function deployUris(array $siteUris, int $delay = null, callable $setProgressHandler = null) { }
+
+    /**
+     * @inheritdoc
+     */
+    public function deploySite(int $siteId, int $delay = null, callable $setProgressHandler = null) { }
+
+    /**
+     * @inheritdoc
+     */
+    public function deployAll(int $delay = null, callable $setProgressHandler = null) { }
 }

@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\jobs;
 use craft\helpers\App;
 use craft\queue\BaseJob;
 use craft\queue\Queue;
+use putyourlightson\blitz\models\SiteUriModel;
 
 class DriverJob extends BaseJob
 {
@@ -15,14 +16,14 @@ class DriverJob extends BaseJob
     // =========================================================================
 
     /**
-     * @var array
+     * @var SiteUriModel[]
      */
-    public $siteUris = [];
+    public $siteUris;
 
     /**
      * @var callable
      */
-    public $callable;
+    public $jobHandler;
 
     /**
      * @var Queue
@@ -41,19 +42,19 @@ class DriverJob extends BaseJob
 
         $this->_queue = $queue;
 
-        if (is_callable($this->callable)) {
-            call_user_func($this->callable, $this->siteUris, [$this, 'setRequestProgress']);
+        if (is_callable($this->jobHandler)) {
+            call_user_func($this->jobHandler, $this->siteUris, [$this, 'setProgressHandler']);
         }
     }
 
     /**
-     * Sets the progress for the requests.
+     * Handles setting the progress.
      *
      * @param int $count
      * @param int $total
      * @param string|null $label
      */
-    public function setRequestProgress(int $count, int $total, string $label = null)
+    public function setProgressHandler(int $count, int $total, string $label = null)
     {
         $progress = $total > 0 ? ($count / $total) : 0;
 

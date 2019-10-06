@@ -29,40 +29,48 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
      */
     const EVENT_AFTER_DEPLOY = 'afterDeploy';
 
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_BEFORE_DEPLOY_ALL = 'beforeDeployAll';
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_DEPLOY_ALL = 'afterDeployAll';
+
     // Public Methods
     // =========================================================================
 
     /**
      * @inheritdoc
      */
-    public function deployUris(array $siteUris, int $delay = null)
+    public function deploySite(int $siteId, int $delay = null, callable $setProgressHandler = null)
     {
+        $siteUris = SiteUriHelper::getSiteSiteUris($siteId);
+        $this->deployUris($siteUris, $delay, $setProgressHandler);
     }
 
     /**
      * @inheritdoc
      */
-    public function deploySite(int $siteId)
+    public function deployAll(int $delay = null, callable $setProgressHandler = null)
     {
-        $this->deployUris(SiteUriHelper::getSiteSiteUris($siteId));
-    }
+        $event = new RefreshCacheEvent();
+        $this->trigger(self::EVENT_BEFORE_DEPLOY_ALL, $event);
 
-    /**
-     * @inheritdoc
-     */
-    public function deployAll()
-    {
+        if (!$event->isValid) {
+            return;
+        }
+
         $sites = Craft::$app->getSites()->getAllSites();
 
         foreach ($sites as $site) {
-            $this->deploySite($site->id);
+            $this->deploySite($site->id, $delay, $setProgressHandler);
         }
-    }
 
-    /**
-     * @inheritdoc
-     */
-    public function callable(array $siteUris, callable $setProgressHandler): int
-    {
+        if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY_ALL)) {
+            $this->trigger(self::EVENT_AFTER_DEPLOY_ALL, $event);
+        }
     }
 }

@@ -114,13 +114,15 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function delete(SiteUriModel $siteUri)
+    public function deleteUris(array $siteUris)
     {
-        $filePath = $this->_getFilePath($siteUri);
+        foreach ($siteUris as $siteUri) {
+            $filePath = $this->_getFilePath($siteUri);
 
-        // Delete file if it exists
-        if (is_file($filePath)) {
-            unlink($filePath);
+            // Delete file if it exists
+            if (is_file($filePath)) {
+                unlink($filePath);
+            }
         }
     }
 

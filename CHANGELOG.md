@@ -6,7 +6,7 @@
 - Added replaceable remote deployers (Git deployer).
 - Added the ability to specify custom site URIs to be warmed.
 - Added remote deploy and refresh cached URI actions to utility, console command and user group permissions.
-- Added `beforeClearCache`, `beforeFlushCache`, `beforeRefreshCache`, `beforeWarmCache`, `afterWarmCache` events. 
+- Added `beforeClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
 
 ### Changed
 - Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
