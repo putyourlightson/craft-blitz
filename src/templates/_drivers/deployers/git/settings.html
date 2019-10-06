@@ -28,8 +28,8 @@
     repositoryPath: {
         type: 'singleline',
         heading: "Repository Path"|t('blitz'),
-        info: "The folder path to an existing repository. This can be set to an environment variable, or begin with an alias."|t('blitz'),
-        placeholder: "/path/to/repository",
+        info: "The folder path to an existing local repository. This can be set to an environment variable, or begin with an alias such as `@root`."|t('blitz'),
+        placeholder: "@root/path/to/repo",
     },
     commitMessage: {
         type: 'singleline',
@@ -44,11 +44,11 @@
 } %}
 
 {% set info %}
-    <span class="info">{{ "Warmed pages will be commited and pushed to the Git repositories using the settings specified below. Git must already be installed on the server."|t('blitz') }}</span>
+    <span class="info">{{ 'Warmed pages will be commited and pushed to existing Git repositories using the specified settings. Git must already be installed on the server and the repositories must already exist with the appropriate credentials. Read more about setting up repositories in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: 'git-deployer'})|raw }}</span>
 {% endset %}
 {{ forms.editableTableField({
     label: "Git Settings"|t('blitz'),
-    instructions: "Choose which sites to commit and push to by entering their details."|t('blitz') ~ info,
+    instructions: "Choose which repositories to commit and push to for each sites."|t('blitz') ~ info,
     name: 'gitSettings',
     id: 'gitSettings',
     cols: cols,

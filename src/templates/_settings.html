@@ -122,7 +122,7 @@
 
     <div id="storage" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about storage types and how to add more storage types in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-storage'})|raw }}</span>
+            <span class="info">{{ 'The storage type determines how and where cached pages are stored. You can extend Blitz to add your own or third-party cache storage types. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'cache-storage'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Storage"|t('blitz'),
@@ -147,10 +147,10 @@
 
     <div id="warming" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about cache warmers and how to add more warmers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'cache-warmers'})|raw }}</span>
+            <span class="info">{{ 'The warmer determines how the cache is warmed. You can extend Blitz to add your own or third-party cache warmers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'cache-warmers'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
-            label: "Cache Warming"|t('blitz'),
+            label: "Cache Warmer"|t('blitz'),
             instructions: "The warmer type to use for warming the cache."|t('blitz') ~ info,
             warning: (config.cacheWarmerType is defined ? configWarning('cacheWarmerType')),
             name: 'settings[cacheWarmerType]',
@@ -202,10 +202,10 @@
 
     <div id="purging" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about reverse proxy purgers and how to add more purgers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'reverse-proxy-purger'})|raw }}</span>
+            <span class="info">{{ 'A purger allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated. You can extend Blitz to add your own or third-party reverse proxy purgers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'reverse-proxy-purger'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
-            label: "Reverse Proxy Purging"|t('blitz'),
+            label: "Reverse Proxy Purger"|t('blitz'),
             instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz') ~ info,
             warning: (config.cachePurgerType is defined ? configWarning('cachePurgerType')),
             name: 'settings[cachePurgerType]',
@@ -227,10 +227,10 @@
 
     <div id="deployment" class="hidden">
         {% set info %}
-            <span class="info">{{ 'Read more about remote deployment and how to add more deployers in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: docs ~ 'deployers'})|raw }}</span>
+            <span class="info">{{ 'A deployer allows you to deploy cached files to a remote location such as a Git repository. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been warmed. You can extend Blitz to add your own or third-party deployers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'remote-deployment'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
-            label: "Remote Deployment"|t('blitz'),
+            label: "Remote Deployer"|t('blitz'),
             instructions: "A deployer to use for remotely deploying cached files."|t('blitz') ~ info,
             warning: (config.deployerType is defined ? configWarning('deployerType')),
             name: 'settings[deployerType]',
@@ -256,7 +256,7 @@
         {% endset %}
         {{ forms.lightswitchField({
             label: "Clear Cache Automatically"|t('blitz'),
-            instructions: "Whether the cache should automatically be cleared when elements are updated."|t('blitz') ~ info,
+            instructions: "Whether the cache should automatically be cleared (and purged) when elements are updated."|t('blitz') ~ info,
             warning: (config.clearCacheAutomatically is defined ? configWarning('clearCacheAutomatically')),
             name: 'settings[clearCacheAutomatically]',
             on: settings.clearCacheAutomatically,
@@ -264,11 +264,11 @@
         }) }}
 
         {% set info %}
-            <span class="info">{{ 'With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. Disabling this setting may make sense if your site is very large and has many related elements.'|t('blitz') }}</span>
+            <span class="info">{{ 'With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. If a deployer has been selected then the warmed pages will be deployed. Disabling this setting may make sense if your site is very large and has many related elements.'|t('blitz') }}</span>
         {% endset %}
         {{ forms.lightswitchField({
             label: "Warm Cache Automatically"|t('blitz'),
-            instructions: "Whether the cache should automatically be warmed after clearing."|t('blitz') ~ info,
+            instructions: "Whether the cache should automatically be warmed (and deployed) after clearing."|t('blitz') ~ info,
             warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
             name: 'settings[warmCacheAutomatically]',
             on: settings.warmCacheAutomatically,
@@ -276,7 +276,7 @@
         }) }}
 
         {% set info %}
-            <span class="info">{{ "This setting determines how URLs with query strings will be cached. See the [documentation]({url})."|t('blitz', {url: docs ~ 'query-string-caching'}) }}</span>
+            <span class="info">{{ "This setting determines how URLs with query strings will be cached. Read more in the [documentation]({url})."|t('blitz', {url: docs ~ 'query-string-caching'}) }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Query String Caching"|t('blitz'),
