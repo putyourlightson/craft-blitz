@@ -158,13 +158,13 @@ class SiteUriHelper
     }
 
     /**
-     * Returns URLs of given site URIs.
+     * Returns URLs from the given site URIs.
      *
      * @param array $siteUris
      *
      * @return string[]
      */
-    public static function getUrls(array $siteUris): array
+    public static function getSiteUriUrls(array $siteUris): array
     {
         $urls = [];
 
@@ -182,6 +182,38 @@ class SiteUriHelper
         }
 
         return $urls;
+    }
+
+    /**
+     * Returns site URIs from the given URLs.
+     *
+     * @param string[] $urls
+     *
+     * @return SiteUriModel[]
+     */
+    public static function getUrlSiteUris(array $urls): array
+    {
+        $siteUris = [];
+
+        foreach (Craft::$app->getSites()->getAllSites() as $site) {
+            $baseUrl = trim(Craft::getAlias($site->getBaseUrl()), '/');
+
+            foreach ($urls as $url) {
+                if (stripos($url, $baseUrl) !== 0) {
+                    continue;
+                }
+
+                $uri = str_replace($baseUrl, '', $url);
+                $uri = trim($uri, '/');
+
+                $siteUris[] = new SiteUriModel([
+                    'siteId' => $site->id,
+                    'uri' => $uri,
+                ]);
+            }
+        }
+
+        return $siteUris;
     }
 
     /**

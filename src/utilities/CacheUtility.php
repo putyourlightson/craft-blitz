@@ -88,21 +88,27 @@ class CacheUtility extends Utility
         if (!Blitz::$plugin->deployer->isDummy) {
             $actions[] = [
                 'id' => 'deploy',
-                'label' => Craft::t('blitz', 'Remote Deployment'),
-                'instructions' => Craft::t('blitz', 'Deploying will push any changed cached files to the selected remote location.'),
+                'label' => Craft::t('blitz', 'Remote Deploy'),
+                'instructions' => Craft::t('blitz', 'Deploying will deploy any changed cached files to the selected remote locations.'),
             ];
         }
 
         $actions[] = [
             'id' => 'refresh',
-            'label' => Craft::t('blitz', 'Refresh Entire Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshing the cache will clear, flush, purge and warm all of the pages.'),
+            'label' => Craft::t('blitz', 'Refresh Cache'),
+            'instructions' => Craft::t('blitz', 'Refreshing the cache will clear (and purge), flush, warm (and deploy) all of the pages.'),
         ];
 
         $actions[] = [
             'id' => 'refresh-expired',
             'label' => Craft::t('blitz', 'Refresh Expired Cache'),
             'instructions' => Craft::t('blitz', 'Refreshing expired cache will refresh all pages and elements that have expired since they were cached.'),
+        ];
+
+        $actions[] = [
+            'id' => 'refresh-urls',
+            'label' => Craft::t('blitz', 'Refresh Cached URL'),
+            'instructions' => Craft::t('blitz', 'Refreshing a cached URL will refresh the cached version of the page.'),
         ];
 
         $actions[] = [

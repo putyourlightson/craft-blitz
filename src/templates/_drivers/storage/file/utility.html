@@ -1,20 +1,43 @@
-<h1>Cached Sites</h1>
+{% import "_includes/forms" as forms %}
 
-<table class="data fullwidth collapsible">
-    <thead>
-        <th scope="col">{{ 'Site'|t('blitz') }}</th>
-        <th scope="col">{{ 'Cache Folder Path'|t('blitz') }}</th>
-        <th scope="col">{{ 'Cached Pages'|t('blitz') }}</th>
-    </thead>
-    <tbody>
-        {% for site in sites %}
-            <tr>
-                <td>{{ site.name }}</td>
-                <td class="code">{{ site.relativePath }}</td>
-                <td>{{ site.count }}</td>
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
+{% do view.registerAssetBundle("putyourlightson\\blitz\\assets\\BlitzAsset") %}
 
-<br/>
+
+<h1>{{ "Cached Sites"|t('blitz') }}</h1>
+
+
+{% set cols = {
+    heading: {
+        type: 'heading',
+        heading: "Site"|t('blitz'),
+        thin: true,
+    },
+    cacheFolderPath: {
+        type: 'html',
+        heading: "Cache Folder Path"|t('blitz'),
+    },
+    cachedPages: {
+        type: 'html',
+        heading: "Cached Pages"|t('blitz'),
+    },
+} %}
+
+{% set rows = [] %}
+{% for site in sites %}
+    {% set rows = rows|merge([{
+        heading: site.name,
+        cacheFolderPath: site.path,
+        cachedPages: site.count,
+    }]) %}
+{% endfor %}
+
+{{ forms.editableTableField({
+    name: 'cachedSites',
+    id: 'cachedSites',
+    cols: cols,
+    rows: rows,
+    staticRows: true,
+    first: true,
+}) }}
+
+<br>

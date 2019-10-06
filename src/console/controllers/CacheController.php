@@ -200,6 +200,30 @@ class CacheController extends Controller
     }
 
     /**
+     * Refreshes cached URL.
+     *
+     * @param array
+     *
+     * @return int
+     */
+    public function actionRefreshUrls(array $urls): int
+    {
+        if (empty($urls)) {
+            $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.').PHP_EOL, Console::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
+
+        Craft::$app->getQueue()->run();
+
+        $this->stdout(Craft::t('blitz', 'Cache URLs successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
      * Refreshes tagged cache.
      *
      * @param array

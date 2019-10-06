@@ -435,8 +435,17 @@ class Blitz extends Plugin
                     'blitz:warm' => [
                         'label' => Craft::t('blitz', 'Warm cache')
                     ],
+                    'blitz:deploy' => [
+                        'label' => Craft::t('blitz', 'Remote deploy')
+                    ],
+                    'blitz:refresh' => [
+                        'label' => Craft::t('blitz', 'Refresh cache')
+                    ],
                     'blitz:refresh-expired' => [
-                        'label' => Craft::t('blitz', 'Refresh entire cache')
+                        'label' => Craft::t('blitz', 'Refresh expired cache')
+                    ],
+                    'blitz:refresh-url' => [
+                        'label' => Craft::t('blitz', 'Refresh cached URL')
                     ],
                     'blitz:refresh-tagged' => [
                         'label' => Craft::t('blitz', 'Refresh tagged cache')

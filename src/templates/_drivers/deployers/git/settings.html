@@ -1,24 +1,6 @@
 {% import "_includes/forms" as forms %}
 
 
-{% set rows = [] %}
-{% for site in craft.app.sites.getAllSites() %}
-    {% set rows = rows|merge({
-        (site.uid): {
-            heading: site.name|t('site')|e,
-            repositoryPath: {
-                value: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['repositoryPath'],
-            },
-            commitMessage: {
-                value: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['commitMessage'],
-            },
-            branch: {
-                value: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['branch'],
-            },
-        }
-    }) %}
-{% endfor %}
-
 {% set cols = {
     heading: {
         type: 'heading',
@@ -42,6 +24,18 @@
         placeholder: deployer.defaultBranch,
     },
 } %}
+
+{% set rows = [] %}
+{% for site in craft.app.sites.getAllSites() %}
+    {% set rows = rows|merge({
+        (site.uid): {
+            heading: site.name,
+            repositoryPath: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['repositoryPath'],
+            commitMessage: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['commitMessage'],
+            branch: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['branch'],
+        }
+    }) %}
+{% endfor %}
 
 {% set info %}
     <span class="info">{{ 'Warmed pages will be commited and pushed to existing Git repositories using the specified settings. Git must already be installed on the server and the repositories must already exist with the appropriate credentials. Read more about setting up repositories in the <a href="{url}" target="_blank">documentation</a>.'|t('blitz', {url: 'git-deployer'})|raw }}</span>

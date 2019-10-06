@@ -3,13 +3,17 @@
 ## 3.0.0 - Unreleased
 ### Added
 - Added replaceable cache warmers (Guzzle warmer).
-- Added replaceable deployers (Git deployer).
+- Added replaceable remote deployers (Git deployer).
 - Added the ability to specify custom site URIs to be warmed.
+- Added remote deploy and refresh cached URI actions to utility, console command and user group permissions.
 - Added `beforeClearCache`, `beforeFlushCache`, `beforeRefreshCache`, `beforeWarmCache`, `afterWarmCache` events. 
 
 ### Changed
 - Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
 - Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
+
+### Fixed
+- Fixed user group permissions for refreshing the cache.
 
 ## 2.3.0 - 2019-10-05
 ### Added

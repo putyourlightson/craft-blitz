@@ -163,6 +163,26 @@ class CacheController extends Controller
     }
 
     /**
+     * Refreshes cached URLs.
+     *
+     * @return Response
+     */
+    public function actionRefreshUrls(): Response
+    {
+        $urls = Craft::$app->getRequest()->getParam('urls');
+
+        if (empty($urls)) {
+            return $this->_getResponse('At least one URL must be provided.', false);
+        }
+
+        $urls = is_string($urls) ? StringHelper::split($urls) : $urls;
+
+        Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
+
+        return $this->_getResponse('Cached URLs successfully refreshed.');
+    }
+
+    /**
      * Refreshes tagged cache.
      *
      * @return Response

@@ -428,14 +428,40 @@ class RefreshCacheService extends Component
     }
 
     /**
+     * Refreshes cached URLs.
+     *
+     * @param string[] $urls
+     */
+    public function refreshCachedUrls(array $urls)
+    {
+        // Get site URIs from URLs
+        $siteUris = SiteUriHelper::getUrlSiteUris($urls);
+
+        foreach ($siteUris as $siteUri) {
+            // Check for cache record
+            $cacheIds = CacheRecord::find()
+                ->select('id')
+                ->where([
+                    'siteId' => $siteUri->siteId,
+                    'uri' => $siteUri->uri,
+                ])
+                ->column();
+
+            if (!empty($cacheIds)) {
+                $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
+            }
+        }
+
+        $this->refresh(true);
+    }
+
+    /**
      * Refreshes tagged cache.
      *
      * @param string[] $tags
      */
     public function refreshTaggedCache(array $tags)
     {
-        $this->batchMode = true;
-
         // Check for tagged cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 

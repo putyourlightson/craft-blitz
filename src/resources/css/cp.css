@@ -10,3 +10,7 @@
 .info-hud {
     max-width: 485px;
 }
+
+table.editable tbody tr td {
+    text-align: left;
+}

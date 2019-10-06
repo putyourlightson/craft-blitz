@@ -152,12 +152,10 @@ class FileStorage extends BaseCacheStorage
 
         foreach ($allSites as $site) {
             $sitePath = $this->_getSitePath($site->id);
-            $relativePath = trim(str_replace(Craft::getAlias('@webroot'), '', $sitePath), '/');
 
             $sites[$site->id] = [
                 'name' => $site->name,
                 'path' => $sitePath,
-                'relativePath' =>  $relativePath,
                 'count' => is_dir($sitePath) ? count(FileHelper::findFiles($sitePath)) : 0,
             ];
         }

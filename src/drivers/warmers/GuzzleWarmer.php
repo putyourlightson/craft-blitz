@@ -66,7 +66,7 @@ class GuzzleWarmer extends BaseCacheWarmer
         $client = Craft::createGuzzleClient();
         $requests = [];
 
-        $urls = SiteUriHelper::getUrls($event->siteUris);
+        $urls = SiteUriHelper::getSiteUriUrls($event->siteUris);
 
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http

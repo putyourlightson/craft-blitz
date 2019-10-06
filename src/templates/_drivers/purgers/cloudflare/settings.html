@@ -24,17 +24,6 @@
     required: true,
 }) }}
 
-{% set rows = [] %}
-{% for site in craft.app.sites.getAllSites() %}
-    {% set rows = rows|merge({
-        (site.uid): {
-            heading: site.name|t('site')|e,
-            zoneId: {
-                value: purger.zoneIds[site.uid] is defined ? purger.zoneIds[site.uid]['zoneId'],
-            },
-        }
-    }) %}
-{% endfor %}
 
 {% set cols = {
     heading: {
@@ -47,6 +36,16 @@
         heading: "Zone ID"|t('blitz'),
     },
 } %}
+
+{% set rows = [] %}
+{% for site in craft.app.sites.getAllSites() %}
+    {% set rows = rows|merge({
+        (site.uid): {
+            heading: site.name,
+            zoneId: purger.zoneIds[site.uid] is defined ? purger.zoneIds[site.uid]['zoneId'],
+        }
+    }) %}
+{% endfor %}
 
 {% set info %}
     <span class="info">{{ "The zone IDs can be found on the “Overview” screen of your domains in your Cloudflare account. This can be set to an environment variable."|t('blitz') }}</span>
