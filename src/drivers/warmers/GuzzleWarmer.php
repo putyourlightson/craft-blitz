@@ -95,9 +95,12 @@ class GuzzleWarmer extends BaseCacheWarmer
     // =========================================================================
 
     /**
-     * @inheritdoc
+     * Warms site URIs with progress.
+     *
+     * @param array $siteUris
+     * @param callable|null $setProgressHandler
      */
-    protected function warmUrisWithProgress(array $siteUris, callable $setProgressHandler)
+    protected function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $client = Craft::createGuzzleClient();
         $requests = [];
@@ -120,13 +123,19 @@ class GuzzleWarmer extends BaseCacheWarmer
             'concurrency' => $this->concurrency,
             'fulfilled' => function() use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
-                $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-                call_user_func($setProgressHandler, $count, $total, $progressLabel);
+
+                if (is_callable($setProgressHandler)) {
+                    $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                    call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                }
             },
             'rejected' => function($reason) use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
-                $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-                call_user_func($setProgressHandler, $count, $total, $progressLabel);
+
+                if (is_callable($setProgressHandler)) {
+                    $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                    call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                }
 
                 if ($reason instanceof RequestException) {
                     /** RequestException $reason */

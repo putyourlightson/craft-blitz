@@ -13,7 +13,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\models\SiteUriModel;
 use Symfony\Component\Process\Process;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
@@ -102,9 +101,9 @@ class GitDeployer extends BaseDeployer
      * Deploys site URIs with progress.
      *
      * @param array $siteUris
-     * @param callable $setProgressHandler
+     * @param callable|null $setProgressHandler
      */
-    protected function deployUrisWithProgress(array $siteUris, callable $setProgressHandler)
+    protected function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $count = 0;
         $total = 0;
@@ -136,8 +135,10 @@ class GitDeployer extends BaseDeployer
             $total += count($siteUris);
         }
 
-        $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-        call_user_func($setProgressHandler, $count, $total, $progressLabel);
+        if (is_callable($setProgressHandler)) {
+            $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+            call_user_func($setProgressHandler, $count, $total, $progressLabel);
+        }
 
         foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
             $repositoryPath = FileHelper::normalizePath(
@@ -171,8 +172,6 @@ class GitDeployer extends BaseDeployer
                 'git push',
             ], $repositoryPath);
         }
-
-        call_user_func($setProgressHandler, $total, $total, $progressLabel);
     }
 
     /**
