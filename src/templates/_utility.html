@@ -65,10 +65,12 @@
     {% endif %}
 {% endfor %}
 
-{{ forms.editableTableField({
-    name: 'actions',
-    id: 'actions',
-    cols: cols,
-    rows: rows,
-    staticRows: true,
-}) }}
+{% if rows|length %}
+    {{ forms.editableTableField({
+        name: 'actions',
+        id: 'actions',
+        cols: cols,
+        rows: rows,
+        staticRows: true,
+    }) }}
+{% endif %}
