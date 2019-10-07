@@ -6,7 +6,7 @@ The Blitz plugin provides intelligent static page caching for creating lightning
 
 - Reduces server response time (TTFB) and load on the server significantly. 
 - Makes your site available even when performing updates and maintenance.
-- Makes it possible to have your site served by a reverse proxy CDN.
+- Makes it possible to have your site served by a reverse proxy CDN or deployed as a static site.
 
 ## Documentation
 
@@ -24,7 +24,7 @@ This plugin requires [Craft CMS](https://craftcms.com/) 3.1.0 or later.
 
 ## Installation
 
-To install the plugin, search for "Blitz" in the Craft Plugin Store, or install manually using composer.
+To install the plugin, search for “Blitz” in the Craft Plugin Store, or install manually using composer.
 
 ```
 composer require putyourlightson/craft-blitz
