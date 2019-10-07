@@ -1,60 +1,64 @@
+{% import "_includes/forms" as forms %}
+
+
 {% set apiKey = settings.apiKey|replace('$', '') %}
 
-<table class="shadow-box editable">
-    <tbody>
-        <tr>
-            <th class="thin">{{ "Clear Cache"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: apiKey }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ "Flush Cache"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: apiKey }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ "Purge Cache"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/purge', { key: apiKey }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ "Warm Cache"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: apiKey }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ "Remote Deploy"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/deploy', { key: apiKey }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ "Refresh Cache"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh', { key: apiKey }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ "Refresh Expired Cache"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ "Refresh Cached URLs"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-urls', { key: apiKey, urls: 'https://domain.com/page1,https://domain.com/page2' }) }}</textarea>
-            </td>
-        </tr>
-        <tr>
-            <th class="thin">{{ "Refresh Tagged Cache"|t('blitz') }}</th>
-            <td class="textual code">
-                <textarea rows="1" disabled>{{ siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-tagged', { key: apiKey, tags: 'tag1,tag2,tag3' }) }}</textarea>
-            </td>
-        </tr>
-    </tbody>
-</table>
+{% set cols = {
+    action: {
+        type: 'heading',
+        heading: 'API Action'|t('blitz'),
+        thin: true,
+    },
+    url: {
+        type: 'html',
+        heading: 'URL'|t('blitz'),
+        class: 'code',
+    },
+} %}
+
+{% set rows = [
+    {
+        action: "Clear Cache"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: apiKey }),
+    },
+    {
+        action: "Flush Cache"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: apiKey }),
+    },
+    {
+        action: "Purge Cache"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/purge', { key: apiKey }),
+    },
+    {
+        action: "Warm Cache"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/warm', { key: apiKey }),
+    },
+    {
+        action: "Remote Deploy"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/deploy', { key: apiKey }),
+    },
+    {
+        action: "Refresh Cache"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh', { key: apiKey }),
+    },
+    {
+        action: "Refresh Expired Cache"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }),
+    },
+    {
+        action: "Refresh Cached URLs"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-urls', { key: apiKey, urls: siteUrl('page1') ~ ',' ~ siteUrl('page2') }),
+    },
+    {
+        action: "Refresh Tagged Cache"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-tagged', { key: apiKey, tags: 'tag1,tag2,tag3' }),
+    },
+] %}
+
+{{ forms.editableTableField({
+    name: 'actions',
+    id: 'actions',
+    cols: cols,
+    rows: rows,
+    staticRows: true,
+}) }}

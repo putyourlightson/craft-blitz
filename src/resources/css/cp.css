@@ -14,3 +14,8 @@
 table.editable tbody tr td {
     text-align: left;
 }
+
+table.editable th.code {
+    font-family: inherit;
+    font-size: inherit !important;
+}
