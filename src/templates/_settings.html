@@ -276,7 +276,7 @@
         }) }}
 
         {% set info %}
-            <span class="info">{{ "This setting determines how URLs with query strings will be cached. Read more in the [documentation]({url})."|t('blitz', {url: docs ~ 'query-string-caching'}) }}</span>
+            <span class="info">{{ 'This setting determines how URLs with query strings will be cached. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'query-string-caching'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Query String Caching"|t('blitz'),
