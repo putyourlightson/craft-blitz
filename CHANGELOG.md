@@ -11,6 +11,7 @@
 ### Changed
 - Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
 - Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
+- Improved the UI of the Blitz cache utility.
 
 ### Fixed
 - Fixed user group permissions for refreshing the cache.

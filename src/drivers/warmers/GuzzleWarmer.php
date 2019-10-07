@@ -71,36 +71,12 @@ class GuzzleWarmer extends BaseCacheWarmer
     }
 
     /**
-     * @inheritdoc
-     */
-    public function rules(): array
-    {
-        return [
-            [['concurrency'], 'required'],
-            [['concurrency'], 'integer', 'min' => 1],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getSettingsHtml()
-    {
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/guzzle/settings', [
-            'warmer' => $this,
-        ]);
-    }
-
-    // Protected Methods
-    // =========================================================================
-
-    /**
      * Warms site URIs with progress.
      *
      * @param array $siteUris
      * @param callable|null $setProgressHandler
      */
-    protected function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $client = Craft::createGuzzleClient();
         $requests = [];
@@ -150,5 +126,26 @@ class GuzzleWarmer extends BaseCacheWarmer
 
         // Initiate the transfers and wait for the pool of requests to complete
         $pool->promise()->wait();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules(): array
+    {
+        return [
+            [['concurrency'], 'required'],
+            [['concurrency'], 'integer', 'min' => 1],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettingsHtml()
+    {
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/guzzle/settings', [
+            'warmer' => $this,
+        ]);
     }
 }

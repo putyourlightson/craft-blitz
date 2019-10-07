@@ -85,25 +85,12 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getSettingsHtml()
-    {
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/deployers/git/settings', [
-            'deployer' => $this,
-        ]);
-    }
-
-    // Protected Methods
-    // =========================================================================
-
-    /**
      * Deploys site URIs with progress.
      *
      * @param array $siteUris
      * @param callable|null $setProgressHandler
      */
-    protected function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    public function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $count = 0;
         $total = 0;
@@ -173,6 +160,19 @@ class GitDeployer extends BaseDeployer
             ], $repositoryPath);
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettingsHtml()
+    {
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/deployers/git/settings', [
+            'deployer' => $this,
+        ]);
+    }
+
+    // Protected Methods
+    // =========================================================================
 
     /**
      * Runs an array of commands in a given working directory.

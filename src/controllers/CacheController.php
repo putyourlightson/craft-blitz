@@ -171,11 +171,11 @@ class CacheController extends Controller
     {
         $urls = Craft::$app->getRequest()->getParam('urls');
 
+        $urls = $this->_normalizeArguments($urls);
+
         if (empty($urls)) {
             return $this->_getResponse('At least one URL must be provided.', false);
         }
-
-        $urls = is_string($urls) ? StringHelper::split($urls) : $urls;
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
 
@@ -191,11 +191,11 @@ class CacheController extends Controller
     {
         $tags = Craft::$app->getRequest()->getParam('tags');
 
+        $tags = $this->_normalizeArguments($tags);
+
         if (empty($tags)) {
             return $this->_getResponse('At least one tag must be provided.', false);
         }
-
-        $tags = is_string($tags) ? StringHelper::split($tags) : $tags;
 
         Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
 
@@ -233,5 +233,35 @@ class CacheController extends Controller
         }
 
         return $this->redirectToPostedUrl();
+    }
+
+    /**
+     * Normalizes values as an array of arguments.
+     *
+     * @param string|array|null $values
+     *
+     * @return string[]
+     */
+    private function _normalizeArguments($values): array
+    {
+        if (is_string($values)) {
+            $values = StringHelper::split($values);
+        }
+
+        if (is_array($values)) {
+            // Flatten multi-dimensional arrays
+            array_walk($values, function(&$value) {
+                if (is_array($value)) {
+                    $value = reset($value);
+                }
+            });
+
+            // Remove empty values
+            $values = array_filter($values);
+
+            return $values;
+        }
+
+        return [];
     }
 }

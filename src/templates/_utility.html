@@ -14,29 +14,44 @@
             <p class="light">{{ action.instructions|t('blitz') }}</p>
 
             {% if action.id == 'refresh-urls' %}
-                {{ forms.autosuggest({
-                    name: 'urls',
-                    placeholder: 'https://domain.com/page-to-refresh',
-                    instructions: action.instructions|t('blitz'),
-                }) }}
-                <br/>
-            {% endif %}
 
-            {% if action.id == 'refresh-tagged' %}
-                {{ forms.autosuggest({
-                    name: 'tags',
-                    placeholder: 'tag1,tag2,tag3',
-                    suggestions: tagSuggestions,
+                {% set cols = [{
+                    type: 'singleline',
+                    heading: 'Cached URLs'|t('blitz'),
+                    placeholder: 'https://domain.com/page-to-refresh',
+                    code: true,
+                }] %}
+                {{ forms.editableTableField({
                     instructions: action.instructions|t('blitz'),
+                    name: 'urls',
+                    id: 'urls',
+                    cols: cols,
+                    rows: [],
+                    addRowLabel: "Add a URL"|t('blitz'),
                 }) }}
-                <br/>
+
+            {% elseif action.id == 'refresh-tagged' %}
+
+                {% set cols = [{
+                    type: 'singleline',
+                    heading: 'Tags'|t('blitz'),
+                    placeholder: 'tag-to-refresh',
+                    suggestions: tagSuggestions,
+                    code: true,
+                }] %}
+                {{ forms.editableTableField({
+                    instructions: action.instructions|t('blitz'),
+                    name: 'tags',
+                    id: 'tags',
+                    cols: cols,
+                    rows: [],
+                    addRowLabel: "Add a Tag"|t('blitz'),
+                }) }}
+
             {% endif %}
 
             <input type="submit" class="btn submit" value="{{ action.label|t('blitz') }}" />
         </form>
-
-        {% if not loop.last %}
-            <br>
-        {% endif %}
+        <br>
     {% endif %}
 {% endfor %}

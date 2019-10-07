@@ -79,7 +79,7 @@ class BaseDriverHelper
     public static function addDriverJob(array $siteUris, callable $jobHandler, string $description = null, int $delay = null)
     {
         // Convert SiteUriModels to arrays to keep the job data from getting too big
-        foreach ($data['siteUris'] as &$siteUri) {
+        foreach ($siteUris as &$siteUri) {
             if ($siteUri instanceof SiteUriModel) {
                 $siteUri = $siteUri->toArray();
             }
@@ -90,7 +90,7 @@ class BaseDriverHelper
             ->priority(Blitz::$plugin->settings->driverJobPriority)
             ->delay($delay)
             ->push(new DriverJob([
-                'si' => $data,
+                'siteUris' => $siteUris,
                 'jobHandler' => $jobHandler,
                 'description' => $description,
             ]));
