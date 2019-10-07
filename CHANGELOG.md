@@ -2,16 +2,15 @@
 
 ## 3.0.0 - Unreleased
 ### Added
-- Added replaceable cache warmers (Guzzle warmer).
-- Added replaceable remote deployers (Git deployer).
-- Added the ability to specify custom site URIs to be warmed.
+- Added replaceable remote deployers (Git Deployer).
+- Added replaceable cache warmers (Guzzle Warmer) with the ability to specify custom site URIs to be warmed.
 - Added remote deploy and refresh cached URI actions to utility, console command and user group permissions.
 - Added `beforeClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
 
 ### Changed
 - Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
 - Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
-- Improved the UI of the Blitz cache utility.
+- Improved the UI of the utility.
 
 ### Fixed
 - Fixed user group permissions for refreshing the cache.
@@ -174,8 +173,8 @@
 
 ## 2.0.0 - 2019-03-14
 ### Added
-- Added replaceable cache drivers (File storage, Yii cache).
-- Added replaceable reverse proxy purgers (Cloudflare).
+- Added replaceable cache drivers (File Storage, Yii Cache).
+- Added replaceable reverse proxy purgers (Cloudflare Purger).
 - Added twig tag for setting template specific cache options including tags and expiry dates.
 - Added refresh tagged cache action to utility and controllers.
 - Added purge cache action to utility and controllers.
