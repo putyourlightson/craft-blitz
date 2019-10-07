@@ -91,7 +91,7 @@
 
         <input type="hidden" name="includedUriPatterns" value="" />
         {% set info %}
-            <span class="info">{{ 'Only URIs that match the specified URI patterns will be cached.'|t('blitz') }}</span>
+            <span class="info">{{ 'Only URIs that match one or more included URI patterns will be cached.'|t('blitz') }}</span>
         {% endset %}
         {{ forms.editableTableField({
             label: "Included URI Patterns"|t('blitz'),
@@ -106,7 +106,7 @@
 
         <input type="hidden" name="excludedUriPatterns" value="" />
         {% set info %}
-            <span class="info">{{ 'The URI patterns specified here will override any matching patterns to include.'|t('blitz') }}</span>
+            <span class="info">{{ 'URIs that match one or more excluded URI patterns will not be cached. Excluded URI patterns will override any matching included URI patterns.'|t('blitz') }}</span>
         {% endset %}
         {{ forms.editableTableField({
             label: "Excluded URI Patterns"|t('blitz'),
