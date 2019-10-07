@@ -2,7 +2,7 @@
 
 
 {% set cols = {
-    heading: {
+    site: {
         type: 'heading',
         heading: "Site"|t('blitz'),
         thin: true,
@@ -29,7 +29,7 @@
 {% for site in craft.app.sites.getAllSites() %}
     {% set rows = rows|merge({
         (site.uid): {
-            heading: site.name,
+            site: site.name,
             repositoryPath: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['repositoryPath'],
             commitMessage: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['commitMessage'],
             branch: deployer.gitSettings[site.uid] is defined ? deployer.gitSettings[site.uid]['branch'],
@@ -38,7 +38,7 @@
 {% endfor %}
 
 {% set info %}
-    <span class="info">{{ 'Warmed pages will be commited and pushed to existing Git repositories using the specified settings. Git must already be installed on the server and the repositories must already exist with the appropriate credentials. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'git-deployer'})|raw }}</span>
+    <span class="info">{{ 'Cached files will be commited and pushed to existing Git repositories using the specified settings. Git must already be installed on the server and the repositories must already exist with the appropriate credentials. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'git-deployer'})|raw }}</span>
 {% endset %}
 {{ forms.editableTableField({
     label: "Git Settings"|t('blitz'),

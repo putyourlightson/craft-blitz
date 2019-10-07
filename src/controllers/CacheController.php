@@ -113,7 +113,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->cacheWarmer->warmAll();
 
-        return $this->_getResponse('Blitz cache warming successfully started.');
+        return $this->_getResponse('Blitz cache successfully queued for warming.');
     }
 
     /**
@@ -129,7 +129,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->deployer->deployAll();
 
-        return $this->_getResponse('Deployment successfully started.');
+        return $this->_getResponse('Pages successfully queued for deployment.');
     }
 
     /**
@@ -141,10 +141,10 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->refreshAll();
 
-        $message = 'Blitz cache successfully refreshed and warming started.';
+        $message = 'Blitz cache successfully refreshed.';
 
-        if (!Blitz::$plugin->settings->cachingEnabled && !Blitz::$plugin->settings->warmCacheAutomatically) {
-            $message = 'Blitz cache successfully refreshed.';
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+            $message = 'Blitz cache successfully refreshed and queued for warming.';
         }
 
         return $this->_getResponse($message);

@@ -14,9 +14,6 @@ use putyourlightson\blitz\utilities\CacheUtility;
 use yii\console\Controller;
 use yii\console\ExitCode;
 
-/**
- * Performs functions on the Blitz cache.
- */
 class CacheController extends Controller
 {
     // Properties
@@ -40,11 +37,44 @@ class CacheController extends Controller
         foreach (CacheUtility::getActions() as $action) {
             $this->_actions[$action['id']] = $action;
         }
+
+        $this->_actions['generate-expiry-dates'] = [
+            'id' => 'generate-expiry-dates',
+            'label' => Craft::t('blitz', 'Generate Expiry Dates'),
+            'instructions' => Craft::t('blitz', 'Generates and stores entry expiry dates.'),
+        ];
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function getHelp(): string
+    {
+        return 'Blitz actions.';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getHelpSummary(): string
+    {
+        return $this->getHelp();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getActionHelp($action): string
     {
         return $this->_actions[$action->id]['instructions'] ?? parent::getActionHelp($action);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getActionHelpSummary($action): string
+    {
+        return $this->getActionHelp($action);
     }
 
     /**
@@ -56,21 +86,13 @@ class CacheController extends Controller
     {
         $this->stdout(Craft::t('blitz','The following actions can be taken:').PHP_EOL.PHP_EOL, Console::FG_YELLOW);
 
-        $actions = CacheUtility::getActions();
-
-        $actions[] = [
-            'id' => 'generate-expiry-dates',
-            'label' => Craft::t('blitz', 'Generate Expiry Dates'),
-            'instructions' => Craft::t('blitz', 'Generates entry expiry dates and stores them to enable refreshing expired cache (this generally happens automatically).'),
-        ];
-
         $lengths = [];
-        foreach ($actions as $action) {
+        foreach ($this->_actions as $action) {
             $lengths[] = strlen($action['id']);
         }
         $maxLength = max($lengths);
 
-        foreach ($actions as $action) {
+        foreach ($this->_actions as $action) {
             $this->stdout('- ');
             $this->stdout(str_pad($action['id'], $maxLength, ' '), Console::FG_YELLOW);
             $this->stdout('  '.$action['instructions'].PHP_EOL);
@@ -82,8 +104,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Clears the cache (pages only).
-     *
      * @return int
      */
     public function actionClear(): int
@@ -94,8 +114,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Flushes the cache (database records only).
-     *
      * @return int
      */
     public function actionFlush(): int
@@ -106,8 +124,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Purges the cache (using reverse proxy purger).
-     *
      * @return int
      */
     public function actionPurge(): int
@@ -118,8 +134,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Warms the entire cache.
-     *
      * @return int
      */
     public function actionWarm(): int
@@ -136,8 +150,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Deploys everything.
-     *
      * @return int
      */
     public function actionDeploy(): int
@@ -154,8 +166,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes the entire cache.
-     *
      * @return int
      */
     public function actionRefresh(): int
@@ -184,8 +194,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes expired cache.
-     *
      * @return int
      */
     public function actionRefreshExpired(): int
@@ -200,8 +208,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes cached URL.
-     *
      * @param array
      *
      * @return int
@@ -224,8 +230,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes tagged cache.
-     *
      * @param array
      *
      * @return int
@@ -248,8 +252,6 @@ class CacheController extends Controller
     }
 
     /**
-     * Generates entry expiry dates.
-     *
      * @return int
      */
     public function actionGenerateExpiryDates(): int
