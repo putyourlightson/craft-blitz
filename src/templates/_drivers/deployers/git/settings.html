@@ -55,6 +55,7 @@
     rows: rows,
     staticRows: true,
     errors: deployer.getErrors('gitRepositories'),
+    required: true,
 }) }}
 
 
@@ -87,6 +88,7 @@
     name: 'name',
     value: deployer.name,
     errors: deployer.getErrors('name'),
+    required: true,
 }) }}
 
 {{ forms.textField({
@@ -95,4 +97,5 @@
     name: 'email',
     value: deployer.email,
     errors: deployer.getErrors('email'),
+    required: true,
 }) }}

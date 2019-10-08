@@ -1,30 +1,6 @@
 {% import "_includes/forms" as forms %}
 
 
-{{ forms.autosuggestField({
-    label: "Email"|t('blitz'),
-    instructions: "The email address associated with your Cloudflare account."|t('blitz'),
-    suggestEnvVars: true,
-    name: 'email',
-    value: purger.email,
-    errors: purger.getErrors('email'),
-    required: true,
-}) }}
-
-{% set info %}
-    <span class="info">{{ "The global API key can be found under “My Profile” in your Cloudflare account."|t('blitz') }}</span>
-{% endset %}
-{{ forms.autosuggestField({
-    label: "Global API Key"|t('blitz'),
-    instructions: "The global API key for your Cloudflare account."|t('blitz') ~ info,
-    suggestEnvVars: true,
-    name: 'apiKey',
-    value: purger.apiKey,
-    errors: purger.getErrors('apiKey'),
-    required: true,
-}) }}
-
-
 {% set cols = {
     heading: {
         type: 'heading',
@@ -48,7 +24,7 @@
 {% endfor %}
 
 {% set info %}
-    <span class="info">{{ "The zone IDs can be found on the “Overview” screen of your domains in your Cloudflare account. This can be set to an environment variable."|t('blitz') }}</span>
+    <span class="info">{{ 'The zone ID for each site can be found on the “Overview” screen of your domains in your Cloudflare account. This can be set to an environment variable. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://docs.craftcms.com/v3/config/environments.html'})|raw }}</span>
 {% endset %}
 {{ forms.editableTableField({
     label: "Zone IDs"|t('blitz'),
@@ -59,6 +35,31 @@
     rows: rows,
     staticRows: true,
     errors: purger.getErrors('zoneIds'),
+    required: true,
+}) }}
+
+
+{{ forms.autosuggestField({
+    label: "Email"|t('blitz'),
+    instructions: "The email address associated with your Cloudflare account."|t('blitz'),
+    suggestEnvVars: true,
+    name: 'email',
+    value: purger.email,
+    errors: purger.getErrors('email'),
+    required: true,
+}) }}
+
+{% set info %}
+    <span class="info">{{ "The global API key can be found under “My Profile” in your Cloudflare account."|t('blitz') }}</span>
+{% endset %}
+{{ forms.autosuggestField({
+    label: "Global API Key"|t('blitz'),
+    instructions: "The global API key for your Cloudflare account."|t('blitz') ~ info,
+    suggestEnvVars: true,
+    name: 'apiKey',
+    value: purger.apiKey,
+    errors: purger.getErrors('apiKey'),
+    required: true,
 }) }}
 
 {% set info %}

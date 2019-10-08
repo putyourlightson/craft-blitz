@@ -88,7 +88,7 @@ class GitDeployer extends BaseDeployer
     public function rules(): array
     {
         return [
-            [['username', 'personalAccessToken'], 'required'],
+            [['username', 'personalAccessToken', 'name', 'email'], 'required'],
             [['email'], 'email'],
         ];
     }
@@ -196,7 +196,7 @@ class GitDeployer extends BaseDeployer
             $git->checkout($branch);
             $git->add('*');
 
-            $this->_updateConfig($git, $remote, 'push');
+            $this->_updateConfig($git, $remote);
 
             // Check for changes first to avoid an exception being thrown
             if ($git->hasChanges()) {
@@ -230,7 +230,7 @@ class GitDeployer extends BaseDeployer
             try {
                 $git->checkout($branch);
 
-                $this->_updateConfig($git, $remote, 'fetch');
+                $this->_updateConfig($git, $remote);
                 $git->fetch($remote);
             }
             catch (GitException $e) {
@@ -263,9 +263,8 @@ class GitDeployer extends BaseDeployer
      *
      * @param GitWorkingCopy $git
      * @param string $remote
-     * @param string $type
      */
-    private function _updateConfig(GitWorkingCopy $git, string $remote, string $type)
+    private function _updateConfig(GitWorkingCopy $git, string $remote)
     {
         // Set user in config
         $git->config('user.name', $this->name);
@@ -274,7 +273,7 @@ class GitDeployer extends BaseDeployer
         // Clear output (important!)
         $git->clearOutput();
 
-        $remoteUrl = $git->getRemote($remote)[$type];
+        $remoteUrl = $git->getRemote($remote)['push'];
 
         // Break the URL into parts to reconstruct
         $parts = parse_url($remoteUrl);
