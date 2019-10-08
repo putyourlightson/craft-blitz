@@ -258,7 +258,7 @@ class GitDeployer extends BaseDeployer
     public function addError($attribute, $error = '')
     {
         // Remove value of personal access token to avoid it being output
-        $error = str_replace(Craft::parseEnv($this->personalAccessToken), $this->personalAccessToken, $error);
+        $error = str_replace($this->getPersonalAccessToken(), $this->personalAccessToken, $error);
 
         return parent::addError($attribute, $error);
     }
@@ -271,6 +271,14 @@ class GitDeployer extends BaseDeployer
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/deployers/git/settings', [
             'deployer' => $this,
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function getPersonalAccessToken(): string
+    {
+        return Craft::parseEnv($this->personalAccessToken);
     }
 
     // Private Methods
@@ -293,12 +301,10 @@ class GitDeployer extends BaseDeployer
 
         $remoteUrl = $git->getRemote($remote)['push'];
 
-        // Break the URL into parts to reconstruct
+        // Break the URL into parts and reconstruct
         $parts = parse_url($remoteUrl);
-
         $remoteUrl = ($parts['schema'] ?? 'https').'://'
-            //.Craft::parseEnv($this->username).':'
-            .Craft::parseEnv($this->personalAccessToken).'@'
+            .$this->getPersonalAccessToken().'@'
             .($parts['host'] ?? '')
             .($parts['path'] ?? '');
 
