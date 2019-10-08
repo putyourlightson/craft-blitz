@@ -9,11 +9,13 @@ use Craft;
 use craft\db\Table;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
+use GitWrapper\GitException;
+use GitWrapper\GitWorkingCopy;
+use GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use Symfony\Component\Process\Process;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
 use yii\log\Logger;
@@ -29,7 +31,27 @@ class GitDeployer extends BaseDeployer
     /**
      * @var array
      */
-    public $gitSettings = [];
+    public $gitRepositories = [];
+
+    /**
+     * @var string|null
+     */
+    public $username;
+
+    /**
+     * @var string|null
+     */
+    public $personalAccessToken;
+
+    /**
+     * @var string|null
+     */
+    public $name;
+
+    /**
+     * @var string|null
+     */
+    public $email;
 
     /**
      * @var string
@@ -40,6 +62,11 @@ class GitDeployer extends BaseDeployer
      * @var string
      */
     public $defaultBranch = 'master';
+
+    /**
+     * @var string
+     */
+    public $defaultRemote = 'origin';
 
     // Static
     // =========================================================================
@@ -54,6 +81,17 @@ class GitDeployer extends BaseDeployer
 
     // Public Methods
     // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    public function rules(): array
+    {
+        return [
+            [['username', 'personalAccessToken'], 'required'],
+            [['email'], 'email'],
+        ];
+    }
 
     /**
      * @inheritdoc
@@ -106,12 +144,12 @@ class GitDeployer extends BaseDeployer
                 continue;
             }
 
-            if (empty($this->gitSettings[$siteUid]) || empty($this->gitSettings[$siteUid]['repositoryPath'])) {
+            if (empty($this->gitRepositories[$siteUid]) || empty($this->gitRepositories[$siteUid]['repositoryPath'])) {
                 continue;
             }
 
             $repositoryPath = FileHelper::normalizePath(
-                Craft::parseEnv($this->gitSettings[$siteUid]['repositoryPath'])
+                Craft::parseEnv($this->gitRepositories[$siteUid]['repositoryPath'])
             );
 
             if (FileHelper::isWritable($repositoryPath) === false) {
@@ -129,7 +167,7 @@ class GitDeployer extends BaseDeployer
 
         foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
             $repositoryPath = FileHelper::normalizePath(
-                Craft::parseEnv($this->gitSettings[$siteUid]['repositoryPath'])
+                Craft::parseEnv($this->gitRepositories[$siteUid]['repositoryPath'])
             );
 
             foreach ($siteUris as $siteUri) {
@@ -144,21 +182,67 @@ class GitDeployer extends BaseDeployer
                 }
 
                 $filePath = FileHelper::normalizePath($repositoryPath.'/'.$siteUri->uri.'/index.html');
-                $this->save($value, $filePath);
+                $this->_save($value, $filePath);
             }
 
-            $commitMessage = $this->gitSettings[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
+            $commitMessage = $this->gitRepositories[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
             $commitMessage = addslashes($commitMessage);
-            $branch = $this->gitSettings[$siteUid]['branch'] ?: $this->defaultBranch;
+            $branch = $this->gitRepositories[$siteUid]['branch'] ?: $this->defaultBranch;
+            $remote = $this->gitRepositories[$siteUid]['remote'] ?: $this->defaultRemote;
 
-            // Run git commands through symfony/process (Git docs: https://devdocs.io/git/)
-            $this->runCommands([
-                'git checkout '.$branch,
-                'git add --all',
-                'git commit --message="'.$commitMessage.'"',
-                'git push',
-            ], $repositoryPath);
+            // Open repository working copy and add all files to branch
+            $gitWrapper = new GitWrapper();
+            $git = $gitWrapper->workingCopy($repositoryPath);
+            $git->checkout($branch);
+            $git->add('*');
+
+            $this->_updateConfig($git, $remote, 'push');
+
+            // Check for changes first to avoid an exception being thrown
+            if ($git->hasChanges()) {
+                $git->commit($commitMessage);
+            }
+
+            $git->push($remote);
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function test(): bool
+    {
+        foreach ($this->gitRepositories as $siteUid => $gitRepository) {
+            $repositoryPath = FileHelper::normalizePath(
+                Craft::parseEnv($gitRepository['repositoryPath'])
+            );
+
+            if (empty($repositoryPath)) {
+                continue;
+            }
+
+            $branch = $gitRepository['branch'] ?: $this->defaultBranch;
+            $remote = $gitRepository['remote'] ?: $this->defaultRemote;
+
+            $gitWrapper = new GitWrapper();
+            $git = $gitWrapper->workingCopy($repositoryPath);
+
+            try {
+                $git->checkout($branch);
+
+                $this->_updateConfig($git, $remote, 'fetch');
+                $git->fetch($remote);
+            }
+            catch (GitException $e) {
+                $site = Craft::$app->getSites()->getSiteByUid($siteUid);
+
+                if ($site !== null) {
+                    $this->addError('gitRepositories', $site->name.': '.$e->getMessage());
+                }
+            }
+        }
+
+        return !$this->hasErrors();
     }
 
     /**
@@ -171,25 +255,36 @@ class GitDeployer extends BaseDeployer
         ]);
     }
 
-    // Protected Methods
+    // Private Methods
     // =========================================================================
 
     /**
-     * Runs an array of commands in a given working directory.
+     * Updates the config with credentials.
      *
-     * @param string[] $commands
-     * @param string $cwd
+     * @param GitWorkingCopy $git
+     * @param string $remote
+     * @param string $type
      */
-    protected function runCommands(array $commands, string $cwd)
+    private function _updateConfig(GitWorkingCopy $git, string $remote, string $type)
     {
-        foreach ($commands as $command) {
-            $process = new Process($command, $cwd);
-            $process->run();
+        // Set user in config
+        $git->config('user.name', $this->name);
+        $git->config('user.email', $this->email);
 
-            if (!$process->isSuccessful()) {
-                Craft::getLogger()->log($process->getErrorOutput(), Logger::LEVEL_ERROR, 'blitz');
-            }
-        }
+        // Clear output (important!)
+        $git->clearOutput();
+
+        $remoteUrl = $git->getRemote($remote)[$type];
+
+        // Break the URL into parts to reconstruct
+        $parts = parse_url($remoteUrl);
+
+        $remoteUrl = ($parts['schema'] ?? 'https').'://'
+            .$this->username.':'.$this->personalAccessToken.'@'
+            .($parts['host'] ?? '')
+            .($parts['path'] ?? '');
+
+        $git->remote('set-url', $remote, $remoteUrl);
     }
 
     /**
@@ -198,7 +293,7 @@ class GitDeployer extends BaseDeployer
      * @param string $value
      * @param string $filePath
      */
-    protected function save(string $value, string $filePath)
+    private function _save(string $value, string $filePath)
     {
         try {
             FileHelper::writeToFile($filePath, $value);

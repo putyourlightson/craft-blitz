@@ -41,7 +41,7 @@ interface CachePurgerInterface extends SavableComponentInterface
     public function purgeAll();
 
     /**
-     * Tests the purge settings.
+     * Tests the purger settings.
      *
      * @return bool
      */

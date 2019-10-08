@@ -88,7 +88,7 @@ class CacheUtility extends Utility
         if (!Blitz::$plugin->deployer->isDummy) {
             $actions[] = [
                 'id' => 'deploy',
-                'label' => Craft::t('blitz', 'Remote Deploy'),
+                'label' => Craft::t('blitz', 'Deploy to Remote'),
                 'instructions' => Craft::t('blitz', 'Deploys all cached files to the remote location.'),
             ];
         }

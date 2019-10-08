@@ -19,6 +19,7 @@ use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
+use putyourlightson\blitz\models\SettingsModel;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -34,6 +35,8 @@ class SettingsController extends Controller
      */
     public function actionEdit()
     {
+        $settings = Blitz::$plugin->settings;
+
         // Get site options
         $siteOptions = [];
 
@@ -43,8 +46,8 @@ class SettingsController extends Controller
 
         /** @var BaseCacheStorage $storageDriver */
         $storageDriver = BaseDriverHelper::createDriver(
-            Blitz::$plugin->settings->cacheStorageType,
-            Blitz::$plugin->settings->cacheStorageSettings
+            $settings->cacheStorageType,
+            $settings->cacheStorageSettings
         );
 
         // Validate the driver so that any errors will be displayed
@@ -54,8 +57,8 @@ class SettingsController extends Controller
 
         /** @var BaseCacheWarmer $warmerDriver */
         $warmerDriver = BaseDriverHelper::createDriver(
-            Blitz::$plugin->settings->cacheWarmerType,
-            Blitz::$plugin->settings->cacheWarmerSettings
+            $settings->cacheWarmerType,
+            $settings->cacheWarmerSettings
         );
 
         // Validate the warmer so that any errors will be displayed
@@ -65,28 +68,30 @@ class SettingsController extends Controller
 
         /** @var BaseCachePurger $purgerDriver */
         $purgerDriver = BaseDriverHelper::createDriver(
-            Blitz::$plugin->settings->cachePurgerType,
-            Blitz::$plugin->settings->cachePurgerSettings
+            $settings->cachePurgerType,
+            $settings->cachePurgerSettings
         );
 
-        // Validate the purger so that any errors will be displayed
+        // Validate and test the purger so that any errors will be displayed
         $purgerDriver->validate();
+        $purgerDriver->test();
 
         $purgerDrivers = CachePurgerHelper::getAllDrivers();
 
         /** @var BaseDeployer $deployerDriver */
         $deployerDriver = BaseDriverHelper::createDriver(
-            Blitz::$plugin->settings->deployerType,
-            Blitz::$plugin->settings->deployerSettings
+            $settings->deployerType,
+            $settings->deployerSettings
         );
 
-        // Validate the deployer so that any errors will be displayed
+        // Validate and test the deployer so that any errors will be displayed
         $deployerDriver->validate();
+        $deployerDriver->test();
 
         $deployerDrivers = DeployerHelper::getAllDrivers();
 
         return $this->renderTemplate('blitz/_settings', [
-            'settings' => Blitz::$plugin->settings,
+            'settings' => $settings,
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
             'siteOptions' => $siteOptions,
             'storageDriver' => $storageDriver,
@@ -192,12 +197,25 @@ class SettingsController extends Controller
         // Save it
         Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
 
+        $notice = Craft::t('blitz', 'Plugin settings saved.');
+        $errors = [];
+
         if (!$purgerDriver->test()) {
-            Craft::$app->getSession()->setError(Craft::t('blitz', 'Plugin settings saved. Purger connection failed.'));
+            $errors[] = Craft::t('blitz', 'One or more purger connections failed.');
         }
-        else {
-            Craft::$app->getSession()->setNotice(Craft::t('blitz', 'Plugin settings saved.'));
+        if (!$deployerDriver->test()) {
+            $errors[] = Craft::t('blitz', 'One or more deployer connections failed.');
         }
+
+        if (!empty($errors)) {
+            Craft::$app->getSession()->setError($notice.' '.implode(' ', $errors));
+
+            Craft::$app->getUrlManager()->setRouteParams($variables);
+
+            return null;
+        }
+
+        Craft::$app->getSession()->setNotice($notice);
 
         return $this->redirectToPostedUrl();
     }

@@ -38,4 +38,11 @@ interface DeployerInterface extends SavableComponentInterface
      * @param callable|null $setProgressHandler
      */
     public function deployAll(int $delay = null, callable $setProgressHandler = null);
+
+    /**
+     * Tests the deployer settings.
+     *
+     * @return bool
+     */
+    public function test(): bool;
 }

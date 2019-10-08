@@ -74,4 +74,12 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
             $this->trigger(self::EVENT_AFTER_DEPLOY_ALL, $event);
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function test(): bool
+    {
+        return true;
+    }
 }
