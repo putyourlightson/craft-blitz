@@ -85,9 +85,7 @@ class SettingsModel extends Model
     /**
      * @var string[]
      */
-    public $cachePurgerTypes = [
-        CloudflarePurger::class,
-    ];
+    public $cachePurgerTypes = [CloudflarePurger::class];
 
     /**
      * @var string
@@ -102,9 +100,7 @@ class SettingsModel extends Model
     /**
      * @var string[]
      */
-    public $deployerTypes = [
-        GitDeployer::class,
-    ];
+    public $deployerTypes = [GitDeployer::class];
 
     /**
      * @var bool

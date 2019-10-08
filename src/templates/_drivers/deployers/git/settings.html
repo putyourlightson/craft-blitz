@@ -13,11 +13,6 @@
         info: "The folder path to an existing local repository. This can be set to an environment variable, or begin with an alias such as `@root`."|t('blitz'),
         placeholder: "@root/path/to/repo",
     },
-    commitMessage: {
-        type: 'singleline',
-        heading: "Commit Message"|t('blitz'),
-        placeholder: deployer.defaultCommitMessage,
-    },
     branch: {
         type: 'singleline',
         heading: "Branch"|t('blitz'),
@@ -36,7 +31,6 @@
         (site.uid): {
             site: site.name,
             repositoryPath: deployer.gitRepositories[site.uid]['repositoryPath']|default(''),
-            commitMessage: deployer.gitRepositories[site.uid]['commitMessage']|default(''),
             branch: deployer.gitRepositories[site.uid]['branch']|default(''),
             remote: deployer.gitRepositories[site.uid]['remote']|default(''),
         }
@@ -44,7 +38,7 @@
 {% endfor %}
 
 {% set info %}
-    <span class="info">{{ 'Cached files will be commited and pushed to existing Git repositories using the specified settings. Git must already be installed on the server and the repositories must already exist with the appropriate credentials. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'git-deployer'})|raw }}</span>
+    <span class="info">{{ 'Cached files will be commited and pushed to existing Git repositories using the specified settings. Git must already be installed on the server and the repositories must already exist in the provided paths. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'git-deployer'})|raw }}</span>
 {% endset %}
 {{ forms.editableTableField({
     label: "Git Repositories"|t('blitz'),
@@ -60,7 +54,7 @@
 
 
 {% set info %}
-    <span class="info">{{ 'Personal access tokens are used in place of a password when performing Git operations. They can be created through your Git service. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'git-deployer'})|raw }}</span>
+    <span class="info">{{ 'Personal access tokens are used in place of a username and password when performing Git operations. They can be created through your Git service provider. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'git-deployer'})|raw }}</span>
 {% endset %}
 {{ forms.autosuggestField({
     label: "Personal Access Token"|t('blitz'),
@@ -87,5 +81,14 @@
     name: 'email',
     value: deployer.email,
     errors: deployer.getErrors('email'),
+    required: true,
+}) }}
+
+{{ forms.textField({
+    label: "Commit Message"|t('blitz'),
+    instructions: "The commit message will be parsed for twig tags."|t('blitz'),
+    name: 'commitMessage',
+    value: deployer.commitMessage,
+    errors: deployer.getErrors('commitMessage'),
     required: true,
 }) }}

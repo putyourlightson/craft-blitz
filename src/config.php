@@ -56,17 +56,21 @@ return [
 
     // The purger type classes to add to the plugin’s default purger types.
     //'cachePurgerTypes' => [
-    //    'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
+    //   'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
     //],
 
     // The deployer type to use.
-    //'deployerType' => 'putyourlightson\blitz\drivers\deployers\DummyDeployer',
+    //'deployerType' => 'putyourlightson\blitz\drivers\deployers\GitDeployer',
 
-    // The deployer settings.
-    //'deployerSettings' => [],
+    // The deployer settings (each deployer can have its own unique settings).
+    //'deployerSettings' => [
+    //    'personalAccessToken' => '',
+    //],
 
     // The deployer type classes to add to the plugin’s default deployer types.
-    //'deployerTypes' => [],
+    //'deployerTypes' => [
+    //    'putyourlightson\blitz\drivers\deployers\GitDeployer',
+    //],
 
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,
@@ -79,9 +83,6 @@ return [
 
     // Whether the cache should automatically be warmed after clearing globals.
     //'warmCacheAutomaticallyForGlobals' => true,
-
-    // The max number of multiple concurrent requests to use when warming the cache. The higher the number, the faster the cache will be warmed and the more server processing will be required. A number between 1 and 5 is recommended.
-    //'concurrency' => 3,
 
     // Whether URLs with query strings should cached and how.
     // 0: Do not cache URLs with query strings

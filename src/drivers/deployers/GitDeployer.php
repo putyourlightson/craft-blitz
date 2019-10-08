@@ -52,7 +52,7 @@ class GitDeployer extends BaseDeployer
     /**
      * @var string
      */
-    public $defaultCommitMessage = 'Blitz auto commit';
+    public $commitMessage = 'Blitz auto commit';
 
     /**
      * @var string
@@ -97,7 +97,7 @@ class GitDeployer extends BaseDeployer
     public function rules(): array
     {
         return [
-            [['personalAccessToken', 'name', 'email'], 'required'],
+            [['personalAccessToken', 'name', 'email', 'commitMessage'], 'required'],
             [['email'], 'email'],
         ];
     }
@@ -141,7 +141,7 @@ class GitDeployer extends BaseDeployer
     {
         $count = 0;
         $total = 0;
-        $label = 'Deploying {count} of {total} pages.';
+        $label = 'Deploying {count} of {total} files.';
 
         $deployGroupedSiteUris = [];
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
@@ -174,6 +174,9 @@ class GitDeployer extends BaseDeployer
             call_user_func($setProgressHandler, $count, $total, $progressLabel);
         }
 
+        // Parse twig tags in the commit message
+        $commitMessage = Craft::$app->getView()->renderString($this->commitMessage);
+
         foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
             $repositoryPath = FileHelper::normalizePath(
                 Craft::parseEnv($this->gitRepositories[$siteUid]['repositoryPath'])
@@ -194,8 +197,6 @@ class GitDeployer extends BaseDeployer
                 $this->_save($value, $filePath);
             }
 
-            $commitMessage = $this->gitRepositories[$siteUid]['commitMessage'] ?: $this->defaultCommitMessage;
-            $commitMessage = addslashes($commitMessage);
             $branch = $this->gitRepositories[$siteUid]['branch'] ?: $this->defaultBranch;
             $remote = $this->gitRepositories[$siteUid]['remote'] ?: $this->defaultRemote;
 
@@ -209,7 +210,7 @@ class GitDeployer extends BaseDeployer
 
             // Check for changes first to avoid an exception being thrown
             if ($git->hasChanges()) {
-                $git->commit($commitMessage);
+                $git->commit(addslashes($commitMessage));
             }
 
             $git->push($remote);
@@ -249,6 +250,17 @@ class GitDeployer extends BaseDeployer
         }
 
         return !$this->hasErrors();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function addError($attribute, $error = '')
+    {
+        // Remove value of personal access token to avoid it being output
+        $error = str_replace(Craft::parseEnv($this->personalAccessToken), $this->personalAccessToken, $error);
+
+        return parent::addError($attribute, $error);
     }
 
     /**
