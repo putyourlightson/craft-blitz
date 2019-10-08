@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\deployers;
 
 use Craft;
+use craft\behaviors\EnvAttributeParserBehavior;
 use craft\db\Table;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
@@ -32,11 +33,6 @@ class GitDeployer extends BaseDeployer
      * @var array
      */
     public $gitRepositories = [];
-
-    /**
-     * @var string|null
-     */
-    public $username;
 
     /**
      * @var string|null
@@ -85,10 +81,23 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
+    public function behaviors(): array
+    {
+        return [
+            'parser' => [
+                'class' => EnvAttributeParserBehavior::class,
+                'attributes' => ['personalAccessToken'],
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules(): array
     {
         return [
-            [['username', 'personalAccessToken', 'name', 'email'], 'required'],
+            [['personalAccessToken', 'name', 'email'], 'required'],
             [['email'], 'email'],
         ];
     }
@@ -193,10 +202,10 @@ class GitDeployer extends BaseDeployer
             // Open repository working copy and add all files to branch
             $gitWrapper = new GitWrapper();
             $git = $gitWrapper->workingCopy($repositoryPath);
-            $git->checkout($branch);
-            $git->add('*');
 
             $this->_updateConfig($git, $remote);
+            $git->add('*');
+            $git->checkout($branch);
 
             // Check for changes first to avoid an exception being thrown
             if ($git->hasChanges()) {
@@ -221,16 +230,13 @@ class GitDeployer extends BaseDeployer
                 continue;
             }
 
-            $branch = $gitRepository['branch'] ?: $this->defaultBranch;
-            $remote = $gitRepository['remote'] ?: $this->defaultRemote;
-
             $gitWrapper = new GitWrapper();
             $git = $gitWrapper->workingCopy($repositoryPath);
 
-            try {
-                $git->checkout($branch);
+            $remote = $gitRepository['remote'] ?: $this->defaultRemote;
+            $this->_updateConfig($git, $remote);
 
-                $this->_updateConfig($git, $remote);
+            try {
                 $git->fetch($remote);
             }
             catch (GitException $e) {
@@ -279,7 +285,7 @@ class GitDeployer extends BaseDeployer
         $parts = parse_url($remoteUrl);
 
         $remoteUrl = ($parts['schema'] ?? 'https').'://'
-            .Craft::parseEnv($this->username).':'
+            //.Craft::parseEnv($this->username).':'
             .Craft::parseEnv($this->personalAccessToken).'@'
             .($parts['host'] ?? '')
             .($parts['path'] ?? '');

@@ -59,16 +59,6 @@
 }) }}
 
 
-{{ forms.autosuggestField({
-    label: "Username"|t('blitz'),
-    instructions: "The username of the Git account."|t('blitz'),
-    suggestEnvVars: true,
-    name: 'username',
-    value: deployer.username,
-    errors: deployer.getErrors('username'),
-    required: true,
-}) }}
-
 {% set info %}
     <span class="info">{{ 'Personal access tokens are used in place of a password when performing Git operations. They can be created through your Git service. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'git-deployer'})|raw }}</span>
 {% endset %}
