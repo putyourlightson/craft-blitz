@@ -279,7 +279,8 @@ class GitDeployer extends BaseDeployer
         $parts = parse_url($remoteUrl);
 
         $remoteUrl = ($parts['schema'] ?? 'https').'://'
-            .$this->username.':'.$this->personalAccessToken.'@'
+            .Craft::parseEnv($this->username).':'
+            .Craft::parseEnv($this->personalAccessToken).'@'
             .($parts['host'] ?? '')
             .($parts['path'] ?? '');
 
