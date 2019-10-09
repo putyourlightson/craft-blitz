@@ -64,11 +64,8 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
             return;
         }
 
-        $sites = Craft::$app->getSites()->getAllSites();
-
-        foreach ($sites as $site) {
-            $this->deploySite($site->id, $delay, $setProgressHandler);
-        }
+        $siteUris = SiteUriHelper::getAllSiteUris(true);
+        $this->deployUris($siteUris, $delay, $setProgressHandler);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY_ALL)) {
             $this->trigger(self::EVENT_AFTER_DEPLOY_ALL, $event);

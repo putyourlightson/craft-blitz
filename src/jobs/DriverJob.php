@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\jobs;
 use craft\helpers\App;
 use craft\queue\BaseJob;
 use craft\queue\Queue;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 
 class DriverJob extends BaseJob
@@ -21,9 +22,14 @@ class DriverJob extends BaseJob
     public $siteUris;
 
     /**
-     * @var callable
+     * @var string
      */
-    public $jobHandler;
+    public $driverId;
+
+    /**
+     * @var string
+     */
+    public $driverMethod;
 
     /**
      * @var Queue
@@ -42,8 +48,11 @@ class DriverJob extends BaseJob
 
         $this->_queue = $queue;
 
-        if (is_callable($this->jobHandler)) {
-            call_user_func($this->jobHandler, $this->siteUris, [$this, 'setProgressHandler']);
+        // Get driver from ID
+        $driver = Blitz::$plugin->get($this->driverId);
+
+        if ($driver !== null && is_callable([$driver, $this->driverMethod])) {
+            call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler']);
         }
     }
 

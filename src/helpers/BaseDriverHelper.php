@@ -72,11 +72,12 @@ class BaseDriverHelper
      * Adds a driver job to the queue.
      *
      * @param SiteUriModel[] $siteUris
-     * @param callable $jobHandler
+     * @param string $driverId
+     * @param string $driverMethod
      * @param string|null $description
      * @param int|null $delay
      */
-    public static function addDriverJob(array $siteUris, callable $jobHandler, string $description = null, int $delay = null)
+    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $delay = null)
     {
         // Convert SiteUriModels to arrays to keep the job data from getting too big
         foreach ($siteUris as &$siteUri) {
@@ -91,7 +92,8 @@ class BaseDriverHelper
             ->delay($delay)
             ->push(new DriverJob([
                 'siteUris' => $siteUris,
-                'jobHandler' => $jobHandler,
+                'driverId' => $driverId,
+                'driverMethod' => $driverMethod,
                 'description' => $description,
             ]));
     }

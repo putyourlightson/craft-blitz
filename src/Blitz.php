@@ -48,6 +48,7 @@ use putyourlightson\blitz\services\OutputCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
+use putyourlightson\logtofile\LogToFile;
 use yii\base\Event;
 
 /**
@@ -115,6 +116,20 @@ class Blitz extends Plugin
                 $this->_registerUserPermissions();
             }
         }
+    }
+
+    /**
+     * Logs an action
+     *
+     * @param string $message
+     * @param array $params
+     * @param string $type
+     */
+    public function log(string $message, array $params = [], string $type = 'info')
+    {
+        $message = Craft::t('blitz', $message, $params);
+
+        LogToFile::log($message, 'blitz', $type);
     }
 
     // Protected Methods
@@ -374,7 +389,7 @@ class Blitz extends Plugin
     {
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
-                // Merge so that settings controller action is first (!important)
+                // Merge so that settings controller action comes first (important!)
                 $event->rules = array_merge([
                         'settings/plugins/blitz' => 'blitz/settings/edit',
                     ],

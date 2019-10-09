@@ -120,8 +120,9 @@ class GitDeployer extends BaseDeployer
         else {
             DeployerHelper::addDriverJob(
                 $siteUris,
-                [$this, 'deployUrisWithProgress'],
-                Craft::t('blitz', 'Deploying pages'),
+                'deployer',
+                'deployUrisWithProgress',
+                Craft::t('blitz', 'Deploying files'),
                 $delay
             );
         }
@@ -200,20 +201,34 @@ class GitDeployer extends BaseDeployer
             $branch = $this->gitRepositories[$siteUid]['branch'] ?: $this->defaultBranch;
             $remote = $this->gitRepositories[$siteUid]['remote'] ?: $this->defaultRemote;
 
-            // Open repository working copy and add all files to branch
-            $gitWrapper = new GitWrapper();
-            $git = $gitWrapper->workingCopy($repositoryPath);
+            try {
+                // Open repository working copy and add all files to branch
+                $gitWrapper = new GitWrapper();
+                $git = $gitWrapper->workingCopy($repositoryPath);
 
-            $this->_updateConfig($git, $remote);
-            $git->add('*');
-            $git->checkout($branch);
+                $this->_updateConfig($git, $remote);
+                $git->add('*');
+                $git->checkout($branch);
 
-            // Check for changes first to avoid an exception being thrown
-            if ($git->hasChanges()) {
-                $git->commit(addslashes($commitMessage));
+                // Check for changes first to avoid an exception being thrown
+                if ($git->hasChanges()) {
+                    $git->commit(addslashes($commitMessage));
+                }
+
+                $git->push($remote);
             }
+            catch (GitException $e) {
+                $site = Craft::$app->getSites()->getSiteByUid($siteUid);
 
-            $git->push($remote);
+                if ($site !== null) {
+                    Blitz::$plugin->log('Deploying “{site}” failed: {error}', [
+                        'site' => $site->name,
+                        'error' => $e->getMessage(),
+                    ], 'error');
+                }
+
+                throw $e;
+            }
         }
     }
 
@@ -231,25 +246,29 @@ class GitDeployer extends BaseDeployer
                 continue;
             }
 
-            $gitWrapper = new GitWrapper();
-            $git = $gitWrapper->workingCopy($repositoryPath);
-
             $remote = $gitRepository['remote'] ?: $this->defaultRemote;
-            $this->_updateConfig($git, $remote);
 
             try {
+                $gitWrapper = new GitWrapper();
+                $git = $gitWrapper->workingCopy($repositoryPath);
+
+                $this->_updateConfig($git, $remote);
                 $git->fetch($remote);
             }
             catch (GitException $e) {
-                $site = Craft::$app->getSites()->getSiteByUid($siteUid);
+                // Remove value of personal access token to avoid it being output
+                $error = str_replace($this->getPersonalAccessToken(), $this->personalAccessToken, $e->getMessage());
 
-                if ($site !== null) {
-                    $this->addError('gitRepositories', $site->name.': '.$e->getMessage());
-                }
+                Blitz::$plugin->log('Testing GitDeployer settings for repository `{repository}` failed: {error}', [
+                    'repository' => $repositoryPath,
+                    'error' => $error,
+                ], 'error');
+
+                return false;
             }
         }
 
-        return !$this->hasErrors();
+        return true;
     }
 
     /**
@@ -264,6 +283,14 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
+     * @return string
+     */
+    public function getPersonalAccessToken(): string
+    {
+        return Craft::parseEnv($this->personalAccessToken);
+    }
+
+    /**
      * @inheritdoc
      */
     public function getSettingsHtml()
@@ -271,14 +298,6 @@ class GitDeployer extends BaseDeployer
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/deployers/git/settings', [
             'deployer' => $this,
         ]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPersonalAccessToken(): string
-    {
-        return Craft::parseEnv($this->personalAccessToken);
     }
 
     // Private Methods

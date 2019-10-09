@@ -59,7 +59,8 @@ class GuzzleWarmer extends BaseCacheWarmer
         else {
             CacheWarmerHelper::addDriverJob(
                 $siteUris,
-                [$this, 'warmUrisWithProgress'],
+                'cacheWarmer',
+                'warmUrisWithProgress',
                 Craft::t('blitz', 'Warming Blitz cache'),
                 $delay
             );

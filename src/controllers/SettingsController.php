@@ -72,10 +72,8 @@ class SettingsController extends Controller
             $settings->cachePurgerSettings
         );
 
-        // Validate (and test the purger if valid) so that any errors will be displayed
-        if ($purgerDriver->validate()) {
-            $purgerDriver->test();
-        }
+        // Validate the purger so that any errors will be displayed
+        $purgerDriver->validate();
 
         $purgerDrivers = CachePurgerHelper::getAllDrivers();
 
@@ -85,10 +83,8 @@ class SettingsController extends Controller
             $settings->deployerSettings
         );
 
-        // Validate (and test the deployer if valid) so that any errors will be displayed
-        if ($deployerDriver->validate()) {
-            $deployerDriver->test();
-        }
+        // Validate the deployer so that any errors will be displayed
+        $deployerDriver->validate();
 
         $deployerDrivers = DeployerHelper::getAllDrivers();
 

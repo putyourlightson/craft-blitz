@@ -67,11 +67,12 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      */
     public function warmAll(int $delay = null, callable $setProgressHandler = null)
     {
-        $sites = Craft::$app->getSites()->getAllSites();
+        $siteUris = array_merge(
+            SiteUriHelper::getAllSiteUris(true),
+            $this->customSiteUris
+        );
 
-        foreach ($sites as $site) {
-            $this->warmSite($site->id, $delay, $setProgressHandler);
-        }
+        $this->warmUris($siteUris, $delay, $setProgressHandler);
     }
 
     // Protected Methods

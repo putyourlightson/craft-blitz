@@ -207,7 +207,7 @@ class SettingsModel extends Model
     public function rules(): array
     {
         return [
-            [['cacheStorageType', 'queryStringCaching'], 'required'],
+            [['cacheStorageType', 'cacheWarmerType', 'queryStringCaching'], 'required'],
             [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
             [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
             [['apiKey'], 'string', 'length' => [16]],

@@ -73,7 +73,10 @@ class CacheController extends Controller
     {
         Blitz::$plugin->clearCache->clearAll();
 
-        return $this->_getResponse('Blitz cache successfully cleared.');
+        $message = 'Blitz cache successfully cleared.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
     }
 
     /**
@@ -85,7 +88,10 @@ class CacheController extends Controller
     {
         Blitz::$plugin->flushCache->flushAll();
 
-        return $this->_getResponse('Blitz cache successfully flushed.');
+        $message = 'Blitz cache successfully flushed.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
     }
 
     /**
@@ -97,7 +103,10 @@ class CacheController extends Controller
     {
         Blitz::$plugin->cachePurger->purgeAll();
 
-        return $this->_getResponse('Blitz cache successfully purged.');
+        $message = 'Blitz cache successfully purged.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
     }
 
     /**
@@ -113,7 +122,10 @@ class CacheController extends Controller
 
         Blitz::$plugin->cacheWarmer->warmAll();
 
-        return $this->_getResponse('Blitz cache successfully queued for warming.');
+        $message = 'Blitz cache successfully queued for warming.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
     }
 
     /**
@@ -129,7 +141,10 @@ class CacheController extends Controller
 
         Blitz::$plugin->deployer->deployAll();
 
-        return $this->_getResponse('Pages successfully queued for deployment.');
+        $message = 'Blitz cache successfully queued for deployment.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
     }
 
     /**
@@ -147,6 +162,8 @@ class CacheController extends Controller
             $message = 'Blitz cache successfully refreshed and queued for warming.';
         }
 
+        Blitz::$plugin->log($message);
+
         return $this->_getResponse($message);
     }
 
@@ -159,7 +176,10 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
 
-        return $this->_getResponse('Expired cache successfully refreshed.');
+        $message = 'Expired cache successfully refreshed.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
     }
 
     /**
@@ -179,7 +199,10 @@ class CacheController extends Controller
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
 
-        return $this->_getResponse('Cached URLs successfully refreshed.');
+        $message = 'Cached URLs successfully refreshed.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
     }
 
     /**
@@ -199,7 +222,10 @@ class CacheController extends Controller
 
         Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
 
-        return $this->_getResponse('Tagged cache successfully refreshed.');
+        $message = 'Tagged cache successfully refreshed.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
     }
 
     // Private Methods
