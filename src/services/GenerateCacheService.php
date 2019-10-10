@@ -318,6 +318,10 @@ class GenerateCacheService extends Component
      */
     private function _isFixedId($value)
     {
+        if (is_array($value)) {
+            $value = $value[0] ?? null;
+        }
+
         if (is_string($value) && stripos($value, 'not') !== 0) {
             return true;
         }

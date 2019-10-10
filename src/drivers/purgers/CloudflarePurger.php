@@ -130,13 +130,15 @@ class CloudflarePurger extends BaseCachePurger
                     $response = $this->_sendRequest('get', '', $site->id);
 
                     if ($response === false) {
-                        return false;
+                        $error = Craft::t('blitz', 'Error connecting to Cloudflare using zone ID for “{site}”.', ['site' => $site->name]);
+
+                        $this->addError('zoneIds', $error);
                     }
                 }
             }
         }
 
-        return true;
+        return !$this->hasErrors();
     }
 
     /**

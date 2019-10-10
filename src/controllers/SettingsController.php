@@ -72,8 +72,9 @@ class SettingsController extends Controller
             $settings->cachePurgerSettings
         );
 
-        // Validate the purger so that any errors will be displayed
+        // Validate and test the purger so that any errors will be displayed
         $purgerDriver->validate();
+        $purgerDriver->test();
 
         $purgerDrivers = CachePurgerHelper::getAllDrivers();
 
@@ -83,8 +84,9 @@ class SettingsController extends Controller
             $settings->deployerSettings
         );
 
-        // Validate the deployer so that any errors will be displayed
+        // Validate and test the deployer so that any errors will be displayed
         $deployerDriver->validate();
+        $deployerDriver->test();
 
         $deployerDrivers = DeployerHelper::getAllDrivers();
 
@@ -184,7 +186,10 @@ class SettingsController extends Controller
         $purgerDriver->validate();
         $deployerDriver->validate();
 
-        if ($settings->hasErrors() || $storageDriver->hasErrors() || $warmerDriver->hasErrors() || $purgerDriver->hasErrors() || $deployerDriver->hasErrors()) {
+        if (
+            $settings->hasErrors() || $storageDriver->hasErrors() || $warmerDriver->hasErrors()
+            || $purgerDriver->hasErrors() || $deployerDriver->hasErrors()
+        ) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
 
             Craft::$app->getUrlManager()->setRouteParams($variables);

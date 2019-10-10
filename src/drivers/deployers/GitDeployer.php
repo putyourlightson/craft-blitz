@@ -256,19 +256,23 @@ class GitDeployer extends BaseDeployer
                 $git->fetch($remote);
             }
             catch (GitException $e) {
-                // Remove value of personal access token to avoid it being output
-                $error = str_replace($this->getPersonalAccessToken(), $this->personalAccessToken, $e->getMessage());
+                $site = Craft::$app->getSites()->getSiteByUid($siteUid);
 
-                Blitz::$plugin->log('Testing GitDeployer settings for repository `{repository}` failed: {error}', [
-                    'repository' => $repositoryPath,
-                    'error' => $error,
-                ], 'error');
+                if ($site !== null) {
+                    $error = Craft::t('blitz', 'Error for “{site}”: {error}', [
+                        'site' => $site->name,
+                        'error' => $e->getMessage(),
+                    ]);
 
-                return false;
+                    // Remove value of personal access token to avoid it being output in plaintext
+                    $error = str_replace($this->getPersonalAccessToken(), $this->personalAccessToken, $error);
+
+                    $this->addError('gitRepositories', $error);
+                }
             }
         }
 
-        return true;
+        return !$this->hasErrors();
     }
 
     /**
