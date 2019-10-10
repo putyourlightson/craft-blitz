@@ -106,11 +106,10 @@ class GenerateCacheService extends Component
         }
 
         // Don't proceed if the query has fixed IDs or UIDs
-        if (
-            $this->_isFixedId($elementQuery->id)
-            || $this->_isFixedId($elementQuery->where['elements.id'])
+        if ($this->_isFixedId($elementQuery->id)
             || $this->_isFixedId($elementQuery->uid)
-            || $this->_isFixedId($elementQuery->where['elements.uid'])
+            || $this->_isFixedId($elementQuery->where['elements.id'] ?? null)
+            || $this->_isFixedId($elementQuery->where['elements.uid'] ?? null)
         ) {
             return;
         }
