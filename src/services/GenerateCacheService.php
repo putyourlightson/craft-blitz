@@ -96,12 +96,16 @@ class GenerateCacheService extends Component
     public function addElementQuery(ElementQuery $elementQuery)
     {
         // Don't proceed if element query caching is disabled
-        if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
+        if (!Blitz::$plugin->settings->cacheElementQueries
+            || !$this->options->cacheElementQueries
+        ) {
             return;
         }
 
         // Don't proceed if not a cacheable element type
-        if (empty($elementQuery->elementType) || !ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)) {
+        if (empty($elementQuery->elementType)
+            || !ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)
+        ) {
             return;
         }
 
@@ -127,7 +131,7 @@ class GenerateCacheService extends Component
         $mutex = Craft::$app->getMutex();
         $lockName = 'blitz:query:'.$index;
 
-        if (!$mutex->acquire($lockName)) {
+        if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
         }
 
@@ -180,7 +184,7 @@ class GenerateCacheService extends Component
         $mutex = Craft::$app->getMutex();
         $lockName = 'blitz:save:'.$siteUri->siteId.'-'.$siteUri->uri;
 
-        if (!$mutex->acquire($lockName)) {
+        if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
         }
 

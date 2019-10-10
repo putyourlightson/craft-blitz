@@ -185,6 +185,11 @@ class SettingsModel extends Model
      */
     public $driverJobPriority = 100;
 
+    /**
+     * @var int|null
+     */
+    public $mutexTimeout = 1;
+
     // Public Methods
     // =========================================================================
 

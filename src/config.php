@@ -133,4 +133,7 @@ return [
 
     // The priority to give the deploy job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
     //'deployJobPriority' => 102,
+
+    // The time in seconds to wait for mutex locks to be released.
+    //'mutexTimeout' => 1,
 ];
