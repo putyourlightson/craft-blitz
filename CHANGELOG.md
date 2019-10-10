@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 2.3.2 - 2019-10-10
+### Fixed
+- Fixed bug introduced in 2.3.1.
+
 ## 2.3.1 - 2019-10-10
 ### Added
 - Added a timestamp to the `Served by Blitz` HTML comment.
