@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\drivers\storage;
 
 use Craft;
 use craft\helpers\FileHelper;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
@@ -104,10 +105,10 @@ class FileStorage extends BaseCacheStorage
             FileHelper::writeToFile($filePath, $value);
         }
         catch (ErrorException $e) {
-            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+            Blitz::$plugin->log($e->getMessage(), [], 'error');
         }
         catch (InvalidArgumentException $e) {
-            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+            Blitz::$plugin->log($e->getMessage(), [], 'error');
         }
     }
 
@@ -139,7 +140,7 @@ class FileStorage extends BaseCacheStorage
             FileHelper::removeDirectory($this->_cacheFolderPath);
         }
         catch (ErrorException $e) {
-            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+            Blitz::$plugin->log($e->getMessage(), [], 'error');
         }
     }
 

@@ -5,7 +5,8 @@
 - Added replaceable remote deployers (Git Deployer).
 - Added replaceable cache warmers (Guzzle Warmer) with the ability to specify custom site URIs to be warmed.
 - Added remote deploy and refresh cached URI actions to utility, console command and user group permissions.
-- Added logging of utility actions and other events to `storage/logs/blitz.log`.
+- Added utility to refresh one or more cached URLs.
+- Added logging of utility actions and other events and errors to `storage/logs/blitz.log`.
 - Added `beforeClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
 
 ### Changed

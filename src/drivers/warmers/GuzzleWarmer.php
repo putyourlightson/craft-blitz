@@ -9,6 +9,7 @@ use Craft;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
@@ -119,7 +120,7 @@ class GuzzleWarmer extends BaseCacheWarmer
                     preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
 
                     if (!empty($matches[1])) {
-                        Craft::getLogger()->log(trim($matches[1], ':'), Logger::LEVEL_ERROR, 'blitz');
+                        Blitz::$plugin->log(trim($matches[1], ':'), [], 'error');
                     }
                 }
             },

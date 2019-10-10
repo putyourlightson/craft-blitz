@@ -342,10 +342,10 @@ class GitDeployer extends BaseDeployer
             FileHelper::writeToFile($filePath, $value);
         }
         catch (ErrorException $e) {
-            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+            Blitz::$plugin->log($e->getMessage(), [], 'error');
         }
         catch (InvalidArgumentException $e) {
-            Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+            Blitz::$plugin->log($e->getMessage(), [], 'error');
         }
     }
 }
