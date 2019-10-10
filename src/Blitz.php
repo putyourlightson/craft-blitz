@@ -88,9 +88,9 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
-        // Register services and variable before processing the request
+        // Register services and variables before processing the request
         $this->_registerComponents();
-        $this->_registerVariable();
+        $this->_registerVariables();
 
         // Process the request
         $this->_processCacheableRequest();
@@ -171,9 +171,9 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers variable
+     * Registers variables
      */
-    private function _registerVariable()
+    private function _registerVariables()
     {
         Event::on(CraftVariable::class, CraftVariable::EVENT_INIT,
             function(Event $event) {
@@ -219,6 +219,8 @@ class Blitz extends Plugin
             function(TemplateEvent $event) use ($response, $siteUri) {
                 if ($response->getIsOk()) {
                     $this->generateCache->save($event->output, $siteUri);
+
+                    $this->outputCache->output($siteUri);
                 }
             }
         );

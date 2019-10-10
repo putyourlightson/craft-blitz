@@ -1,5 +1,13 @@
 # Release Notes for Blitz
 
+## 2.3.1 - 2019-10-10
+### Added
+- Added a timestamp to the `Served by Blitz` HTML comment.
+
+### Fixed
+- Fixed element queries not being stored for cache invalidation if they specified an ID to exclude using the `id` parameter.
+- Fixed response headers not being sent in the initial cache output in some cases.
+
 ## 2.3.0 - 2019-10-05
 ### Added
 - Added the ability to dynamically get and inject templates with the `craft.blitz.getTemplate` template tag and the `TemplatesController::actionGet` controller action ([#129](https://github.com/putyourlightson/craft-blitz/issues/129)).

@@ -105,8 +105,13 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has fixed IDs
-        if (!empty($elementQuery->id) || !empty($elementQuery->where['elements.id'])) {
+        // Don't proceed if the query has fixed IDs or UIDs
+        if (
+            $this->_isFixedId($elementQuery->id)
+            || $this->_isFixedId($elementQuery->where['elements.id'])
+            || $this->_isFixedId($elementQuery->uid)
+            || $this->_isFixedId($elementQuery->where['elements.uid'])
+        ) {
             return;
         }
 
@@ -305,6 +310,20 @@ class GenerateCacheService extends Component
         array_walk_recursive($params, [$this, '_convertQueryParams']);
 
         return $params;
+    }
+
+    /**
+     * Returns whether the value is a fixed ID.
+     *
+     * @param mixed $value
+     */
+    private function _isFixedId($value)
+    {
+        if (!empty($value) && stripos($value, 'not') !== 0) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

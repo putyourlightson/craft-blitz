@@ -46,36 +46,35 @@ class OutputCacheService extends Component
             return;
         }
 
-        // Update cache control header
-        header('Cache-Control: '.Blitz::$plugin->settings->cacheControlHeader);
+        $response = Craft::$app->getResponse();
+        $headers = $response->getHeaders();
 
-        // Update powered by header
-        header_remove('X-Powered-By');
+        $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
 
+        // Add the Craft `X-Powered-By` header as it will not have been added at this point
         if (Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader) {
-            header('X-Powered-By: '.Craft::$app->name, false);
+            $headers->add('X-Powered-By', Craft::$app->name);
         }
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            header('X-Powered-By: Blitz', false);
+            $headers->add('X-Powered-By', Blitz::$plugin->name);
         }
 
         // Add cache tag header if set
         $tags = Blitz::$plugin->cacheTags->getSiteUriTags($siteUri);
 
         if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
-            $header = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
-            header(Blitz::$plugin->cachePurger->tagHeaderName.': '.$header);
+            $tagsHeader = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
+            $headers->set(Blitz::$plugin->cachePurger->tagHeaderName, $tagsHeader);
         }
 
         // Append served by comment
         if (Blitz::$plugin->settings->outputComments) {
-            $value .= '<!-- Served by Blitz -->';
+            $value .= '<!-- Served by Blitz on '.date('c').' -->';
         }
 
-        // Create and send response
-        $response = Craft::$app->getResponse();
         $response->data = $value;
+
         Craft::$app->end(0, $response);
     }
 }
