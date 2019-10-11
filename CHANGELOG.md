@@ -1,6 +1,8 @@
 # Release Notes for Blitz
 
 ## 2.3.3 - 2019-10-11
+> {note} This release optimises the cache invalidation process therefore the cache should be refreshed following the update to take advantage of the improvements.
+
 ### Changed
 - Improved performance and stability of cache invalidation by removing redundant element queries. 
 
