@@ -25,6 +25,19 @@ use yii\db\Exception;
 
 class GenerateCacheService extends Component
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @const string
+     */
+    const MUTEX_LOCK_NAME_QUERY = 'blitz:query';
+
+    /**
+     * @const string
+     */
+    const MUTEX_LOCK_NAME_SITE_URI = 'blitz:siteUri';
+
     // Properties
     // =========================================================================
 
@@ -125,7 +138,7 @@ class GenerateCacheService extends Component
         $index = sprintf('%u', crc32($elementQuery->elementType.$params));
 
         $mutex = Craft::$app->getMutex();
-        $lockName = 'blitz:query:'.$index;
+        $lockName = self::MUTEX_LOCK_NAME_QUERY.':'.$index;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
@@ -178,7 +191,7 @@ class GenerateCacheService extends Component
         }
 
         $mutex = Craft::$app->getMutex();
-        $lockName = 'blitz:save:'.$siteUri->siteId.'-'.$siteUri->uri;
+        $lockName = self::MUTEX_LOCK_NAME_SITE_URI.':'.$siteUri->siteId.'-'.$siteUri->uri;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
@@ -335,6 +348,10 @@ class GenerateCacheService extends Component
 
             if (is_array($value)) {
                 $value = $value[0] ?? null;
+            }
+
+            if (is_int($value)) {
+                return true;
             }
 
             if (is_string($value) && stripos($value, 'not') !== 0) {

@@ -7,8 +7,13 @@
 namespace putyourlightson\blitztests\unit;
 
 use Codeception\Test\Unit;
+use craft\elements\Entry;
+use craft\elements\User;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\ElementCacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
 use UnitTester;
 
 /**
@@ -27,6 +32,16 @@ class GenerateCacheTest extends Unit
      */
     protected $tester;
 
+    /**
+     * @var SiteUriModel
+     */
+    private $siteUri;
+
+    /**
+     * @var string
+     */
+    private $output;
+
     // Protected methods
     // =========================================================================
 
@@ -37,6 +52,14 @@ class GenerateCacheTest extends Unit
         Blitz::$plugin->generateCache->options->cachingEnabled = true;
 
         Blitz::$plugin->cacheStorage->deleteAll();
+        Blitz::$plugin->flushCache->flushAll();
+
+        $this->siteUri = new SiteUriModel([
+            'siteId' => 1,
+            'uri' => 'page',
+        ]);
+
+        $this->output = 'xyz';
     }
 
     protected function _after()
@@ -47,21 +70,77 @@ class GenerateCacheTest extends Unit
     // Public methods
     // =========================================================================
 
-    public function testPageCached()
+    public function testCacheSaved()
     {
-        $siteUri = new SiteUriModel([
-            'siteId' => 1,
-            'uri' => 'page',
-        ]);
-
-        $output = 'xyz';
-
-        // Assert that the statically cached file is empty
-        $this->assertEmpty(Blitz::$plugin->cacheStorage->get($siteUri));
-
-        Blitz::$plugin->generateCache->save($output, $siteUri);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         // Assert that the statically cached file contains the output
-        $this->assertContains($output, Blitz::$plugin->cacheStorage->get($siteUri));
+        $this->assertContains($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
+    }
+
+    public function testCacheRecordSaved()
+    {
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        $count = CacheRecord::find()
+            ->where($this->siteUri->toArray())
+            ->count();
+
+        // Assert that the record was saved
+        $this->assertEquals(1, $count);
+    }
+
+    public function testElementCacheRecordSaved()
+    {
+        $element = User::find()->one();
+        Blitz::$plugin->generateCache->addElement($element);
+
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        $count = ElementCacheRecord::find()
+            ->where(['elementId' => $element->id])
+            ->count();
+
+        // Assert that the record was saved
+        $this->assertEquals(1, $count);
+    }
+
+    public function testElementQueryRecordsSaved()
+    {
+        $elementQueries = [
+            Entry::find(),
+            Entry::find()->id('not 1'),
+            Entry::find()->id(['not', 1]),
+            Entry::find()->id(['not', '1']),
+        ];
+
+        foreach ($elementQueries as $elementQuery) {
+            Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        }
+
+        $count = ElementQueryRecord::find()->count();
+
+        // Assert that all records were saved
+        $this->assertEquals(count($elementQueries), $count);
+    }
+
+    public function testElementQueryRecordsNotSaved()
+    {
+        $elementQueries = [
+            Entry::find()->id(1),
+            Entry::find()->id('1'),
+            Entry::find()->id('1, 2, 3'),
+            Entry::find()->id([1, 2, 3]),
+            Entry::find()->id(['1', '2', '3']),
+        ];
+
+        foreach ($elementQueries as $elementQuery) {
+            Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        }
+
+        $count = ElementQueryRecord::find()->count();
+
+        // Assert that no records were saved
+        $this->assertEquals(0, $count);
     }
 }

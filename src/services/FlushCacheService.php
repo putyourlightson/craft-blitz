@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -56,7 +57,15 @@ class FlushCacheService extends Component
             return;
         }
 
+        $mutex = Craft::$app->getMutex();
+
         foreach ($event->siteUris as $siteUri) {
+            $lockName = GenerateCacheService::MUTEX_LOCK_NAME_SITE_URI.':'.$siteUri->siteId.'-'.$siteUri->uri;
+
+            if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
+                continue;
+            }
+
             CacheRecord::deleteAll([
                 'siteId' => $siteUri->siteId,
                 'uri' => $siteUri->uri,

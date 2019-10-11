@@ -17,6 +17,10 @@
 ### Fixed
 - Fixed user group permissions for refreshing the cache.
 
+## 2.3.3 - 2019-10-11
+### Changed
+- Improvement performance and stability of cache invalidation by removing redundant element queries. 
+
 ## 2.3.2 - 2019-10-10
 ### Fixed
 - Fixed bug introduced in 2.3.1.
