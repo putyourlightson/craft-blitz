@@ -105,12 +105,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has fixed IDs or UIDs
-        if ($this->_isFixedId($elementQuery->id)
-            || $this->_isFixedId($elementQuery->uid)
-            || $this->_isFixedId($elementQuery->where['elements.id'] ?? null)
-            || $this->_isFixedId($elementQuery->where['elements.uid'] ?? null)
-        ) {
+        // Don't proceed if the query has fixed IDs
+        if ($this->_hasFixedIds($elementQuery)) {
             return;
         }
 
@@ -312,14 +308,38 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Returns whether the value is a fixed ID.
+     * Returns whether the element query has fixed IDs.
      *
-     * @param mixed $value
+     * @param ElementQuery $elementQuery
+     *
+     * @return bool
      */
-    private function _isFixedId($value)
+    private function _hasFixedIds(ElementQuery $elementQuery): bool
     {
-        if (is_string($value) && stripos($value, 'not') !== 0) {
-            return true;
+        // The query values to check
+        $values = [
+            $elementQuery->id,
+            $elementQuery->uid,
+            $elementQuery->where['elements.id'] ?? null,
+            $elementQuery->where['elements.uid'] ?? null,
+        ];
+
+        foreach ($values as $value) {
+            if (empty($value)) {
+                continue;
+            }
+
+            if (is_array($value)) {
+                $value = $value[0] ?? null;
+            }
+
+            if (is_int($value)) {
+                return true;
+            }
+
+            if (is_string($value) && stripos($value, 'not') !== 0) {
+                return true;
+            }
         }
 
         return false;
