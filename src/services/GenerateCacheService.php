@@ -122,8 +122,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has has a fixed ID
-        if ($this->_hasFixedId($elementQuery)) {
+        // Don't proceed if the query has fixed IDs
+        if ($this->_hasFixedIds($elementQuery)) {
             return;
         }
 
@@ -325,13 +325,13 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Returns whether the element query has a fixed ID.
+     * Returns whether the element query has fixed IDs.
      *
      * @param ElementQuery $elementQuery
      *
      * @return bool
      */
-    private function _hasFixedId(ElementQuery $elementQuery): bool
+    private function _hasFixedIds(ElementQuery $elementQuery): bool
     {
         // The query values to check
         $values = [

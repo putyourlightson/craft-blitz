@@ -13,6 +13,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
+use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use UnitTester;
 
@@ -100,6 +101,19 @@ class GenerateCacheTest extends Unit
         $count = ElementCacheRecord::find()
             ->where(['elementId' => $element->id])
             ->count();
+
+        // Assert that the record was saved
+        $this->assertEquals(1, $count);
+    }
+
+    public function testElementQueryCacheRecordSaved()
+    {
+        $elementQuery = Entry::find();
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        $count = ElementQueryCacheRecord::find()->count();
 
         // Assert that the record was saved
         $this->assertEquals(1, $count);
