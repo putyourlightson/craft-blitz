@@ -17,7 +17,6 @@ use craft\events\PluginEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
-use craft\events\RegisterTemplateRootsEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
@@ -35,7 +34,6 @@ use putyourlightson\blitz\drivers\deployers\BaseDeployer;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
-use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SettingsModel;
@@ -107,7 +105,6 @@ class Blitz extends Plugin
 
         // Register control panel events
         if (Craft::$app->getRequest()->getIsCpRequest()) {
-            $this->_registerCpTemplateRoots();
             $this->_registerCpUrlRules();
             $this->_registerUtilities();
             $this->_registerRedirectAfterInstall();
@@ -359,27 +356,6 @@ class Blitz extends Plugin
         Event::on(Gc::class, Gc::EVENT_RUN,
             function() {
                 $this->flushCache->runGarbageCollection();
-            }
-        );
-    }
-
-    /**
-     * Registers CP template roots event
-     */
-    private function _registerCpTemplateRoots()
-    {
-        Event::on(View::class, View::EVENT_REGISTER_CP_TEMPLATE_ROOTS,
-            function(RegisterTemplateRootsEvent $event) {
-                $purgerDrivers = CachePurgerHelper::getAllDrivers();
-
-                // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
-                $templateRootSets = [$event->roots];
-
-                foreach ($purgerDrivers as $purgerDriver) {
-                    $templateRootSets[] = $purgerDriver::getTemplatesRoot();
-                }
-
-                $event->roots = array_merge(...$templateRootSets);
             }
         );
     }

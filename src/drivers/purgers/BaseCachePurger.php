@@ -40,17 +40,6 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
      */
     const EVENT_AFTER_PURGE_ALL_CACHE = 'afterPurgeAllCache';
 
-    // Static Methods
-    // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    public static function getTemplatesRoot(): array
-    {
-        return [];
-    }
-
     // Public Methods
     // =========================================================================
 

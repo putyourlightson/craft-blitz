@@ -10,14 +10,6 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 interface CachePurgerInterface extends SavableComponentInterface
 {
-    // Static Methods
-    // =========================================================================
-
-    /**
-     * Returns the template roots.
-     */
-    public static function getTemplatesRoot(): array;
-
     // Public Methods
     // =========================================================================
 

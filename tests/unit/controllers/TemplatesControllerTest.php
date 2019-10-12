@@ -22,6 +22,20 @@ class TemplatesControllerTest extends BaseControllerTest
     // Public methods
     // =========================================================================
 
+    public function testGetSuccess()
+    {
+        Craft::$app->getView()->setTemplateMode('site');
+
+        $response = $this->runActionWithParams('templates/get', [
+            'template' => Craft::$app->getSecurity()->hashData('_hidden'),
+        ]);
+
+        $this->assertInstanceOf(Response::class, $response);
+
+        // Assert that the output is correct
+        $this->assertEquals('xyz', trim($response->data));
+    }
+
     public function testGetBadRequestHttpException()
     {
         // Expect an exception
@@ -40,19 +54,5 @@ class TemplatesControllerTest extends BaseControllerTest
         $this->runActionWithParams('templates/get', [
             'template' => Craft::$app->getSecurity()->hashData('_nonexistant'),
         ]);
-    }
-
-    public function testGetSuccess()
-    {
-        Craft::$app->getView()->setTemplateMode('site');
-
-        $response = $this->runActionWithParams('templates/get', [
-            'template' => Craft::$app->getSecurity()->hashData('_hidden'),
-        ]);
-
-        $this->assertInstanceOf(Response::class, $response);
-
-        // Assert that the output is correct
-        $this->assertEquals('xyz', trim($response->data));
     }
 }
