@@ -53,9 +53,11 @@ class CacheUtility extends Utility
     /**
      * Returns available actions.
      *
+     * @param bool $showAll
+     *
      * @return array
      */
-    public static function getActions(): array
+    public static function getActions(bool $showAll = false): array
     {
         $actions = [];
 
@@ -71,7 +73,7 @@ class CacheUtility extends Utility
             'instructions' => Craft::t('blitz', 'Deletes all cache records from the database.'),
         ];
 
-        if (!Blitz::$plugin->cachePurger->isDummy) {
+        if ($showAll || !Blitz::$plugin->cachePurger->isDummy) {
             $actions[] = [
                 'id' => 'purge',
                 'label' => Craft::t('blitz', 'Purge Cache'),
@@ -85,7 +87,7 @@ class CacheUtility extends Utility
             'instructions' => Craft::t('blitz', 'Warms all of the cacheable pages.'),
         ];
 
-        if (!Blitz::$plugin->deployer->isDummy) {
+        if ($showAll || !Blitz::$plugin->deployer->isDummy) {
             $actions[] = [
                 'id' => 'deploy',
                 'label' => Craft::t('blitz', 'Deploy to Remote'),

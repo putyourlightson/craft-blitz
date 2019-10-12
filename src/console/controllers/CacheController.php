@@ -34,7 +34,7 @@ class CacheController extends Controller
     {
         parent::init();
 
-        foreach (CacheUtility::getActions() as $action) {
+        foreach (CacheUtility::getActions(true) as $action) {
             $this->_actions[$action['id']] = $action;
         }
 
