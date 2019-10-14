@@ -171,14 +171,6 @@ class SettingsController extends Controller
             $settings->deployerSettings
         );
 
-        $variables = [
-            'settings' => $settings,
-            'storageDriver' => $storageDriver,
-            'warmerDriver' => $warmerDriver,
-            'purgerDriver' => $purgerDriver,
-            'deployerDriver' => $deployerDriver,
-        ];
-
         // Validate
         $settings->validate();
         $storageDriver->validate();
@@ -191,8 +183,6 @@ class SettingsController extends Controller
             || $purgerDriver->hasErrors() || $deployerDriver->hasErrors()
         ) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
-
-            Craft::$app->getUrlManager()->setRouteParams($variables);
 
             return null;
         }
@@ -212,8 +202,6 @@ class SettingsController extends Controller
 
         if (!empty($errors)) {
             Craft::$app->getSession()->setError($notice.' '.implode(' ', $errors));
-
-            Craft::$app->getUrlManager()->setRouteParams($variables);
 
             return null;
         }

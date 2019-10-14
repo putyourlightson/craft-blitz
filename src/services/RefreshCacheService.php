@@ -350,8 +350,6 @@ class RefreshCacheService extends Component
 
         $siteUris = $event->siteUris;
 
-        Blitz::$plugin->flushCache->flushUris($siteUris);
-
         Blitz::$plugin->clearCache->clearUris($siteUris);
 
         // Warm and deploy if enabled
@@ -383,7 +381,6 @@ class RefreshCacheService extends Component
 
         Blitz::$plugin->flushCache->flushAll();
         Blitz::$plugin->clearCache->clearAll();
-        Blitz::$plugin->cachePurger->purgeAll();
 
         // Warm and deploy if enabled
         if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {

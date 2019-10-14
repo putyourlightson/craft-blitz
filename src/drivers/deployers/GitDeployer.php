@@ -19,7 +19,6 @@ use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
-use yii\log\Logger;
 
 /**
  * @property mixed $settingsHtml

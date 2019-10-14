@@ -76,9 +76,12 @@ class BaseDriverHelper
      * @param string $driverMethod
      * @param string|null $description
      * @param int|null $delay
+     * @param int|null $priority
      */
-    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $delay = null)
+    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $delay = null, int $priority = null)
     {
+        $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
+
         // Convert SiteUriModels to arrays to keep the job data from getting too big
         foreach ($siteUris as &$siteUri) {
             if ($siteUri instanceof SiteUriModel) {
@@ -88,7 +91,7 @@ class BaseDriverHelper
 
         // Add job to queue with a priority and delay
         Craft::$app->getQueue()
-            ->priority(Blitz::$plugin->settings->driverJobPriority)
+            ->priority($priority)
             ->delay($delay)
             ->push(new DriverJob([
                 'siteUris' => $siteUris,
