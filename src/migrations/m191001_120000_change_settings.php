@@ -5,6 +5,7 @@ namespace putyourlightson\blitz\migrations;
 use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\FileStorage;
 
 class m191001_120000_change_settings extends Migration
 {
@@ -28,7 +29,8 @@ class m191001_120000_change_settings extends Migration
 
         // Prepend `@webroot` to folder path in cache storage
         if ($settings['cacheStorageType'] == 'putyourlightson\blitz\drivers\storage\FileStorage') {
-            $settings['cacheStorageSettings']['folderPath'] = '@webroot/'.trim($settings['cacheStorageSettings']['folderPath'], '/');
+            $folderPath = $settings['cacheStorageSettings']['folderPath'] ?? 'cache/blitz';
+            $settings['cacheStorageSettings']['folderPath'] = '@webroot/'.trim($folderPath, '/');
         }
 
         // Add keys to URI patterns
