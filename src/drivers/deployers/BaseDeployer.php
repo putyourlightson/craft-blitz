@@ -5,7 +5,6 @@
 
 namespace putyourlightson\blitz\drivers\deployers;
 
-use Craft;
 use craft\base\SavableComponent;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;

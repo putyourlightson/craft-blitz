@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.0.0 - Unreleased
+## 3.0.0-beta.1 - 2019-10-15
 ### Added
 - Added replaceable remote deployers (Git Deployer).
 - Added replaceable cache warmers (Guzzle Warmer) with the ability to specify custom site URIs to be warmed.

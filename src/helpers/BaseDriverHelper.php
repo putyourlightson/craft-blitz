@@ -6,13 +6,11 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
-use craft\base\SavableComponentInterface;
-use craft\errors\MissingComponentException;
+use craft\base\SavableComponent;
 use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
-use yii\base\InvalidConfigException;
 
 class BaseDriverHelper
 {
@@ -24,13 +22,12 @@ class BaseDriverHelper
      *
      * @param array $types
      *
-     * @return SavableComponentInterface[]
+     * @return SavableComponent[]
      */
     public static function createDrivers(array $types): array
     {
         $drivers = [];
 
-        /** @var SavableComponentInterface $type */
         foreach ($types as $type) {
             if ($type::isSelectable()) {
                 $driver = self::createDriver($type);
@@ -50,20 +47,15 @@ class BaseDriverHelper
      * @param string $type
      * @param array|null $settings
      *
-     * @return SavableComponentInterface|null
+     * @return SavableComponent
      */
     public static function createDriver(string $type, array $settings = [])
     {
-        $driver = null;
-
-        try {
-            $driver = Component::createComponent([
-                'type' => $type,
-                'settings' => $settings,
-            ]);
-        }
-        catch (InvalidConfigException $e) {}
-        catch (MissingComponentException $e) {}
+        /** @var SavableComponent $driver */
+        $driver = Component::createComponent([
+            'type' => $type,
+            'settings' => $settings,
+        ], SavableComponent::class);
 
         return $driver;
     }
@@ -82,7 +74,7 @@ class BaseDriverHelper
     {
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
 
-        // Convert SiteUriModels to arrays to keep the job data from getting too big
+        // Convert SiteUriModels to arrays to keep the job data minimal
         foreach ($siteUris as &$siteUri) {
             if ($siteUri instanceof SiteUriModel) {
                 $siteUri = $siteUri->toArray();

@@ -19,7 +19,6 @@ use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
-use putyourlightson\blitz\models\SettingsModel;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -145,7 +144,6 @@ class SettingsController extends Controller
         $settings->cacheWarmerSettings = $warmerSettings[$settings->cacheWarmerType] ?? [];
 
         // Create the warmer driver so that we can validate it
-        /* @var BaseCacheWarmer $storageDriver */
         $warmerDriver = BaseDriverHelper::createDriver(
             $settings->cacheWarmerType,
             $settings->cacheWarmerSettings
@@ -155,7 +153,6 @@ class SettingsController extends Controller
         $settings->cachePurgerSettings = $purgerSettings[$settings->cachePurgerType] ?? [];
 
         // Create the purger driver so that we can validate it
-        /* @var BaseCachePurger $purgerDriver */
         $purgerDriver = BaseDriverHelper::createDriver(
             $settings->cachePurgerType,
             $settings->cachePurgerSettings
@@ -165,7 +162,6 @@ class SettingsController extends Controller
         $settings->deployerSettings = $deployerSettings[$settings->deployerType] ?? [];
 
         // Create the deployer driver so that we can validate it
-        /* @var BaseDeployer $deployerDriver */
         $deployerDriver = BaseDriverHelper::createDriver(
             $settings->deployerType,
             $settings->deployerSettings

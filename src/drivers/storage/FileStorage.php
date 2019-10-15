@@ -11,7 +11,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
-use yii\log\Logger;
 
 /**
  * @property mixed $settingsHtml

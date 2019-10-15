@@ -38,6 +38,8 @@ class m190921_120000_change_zoneid_setting extends Migration
                 Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
             }
         }
+
+        return true;
     }
 
     /**

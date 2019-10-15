@@ -13,7 +13,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use yii\log\Logger;
 
 /**
  * @property mixed $settingsHtml

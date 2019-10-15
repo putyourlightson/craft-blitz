@@ -5,16 +5,12 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use craft\errors\MissingComponentException;
 use craft\events\RegisterComponentTypesEvent;
-use craft\helpers\Component;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
-use putyourlightson\blitz\drivers\storage\CacheStorageInterface;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use yii\base\Event;
-use yii\base\InvalidConfigException;
 
 class CacheStorageHelper extends BaseDriverHelper
 {
