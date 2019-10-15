@@ -11,6 +11,7 @@ use craft\records\Element;
 use craft\records\Site;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
@@ -45,6 +46,7 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
+        $this->dropTableIfExists(DriverDataRecord::tableName());
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
         $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementCacheRecord::tableName());
@@ -108,6 +110,17 @@ class Install extends Migration
             $this->createTable(CacheTagRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'tag' => $this->string()->notNull(),
+            ]);
+        }
+
+        if (!$this->db->tableExists(DriverDataRecord::tableName())) {
+            $this->createTable(DriverDataRecord::tableName(), [
+                'id' => $this->primaryKey(),
+                'driver' => $this->string()->notNull(),
+                'data' => $this->text(),
+                'dateCreated' => $this->dateTime()->notNull(),
+                'dateUpdated' => $this->dateTime()->notNull(),
+                'uid' => $this->uid(),
             ]);
         }
 

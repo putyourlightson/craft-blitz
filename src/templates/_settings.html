@@ -147,7 +147,7 @@
 
     <div id="warming" class="hidden">
         {% set info %}
-            <span class="info">{{ 'The warmer determines how the cache is warmed. You can extend Blitz to add your own or third-party cache warmers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'cache-warmers'})|raw }}</span>
+            <span class="info">{{ 'The warmer determines how the cache is warmed. You can extend Blitz to add your own or third-party cache warmers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'cache-warming'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Warmer"|t('blitz'),

@@ -9,6 +9,7 @@ use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
+use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
 class DeployerHelper extends BaseDriverHelper
@@ -56,5 +57,18 @@ class DeployerHelper extends BaseDriverHelper
     public static function getAllDrivers(): array
     {
         return self::createDrivers(self::getAllTypes());
+    }
+
+    /**
+     * @param SiteUriModel[] $siteUris
+     * @param string $driverMethod
+     * @param int|null $delay
+     * @param int|null $priority
+     */
+    public static function addDeployerJob(array $siteUris, string $driverMethod, int $delay = null, int $priority = null)
+    {
+        $description = Craft::t('blitz', 'Deploying files');
+
+        self::addDriverJob($siteUris, 'driver', $driverMethod, $description, $delay, $priority);
     }
 }

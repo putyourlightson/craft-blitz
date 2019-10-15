@@ -9,6 +9,7 @@ use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
+use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
 class CacheWarmerHelper extends BaseDriverHelper
@@ -56,5 +57,18 @@ class CacheWarmerHelper extends BaseDriverHelper
     public static function getAllDrivers(): array
     {
         return self::createDrivers(self::getAllTypes());
+    }
+
+    /**
+     * @param SiteUriModel[] $siteUris
+     * @param string $driverMethod
+     * @param int|null $delay
+     * @param int|null $priority
+     */
+    public static function addWarmerJob(array $siteUris, string $driverMethod, int $delay = null, int $priority = null)
+    {
+        $description = Craft::t('blitz', 'Warming Blitz cache');
+
+        self::addDriverJob($siteUris, 'cacheWarmer', $driverMethod, $description, $delay, $priority);
     }
 }

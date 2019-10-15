@@ -117,13 +117,7 @@ class GitDeployer extends BaseDeployer
             $this->deployUrisWithProgress($siteUris, $setProgressHandler);
         }
         else {
-            DeployerHelper::addDriverJob(
-                $siteUris,
-                'deployer',
-                'deployUrisWithProgress',
-                Craft::t('blitz', 'Deploying files'),
-                $delay
-            );
+            DeployerHelper::addDriverJob($siteUris, 'deployUrisWithProgress', $delay);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY)) {
