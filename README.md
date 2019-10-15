@@ -2,6 +2,9 @@
 
 # Blitz Plugin for Craft CMS 3
 
+> Blitz 3 is in public beta! Read the announcement [here](https://putyourlightson.com/articles/blitz-3-is-here-hello-jamstack). Install it in a testing environment as follows:  
+`composer require putyourlightson/craft-blitz:^3.0.0-beta.1`
+
 The Blitz plugin provides intelligent static page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
 - Reduces server response time (TTFB) and load on the server significantly. 
@@ -16,7 +19,7 @@ Learn more and read the documentation at [putyourlightson.com/plugins/blitz »](
 
 ## License
 
-This plugin requires a commercial license pur­chas­able through the [Craft Plugin Store](https://plugins.craftcms.com/blitz). The license fee is **$59** plus **$29** per subsequent year for updates (optional).
+This plugin requires a commercial license pur­chas­able through the [Craft Plugin Store](https://plugins.craftcms.com/blitz). The license fee is **$99** plus **$49** per subsequent year for updates (optional).
 
 ## Requirements
 
