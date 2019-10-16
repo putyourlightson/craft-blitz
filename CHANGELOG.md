@@ -1,5 +1,12 @@
 # Release Notes for Blitz
 
+## 3.0.0-beta.2 - 2019-10-16
+### Added
+- Added driver data table.
+
+### Changed
+- Relaxed version constraint for `cpliakas/git-wrapper` library.
+
 ## 3.0.0-beta.1 - 2019-10-15
 ### Added
 - Added replaceable remote deployers (Git Deployer).
