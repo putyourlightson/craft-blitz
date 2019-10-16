@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use Craft;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;

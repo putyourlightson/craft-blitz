@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use Craft;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
@@ -69,6 +70,6 @@ class DeployerHelper extends BaseDriverHelper
     {
         $description = Craft::t('blitz', 'Deploying files');
 
-        self::addDriverJob($siteUris, 'driver', $driverMethod, $description, $delay, $priority);
+        self::addDriverJob($siteUris, 'deployer', $driverMethod, $description, $delay, $priority);
     }
 }
