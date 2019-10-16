@@ -48,7 +48,7 @@ return [
     // The purger type to use.
     //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
 
-    // The purger settings (each purger can have its own unique settings).
+    // The purger settings.
     //'cachePurgerSettings' => [
     //    'email' => '',
     //    'apiKey' => '',
@@ -62,7 +62,7 @@ return [
     // The deployer type to use.
     //'deployerType' => 'putyourlightson\blitz\drivers\deployers\GitDeployer',
 
-    // The deployer settings (each deployer can have its own unique settings).
+    // The deployer settings.
     //'deployerSettings' => [
     //    'personalAccessToken' => '',
     //],
