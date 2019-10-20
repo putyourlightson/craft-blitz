@@ -10,6 +10,7 @@ use craft\base\Component;
 use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
+use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use DateTime;
@@ -22,6 +23,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\Exception;
+use yii\log\Logger;
 
 class GenerateCacheService extends Component
 {
@@ -137,18 +139,23 @@ class GenerateCacheService extends Component
             ->scalar();
 
         if (!$queryId) {
-            $db->createCommand()
-                ->insert(ElementQueryRecord::tableName(), [
-                    'index' => $index,
-                    'type' => $elementQuery->elementType,
-                    'params' => $params,
-                ], false)
-                ->execute();
+            try {
+                $db->createCommand()
+                    ->insert(ElementQueryRecord::tableName(), [
+                        'index' => $index,
+                        'type' => $elementQuery->elementType,
+                        'params' => $params,
+                    ], false)
+                    ->execute();
 
-            $queryId = $db->getLastInsertID();
+                $queryId = $db->getLastInsertID();
+            }
+            catch (Exception $e) {
+                Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+            }
         }
 
-        if (!in_array($queryId, $this->_elementQueryCaches)) {
+        if ($queryId && !in_array($queryId, $this->_elementQueryCaches)) {
             $this->_elementQueryCaches[] = $queryId;
         }
 
@@ -353,8 +360,13 @@ class GenerateCacheService extends Component
     private function _convertQueryParams(&$value)
     {
         // Convert elements to their ID
-        if ($value instanceof Element) {
+        if ($value instanceof ElementInterface) {
             $value = $value->id;
+        }
+
+        // Convert element queries to element IDs
+        if ($value instanceof ElementQueryInterface) {
+            $value = $value->ids();
         }
 
         // Convert DateTime objects to Unix timestamp
