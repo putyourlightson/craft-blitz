@@ -53,16 +53,12 @@
 }) }}
 
 
-{% set info %}
-    <span class="info">{{ 'Personal access tokens are used in place of a username and password when performing Git operations. They can be created through your Git service provider. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#remote-deployment'})|raw }}</span>
-{% endset %}
-{{ forms.autosuggestField({
-    label: "Personal Access Token"|t('blitz'),
-    instructions: "A personal access token for the Git account."|t('blitz') ~ info,
-    suggestEnvVars: true,
-    name: 'personalAccessToken',
-    value: deployer.personalAccessToken,
-    errors: deployer.getErrors('personalAccessToken'),
+{{ forms.textField({
+    label: "Commit Message"|t('blitz'),
+    instructions: "The commit message will be parsed for twig tags."|t('blitz'),
+    name: 'commitMessage',
+    value: deployer.commitMessage,
+    errors: deployer.getErrors('commitMessage'),
     required: true,
 }) }}
 
@@ -84,11 +80,15 @@
     required: true,
 }) }}
 
-{{ forms.textField({
-    label: "Commit Message"|t('blitz'),
-    instructions: "The commit message will be parsed for twig tags."|t('blitz'),
-    name: 'commitMessage',
-    value: deployer.commitMessage,
-    errors: deployer.getErrors('commitMessage'),
+{% set info %}
+    <span class="info">{{ 'Personal access tokens are used in place of a username and password when performing Git operations. They can be created through your Git service provider. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#remote-deployment'})|raw }}</span>
+{% endset %}
+{{ forms.autosuggestField({
+    label: "Personal Access Token"|t('blitz'),
+    instructions: "A personal access token for the Git account."|t('blitz') ~ info,
+    suggestEnvVars: true,
+    name: 'personalAccessToken',
+    value: deployer.personalAccessToken,
+    errors: deployer.getErrors('personalAccessToken'),
     required: true,
 }) }}
