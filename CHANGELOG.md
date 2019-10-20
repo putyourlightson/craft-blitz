@@ -24,6 +24,10 @@
 ### Fixed
 - Fixed user group permissions for refreshing the cache.
 
+## 2.3.4 - 2019-10-21
+### Changed
+- Improved element query caching to help catch exceptions ([#136](https://github.com/putyourlightson/craft-blitz/issues/136)).
+
 ## 2.3.3 - 2019-10-11
 > {tip} This release optimises the cache invalidation process therefore the cache should be refreshed following the update to take advantage of the improvements.
 
