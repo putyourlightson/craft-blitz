@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.0.0-beta.2.1 - 2019-10-29
+### Fixed
+- Fixed a bug when creating a new deployer job.
+
 ## 3.0.0-beta.2 - 2019-10-16
 ### Added
 - Added driver data table.
