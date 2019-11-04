@@ -12,12 +12,12 @@ use craft\events\CancelableEvent;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use GitWrapper\GitException;
-use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use yii\base\ErrorException;
 use yii\base\Event;
@@ -228,11 +228,9 @@ class GitDeployer extends BaseDeployer
             }
 
             try {
-                // Open repository working copy and add all files to branch
-                $gitWrapper = new GitWrapper();
-                $git = $gitWrapper->workingCopy($repositoryPath);
+                $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
 
-                $this->_updateConfig($git, $remote);
+                // Add all files to branch and check it out
                 $git->add('*');
                 $git->checkout($branch);
 
@@ -287,10 +285,8 @@ class GitDeployer extends BaseDeployer
             $remote = $gitRepository['remote'] ?: $this->defaultRemote;
 
             try {
-                $gitWrapper = new GitWrapper();
-                $git = $gitWrapper->workingCopy($repositoryPath);
+                $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
 
-                $this->_updateConfig($git, $remote);
                 $git->fetch($remote);
             }
             catch (GitException $e) {
@@ -346,13 +342,23 @@ class GitDeployer extends BaseDeployer
     // =========================================================================
 
     /**
-     * Updates the config with credentials.
+     * Returns a git working copy
      *
-     * @param GitWorkingCopy $git
+     * @param string $repositoryPath
      * @param string $remote
      */
-    private function _updateConfig(GitWorkingCopy $git, string $remote)
+    private function _getGitWorkingCopy(string $repositoryPath, string $remote)
     {
+        // Find the git binary ourselves, providing a default
+        // (important because ExecutableFinder cannot always find it)
+        $finder = new ExecutableFinder();
+        $gitBinary = $finder->find('git', '/usr/bin/git');
+
+        $gitWrapper = new GitWrapper($gitBinary);
+
+        // Get working copy
+        $git = $gitWrapper->workingCopy($repositoryPath);
+
         // Set user in config
         $git->config('user.name', $this->name);
         $git->config('user.email', $this->email);
