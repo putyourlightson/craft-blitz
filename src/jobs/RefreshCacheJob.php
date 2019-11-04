@@ -179,8 +179,10 @@ class RefreshCacheJob extends BaseJob
             $elementQuery->offset(null);
         }
 
-        // If one or more of the element IDs are in the query's results
-        if (!empty(array_intersect($elementIds, $elementQuery->ids()))) {
+        // If one or more of the element IDs are in the element query's IDs
+        $elementQueryIds = $elementQuery->ids();
+
+        if (!empty(array_intersect($elementIds, $elementQueryIds))) {
             // Get related element query cache records
             $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
 

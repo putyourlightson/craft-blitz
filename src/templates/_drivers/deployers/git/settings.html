@@ -92,3 +92,17 @@
     errors: deployer.getErrors('personalAccessToken'),
     required: true,
 }) }}
+
+{{ forms.textareaField({
+    label: "Commands Before"|t('blitz'),
+    instructions: "Commands to run before the Git commit."|t('blitz'),
+    name: 'commandsBefore',
+    value: deployer.commandsBefore,
+}) }}
+
+{{ forms.textareaField({
+    label: "Commands After"|t('blitz'),
+    instructions: "Commands to run after the Git commit."|t('blitz'),
+    name: 'commandsAfter',
+    value: deployer.commandsAfter,
+}) }}

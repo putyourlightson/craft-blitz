@@ -80,14 +80,14 @@ class GitDeployer extends BaseDeployer
     public $defaultRemote = 'origin';
 
     /**
-     * @var array
+     * @var string
      */
-    public $commandsBefore = [];
+    public $commandsBefore = '';
 
     /**
-     * @var array
+     * @var string
      */
-    public $commandsAfter = [];
+    public $commandsAfter = '';
 
     // Static
     // =========================================================================
@@ -224,8 +224,8 @@ class GitDeployer extends BaseDeployer
                 continue;
             }
 
-            foreach ($this->commandsBefore as $command) {
-                $process = new Process($command);
+            if ($this->commandsBefore) {
+                $process = new Process($this->commandsBefore);
                 $process->mustRun();
             }
 
@@ -265,8 +265,8 @@ class GitDeployer extends BaseDeployer
                 $this->trigger(self::EVENT_AFTER_COMMIT, new Event());
             }
 
-            foreach ($this->commandsAfter as $command) {
-                $process = new Process($command);
+            if ($this->commandsAfter) {
+                $process = new Process($this->commandsAfter);
                 $process->mustRun();
             }
         }
