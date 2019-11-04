@@ -189,10 +189,8 @@ class GitDeployer extends BaseDeployer
             $total += count($siteUris);
         }
 
-        if (is_callable($setProgressHandler)) {
-            $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-            call_user_func($setProgressHandler, $count, $total, $progressLabel);
-        }
+        $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+        call_user_func($setProgressHandler, $count, $total, $progressLabel);
 
         foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
             $repositoryPath = FileHelper::normalizePath(

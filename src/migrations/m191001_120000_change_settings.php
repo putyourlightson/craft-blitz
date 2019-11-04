@@ -5,7 +5,6 @@ namespace putyourlightson\blitz\migrations;
 use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\storage\FileStorage;
 
 class m191001_120000_change_settings extends Migration
 {

@@ -106,7 +106,6 @@ class GenerateCacheService extends Component
      * Adds an element query to be cached.
      *
      * @param ElementQuery $elementQuery
-     * @throws Exception
      */
     public function addElementQuery(ElementQuery $elementQuery)
     {

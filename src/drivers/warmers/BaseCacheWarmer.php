@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\drivers\warmers;
 
 use Craft;
 use craft\base\SavableComponent;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
 /**
@@ -14,11 +15,6 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
  */
 abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerInterface
 {
-    // Traits
-    // =========================================================================
-
-    use CacheWarmerTrait;
-
     // Constants
     // =========================================================================
 
@@ -51,7 +47,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     public function warmSite(int $siteId, int $delay = null, callable $setProgressHandler = null)
     {
         // Get custom site URIs for the provided site only
-        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($this->customSiteUris);
+        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->customSiteUris);
         $customSiteUris = $groupedSiteUris[$siteId] ?? [];
 
         $siteUris = array_merge(
@@ -69,7 +65,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     {
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(true),
-            $this->customSiteUris
+            Blitz::$plugin->settings->customSiteUris
         );
 
         $this->warmUris($siteUris, $delay, $setProgressHandler);
