@@ -12,6 +12,7 @@ use craft\events\CancelableEvent;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use GitWrapper\GitException;
+use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
@@ -346,8 +347,10 @@ class GitDeployer extends BaseDeployer
      *
      * @param string $repositoryPath
      * @param string $remote
+     *
+     * @return GitWorkingCopy
      */
-    private function _getGitWorkingCopy(string $repositoryPath, string $remote)
+    private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
         // Find the git binary ourselves, providing a default
         // (important because ExecutableFinder cannot always find it)
@@ -376,6 +379,8 @@ class GitDeployer extends BaseDeployer
             .($parts['path'] ?? '');
 
         $git->remote('set-url', $remote, $remoteUrl);
+
+        return $git;
     }
 
     /**
