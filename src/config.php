@@ -75,14 +75,11 @@ return [
     // Whether the cache should automatically be cleared when elements are updated.
     //'clearCacheAutomatically' => true,
 
-    // Whether the cache should automatically be cleared after clearing globals.
-    //'clearCacheAutomaticallyForGlobals' => true,
-
     // Whether the cache should automatically be warmed after clearing.
     //'warmCacheAutomatically' => true,
 
-    // Whether the cache should automatically be warmed after clearing globals.
-    //'warmCacheAutomaticallyForGlobals' => true,
+    // Whether the cache should automatically be refreshed after a global set is updated.
+    //'refreshCacheAutomaticallyForGlobals' => true,
 
     // Whether URLs with query strings should cached and how.
     // 0: Do not cache URLs with query strings

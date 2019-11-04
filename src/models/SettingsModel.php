@@ -110,17 +110,12 @@ class SettingsModel extends Model
     /**
      * @var bool
      */
-    public $clearCacheAutomaticallyForGlobals = true;
-
-    /**
-     * @var bool
-     */
     public $warmCacheAutomatically = true;
 
     /**
      * @var bool
      */
-    public $warmCacheAutomaticallyForGlobals = true;
+    public $refreshCacheAutomaticallyForGlobals = true;
 
     /**
      * @var int

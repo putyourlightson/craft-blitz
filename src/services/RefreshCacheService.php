@@ -161,16 +161,10 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Clear the entire cache if this is a global set element as they are populated on every request
+        // Refresh the entire cache if this is a global set since they are populated on every request
         if ($element instanceof GlobalSet) {
-            if (Blitz::$plugin->settings->clearCacheAutomaticallyForGlobals) {
-                Blitz::$plugin->clearCache->clearAll();
-            }
-
-            if (Blitz::$plugin->settings->cachingEnabled
-                && Blitz::$plugin->settings->warmCacheAutomatically
-                && Blitz::$plugin->settings->warmCacheAutomaticallyForGlobals) {
-                Blitz::$plugin->cacheWarmer->warmAll();
+            if (Blitz::$plugin->settings->refreshCacheAutomaticallyForGlobals) {
+                $this->refreshAll();
             }
 
             return;
@@ -323,15 +317,17 @@ class RefreshCacheService extends Component
             return;
         }
 
+        $refreshCacheJob = new RefreshCacheJob([
+            'cacheIds' => $this->_cacheIds,
+            'elementIds' => $this->_elementIds,
+            'elementTypes' => $this->_elementTypes,
+            'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
+        ]);
+
         // Add job to queue with a priority
         Craft::$app->getQueue()
             ->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
-            ->push(new RefreshCacheJob([
-                'cacheIds' => $this->_cacheIds,
-                'elementIds' => $this->_elementIds,
-                'elementTypes' => $this->_elementTypes,
-                'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
-            ]));
+            ->push($refreshCacheJob);
     }
 
     /**
