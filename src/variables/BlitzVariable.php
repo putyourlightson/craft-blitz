@@ -159,7 +159,10 @@ class BlitzVariable
                     var xhr = new XMLHttpRequest();
                     xhr.onload = function () {
                         if (xhr.status >= 200 && xhr.status < 300) {
-                            document.getElementById("blitz-inject-" + id).innerHTML = this.responseText;
+                            var element = document.getElementById("blitz-inject-" + id));
+                            if (element) {
+                                element.innerHTML = this.responseText;
+                            }
                         }
                     };
                     xhr.open("GET", uri);
