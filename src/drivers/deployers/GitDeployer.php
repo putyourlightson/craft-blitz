@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\drivers\deployers;
 use Craft;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\db\Table;
+use craft\events\CancelableEvent;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use GitWrapper\GitException;
@@ -17,7 +18,9 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use Symfony\Component\Process\Process;
 use yii\base\ErrorException;
+use yii\base\Event;
 use yii\base\InvalidArgumentException;
 
 /**
@@ -25,6 +28,19 @@ use yii\base\InvalidArgumentException;
  */
 class GitDeployer extends BaseDeployer
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @event CancelableEvent
+     */
+    const EVENT_BEFORE_COMMIT = 'beforeCommit';
+
+    /**
+     * @event Event
+     */
+    const EVENT_AFTER_COMMIT = 'afterCommit';
+
     // Properties
     // =========================================================================
 
@@ -62,6 +78,16 @@ class GitDeployer extends BaseDeployer
      * @var string
      */
     public $defaultRemote = 'origin';
+
+    /**
+     * @var array
+     */
+    public $commandsBefore = [];
+
+    /**
+     * @var array
+     */
+    public $commandsAfter = [];
 
     // Static
     // =========================================================================
@@ -168,9 +194,6 @@ class GitDeployer extends BaseDeployer
             call_user_func($setProgressHandler, $count, $total, $progressLabel);
         }
 
-        // Parse twig tags in the commit message
-        $commitMessage = Craft::$app->getView()->renderString($this->commitMessage);
-
         foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
             $repositoryPath = FileHelper::normalizePath(
                 Craft::parseEnv($this->gitRepositories[$siteUid]['repositoryPath'])
@@ -194,6 +217,18 @@ class GitDeployer extends BaseDeployer
             $branch = $this->gitRepositories[$siteUid]['branch'] ?: $this->defaultBranch;
             $remote = $this->gitRepositories[$siteUid]['remote'] ?: $this->defaultRemote;
 
+            $event = new CancelableEvent();
+            $this->trigger(self::EVENT_BEFORE_COMMIT, $event);
+
+            if (!$event->isValid) {
+                continue;
+            }
+
+            foreach ($this->commandsBefore as $command) {
+                $process = new Process($command);
+                $process->mustRun();
+            }
+
             try {
                 // Open repository working copy and add all files to branch
                 $gitWrapper = new GitWrapper();
@@ -205,6 +240,9 @@ class GitDeployer extends BaseDeployer
 
                 // Check for changes first to avoid an exception being thrown
                 if ($git->hasChanges()) {
+                    // Parse twig tags in the commit message
+                    $commitMessage = Craft::$app->getView()->renderString($this->commitMessage);
+
                     $git->commit(addslashes($commitMessage));
                 }
 
@@ -221,6 +259,15 @@ class GitDeployer extends BaseDeployer
                 }
 
                 throw $e;
+            }
+
+            if ($this->hasEventHandlers(self::EVENT_AFTER_COMMIT)) {
+                $this->trigger(self::EVENT_AFTER_COMMIT, new Event());
+            }
+
+            foreach ($this->commandsAfter as $command) {
+                $process = new Process($command);
+                $process->mustRun();
             }
         }
     }

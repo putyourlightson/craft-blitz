@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 3.0.0-beta.3 - Unreleased
+### Added
+- Added `commandsBefore` and `commandsAfter` config settings to Git Deployer.
+- Added `EVENT_BEFORE_COMMIT` and `EVENT_AFTER_COMMIT` events to Git Deployer.
+
 ## 3.0.0-beta.2.1 - 2019-10-29
 ### Fixed
 - Fixed a bug when creating a new deployer job.
