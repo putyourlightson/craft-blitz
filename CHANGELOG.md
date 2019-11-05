@@ -1,12 +1,13 @@
 # Release Notes for Blitz
 
-## 3.0.0-beta.3 - Unreleased
+## 3.0.0-beta.3 - 2019-11-05
 ### Added
-- Added the `refreshCacheAutomaticallyForGlobals` config setting.
-- Added the `commandsBefore` and `commandsAfter` config settings to Git Deployer.
+- Added the `commandsBefore` and `commandsAfter`  settings to the Git Deployer.
 - Added the `EVENT_BEFORE_COMMIT` and `EVENT_AFTER_COMMIT` events to Git Deployer.
+- Added the `refreshCacheAutomaticallyForGlobals` config setting.
 
 ### Changed
+- Improved the detection of where Git is installed.
 - Removed the `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings.
 
 ## 3.0.0-beta.2.1 - 2019-10-29
