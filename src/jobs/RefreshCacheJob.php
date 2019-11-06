@@ -179,7 +179,8 @@ class RefreshCacheJob extends BaseJob
             $elementQuery->offset(null);
         }
 
-        /** Ensure `indexBy` is null to avoid an integrity constraint violation error
+        /**
+         * Ensure `indexBy` is null to avoid an integrity constraint violation error
          * @see https://github.com/craftcms/cms/issues/5216
          */
         if ($elementQuery->indexBy !== null) {
