@@ -14,6 +14,13 @@ interface CacheWarmerInterface extends SavableComponentInterface
     // =========================================================================
 
     /**
+     * Warms the cache given a site URI.
+     *
+     * @param SiteUriModel $siteUri
+     */
+    public function warmUri(SiteUriModel $siteUri);
+
+    /**
      * Warms the cache given an array of site URIs.
      *
      * @param SiteUriModel[] $siteUris

@@ -10,7 +10,6 @@ use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
-use putyourlightson\blitz\drivers\warmers\LocalWarmer;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
@@ -36,7 +35,6 @@ class CacheWarmerHelper extends BaseDriverHelper
     {
         $warmerTypes = [
             GuzzleWarmer::class,
-            LocalWarmer::class,
         ];
 
         $warmerTypes = array_unique(array_merge(
