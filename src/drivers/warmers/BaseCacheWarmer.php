@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\drivers\warmers;
 use Craft;
 use craft\base\SavableComponent;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
 /**
@@ -88,5 +89,34 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
         }
 
         return $siteOptions;
+    }
+
+    /**
+     * Triggers the `beforeWarmCache` event.
+     *
+     * @param SiteUriModel[] $siteUris
+
+     * @return bool
+     */
+    protected function beforeWarmCache(array $siteUris): bool
+    {
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_WARM_CACHE, $event);
+
+        return $event->isValid;
+    }
+
+    /**
+     * Triggers the `afterWarmCache` event.
+     *
+     * @param SiteUriModel[] $siteUris
+     */
+    protected function afterWarmCache(array $siteUris)
+    {
+        if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_WARM_CACHE, new RefreshCacheEvent([
+                'siteUris' => $siteUris
+            ]));
+        }
     }
 }

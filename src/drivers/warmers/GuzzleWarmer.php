@@ -46,10 +46,7 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public function warmUris(array $siteUris, int $delay = null, callable $setProgressHandler = null)
     {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-        $this->trigger(self::EVENT_BEFORE_WARM_CACHE, $event);
-
-        if (!$event->isValid) {
+        if (!$this->beforeWarmCache($siteUris)) {
             return;
         }
 
@@ -63,6 +60,8 @@ class GuzzleWarmer extends BaseCacheWarmer
         if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_CACHE)) {
             $this->trigger(self::EVENT_AFTER_WARM_CACHE, $event);
         }
+
+        $this->afterWarmCache($siteUris);
     }
 
     /**

@@ -1,5 +1,12 @@
 # Release Notes for Blitz
 
+## 3.0.0-beta.4 - 2019-11-07
+### Added
+- Added the Local Warmer to the default cache warmers.
+
+### Fixed
+- Fixed a bug that could occur when `indexBy` was set to `id` in an element type query ([#140](https://github.com/putyourlightson/craft-blitz/issues/140)).
+
 ## 3.0.0-beta.3 - 2019-11-05
 ### Added
 - Added the `commandsBefore` and `commandsAfter`  settings to the Git Deployer.
