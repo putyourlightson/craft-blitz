@@ -378,16 +378,19 @@ class GenerateCacheService extends Component
         // Convert elements to their ID
         if ($value instanceof ElementInterface) {
             $value = $value->id;
+            return;
         }
 
         // Convert element queries to element IDs
         if ($value instanceof ElementQueryInterface) {
             $value = $value->ids();
+            return;
         }
 
         // Convert DateTime objects to Unix timestamp
         if ($value instanceof DateTime) {
             $value = $value->getTimestamp();
+            return;
         }
     }
 }

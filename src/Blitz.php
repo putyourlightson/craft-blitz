@@ -93,8 +93,7 @@ class Blitz extends Plugin
         $this->_registerComponents();
         $this->_registerVariables();
 
-        // Process the request
-        $this->_processCacheableRequest();
+        $this->processCacheableRequest();
 
         // Register events
         $this->_registerElementEvents();
@@ -111,6 +110,27 @@ class Blitz extends Plugin
 
             if (Craft::$app->getEdition() === Craft::Pro) {
                 $this->_registerUserPermissions();
+            }
+        }
+    }
+
+    /**
+     * Processes if a cacheable request
+     *
+     * @param bool|null $outputResult
+     */
+    public function processCacheableRequest(bool $outputResult = true)
+    {
+        if (RequestHelper::getIsCacheableRequest()) {
+            $siteUri = RequestHelper::getRequestedSiteUri();
+
+            if ($siteUri !== null && $siteUri->getIsCacheableUri()) {
+                if ($outputResult) {
+                    // If a cached version exists then it will be output
+                    $this->outputCache->output($siteUri);
+                }
+
+                $this->_registerCacheableRequestEvents($siteUri, $outputResult);
             }
         }
     }
@@ -142,23 +162,6 @@ class Blitz extends Plugin
 
     // Private Methods
     // =========================================================================
-
-    /**
-     * Processes cacheable request
-     */
-    private function _processCacheableRequest()
-    {
-        if (RequestHelper::getIsCacheableRequest()) {
-            $siteUri = RequestHelper::getRequestedSiteUri();
-
-            if ($siteUri !== null && $siteUri->getIsCacheableUri()) {
-                // If output then the script will exit
-                $this->outputCache->output($siteUri);
-
-                $this->_registerCacheableRequestEvents($siteUri);
-            }
-        }
-    }
 
     /**
      * Registers the components
@@ -209,8 +212,9 @@ class Blitz extends Plugin
      * Registers cacheable request events
      *
      * @param SiteUriModel $siteUri
+     * @param bool|null $outputResult
      */
-    private function _registerCacheableRequestEvents(SiteUriModel $siteUri)
+    private function _registerCacheableRequestEvents(SiteUriModel $siteUri, bool $outputResult = true)
     {
         // We will need to check if the response is ok again inside the event functions as it may change during the request
         $response = Craft::$app->getResponse();
@@ -237,11 +241,15 @@ class Blitz extends Plugin
 
         // Register after render page template event
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-            function(TemplateEvent $event) use ($response, $siteUri) {
+            function(TemplateEvent $event) use ($response, $siteUri, $outputResult) {
                 if ($response->getIsOk()) {
+                    // Save the cached output
                     $this->generateCache->save($event->output, $siteUri);
 
-                    $this->outputCache->output($siteUri);
+                    if ($outputResult) {
+                        // Output the cached result
+                        $this->outputCache->output($siteUri);
+                    }
                 }
             }
         );

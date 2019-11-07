@@ -73,7 +73,6 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
-        $client = Craft::createGuzzleClient();
         $requests = [];
 
         $urls = SiteUriHelper::getSiteUriUrls($siteUris);
@@ -88,6 +87,8 @@ class GuzzleWarmer extends BaseCacheWarmer
         $count = 0;
         $total = count($urls);
         $label = 'Warming {count} of {total} pages.';
+
+        $client = Craft::createGuzzleClient();
 
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $requests, [
