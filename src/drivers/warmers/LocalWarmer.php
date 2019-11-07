@@ -74,7 +74,7 @@ class LocalWarmer extends BaseCacheWarmer
 
         /**
          * Create simplified Request and UrlManager configs
-         * @see craftcms/cms/src/config/app.web.php
+         * @see vendor/craftcms/cms/src/config/app.web.php
          */
         $requestConfig = App::webRequestConfig();
         $urlManagerConfig = [
@@ -114,13 +114,16 @@ class LocalWarmer extends BaseCacheWarmer
     {
         $url = $siteUri->getUrl();
 
-        // Mock the web server request
+        /**
+         * Mock the web server request
+         * @see \craft\test\Craft::recreateClient
+        */
         $_SERVER = array_merge($_SERVER, [
             'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
             'SERVER_PORT' => parse_url($url, PHP_URL_PORT) ?: '80',
             'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https',
-            'REQUEST_URI' => $siteUri->uri,
             'REQUEST_METHOD' => 'GET',
+            'REQUEST_URI' => $siteUri->uri,
             'QUERY_STRING' => 'p='.trim($siteUri->uri, '/'),
         ]);
         $_GET = array_merge($_GET, [
@@ -131,7 +134,7 @@ class LocalWarmer extends BaseCacheWarmer
         Craft::$app->set('request', $requestConfig);
         Craft::$app->set('urlManager', $urlManagerConfig);
 
-        // Set the template mode to the front-end site
+        // Set the template mode to front-end site
         Craft::$app->getView()->setTemplateMode('site');
 
         // Tell Blitz to process if a cacheable request and not to output the result
