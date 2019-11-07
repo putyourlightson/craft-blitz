@@ -10,7 +10,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
@@ -55,10 +54,6 @@ class GuzzleWarmer extends BaseCacheWarmer
         }
         else {
             CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
-        }
-
-        if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_WARM_CACHE, $event);
         }
 
         $this->afterWarmCache($siteUris);
