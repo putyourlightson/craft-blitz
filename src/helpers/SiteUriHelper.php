@@ -164,7 +164,7 @@ class SiteUriHelper
      *
      * @return string[]
      */
-    public static function getUrlsFromSiteUri(array $siteUris): array
+    public static function getUrlsFromSiteUris(array $siteUris): array
     {
         $urls = [];
 
