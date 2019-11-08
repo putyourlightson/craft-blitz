@@ -220,13 +220,10 @@ class Blitz extends Plugin
      */
     private function _registerCacheableRequestEvents(SiteUriModel $siteUri, bool $outputResult = true)
     {
-        // We will need to check if the response is ok again inside the event functions as it may change during the request
-        $response = Craft::$app->getResponse();
-
         // Register element populate event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event) use ($response) {
-                if ($response->getIsOk() && $event->element !== null) {
+            function(PopulateElementEvent $event) {
+                if (Craft::$app->getResponse()->getIsOk() && $event->element !== null) {
                     $this->generateCache->addElement($event->element);
                 }
             }
@@ -234,8 +231,8 @@ class Blitz extends Plugin
 
         // Register element query prepare event
         Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
-            function(CancelableEvent $event) use ($response) {
-                if ($response->getIsOk()) {
+            function(CancelableEvent $event) {
+                if (Craft::$app->getResponse()->getIsOk()) {
                     /** @var ElementQuery $elementQuery */
                     $elementQuery = $event->sender;
                     $this->generateCache->addElementQuery($elementQuery);
@@ -245,8 +242,8 @@ class Blitz extends Plugin
 
         // Register after render page template event
         Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-            function(TemplateEvent $event) use ($response, $siteUri, $outputResult) {
-                if ($response->getIsOk()) {
+            function(TemplateEvent $event) use ($siteUri, $outputResult) {
+                if (Craft::$app->getResponse()->getIsOk()) {
                     // Save the cached output
                     $this->generateCache->save($event->output, $siteUri);
 

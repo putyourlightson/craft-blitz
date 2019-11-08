@@ -64,14 +64,17 @@ class LocalWarmer extends BaseCacheWarmer
         $label = 'Warming {count} of {total} pages.';
 
         /**
-         * Create simplified Request and UrlManager configs
+         * Create component configs
          * @see vendor/craftcms/cms/src/config/app.web.php
          */
-        $requestConfig = App::webRequestConfig();
-        $urlManagerConfig = [
-            'class' => UrlManager::class,
-            'enablePrettyUrl' => true,
-            'ruleConfig' => ['class' => UrlRule::class],
+        $componentConfigs = [
+            'request' => App::webRequestConfig(),
+            'response' => App::webResponseConfig(),
+            'urlManager' => [
+                'class' => UrlManager::class,
+                'enablePrettyUrl' => true,
+                'ruleConfig' => ['class' => UrlRule::class],
+            ]
         ];
 
         foreach ($siteUris as $siteUri) {
@@ -80,7 +83,7 @@ class LocalWarmer extends BaseCacheWarmer
                 $siteUri = new SiteUriModel($siteUri);
             }
 
-            $this->_warmUri($siteUri, $requestConfig, $urlManagerConfig);
+            $this->_warmUri($siteUri, $componentConfigs);
 
             $count++;
 
@@ -98,12 +101,14 @@ class LocalWarmer extends BaseCacheWarmer
      * Warms a site URI.
      *
      * @param SiteUriModel $siteUri
-     * @param array $requestConfig
-     * @param array $urlManagerConfig
+     * @param array $componentConfigs
      */
-    private function _warmUri(SiteUriModel $siteUri, array $requestConfig, array $urlManagerConfig)
+    private function _warmUri(SiteUriModel $siteUri, array $componentConfigs)
     {
         $url = $siteUri->getUrl();
+
+        // Parse the URI rather than getting it from `$siteUri` to ensure we have the full request URI (!important)
+        $uri = trim(parse_url($url, PHP_URL_PATH), '/');
 
         /**
          * Mock the web server request
@@ -114,16 +119,17 @@ class LocalWarmer extends BaseCacheWarmer
             'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
             'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https',
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/'.$siteUri->uri,
-            'QUERY_STRING' => 'p='.$siteUri->uri,
+            'REQUEST_URI' => '/'.$uri,
+            'QUERY_STRING' => 'p='.$uri,
         ]);
         $_GET = array_merge($_GET, [
-            'p' => $siteUri->uri,
+            'p' => $uri,
         ]);
 
-        // Recreate the Request and UrlManager components
-        Craft::$app->set('request', $requestConfig);
-        Craft::$app->set('urlManager', $urlManagerConfig);
+        // Recreate components from configs
+        foreach ($componentConfigs as $id => $componentConfig) {
+            Craft::$app->set($id, $componentConfig);
+        }
 
         /**
          * Override the host info as it can be set unreliably
