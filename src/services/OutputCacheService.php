@@ -29,7 +29,7 @@ class OutputCacheService extends Component
     // =========================================================================
 
     /**
-     * Outputs a given site URI if cached.
+     * Outputs a given site URI if cached and ends the script.
      *
      * @param SiteUriModel $siteUri
      */

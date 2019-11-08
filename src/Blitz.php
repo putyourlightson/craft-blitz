@@ -125,12 +125,16 @@ class Blitz extends Plugin
             $siteUri = RequestHelper::getRequestedSiteUri();
 
             if ($siteUri !== null && $siteUri->getIsCacheableUri()) {
-                if ($outputResult) {
-                    // If a cached version exists then it will be output
-                    $this->outputCache->output($siteUri);
+                // If the cached value exists
+                if (Blitz::$plugin->cacheStorage->get($siteUri)) {
+                    if ($outputResult) {
+                        // Output the cached result and end the script
+                        $this->outputCache->output($siteUri);
+                    }
                 }
-
-                $this->_registerCacheableRequestEvents($siteUri, $outputResult);
+                else {
+                    $this->_registerCacheableRequestEvents($siteUri, $outputResult);
+                }
             }
         }
     }
@@ -247,7 +251,7 @@ class Blitz extends Plugin
                     $this->generateCache->save($event->output, $siteUri);
 
                     if ($outputResult) {
-                        // Output the cached result
+                        // Output the cached result and end the script
                         $this->outputCache->output($siteUri);
                     }
                 }
