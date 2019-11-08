@@ -438,7 +438,7 @@ class RefreshCacheService extends Component
     public function refreshCachedUrls(array $urls)
     {
         // Get site URIs from URLs
-        $siteUris = SiteUriHelper::getUrlSiteUris($urls);
+        $siteUris = SiteUriHelper::getSiteUrisFromUrls($urls);
 
         $this->refreshSiteUris($siteUris);
     }

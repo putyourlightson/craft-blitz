@@ -86,7 +86,7 @@ class FlushCacheService extends Component
      */
     public function flushSite(int $siteId)
     {
-        $siteUris = SiteUriHelper::getSiteSiteUris($siteId);
+        $siteUris = SiteUriHelper::getSiteUrisForSite($siteId);
         $this->flushUris($siteUris);
     }
 

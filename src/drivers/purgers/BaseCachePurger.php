@@ -48,7 +48,7 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
      */
     public function purgeSite(int $siteId)
     {
-        $this->purgeUris(SiteUriHelper::getSiteSiteUris($siteId));
+        $this->purgeUris(SiteUriHelper::getSiteUrisForSite($siteId));
     }
 
     /**

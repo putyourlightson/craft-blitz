@@ -52,7 +52,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
         $customSiteUris = $groupedSiteUris[$siteId] ?? [];
 
         $siteUris = array_merge(
-            SiteUriHelper::getSiteSiteUris($siteId, true),
+            SiteUriHelper::getSiteUrisForSite($siteId, true),
             $customSiteUris
         );
 

@@ -80,13 +80,6 @@ class RequestHelper
      */
     public static function getRequestedSiteUri()
     {
-        try {
-            $site = Craft::$app->getSites()->getCurrentSite();
-        }
-        catch (SiteNotFoundException $e) {
-            return null;
-        }
-
         $url = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
@@ -94,17 +87,9 @@ class RequestHelper
             $url = preg_replace('/\?.*/', '', $url);
         }
 
-        // Remove site base URL
-        $baseUrl = trim(Craft::getAlias($site->getBaseUrl()), '/');
-        $uri = str_replace($baseUrl, '', $url);
+        $siteUri = SiteUriHelper::getSiteUriFromUrl($url);
 
-        // Trim slashes from the beginning and end of the URI
-        $uri = trim($uri, '/');
-
-        return new SiteUriModel([
-            'siteId' => $site->id,
-            'uri' => $uri,
-        ]);
+        return $siteUri;
     }
 
     // Private Methods

@@ -69,7 +69,7 @@ class ClearCacheService extends Component
      */
     public function clearSite(int $siteId)
     {
-        $siteUris = SiteUriHelper::getSiteSiteUris($siteId);
+        $siteUris = SiteUriHelper::getSiteUrisForSite($siteId);
         $this->clearUris($siteUris);
     }
 

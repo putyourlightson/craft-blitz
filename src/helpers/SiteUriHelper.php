@@ -28,7 +28,7 @@ class SiteUriHelper
         $primarySite = $sitesService->getPrimarySite();
 
         // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
-        $siteUriSets = [self::getSiteSiteUris($primarySite->id, $cacheableOnly)];
+        $siteUriSets = [self::getSiteUrisForSite($primarySite->id, $cacheableOnly)];
 
         // Loop through all sites to ensure we warm all site element URLs
         $sites = $sitesService->getAllSites();
@@ -39,7 +39,7 @@ class SiteUriHelper
                 continue;
             }
 
-            $siteUriSets[] = self::getSiteSiteUris($site->id, $cacheableOnly);
+            $siteUriSets[] = self::getSiteUrisForSite($site->id, $cacheableOnly);
         }
 
         $siteUris = array_merge(...$siteUriSets);
@@ -55,7 +55,7 @@ class SiteUriHelper
      *
      * @return SiteUriModel[]
      */
-    public static function getSiteSiteUris(int $siteId, bool $cacheableOnly = false): array
+    public static function getSiteUrisForSite(int $siteId, bool $cacheableOnly = false): array
     {
         $siteUris = [];
 
@@ -164,7 +164,7 @@ class SiteUriHelper
      *
      * @return string[]
      */
-    public static function getSiteUriUrls(array $siteUris): array
+    public static function getUrlsFromSiteUri(array $siteUris): array
     {
         $urls = [];
 
@@ -191,29 +191,43 @@ class SiteUriHelper
      *
      * @return SiteUriModel[]
      */
-    public static function getUrlSiteUris(array $urls): array
+    public static function getSiteUrisFromUrls(array $urls): array
     {
         $siteUris = [];
 
+        foreach ($urls as $url) {
+            $siteUri = self::getSiteUriFromUrl($url);
+
+            if ($siteUri !== null) {
+                $siteUris[] = $siteUri;
+            }
+        }
+
+        return $siteUris;
+    }
+
+    /**
+     * Returns site URI from a given URL.
+     *
+     * @param string $url
+     *
+     * @return SiteUriModel|null
+     */
+    public static function getSiteUriFromUrl(string $url)
+    {
         foreach (Craft::$app->getSites()->getAllSites() as $site) {
             $baseUrl = trim(Craft::getAlias($site->getBaseUrl()), '/');
 
-            foreach ($urls as $url) {
-                if (stripos($url, $baseUrl) !== 0) {
-                    continue;
-                }
-
+            if (stripos($url, $baseUrl) === 0) {
                 $uri = str_replace($baseUrl, '', $url);
                 $uri = trim($uri, '/');
 
-                $siteUris[] = new SiteUriModel([
+                return new SiteUriModel([
                     'siteId' => $site->id,
                     'uri' => $uri,
                 ]);
             }
         }
-
-        return $siteUris;
     }
 
     /**
