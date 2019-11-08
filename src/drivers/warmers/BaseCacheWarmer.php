@@ -45,6 +45,14 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     /**
      * @inheritdoc
      */
+    public function canWarmConsoleRequest(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function warmSite(int $siteId, int $delay = null, callable $setProgressHandler = null)
     {
         // Get custom site URIs for the provided site only

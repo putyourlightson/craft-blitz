@@ -16,6 +16,13 @@ interface CacheWarmerInterface extends SavableComponentInterface
     /**
      * Warms the cache given an array of site URIs.
      *
+     * @return bool
+     */
+    public function canWarmConsoleRequest(): bool;
+
+    /**
+     * Warms the cache given an array of site URIs.
+     *
      * @param SiteUriModel[] $siteUris
      * @param int|null $delay
      * @param callable|null $setProgressHandler

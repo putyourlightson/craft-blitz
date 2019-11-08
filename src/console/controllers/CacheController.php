@@ -305,6 +305,12 @@ class CacheController extends Controller
      */
     private function _warmCache(array $siteUris)
     {
+        if (!Blitz::$plugin->cacheWarmer->canWarmConsoleRequest()) {
+            $this->stderr(Craft::t('blitz', 'Cannot warm URIs from console command using Local Warmer (use the Guzzle Warmer instead).').PHP_EOL, Console::FG_RED);
+
+            return;
+        }
+
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, Console::FG_YELLOW);
 
         Console::startProgress(0, count($siteUris), '', 0.8);

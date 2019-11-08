@@ -35,18 +35,28 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
+    public function canWarmConsoleRequest(): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function warmUris(array $siteUris, int $delay = null, callable $setProgressHandler = null)
     {
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $error = Craft::t('blitz', 'Cannot warm URIs from console command using Local Warmer (use the Guzzle Warmer instead).');
+            Blitz::$plugin->log($error, [], 'error');
+
+            return;
+        }
+
         if (!$this->beforeWarmCache($siteUris)) {
             return;
         }
 
-        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
-            //$this->warmUrisWithProgress($siteUris, $setProgressHandler);
-        }
-        else {
-            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
-        }
+        CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
 
         $this->afterWarmCache($siteUris);
     }
