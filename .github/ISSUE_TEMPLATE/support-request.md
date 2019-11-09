@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-**Question**
+### Question
 A question about the plugin or how it works. We are diligent about documentation so check the [plugin docs](https://putyourlightson.com/plugins/blitz) before submitting your question.
 
-**Additional context**
+### Additional context
 Add any other context or screenshots about the support request here.

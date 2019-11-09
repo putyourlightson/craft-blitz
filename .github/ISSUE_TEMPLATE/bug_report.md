@@ -7,21 +7,21 @@ assignees: ''
 
 ---
 
-**Describe the bug**
+### Describe the bug
 A clear and concise description of what the bug is.
 
-**To reproduce**
+### To reproduce
 Steps to reproduce the behaviour:
 1. Go to '...'
 2. Click on '...'
 3. See error message '...'
 
-**Expected behaviour**
+### Expected behaviour
 A clear and concise description of what you expected to happen.
 
-**Screenshots**
+### Screenshots
 If applicable, add screenshots to help explain your problem.
 
-**Versions**
+### Versions
  - Plugin version:
  - Craft version:
