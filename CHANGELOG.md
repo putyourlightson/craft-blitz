@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 2.3.5 - Unreleased
+### Fixed
+- Fixed `cacheDuration` config setting not being applied when generating a cache record ([#141](https://github.com/putyourlightson/craft-blitz/issues/141)).
+- Fixed a potential JavaScript error if the `blitz-inject` element is not found ([#139](https://github.com/putyourlightson/craft-blitz/issues/139)).
+
 ## 2.3.4 - 2019-10-21
 ### Changed
 - Improved element query caching to help catch exceptions ([#136](https://github.com/putyourlightson/craft-blitz/issues/136)).
