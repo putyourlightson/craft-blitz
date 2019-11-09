@@ -64,6 +64,17 @@ class CacheOptionsModel extends Model
     /**
      * @inheritdoc
      */
+    public function attributes(): array
+    {
+        $names = parent::attributes();
+        $names = array_merge($names, ['cacheDuration']);
+
+        return $names;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules(): array
     {
         return [
