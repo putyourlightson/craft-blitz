@@ -12,9 +12,9 @@ A clear and concise description of what the bug is.
 
 ### To reproduce
 Steps to reproduce the behaviour:
-1. Go to '...'
-2. Click on '...'
-3. See error message '...'
+1. Go to "..."
+2. Click on "..."
+3. See error message "..."
 
 ### Expected behaviour
 A clear and concise description of what you expected to happen.
@@ -23,5 +23,5 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 ### Versions
- - Plugin version:
- - Craft version:
+- Plugin version:
+- Craft version:
