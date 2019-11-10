@@ -190,8 +190,10 @@ class GitDeployer extends BaseDeployer
             $total += count($siteUris);
         }
 
-        $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-        call_user_func($setProgressHandler, $count, $total, $progressLabel);
+        if (is_callable($setProgressHandler)) {
+            $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+            call_user_func($setProgressHandler, $count, $total, $progressLabel);
+        }
 
         foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
             $repositoryPath = FileHelper::normalizePath(
@@ -200,8 +202,11 @@ class GitDeployer extends BaseDeployer
 
             foreach ($siteUris as $siteUri) {
                 $count++;
-                $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-                call_user_func($setProgressHandler, $count, $total, $progressLabel);
+
+                if (is_callable($setProgressHandler)) {
+                    $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                    call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                }
 
                 $value = Blitz::$plugin->cacheStorage->get($siteUri);
 
@@ -210,6 +215,7 @@ class GitDeployer extends BaseDeployer
                 }
 
                 $filePath = FileHelper::normalizePath($repositoryPath.'/'.$siteUri->uri.'/index.html');
+
                 $this->_save($value, $filePath);
             }
 
@@ -230,6 +236,9 @@ class GitDeployer extends BaseDeployer
 
             try {
                 $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
+
+                // Pull down any remote commits
+                $git->pull();
 
                 // Add all files to branch and check it out
                 $git->add('*');

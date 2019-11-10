@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.0.0-RC1 - Unreleased
+### Changed
+- The Git Deployer now calls `git pull` before committing changes.
+
 ## 3.0.0-beta.4 - 2019-11-07
 ### Added
 - Added the Local Warmer to the default cache warmers.
