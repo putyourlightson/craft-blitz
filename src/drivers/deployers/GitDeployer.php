@@ -229,7 +229,8 @@ class GitDeployer extends BaseDeployer
             }
 
             if ($this->commandsBefore) {
-                $process = new Process([$this->commandsBefore]);
+                $commands = preg_split('/\R/', $this->commandsBefore);
+                $process = new Process($commands);
                 $process->mustRun();
             }
 
@@ -271,7 +272,8 @@ class GitDeployer extends BaseDeployer
             }
 
             if ($this->commandsAfter) {
-                $process = new Process([$this->commandsAfter]);
+                $commands = preg_split('/\R/', $this->commandsAfter);
+                $process = new Process($commands);
                 $process->mustRun();
             }
         }
@@ -334,7 +336,7 @@ class GitDeployer extends BaseDeployer
      */
     public function getPersonalAccessToken(): string
     {
-        return Craft::parseEnv($this->personalAccessToken) ?? '';
+        return Craft::parseEnv($this->personalAccessToken) ?: '';
     }
 
     /**
