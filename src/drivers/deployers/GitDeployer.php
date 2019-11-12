@@ -306,7 +306,7 @@ class GitDeployer extends BaseDeployer
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
         // Find the git binary
-        $process = new Process(['which git']);
+        $process = new Process('which git');
         $process->run();
         $gitPath = trim($process->getOutput());
 
@@ -370,10 +370,7 @@ class GitDeployer extends BaseDeployer
             return;
         }
 
-        if ($this->commandsBefore) {
-            $process = new Process([$this->commandsBefore]);
-            $process->mustRun();
-        }
+        $this->_runCommands($this->commandsBefore);
 
         try {
             $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
@@ -396,7 +393,7 @@ class GitDeployer extends BaseDeployer
             $git->push($remote);
         }
         catch (GitException $e) {
-            Blitz::$plugin->log('Deploying failed: {error}', [
+            Blitz::$plugin->log('Remote deploy failed: {error}', [
                 'error' => $e->getMessage(),
             ], 'error');
 
@@ -407,8 +404,26 @@ class GitDeployer extends BaseDeployer
             $this->trigger(self::EVENT_AFTER_COMMIT, new Event());
         }
 
-        if ($this->commandsAfter) {
-            $process = new Process($this->commandsAfter);
+        $this->_runCommands($this->commandsAfter);
+    }
+
+    /**
+     * Runs one or more commands.
+     *
+     * @param string|array $commands
+     */
+    private function _runCommands($commands)
+    {
+        if (is_string($commands)) {
+            $commands = preg_split('/\R/', $commands);
+        }
+
+        if (empty($commands)) {
+            return;
+        }
+
+        foreach ($commands as $command) {
+            $process = new Process($command);
             $process->mustRun();
         }
     }
