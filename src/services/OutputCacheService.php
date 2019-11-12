@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\OutputEvent;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -46,6 +47,7 @@ class OutputCacheService extends Component
             return;
         }
 
+        /** @var Response $response */
         $response = Craft::$app->getResponse();
         $headers = $response->getHeaders();
 

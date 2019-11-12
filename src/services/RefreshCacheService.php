@@ -209,6 +209,10 @@ class RefreshCacheService extends Component
      */
     public function addElementExpiryDates(ElementInterface $element)
     {
+        if (!($element instanceof Element)) {
+            return;
+        }
+
         $expiryDate = null;
         $now = new DateTime();
 

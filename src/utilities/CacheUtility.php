@@ -35,7 +35,7 @@ class CacheUtility extends Utility
      */
     public static function iconPath()
     {
-        return Craft::getAlias('@vendor/putyourlightson/craft-blitz/src/icon-mask.svg');
+        return Craft::getAlias('@vendor/putyourlightson/craft-blitz/src/icon-mask.svg') ?: '';
     }
 
     /**

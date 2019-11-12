@@ -377,7 +377,7 @@ class GenerateCacheService extends Component
     {
         // Convert elements to their ID
         if ($value instanceof ElementInterface) {
-            $value = $value->id;
+            $value = $value->getId();
             return;
         }
 
