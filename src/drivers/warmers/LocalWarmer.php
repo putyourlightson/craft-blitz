@@ -88,19 +88,19 @@ class LocalWarmer extends BaseCacheWarmer
         ];
 
         foreach ($siteUris as $siteUri) {
-            // Convert to a SiteUriModel if it is an array
-            if (is_array($siteUri)) {
-                $siteUri = new SiteUriModel($siteUri);
-            }
-
-            $this->_warmUri($siteUri, $componentConfigs);
-
             $count++;
 
             if (is_callable($setProgressHandler)) {
                 $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
                 call_user_func($setProgressHandler, $count, $total, $progressLabel);
             }
+
+            // Convert to a SiteUriModel if it is an array
+            if (is_array($siteUri)) {
+                $siteUri = new SiteUriModel($siteUri);
+            }
+
+            $this->_warmUri($siteUri, $componentConfigs);
         }
     }
 

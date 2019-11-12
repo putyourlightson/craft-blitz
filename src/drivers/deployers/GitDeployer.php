@@ -218,64 +218,15 @@ class GitDeployer extends BaseDeployer
                 $this->_save($value, $filePath);
             }
 
+            if (is_callable($setProgressHandler)) {
+                $progressLabel = Craft::t('blitz', 'Deploying to remote.');
+                call_user_func($setProgressHandler, $count, $total, $progressLabel);
+            }
+
             $branch = $this->gitRepositories[$siteUid]['branch'] ?: $this->defaultBranch;
             $remote = $this->gitRepositories[$siteUid]['remote'] ?: $this->defaultRemote;
 
-            $event = new CancelableEvent();
-            $this->trigger(self::EVENT_BEFORE_COMMIT, $event);
-
-            if (!$event->isValid) {
-                continue;
-            }
-
-            if ($this->commandsBefore) {
-                $commands = preg_split('/\R/', $this->commandsBefore);
-                $process = new Process($commands);
-                $process->mustRun();
-            }
-
-            try {
-                $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
-
-                // Pull down any remote commits
-                $git->pull();
-
-                // Add all files to branch and check it out
-                $git->add('*');
-                $git->checkout($branch);
-
-                // Check for changes first to avoid an exception being thrown
-                if ($git->hasChanges()) {
-                    // Parse twig tags in the commit message
-                    $commitMessage = Craft::$app->getView()->renderString($this->commitMessage);
-
-                    $git->commit(addslashes($commitMessage));
-                }
-
-                $git->push($remote);
-            }
-            catch (GitException $e) {
-                $site = Craft::$app->getSites()->getSiteByUid($siteUid);
-
-                if ($site !== null) {
-                    Blitz::$plugin->log('Deploying “{site}” failed: {error}', [
-                        'site' => $site->name,
-                        'error' => $e->getMessage(),
-                    ], 'error');
-                }
-
-                throw $e;
-            }
-
-            if ($this->hasEventHandlers(self::EVENT_AFTER_COMMIT)) {
-                $this->trigger(self::EVENT_AFTER_COMMIT, new Event());
-            }
-
-            if ($this->commandsAfter) {
-                $commands = preg_split('/\R/', $this->commandsAfter);
-                $process = new Process($commands);
-                $process->mustRun();
-            }
+            $this->_deploy($repositoryPath, $branch, $remote);
         }
     }
 
@@ -301,19 +252,11 @@ class GitDeployer extends BaseDeployer
                 $git->fetch($remote);
             }
             catch (GitException $e) {
-                $site = Craft::$app->getSites()->getSiteByUid($siteUid);
+                $error = Craft::t('blitz', 'Error connecting to repository: {error}', [
+                    'error' => $e->getMessage(),
+                ]);
 
-                if ($site !== null) {
-                    $error = Craft::t('blitz', 'Error for “{site}”: {error}', [
-                        'site' => $site->name,
-                        'error' => $e->getMessage(),
-                    ]);
-
-                    // Remove value of personal access token to avoid it being output in plaintext
-                    $error = str_replace($this->getPersonalAccessToken(), $this->personalAccessToken, $error);
-
-                    $this->addError('gitRepositories', $error);
-                }
+                $this->addError('gitRepositories', $error);
             }
         }
 
@@ -408,6 +351,65 @@ class GitDeployer extends BaseDeployer
         }
         catch (InvalidArgumentException $e) {
             Blitz::$plugin->log($e->getMessage(), [], 'error');
+        }
+    }
+
+    /**
+     * Deploys to the remote repository.
+     *
+     * @param string $repositoryPath
+     * @param string $branch
+     * @param string $remote
+     */
+    private function _deploy(string $repositoryPath, string $branch, string $remote)
+    {
+        $event = new CancelableEvent();
+        $this->trigger(self::EVENT_BEFORE_COMMIT, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        if ($this->commandsBefore) {
+            $process = new Process([$this->commandsBefore]);
+            $process->mustRun();
+        }
+
+        try {
+            $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
+
+            // Pull down any remote commits
+            $git->pull();
+
+            // Add all files to branch and check it out
+            $git->add('*');
+            $git->checkout($branch);
+
+            // Check for changes first to avoid an exception being thrown
+            if ($git->hasChanges()) {
+                // Parse twig tags in the commit message
+                $commitMessage = Craft::$app->getView()->renderString($this->commitMessage);
+
+                $git->commit(addslashes($commitMessage));
+            }
+
+            $git->push($remote);
+        }
+        catch (GitException $e) {
+            Blitz::$plugin->log('Deploying failed: {error}', [
+                'error' => $e->getMessage(),
+            ], 'error');
+
+            throw $e;
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_COMMIT)) {
+            $this->trigger(self::EVENT_AFTER_COMMIT, new Event());
+        }
+
+        if ($this->commandsAfter) {
+            $process = new Process($this->commandsAfter);
+            $process->mustRun();
         }
     }
 }
