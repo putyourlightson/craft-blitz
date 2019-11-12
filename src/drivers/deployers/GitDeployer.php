@@ -328,7 +328,7 @@ class GitDeployer extends BaseDeployer
         $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https').'://'
             .$this->getPersonalAccessToken().'@'
             .parse_url($remoteUrl, PHP_URL_HOST)
-            .parse_url($remoteUrl, PHP_URL_PORT);
+            .parse_url($remoteUrl, PHP_URL_PATH);
 
         $git->remote('set-url', $remote, $remoteUrl);
 
