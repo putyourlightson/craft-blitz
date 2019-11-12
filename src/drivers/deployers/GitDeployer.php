@@ -18,7 +18,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 use yii\base\ErrorException;
 use yii\base\Event;
@@ -230,7 +229,7 @@ class GitDeployer extends BaseDeployer
             }
 
             if ($this->commandsBefore) {
-                $process = new Process($this->commandsBefore);
+                $process = new Process([$this->commandsBefore]);
                 $process->mustRun();
             }
 
@@ -272,7 +271,7 @@ class GitDeployer extends BaseDeployer
             }
 
             if ($this->commandsAfter) {
-                $process = new Process($this->commandsAfter);
+                $process = new Process([$this->commandsAfter]);
                 $process->mustRun();
             }
         }
@@ -335,7 +334,7 @@ class GitDeployer extends BaseDeployer
      */
     public function getPersonalAccessToken(): string
     {
-        return Craft::parseEnv($this->personalAccessToken);
+        return Craft::parseEnv($this->personalAccessToken) ?? '';
     }
 
     /**
@@ -361,9 +360,8 @@ class GitDeployer extends BaseDeployer
      */
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
-        // Find the git binary ourselves and use it as the default
-        // (important because GitWrapper cannot always find it)
-        $process = new Process('which git');
+        // Find the git binary
+        $process = new Process(['which git']);
         $process->run();
         $gitPath = trim($process->getOutput());
 

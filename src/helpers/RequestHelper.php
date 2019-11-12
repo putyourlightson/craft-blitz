@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\helpers;
 
 use Craft;
 use craft\elements\User;
-use craft\errors\SiteNotFoundException;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 

@@ -228,6 +228,8 @@ class SiteUriHelper
                 ]);
             }
         }
+
+        return null;
     }
 
     /**

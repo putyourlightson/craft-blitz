@@ -10,6 +10,7 @@ use craft\base\SavableComponent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 
 /**
  * @property array $siteOptions
