@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.0.0-RC1 - Unreleased
+## 3.0.0-RC1 - 2019-11-13
 ### Changed
 - The Git Deployer now calls `git pull` before committing changes.
 - Code cleanup and stability improvements.
