@@ -54,7 +54,7 @@ return [
     //    'apiKey' => '',
     //],
 
-    // The purger type classes to add to the plugin’s default purger types.
+    // The purger type classes that should be available.
     //'cachePurgerTypes' => [
     //   'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
     //],
@@ -67,7 +67,7 @@ return [
     //    'personalAccessToken' => '',
     //],
 
-    // The deployer type classes to add to the plugin’s default deployer types.
+    // The deployer type classes that should be available.
     //'deployerTypes' => [
     //    'putyourlightson\blitz\drivers\deployers\GitDeployer',
     //],

@@ -14,7 +14,7 @@ interface CacheWarmerInterface extends SavableComponentInterface
     // =========================================================================
 
     /**
-     * Warms the cache given an array of site URIs.
+     * Returns whether the warmer can warm during a console request.
      *
      * @return bool
      */
