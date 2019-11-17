@@ -306,7 +306,7 @@ class GitDeployer extends BaseDeployer
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
         // Find the git binary
-        $process = new Process(['which git']);
+        $process = new Process(['which', 'git']);
         $process->run();
         $gitPath = trim($process->getOutput()) ?: null;
 
@@ -425,9 +425,16 @@ class GitDeployer extends BaseDeployer
             $commands = preg_split('/\R/', $commands);
         }
 
+        /** @var string $command */
         foreach ($commands as $command) {
-            /** @var string $command */
-            $process = new Process([$command]);
+            // TODO: remove in Blitz 4 when Process 4 is forced
+            if (method_exists(Process::class, 'fromShellCommandline')) {
+                $process = Process::fromShellCommandline($command);
+            }
+            else {
+                $process = new Process($command);
+            }
+
             $process->mustRun();
         }
     }
