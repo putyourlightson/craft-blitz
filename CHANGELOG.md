@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.0.0-RC2 - 2019-11-17
+### Changed
+- Loosened version constraints for GitWrapper so the latest version for the local PHP version is used.
+
 ## 3.0.0-RC1 - 2019-11-13
 ### Changed
 - The Git Deployer now calls `git pull` before committing changes.
