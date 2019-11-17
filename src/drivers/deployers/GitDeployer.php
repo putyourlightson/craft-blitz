@@ -306,9 +306,9 @@ class GitDeployer extends BaseDeployer
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
         // Find the git binary
-        $process = new Process('which git');
+        $process = new Process(['which git']);
         $process->run();
-        $gitPath = trim($process->getOutput());
+        $gitPath = trim($process->getOutput()) ?: null;
 
         $gitWrapper = new GitWrapper($gitPath);
 
@@ -320,11 +320,14 @@ class GitDeployer extends BaseDeployer
         $git->config('user.email', $this->email);
 
         // Clear output (important!)
-        $git->clearOutput();
+        // TODO: remove in Blitz 4 when GitWrapper 2 is forced
+        if (method_exists($git, 'clearOutput')) {
+            $git->clearOutput();
+        }
 
         $remoteUrl = $git->getRemote($remote)['push'];
 
-        // Break the URL into parts and reconstruct
+        // Break the URL into parts and reconstruct with personal access token
         $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https').'://'
             .$this->getPersonalAccessToken().'@'
             .parse_url($remoteUrl, PHP_URL_HOST)
@@ -410,20 +413,21 @@ class GitDeployer extends BaseDeployer
     /**
      * Runs one or more commands.
      *
-     * @param string|array $commands
+     * @param string|string[] $commands
      */
     private function _runCommands($commands)
     {
-        if (is_string($commands)) {
-            $commands = preg_split('/\R/', $commands);
-        }
-
         if (empty($commands)) {
             return;
         }
 
+        if (is_string($commands)) {
+            $commands = preg_split('/\R/', $commands);
+        }
+
         foreach ($commands as $command) {
-            $process = new Process($command);
+            /** @var string $command */
+            $process = new Process([$command]);
             $process->mustRun();
         }
     }

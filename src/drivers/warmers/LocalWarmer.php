@@ -117,7 +117,7 @@ class LocalWarmer extends BaseCacheWarmer
     {
         $url = $siteUri->getUrl();
 
-        // Parse the URI rather than getting it from `$siteUri` to ensure we have the full request URI (!important)
+        // Parse the URI rather than getting it from `$siteUri` to ensure we have the full request URI (important!)
         $uri = trim(parse_url($url, PHP_URL_PATH), '/');
 
         /**
