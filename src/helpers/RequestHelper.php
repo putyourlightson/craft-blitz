@@ -40,32 +40,42 @@ class RequestHelper
             return false;
         }
 
+        $request = Craft::$app->getRequest();
+
         /** @var User|null $user */
         $user = Craft::$app->getUser()->getIdentity();
 
         if ($user !== null) {
             // Ensure that if the site is not live that the user has permission to access it
             if (!Craft::$app->getIsLive() && !$user->can('accessSiteWhenSystemIsOff')) {
+                Blitz::$plugin->debug('Page not cached because the site is not live and the user does not have permission to access it.');
+
                 return false;
             }
 
             // Ensure that if user is logged in then debug toolbar is not enabled
             if ($user->getPreference('enableDebugToolbarForSite')) {
+                Blitz::$plugin->debug('Page not cached because the debug toolbar is enabled.');
+
                 return false;
             }
         }
 
-        $request = Craft::$app->getRequest();
-
         if (!empty($request->getParam('no-cache'))) {
+            Blitz::$plugin->debug('Page not cached because a `no-cache` request parameter was provided.');
+
             return false;
         }
 
         if (!empty($request->getParam('token'))) {
+            Blitz::$plugin->debug('Page not cached because a `token` request parameter was provided.');
+
             return false;
         }
 
         if (Blitz::$plugin->settings->queryStringCaching == 0 && !empty($request->getQueryStringWithoutPath())) {
+            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.');
+
             return false;
         }
 

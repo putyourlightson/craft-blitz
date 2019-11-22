@@ -153,6 +153,24 @@ class Blitz extends Plugin
         LogToFile::log($message, 'blitz', $type);
     }
 
+    /**
+     * Logs a debug message if debug mode is enabled
+     *
+     * @param string $message
+     * @param array $params
+     */
+    public function debug(string $message, array $params = [])
+    {
+        if (!$this->settings->debug) {
+            return;
+        }
+
+        $url = Craft::$app->getRequest()->getAbsoluteUrl();
+        $message = Craft::t('blitz', $message, $params).' ['.$url.']';
+
+        LogToFile::log($message, 'blitz', 'debug');
+    }
+
     // Protected Methods
     // =========================================================================
 

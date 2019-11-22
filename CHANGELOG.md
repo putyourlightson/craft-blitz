@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
 ## 3.0.0-RC3 - Unreleased
+### Added
+- Added `debug` config setting to help debug why pages are not being cached.
+
 ### Changed
 - Set max value for concurrency to `10`.
 

@@ -25,6 +25,11 @@ class SettingsModel extends Model
     /**
      * @var bool
      */
+    public $debug = false;
+
+    /**
+     * @var bool
+     */
     public $cachingEnabled = false;
 
     /**

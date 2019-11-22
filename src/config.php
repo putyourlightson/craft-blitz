@@ -19,6 +19,9 @@
 
 return [
     '*' => [
+        // Enable debug mode to help figure out why pages are not being cached. With this setting enabled, Blitz will log detailed messages to `storage/logs/blitz.php`.
+        //'debug' => false,
+
         // Whether caching should be enabled. With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 

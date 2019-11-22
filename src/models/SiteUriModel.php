@@ -56,26 +56,36 @@ class SiteUriModel extends Model
     {
         // Ignore URIs that contain index.php
         if (strpos($this->uri, 'index.php') !== false) {
+            Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.');
+
             return false;
         }
 
         // Ignore URIs that are longer than the max URI length
         if (strlen($this->uri) > self::MAX_URI_LENGTH) {
+            Blitz::$plugin->debug('Page not cached because it exceeds the max URL length of {max} characters.', [
+                'max' => self::MAX_URI_LENGTH
+            ]);
+
             return false;
         }
 
         // Excluded URI patterns take priority
         if (is_array(Blitz::$plugin->settings->excludedUriPatterns)
             && $this->_matchesUriPatterns(Blitz::$plugin->settings->excludedUriPatterns)) {
+            Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.');
+
             return false;
         }
 
-        if (is_array(Blitz::$plugin->settings->includedUriPatterns)
-            && $this->_matchesUriPatterns(Blitz::$plugin->settings->includedUriPatterns)) {
-            return true;
+        if (!is_array(Blitz::$plugin->settings->includedUriPatterns)
+            || !$this->_matchesUriPatterns(Blitz::$plugin->settings->includedUriPatterns)) {
+            Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.');
+
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     // Private Methods
