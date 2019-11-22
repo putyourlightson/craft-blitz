@@ -1,0 +1,8 @@
+{% if craft.app.request.getParam('welcome') %}
+
+    <div class="step step-{{ step }}">
+        <div class="number">{{ step }}</div>
+        {{ text|t('blitz') }}
+    </div>
+
+{% endif %}

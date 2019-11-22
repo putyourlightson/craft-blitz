@@ -1,0 +1,22 @@
+{% if craft.app.request.getParam('welcome') %}
+
+    <div class="flex spaced">
+        {% include 'blitz/_includes/welcome/step' with {step: 3, text: 'Warm the cache'} %}
+
+        <div class="flex-grow">
+            {{ 'Save the settings and then visit the <a href="{siteUrl}" target="_blank">site</a> or warm the cache using the <a href="{url}" target="_blank">Blitz Cache Utility</a>.'|t('blitz', {
+                siteUrl: siteUrl,
+                url: cpUrl('utilities/blitz-cache')
+            })|raw }}
+        </div>
+    </div>
+
+    <div class="welcome bottom readable">
+        <p>
+            {{ 'Everything else is optional!'|t('blitz') }}
+            📖
+            {{ 'More in the <a href="{url}" class="go" target="_blank">Getting Started Guide</a>'|t('blitz', {url: docs ~ 'getting-started'})|raw }}
+        </p>
+    </div>
+
+{% endif %}

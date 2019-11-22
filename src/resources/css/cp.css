@@ -2,30 +2,23 @@
     position: relative;
     text-align: center;
     padding: 30px;
-    margin-bottom: 30px;
     background: #ECF8FF;
-    border-radius: 10px;
-}
-
-.welcome .watermark {
-    opacity: 0.5;
-    position: absolute;
-    top: 0;
-    right: 0;
-    margin: 20px;
-    max-width: 30%;
-    max-height: 90%;
-}
-
-@media (max-width: 768px) {
-    .welcome .watermark {
-        display: none;
-    }
+    border-radius: 7px;
 }
 
 .welcome .logo {
+    opacity: 0.9;
+    position: absolute;
+    top: 0;
     left: 0;
+    margin: 20px;
     width: 120px;
+}
+
+@media (max-width: 768px) {
+    .welcome .logo {
+        display: none;
+    }
 }
 
 .welcome .main {
@@ -33,11 +26,36 @@
 }
 
 .welcome .icon {
-    height: 150px;
+    height: 130px;
 }
 
-.welcome ol {
-    list-style-position: inside;
+.spaced {
+    margin: 20px 0 30px;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 130px;
+    padding-right: 10px;
+    text-align: center;
+}
+.step-2 {
+    align-self: flex-start;
+    margin-top: 38px;
+}
+
+.step .number {
+    font-size: 20px;
+    font-weight: bold;
+    background: #ECF8FF;
+    border-radius: 100%;
+    width: 33px;
+    height: 33px;
+    line-height: 32px;
+    margin-bottom: 3px;
 }
 
 .info-hud {
