@@ -51,7 +51,7 @@
 
             <div class="flex-grow">
                 {% set info %}
-                    <span class="info">{{ 'With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disabling this setting will prevent Blitz from caching pages new pages.'|t('blitz') }}</span>
+                    <span class="info">{{ 'With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disabling this setting will prevent Blitz from caching any new pages.'|t('blitz') }}</span>
                 {% endset %}
                 {% set warning = craft.blitz.getWebAliasExists() ? "One or more sites use `@web` in their base URL. The `@web` alias is not recommended if it is determined automatically."|t('blitz') : "" %}
                 {{ forms.lightswitchField({
