@@ -34,7 +34,7 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Guzzle Warmer');
+        return Craft::t('blitz', 'Guzzle Warmer (recommended)');
     }
 
     // Public Methods
@@ -121,7 +121,7 @@ class GuzzleWarmer extends BaseCacheWarmer
     {
         return [
             [['concurrency'], 'required'],
-            [['concurrency'], 'integer', 'min' => 1],
+            [['concurrency'], 'integer', 'min' => 1, 'max' => 10],
         ];
     }
 
