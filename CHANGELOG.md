@@ -7,6 +7,9 @@
 ### Changed
 - Set max value for concurrency to `10`.
 
+### Fixed
+- Fixed authentication issue with Git Deployer connecting to GitLab. 
+
 ## 3.0.0-RC2 - 2019-11-17
 ### Changed
 - Loosened version constraints for GitWrapper so the latest version for the local PHP version is used.

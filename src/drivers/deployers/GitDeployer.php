@@ -327,9 +327,12 @@ class GitDeployer extends BaseDeployer
 
         $remoteUrl = $git->getRemote($remote)['push'];
 
-        // Break the URL into parts and reconstruct with personal access token
+        /**
+         * Break the URL into parts and reconstruct with personal access token
+         * as username and password (both are required by GitLab).
+         */
         $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https').'://'
-            .$this->getPersonalAccessToken().'@'
+            .$this->getPersonalAccessToken().':'.$this->getPersonalAccessToken().'@'
             .parse_url($remoteUrl, PHP_URL_HOST)
             .parse_url($remoteUrl, PHP_URL_PATH);
 
