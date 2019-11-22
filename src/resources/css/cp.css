@@ -11,6 +11,16 @@
     max-width: 485px;
 }
 
+.info-hud li {
+    margin: 2px 0;
+}
+
+.info-hud code {
+    padding: 4px 5px;
+    background: #ececec;
+    border-radius: 3px;
+}
+
 table.editable tbody tr td {
     text-align: left;
 }
