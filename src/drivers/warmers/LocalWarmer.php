@@ -123,7 +123,7 @@ class LocalWarmer extends BaseCacheWarmer
         /**
          * Mock the web server request
          * @see \craft\test\Craft::recreateClient
-        */
+         */
         $_SERVER = array_merge($_SERVER, [
             'HTTP_HOST' => parse_url($url, PHP_URL_HOST),
             'SERVER_NAME' => parse_url($url, PHP_URL_HOST),

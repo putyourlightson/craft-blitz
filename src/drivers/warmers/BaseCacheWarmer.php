@@ -104,7 +104,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      * Triggers the `beforeWarmCache` event.
      *
      * @param SiteUriModel[] $siteUris
-
+     *
      * @return bool
      */
     protected function beforeWarmCache(array $siteUris): bool

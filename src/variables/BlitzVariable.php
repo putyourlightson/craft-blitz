@@ -50,7 +50,7 @@ class BlitzVariable
     {
         // Ensure template exists
         if (!Craft::$app->getView()->resolveTemplate($template)) {
-            throw new NotFoundHttpException('Template not found: ' . $template);
+            throw new NotFoundHttpException('Template not found: '.$template);
         }
 
         // Hash the template
