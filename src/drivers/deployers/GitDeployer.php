@@ -207,13 +207,16 @@ class GitDeployer extends BaseDeployer
                     call_user_func($setProgressHandler, $count, $total, $progressLabel);
                 }
 
+                $filePath = FileHelper::normalizePath($repositoryPath.'/'.$siteUri->uri.'/index.html');
+
                 $value = Blitz::$plugin->cacheStorage->get($siteUri);
 
                 if (empty($value)) {
+                    // Delete the file if it exists
+                    FileHelper::unlink($filePath);
+
                     continue;
                 }
-
-                $filePath = FileHelper::normalizePath($repositoryPath.'/'.$siteUri->uri.'/index.html');
 
                 $this->_save($value, $filePath);
             }

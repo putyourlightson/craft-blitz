@@ -6,6 +6,7 @@
 
 ### Changed
 - Set max value for concurrency to `10`.
+- Git Deployer now removes files that have been cleared.
 
 ### Fixed
 - Fixed authentication issue with Git Deployer connecting to GitLab. 
