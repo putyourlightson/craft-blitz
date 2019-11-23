@@ -172,19 +172,11 @@ class GitDeployer extends BaseDeployer
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
         foreach ($groupedSiteUris as $siteId => $siteUris) {
-            $siteUid = Db::uidById(Table::SITES, $siteId);
-
-            if ($siteUid === null) {
+            if ($this->_getRepositoryPath($siteId) === null) {
                 continue;
             }
 
-            $repositoryPath = $this->_getRepositoryPath($siteUid);
-
-            if ($repositoryPath === null) {
-                continue;
-            }
-
-            $deployGroupedSiteUris[$siteUid] = $siteUris;
+            $deployGroupedSiteUris[$siteId] = $siteUris;
             $total += count($siteUris);
         }
 
@@ -193,8 +185,8 @@ class GitDeployer extends BaseDeployer
             call_user_func($setProgressHandler, $count, $total, $progressLabel);
         }
 
-        foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
-            $repositoryPath = $this->_getRepositoryPath($siteUid);
+        foreach ($deployGroupedSiteUris as $siteId => $siteUris) {
+            $repositoryPath = $this->_getRepositoryPath($siteId);
 
             if ($repositoryPath === null) {
                 continue;
@@ -212,14 +204,7 @@ class GitDeployer extends BaseDeployer
 
                 $value = Blitz::$plugin->cacheStorage->get($siteUri);
 
-                if (empty($value)) {
-                    // Delete the file if it exists
-                    FileHelper::unlink($filePath);
-
-                    continue;
-                }
-
-                $this->_save($value, $filePath);
+                $this->_updateFile($value, $filePath);
             }
 
             if (is_callable($setProgressHandler)) {
@@ -227,10 +212,7 @@ class GitDeployer extends BaseDeployer
                 call_user_func($setProgressHandler, $count, $total, $progressLabel);
             }
 
-            $branch = $this->gitRepositories[$siteUid]['branch'] ?: $this->defaultBranch;
-            $remote = $this->gitRepositories[$siteUid]['remote'] ?: $this->defaultRemote;
-
-            $this->_deploy($repositoryPath, $branch, $remote);
+            $this->_deploy($siteId);
         }
     }
 
@@ -240,7 +222,7 @@ class GitDeployer extends BaseDeployer
     public function test(): bool
     {
         foreach ($this->gitRepositories as $siteUid => $gitRepository) {
-            $repositoryPath = $this->_getRepositoryPath($siteUid);
+            $repositoryPath = $this->_getRepositoryPathBySiteUid($siteUid);
 
             if ($repositoryPath === null) {
                 continue;
@@ -306,11 +288,29 @@ class GitDeployer extends BaseDeployer
     /**
      * Returns the repository path for a given site UID
      *
+     * @param int $siteId
+     *
+     * @return string|null
+     */
+    private function _getRepositoryPath(int $siteId)
+    {
+        $siteUid = Db::uidById(Table::SITES, $siteId);
+
+        if ($siteUid === null) {
+            return null;
+        }
+
+        return $this->_getRepositoryPathBySiteUid($siteUid);
+    }
+
+    /**
+     * Returns the repository path for a given site UID
+     *
      * @param string $siteUid
      *
      * @return string|null
      */
-    private function _getRepositoryPath(string $siteUid)
+    private function _getRepositoryPathBySiteUid(string $siteUid)
     {
         $repositoryPath = $this->gitRepositories[$siteUid]['repositoryPath'] ?? null;
 
@@ -406,13 +406,19 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
-     * Saves a value to a file path.
+     * Updates a file by saving the value or deleting the file if empty.
      *
      * @param string $value
      * @param string $filePath
      */
-    private function _save(string $value, string $filePath)
+    private function _updateFile(string $value, string $filePath)
     {
+        if (empty($value)) {
+            FileHelper::unlink($filePath);
+
+            return;
+        }
+
         try {
             FileHelper::writeToFile($filePath, $value);
         }
@@ -427,11 +433,9 @@ class GitDeployer extends BaseDeployer
     /**
      * Deploys to the remote repository.
      *
-     * @param string $repositoryPath
-     * @param string $branch
-     * @param string $remote
+     * @param int $siteId
      */
-    private function _deploy(string $repositoryPath, string $branch, string $remote)
+    private function _deploy(int $siteId)
     {
         $event = new CancelableEvent();
         $this->trigger(self::EVENT_BEFORE_COMMIT, $event);
@@ -441,6 +445,21 @@ class GitDeployer extends BaseDeployer
         }
 
         $this->_runCommands($this->commandsBefore);
+
+        $siteUid = Db::uidById(Table::SITES, $siteId);
+
+        if ($siteUid === null) {
+            return;
+        }
+
+        $repositoryPath = $this->_getRepositoryPathBySiteUid($siteUid);
+
+        if ($repositoryPath === null) {
+            return;
+        }
+
+        $branch = $this->gitRepositories[$siteUid]['branch'] ?: $this->defaultBranch;
+        $remote = $this->gitRepositories[$siteUid]['remote'] ?: $this->defaultRemote;
 
         try {
             $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
