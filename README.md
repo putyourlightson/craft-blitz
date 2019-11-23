@@ -1,4 +1,6 @@
-<p align="center"><img height="150" src="src/icon.svg"></p>
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/putyourlightson/craft-blitz/badges/quality-score.png?b=v2)](https://scrutinizer-ci.com/g/putyourlightson/craft-blitz/?branch=v2)
+
+<p align="center"><img height="130" src="src/icon.svg"></p>
 
 # Blitz Plugin for Craft CMS 3
 
