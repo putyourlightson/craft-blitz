@@ -52,6 +52,11 @@ class GitDeployer extends BaseDeployer
     /**
      * @var string|null
      */
+    public $username;
+
+    /**
+     * @var string|null
+     */
     public $personalAccessToken;
 
     /**
@@ -122,7 +127,7 @@ class GitDeployer extends BaseDeployer
     public function rules(): array
     {
         return [
-            [['personalAccessToken', 'name', 'email', 'commitMessage'], 'required'],
+            [['username', 'personalAccessToken', 'name', 'email', 'commitMessage'], 'required'],
             [['email'], 'email'],
         ];
     }
@@ -330,18 +335,40 @@ class GitDeployer extends BaseDeployer
 
         $remoteUrl = $git->getRemote($remote)['push'];
 
-        /**
-         * Break the URL into parts and reconstruct with personal access token
-         * as username and password (both are required by GitLab).
-         */
+        // Break the URL into parts and reconstruct with personal access token
         $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https').'://'
-            .$this->getPersonalAccessToken().':'.$this->getPersonalAccessToken().'@'
+            .$this->_getAuthenticationToken($remoteUrl).'@'
             .parse_url($remoteUrl, PHP_URL_HOST)
             .parse_url($remoteUrl, PHP_URL_PATH);
 
         $git->remote('set-url', $remote, $remoteUrl);
 
         return $git;
+    }
+
+    /**
+     * Returns the authentication token based on the quirks of the Git server
+     *
+     * @param string $url
+     *
+     * @return string
+     */
+    public function _getAuthenticationToken(string $url): string
+    {
+        // Default `{personalAccessToken}`
+        $token = $this->getPersonalAccessToken();
+
+        // GitLab `{personalAccessToken}:{personalAccessToken}`
+        if (strpos($url, 'gitlab.com') !== false) {
+            $token = $token.':'.$token;
+        }
+
+        // BitBucket `{username}:{personalAccessToken}`
+        if (strpos($url, 'bitbucket.org') !== false) {
+            $token = $this->username.':'.$token;
+        }
+
+        return $token;
     }
 
     /**

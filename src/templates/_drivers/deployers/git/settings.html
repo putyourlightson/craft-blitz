@@ -81,7 +81,7 @@
 }) }}
 
 {% set info %}
-    <span class="info">{{ 'Personal access tokens are used in place of a username and password when performing Git operations. They can be created through your Git service provider. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#remote-deployment'})|raw }}</span>
+    <span class="info">{{ 'Personal access tokens are used in place of a username/password when performing Git operations. They can be created through your Git service provider. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#remote-deployment'})|raw }}</span>
 {% endset %}
 {{ forms.autosuggestField({
     label: "Personal Access Token"|t('blitz'),
