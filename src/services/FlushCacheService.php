@@ -160,7 +160,9 @@ class FlushCacheService extends Component
             try {
                 $db->createCommand($sql)->execute();
             }
-            catch (Exception $e) { }
+            catch (Exception $e) {
+                Blitz::$plugin->log('Failed to reset auto increment: '.$e->getMessage(), [], 'error');
+            }
         }
     }
 }

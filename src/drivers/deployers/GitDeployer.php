@@ -178,15 +178,9 @@ class GitDeployer extends BaseDeployer
                 continue;
             }
 
-            if (empty($this->gitRepositories[$siteUid]) || empty($this->gitRepositories[$siteUid]['repositoryPath'])) {
-                continue;
-            }
+            $repositoryPath = $this->_getRepositoryPath($siteUid);
 
-            $repositoryPath = FileHelper::normalizePath(
-                Craft::parseEnv($this->gitRepositories[$siteUid]['repositoryPath'])
-            );
-
-            if (FileHelper::isWritable($repositoryPath) === false) {
+            if ($repositoryPath === null) {
                 continue;
             }
 
@@ -200,9 +194,11 @@ class GitDeployer extends BaseDeployer
         }
 
         foreach ($deployGroupedSiteUris as $siteUid => $siteUris) {
-            $repositoryPath = FileHelper::normalizePath(
-                Craft::parseEnv($this->gitRepositories[$siteUid]['repositoryPath'])
-            );
+            $repositoryPath = $this->_getRepositoryPath($siteUid);
+
+            if ($repositoryPath === null) {
+                continue;
+            }
 
             foreach ($siteUris as $siteUri) {
                 $count++;
@@ -244,11 +240,9 @@ class GitDeployer extends BaseDeployer
     public function test(): bool
     {
         foreach ($this->gitRepositories as $siteUid => $gitRepository) {
-            $repositoryPath = FileHelper::normalizePath(
-                Craft::parseEnv($gitRepository['repositoryPath'])
-            );
+            $repositoryPath = $this->_getRepositoryPath($siteUid);
 
-            if (empty($repositoryPath)) {
+            if ($repositoryPath === null) {
                 continue;
             }
 
@@ -279,7 +273,7 @@ class GitDeployer extends BaseDeployer
         // Remove value of personal access token to avoid it being output
         $error = str_replace($this->getPersonalAccessToken(), $this->personalAccessToken, $error);
 
-        return parent::addError($attribute, $error);
+        parent::addError($attribute, $error);
     }
 
     /**
@@ -287,7 +281,13 @@ class GitDeployer extends BaseDeployer
      */
     public function getPersonalAccessToken(): string
     {
-        return Craft::parseEnv($this->personalAccessToken) ?: '';
+        $personalAccessToken = Craft::parseEnv($this->personalAccessToken);
+
+        if (!is_string($personalAccessToken)) {
+            return '';
+        }
+
+        return $personalAccessToken;
     }
 
     /**
@@ -302,6 +302,40 @@ class GitDeployer extends BaseDeployer
 
     // Private Methods
     // =========================================================================
+
+    /**
+     * Returns the repository path for a given site UID
+     *
+     * @param string $siteUid
+     *
+     * @return string|null
+     */
+    private function _getRepositoryPath(string $siteUid)
+    {
+        $repositoryPath = $this->gitRepositories[$siteUid]['repositoryPath'] ?? null;
+
+        if (empty($repositoryPath)) {
+            return null;
+        }
+
+        $repositoryPath = Craft::parseEnv($this->gitRepositories[$siteUid]['repositoryPath']);
+
+        if (!is_string($repositoryPath)) {
+            return null;
+        }
+
+        $repositoryPath = FileHelper::normalizePath($repositoryPath);
+
+        if (FileHelper::isWritable($repositoryPath) === false) {
+            Blitz::$plugin->log('Repository path `{path}` is not writeable.', [
+                'path' => $repositoryPath
+            ], 'error');
+
+            return null;
+        }
+
+        return $repositoryPath;
+    }
 
     /**
      * Returns a git working copy

@@ -13,7 +13,6 @@ use craft\events\BatchElementActionEvent;
 use craft\events\CancelableEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
-use craft\events\ElementQueryEvent;
 use craft\events\PluginEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\RegisterCacheOptionsEvent;

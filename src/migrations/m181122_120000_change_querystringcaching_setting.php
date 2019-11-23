@@ -29,7 +29,7 @@ class m181122_120000_change_querystringcaching_setting extends Migration
             ->where(['handle' => 'blitz'])
             ->one();
 
-        if ($plugin === null || empty($plugin['settings'])) {
+        if ($plugin === false || empty($plugin['settings'])) {
             return true;
         }
 
@@ -42,6 +42,8 @@ class m181122_120000_change_querystringcaching_setting extends Migration
         $settings->queryStringCaching = $queryStringCachingEnabled ? 1 : 0;
 
         Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings->getAttributes());
+
+        return true;
     }
 
     /**

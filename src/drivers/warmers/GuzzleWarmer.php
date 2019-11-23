@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\warmers;
 
 use Craft;
+use Generator;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
@@ -78,6 +79,9 @@ class GuzzleWarmer extends BaseCacheWarmer
         /**
          * Use a generator instead of creating an array to save memory
          * https://www.php.net/manual/en/language.generators.overview.php
+         *
+         * @param $urls
+         * @return Generator
          */
         $requests = function($urls) {
             foreach ($urls as $url) {

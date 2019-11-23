@@ -71,15 +71,13 @@ class SiteUriModel extends Model
         }
 
         // Excluded URI patterns take priority
-        if (is_array(Blitz::$plugin->settings->excludedUriPatterns)
-            && $this->_matchesUriPatterns(Blitz::$plugin->settings->excludedUriPatterns)) {
+        if ($this->_matchesUriPatterns(Blitz::$plugin->settings->excludedUriPatterns)) {
             Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.');
 
             return false;
         }
 
-        if (!is_array(Blitz::$plugin->settings->includedUriPatterns)
-            || !$this->_matchesUriPatterns(Blitz::$plugin->settings->includedUriPatterns)) {
+        if (!$this->_matchesUriPatterns(Blitz::$plugin->settings->includedUriPatterns)) {
             Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.');
 
             return false;

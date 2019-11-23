@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
-use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
@@ -281,6 +280,7 @@ class GenerateCacheService extends Component
             return $this->_defaultElementQueryParams[$elementType];
         }
 
+        /** @var ElementInterface $elementType */
         $this->_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
 
         $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
