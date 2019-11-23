@@ -76,24 +76,8 @@ class GuzzleWarmer extends BaseCacheWarmer
 
         $client = Craft::createGuzzleClient();
 
-        /**
-         * Use a generator instead of creating an array to save memory
-         * https://www.php.net/manual/en/language.generators.overview.php
-         *
-         * @param $urls
-         * @return Generator
-         */
-        $requests = function($urls) {
-            foreach ($urls as $url) {
-                // Ensure URL is an absolute URL starting with http
-                if (stripos($url, 'http') === 0) {
-                    yield new Request('GET', $url);
-                }
-            }
-        };
-
         // Create a pool of requests for sending multiple concurrent requests
-        $pool = new Pool($client, $requests($urls), [
+        $pool = new Pool($client, $this->_getRequests($urls), [
             'concurrency' => $this->concurrency,
             'fulfilled' => function() use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
@@ -141,5 +125,26 @@ class GuzzleWarmer extends BaseCacheWarmer
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/guzzle/settings', [
             'warmer' => $this,
         ]);
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * Returns a generator to return the URL requests in a memory efficient manner
+     * https://medium.com/tech-tajawal/use-memory-gently-with-yield-in-php-7e62e2480b8d
+     *
+     * @param array $urls
+     *
+     * @return Generator
+     */
+    private function _getRequests(array $urls): Generator
+    {
+        foreach ($urls as $url) {
+            // Ensure URL is an absolute URL starting with http
+            if (stripos($url, 'http') === 0) {
+                yield new Request('GET', $url);
+            }
+        }
     }
 }
