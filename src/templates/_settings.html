@@ -66,7 +66,7 @@
         </div>
 
         <div class="flex">
-            {% include 'blitz/_includes/welcome/step' with {step: 2, text: 'Add at least one include URI pattern'} %}
+            {% include 'blitz/_includes/welcome/step' with {step: 2, text: 'Add at least one included URI pattern'} %}
 
             <div class="flex-grow">
                 {% set cols = [] %}
@@ -102,7 +102,7 @@
                     <span class="info">{{ 'Only URIs that match one or more included URI patterns will be cached.'|t('blitz') }}</span>
                 {% endset %}
                 {{ forms.editableTableField({
-                    label: "Include URI Patterns"|t('blitz'),
+                    label: "Included URI Patterns"|t('blitz'),
                     instructions: "The URI patterns to include in caching."|t('blitz') ~ info,
                     warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
                     name: 'settings[includedUriPatterns]',
