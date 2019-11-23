@@ -1,0 +1,6 @@
+parameters:
+	autoload_files:
+		- %currentWorkingDirectory%/vendor/yiisoft/yii2/Yii.php
+		- %currentWorkingDirectory%/vendor/craftcms/cms/src/Craft.php
+	ignoreErrors:
+		- '#Call to an undefined method yii\\db\\ActiveQueryInterface::select\(\).#'

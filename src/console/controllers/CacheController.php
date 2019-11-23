@@ -208,7 +208,7 @@ class CacheController extends Controller
     }
 
     /**
-     * @param array
+     * @param array $urls
      *
      * @return int
      */
@@ -230,7 +230,7 @@ class CacheController extends Controller
     }
 
     /**
-     * @param array
+     * @param array $tags
      *
      * @return int
      */

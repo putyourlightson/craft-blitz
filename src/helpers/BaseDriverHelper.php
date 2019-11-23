@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\SavableComponent;
 use craft\helpers\Component;
+use craft\queue\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -45,7 +46,7 @@ class BaseDriverHelper
      * Creates a driver of the provided type with the optional settings.
      *
      * @param string $type
-     * @param array|null $settings
+     * @param array $settings
      *
      * @return SavableComponent
      */
@@ -82,8 +83,9 @@ class BaseDriverHelper
         }
 
         // Add job to queue with a priority and delay
-        Craft::$app->getQueue()
-            ->priority($priority)
+        /** @var Queue $queue */
+        $queue = Craft::$app->getQueue();
+        $queue->priority($priority)
             ->delay($delay)
             ->push(new DriverJob([
                 'siteUris' => $siteUris,

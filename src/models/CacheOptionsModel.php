@@ -84,7 +84,7 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param bool
+     * @param bool $value
      *
      * @return static self reference
      */
@@ -96,7 +96,7 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param bool
+     * @param bool $value
      *
      * @return static self reference
      */
@@ -108,7 +108,7 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param bool
+     * @param bool $value
      *
      * @return static self reference
      */
@@ -120,7 +120,7 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param mixed
+     * @param mixed $value
      *
      * @return static self reference
      */
@@ -140,7 +140,7 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param string|string[]|null
+     * @param string|string[]|null $value
      *
      * @return static self reference
      */
@@ -152,7 +152,7 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @param DateTime|null
+     * @param DateTime|null $value
      *
      * @return static self reference
      */

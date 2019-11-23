@@ -13,6 +13,7 @@ use craft\events\BatchElementActionEvent;
 use craft\events\CancelableEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
+use craft\events\ElementQueryEvent;
 use craft\events\PluginEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\RegisterCacheOptionsEvent;
@@ -117,7 +118,7 @@ class Blitz extends Plugin
     /**
      * Processes if a cacheable request
      *
-     * @param bool|null $outputResult
+     * @param bool $outputResult
      */
     public function processCacheableRequest(bool $outputResult = true)
     {
@@ -234,7 +235,7 @@ class Blitz extends Plugin
      * Registers cacheable request events
      *
      * @param SiteUriModel $siteUri
-     * @param bool|null $outputResult
+     * @param bool $outputResult
      */
     private function _registerCacheableRequestEvents(SiteUriModel $siteUri, bool $outputResult = true)
     {
@@ -299,8 +300,8 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on($event[0], $event[1],
-                function(Event $event) {
-                    /** @var ElementEvent|BatchElementActionEvent $event */
+                /** @var ElementEvent|BatchElementActionEvent $event */
+                function($event) {
                     if ($event->element !== null) {
                         $this->refreshCache->addElement($event->element);
                     }

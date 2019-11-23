@@ -144,6 +144,7 @@ class SettingsController extends Controller
         $settings->cacheWarmerSettings = $warmerSettings[$settings->cacheWarmerType] ?? [];
 
         // Create the warmer driver so that we can validate it
+        /** @var BaseCacheWarmer $warmerDriver */
         $warmerDriver = BaseDriverHelper::createDriver(
             $settings->cacheWarmerType,
             $settings->cacheWarmerSettings
@@ -153,6 +154,7 @@ class SettingsController extends Controller
         $settings->cachePurgerSettings = $purgerSettings[$settings->cachePurgerType] ?? [];
 
         // Create the purger driver so that we can validate it
+        /** @var BaseCachePurger $purgerDriver */
         $purgerDriver = BaseDriverHelper::createDriver(
             $settings->cachePurgerType,
             $settings->cachePurgerSettings
@@ -162,6 +164,7 @@ class SettingsController extends Controller
         $settings->deployerSettings = $deployerSettings[$settings->deployerType] ?? [];
 
         // Create the deployer driver so that we can validate it
+        /** @var BaseDeployer $deployerDriver */
         $deployerDriver = BaseDriverHelper::createDriver(
             $settings->deployerType,
             $settings->deployerSettings

@@ -96,9 +96,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        /** @var Element $element */
-        if (!in_array($element->id, $this->_elementCaches)) {
-            $this->_elementCaches[] = $element->id;
+        if (!in_array($element->getId(), $this->_elementCaches)) {
+            $this->_elementCaches[] = $element->getId();
         }
     }
 
@@ -272,7 +271,7 @@ class GenerateCacheService extends Component
     /**
      * Returns an element query's default parameters for a given element type.
      *
-     * @param string|ElementInterface $elementType
+     * @param string $elementType
      *
      * @return array
      */

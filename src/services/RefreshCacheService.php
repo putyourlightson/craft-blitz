@@ -14,6 +14,7 @@ use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use craft\helpers\ElementHelper;
+use craft\queue\Queue;
 use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
@@ -329,8 +330,9 @@ class RefreshCacheService extends Component
         ]);
 
         // Add job to queue with a priority
-        Craft::$app->getQueue()
-            ->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
+        /** @var Queue $queue */
+        $queue = Craft::$app->getQueue();
+        $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
             ->push($refreshCacheJob);
     }
 

@@ -100,7 +100,7 @@ class BlitzVariable
     /**
      * Returns options for the current page cache, first setting any parameters provided.
      *
-     * @param array|null
+     * @param array $params
      *
      * @return CacheOptionsModel
      */

@@ -160,7 +160,7 @@ class CloudflarePurger extends BaseCachePurger
      * @param string $method
      * @param string $action
      * @param int $siteId
-     * @param array|null $params
+     * @param array $params
      *
      * @return bool
      */
