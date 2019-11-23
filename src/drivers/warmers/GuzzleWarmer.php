@@ -67,25 +67,29 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
-        $requests = [];
-
         $urls = SiteUriHelper::getUrlsFromSiteUris($siteUris);
 
-        foreach ($urls as $url) {
-            // Ensure URL is an absolute URL starting with http
-            if (stripos($url, 'http') === 0) {
-                $requests[] = new Request('GET', $url);
-            }
-        }
-
         $count = 0;
-        $total = count($requests);
+        $total = count($urls);
         $label = 'Warming {count} of {total} pages.';
 
         $client = Craft::createGuzzleClient();
 
+        /**
+         * Use a generator instead of creating an array to save memory
+         * https://www.php.net/manual/en/language.generators.overview.php
+         */
+        $requests = function($urls) {
+            foreach ($urls as $url) {
+                // Ensure URL is an absolute URL starting with http
+                if (stripos($url, 'http') === 0) {
+                    yield new Request('GET', $url);
+                }
+            }
+        };
+
         // Create a pool of requests for sending multiple concurrent requests
-        $pool = new Pool($client, $requests, [
+        $pool = new Pool($client, $requests($urls), [
             'concurrency' => $this->concurrency,
             'fulfilled' => function() use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
