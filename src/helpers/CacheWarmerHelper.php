@@ -6,9 +6,9 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
+use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
 use putyourlightson\blitz\drivers\warmers\LocalWarmer;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -55,7 +55,7 @@ class CacheWarmerHelper extends BaseDriverHelper
     /**
      * Returns all warmer drivers.
      *
-     * @return BaseCacheWarmer[]
+     * @return SavableComponent[]
      */
     public static function getAllDrivers(): array
     {

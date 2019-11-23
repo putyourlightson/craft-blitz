@@ -2,7 +2,7 @@
 
 To run static analysis on the plugin, install PHPStan and run the following command from the root of your project.
 
-    vendor/bin/phpstan analyse -l 2 -c vendor/putyourlightson/craft-blitz/phpstan.neon vendor/putyourlightson/craft-blitz/src
+    vendor/bin/phpstan analyse -l 3 -c vendor/putyourlightson/craft-blitz/phpstan.neon vendor/putyourlightson/craft-blitz/src
 
 # Testing
 

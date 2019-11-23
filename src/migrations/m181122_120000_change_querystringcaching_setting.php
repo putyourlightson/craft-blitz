@@ -21,7 +21,7 @@ class m181122_120000_change_querystringcaching_setting extends Migration
     {
         // Only for Craft 3.0
         if (!version_compare(Craft::$app->getInfo()->version, '3.1', '<')) {
-            return;
+            return true;
         }
 
         // Get old setting from database
@@ -30,7 +30,7 @@ class m181122_120000_change_querystringcaching_setting extends Migration
             ->one();
 
         if ($plugin === null || empty($plugin['settings'])) {
-            return;
+            return true;
         }
 
         $pluginSettings = Json::decodeIfJson($plugin['settings']);

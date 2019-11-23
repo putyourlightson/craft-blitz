@@ -5,9 +5,9 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use yii\base\Event;
 
@@ -51,7 +51,7 @@ class CachePurgerHelper extends BaseDriverHelper
     /**
      * Returns all purger drivers.
      *
-     * @return BaseCachePurger[]
+     * @return SavableComponent[]
      */
     public static function getAllDrivers(): array
     {

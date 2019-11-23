@@ -5,9 +5,9 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use yii\base\Event;
@@ -53,7 +53,7 @@ class CacheStorageHelper extends BaseDriverHelper
     /**
      * Returns all storage drivers.
      *
-     * @return BaseCacheStorage[]
+     * @return SavableComponent[]
      */
     public static function getAllDrivers(): array
     {

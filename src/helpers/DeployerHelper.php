@@ -6,10 +6,10 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
+use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
-use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
@@ -53,7 +53,7 @@ class DeployerHelper extends BaseDriverHelper
     /**
      * Returns all deployer drivers.
      *
-     * @return BaseCachePurger[]
+     * @return SavableComponent[]
      */
     public static function getAllDrivers(): array
     {

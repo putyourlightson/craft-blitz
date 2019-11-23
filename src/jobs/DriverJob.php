@@ -7,9 +7,9 @@ namespace putyourlightson\blitz\jobs;
 
 use craft\helpers\App;
 use craft\queue\BaseJob;
-use craft\queue\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\queue\Queue;
 
 class DriverJob extends BaseJob
 {
