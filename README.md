@@ -1,6 +1,8 @@
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/putyourlightson/craft-blitz/badges/quality-score.png?b=develop-3.0.0)](https://scrutinizer-ci.com/g/putyourlightson/craft-blitz/?branch=develop-3.0.0)
+[![Stable Version](https://img.shields.io/packagist/v/putyourlightson/craft-blitz?label=stable)]((https://packagist.org/packages/putyourlightson/craft-blitz))
+[![Total Downloads](https://img.shields.io/packagist/dt/putyourlightson/craft-blitz)](https://packagist.org/packages/putyourlightson/craft-blitz)
+[![Code Quality](https://img.shields.io/scrutinizer/quality/g/putyourlightson/craft-blitz)](https://scrutinizer-ci.com/g/putyourlightson/craft-blitz)
 
-<p align="center"><img width="130" src="src/icon.svg"></p>
+<p align="center"><img width="130" src="https://putyourlightson.com/assets/logos/blitz.svg"></p>
 
 # Blitz Plugin for Craft CMS 3
 
