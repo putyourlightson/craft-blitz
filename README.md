@@ -25,7 +25,7 @@ This plugin requires a commercial license pur­chas­able through the [Craft Plu
 
 ## Requirements
 
-This plugin requires [Craft CMS](https://craftcms.com/) 3.1.0 or later.
+This plugin requires [Craft CMS](https://craftcms.com/) 3.2.1 or later.
 
 ## Installation
 

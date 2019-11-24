@@ -414,7 +414,9 @@ class GitDeployer extends BaseDeployer
     private function _updateFile(string $value, string $filePath)
     {
         if (empty($value)) {
-            FileHelper::unlink($filePath);
+            if (file_exists($filePath)) {
+                FileHelper::unlink($filePath);
+            }
 
             return;
         }
