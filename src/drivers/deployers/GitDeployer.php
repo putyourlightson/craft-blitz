@@ -172,12 +172,10 @@ class GitDeployer extends BaseDeployer
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
         foreach ($groupedSiteUris as $siteId => $siteUris) {
-            if ($this->_getRepositoryPath($siteId) === null) {
-                continue;
+            if ($this->_hasRepository($siteId)) {
+                $deployGroupedSiteUris[$siteId] = $siteUris;
+                $total += count($siteUris);
             }
-
-            $deployGroupedSiteUris[$siteId] = $siteUris;
-            $total += count($siteUris);
         }
 
         if (is_callable($setProgressHandler)) {
@@ -186,9 +184,9 @@ class GitDeployer extends BaseDeployer
         }
 
         foreach ($deployGroupedSiteUris as $siteId => $siteUris) {
-            $repositoryPath = $this->_getRepositoryPath($siteId);
+            $repository = $this->_getRepository($siteId);
 
-            if ($repositoryPath === null) {
+            if ($repository === null) {
                 continue;
             }
 
@@ -200,7 +198,7 @@ class GitDeployer extends BaseDeployer
                     call_user_func($setProgressHandler, $count, $total, $progressLabel);
                 }
 
-                $filePath = FileHelper::normalizePath($repositoryPath.'/'.$siteUri->uri.'/index.html');
+                $filePath = FileHelper::normalizePath($repository['repositoryPath'].'/'.$siteUri->uri.'/index.html');
 
                 $value = Blitz::$plugin->cacheStorage->get($siteUri);
 
@@ -222,18 +220,16 @@ class GitDeployer extends BaseDeployer
     public function test(): bool
     {
         foreach ($this->gitRepositories as $siteUid => $gitRepository) {
-            $repositoryPath = $this->_getRepositoryPathBySiteUid($siteUid);
+            $repository = $this->_getRepositoryBySiteUid($siteUid);
 
-            if ($repositoryPath === null) {
+            if ($repository === null) {
                 continue;
             }
 
-            $remote = $gitRepository['remote'] ?: $this->defaultRemote;
-
             try {
-                $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
+                $git = $this->_getGitWorkingCopy($repository['repositoryPath'], $repository['remote']);
 
-                $git->fetch($remote);
+                $git->fetch();
             }
             catch (GitException $e) {
                 $error = Craft::t('blitz', 'Error connecting to repository: {error}', [
@@ -286,13 +282,13 @@ class GitDeployer extends BaseDeployer
     // =========================================================================
 
     /**
-     * Returns the repository path for a given site UID
+     * Returns the repository for a given site UID
      *
      * @param int $siteId
      *
-     * @return string|null
+     * @return array|null
      */
-    private function _getRepositoryPath(int $siteId)
+    private function _getRepository(int $siteId)
     {
         $siteUid = Db::uidById(Table::SITES, $siteId);
 
@@ -300,7 +296,7 @@ class GitDeployer extends BaseDeployer
             return null;
         }
 
-        return $this->_getRepositoryPathBySiteUid($siteUid);
+        return $this->_getRepositoryBySiteUid($siteUid);
     }
 
     /**
@@ -308,17 +304,21 @@ class GitDeployer extends BaseDeployer
      *
      * @param string $siteUid
      *
-     * @return string|null
+     * @return array|null
      */
-    private function _getRepositoryPathBySiteUid(string $siteUid)
+    private function _getRepositoryBySiteUid(string $siteUid)
     {
-        $repositoryPath = $this->gitRepositories[$siteUid]['repositoryPath'] ?? null;
+        $repository = $this->gitRepositories[$siteUid] ?? null;
 
-        if (empty($repositoryPath)) {
+        if (empty($repository)) {
             return null;
         }
 
-        $repositoryPath = Craft::parseEnv($this->gitRepositories[$siteUid]['repositoryPath']);
+        if (empty($repository['repositoryPath'])) {
+            return null;
+        }
+
+        $repositoryPath = Craft::parseEnv($repository['repositoryPath']);
 
         if (!is_string($repositoryPath)) {
             return null;
@@ -334,7 +334,24 @@ class GitDeployer extends BaseDeployer
             return null;
         }
 
-        return $repositoryPath;
+        $repository['branch'] = $repository['branch'] ?: $this->defaultBranch;
+        $repository['remote'] = $repository['remote'] ?: $this->defaultRemote;
+
+        return $repository;
+    }
+
+    /**
+     * Returns whether the site has a writeable repository path
+     *
+     * @param string $siteId
+     *
+     * @return bool
+     */
+    private function _hasRepository(string $siteId): bool
+    {
+        $repository = $this->_getRepository($siteId);
+
+        return $repository !== null;
     }
 
     /**
@@ -448,30 +465,21 @@ class GitDeployer extends BaseDeployer
 
         $this->_runCommands($this->commandsBefore);
 
-        $siteUid = Db::uidById(Table::SITES, $siteId);
+        $repository = $this->_getRepository($siteId);
 
-        if ($siteUid === null) {
+        if ($repository === null) {
             return;
         }
-
-        $repositoryPath = $this->_getRepositoryPathBySiteUid($siteUid);
-
-        if ($repositoryPath === null) {
-            return;
-        }
-
-        $branch = $this->gitRepositories[$siteUid]['branch'] ?: $this->defaultBranch;
-        $remote = $this->gitRepositories[$siteUid]['remote'] ?: $this->defaultRemote;
 
         try {
-            $git = $this->_getGitWorkingCopy($repositoryPath, $remote);
+            $git = $this->_getGitWorkingCopy($repository['repositoryPath'], $repository['remote']);
 
             // Pull down any remote commits
             $git->pull();
 
             // Add all files to branch and check it out
             $git->add('*');
-            $git->checkout($branch);
+            $git->checkout($repository['branch']);
 
             // Check for changes first to avoid an exception being thrown
             if ($git->hasChanges()) {
@@ -481,7 +489,7 @@ class GitDeployer extends BaseDeployer
                 $git->commit(addslashes($commitMessage));
             }
 
-            $git->push($remote);
+            $git->push();
         }
         catch (GitException $e) {
             Blitz::$plugin->log('Remote deploy failed: {error}', [
