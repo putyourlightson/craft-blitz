@@ -12,7 +12,7 @@ The Blitz plugin provides intelligent static page caching for creating lightning
 - Your site remains available even when performing updates and maintenance.
 - Your entire site can be served statically from a CDN such as Cloudflare or Netlify.
 
-![TTFB](https://putyourlightson.com/assets/images/plugins/blitz/ttfb.png)  
+![Server response time](https://putyourlightson.com/assets/images/plugins/blitz/server-response-time.png)  
 
 ## Documentation
 
