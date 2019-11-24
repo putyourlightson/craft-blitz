@@ -334,6 +334,7 @@ class GitDeployer extends BaseDeployer
             return null;
         }
 
+        $repository['repositoryPath'] = $repositoryPath;
         $repository['branch'] = $repository['branch'] ?: $this->defaultBranch;
         $repository['remote'] = $repository['remote'] ?: $this->defaultRemote;
 
