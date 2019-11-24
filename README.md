@@ -4,20 +4,17 @@
 
 # Blitz Plugin for Craft CMS 3
 
-> Blitz 3 is in public beta! Read the announcement [here](https://putyourlightson.com/articles/blitz-3-is-here-hello-jamstack). Install it in a testing environment as follows:  
-`composer require putyourlightson/craft-blitz:^3.0.0-beta.1`
-
 The Blitz plugin provides intelligent static page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
-- Reduces server response time (TTFB) and load on the server significantly. 
-- Makes your site available even when performing updates and maintenance.
-- Makes it possible to have your site served by a reverse proxy CDN or deployed as a static site.
+- Blitz makes your site fly and feel light-weight and instantaneous to navigate.
+- Your site remains available even when performing updates and maintenance.
+- Your entire site can be served statically from a CDN such as Cloudflare or Netlify.
+
+![TTFB](https://putyourlightson.com/assets/images/plugins/blitz/ttfb.png)  
 
 ## Documentation
 
 Learn more and read the documentation at [putyourlightson.com/plugins/blitz »](https://putyourlightson.com/plugins/blitz)
-
-![TTFB](https://putyourlightson.com/assets/images/plugins/blitz/ttfb.png)  
 
 ## License
 
