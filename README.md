@@ -1,6 +1,6 @@
+[![Stable Version](https://img.shields.io/packagist/v/putyourlightson/craft-blitz?label=stable)]((https://packagist.org/packages/putyourlightson/craft-blitz))
 [![Total Downloads](https://img.shields.io/packagist/dt/putyourlightson/craft-blitz)](https://packagist.org/packages/putyourlightson/craft-blitz)
 [![Code Quality](https://img.shields.io/scrutinizer/quality/g/putyourlightson/craft-blitz)](https://scrutinizer-ci.com/g/putyourlightson/craft-blitz)
-[![Stable Version](https://img.shields.io/packagist/v/putyourlightson/craft-blitz?label=stable)]((https://packagist.org/packages/putyourlightson/craft-blitz))
 
 <p align="center"><img width="130" src="https://putyourlightson.com/assets/logos/blitz.svg"></p>
 
@@ -11,6 +11,9 @@ The Blitz plugin provides intelligent static page caching for creating lightning
 - Blitz makes your site fly and feel light-weight and instantaneous to navigate.
 - Your site remains available even when performing updates and maintenance.
 - Your entire site can be served statically from a CDN such as Cloudflare or Netlify.
+
+> Blitz 3 is in release candidate phase which means that we now consider it stable for production! Read the [beta announcement](https://putyourlightson.com/articles/blitz-3-is-here-hello-jamstack) or install it as follows:  
+`composer require putyourlightson/craft-blitz:^3.0.0-RC1`
 
 ![Server response time](https://putyourlightson.com/assets/images/plugins/blitz/server-response-time.png)  
 
