@@ -5,7 +5,7 @@
 - Added `debug` config setting to help debug why pages are not being cached.
 
 ### Changed
-- Set max value for concurrency to `10`.
+- Set max value for concurrency to `100`.
 - Git Deployer now removes files that have been cleared.
 
 ### Fixed

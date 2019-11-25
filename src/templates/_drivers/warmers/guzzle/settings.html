@@ -11,7 +11,7 @@
     instructions: "The max number of concurrent requests to use when warming the cache."|t('blitz') ~ info,
     name: 'concurrency',
     min: 1,
-    max: 10,
+    max: 100,
     value: warmer.concurrency,
     errors: warmer.getErrors('concurrency'),
     required: true,

@@ -113,7 +113,7 @@ class GuzzleWarmer extends BaseCacheWarmer
     {
         return [
             [['concurrency'], 'required'],
-            [['concurrency'], 'integer', 'min' => 1, 'max' => 10],
+            [['concurrency'], 'integer', 'min' => 1, 'max' => 100],
         ];
     }
 
