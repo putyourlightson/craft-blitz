@@ -33,12 +33,12 @@ class SettingsModel extends Model
     public $cachingEnabled = false;
 
     /**
-     * @var array
+     * @var array|string
      */
     public $includedUriPatterns = [];
 
     /**
-     * @var array
+     * @var array|string
      */
     public $excludedUriPatterns = [];
 
@@ -73,7 +73,7 @@ class SettingsModel extends Model
     public $cacheWarmerTypes = [];
 
     /**
-     * @var array
+     * @var array|string
      */
     public $customSiteUris = [];
 

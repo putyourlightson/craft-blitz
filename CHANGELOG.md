@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.0.0-RC3 - Unreleased
+## 3.0.0-RC3 - 2019-11-25
 ### Added
 - Added `debug` config setting to help debug why pages are not being cached.
 

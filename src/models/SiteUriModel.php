@@ -92,12 +92,16 @@ class SiteUriModel extends Model
     /**
      * Returns true if the URI matches a set of patterns.
      *
-     * @param array $siteUriPatterns
+     * @param array|string $siteUriPatterns
      *
      * @return bool
      */
-    private function _matchesUriPatterns(array $siteUriPatterns): bool
+    private function _matchesUriPatterns($siteUriPatterns): bool
     {
+        if (!is_array($siteUriPatterns)) {
+            return false;
+        }
+
         foreach ($siteUriPatterns as $siteUriPattern) {
             // Don't proceed if site is not empty and does not match the provided site ID
             if (!empty($siteUriPattern['siteId']) && $siteUriPattern['siteId'] != $this->siteId) {
