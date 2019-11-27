@@ -10,7 +10,7 @@ The Blitz plugin provides intelligent static page caching for creating lightning
 
 - Blitz makes your site fly and feel light-weight and instantaneous to navigate.
 - Your site remains available even when performing updates and maintenance.
-- Your entire site can be served statically from a CDN such as Cloudflare or Netlify.
+- Your entire site can be served statically from a CDN such as [Cloudflare](https://www.cloudflare.com/cdn/) or [Netlify Edge](https://www.netlify.com/products/edge/).
 
 > Blitz 3 is in release candidate phase which means that we now consider it stable for production! Read the [beta announcement](https://putyourlightson.com/articles/blitz-3-is-here-hello-jamstack) or install it as follows:  
 `composer require putyourlightson/craft-blitz:^3.0.0-RC1`
