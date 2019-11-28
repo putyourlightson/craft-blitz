@@ -95,10 +95,7 @@ class GuzzleWarmer extends BaseCacheWarmer
                     call_user_func($setProgressHandler, $count, $total, $progressLabel);
                 }
 
-                // Get first line of message only so as not to bloat the logs
-                $message = strtok($reason->getMessage(), "\n");
-
-                Blitz::$plugin->log($message, [], 'error');
+                Blitz::$plugin->debug($reason->getMessage());
             },
         ]);
 

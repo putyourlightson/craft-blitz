@@ -224,7 +224,7 @@ class CacheController extends Controller
 
         Craft::$app->getQueue()->run();
 
-        $this->stdout(Craft::t('blitz', 'Caches URLs successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Cached URLs successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }
