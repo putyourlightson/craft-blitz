@@ -389,38 +389,13 @@ class GitDeployer extends BaseDeployer
 
         // Break the URL into parts and reconstruct with personal access token
         $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https').'://'
-            .$this->_getAuthenticationToken($remoteUrl).'@'
+            .$this->username.':'.$this->getPersonalAccessToken().'@'
             .parse_url($remoteUrl, PHP_URL_HOST)
             .parse_url($remoteUrl, PHP_URL_PATH);
 
         $git->remote('set-url', $remote, $remoteUrl);
 
         return $git;
-    }
-
-    /**
-     * Returns the authentication token based on the quirks of the Git server
-     *
-     * @param string $url
-     *
-     * @return string
-     */
-    public function _getAuthenticationToken(string $url): string
-    {
-        // Default `{personalAccessToken}`
-        $token = $this->getPersonalAccessToken();
-
-        // GitLab `{personalAccessToken}:{personalAccessToken}`
-        if (strpos($url, 'gitlab.com') !== false) {
-            $token = $token.':'.$token;
-        }
-
-        // BitBucket `{username}:{personalAccessToken}`
-        if (strpos($url, 'bitbucket.org') !== false) {
-            $token = $this->username.':'.$token;
-        }
-
-        return $token;
     }
 
     /**
