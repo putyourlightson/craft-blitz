@@ -7,11 +7,14 @@ namespace putyourlightson\blitz\drivers\warmers;
 
 use Craft;
 use craft\helpers\App;
+use craft\helpers\ArrayHelper;
 use craft\web\UrlManager;
 use craft\web\UrlRule;
+use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\models\SiteUriModel;
+use Twig\Error\RuntimeError;
 
 /**
  * @property mixed $settingsHtml
@@ -35,28 +38,20 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function canWarmConsoleRequest(): bool
-    {
-        return false;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function warmUris(array $siteUris, int $delay = null, callable $setProgressHandler = null)
     {
-        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
-            $error = Craft::t('blitz', 'Cannot warm URIs from console command using Local Warmer (use the Guzzle Warmer instead).');
-            Blitz::$plugin->log($error, [], 'error');
-
-            return;
-        }
-
         if (!$this->beforeWarmCache($siteUris)) {
             return;
         }
 
-        CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $this->warmUrisWithProgress($siteUris, $setProgressHandler);
+
+            $this->_resetApplicationConfig('console');
+        }
+        else {
+            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
+        }
 
         $this->afterWarmCache($siteUris);
     }
@@ -73,20 +68,6 @@ class LocalWarmer extends BaseCacheWarmer
         $total = count($siteUris);
         $label = 'Warming {count} of {total} pages.';
 
-        /**
-         * Create component configs
-         * @see vendor/craftcms/cms/src/config/app.web.php
-         */
-        $componentConfigs = [
-            'request' => App::webRequestConfig(),
-            'response' => App::webResponseConfig(),
-            'urlManager' => [
-                'class' => UrlManager::class,
-                'enablePrettyUrl' => true,
-                'ruleConfig' => ['class' => UrlRule::class],
-            ]
-        ];
-
         foreach ($siteUris as $siteUri) {
             $count++;
 
@@ -100,7 +81,7 @@ class LocalWarmer extends BaseCacheWarmer
                 $siteUri = new SiteUriModel($siteUri);
             }
 
-            $this->_warmUri($siteUri, $componentConfigs);
+            $this->_warmUri($siteUri);
         }
     }
 
@@ -111,9 +92,8 @@ class LocalWarmer extends BaseCacheWarmer
      * Warms a site URI.
      *
      * @param SiteUriModel $siteUri
-     * @param array $componentConfigs
      */
-    private function _warmUri(SiteUriModel $siteUri, array $componentConfigs)
+    private function _warmUri(SiteUriModel $siteUri)
     {
         $url = $siteUri->getUrl();
 
@@ -136,16 +116,15 @@ class LocalWarmer extends BaseCacheWarmer
             'p' => $uri,
         ]);
 
-        // Recreate components from configs
-        foreach ($componentConfigs as $id => $componentConfig) {
-            Craft::$app->set($id, $componentConfig);
-        }
+        $this->_resetApplicationConfig('web');
+
+        $request = Craft::$app->getRequest();
 
         /**
          * Override the host info as it can be set unreliably
          * @see \yii\web\Request::getHostInfo
          */
-        Craft::$app->getRequest()->setHostInfo(
+        $request->setHostInfo(
             parse_url($url, PHP_URL_SCHEME).'://'
             .parse_url($url, PHP_URL_HOST)
         );
@@ -157,8 +136,43 @@ class LocalWarmer extends BaseCacheWarmer
         Blitz::$plugin->processCacheableRequest(false);
 
         // Handle the request with before/after events
-        Craft::$app->trigger(Craft::$app::EVENT_BEFORE_REQUEST);
-        Craft::$app->handleRequest(Craft::$app->getRequest());
-        Craft::$app->trigger(Craft::$app::EVENT_AFTER_REQUEST);
+        try {
+            Craft::$app->trigger(Craft::$app::EVENT_BEFORE_REQUEST);
+            Craft::$app->handleRequest($request);
+            Craft::$app->trigger(Craft::$app::EVENT_AFTER_REQUEST);
+        }
+        catch (Exception $e) {
+            Blitz::$plugin->debug($e->getMessage());
+        }
+    }
+
+    /**
+     * Resets the application based on the provided app type (`web` or `console`).
+     * @see vendor/craftcms/cms/bootstrap/bootstrap.php
+     *
+     * @param string $appType
+     */
+    private function _resetApplicationConfig(string $appType)
+    {
+        $config = ArrayHelper::merge(
+            require Craft::getAlias('@craft/config/app.'.$appType.'.php'),
+            Craft::$app->getConfig()->getConfigFromFile('app.'.$appType)
+        );
+
+        // Recreate components from config
+        foreach ($config['components'] as $id => $component) {
+            Craft::$app->set($id, $component);
+        }
+
+        Craft::$app->controllerNamespace = $config['controllerNamespace'];
+
+        /**
+         * Set this explicitly
+         * @see \yii\base\Request::getIsConsoleRequest
+         */
+        Craft::$app->getRequest()->setIsConsoleRequest(($appType == 'console'));
+
+        // Reset the response data to avoid it being output in the CLI
+        Craft::$app->getResponse()->data = '';
     }
 }
