@@ -135,7 +135,7 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deployUris(array $siteUris, int $delay = null, callable $setProgressHandler = null)
+    public function deployUris(array $siteUris, callable $setProgressHandler = null)
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_DEPLOY, $event);
@@ -148,7 +148,7 @@ class GitDeployer extends BaseDeployer
             $this->deployUrisWithProgress($siteUris, $setProgressHandler);
         }
         else {
-            DeployerHelper::addDeployerJob($siteUris, 'deployUrisWithProgress', $delay);
+            DeployerHelper::addDeployerJob($siteUris, 'deployUrisWithProgress');
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY)) {

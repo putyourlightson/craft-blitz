@@ -44,7 +44,7 @@ class GuzzleWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, int $delay = null, callable $setProgressHandler = null)
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
         if (!$this->beforeWarmCache($siteUris)) {
             return;
@@ -65,9 +65,12 @@ class GuzzleWarmer extends BaseCacheWarmer
      *
      * @param array $siteUris
      * @param callable|null $setProgressHandler
+     * @param int|null $delay
      */
-    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
+        $this->delay($setProgressHandler, $delay);
+
         $urls = SiteUriHelper::getUrlsFromSiteUris($siteUris);
 
         $count = 0;

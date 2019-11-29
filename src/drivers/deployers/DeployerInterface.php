@@ -17,27 +17,24 @@ interface DeployerInterface extends SavableComponentInterface
      * Deploys the cache given an array of site URIs.
      *
      * @param SiteUriModel[] $siteUris
-     * @param int|null $delay
      * @param callable|null $setProgressHandler
      */
-    public function deployUris(array $siteUris, int $delay = null, callable $setProgressHandler = null);
+    public function deployUris(array $siteUris, callable $setProgressHandler = null);
 
     /**
      * Deploys the cache for a given site ID.
      *
      * @param int $siteId
-     * @param int|null $delay
      * @param callable|null $setProgressHandler
      */
-    public function deploySite(int $siteId, int $delay = null, callable $setProgressHandler = null);
+    public function deploySite(int $siteId, callable $setProgressHandler = null);
 
     /**
      * Deploys the entire cache.
      *
-     * @param int|null $delay
      * @param callable|null $setProgressHandler
      */
-    public function deployAll(int $delay = null, callable $setProgressHandler = null);
+    public function deployAll(callable $setProgressHandler = null);
 
     /**
      * Tests the deployer settings.

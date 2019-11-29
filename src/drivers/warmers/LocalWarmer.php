@@ -36,14 +36,13 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, int $delay = null, callable $setProgressHandler = null)
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
         if (!$this->beforeWarmCache($siteUris)) {
             return;
         }
 
         if (Craft::$app->getRequest()->getIsConsoleRequest()) {
-            //var_dump(Craft::$app->getResponse());die();
             $this->warmUrisWithProgress($siteUris, $setProgressHandler);
 
             $this->_resetApplicationConfig('console');
@@ -61,8 +60,10 @@ class LocalWarmer extends BaseCacheWarmer
      * @param array $siteUris
      * @param callable|null $setProgressHandler
      */
-    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
+        $this->delay($setProgressHandler, $delay);
+
         $count = 0;
         $total = count($siteUris);
         $label = 'Warming {count} of {total} pages.';
@@ -150,6 +151,13 @@ class LocalWarmer extends BaseCacheWarmer
             if ($response->getIsOk()) {
                 // Save the cached output
                 Blitz::$plugin->generateCache->save($response->data, $siteUri);
+            }
+            else {
+
+                // Get first line of message only so as not to bloat the logs
+                $message = strtok($reason->getMessage(), "\n");
+
+                Blitz::$plugin->log($message, [], 'error');
             }
         }
         catch (Exception $e) {

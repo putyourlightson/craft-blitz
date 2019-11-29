@@ -34,15 +34,15 @@ class DummyDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deployUris(array $siteUris, int $delay = null, callable $setProgressHandler = null) { }
+    public function deployUris(array $siteUris, callable $setProgressHandler = null) { }
 
     /**
      * @inheritdoc
      */
-    public function deploySite(int $siteId, int $delay = null, callable $setProgressHandler = null) { }
+    public function deploySite(int $siteId, callable $setProgressHandler = null) { }
 
     /**
      * @inheritdoc
      */
-    public function deployAll(int $delay = null, callable $setProgressHandler = null) { }
+    public function deployAll(callable $setProgressHandler = null) { }
 }

@@ -82,16 +82,16 @@ class BaseDriverHelper
             }
         }
 
-        // Add job to queue with a priority and delay
+        // Add job to queue with a priority
         /** @var Queue $queue */
         $queue = Craft::$app->getQueue();
-        $queue->priority($priority)
-            ->delay($delay)
-            ->push(new DriverJob([
-                'siteUris' => $siteUris,
-                'driverId' => $driverId,
-                'driverMethod' => $driverMethod,
-                'description' => $description,
-            ]));
+        $queue->priority($priority);
+        $queue->push(new DriverJob([
+            'siteUris' => $siteUris,
+            'driverId' => $driverId,
+            'driverMethod' => $driverMethod,
+            'description' => $description,
+            'delay' => $delay,
+        ]));
     }
 }

@@ -78,7 +78,7 @@ class CloudflarePurger extends BaseCachePurger
         return [
             [['apiKey', 'email', 'warmCacheDelay'], 'required'],
             [['email'], 'email'],
-            [['warmCacheDelay'], 'integer'],
+            [['warmCacheDelay'], 'integer', 'min' => 0, 'max' => 30],
         ];
     }
 

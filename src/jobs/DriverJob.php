@@ -32,6 +32,11 @@ class DriverJob extends BaseJob
     public $driverMethod;
 
     /**
+     * @var int|null
+     */
+    public $delay;
+
+    /**
      * @var Queue
      */
     private $_queue;
@@ -52,7 +57,7 @@ class DriverJob extends BaseJob
         $driver = Blitz::$plugin->get($this->driverId);
 
         if ($driver !== null && is_callable([$driver, $this->driverMethod])) {
-            call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler']);
+            call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler'], $this->delay);
         }
     }
 

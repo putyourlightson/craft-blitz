@@ -165,9 +165,15 @@ class Blitz extends Plugin
             return;
         }
 
-        $request = Craft::$app->getRequest();
-        $url = $request->getIsConsoleRequest() ? '' : $request->getAbsoluteUrl();
-        $message = Craft::t('blitz', $message, $params).' ['.$url.']';
+        // Get first line of message only so as not to bloat the logs
+        $message = strtok($message, "\n");
+
+        $message = Craft::t('blitz', $message, $params);
+
+        // Append URL if not a console request
+        if (!Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $message .= ' ['.Craft::$app->getRequest()->getAbsoluteUrl().']';
+        }
 
         LogToFile::log($message, 'blitz', 'debug');
     }

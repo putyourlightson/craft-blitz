@@ -307,7 +307,7 @@ class CacheController extends Controller
 
         Console::startProgress(0, count($siteUris), '', 0.8);
 
-        Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, [$this, 'setProgressHandler']);
+        Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler']);
 
         Console::endProgress();
 
@@ -323,7 +323,7 @@ class CacheController extends Controller
 
         Console::startProgress(0, count($siteUris), '', 0.8);
 
-        Blitz::$plugin->deployer->deployUris($siteUris, null, [$this, 'setProgressHandler']);
+        Blitz::$plugin->deployer->deployUris($siteUris, [$this, 'setProgressHandler']);
 
         Console::endProgress();
 

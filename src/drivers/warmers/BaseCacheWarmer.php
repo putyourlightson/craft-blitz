@@ -46,7 +46,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     /**
      * @inheritdoc
      */
-    public function warmSite(int $siteId, int $delay = null, callable $setProgressHandler = null)
+    public function warmSite(int $siteId, callable $setProgressHandler = null, int $delay = null)
     {
         // Get custom site URIs for the provided site only
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->customSiteUris);
@@ -57,13 +57,13 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
             $customSiteUris
         );
 
-        $this->warmUris($siteUris, $delay, $setProgressHandler);
+        $this->warmUris($siteUris, $setProgressHandler, $delay);
     }
 
     /**
      * @inheritdoc
      */
-    public function warmAll(int $delay = null, callable $setProgressHandler = null)
+    public function warmAll(callable $setProgressHandler = null, int $delay = null)
     {
         $siteUris = SiteUriHelper::getAllSiteUris(true);
 
@@ -71,7 +71,27 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
             $siteUris = array_merge($siteUris, Blitz::$plugin->settings->customSiteUris);
         }
 
-        $this->warmUris($siteUris, $delay, $setProgressHandler);
+        $this->warmUris($siteUris, $setProgressHandler, $delay);
+    }
+
+    /**
+     * Delays warming by the provided delay value.
+     *
+     * @param callable|null $setProgressHandler
+     * @param int|null $delay
+     */
+    public function delay(callable $setProgressHandler = null, int $delay = null)
+    {
+        if (!empty($delay)) {
+            if (is_callable($setProgressHandler)) {
+                $progressLabel = Craft::t('blitz', 'Waiting {delay} seconds before warming.', [
+                    'delay' => $delay
+                ]);
+                call_user_func($setProgressHandler, 0, 0, $progressLabel);
+            }
+
+            sleep($delay);
+        }
     }
 
     // Protected Methods
