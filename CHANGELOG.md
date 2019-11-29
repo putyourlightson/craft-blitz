@@ -1,5 +1,12 @@
 # Release Notes for Blitz
 
+## 3.0.0-RC4 - Unreleased
+### Added
+- Added the ability to warm the cache using the Local Warmer from the command line.
+
+### Changed
+- Improved the functionality and feedback when a warm cache delay is set.
+
 ## 3.0.0-RC3 - 2019-11-25
 ### Added
 - Added `debug` config setting to help debug why pages are not being cached.
