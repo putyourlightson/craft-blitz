@@ -226,6 +226,24 @@ class GitDeployer extends BaseDeployer
                 continue;
             }
 
+            if (!is_dir($repository['repositoryPath'])) {
+                $this->addError('gitRepositories',
+                    Craft::t('blitz', 'Repository path is not a valid directory: {repositoryPath}', [
+                        'repositoryPath' => $repository['repositoryPath'],
+                    ])
+                );
+                continue;
+            }
+
+            if (!FileHelper::isWritable($repository['repositoryPath'])) {
+                $this->addError('gitRepositories',
+                    Craft::t('blitz', 'Repository path is not writeable: {repositoryPath}', [
+                        'repositoryPath' => $repository['repositoryPath'],
+                    ])
+                );
+                continue;
+            }
+
             try {
                 $git = $this->_getGitWorkingCopy($repository['repositoryPath'], $repository['remote']);
 
@@ -235,14 +253,6 @@ class GitDeployer extends BaseDeployer
                 $this->addError('gitRepositories',
                     Craft::t('blitz', 'Error connecting to repository: {error}', [
                         'error' => $e->getMessage(),
-                    ])
-                );
-            }
-
-            if (!FileHelper::isWritable($repository['repositoryPath'])) {
-                $this->addError('gitRepositories',
-                    Craft::t('blitz', 'Repository path is not writeable: {repositoryPath}', [
-                        'repositoryPath' => $repository['repositoryPath'],
                     ])
                 );
             }
