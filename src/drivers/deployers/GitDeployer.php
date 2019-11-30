@@ -228,18 +228,20 @@ class GitDeployer extends BaseDeployer
 
             if (!is_dir($repository['repositoryPath'])) {
                 $this->addError('gitRepositories',
-                    Craft::t('blitz', 'Repository path is not a valid directory: {repositoryPath}', [
-                        'repositoryPath' => $repository['repositoryPath'],
-                    ])
+                    Craft::t('blitz',
+                        'Repository path `{path}` is not a directory.',
+                        ['path' => $repository['repositoryPath']]
+                    )
                 );
                 continue;
             }
 
             if (!FileHelper::isWritable($repository['repositoryPath'])) {
                 $this->addError('gitRepositories',
-                    Craft::t('blitz', 'Repository path is not writeable: {repositoryPath}', [
-                        'repositoryPath' => $repository['repositoryPath'],
-                    ])
+                    Craft::t('blitz',
+                        'Repository path `{path}` is not writeable.',
+                        ['path' => $repository['repositoryPath']]
+                    )
                 );
                 continue;
             }
@@ -251,9 +253,10 @@ class GitDeployer extends BaseDeployer
             }
             catch (GitException $e) {
                 $this->addError('gitRepositories',
-                    Craft::t('blitz', 'Error connecting to repository: {error}', [
-                        'error' => $e->getMessage(),
-                    ])
+                    Craft::t('blitz',
+                        'Error connecting to repository: {error}',
+                        ['error' => $e->getMessage()]
+                    )
                 );
             }
         }
@@ -342,17 +345,7 @@ class GitDeployer extends BaseDeployer
             return null;
         }
 
-        $repositoryPath = FileHelper::normalizePath($repositoryPath);
-
-        if (FileHelper::isWritable($repositoryPath) === false) {
-            Blitz::$plugin->log('Repository path `{path}` is not writeable.', [
-                'path' => $repositoryPath
-            ], 'error');
-
-            return null;
-        }
-
-        $repository['repositoryPath'] = $repositoryPath;
+        $repository['repositoryPath'] = FileHelper::normalizePath($repositoryPath);
         $repository['branch'] = $repository['branch'] ?: $this->defaultBranch;
         $repository['remote'] = $repository['remote'] ?: $this->defaultRemote;
 
