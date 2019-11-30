@@ -232,11 +232,19 @@ class GitDeployer extends BaseDeployer
                 $git->fetch();
             }
             catch (GitException $e) {
-                $error = Craft::t('blitz', 'Error connecting to repository: {error}', [
-                    'error' => $e->getMessage(),
-                ]);
+                $this->addError('gitRepositories',
+                    Craft::t('blitz', 'Error connecting to repository: {error}', [
+                        'error' => $e->getMessage(),
+                    ])
+                );
+            }
 
-                $this->addError('gitRepositories', $error);
+            if (!FileHelper::isWritable($repository['repositoryPath'])) {
+                $this->addError('gitRepositories',
+                    Craft::t('blitz', 'Repository path is not writeable: {repositoryPath}', [
+                        'repositoryPath' => $repository['repositoryPath'],
+                    ])
+                );
             }
         }
 

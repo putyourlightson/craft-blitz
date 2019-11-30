@@ -3,6 +3,7 @@
 ## 3.0.0-RC4 - Unreleased
 ### Added
 - Added the ability to warm the cache using the Local Warmer from the command line.
+- Added test to validate that Git repository path is writeable.
 
 ### Changed
 - Improved the functionality and feedback when a warm cache delay is set.

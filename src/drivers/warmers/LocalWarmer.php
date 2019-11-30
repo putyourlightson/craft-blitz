@@ -153,11 +153,8 @@ class LocalWarmer extends BaseCacheWarmer
                 Blitz::$plugin->generateCache->save($response->data, $siteUri);
             }
             else {
-
-                // Get first line of message only so as not to bloat the logs
-                $message = strtok($reason->getMessage(), "\n");
-
-                Blitz::$plugin->log($message, [], 'error');
+                // TODO: test the output of this
+                Blitz::$plugin->debug($response->content);
             }
         }
         catch (Exception $e) {
