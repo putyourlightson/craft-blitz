@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.0.0-RC4 - Unreleased
+## 3.0.0-RC4 - 2019-11-29
 ### Added
 - Added the ability to warm the cache using the Local Warmer from the command line.
 - Added test to validate that Git repository path is writeable.
