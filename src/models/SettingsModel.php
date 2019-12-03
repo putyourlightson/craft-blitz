@@ -163,7 +163,7 @@ class SettingsModel extends Model
     /**
      * @var string
      */
-    public $cacheControlHeader = 'public, s-maxage=0';
+    public $cacheControlHeader = 'public, s-maxage=31536000, max-age=0';
 
     /**
      * @var bool

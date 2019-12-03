@@ -1,5 +1,29 @@
 # Release Notes for Blitz
 
+## 3.0.0 - Unreleased
+>{note} The `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings have been replaced by a single new `refreshCacheAutomaticallyForGlobals` config setting.
+
+### Added
+- Added replaceable remote deployers (Git Deployer).
+- Added replaceable cache warmers (Guzzle Warmer, Local Warmer) with the ability to specify custom site URIs to be warmed.
+- Added remote deploy and refresh cached URI actions to utility, console commands and user group permissions.
+- Added a table to the database in which drivers can store data.
+- Added logging of utility actions and other events and errors to `storage/logs/blitz.log`.
+- Added a `debug` config setting to help debug why pages are not being cached.
+- Added a `refreshCacheAutomaticallyForGlobals` config setting.
+- Added a `mutexTimeout` config setting.
+- Added `beforeClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
+
+### Changed
+- General performance and control panel UI improvements.
+- Changed the `cacheControlHeader` to include `max-age`.
+- Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
+- Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
+- Removed the `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings.
+
+### Fixed
+- Fixed user group permissions for refreshing the cache.
+
 ## 3.0.0-RC4 - 2019-11-29
 ### Added
 - Added the ability to warm the cache using the Local Warmer from the command line.

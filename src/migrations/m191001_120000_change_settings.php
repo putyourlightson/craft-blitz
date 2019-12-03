@@ -74,6 +74,11 @@ class m191001_120000_change_settings extends Migration
             $settings['deployJobPriority'] = $settings['warmCacheJobPriority'];
         }
 
+        // Set value of `refreshCacheAutomaticallyForGlobals` to that of `clearCacheAutomaticallyForGlobals`
+        if (isset($settings['clearCacheAutomaticallyForGlobals'])) {
+            $settings['refreshCacheAutomaticallyForGlobals'] = $settings['clearCacheAutomaticallyForGlobals'];
+        }
+
         Craft::$app->getPlugins()->savePluginSettings(Blitz::$plugin, $settings);
 
         return true;
