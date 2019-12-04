@@ -32,12 +32,12 @@ class GenerateCacheService extends Component
     /**
      * @const string
      */
-    const MUTEX_LOCK_NAME_QUERY = 'blitz:query';
+    const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
 
     /**
      * @const string
      */
-    const MUTEX_LOCK_NAME_SITE_URI = 'blitz:siteUri';
+    const MUTEX_LOCK_NAME_CACHE_RECORDS = 'blitz:cacheRecords';
 
     // Properties
     // =========================================================================
@@ -137,7 +137,7 @@ class GenerateCacheService extends Component
         $index = sprintf('%u', crc32($elementQuery->elementType.$params));
 
         $mutex = Craft::$app->getMutex();
-        $lockName = self::MUTEX_LOCK_NAME_QUERY.':'.$index;
+        $lockName = self::MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS.':'.$index;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
@@ -195,7 +195,7 @@ class GenerateCacheService extends Component
         }
 
         $mutex = Craft::$app->getMutex();
-        $lockName = self::MUTEX_LOCK_NAME_SITE_URI.':'.$siteUri->siteId.'-'.$siteUri->uri;
+        $lockName = self::MUTEX_LOCK_NAME_CACHE_RECORDS;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;

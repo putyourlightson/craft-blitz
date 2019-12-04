@@ -11,7 +11,7 @@
 - Added logging of utility actions and other events and errors to `storage/logs/blitz.log`.
 - Added a `debug` config setting to help debug why pages are not being cached.
 - Added a `refreshCacheAutomaticallyForGlobals` config setting.
-- Added a `mutexTimeout` config setting.
+- Added broader Mutex locks and a `mutexTimeout` config setting.
 - Added `beforeClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
 
 ### Changed

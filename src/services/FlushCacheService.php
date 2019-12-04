@@ -58,14 +58,13 @@ class FlushCacheService extends Component
         }
 
         $mutex = Craft::$app->getMutex();
+        $lockName = GenerateCacheService::MUTEX_LOCK_NAME_CACHE_RECORDS;
+
+        if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
+            return;
+        }
 
         foreach ($event->siteUris as $siteUri) {
-            $lockName = GenerateCacheService::MUTEX_LOCK_NAME_SITE_URI.':'.$siteUri->siteId.'-'.$siteUri->uri;
-
-            if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
-                continue;
-            }
-
             CacheRecord::deleteAll([
                 'siteId' => $siteUri->siteId,
                 'uri' => $siteUri->uri,
@@ -73,6 +72,8 @@ class FlushCacheService extends Component
         }
 
         $this->runGarbageCollection();
+
+        $mutex->release($lockName);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_FLUSH_CACHE, $event);
@@ -102,9 +103,18 @@ class FlushCacheService extends Component
             return;
         }
 
+        $mutex = Craft::$app->getMutex();
+        $lockName = GenerateCacheService::MUTEX_LOCK_NAME_CACHE_RECORDS;
+
+        if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
+            return;
+        }
+
         CacheRecord::deleteAll();
 
         $this->runGarbageCollection();
+
+        $mutex->release($lockName);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_ALL_CACHE)) {
             $this->trigger(self::EVENT_AFTER_FLUSH_ALL_CACHE, $event);
