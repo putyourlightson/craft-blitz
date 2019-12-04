@@ -76,7 +76,7 @@ class GenerateCacheTest extends Unit
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         // Assert that the statically cached file contains the output
-        $this->assertContains($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
+        $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
     }
 
     public function testCacheRecordSaved()
