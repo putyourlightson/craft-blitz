@@ -39,7 +39,9 @@ class TemplatesController extends Controller
             throw new BadRequestHttpException('Request contained an invalid param.');
         }
 
-        $output = Craft::$app->getView()->renderTemplate($template);
+        $params = Craft::$app->getRequest()->getParam('params', []);
+
+        $output = Craft::$app->getView()->renderTemplate($template, $params);
 
         return $this->asRaw($output);
     }

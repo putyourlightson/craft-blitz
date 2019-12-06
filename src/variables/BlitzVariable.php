@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\variables;
 
 use Craft;
 use craft\helpers\Template;
+use craft\helpers\UrlHelper;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
@@ -27,38 +28,44 @@ class BlitzVariable
      * Returns script to get the output of a URI.
      *
      * @param string $uri
+     * @param array $params
      *
      * @return Markup
      */
-    public function getUri(string $uri): Markup
+    public function getUri(string $uri, array $params = []): Markup
     {
-        // Append no-cache query parameter
-        $uri .= strpos($uri, '?') === false ? '?' : '&';
-        $uri .= 'no-cache=1';
+        $params['no-cache'] = 1;
 
-        return $this->_getScript($uri);
+        return $this->_getScript($uri, $params);
     }
 
     /**
      * Returns script to get the output of a template.
      *
      * @param string $template
+     * @param array $params
      *
      * @return Markup
      */
-    public function getTemplate(string $template): Markup
+    public function getTemplate(string $template, array $params = []): Markup
     {
         // Ensure template exists
         if (!Craft::$app->getView()->resolveTemplate($template)) {
             throw new NotFoundHttpException('Template not found: '.$template);
         }
 
+        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/templates/get';
+
         // Hash the template
         $template = Craft::$app->getSecurity()->hashData($template);
 
-        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/templates/get?template='.$template;
+        // Add template and passed in params to the params
+        $params = [
+            'template' => $template,
+            'params' => $params,
+        ];
 
-        return $this->_getScript($uri);
+        return $this->_getScript($uri, $params);
     }
 
     /**
@@ -146,10 +153,11 @@ class BlitzVariable
      * Returns a script to inject the output of a URI into a div.
      *
      * @param string $uri
+     * @param array $params
      *
      * @return Markup
      */
-    private function _getScript(string $uri): Markup
+    private function _getScript(string $uri, array $params = []): Markup
     {
         $view = Craft::$app->getView();
 
@@ -175,6 +183,12 @@ class BlitzVariable
         $this->_injected++;
 
         $id = 'blitz-inject-'.$this->_injected;
+
+        $query = UrlHelper::buildQuery($params);
+
+        if ($query !== '') {
+            $uri = $uri.'?'.$query;
+        }
 
         $view->registerJs('blitzInject('.$this->_injected.', "'.$uri.'");', View::POS_END);
 

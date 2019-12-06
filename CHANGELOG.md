@@ -8,6 +8,7 @@
 - Added replaceable cache warmers (Guzzle Warmer, Local Warmer) with the ability to specify custom site URIs to be warmed.
 - Added remote deploy and refresh cached URI actions to utility, console commands and user group permissions.
 - Added a table to the database in which drivers can store data.
+- Added a `params` parameter to the `craft.blitz.getUri` and `craft.blitz.getTemplate` variables.
 - Added logging of utility actions and other events and errors to `storage/logs/blitz.log`.
 - Added a `debug` config setting to help debug why pages are not being cached.
 - Added a `refreshCacheAutomaticallyForGlobals` config setting.
