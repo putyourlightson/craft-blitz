@@ -6,14 +6,15 @@
 namespace putyourlightson\blitz\events;
 
 use craft\events\CancelableEvent;
+use craft\web\Response;
 
-class OutputEvent extends CancelableEvent
+class ResponseEvent extends CancelableEvent
 {
     // Properties
     // =========================================================================
 
     /**
-     * @var string
+     * @var Response
      */
-    public $value = '';
+    public $response;
 }

@@ -10,7 +10,6 @@ use craft\helpers\ArrayHelper;
 use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
-use putyourlightson\blitz\helpers\RequestHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\console\Response;
 
@@ -59,6 +58,7 @@ class LocalWarmer extends BaseCacheWarmer
      *
      * @param array $siteUris
      * @param callable|null $setProgressHandler
+     * @param int|null $delay
      */
     public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
@@ -138,7 +138,9 @@ class LocalWarmer extends BaseCacheWarmer
         Craft::$app->getView()->setTemplateMode('site');
 
         // Only proceed if this is a cacheable request
-        if (!RequestHelper::getIsCacheableRequest() || !$siteUri->getIsCacheableUri()) {
+        if (!Blitz::$plugin->cacheRequest->getIsCacheableRequest()
+            || !Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
+        ) {
             return;
         }
 

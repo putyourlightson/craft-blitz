@@ -20,7 +20,7 @@ class m190518_120000_alter_uri_column extends Migration
         $table = CacheRecord::tableName();
 
         if ($this->db->columnExists($table, 'uri')) {
-            $this->alterColumn($table, 'uri', $this->string(SiteUriModel::MAX_URI_LENGTH)->notNull());
+            $this->alterColumn($table, 'uri', $this->string()->notNull());
         }
 
         // Refresh the db schema caches

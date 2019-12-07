@@ -118,7 +118,7 @@ return [
         //],
 
         // The value to send in the cache control header.
-        //'cacheControlHeader' => 'public, s-maxage=0',
+        //'cacheControlHeader' => 'public, s-maxage=31536000, max-age=0',
 
         // Whether an `X-Powered-By: Craft CMS, Blitz` header should be sent.
         //'sendPoweredByHeader' => true,

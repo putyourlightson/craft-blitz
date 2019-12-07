@@ -63,11 +63,6 @@ class GenerateCacheTest extends Unit
         $this->output = 'xyz';
     }
 
-    protected function _after()
-    {
-        Blitz::$plugin->cacheStorage->deleteAll();
-    }
-
     // Public methods
     // =========================================================================
 

@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\records\Element;
 use craft\records\Element_SiteSettings;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 
@@ -89,7 +90,7 @@ class SiteUriHelper
                 'uri' => str_replace('__home__', '', $uri),
             ]);
 
-            if (!$cacheableOnly || $siteUri->getIsCacheableUri()) {
+            if (!$cacheableOnly || Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
                 $siteUris[] = $siteUri;
             }
         }

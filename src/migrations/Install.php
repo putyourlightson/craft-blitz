@@ -71,7 +71,7 @@ class Install extends Migration
             $this->createTable(CacheRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string(SiteUriModel::MAX_URI_LENGTH)->notNull(),
+                'uri' => $this->string()->notNull(),
                 'expiryDate' => $this->dateTime(),
             ]);
         }

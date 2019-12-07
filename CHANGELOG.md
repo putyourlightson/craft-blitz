@@ -13,7 +13,7 @@
 - Added a `debug` config setting to help debug why pages are not being cached.
 - Added a `refreshCacheAutomaticallyForGlobals` config setting.
 - Added broader Mutex locks and a `mutexTimeout` config setting.
-- Added `beforeClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
+- Added `beforeGetResponse`, `afterGetResponse`, `beforeClearCache`, `afterClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `afterFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `afterRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
 
 ### Changed
 - General performance and control panel UI improvements.
@@ -21,6 +21,7 @@
 - Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
 - Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
 - Removed the `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings.
+- Removed the `beforeOutput` event.
 
 ### Fixed
 - Fixed user group permissions for refreshing the cache.
