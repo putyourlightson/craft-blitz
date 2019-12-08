@@ -9,8 +9,6 @@ namespace putyourlightson\blitztests\unit;
 use Codeception\Test\Unit;
 use Craft;
 use craft\helpers\App;
-use craft\helpers\UrlHelper;
-use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
