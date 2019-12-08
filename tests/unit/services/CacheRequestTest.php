@@ -115,8 +115,8 @@ class CacheRequestTest extends Unit
         // Save a value for the site URI
         Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
 
-        // Assert that the response is valid
-        $this->assertInstanceOf(Response::class, Blitz::$plugin->cacheRequest->getResponse($this->siteUri));
+        // Assert that the response is not null
+        $this->assertNotNull(Blitz::$plugin->cacheRequest->getResponse($this->siteUri));
     }
 
     // Private methods

@@ -28,12 +28,15 @@ class TemplatesControllerTest extends BaseControllerTest
 
         $response = $this->runActionWithParams('templates/get', [
             'template' => Craft::$app->getSecurity()->hashData('_hidden'),
+            'params' => [
+                'number' => 123,
+            ],
         ]);
 
         $this->assertInstanceOf(Response::class, $response);
 
         // Assert that the output is correct
-        $this->assertEquals('xyz', trim($response->data));
+        $this->assertEquals('xyz123', trim($response->data));
     }
 
     public function testGetBadRequestHttpException()
