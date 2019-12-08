@@ -68,10 +68,11 @@ class GenerateCacheTest extends Unit
 
     public function testCacheSaved()
     {
+        // Save the output for the site URI
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        // Assert that the statically cached file contains the output
-        $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
+        // Assert that the cached value equals the output
+        $this->assertEquals($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
     }
 
     public function testCacheRecordSaved()
