@@ -137,10 +137,8 @@ class LocalWarmer extends BaseCacheWarmer
         // Set the template mode to front-end site
         Craft::$app->getView()->setTemplateMode('site');
 
-        // Only proceed if this is a cacheable request
-        if (!Blitz::$plugin->cacheRequest->getIsCacheableRequest()
-            || !Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
-        ) {
+        // Only proceed if this is a cacheable site URI
+        if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
             return;
         }
 

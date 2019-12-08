@@ -71,8 +71,10 @@ class GenerateCacheTest extends Unit
         // Save the output for the site URI
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        // Assert that the cached value equals the output
-        $this->assertEquals($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
+        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+
+        // Assert that the output (which may also contain a timestamp) contains the cached value
+        $this->assertStringContainsString($this->output, $value);
     }
 
     public function testCacheRecordSaved()
