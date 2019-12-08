@@ -8,90 +8,21 @@
 - Added replaceable cache warmers (Guzzle Warmer, Local Warmer) with the ability to specify custom site URIs to be warmed.
 - Added remote deploy and refresh cached URI actions to utility, console commands and user group permissions.
 - Added a table to the database in which drivers can store data.
-- Added a `params` parameter to the `craft.blitz.getUri` and `craft.blitz.getTemplate` variables.
+- Added an optional `params` parameter to the `craft.blitz.getUri` and `craft.blitz.getTemplate` variables.
 - Added logging of utility actions and other events and errors to `storage/logs/blitz.log`.
-- Added a `debug` config setting to help debug why pages are not being cached.
+- Added a `debug` config setting to debug why pages are not being cached.
 - Added a `refreshCacheAutomaticallyForGlobals` config setting.
-- Added broader Mutex locks and a `mutexTimeout` config setting.
+- Added a `mutexTimeout` config setting.
 - Added `beforeGetResponse`, `afterGetResponse`, `beforeClearCache`, `afterClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `afterFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `afterRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
 
 ### Changed
-- General performance and control panel UI improvements.
+- Replaced the `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings with a `refreshCacheAutomaticallyForGlobals` config setting.
+- Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
+- Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
+- Removed the `beforeOutput` event (use `Application::EVENT_AFTER_REQUEST` instead).
 - Changed the `cacheControlHeader` to include `max-age`.
-- Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
-- Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
-- Removed the `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings.
-- Removed the `beforeOutput` event.
-
-### Fixed
-- Fixed user group permissions for refreshing the cache.
-
-## 3.0.0-RC4 - 2019-11-29
-### Added
-- Added the ability to warm the cache using the Local Warmer from the command line.
-- Added test to validate that Git repository path is writeable.
-
-### Changed
-- Improved the functionality and feedback when a warm cache delay is set.
-
-## 3.0.0-RC3 - 2019-11-25
-### Added
-- Added `debug` config setting to help debug why pages are not being cached.
-
-### Changed
-- Set max value for concurrency to `100`.
-- Git Deployer now removes files that have been cleared.
-
-### Fixed
-- Fixed authentication issue with Git Deployer connecting to GitLab. 
-
-## 3.0.0-RC2 - 2019-11-17
-### Changed
-- Loosened version constraints for GitWrapper so the latest version for the local PHP version is used.
-
-## 3.0.0-RC1 - 2019-11-13
-### Changed
-- The Git Deployer now calls `git pull` before committing changes.
-- Code cleanup and stability improvements.
-
-## 3.0.0-beta.4 - 2019-11-07
-### Added
-- Added the Local Warmer to the default cache warmers.
-
-## 3.0.0-beta.3 - 2019-11-05
-### Added
-- Added the `commandsBefore` and `commandsAfter`  settings to the Git Deployer.
-- Added the `EVENT_BEFORE_COMMIT` and `EVENT_AFTER_COMMIT` events to Git Deployer.
-- Added the `refreshCacheAutomaticallyForGlobals` config setting.
-
-### Changed
-- Improved the detection of where Git is installed.
-- Removed the `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings.
-
-## 3.0.0-beta.2.1 - 2019-10-29
-### Fixed
-- Fixed a bug when creating a new deployer job.
-
-## 3.0.0-beta.2 - 2019-10-16
-### Added
-- Added driver data table.
-
-### Changed
-- Relaxed version constraint for `cpliakas/git-wrapper` library.
-
-## 3.0.0-beta.1 - 2019-10-15
-### Added
-- Added replaceable remote deployers (Git Deployer).
-- Added replaceable cache warmers (Guzzle Warmer) with the ability to specify custom site URIs to be warmed.
-- Added remote deploy and refresh cached URI actions to utility, console commands and user group permissions.
-- Added logging of utility actions and other events and errors to `storage/logs/blitz.log`.
-- Added a `mutexTimeout` config setting.
-- Added `beforeClearCache`, `beforeClearAllCache`, `afterClearAllCache`, `beforeFlushCache`, `beforeFlushAllCache`, `afterFlushAllCache`, `beforeRefreshCache`, `beforeRefreshAllCache`, `afterRefreshAllCache`, `beforeWarmCache`, `afterWarmCache`, `beforeWarmAllCache`, `afterWarmAllCache`, `beforePurgeCache`, `afterPurgeCache`, `beforePurgeAllCache`, `afterPurgeAllCache`,`beforeDeploy`, `afterDeploy`, `beforeDeployAll`, `afterDeployAll` events. 
-
-### Changed
+- Made the Mutex locks broader to help catch integrity constraint violation errors.
 - General performance and control panel UI improvements.
-- Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
-- Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
 
 ### Fixed
 - Fixed user group permissions for refreshing the cache.

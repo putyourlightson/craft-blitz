@@ -23,21 +23,18 @@ class SettingsModel extends Model
     // =========================================================================
 
     /**
-     * With this setting enabled, Blitz will log detailed messages to `storage/logs/blitz.php`.
-     *
-     * @var bool
+     * @var bool With this setting enabled, Blitz will log detailed messages to `storage/logs/blitz.php`.
      */
     public $debug = false;
 
     /**
-     * With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
-     *
-     * @var bool
+     * @var bool With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
      */
     public $cachingEnabled = false;
 
     /**
-     * The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
+     * @var array|string The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
+     *
      * [
      *     [
      *         'siteId' => 1,
@@ -48,185 +45,137 @@ class SettingsModel extends Model
      *         'uri' => 'articles/.*',
      *     ],
      * ]
-     *
-     * @var array|string
      */
     public $includedUriPatterns = [];
 
     /**
-     * The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
+     * @var array|string The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
+     *
      * [
      *     [
      *         'siteId' => 1,
      *         'uri' => 'pages/contact',
      *     ],
      * ]
-     *
-     * @var array|string
      */
     public $excludedUriPatterns = [];
 
     /**
-     * The storage type to use.
-     *
-     * @var string
+     * @var string The storage type to use.
      */
     public $cacheStorageType = FileStorage::class;
 
     /**
-     * The storage settings.
-     *
-     * @var array
+     * @var array The storage settings.
      */
     public $cacheStorageSettings = [];
 
     /**
-     * The storage type classes to add to the plugin’s default storage types.
-     *
-     * @var array
+     * @var array The storage type classes to add to the plugin’s default storage types.
      */
     public $cacheStorageTypes = [];
 
     /**
-     * The warmer type to use.
-     *
-     * @var string
+     * @var string The warmer type to use.
      */
     public $cacheWarmerType = GuzzleWarmer::class;
 
     /**
-     * The warmer settings.
-     *
-     * @var array
+     * @var array The warmer settings.
      */
     public $cacheWarmerSettings = [];
 
     /**
-     * The warmer type classes to add to the plugin’s default warmer types.
-     *
-     * @var string[]
+     * @var string[] The warmer type classes to add to the plugin’s default warmer types.
      */
     public $cacheWarmerTypes = [];
 
     /**
-     * Custom site URIs to warm when either a site or the entire cache is warmed.
-     *
-     * @var array|string
+     * @var array|string Custom site URIs to warm when either a site or the entire cache is warmed.
      */
     public $customSiteUris = [];
 
     /**
-     * The purger type to use.
-     *
-     * @var string
+     * @var string The purger type to use.
      */
     public $cachePurgerType = DummyPurger::class;
 
     /**
-     * The purger settings.
-     *
-     * @var array
+     * @var array The purger settings.
      */
     public $cachePurgerSettings = [];
 
     /**
-     * The purger type classes that should be available.
-     *
-     * @var string[]
+     * @var string[] The purger type classes that should be available.
      */
     public $cachePurgerTypes = [CloudflarePurger::class];
 
     /**
-     * The deployer type to use.
-     *
-     * @var string
+     * @var string The deployer type to use.
      */
     public $deployerType = DummyDeployer::class;
 
     /**
-     * The deployer settings.
-     *
-     * @var array
+     * @var array The deployer settings.
      */
     public $deployerSettings = [];
 
     /**
-     * The deployer type classes that should be available.
-     *
-     * @var string[]
+     * @var string[] The deployer type classes that should be available.
      */
     public $deployerTypes = [GitDeployer::class];
 
     /**
-     * Whether the cache should automatically be cleared when elements are updated.
-     *
-     * @var bool
+     * @var bool Whether the cache should automatically be cleared when elements are updated.
      */
     public $clearCacheAutomatically = true;
 
     /**
-     * Whether the cache should automatically be warmed after clearing.
-     *
-     * @var bool
+     * @var bool Whether the cache should automatically be warmed after clearing.
      */
     public $warmCacheAutomatically = true;
 
     /**
-     * Whether the cache should automatically be refreshed after a global set is updated.
-     *
-     * @var bool
+     * @var bool Whether the cache should automatically be refreshed after a global set is updated.
      */
     public $refreshCacheAutomaticallyForGlobals = true;
 
     /**
-     * Whether URLs with query strings should cached and how.
+     * @var int Whether URLs with query strings should cached and how.
+     *
      * 0: Do not cache URLs with query strings
      * 1: Cache URLs with query strings as unique pages
      * 2: Cache URLs with query strings as the same page
-     *
-     * @var int
      */
     public $queryStringCaching = 0;
 
     /**
-     * An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
-     *
-     * @var string
+     * @var string An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
      */
     public $apiKey = '';
 
     /**
-     * Whether elements should be cached in the database.
-     *
-     * @var bool
+     * @var bool Whether elements should be cached in the database.
      */
     public $cacheElements = true;
 
     /**
-     * Whether element queries should be cached in the database.
-     *
-     * @var bool
+     * @var bool Whether element queries should be cached in the database.
      */
     public $cacheElementQueries = true;
 
     /**
-     * The amount of time after which the cache should expire (if not 0). See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
-     *
-     * @var int|null
+     * @var int|null The amount of time after which the cache should expire (if not 0). See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
      */
     public $cacheDuration;
 
     /**
-     * Element types that should not be cached.
-     *
-     * @var string[]
+     * @var string[] Element types that should not be cached.
      */
     public $nonCacheableElementTypes = [];
 
     /**
-     * The integrations to initialise.
-     *
-     * @var string[]
+     * @var string[] The integrations to initialise.
      */
     public $integrations = [
         FeedMeIntegration::class,
@@ -234,44 +183,32 @@ class SettingsModel extends Model
     ];
 
     /**
-     * The value to send in the cache control header.
-     *
-     * @var string
+     * @var string The value to send in the cache control header.
      */
     public $cacheControlHeader = 'public, s-maxage=31536000, max-age=0';
 
     /**
-     * Whether an `X-Powered-By: Blitz` header should be sent.
-     *
-     * @var bool
+     * @var bool Whether an `X-Powered-By: Blitz` header should be sent.
      */
     public $sendPoweredByHeader = true;
 
     /**
-     * Whether the timestamp and served by comments should be appended to the cached output.
-     *
-     * @var bool
+     * @var bool Whether the timestamp and served by comments should be appended to the cached output.
      */
     public $outputComments = true;
 
     /**
-     * The priority to give the refresh cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
-     *
-     * @var int|null
+     * @var int|null The priority to give the refresh cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
      */
     public $refreshCacheJobPriority = 10;
 
     /**
-     * The priority to give driver jobs (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
-     *
-     * @var int|null
+     * @var int|null The priority to give driver jobs (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
      */
     public $driverJobPriority = 100;
 
     /**
-     * The time in seconds to wait for mutex locks to be released.
-     *
-     * @var int|null
+     * @var int|null The time in seconds to wait for mutex locks to be released.
      */
     public $mutexTimeout = 1;
 
