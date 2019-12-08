@@ -219,7 +219,7 @@ class GenerateCacheService extends Component
             ->insert(CacheRecord::tableName(), $values, false)
             ->execute();
 
-        $cacheId = $db->getLastInsertID();
+        $cacheId = (int)$db->getLastInsertID();
 
         // Add element caches to database
         $values = [];

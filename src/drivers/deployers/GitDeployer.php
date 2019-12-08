@@ -355,11 +355,11 @@ class GitDeployer extends BaseDeployer
     /**
      * Returns whether the site has a writeable repository path
      *
-     * @param string $siteId
+     * @param int $siteId
      *
      * @return bool
      */
-    private function _hasRepository(string $siteId): bool
+    private function _hasRepository(int $siteId): bool
     {
         $repository = $this->_getRepository($siteId);
 
