@@ -19,17 +19,34 @@
 
 return [
     '*' => [
-        // Enable debug mode to help figure out why pages are not being cached. With this setting enabled, Blitz will log detailed messages to `storage/logs/blitz.php`.
+        // With this setting enabled, Blitz will log detailed messages to `storage/logs/blitz.php`.
         //'debug' => false,
 
-        // Whether caching should be enabled. With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
+        // With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 
-        // The URI patterns to include in caching. The second variable represents a site ID, or a blank string for all sites.
-        //'includedUriPatterns' => [['pages/.*', '1'], ['articles/.*', '2']],
+        // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
+        //'includedUriPatterns' => [
+        //  [
+        //      'siteId' => 1,
+        //      'uri' => 'pages/.*',
+        //  ],
+        //  [
+        //      'siteId' => 2,
+        //      'uri' => 'articles/.*',
+        //  ],
+        //]
 
         // The URI patterns to exclude from caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
         //'excludedUriPatterns' => [['contact', '']],
+
+        // The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
+        //'excludedUriPatterns' => [
+        //  [
+        //      'siteId' => 1,
+        //      'uri' => 'pages/contact',
+        //  ],
+        //]
 
         // The storage type to use.
         //'cacheStorageType' => 'putyourlightson\blitz\drivers\storage\FileStorage',
@@ -49,14 +66,14 @@ return [
         // The warmer type classes to add to the plugin’s default warmer types.
         //'cacheWarmerTypes' => [],
 
+        // Custom site URIs to warm when either a site or the entire cache is warmed.
+        //'customSiteUris' => [],
+
         // The purger type to use.
         //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
 
         // The purger settings.
-        //'cachePurgerSettings' => [
-        //    'email' => '',
-        //    'apiKey' => '',
-        //],
+        //'cachePurgerSettings' => [],
 
         // The purger type classes that should be available.
         //'cachePurgerTypes' => [
@@ -67,9 +84,7 @@ return [
         //'deployerType' => 'putyourlightson\blitz\drivers\deployers\GitDeployer',
 
         // The deployer settings.
-        //'deployerSettings' => [
-        //    'personalAccessToken' => '',
-        //],
+        //'deployerSettings' => [],
 
         // The deployer type classes that should be available.
         //'deployerTypes' => [
@@ -120,7 +135,7 @@ return [
         // The value to send in the cache control header.
         //'cacheControlHeader' => 'public, s-maxage=31536000, max-age=0',
 
-        // Whether an `X-Powered-By: Craft CMS, Blitz` header should be sent.
+        // Whether an `X-Powered-By: Blitz` header should be sent.
         //'sendPoweredByHeader' => true,
 
         // Whether the timestamp and served by comments should be appended to the cached output.
@@ -129,11 +144,8 @@ return [
         // The priority to give the refresh cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
         //'refreshCacheJobPriority' => 10,
 
-        // The priority to give the warm cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
-        //'warmCacheJobPriority' => 101,
-
-        // The priority to give the deploy job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
-        //'deployJobPriority' => 102,
+        // The priority to give driver jobs (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
+        //'driverJobPriority' => 100,
 
         // The time in seconds to wait for mutex locks to be released.
         //'mutexTimeout' => 1,
