@@ -12,6 +12,7 @@ use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 
 /**
@@ -41,15 +42,15 @@ class CacheRequestService extends Component
     // =========================================================================
 
     /**
-     * Returns a site URI if the request is cacheable.
+     * Returns whether the request is cacheable.
      *
-     * @return SiteUriModel|null
+     * @return bool
      */
-    public function getRequestedCacheableSiteUri()
+    public function getIsCacheableRequest(): bool
     {
         // Ensure caching is enabled
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            return null;
+            return false;
         }
 
         $request = Craft::$app->getRequest();
@@ -61,12 +62,12 @@ class CacheRequestService extends Component
             || $request->getIsActionRequest()
             || $request->getIsPreview()
         ) {
-            return null;
+            return false;
         }
 
         // Ensure the response is not an error
         if (!Craft::$app->getResponse()->getIsOk()) {
-            return null;
+            return false;
         }
 
         /** @var User|null $user */
@@ -77,49 +78,55 @@ class CacheRequestService extends Component
             if (!Craft::$app->getIsLive() && !$user->can('accessSiteWhenSystemIsOff')) {
                 Blitz::$plugin->debug('Page not cached because the site is not live and the user does not have permission to access it.');
 
-                return null;
+                return false;
             }
 
             // Ensure that the debug toolbar is not enabled
             if ($user->getPreference('enableDebugToolbarForSite')) {
                 Blitz::$plugin->debug('Page not cached because the debug toolbar is enabled.');
 
-                return null;
+                return false;
             }
         }
 
         if (!empty($request->getParam('no-cache'))) {
             Blitz::$plugin->debug('Page not cached because a `no-cache` request parameter was provided.');
 
-            return null;
+            return false;
         }
 
         if (!empty($request->getParam('token'))) {
             Blitz::$plugin->debug('Page not cached because a `token` request parameter was provided.');
 
-            return null;
+            return false;
         }
 
-        if (Blitz::$plugin->settings->queryStringCaching == 0 && !empty($request->getQueryStringWithoutPath())) {
+        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
+            && !empty($request->getQueryStringWithoutPath())
+        ) {
             Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.');
 
-            return null;
+            return false;
         }
 
+        return true;
+    }
+
+    /**
+     * Returns the requested cacheable site URI if valid.
+     *
+     * @return SiteUriModel|null
+     */
+    public function getRequestedCacheableSiteUri()
+    {
         $url = Craft::$app->getRequest()->getAbsoluteUrl();
 
         // Remove the query string if unique query strings should be cached as the same page
-        if (Blitz::$plugin->settings->queryStringCaching == 2) {
+        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE) {
             $url = preg_replace('/\?.*/', '', $url);
         }
 
-        $siteUri = SiteUriHelper::getSiteUriFromUrl($url);
-
-        if ($siteUri === null || !$this->getIsCacheableSiteUri($siteUri)) {
-            return null;
-        }
-
-        return $siteUri;
+        return SiteUriHelper::getSiteUriFromUrl($url);
     }
 
     /**

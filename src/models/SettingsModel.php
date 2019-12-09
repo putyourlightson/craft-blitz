@@ -19,6 +19,24 @@ use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
 
 class SettingsModel extends Model
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @const int
+     */
+    const QUERY_STRINGS_DO_NOT_CACHE_URLS = 0;
+
+    /**
+     * @const int
+     */
+    const QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES = 1;
+
+    /**
+     * @const int
+     */
+    const QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE = 2;
+
     // Public Properties
     // =========================================================================
 
@@ -147,7 +165,7 @@ class SettingsModel extends Model
      * 1: Cache URLs with query strings as unique pages
      * 2: Cache URLs with query strings as the same page
      */
-    public $queryStringCaching = 0;
+    public $queryStringCaching = self::QUERY_STRINGS_DO_NOT_CACHE_URLS;
 
     /**
      * @var string An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
@@ -236,7 +254,11 @@ class SettingsModel extends Model
         return [
             [['cacheStorageType', 'cacheWarmerType', 'queryStringCaching'], 'required'],
             [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
-            [['queryStringCaching'], 'integer', 'min' => 0, 'max' => 2],
+            [['queryStringCaching'], 'in', 'range' => [
+                self::QUERY_STRINGS_DO_NOT_CACHE_URLS,
+                self::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES,
+                self::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE,
+            ]],
             [['apiKey'], 'string', 'length' => [16]],
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
         ];

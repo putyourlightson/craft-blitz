@@ -214,7 +214,7 @@
 
     <div id="purging" class="hidden">
         {% set info %}
-            <span class="info">{{ 'A purger allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated. You can extend Blitz to add your own or third-party reverse proxy purgers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'reverse-proxy-purger'})|raw }}</span>
+            <span class="info">{{ 'A purger allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated. You can extend Blitz to add your own or third-party reverse proxy purgers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'reverse-proxy-purging'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Reverse Proxy Purger"|t('blitz'),

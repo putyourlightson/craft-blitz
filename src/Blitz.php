@@ -93,13 +93,16 @@ class Blitz extends Plugin
         $this->_registerVariables();
 
         // Process the request before registering the other events
-        if ($siteUri = $this->cacheRequest->getRequestedCacheableSiteUri()) {
-            if ($response = $this->cacheRequest->getResponse($siteUri)) {
-                // Output the response and end the script
-                Craft::$app->end(0, $response);
-            }
-            else {
-                $this->_registerCacheableRequestEvents($siteUri);
+        if ($this->cacheRequest->getIsCacheableRequest()) {
+            $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
+            if ($siteUri && $this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+                if ($response = $this->cacheRequest->getResponse($siteUri)) {
+                    // Output the response and end the script
+                    Craft::$app->end(0, $response);
+                }
+                else {
+                    $this->_registerCacheableRequestEvents($siteUri);
+                }
             }
         }
 

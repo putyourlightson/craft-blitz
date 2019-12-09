@@ -10,6 +10,7 @@ use Codeception\Test\Unit;
 use Craft;
 use craft\helpers\App;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
 
@@ -60,13 +61,10 @@ class CacheRequestTest extends Unit
     // Public methods
     // =========================================================================
 
-    public function testGetRequestedCacheableSiteUri()
+    public function testGetIsCacheableRequest()
     {
-        // Mock a site URI request
-        $this->_mockRequest($this->siteUri);
-
         // Assert that the request is not cacheable
-        $this->assertNull(Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri());
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableRequest());
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
@@ -76,13 +74,29 @@ class CacheRequestTest extends Unit
         Craft::$app->getRequest()->isConsoleRequest = false;
 
         // Assert that the request is cacheable
-        $this->assertNotNull(Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri());
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableRequest());
+    }
 
-        // Add a query string
-        $_SERVER['QUERY_STRING'] = 'x=1';
+    public function testGetRequestedCacheableSiteUri()
+    {
+        $queryString = 'x=1';
 
-        // Assert that the request is not cacheable
-        $this->assertNull(Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri());
+        // Mock a URL request
+        $this->_mockRequest($this->siteUri->getUrl().'?'.$queryString);
+
+        // Enable caching and add an included URI pattern
+        Blitz::$plugin->settings->cachingEnabled = true;
+        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
+
+        // Assert that the URI contains the query string only if unique query strings should be cached as the same page
+        Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS;
+        $this->assertStringContainsString($queryString, Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri);
+
+        Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
+        $this->assertStringContainsString($queryString, Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri);
+
+        Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE;
+        $this->assertStringNotContainsString($queryString, Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri);
     }
 
     public function testGetIsCacheableSiteUri()
@@ -120,25 +134,22 @@ class CacheRequestTest extends Unit
     // Private methods
     // =========================================================================
 
-    private function _mockRequest(SiteUriModel $siteUri)
+    private function _mockRequest(string $url)
     {
         /**
          * Mock the web server request
          *
          * @see \putyourlightson\blitz\drivers\warmers\LocalWarmer::_warmUri
          */
-        $url = $siteUri->getUrl();
+        $uri = trim(parse_url($url, PHP_URL_PATH), '/');
 
         $_SERVER = array_merge($_SERVER, [
             'HTTP_HOST' => parse_url($url, PHP_URL_HOST),
             'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
             'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https',
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/'.$siteUri->uri,
-            'QUERY_STRING' => 'p='.$siteUri->uri,
-        ]);
-        $_GET = array_merge($_GET, [
-            'p' => $siteUri->uri,
+            'REQUEST_URI' => '/'.$uri.'?'.parse_url($url, PHP_URL_QUERY),
+            'QUERY_STRING' => parse_url($url, PHP_URL_QUERY),
         ]);
         $_POST = [];
         $_REQUEST = [];
