@@ -1,7 +1,7 @@
 # Release Notes for Blitz
 
 ## 3.0.0 - 2019-12-10
->{warning} The `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings have been replaced by a single new `refreshCacheAutomaticallyForGlobals` config setting.
+> {warning} The `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings have been replaced by a single new `refreshCacheAutomaticallyForGlobals` config setting.
 
 ### Added
 - Added replaceable remote deployers (Git Deployer).
