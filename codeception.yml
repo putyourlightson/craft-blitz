@@ -20,6 +20,6 @@ modules:
                 blitz:
                     class: '\putyourlightson\blitz\Blitz'
                     handle: blitz
-#            cleanup: true
+            cleanup: true
             transaction: true
-#            dbSetup: {clean: true, setupCraft: true}
+            dbSetup: {clean: true, setupCraft: true}
