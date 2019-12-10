@@ -376,16 +376,24 @@ class GitDeployer extends BaseDeployer
      */
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
-        // Find the git binary
-        $process = new Process(['which', 'git']);
-        $process->run();
-        $gitPath = trim($process->getOutput()) ?: null;
+        // Find the git binary (important because `ExecutableFinder` doesn't always find it!)
+        $gitPath = null;
 
-        if ($gitPath === null) {
-            // Fall back to trying `command -v`
-            $process = new Process(['command', '-v', 'git']);
+        // Commands to try to
+        $commands = [
+            ['type', '-p', 'git'],
+            ['command', '-v', 'git'],
+            ['which', 'git'],
+        ];
+
+        foreach ($commands as $command) {
+            $process = new Process($command);
             $process->run();
             $gitPath = trim($process->getOutput()) ?: null;
+
+            if ($gitPath !== null) {
+                break;
+            }
         }
 
         $gitWrapper = new GitWrapper($gitPath);
