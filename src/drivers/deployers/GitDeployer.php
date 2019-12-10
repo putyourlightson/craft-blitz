@@ -377,9 +377,16 @@ class GitDeployer extends BaseDeployer
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
         // Find the git binary
-        $process = new Process(['command', '-v', 'git']);
+        $process = new Process(['which', 'git']);
         $process->run();
         $gitPath = trim($process->getOutput()) ?: null;
+
+        if ($gitPath === null) {
+            // Fall back to trying `command -v`
+            $process = new Process(['command', '-v', 'git']);
+            $process->run();
+            $gitPath = trim($process->getOutput()) ?: null;
+        }
 
         $gitWrapper = new GitWrapper($gitPath);
 
