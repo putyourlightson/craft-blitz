@@ -27,7 +27,9 @@ class m191001_120000_change_settings extends Migration
         $settings = $info ? $info['settings'] : [];
 
         // Prepend `@webroot` to folder path in cache storage
-        if ($settings['cacheStorageType'] == 'putyourlightson\blitz\drivers\storage\FileStorage') {
+        if (!empty($settings['cacheStorageType'])
+            && $settings['cacheStorageType'] == 'putyourlightson\blitz\drivers\storage\FileStorage'
+        ) {
             $folderPath = 'cache/blitz';
 
             if (!empty($settings['cacheStorageSettings']) && !empty($settings['cacheStorageSettings']['folderPath'])) {

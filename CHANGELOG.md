@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
-## 3.0.1 - Unreleased
+## 3.0.1 - 2019-12-10
 ### Changed
 - Removed the addition of the `X-Powered-By` header for `Craft CMS`.
+
+### Fixed
+- Fixed an error that could occur when updating the plugin without having previously ever saved the settings.
 
 ## 3.0.0 - 2019-12-10
 > {warning} The `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings have been replaced by a single new `refreshCacheAutomaticallyForGlobals` config setting.
