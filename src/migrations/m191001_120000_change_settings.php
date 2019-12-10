@@ -5,6 +5,7 @@ namespace putyourlightson\blitz\migrations;
 use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\FileStorage;
 
 class m191001_120000_change_settings extends Migration
 {
@@ -26,45 +27,9 @@ class m191001_120000_change_settings extends Migration
         $info = Craft::$app->getPlugins()->getStoredPluginInfo('blitz');
         $settings = $info ? $info['settings'] : [];
 
-        // Prepend `@webroot` to folder path in cache storage
-        if (isset($settings['cacheStorageType'])
-            && $settings['cacheStorageType'] == 'putyourlightson\blitz\drivers\storage\FileStorage'
-        ) {
-            $folderPath = 'cache/blitz';
-
-            if (!empty($settings['cacheStorageSettings']) && !empty($settings['cacheStorageSettings']['folderPath'])) {
-                $folderPath = $settings['cacheStorageSettings']['folderPath'];
-            }
-
-            $settings['cacheStorageSettings']['folderPath'] = '@webroot/'.trim($folderPath, '/');
-        }
-
-        // Add keys to URI patterns
-        $includedUriPatterns = [];
-        if (isset($settings['includedUriPatterns'])
-            && is_array($settings['includedUriPatterns'])
-        ) {
-            foreach ($settings['includedUriPatterns'] as $includedUriPattern) {
-                $includedUriPatterns[] = [
-                    'siteId' => $includedUriPattern[1] ?? '',
-                    'uriPattern' => $includedUriPattern[0] ?? '',
-                ];
-            }
-        }
-        $settings['includedUriPatterns'] = $includedUriPatterns;
-
-        $excludedUriPatterns = [];
-        if (isset($settings['excludedUriPatterns'])
-            && is_array($settings['excludedUriPatterns'])
-        ) {
-            foreach ($settings['excludedUriPatterns'] as $excludedUriPattern) {
-                $excludedUriPatterns[] = [
-                    'siteId' => $excludedUriPattern[1] ?? '',
-                    'uriPattern' => $excludedUriPattern[0] ?? '',
-                ];
-            }
-        }
-        $settings['excludedUriPatterns'] = $excludedUriPatterns;
+        $settings = $this->_updateCacheStorage($settings);
+        $settings = $this->_updateUriPatterns($settings, 'includedUriPatterns');
+        $settings = $this->_updateUriPatterns($settings, 'excludedUriPatterns');
 
         // Move concurrency setting into cache warmer settings
         if (empty($settings['cacheWarmerSettings']) && !empty($settings['concurrency'])) {
@@ -98,5 +63,54 @@ class m191001_120000_change_settings extends Migration
         echo self::class." cannot be reverted.\n";
 
         return false;
+    }
+
+    // Private Methods
+    // =========================================================================
+
+    /**
+     * @param array $settings
+     *
+     * @return array
+     */
+    private function _updateCacheStorage(array $settings): array
+    {
+        // Prepend `@webroot` to folder path in cache storage
+        if (isset($settings['cacheStorageType']) && $settings['cacheStorageType'] == FileStorage::class) {
+            $folderPath = 'cache/blitz';
+
+            if (!empty($settings['cacheStorageSettings']) && !empty($settings['cacheStorageSettings']['folderPath'])) {
+                $folderPath = $settings['cacheStorageSettings']['folderPath'];
+            }
+
+            $settings['cacheStorageSettings']['folderPath'] = '@webroot/'.trim($folderPath, '/');
+        }
+
+        return $settings;
+    }
+
+    /**
+     * @param array $settings
+     * @param string $key
+     *
+     * @return array
+     */
+    private function _updateUriPatterns(array $settings, string $key): array
+    {
+        // Add keys to URI patterns
+        if (isset($settings[$key]) && is_array($settings[$key])) {
+            $uriPatterns = [];
+
+            foreach ($settings[$key] as $uriPattern) {
+                $uriPatterns[] = [
+                    'siteId' => $uriPattern[1] ?? '',
+                    'uriPattern' => $uriPattern[0] ?? '',
+                ];
+            }
+
+            $settings[$key] = $uriPatterns;
+        }
+
+        return $settings;
     }
 }
