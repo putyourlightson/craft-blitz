@@ -18,6 +18,8 @@ class m180704_120000_add_caches_elementquerycaches_tables extends Migration
         $install = new Install();
         $install->safeDown();
         $install->safeUp();
+
+        return true;
     }
 
     /**

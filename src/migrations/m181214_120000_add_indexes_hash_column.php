@@ -31,6 +31,8 @@ class m181214_120000_add_indexes_hash_column extends Migration
 
         // Refresh the db schema caches
         Craft::$app->db->schema->refresh();
+
+        return true;
     }
 
     /**

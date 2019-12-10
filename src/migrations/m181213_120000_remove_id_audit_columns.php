@@ -52,6 +52,8 @@ class m181213_120000_remove_id_audit_columns extends Migration
 
         // Refresh the db schema caches
         Craft::$app->db->schema->refresh();
+
+        return true;
     }
 
     /**

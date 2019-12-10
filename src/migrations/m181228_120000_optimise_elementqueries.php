@@ -33,6 +33,8 @@ class m181228_120000_optimise_elementqueries extends Migration
 
         // Refresh the db schema caches
         Craft::$app->db->schema->refresh();
+
+        return true;
     }
 
     /**

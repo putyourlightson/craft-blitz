@@ -33,6 +33,8 @@ class m190105_120000_add_elementexpirydates_table extends Migration
 
         // Refresh the db schema caches
         Craft::$app->db->schema->refresh();
+
+        return true;
     }
 
     /**

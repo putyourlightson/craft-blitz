@@ -35,6 +35,8 @@ class m180628_120000_add_elementcaches_table extends Migration
             // Refresh the db schema caches
             Craft::$app->db->schema->refresh();
         }
+
+        return true;
     }
 
     /**

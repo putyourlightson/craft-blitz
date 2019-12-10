@@ -32,6 +32,8 @@ class m190227_120000_add_cachetags_table extends Migration
 
         // Refresh the db schema caches
         Craft::$app->db->schema->refresh();
+
+        return true;
     }
 
     /**

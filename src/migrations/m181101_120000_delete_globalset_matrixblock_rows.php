@@ -40,6 +40,8 @@ class m181101_120000_delete_globalset_matrixblock_rows extends Migration
         foreach ($records as $record) {
             $record->delete();
         }
+
+        return true;
     }
 
     /**

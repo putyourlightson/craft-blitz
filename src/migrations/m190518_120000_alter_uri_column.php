@@ -25,6 +25,8 @@ class m190518_120000_alter_uri_column extends Migration
 
         // Refresh the db schema caches
         Craft::$app->db->schema->refresh();
+
+        return true;
     }
 
     /**

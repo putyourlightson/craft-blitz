@@ -18,6 +18,8 @@ class m180703_120000_add_siteid_column extends Migration
         $install = new Install();
         $install->safeDown();
         $install->safeUp();
+
+        return true;
     }
 
     /**

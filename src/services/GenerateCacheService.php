@@ -280,7 +280,6 @@ class GenerateCacheService extends Component
             return $this->_defaultElementQueryParams[$elementType];
         }
 
-        /** @var ElementInterface $elementType */
         $this->_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
 
         $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];

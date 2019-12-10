@@ -24,6 +24,8 @@ class m190105_120000_alter_index_column extends Migration
 
         // Refresh the db schema caches
         Craft::$app->db->schema->refresh();
+
+        return true;
     }
 
     /**
