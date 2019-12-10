@@ -12,7 +12,7 @@ Blitz provides intelligent static page caching for creating lightning-fast sites
 - Your site remains available even when performing updates and maintenance.
 - Your entire site can be served statically from a CDN such as [Cloudflare](https://www.cloudflare.com/cdn/) or [Netlify Edge](https://www.netlify.com/products/edge/).
 
-> Blitz 3 was recentyl released!! Read the [announcement here](https://putyourlightson.com/articles/blitz-3-embracing-the-jamstack).
+> Blitz 3 was recently released!! Read the [announcement here](https://putyourlightson.com/articles/blitz-3-embracing-the-jamstack).
 
 ![Server response time](https://putyourlightson.com/assets/images/plugins/blitz/server-response-time.png)  
 
