@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.0.0 - Unreleased
+## 3.0.0 - 2019-12-10
 >{note} The `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings have been replaced by a single new `refreshCacheAutomaticallyForGlobals` config setting.
 
 ### Added
@@ -19,7 +19,7 @@
 - Replaced the `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings with a `refreshCacheAutomaticallyForGlobals` config setting.
 - Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
 - Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
-- Removed the `beforeOutput` event (use `Application::EVENT_AFTER_REQUEST` instead).
+- Removed the `beforeOutput` event (use `beforeGetResponse` or `afterGetResponse` instead).
 - Changed the `cacheControlHeader` to include `max-age`.
 - Made the Mutex locks broader to help catch integrity constraint violation errors.
 - General performance and control panel UI improvements.
