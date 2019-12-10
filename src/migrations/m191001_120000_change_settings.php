@@ -27,7 +27,7 @@ class m191001_120000_change_settings extends Migration
         $settings = $info ? $info['settings'] : [];
 
         // Prepend `@webroot` to folder path in cache storage
-        if (!empty($settings['cacheStorageType'])
+        if (isset($settings['cacheStorageType'])
             && $settings['cacheStorageType'] == 'putyourlightson\blitz\drivers\storage\FileStorage'
         ) {
             $folderPath = 'cache/blitz';
@@ -41,7 +41,9 @@ class m191001_120000_change_settings extends Migration
 
         // Add keys to URI patterns
         $includedUriPatterns = [];
-        if (is_array($settings['includedUriPatterns'])) {
+        if (isset($settings['includedUriPatterns'])
+            && is_array($settings['includedUriPatterns'])
+        ) {
             foreach ($settings['includedUriPatterns'] as $includedUriPattern) {
                 $includedUriPatterns[] = [
                     'siteId' => $includedUriPattern[1] ?? '',
@@ -52,7 +54,9 @@ class m191001_120000_change_settings extends Migration
         $settings['includedUriPatterns'] = $includedUriPatterns;
 
         $excludedUriPatterns = [];
-        if (is_array($settings['excludedUriPatterns'])) {
+        if (isset($settings['excludedUriPatterns'])
+            && is_array($settings['excludedUriPatterns'])
+        ) {
             foreach ($settings['excludedUriPatterns'] as $excludedUriPattern) {
                 $excludedUriPatterns[] = [
                     'siteId' => $excludedUriPattern[1] ?? '',
