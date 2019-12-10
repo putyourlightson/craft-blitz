@@ -201,11 +201,6 @@ class CacheRequestService extends Component
 
         $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
 
-        // Add the Craft `X-Powered-By` header as it will not have been added at this point
-        if (Craft::$app->getConfig()->getGeneral()->sendPoweredByHeader) {
-            $headers->add('X-Powered-By', Craft::$app->name);
-        }
-
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
             $headers->add('X-Powered-By', Blitz::$plugin->name);
         }
