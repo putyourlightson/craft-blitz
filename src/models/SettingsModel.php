@@ -56,11 +56,11 @@ class SettingsModel extends Model
      * [
      *     [
      *         'siteId' => 1,
-     *         'uri' => 'pages/.*',
+     *         'uriPattern' => 'pages/.*',
      *     ],
      *     [
      *         'siteId' => '',
-     *         'uri' => 'articles/.*',
+     *         'uriPattern' => 'articles/.*',
      *     ],
      * ]
      */
@@ -72,7 +72,7 @@ class SettingsModel extends Model
      * [
      *     [
      *         'siteId' => 1,
-     *         'uri' => 'pages/contact',
+     *         'uriPattern' => 'pages/contact',
      *     ],
      * ]
      */

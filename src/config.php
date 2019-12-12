@@ -29,24 +29,21 @@ return [
         //'includedUriPatterns' => [
         //  [
         //      'siteId' => 1,
-        //      'uri' => 'pages/.*',
+        //      'uriPattern' => 'pages/.*',
         //  ],
         //  [
         //      'siteId' => 2,
-        //      'uri' => 'articles/.*',
+        //      'uriPattern' => 'articles/.*',
         //  ],
-        //]
-
-        // The URI patterns to exclude from caching (overrides any matching patterns to include). The second variable represents a site ID, or a blank string for all sites.
-        //'excludedUriPatterns' => [['contact', '']],
+        //],
 
         // The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
         //'excludedUriPatterns' => [
         //  [
         //      'siteId' => 1,
-        //      'uri' => 'pages/contact',
+        //      'uriPattern' => 'pages/contact',
         //  ],
-        //]
+        //],
 
         // The storage type to use.
         //'cacheStorageType' => 'putyourlightson\blitz\drivers\storage\FileStorage',
