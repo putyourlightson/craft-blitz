@@ -230,6 +230,11 @@ class SettingsModel extends Model
      */
     public $mutexTimeout = 1;
 
+    /**
+     * @var string|null The shell command to execute Git commands.
+     */
+    public $gitCommand;
+
     // Public Methods
     // =========================================================================
 

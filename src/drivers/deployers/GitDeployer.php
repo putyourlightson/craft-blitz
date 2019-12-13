@@ -85,11 +85,6 @@ class GitDeployer extends BaseDeployer
     public $commandsAfter = '';
 
     /**
-     * @var string|null
-     */
-    public $gitCommand;
-
-    /**
      * @var string
      */
     public $defaultBranch = 'master';
@@ -381,7 +376,9 @@ class GitDeployer extends BaseDeployer
      */
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
-        if ($this->gitCommand === null) {
+        $gitCommand = Blitz::$plugin->settings->gitCommand;
+
+        if ($gitCommand === null) {
             // Find the git binary (important because `ExecutableFinder` doesn't always find it!)
             $commands = [
                 ['type', '-p', 'git'],
@@ -391,15 +388,15 @@ class GitDeployer extends BaseDeployer
             foreach ($commands as $command) {
                 $process = new Process($command);
                 $process->run();
-                $this->gitCommand = trim($process->getOutput()) ?: null;
+                $gitCommand = trim($process->getOutput()) ?: null;
 
-                if ($this->gitCommand !== null) {
+                if ($gitCommand !== null) {
                     break;
                 }
             }
         }
 
-        $gitWrapper = new GitWrapper($this->gitCommand);
+        $gitWrapper = new GitWrapper($gitCommand);
 
         // Get working copy
         $git = $gitWrapper->workingCopy($repositoryPath);

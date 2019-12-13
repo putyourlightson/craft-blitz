@@ -2,7 +2,7 @@
 
 ## 3.0.2 - Unreleased
 ### Added
-- Added a `gitCommand` config setting to the Git Deployer.
+- Added a `gitCommand` config setting.
 - Added config setting warning messages for driver settings in the control panel.
 
 ## 3.0.1 - 2019-12-10

@@ -96,7 +96,6 @@ return [
         //    'email' => '',
         //    'commandsBefore' => '',
         //    'commandsAfter' => '',
-        //    'gitCommand' => '',
         //],
 
         // The deployer type classes that should be available.
@@ -165,5 +164,8 @@ return [
 
         // The time in seconds to wait for mutex locks to be released.
         //'mutexTimeout' => 1,
+
+        // The shell command to execute Git commands.
+        //'gitCommand' => '',
     ]
 ];
