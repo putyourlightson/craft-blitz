@@ -81,7 +81,23 @@ return [
         //'deployerType' => 'putyourlightson\blitz\drivers\deployers\GitDeployer',
 
         // The deployer settings.
-        //'deployerSettings' => [],
+        //'deployerSettings' => [
+        //    'gitRepositories' => [
+        //        'site-uid-f64d4923-f64d4923-f64d4923' => [
+        //            'repositoryPath' => '@root/path/to/repo',
+        //            'branch' => 'master',
+        //            'remote' => 'origin',
+        //        ],
+        //    ],
+        //    'commitMessage' => 'Blitz auto commit',
+        //    'username' => '',
+        //    'personalAccessToken' => '',
+        //    'name' => '',
+        //    'email' => '',
+        //    'commandsBefore' => '',
+        //    'commandsAfter' => '',
+        //    'gitCommand' => '',
+        //],
 
         // The deployer type classes that should be available.
         //'deployerTypes' => [

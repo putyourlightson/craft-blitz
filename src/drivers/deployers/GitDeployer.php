@@ -50,6 +50,11 @@ class GitDeployer extends BaseDeployer
     public $gitRepositories = [];
 
     /**
+     * @var string
+     */
+    public $commitMessage = 'Blitz auto commit';
+
+    /**
      * @var string|null
      */
     public $username;
@@ -72,7 +77,17 @@ class GitDeployer extends BaseDeployer
     /**
      * @var string
      */
-    public $commitMessage = 'Blitz auto commit';
+    public $commandsBefore = '';
+
+    /**
+     * @var string
+     */
+    public $commandsAfter = '';
+
+    /**
+     * @var string|null
+     */
+    public $gitCommand;
 
     /**
      * @var string
@@ -83,16 +98,6 @@ class GitDeployer extends BaseDeployer
      * @var string
      */
     public $defaultRemote = 'origin';
-
-    /**
-     * @var string
-     */
-    public $commandsBefore = '';
-
-    /**
-     * @var string
-     */
-    public $commandsAfter = '';
 
     // Static
     // =========================================================================
@@ -376,32 +381,25 @@ class GitDeployer extends BaseDeployer
      */
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
-        // Find the git binary (important because `ExecutableFinder` doesn't always find it!)
-        $gitPath = null;
-
-        if (!empty(Blitz::$plugin->settings->binPath)) {
-            $gitPath = rtrim(Blitz::$plugin->settings->binPath, '/').'/git';
-        }
-        else {
-            // Commands to try to
+        if ($this->gitCommand === null) {
+            // Find the git binary (important because `ExecutableFinder` doesn't always find it!)
             $commands = [
                 ['type', '-p', 'git'],
-                ['command', '-v', 'git'],
                 ['which', 'git'],
             ];
 
             foreach ($commands as $command) {
                 $process = new Process($command);
                 $process->run();
-                $gitPath = trim($process->getOutput()) ?: null;
+                $this->gitCommand = trim($process->getOutput()) ?: null;
 
-                if ($gitPath !== null) {
+                if ($this->gitCommand !== null) {
                     break;
                 }
             }
         }
 
-        $gitWrapper = new GitWrapper($gitPath);
+        $gitWrapper = new GitWrapper($this->gitCommand);
 
         // Get working copy
         $git = $gitWrapper->workingCopy($repositoryPath);

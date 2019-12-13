@@ -2,11 +2,8 @@
 
 {% import "_includes/forms" as forms %}
 
-{% macro configWarning(setting) -%}
-    {{ "This is being overridden by the {setting} config setting."|t('app', {setting: '<code>' ~ setting ~ '</code>' })|raw }}
-{%- endmacro %}
-
-{% from _self import configWarning %}
+{% from "blitz/_macros" import configWarning %}
+{% from "blitz/_macros" import configFieldWarning %}
 
 {% do view.registerAssetBundle("putyourlightson\\blitz\\assets\\BlitzAsset") %}
 
@@ -155,6 +152,8 @@
                 {% endnamespace %}
             </div>
         {% endfor %}
+
+        {{ config.cacheStorageSettings is defined ? configFieldWarning('cacheStorageSettings') }}
     </div>
 
     <div id="warming" class="hidden">
@@ -181,6 +180,8 @@
             </div>
         {% endfor %}
 
+        {{ config.cacheWarmerSettings is defined ? configFieldWarning('cacheWarmerSettings') }}
+
         {% set cols = {
             siteId: {
                 type: 'select',
@@ -204,6 +205,7 @@
         {{ forms.editableTableField({
             label: "Custom Site URIs"|t('blitz'),
             instructions: "Custom site URIs to include when warming the cache."|t('blitz') ~ info,
+            warning: (config.customSiteUris is defined ? configWarning('customSiteUris')),
             name: 'settings[customSiteUris]',
             id: 'customSiteUris',
             cols: cols,
@@ -235,6 +237,8 @@
                 {% endnamespace %}
             </div>
         {% endfor %}
+
+        {{ config.cachePurgerSettings is defined ? configFieldWarning('cachePurgerSettings') }}
     </div>
 
     <div id="deployment" class="hidden">
@@ -260,6 +264,8 @@
                 {% endnamespace %}
             </div>
         {% endfor %}
+
+        {{ config.deployerSettings is defined ? configFieldWarning('deployerSettings') }}
     </div>
 
     <div id="advanced" class="hidden">

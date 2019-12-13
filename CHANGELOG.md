@@ -2,7 +2,8 @@
 
 ## 3.0.2 - Unreleased
 ### Added
-- Added a `binPath` config setting that forces thepath to the `bin` folder.
+- Added a `gitCommand` config setting to the Git Deployer.
+- Added config setting warning messages for driver settings in the control panel.
 
 ## 3.0.1 - 2019-12-10
 ### Changed

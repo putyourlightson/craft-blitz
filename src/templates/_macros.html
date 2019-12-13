@@ -1,0 +1,12 @@
+{% macro configWarning(setting) -%}
+    {{ "This is being overridden by the {setting} config setting."|t('app', {setting: '<code>' ~ setting ~ '</code>' })|raw }}
+{%- endmacro %}
+
+
+{% macro configFieldWarning(setting) -%}
+    <div class="field">
+        <p class="warning">
+            {{ "These settings are being overridden by the {setting} config setting."|t('app', {setting: '<code>' ~ setting ~ '</code>' })|raw }}
+        </p>
+    </div>
+{%- endmacro %}

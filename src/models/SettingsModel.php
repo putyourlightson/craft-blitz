@@ -173,11 +173,6 @@ class SettingsModel extends Model
     public $apiKey = '';
 
     /**
-     * @var string A path to the `bin` folder that should be forced.
-     */
-    public $binPath = '';
-
-    /**
      * @var bool Whether elements should be cached in the database.
      */
     public $cacheElements = true;
