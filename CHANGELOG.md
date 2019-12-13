@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.0.2 - Unreleased
+### Added
+- Added a `binPath` config setting that forces thepath to the `bin` folder.
+
 ## 3.0.1 - 2019-12-10
 ### Changed
 - Removed the addition of the `X-Powered-By` header for `Craft CMS`.

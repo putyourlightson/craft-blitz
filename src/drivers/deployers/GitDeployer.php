@@ -379,20 +379,25 @@ class GitDeployer extends BaseDeployer
         // Find the git binary (important because `ExecutableFinder` doesn't always find it!)
         $gitPath = null;
 
-        // Commands to try to
-        $commands = [
-            ['type', '-p', 'git'],
-            ['command', '-v', 'git'],
-            ['which', 'git'],
-        ];
+        if (!empty(Blitz::$plugin->settings->binPath)) {
+            $gitPath = rtrim(Blitz::$plugin->settings->binPath, '/').'/git';
+        }
+        else {
+            // Commands to try to
+            $commands = [
+                ['type', '-p', 'git'],
+                ['command', '-v', 'git'],
+                ['which', 'git'],
+            ];
 
-        foreach ($commands as $command) {
-            $process = new Process($command);
-            $process->run();
-            $gitPath = trim($process->getOutput()) ?: null;
+            foreach ($commands as $command) {
+                $process = new Process($command);
+                $process->run();
+                $gitPath = trim($process->getOutput()) ?: null;
 
-            if ($gitPath !== null) {
-                break;
+                if ($gitPath !== null) {
+                    break;
+                }
             }
         }
 

@@ -106,6 +106,9 @@ return [
         // An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
         //'apiKey' => '',
 
+        // A path to the `bin` folder that should be forced.
+        //'binPath' => '',
+
         // Whether elements should be cached in the database.
         //'cacheElements' => true,
 
