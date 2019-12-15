@@ -376,7 +376,7 @@ class GitDeployer extends BaseDeployer
      */
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
-        $gitCommand = Blitz::$plugin->settings->gitCommand;
+        $gitCommand = Blitz::$plugin->settings->commands['git'] ?? null;
 
         if ($gitCommand === null) {
             // Find the git binary (important because `ExecutableFinder` doesn't always find it!)

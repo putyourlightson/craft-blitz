@@ -27,22 +27,22 @@ return [
 
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
         //'includedUriPatterns' => [
-        //  [
-        //      'siteId' => 1,
-        //      'uriPattern' => 'pages/.*',
-        //  ],
-        //  [
-        //      'siteId' => 2,
-        //      'uriPattern' => 'articles/.*',
-        //  ],
+        //    [
+        //        'siteId' => 1,
+        //        'uriPattern' => 'pages/.*',
+        //    ],
+        //    [
+        //        'siteId' => 2,
+        //        'uriPattern' => 'articles/.*',
+        //    ],
         //],
 
         // The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
         //'excludedUriPatterns' => [
-        //  [
-        //      'siteId' => 1,
-        //      'uriPattern' => 'pages/contact',
-        //  ],
+        //    [
+        //        'siteId' => 1,
+        //        'uriPattern' => 'pages/contact',
+        //    ],
         //],
 
         // The storage type to use.
@@ -165,7 +165,9 @@ return [
         // The time in seconds to wait for mutex locks to be released.
         //'mutexTimeout' => 1,
 
-        // The shell command to execute Git commands.
-        //'gitCommand' => '',
+        // The paths to executable shell commands.
+        //'commands' => [
+        //    'git' => '/usr/bin/git',
+        //],
     ]
 ];

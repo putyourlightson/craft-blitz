@@ -216,24 +216,28 @@ class SettingsModel extends Model
     public $outputComments = true;
 
     /**
-     * @var int|null The priority to give the refresh cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
+     * @var int The priority to give the refresh cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
      */
     public $refreshCacheJobPriority = 10;
 
     /**
-     * @var int|null The priority to give driver jobs (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
+     * @var int The priority to give driver jobs (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
      */
     public $driverJobPriority = 100;
 
     /**
-     * @var int|null The time in seconds to wait for mutex locks to be released.
+     * @var int The time in seconds to wait for mutex locks to be released.
      */
     public $mutexTimeout = 1;
 
     /**
-     * @var string|null The shell command to execute Git commands.
+     * @var array The paths to executable shell commands.
+     *
+     * [
+     *     'git' => '/usr/bin/git',
+     * ]
      */
-    public $gitCommand;
+    public $commands = [];
 
     // Public Methods
     // =========================================================================
