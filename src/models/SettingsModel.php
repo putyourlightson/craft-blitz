@@ -110,6 +110,13 @@ class SettingsModel extends Model
 
     /**
      * @var array|string Custom site URIs to warm when either a site or the entire cache is warmed.
+     *
+     * [
+     *     [
+     *         'siteId' => 1,
+     *         'uri' => 'pages/custom',
+     *     ],
+     * ]
      */
     public $customSiteUris = [];
 

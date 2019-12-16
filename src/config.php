@@ -64,7 +64,12 @@ return [
         //'cacheWarmerTypes' => [],
 
         // Custom site URIs to warm when either a site or the entire cache is warmed.
-        //'customSiteUris' => [],
+        //'customSiteUris' => [
+        //    [
+        //        'siteId' => 1,
+        //        'uri' => 'pages/custom',
+        //    ],
+        //],
 
         // The purger type to use.
         //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
