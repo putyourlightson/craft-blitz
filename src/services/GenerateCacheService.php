@@ -188,9 +188,11 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't cache if there are any transform generation URLs in the body
+        // Don't cache if the output contains any transform generation URLs
         // https://github.com/putyourlightson/craft-blitz/issues/125
         if (StringHelper::contains(stripslashes($output), 'assets/generate-transform')) {
+            Blitz::$plugin->debug('Page not cached because it contains transform generation URLs.');
+
             return;
         }
 
@@ -198,6 +200,8 @@ class GenerateCacheService extends Component
         $lockName = self::MUTEX_LOCK_NAME_CACHE_RECORDS;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
+            Blitz::$plugin->debug('Page not cached because a `'.$lockName.'` mutex could not be acquired.');
+
             return;
         }
 

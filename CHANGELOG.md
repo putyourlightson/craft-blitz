@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 3.0.3 - Unreleased
+### Added
+- Added more debug logs for cases in which pages are not cached.
+
+
 ## 3.0.2 - 2019-12-18
 ### Added
 - Added a `commands` config setting to define the paths to executable shell commands.
