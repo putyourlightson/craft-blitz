@@ -180,8 +180,6 @@ class BlitzVariable
                                 customEventInit.detail.element = element;
                                 customEventInit.detail.responseText = this.responseText;
                                 
-                                const event = new CustomEvent("beforeBlitzInject", customEventInit);
-
                                 if (!document.dispatchEvent(new CustomEvent("beforeBlitzInject", customEventInit))) {
                                     return;
                                 }
