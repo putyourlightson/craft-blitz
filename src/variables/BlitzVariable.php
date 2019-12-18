@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\variables;
 
 use Craft;
 use craft\helpers\Template;
-use craft\helpers\UrlHelper;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
@@ -161,49 +160,20 @@ class BlitzVariable
     {
         $view = Craft::$app->getView();
 
+        $js = '';
+
         if ($this->_injected === 0) {
-            $view->registerJs('
-                function blitzInject(id, uri, params) {
-                    const customEventInit = {
-                        detail: {
-                            uri: uri,
-                            params: params,
-                        },
-                        cancelable: true,
-                    };
-                    
-                    const xhr = new XMLHttpRequest();
-                    xhr.onload = function () {
-                        if (xhr.status >= 200 && xhr.status < 300) {
-                            const element = document.getElementById("blitz-inject-" + id);
-                            if (element) {
-                                customEventInit.detail.element = element;
-                                customEventInit.detail.responseText = this.responseText;
-                                
-                                if (!document.dispatchEvent(new CustomEvent("beforeBlitzInject", customEventInit))) {
-                                    return;
-                                }
-
-                                element.innerHTML = this.responseText;
-
-                                document.dispatchEvent(new CustomEvent("afterBlitzInject", customEventInit));
-                            }
-                        }
-                    };
-                    xhr.open("GET", uri + (params && ("?" + params)));
-                    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-                    xhr.send();
-                }
-            ', View::POS_END);
+            $blitzInjectScript = Craft::getAlias('@putyourlightson/blitz/resources/js/blitzInjectScript.js');
+            $js .= file_exists($blitzInjectScript) ? file_get_contents($blitzInjectScript) : '';
         }
 
         $this->_injected++;
 
-        $id = 'blitz-inject-'.$this->_injected;
+        $js .= 'blitzInject('.$this->_injected.', "'.$uri.'", "'.http_build_query($params).'");';
 
-        $view->registerJs('blitzInject('.$this->_injected.', "'.$uri.'", "'.http_build_query($params).'");', View::POS_END);
+        $view->registerJs($js, View::POS_END);
 
-        $output = '<span class="blitz-inject" id="'.$id.'"></span>';
+        $output = '<span class="blitz-inject" id="'.'blitz-inject-'.$this->_injected.'"></span>';
 
         return Template::raw($output);
     }
