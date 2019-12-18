@@ -22,7 +22,7 @@ Learn more and read the documentation at [putyourlightson.com/plugins/blitz »](
 
 ## License
 
-This plugin requires a commercial license pur­chas­able through the [Craft Plugin Store](https://plugins.craftcms.com/blitz).  
+This plugin requires a commercial license purchasable through the [Craft Plugin Store](https://plugins.craftcms.com/blitz).  
 The license fee is **$99** plus **$49** per subsequent year for updates (optional).
 
 ## Requirements

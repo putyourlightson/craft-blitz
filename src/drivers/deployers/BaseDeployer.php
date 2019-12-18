@@ -5,8 +5,10 @@
 
 namespace putyourlightson\blitz\drivers\deployers;
 
+use Craft;
 use craft\base\SavableComponent;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
 abstract class BaseDeployer extends SavableComponent implements DeployerInterface
@@ -45,6 +47,30 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
     /**
      * @inheritdoc
      */
+    public function deployUris(array $siteUris, callable $setProgressHandler = null)
+    {
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_DEPLOY, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+            $this->deployUrisWithProgress($siteUris, $setProgressHandler);
+        }
+        else {
+            DeployerHelper::addDeployerJob($siteUris, 'deployUrisWithProgress');
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY)) {
+            $this->trigger(self::EVENT_AFTER_DEPLOY, $event);
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function deploySite(int $siteId, callable $setProgressHandler = null)
     {
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
@@ -69,6 +95,17 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY_ALL)) {
             $this->trigger(self::EVENT_AFTER_DEPLOY_ALL, $event);
         }
+    }
+
+    /**
+     * Deploys site URIs with progress.
+     *
+     * @param array $siteUris
+     * @param callable|null $setProgressHandler
+     */
+    public function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    {
+
     }
 
     /**

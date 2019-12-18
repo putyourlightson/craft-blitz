@@ -77,9 +77,9 @@ return [
         // The purger settings.
         //'cachePurgerSettings' => [],
 
-        // The purger type classes that should be available.
+        // The purger type classes to add to the plugin’s default purger types.
         //'cachePurgerTypes' => [
-        //   'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
+        //    'putyourlightson\blitzshell\ShellDeployer',
         //],
 
         // The deployer type to use.
@@ -103,9 +103,9 @@ return [
         //    'commandsAfter' => '',
         //],
 
-        // The deployer type classes that should be available.
+        // The deployer type classes to add to the plugin’s default deployer types.
         //'deployerTypes' => [
-        //    'putyourlightson\blitz\drivers\deployers\GitDeployer',
+        //    'putyourlightson\blitzshell\ShellDeployer',
         //],
 
         // Whether the cache should automatically be cleared when elements are updated.

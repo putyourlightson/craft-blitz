@@ -243,7 +243,7 @@
 
     <div id="deployment" class="hidden">
         {% set info %}
-            <span class="info">{{ 'A deployer allows you to deploy cached files to a remote location such as a Git repository. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been warmed. You can extend Blitz to add your own or third-party deployers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'remote-deployment'})|raw }}</span>
+            <span class="info">{{ 'A deployer allows you to deploy cached files to a remote location. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been warmed. You can extend Blitz to add your own or third-party deployers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'remote-deployment'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Remote Deployer"|t('blitz'),

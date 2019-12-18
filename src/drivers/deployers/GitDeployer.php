@@ -41,6 +41,17 @@ class GitDeployer extends BaseDeployer
      */
     const EVENT_AFTER_COMMIT = 'afterCommit';
 
+    // Static
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    public static function displayName(): string
+    {
+        return Craft::t('blitz', 'Git Deployer');
+    }
+
     // Properties
     // =========================================================================
 
@@ -94,17 +105,6 @@ class GitDeployer extends BaseDeployer
      */
     public $defaultRemote = 'origin';
 
-    // Static
-    // =========================================================================
-
-    /**
-     * @inheritdoc
-     */
-    public static function displayName(): string
-    {
-        return Craft::t('blitz', 'Git Deployer');
-    }
-
     // Public Methods
     // =========================================================================
 
@@ -134,33 +134,6 @@ class GitDeployer extends BaseDeployer
 
     /**
      * @inheritdoc
-     */
-    public function deployUris(array $siteUris, callable $setProgressHandler = null)
-    {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-        $this->trigger(self::EVENT_BEFORE_DEPLOY, $event);
-
-        if (!$event->isValid) {
-            return;
-        }
-
-        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
-            $this->deployUrisWithProgress($siteUris, $setProgressHandler);
-        }
-        else {
-            DeployerHelper::addDeployerJob($siteUris, 'deployUrisWithProgress');
-        }
-
-        if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY)) {
-            $this->trigger(self::EVENT_AFTER_DEPLOY, $event);
-        }
-    }
-
-    /**
-     * Deploys site URIs with progress.
-     *
-     * @param array $siteUris
-     * @param callable|null $setProgressHandler
      */
     public function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
@@ -508,6 +481,9 @@ class GitDeployer extends BaseDeployer
         $this->_runCommands($this->commandsAfter);
     }
 
+    // Private Methods
+    // =========================================================================
+
     /**
      * Runs one or more commands.
      *
@@ -525,7 +501,7 @@ class GitDeployer extends BaseDeployer
 
         /** @var string $command */
         foreach ($commands as $command) {
-            // TODO: remove in Blitz 4 when Process 4 is forced
+            // TODO: remove condition in Blitz 4 when Process 4 is forced
             if (method_exists(Process::class, 'fromShellCommandline')) {
                 $process = Process::fromShellCommandline($command);
             }

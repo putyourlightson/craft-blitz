@@ -8,10 +8,8 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
-use putyourlightson\blitz\drivers\deployers\GitDeployer;
 use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
-use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
@@ -131,9 +129,9 @@ class SettingsModel extends Model
     public $cachePurgerSettings = [];
 
     /**
-     * @var string[] The purger type classes that should be available.
+     * @var string[] The purger type classes to add to the plugin’s default purger types.
      */
-    public $cachePurgerTypes = [CloudflarePurger::class];
+    public $cachePurgerTypes = [];
 
     /**
      * @var string The deployer type to use.
@@ -146,9 +144,9 @@ class SettingsModel extends Model
     public $deployerSettings = [];
 
     /**
-     * @var string[] The deployer type classes that should be available.
+     * @var string[] The deployer type classes to add to the plugin’s default deployer types.
      */
-    public $deployerTypes = [GitDeployer::class];
+    public $deployerTypes = [];
 
     /**
      * @var bool Whether the cache should automatically be cleared when elements are updated.

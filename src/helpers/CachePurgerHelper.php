@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use yii\base\Event;
 
@@ -33,6 +34,7 @@ class CachePurgerHelper extends BaseDriverHelper
     {
         $purgerTypes = [
             DummyPurger::class,
+            CloudflarePurger::class,
         ];
 
         $purgerTypes = array_unique(array_merge(

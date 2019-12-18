@@ -1,9 +1,13 @@
 # Release Notes for Blitz
 
-## 3.0.2 - Unreleased
+## 3.0.2 - 2019-12-18
 ### Added
 - Added a `commands` config setting to define the paths to executable shell commands.
 - Added config setting warning messages for driver settings in the control panel.
+- Added better support for custom remote deployers. 
+
+### Changed
+- The `cachePurgerTypes` and `deployerTypes` config settings now define the classes that will be added to the plugin’s default respective types.
 
 ## 3.0.1 - 2019-12-10
 ### Changed

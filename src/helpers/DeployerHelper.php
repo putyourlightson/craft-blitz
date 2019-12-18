@@ -10,6 +10,7 @@ use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
+use putyourlightson\blitz\drivers\deployers\GitDeployer;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
@@ -35,6 +36,7 @@ class DeployerHelper extends BaseDriverHelper
     {
         $deployerTypes = [
             DummyDeployer::class,
+            GitDeployer::class,
         ];
 
         $deployerTypes = array_unique(array_merge(
