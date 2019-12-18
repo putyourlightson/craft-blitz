@@ -163,37 +163,36 @@ class BlitzVariable
 
         if ($this->_injected === 0) {
             $view->registerJs('
-                function blitzInject(id, uri) {
-                    var customEventInit = {
+                function blitzInject(id, uri, params) {
+                    const customEventInit = {
                         detail: {
                             uri: uri,
-                            params: '.json_encode($params).',
+                            params: params,
                         },
                         cancelable: true,
                     };
                     
-                    var xhr = new XMLHttpRequest();
+                    const xhr = new XMLHttpRequest();
                     xhr.onload = function () {
                         if (xhr.status >= 200 && xhr.status < 300) {
-                            var element = document.getElementById("blitz-inject-" + id);
+                            const element = document.getElementById("blitz-inject-" + id);
                             if (element) {
                                 customEventInit.detail.element = element;
                                 customEventInit.detail.responseText = this.responseText;
                                 
-                                var event = new CustomEvent("beforeBlitzInject", customEventInit);
+                                const event = new CustomEvent("beforeBlitzInject", customEventInit);
 
-                                if (!document.dispatchEvent(event)) {
+                                if (!document.dispatchEvent(new CustomEvent("beforeBlitzInject", customEventInit))) {
                                     return;
                                 }
 
                                 element.innerHTML = this.responseText;
 
-                                var event = new CustomEvent("afterBlitzInject", customEventInit);
-                                document.dispatchEvent(event);
+                                document.dispatchEvent(new CustomEvent("afterBlitzInject", customEventInit));
                             }
                         }
                     };
-                    xhr.open("GET", uri);
+                    xhr.open("GET", uri + (params && ("?" + params)));
                     xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
                     xhr.send();
                 }
@@ -204,13 +203,7 @@ class BlitzVariable
 
         $id = 'blitz-inject-'.$this->_injected;
 
-        $query = UrlHelper::buildQuery($params);
-
-        if ($query !== '') {
-            $uri = $uri.'?'.$query;
-        }
-
-        $view->registerJs('blitzInject('.$this->_injected.', "'.$uri.'");', View::POS_END);
+        $view->registerJs('blitzInject('.$this->_injected.', "'.$uri.'", "'.http_build_query($params).'");', View::POS_END);
 
         $output = '<span class="blitz-inject" id="'.$id.'"></span>';
 
