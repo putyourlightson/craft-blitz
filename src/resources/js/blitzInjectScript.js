@@ -8,6 +8,8 @@ function blitzInject(id, uri, params) {
     };
 
     const xhr = new XMLHttpRequest();
+    xhr.open("GET", uri + (params && ("?" + params)));
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     xhr.onload = function () {
         if (xhr.status >= 200 && xhr.status < 300) {
             const element = document.getElementById("blitz-inject-" + id);
@@ -25,7 +27,5 @@ function blitzInject(id, uri, params) {
             }
         }
     };
-    xhr.open("GET", uri + (params && ("?" + params)));
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
     xhr.send();
 }
