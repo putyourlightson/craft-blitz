@@ -164,12 +164,32 @@ class BlitzVariable
         if ($this->_injected === 0) {
             $view->registerJs('
                 function blitzInject(id, uri) {
+                    var customEventInit = {
+                        detail: {
+                            uri: uri,
+                            params: '.json_encode($params).',
+                        },
+                        cancelable: true,
+                    };
+                    
                     var xhr = new XMLHttpRequest();
                     xhr.onload = function () {
                         if (xhr.status >= 200 && xhr.status < 300) {
                             var element = document.getElementById("blitz-inject-" + id);
                             if (element) {
+                                customEventInit.detail.element = element;
+                                customEventInit.detail.responseText = this.responseText;
+                                
+                                var event = new CustomEvent("beforeBlitzInject", customEventInit);
+
+                                if (!document.dispatchEvent(event)) {
+                                    return;
+                                }
+
                                 element.innerHTML = this.responseText;
+
+                                var event = new CustomEvent("afterBlitzInject", customEventInit);
+                                document.dispatchEvent(event);
                             }
                         }
                     };
