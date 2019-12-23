@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', blitzInject);
 
 async function blitzInject()
 {
-    if (blitzInjectData == 0) {
+    if (blitzInjectData.length == 0) {
         return;
     }
 
