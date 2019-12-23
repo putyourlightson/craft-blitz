@@ -1,31 +1,44 @@
-function blitzInject(id, uri, params) {
-    const customEventInit = {
-        detail: {
-            uri: uri,
-            params: params,
-        },
-        cancelable: true,
-    };
+const blitzInjectData = [];
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", uri + (params && ("?" + params)));
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    xhr.onload = function () {
-        if (xhr.status >= 200 && xhr.status < 300) {
-            const element = document.getElementById("blitz-inject-" + id);
-            if (element) {
-                customEventInit.detail.element = element;
-                customEventInit.detail.responseText = this.responseText;
+document.addEventListener('DOMContentLoaded', blitzInject);
 
-                if (!document.dispatchEvent(new CustomEvent("beforeBlitzInject", customEventInit))) {
-                    return;
-                }
+async function blitzInject()
+{
+    if (blitzInjectData == 0) {
+        return;
+    }
 
-                element.innerHTML = this.responseText;
+    if (!document.dispatchEvent(new Event("beforeBlitzInjectAll", { cancelable: true }))) {
+        return;
+    }
 
-                document.dispatchEvent(new CustomEvent("afterBlitzInject", customEventInit));
+    const responses = await Promise.all(
+        blitzInjectData.map(async (data) => {
+            const url = data.uri + (data.params && ("?" + data.params));
+            const response = await fetch(url);
+            const responseText = await response.text();
+            const element = document.getElementById("blitz-inject-" + data.id);
+            const blitzInjectEvent = {
+                detail: {
+                    uri: data.uri,
+                    params: data.params,
+                    element: element,
+                    response: response,
+                    responseText: responseText,
+                },
+                cancelable: true,
+            };
+
+            if (!document.dispatchEvent(new CustomEvent("beforeBlitzInject", blitzInjectEvent))) {
+                return;
             }
-        }
-    };
-    xhr.send();
+
+            if (response.ok && element) {
+                element.innerHTML = responseText;
+            }
+
+            document.dispatchEvent(new CustomEvent("afterBlitzInject", blitzInjectEvent));
+        }));
+
+    document.dispatchEvent(new Event("afterBlitzInjectAll"));
 }

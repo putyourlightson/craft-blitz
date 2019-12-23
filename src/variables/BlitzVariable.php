@@ -169,7 +169,7 @@ class BlitzVariable
 
         $this->_injected++;
 
-        $js .= 'blitzInject('.$this->_injected.', "'.$uri.'", "'.http_build_query($params).'");';
+        $js .= 'blitzInjectData.push({id: '.$this->_injected.', uri: "'.$uri.'", params: "'.http_build_query($params).'"});';
 
         $view->registerJs($js, View::POS_END);
 
