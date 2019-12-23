@@ -12,7 +12,7 @@ async function blitzInject()
         return;
     }
 
-    const responses = await Promise.all(
+    await Promise.all(
         blitzInjectData.map(async (data) => {
             const url = data.uri + (data.params && ("?" + data.params));
             const response = await fetch(url);
