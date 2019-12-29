@@ -1,7 +1,8 @@
 # Release Notes for Blitz
 
-## 3.0.3 - Unreleased
+## 3.0.3 - 2019-12-29
 ### Added
+- Added `beforeBlitzInject`, `afterBlitzInject`, `beforeBlitzInjectAll`, `afterBlitzInjectAll` events to inject script.
 - Added more debug logs for cases in which pages are not cached.
 
 
