@@ -1,44 +1,61 @@
-const blitzInjectData = [];
+var Blitz = {
+    inject: {
+        data: [],
+        count: 0
+    }
+};
 
-document.addEventListener('DOMContentLoaded', blitzInject);
+document.addEventListener("DOMContentLoaded", blitzInject);
 
-async function blitzInject()
-{
-    if (blitzInjectData.length == 0) {
+function blitzInject() {
+    "use strict";
+
+    var event = new Event("beforeBlitzInjectAll", {
+        cancelable: true
+    });
+
+    if (!document.dispatchEvent(event)) {
         return;
     }
 
-    if (!document.dispatchEvent(new Event("beforeBlitzInjectAll", { cancelable: true }))) {
-        return;
-    }
+    Blitz.inject.data.forEach(function(data, index) {
+        var customEventInit = {
+            detail: {
+                uri: data.uri,
+                params: data.params
+            },
+            cancelable: true
+        };
 
-    await Promise.all(
-        blitzInjectData.map(async (data) => {
-            const url = data.uri + (data.params && ("?" + data.params));
-            const response = await fetch(url);
-            const responseText = await response.text();
-            const element = document.getElementById("blitz-inject-" + data.id);
-            const blitzInjectEvent = {
-                detail: {
-                    uri: data.uri,
-                    params: data.params,
-                    element: element,
-                    response: response,
-                    responseText: responseText,
-                },
-                cancelable: true,
-            };
+        if (!document.dispatchEvent(new CustomEvent("beforeBlitzInject", customEventInit))) {
+            return;
+        }
 
-            if (!document.dispatchEvent(new CustomEvent("beforeBlitzInject", blitzInjectEvent))) {
-                return;
+        var xhr = new XMLHttpRequest();
+
+        xhr.onload = function() {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                var element = document.getElementById("blitz-inject-" + data.id);
+
+                if (element) {
+                    customEventInit.detail.element = element;
+                    customEventInit.detail.responseText = this.responseText;
+
+                    element.innerHTML = this.responseText;
+                }
+
+                document.dispatchEvent(new CustomEvent("afterBlitzInject", customEventInit));
             }
 
-            if (response.ok && element) {
-                element.innerHTML = responseText;
+            Blitz.inject.count++;
+
+            if (Blitz.inject.count >= Blitz.inject.data.length) {
+                document.dispatchEvent(new Event("afterBlitzInjectAll"));
             }
+        };
 
-            document.dispatchEvent(new CustomEvent("afterBlitzInject", blitzInjectEvent));
-        }));
-
-    document.dispatchEvent(new Event("afterBlitzInjectAll"));
+        xhr.open("GET", data.uri + (data.params && "?" + data.params));
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+        xhr.send();
+    });
 }

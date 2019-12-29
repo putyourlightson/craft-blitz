@@ -159,17 +159,19 @@ class BlitzVariable
     private function _getScript(string $uri, array $params = []): Markup
     {
         $view = Craft::$app->getView();
-
         $js = '';
 
         if ($this->_injected === 0) {
             $blitzInjectScript = Craft::getAlias('@putyourlightson/blitz/resources/js/blitzInjectScript.js');
-            $js .= file_exists($blitzInjectScript) ? file_get_contents($blitzInjectScript) : '';
+
+            if (file_exists($blitzInjectScript)) {
+                $js .= file_get_contents($blitzInjectScript);
+            }
         }
 
         $this->_injected++;
 
-        $js .= 'blitzInjectData.push({id: '.$this->_injected.', uri: "'.$uri.'", params: "'.http_build_query($params).'"});';
+        $js .= 'Blitz.inject.data.push({id: '.$this->_injected.', uri: "'.$uri.'", params: "'.http_build_query($params).'"});';
 
         $view->registerJs($js, View::POS_END);
 
