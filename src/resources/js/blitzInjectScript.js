@@ -1,7 +1,7 @@
 var Blitz = {
     inject: {
         data: [],
-        count: 0
+        loaded: 0
     }
 };
 
@@ -47,9 +47,9 @@ function blitzInject() {
                 document.dispatchEvent(new CustomEvent("afterBlitzInject", customEventInit));
             }
 
-            Blitz.inject.count++;
+            Blitz.inject.loaded++;
 
-            if (Blitz.inject.count >= Blitz.inject.data.length) {
+            if (Blitz.inject.loaded >= Blitz.inject.data.length) {
                 document.dispatchEvent(new Event("afterBlitzInjectAll"));
             }
         };
