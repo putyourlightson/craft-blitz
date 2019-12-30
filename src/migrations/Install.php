@@ -17,6 +17,7 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
+use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use Throwable;
 
 class Install extends Migration
@@ -93,6 +94,13 @@ class Install extends Migration
         if (!$this->db->tableExists(ElementQueryCacheRecord::tableName())) {
             $this->createTable(ElementQueryCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
+                'queryId' => $this->integer()->notNull(),
+            ]);
+        }
+
+        if (!$this->db->tableExists(ElementQuerySourceRecord::tableName())) {
+            $this->createTable(ElementQuerySourceRecord::tableName(), [
+                'sourceId' => $this->integer()->notNull(),
                 'queryId' => $this->integer()->notNull(),
             ]);
         }

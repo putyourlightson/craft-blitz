@@ -1,6 +1,5 @@
 <?php
 /**
- * @link      https://craftcampaign.com
  * @copyright Copyright (c) PutYourLightsOn
  */
 
@@ -41,7 +40,7 @@ class GenerateCacheTest extends Unit
     /**
      * @var string
      */
-    private $output;
+    private $output = 'xyz';
 
     // Protected methods
     // =========================================================================
@@ -59,8 +58,6 @@ class GenerateCacheTest extends Unit
             'siteId' => 1,
             'uri' => 'page',
         ]);
-
-        $this->output = 'xyz';
     }
 
     // Public methods

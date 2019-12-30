@@ -154,10 +154,15 @@ class GenerateCacheService extends Component
 
         if (!$queryId) {
             try {
+                // Get source ID of element query
+                $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
+                $sourceId = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : '';
+
                 $db->createCommand()
                     ->insert(ElementQueryRecord::tableName(), [
                         'index' => $index,
                         'type' => $elementQuery->elementType,
+                        'sourceId' => $sourceId,
                         'params' => $params,
                     ], false)
                     ->execute();

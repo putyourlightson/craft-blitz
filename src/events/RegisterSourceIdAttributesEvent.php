@@ -7,7 +7,7 @@ namespace putyourlightson\blitz\events;
 
 use yii\base\Event;
 
-class RegisterNonCacheableElementTypesEvent extends Event
+class RegisterSourceIdAttributesEvent extends Event
 {
     // Properties
     // =========================================================================
@@ -15,5 +15,5 @@ class RegisterNonCacheableElementTypesEvent extends Event
     /**
      * @var string[]
      */
-    public $elementTypes = [];
+    public $sourceIdAttributes = [];
 }
