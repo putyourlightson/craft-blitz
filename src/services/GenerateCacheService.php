@@ -144,7 +144,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Use DB connection so we can insert and exclude audit columns
+        // Use DB connection so we can exclude audit columns when inserting
         $db = Craft::$app->getDb();
 
         // Get element query record from index or create one if it does not exist
@@ -165,16 +165,31 @@ class GenerateCacheService extends Component
 
                 $queryId = $db->getLastInsertID();
 
-                // Add source ID
+                // Add source IDs
                 $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-                $sourceId = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
+                $elementQuerySourceId = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
+                $sourceIds = [null];
 
-                $db->createCommand()
-                    ->insert(ElementQuerySourceRecord::tableName(), [
-                        'sourceId' => $sourceId,
-                        'queryId' => $queryId,
-                    ], false)
-                    ->execute();
+                if (is_int($elementQuerySourceId)) {
+                    $sourceIds = [$elementQuerySourceId];
+                }
+
+                if (is_string($elementQuerySourceId)) {
+                    $sourceIds = StringHelper::split($elementQuerySourceId);
+                }
+
+                if (is_array($elementQuerySourceId) && stripos($elementQuerySourceId[0], 'not') !== 0) {
+                    $sourceIds = $elementQuerySourceId;
+                }
+
+                foreach ($sourceIds as $sourceId) {
+                    $db->createCommand()
+                        ->insert(ElementQuerySourceRecord::tableName(), [
+                            'sourceId' => $sourceId,
+                            'queryId' => $queryId,
+                        ], false)
+                        ->execute();
+                }
             }
             catch (Exception $e) {
                 Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
@@ -370,7 +385,7 @@ class GenerateCacheService extends Component
                 $value = $value[0] ?? null;
             }
 
-            if (is_int($value)) {
+            if (is_numeric($value)) {
                 return true;
             }
 
