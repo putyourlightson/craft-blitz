@@ -52,16 +52,14 @@ class RefreshCacheJob extends BaseJob
             Craft::t('blitz', 'Clearing cached pages.')
         );
 
-        $cacheIds = $this->cacheIds;
-
         // Merge in element cache IDs
         foreach ($this->elements as $elementType => $elementData) {
-            $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds'], $cacheIds);
+            $this->cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds'], $this->cacheIds);
         }
 
         // If clear cache is enabled then clear the site URIs now
         if ($this->clearCache) {
-            $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
+            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
@@ -70,7 +68,7 @@ class RefreshCacheJob extends BaseJob
             // If we have element IDs then loop through element queries to check for matches
             if (count($elementData['elementIds'])) {
                 $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
-                    $elementType, $elementData['sourceIds'], $cacheIds
+                    $elementType, $elementData['sourceIds'], $this->cacheIds
                 );
 
                 if ($total = count($elementQueryRecords)) {
@@ -82,7 +80,7 @@ class RefreshCacheJob extends BaseJob
                     foreach ($elementQueryRecords as $elementQueryRecord) {
                         // Merge in element query cache IDs
                         $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
-                            $elementQueryRecord, $elementData['elementIds'], $cacheIds
+                            $elementQueryRecord, $elementData['elementIds'], $this->cacheIds
                         );
 
                         $count++;
@@ -95,12 +93,12 @@ class RefreshCacheJob extends BaseJob
                     }
 
                     $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
-                    $cacheIds = array_merge($cacheIds, $elementQueryCacheIds);
+                    $this->cacheIds = array_merge($this->cacheIds, $elementQueryCacheIds);
                 }
             }
         }
 
-        if (empty($cacheIds)) {
+        if (empty($this->cacheIds)) {
             return;
         }
 
@@ -111,12 +109,12 @@ class RefreshCacheJob extends BaseJob
                 Craft::t('blitz', 'Clearing cached pages.')
             );
 
-            $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
+            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
             Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
         }
         else {
-            Blitz::$plugin->refreshCache->expireCacheIds($cacheIds);
+            Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
         }
     }
 

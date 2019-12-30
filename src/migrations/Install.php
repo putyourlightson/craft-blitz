@@ -48,6 +48,7 @@ class Install extends Migration
     public function safeDown(): bool
     {
         $this->dropTableIfExists(DriverDataRecord::tableName());
+        $this->dropTableIfExists(ElementQuerySourceRecord::tableName());
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
         $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementCacheRecord::tableName());
@@ -100,7 +101,7 @@ class Install extends Migration
 
         if (!$this->db->tableExists(ElementQuerySourceRecord::tableName())) {
             $this->createTable(ElementQuerySourceRecord::tableName(), [
-                'sourceId' => $this->integer()->notNull(),
+                'sourceId' => $this->integer(),
                 'queryId' => $this->integer()->notNull(),
             ]);
         }
@@ -147,6 +148,7 @@ class Install extends Migration
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'elementId', true);
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate', false);
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
+        $this->createIndex(null, ElementQuerySourceRecord::tableName(), ['sourceId', 'queryId'], true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag', false);
@@ -165,6 +167,7 @@ class Install extends Migration
         $this->addForeignKey(null, ElementExpiryDateRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementQuerySourceRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, CacheTagRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
     }
 }

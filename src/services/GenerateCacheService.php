@@ -21,6 +21,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use yii\db\Exception;
 use yii\log\Logger;
 
@@ -154,20 +155,26 @@ class GenerateCacheService extends Component
 
         if (!$queryId) {
             try {
-                // Get source ID of element query
-                $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-                $sourceId = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : '';
-
                 $db->createCommand()
                     ->insert(ElementQueryRecord::tableName(), [
                         'index' => $index,
                         'type' => $elementQuery->elementType,
-                        'sourceId' => $sourceId,
                         'params' => $params,
                     ], false)
                     ->execute();
 
                 $queryId = $db->getLastInsertID();
+
+                // Add source ID
+                $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
+                $sourceId = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
+
+                $db->createCommand()
+                    ->insert(ElementQuerySourceRecord::tableName(), [
+                        'sourceId' => $sourceId,
+                        'queryId' => $queryId,
+                    ], false)
+                    ->execute();
             }
             catch (Exception $e) {
                 Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');

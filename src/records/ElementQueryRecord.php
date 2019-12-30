@@ -15,7 +15,7 @@ use yii\db\ActiveQueryInterface;
  * @property string $sourceId
  * @property string $params
  * @property ElementQueryCacheRecord[] $elementQueryCaches
- * @property ElementQuerySourceRecord[] $elementQuerySource
+ * @property ElementQuerySourceRecord[] $elementQuerySources
  */
 class ElementQueryRecord extends ActiveRecord
 {

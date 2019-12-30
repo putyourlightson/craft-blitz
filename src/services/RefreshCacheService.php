@@ -67,12 +67,12 @@ class RefreshCacheService extends Component
     /**
      * @var int[]
      */
-    private $_cacheIds = [];
+    public $cacheIds = [];
 
     /**
      * @var array
      */
-    private $_elements = [];
+    public $elements = [];
 
     // Public Methods
     // =========================================================================
@@ -114,9 +114,8 @@ class RefreshCacheService extends Component
         return ElementQueryRecord::find()
             ->select(['id', 'type', 'params'])
             ->where(['type' => $elementType])
-            ->andWhere(['sourceId' => $sourceIds])
             ->innerJoinWith([
-                'elementQuerySourceIds' => function(ActiveQuery $query) use ($sourceIds) {
+                'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
                     $query->where(['sourceId' => $sourceIds])
                         ->orWhere(['sourceId' => null]);
                 }
@@ -136,7 +135,7 @@ class RefreshCacheService extends Component
      */
     public function addCacheIds(ElementInterface $element)
     {
-        $this->_cacheIds = $this->getElementCacheIds([$element->getId()], $this->_cacheIds);
+        $this->cacheIds = $this->getElementCacheIds([$element->getId()], $this->cacheIds);
     }
 
     /**
@@ -182,18 +181,18 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $this->_elements[$elementType] = $this->_elements[$elementType] ?? [
+        $this->elements[$elementType] = $this->elements[$elementType] ?? [
             'elementIds' => [],
             'sourceIds' => [],
         ];
 
         // Don't proceed if element has already been added
-        if (in_array($element->getId(), $this->_elements[$elementType]['elementIds'])) {
+        if (in_array($element->getId(), $this->elements[$elementType]['elementIds'])) {
             return;
         }
 
         // Add element
-        $this->_elements[$elementType]['elementIds'][] = $element->getId();
+        $this->elements[$elementType]['elementIds'][] = $element->getId();
 
         // Add source ID
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
@@ -201,8 +200,8 @@ class RefreshCacheService extends Component
         if ($sourceIdAttribute !== null) {
             $sourceId = $element->$sourceIdAttribute;
 
-            if (!in_array($sourceId, $this->_elements[$elementType]['sourceIds'])) {
-                $this->_elements[$elementType]['sourceIds'][] = $sourceId;
+            if (!in_array($sourceId, $this->elements[$elementType]['sourceIds'])) {
+                $this->elements[$elementType]['sourceIds'][] = $sourceId;
             }
         }
 
@@ -330,13 +329,13 @@ class RefreshCacheService extends Component
      */
     public function refresh(bool $forceClear = false)
     {
-        if (empty($this->_cacheIds) && empty($this->_elementIds)) {
+        if (empty($this->cacheIds) && empty($this->elements)) {
             return;
         }
 
         $refreshCacheJob = new RefreshCacheJob([
-            'cacheIds' => $this->_cacheIds,
-            'elements' => $this->_elements,
+            'cacheIds' => $this->cacheIds,
+            'elements' => $this->elements,
             'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
         ]);
 
@@ -421,7 +420,7 @@ class RefreshCacheService extends Component
             ->where(['<', 'expiryDate', $now])
             ->column();
 
-        $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
+        $this->cacheIds = array_merge($this->cacheIds, $cacheIds);
 
         // Check for expired elements to invalidate
         $elementExpiryDates = ElementExpiryDateRecord::find()
@@ -470,7 +469,7 @@ class RefreshCacheService extends Component
         // Check for tagged cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
-        $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
+        $this->cacheIds = array_merge($this->cacheIds, $cacheIds);
 
         $this->refresh(true);
     }
