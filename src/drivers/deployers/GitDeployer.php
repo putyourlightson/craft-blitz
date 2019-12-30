@@ -15,8 +15,6 @@ use GitWrapper\GitException;
 use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\events\RefreshCacheEvent;
-use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use Symfony\Component\Process\Process;
 use yii\base\ErrorException;

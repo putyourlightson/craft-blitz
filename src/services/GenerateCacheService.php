@@ -51,12 +51,12 @@ class GenerateCacheService extends Component
     /**
      * @var int[]
      */
-    private $_elementCaches = [];
+    public $elementCaches = [];
 
     /**
      * @var int[]
      */
-    private $_elementQueryCaches = [];
+    public $elementQueryCaches = [];
 
     /**
      * @var array
@@ -96,8 +96,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        if (!in_array($element->getId(), $this->_elementCaches)) {
-            $this->_elementCaches[] = $element->getId();
+        if (!in_array($element->getId(), $this->elementCaches)) {
+            $this->elementCaches[] = $element->getId();
         }
     }
 
@@ -181,8 +181,8 @@ class GenerateCacheService extends Component
             }
         }
 
-        if ($queryId && !in_array($queryId, $this->_elementQueryCaches)) {
-            $this->_elementQueryCaches[] = $queryId;
+        if ($queryId && !in_array($queryId, $this->elementQueryCaches)) {
+            $this->elementQueryCaches[] = $queryId;
         }
 
         $mutex->release($lockName);
@@ -240,7 +240,7 @@ class GenerateCacheService extends Component
         // Add element caches to database
         $values = [];
 
-        foreach ($this->_elementCaches as $elementId) {
+        foreach ($this->elementCaches as $elementId) {
             $values[] = [$cacheId, $elementId];
         }
 
@@ -254,7 +254,7 @@ class GenerateCacheService extends Component
         // Add element query caches to database
         $values = [];
 
-        foreach ($this->_elementQueryCaches as $queryId) {
+        foreach ($this->elementQueryCaches as $queryId) {
             $values[] = [$cacheId, $queryId];
         }
 

@@ -13,9 +13,12 @@ use crafttests\fixtures\EntryFixture;
 use DateInterval;
 use DateTime;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use UnitTester;
 
 /**
@@ -120,6 +123,49 @@ class RefreshCacheTest extends Unit
         $this->assertEquals(2, count($cacheIds));
     }
 
+    public function testGetElementTypeQueries()
+    {
+        // Add element queries and save
+        $elementQuery1 = Entry::find();
+        $elementQuery2 = Entry::find()->sectionId($this->entry1->sectionId);
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery1);
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery2);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        // Add a rogue element query (without a cache ID)
+        $db = Craft::$app->getDb();
+        $db->createCommand()
+            ->insert(ElementQueryRecord::tableName(), [
+                'index' => 1234567890,
+                'type' => Entry::class,
+                'params' => '[]',
+            ], false)
+            ->execute();
+        $queryId = $db->getLastInsertID();
+
+        // Add source ID
+        $db->createCommand()
+            ->insert(ElementQuerySourceRecord::tableName(), [
+                'sourceId' => $this->entry1->sectionId,
+                'queryId' => $queryId,
+            ], false)
+            ->execute();
+
+        $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
+            Entry::class, [$this->entry1->sectionId], []
+        );
+
+        // Assert that two element type queries were returned
+        $this->assertEquals(2, count($elementTypeQueries));
+
+        $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
+            Entry::class, [$this->entry2->sectionId], []
+        );
+
+        // Assert that one element type query was returned
+        $this->assertEquals(1, count($elementTypeQueries));
+    }
+
     public function testAddElement()
     {
         Blitz::$plugin->refreshCache->elements = [];
@@ -165,30 +211,6 @@ class RefreshCacheTest extends Unit
             Db::prepareDateForDb($this->entry1->postDate),
             $elementExpiryDateRecord->expiryDate
         );
-    }
-
-    public function testGetElementTypeQueries()
-    {
-        // Add element queries and save
-        $elementQuery1 = Entry::find();
-        $elementQuery2 = Entry::find()->sectionId($this->entry1->sectionId);
-        Blitz::$plugin->generateCache->addElementQuery($elementQuery1);
-        Blitz::$plugin->generateCache->addElementQuery($elementQuery2);
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-
-        $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
-            Entry::class, [$this->entry1->sectionId], []
-        );
-
-        // Assert that two element type queries were returned
-        $this->assertEquals(2, count($elementTypeQueries));
-
-        $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
-            Entry::class, [$this->entry2->sectionId], []
-        );
-
-        // Assert that one element type query was returned
-        $this->assertEquals(1, count($elementTypeQueries));
     }
 
     public function testRefreshCacheJob()

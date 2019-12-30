@@ -10,7 +10,6 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\elements\Tag;
-use craft\elements\User;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use putyourlightson\blitz\events\RegisterSourceIdAttributesEvent;

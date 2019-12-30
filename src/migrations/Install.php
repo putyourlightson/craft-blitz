@@ -9,7 +9,6 @@ use Craft;
 use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
-use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
