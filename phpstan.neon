@@ -4,4 +4,3 @@ parameters:
 		- %currentWorkingDirectory%/vendor/craftcms/cms/src/Craft.php
 	ignoreErrors:
 		- '#Call to an undefined method yii\\db\\ActiveQueryInterface::select\(\).#'
-		- '#Call to method wait\(\) on an unknown class GuzzleHttp\\GuzzleHttp\\Promise\\Promise.#'

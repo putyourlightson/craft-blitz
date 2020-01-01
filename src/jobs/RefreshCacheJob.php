@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\jobs;
 
 use Craft;
 use craft\base\Element;
+use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
 use craft\queue\BaseJob;
@@ -64,6 +65,7 @@ class RefreshCacheJob extends BaseJob
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
+        /** @var ElementInterface|string $elementType */
         foreach ($this->elements as $elementType => $elementData) {
             // If we have element IDs then loop through element queries to check for matches
             if (count($elementData['elementIds'])) {
@@ -85,9 +87,10 @@ class RefreshCacheJob extends BaseJob
 
                         $count++;
                         $this->setProgress($queue, $count / $total,
-                            Craft::t('blitz', 'Checking {count} of {total} element queries.', [
+                            Craft::t('blitz', 'Checking {count} of {total} {elementType} queries.', [
                                 'count' => $count,
                                 'total' => $total,
+                                'elementType' => $elementType::lowerDisplayName()
                             ])
                         );
                     }
