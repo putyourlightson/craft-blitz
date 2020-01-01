@@ -9,12 +9,10 @@ use Craft;
 use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
-use craft\elements\db\ElementQueryInterface;
-use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
-use DateTime;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -24,7 +22,6 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use yii\db\Exception;
-use yii\log\Logger;
 
 class GenerateCacheService extends Component
 {
@@ -58,11 +55,6 @@ class GenerateCacheService extends Component
      * @var int[]
      */
     public $elementQueryCaches = [];
-
-    /**
-     * @var array
-     */
-    private $_defaultElementQueryParams = [];
 
     // Public Methods
     // =========================================================================
@@ -124,7 +116,7 @@ class GenerateCacheService extends Component
         }
 
         // Don't proceed if the query has fixed IDs
-        if ($this->_hasFixedIds($elementQuery)) {
+        if (ElementQueryHelper::hasFixedIds($elementQuery)) {
             return;
         }
 
@@ -143,7 +135,7 @@ class GenerateCacheService extends Component
      */
     public function saveElementQuery(ElementQuery $elementQuery)
     {
-        $params = json_encode($this->_getUniqueElementQueryParams($elementQuery));
+        $params = json_encode(ElementQueryHelper::getUniqueParams($elementQuery));
 
         // Create a unique index from the element type and parameters for quicker indexing and less storage
         $index = sprintf('%u', crc32($elementQuery->elementType.$params));
@@ -206,7 +198,7 @@ class GenerateCacheService extends Component
         $sourceIds = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
 
         // Normalize source IDs
-        $sourceIds = $this->_getNormalizedElementQueryIdParam($sourceIds);
+        $sourceIds = ElementQueryHelper::getNormalizedIdParam($sourceIds);
 
         // Convert to an array
         if (!is_array($sourceIds)) {
@@ -318,193 +310,5 @@ class GenerateCacheService extends Component
         Blitz::$plugin->cacheStorage->save($output, $siteUri);
 
         $mutex->release($lockName);
-    }
-
-    // Private Methods
-    // =========================================================================
-
-    /**
-     * Returns an element query's default parameters for a given element type.
-     *
-     * @param string $elementType
-     *
-     * @return array
-     */
-    private function _getDefaultElementQueryParams(string $elementType): array
-    {
-        if (!empty($this->_defaultElementQueryParams[$elementType])) {
-            return $this->_defaultElementQueryParams[$elementType];
-        }
-
-        $this->_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
-
-        $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
-
-        foreach ($ignoreParams as $key) {
-            unset($this->_defaultElementQueryParams[$elementType][$key]);
-        }
-
-        return $this->_defaultElementQueryParams[$elementType];
-    }
-
-    /**
-     * Returns the element query's unique parameters.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return array
-     */
-    private function _getUniqueElementQueryParams(ElementQuery $elementQuery): array
-    {
-        $params = [];
-
-        $defaultParams = $this->_getDefaultElementQueryParams($elementQuery->elementType);
-
-        foreach ($defaultParams as $key => $default) {
-            $value = $elementQuery->{$key};
-
-            if ($value !== $default) {
-                $params[$key] = $value;
-            }
-        }
-
-        // Ignore specific empty params as they are redundant
-        $ignoreEmptyParams = ['structureId', 'orderBy'];
-
-        foreach ($ignoreEmptyParams as $key) {
-            // Use `array_key_exists` rather than `isset` as it will return `true` for null results
-            if (array_key_exists($key, $params) && empty($params[$key])) {
-                unset($params[$key]);
-            }
-        }
-
-        // Convert ID parameters to arrays
-        foreach ($params as $key => $value) {
-            if ($key == 'id' || substr($key, -2) == 'Id') {
-                $params[$key] = $this->_getNormalizedElementQueryIdParam($value);
-            }
-        }
-
-        // Convert the query parameter values recursively
-        array_walk_recursive($params, [$this, '_convertQueryParamsRecursively']);
-
-        return $params;
-    }
-
-    /**
-     * Returns a normalized element query ID parameter.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
-     */
-    private function _getNormalizedElementQueryIdParam($value)
-    {
-        if ($value === null || is_int($value)) {
-            return $value;
-        }
-
-        /**
-         * Copied from Db helper
-         * @see \craft\helpers\Db::_toArray
-         */
-        if (is_string($value)) {
-            // Split it on the non-escaped commas
-            $value = preg_split('/(?<!\\\),/', $value);
-
-            // Remove any of the backslashes used to escape the commas
-            foreach ($value as $key => $val) {
-                // Remove leading/trailing whitespace
-                $val = trim($val);
-
-                // Remove any backslashes used to escape commas
-                $val = str_replace('\,', ',', $val);
-
-                $value[$key] = $val;
-            }
-
-            // Remove any empty elements and reset the keys
-            $value = array_values(ArrayHelper::filterEmptyStringsFromArray($value));
-        }
-
-        if (is_array($value)) {
-            // Convert numeric strings to integers
-            foreach ($value as $key => $val) {
-                if (is_string($val) && is_numeric($val)) {
-                    $value[$key] = (int)$val;
-                }
-            }
-
-            // If there is only a single value in the array then set the value to it
-            if (count($value) === 1) {
-                $value = reset($value);
-            }
-        }
-
-        return $value;
-    }
-
-    /**
-     * Returns whether the element query has fixed IDs.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return bool
-     */
-    private function _hasFixedIds(ElementQuery $elementQuery): bool
-    {
-        // The query values to check
-        $values = [
-            $elementQuery->id,
-            $elementQuery->uid,
-            $elementQuery->where['elements.id'] ?? null,
-            $elementQuery->where['elements.uid'] ?? null,
-        ];
-
-        foreach ($values as $value) {
-            if (empty($value)) {
-                continue;
-            }
-
-            if (is_array($value)) {
-                $value = $value[0] ?? null;
-            }
-
-            if (is_numeric($value)) {
-                return true;
-            }
-
-            if (is_string($value) && stripos($value, 'not') !== 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Converts query parameter values to more concise formats recursively.
-     *
-     * @param mixed $value
-     */
-    private function _convertQueryParamsRecursively(&$value)
-    {
-        // Convert elements to their ID
-        if ($value instanceof ElementInterface) {
-            $value = $value->getId();
-            return;
-        }
-
-        // Convert element queries to element IDs
-        if ($value instanceof ElementQueryInterface) {
-            $value = $value->ids();
-            return;
-        }
-
-        // Convert DateTime objects to Unix timestamp
-        if ($value instanceof DateTime) {
-            $value = $value->getTimestamp();
-            return;
-        }
     }
 }

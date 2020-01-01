@@ -98,7 +98,7 @@ class ElementTypeHelper
         if ($elementType === null) {
             return null;
         }
-        
+
         $sourceIdAttributes = self::getSourceIdAttributes();
 
         return $sourceIdAttributes[$elementType] ?? null;
