@@ -71,7 +71,7 @@ class ElementTypeHelper
      *
      * @return bool
      */
-    public static function getIsCacheableElementType(string $elementType): bool
+    public static function getIsCacheableElementType($elementType): bool
     {
         if ($elementType === null) {
             return false;

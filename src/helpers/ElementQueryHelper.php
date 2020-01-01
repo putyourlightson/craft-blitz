@@ -10,8 +10,6 @@ use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use DateTime;
-use putyourlightson\blitz\records\ElementQueryRecord;
-use yii\db\ActiveQuery;
 
 class ElementQueryHelper
 {
@@ -65,7 +63,7 @@ class ElementQueryHelper
         }
 
         // Convert the query parameter values recursively
-        array_walk_recursive($params, [__CLASS__ , '_convertQueryParamsRecursively']);
+        array_walk_recursive($params, [__CLASS__, '_convertQueryParamsRecursively']);
 
         return $params;
     }
@@ -73,12 +71,16 @@ class ElementQueryHelper
     /**
      * Returns an element query's default parameters for a given element type.
      *
-     * @param string $elementType
+     * @param string|null $elementType
      *
      * @return array
      */
-    public static function getDefaultElementQueryParams(string $elementType): array
+    public static function getDefaultElementQueryParams($elementType): array
     {
+        if ($elementType === null) {
+            return [];
+        }
+
         if (!empty(self::$_defaultElementQueryParams[$elementType])) {
             return self::$_defaultElementQueryParams[$elementType];
         }

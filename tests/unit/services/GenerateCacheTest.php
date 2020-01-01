@@ -100,7 +100,11 @@ class GenerateCacheTest extends Unit
     public function testElementQueryRecordsSaved()
     {
         $elementQueries = [
-            Entry::find(),
+            [
+                Entry::find(),
+                Entry::find()->limit(''),
+                Entry::find()->offset(0),
+            ],
             Entry::find()->id('not 1'),
             [
                 Entry::find()->id(['not', 1]),
@@ -111,6 +115,10 @@ class GenerateCacheTest extends Unit
                 Entry::find()->sectionId('1'),
                 Entry::find()->sectionId([1]),
                 Entry::find()->sectionId(['1']),
+            ],
+            [
+                Entry::find()->sectionId('1, 2'),
+                Entry::find()->sectionId([1, 2]),
             ],
         ];
 
