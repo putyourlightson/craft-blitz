@@ -4,6 +4,9 @@
 ### Added
 - Added source IDs to element queries for more performant refresh cache jobs.
 
+### Changed
+- Element query ID parameters are now normalized for more performant refresh cache jobs.
+
 ## 3.0.3 - 2019-12-30
 ### Added
 - Added `beforeBlitzInject`, `afterBlitzInject`, `beforeBlitzInjectAll`, `afterBlitzInjectAll` events to inject script.
