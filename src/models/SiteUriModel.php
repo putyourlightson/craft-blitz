@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\models;
 
 use craft\base\Model;
 use craft\helpers\UrlHelper;
-use putyourlightson\blitz\Blitz;
 
 /**
  * @property string $url

@@ -24,7 +24,7 @@ class CacheWarmerHelper extends BaseDriverHelper
      */
     const EVENT_REGISTER_WARMER_TYPES = 'registerWarmerTypes';
 
-    // Static
+    // Public Methods
     // =========================================================================
 
     /**

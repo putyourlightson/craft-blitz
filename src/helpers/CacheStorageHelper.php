@@ -22,7 +22,7 @@ class CacheStorageHelper extends BaseDriverHelper
      */
     const EVENT_REGISTER_STORAGE_TYPES = 'registerStorageTypes';
 
-    // Static
+    // Public Methods
     // =========================================================================
 
     /**

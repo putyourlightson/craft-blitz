@@ -67,17 +67,12 @@ class RefreshCacheService extends Component
     /**
      * @var int[]
      */
-    private $_cacheIds = [];
+    public $cacheIds = [];
 
     /**
-     * @var int[]
+     * @var array
      */
-    private $_elementIds = [];
-
-    /**
-     * @var string[]
-     */
-    private $_elementTypes = [];
+    public $elements = [];
 
     // Public Methods
     // =========================================================================
@@ -103,20 +98,26 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Returns cache IDs from entry queries of the provided element types that
-     * contain the provided element IDs, ignoring the provided cache IDs.
+     * Returns element queries of the provided element type that can be joined
+     * with the provided source IDs, ignoring the provided cache IDs.
      *
-     * @param string[] $elementTypes
+     * @param string $elementType
+     * @param int[] $sourceIds
      * @param int[] $ignoreCacheIds
      *
      * @return ElementQueryRecord[]
      */
-    public function getElementTypeQueries(array $elementTypes, array $ignoreCacheIds): array
+    public function getElementTypeQueries(string $elementType, array $sourceIds, array $ignoreCacheIds): array
     {
-        // Get element query records of the provided element types without the cache IDs and without eager loading
+        // Get element query records without eager loading
         return ElementQueryRecord::find()
-            ->select(['id', 'type', 'params'])
-            ->where(['type' => $elementTypes])
+            ->where(['type' => $elementType])
+            ->innerJoinWith([
+                'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
+                    $query->where(['sourceId' => $sourceIds])
+                        ->orWhere(['sourceId' => null]);
+                }
+            ], false)
             ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
                     $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
@@ -132,7 +133,7 @@ class RefreshCacheService extends Component
      */
     public function addCacheIds(ElementInterface $element)
     {
-        $this->_cacheIds = $this->getElementCacheIds([$element->getId()], $this->_cacheIds);
+        $this->cacheIds = $this->getElementCacheIds([$element->getId()], $this->cacheIds);
     }
 
     /**
@@ -178,20 +179,28 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Cast ID to integer to ensure the strict type check below works
-        $elementId = (int)$element->getId();
+        $this->elements[$elementType] = $this->elements[$elementType] ?? [
+            'elementIds' => [],
+            'sourceIds' => [],
+        ];
 
         // Don't proceed if element has already been added
-        if (in_array($elementId, $this->_elementIds, true)) {
+        if (in_array($element->getId(), $this->elements[$elementType]['elementIds'])) {
             return;
         }
 
         // Add element
-        $this->_elementIds[] = $elementId;
+        $this->elements[$elementType]['elementIds'][] = $element->getId();
 
-        // Add element type
-        if (!in_array($elementType, $this->_elementTypes, true)) {
-            $this->_elementTypes[] = $elementType;
+        // Add source ID
+        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
+
+        if ($sourceIdAttribute !== null) {
+            $sourceId = $element->$sourceIdAttribute;
+
+            if (!in_array($sourceId, $this->elements[$elementType]['sourceIds'])) {
+                $this->elements[$elementType]['sourceIds'][] = $sourceId;
+            }
         }
 
         // Add element expiry dates
@@ -318,14 +327,13 @@ class RefreshCacheService extends Component
      */
     public function refresh(bool $forceClear = false)
     {
-        if (empty($this->_cacheIds) && empty($this->_elementIds)) {
+        if (empty($this->cacheIds) && empty($this->elements)) {
             return;
         }
 
         $refreshCacheJob = new RefreshCacheJob([
-            'cacheIds' => $this->_cacheIds,
-            'elementIds' => $this->_elementIds,
-            'elementTypes' => $this->_elementTypes,
+            'cacheIds' => $this->cacheIds,
+            'elements' => $this->elements,
             'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
         ]);
 
@@ -410,7 +418,7 @@ class RefreshCacheService extends Component
             ->where(['<', 'expiryDate', $now])
             ->column();
 
-        $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
+        $this->cacheIds = array_merge($this->cacheIds, $cacheIds);
 
         // Check for expired elements to invalidate
         $elementExpiryDates = ElementExpiryDateRecord::find()
@@ -459,7 +467,7 @@ class RefreshCacheService extends Component
         // Check for tagged cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
-        $this->_cacheIds = array_merge($this->_cacheIds, $cacheIds);
+        $this->cacheIds = array_merge($this->cacheIds, $cacheIds);
 
         $this->refresh(true);
     }

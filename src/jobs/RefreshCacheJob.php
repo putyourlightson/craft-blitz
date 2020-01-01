@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\jobs;
 
 use Craft;
 use craft\base\Element;
+use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
 use craft\queue\BaseJob;
@@ -27,14 +28,9 @@ class RefreshCacheJob extends BaseJob
     public $cacheIds = [];
 
     /**
-     * @var int[]
+     * @var array
      */
-    public $elementIds = [];
-
-    /**
-     * @var string[]
-     */
-    public $elementTypes = [];
+    public $elements = [];
 
     /**
      * @var bool
@@ -46,6 +42,7 @@ class RefreshCacheJob extends BaseJob
 
     /**
      * @inheritdoc
+     *
      * @throws Exception
      * @throws Throwable
      */
@@ -57,50 +54,54 @@ class RefreshCacheJob extends BaseJob
         );
 
         // Merge in element cache IDs
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($this->elementIds, $this->cacheIds);
+        foreach ($this->elements as $elementType => $elementData) {
+            $this->cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds'], $this->cacheIds);
+        }
 
         // If clear cache is enabled then clear the site URIs now
         if ($this->clearCache) {
-            $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
+            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
-        // If we have element IDs then loop through element queries to check for matches
-        if (count($this->elementIds)) {
-            $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
-                $this->elementTypes, $cacheIds
-            );
+        /** @var ElementInterface|string $elementType */
+        foreach ($this->elements as $elementType => $elementData) {
+            // If we have element IDs then loop through element queries to check for matches
+            if (count($elementData['elementIds'])) {
+                $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
+                    $elementType, $elementData['sourceIds'], $this->cacheIds
+                );
 
-            if (count($elementQueryRecords)) {
-                // Set progress total to number of query records plus one to avoid dividing by zero
-                $total = count($elementQueryRecords) + 1;
-                $count = 0;
+                if ($total = count($elementQueryRecords)) {
+                    $count = 0;
 
-                // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
-                $elementQueryCacheIdSets = [[]];
+                    // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
+                    $elementQueryCacheIdSets = [[]];
 
-                foreach ($elementQueryRecords as $elementQueryRecord) {
-                    // Merge in element query cache IDs
-                    $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
-                        $elementQueryRecord, $this->elementIds, $cacheIds
-                    );
+                    foreach ($elementQueryRecords as $elementQueryRecord) {
+                        // Merge in element query cache IDs
+                        $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
+                            $elementQueryRecord, $elementData['elementIds'], $this->cacheIds
+                        );
 
-                    $count++;
-                    $this->setProgress($queue, $count / $total,
-                        Craft::t('blitz', 'Checking {count} of {total} element queries.', [
-                            'count' => $count,
-                            'total' => $total,
-                        ])
-                    );
+                        $count++;
+                        $this->setProgress($queue, $count / $total,
+                            Craft::t('blitz', 'Checking {count} of {total} {elementType} queries.', [
+                                'count' => $count,
+                                'total' => $total,
+                                'elementType' => $elementType::lowerDisplayName()
+                            ])
+                        );
+                    }
+
+                    $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
+                    $this->cacheIds = array_merge($this->cacheIds, $elementQueryCacheIds);
                 }
-
-                $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
-                $cacheIds = array_merge($cacheIds, $elementQueryCacheIds);
             }
         }
 
-        if (empty($cacheIds)) {
+        if (empty($this->cacheIds)) {
             return;
         }
 
@@ -111,12 +112,12 @@ class RefreshCacheJob extends BaseJob
                 Craft::t('blitz', 'Clearing cached pages.')
             );
 
-            $siteUris = SiteUriHelper::getCachedSiteUris($cacheIds);
+            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
             Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
         }
         else {
-            Blitz::$plugin->refreshCache->expireCacheIds($cacheIds);
+            Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
         }
     }
 
@@ -146,12 +147,12 @@ class RefreshCacheJob extends BaseJob
      */
     private function _getElementQueryCacheIds(ElementQueryRecord $elementQueryRecord, array $elementIds, array $ignoreCacheIds): array
     {
-        $cacheIds = [];
-
         // Ensure class still exists as a plugin may have been removed since being saved
         if (!class_exists($elementQueryRecord->type)) {
             return [];
         }
+
+        $cacheIds = [];
 
         /** @var Element $elementType */
         $elementType = $elementQueryRecord->type;
@@ -163,7 +164,7 @@ class RefreshCacheJob extends BaseJob
 
         // If json decode failed
         if (!is_array($params)) {
-            return $cacheIds;
+            return [];
         }
 
         foreach ($params as $key => $val) {
@@ -184,11 +185,11 @@ class RefreshCacheJob extends BaseJob
 
         if (!empty(array_intersect($elementIds, $elementQueryIds))) {
             // Get related element query cache records
-            $elementQueryCacheRecords = $elementQueryRecord->elementQueryCaches;
+            $elementQueryCacheRecords = $elementQueryRecord->getElementQueryCaches()->all();
 
             // Add cache IDs to the array that do not already exist
             foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
-                if (!in_array($elementQueryCacheRecord->cacheId, $ignoreCacheIds, true)) {
+                if (!in_array($elementQueryCacheRecord->cacheId, $ignoreCacheIds)) {
                     $cacheIds[] = $elementQueryCacheRecord->cacheId;
                 }
             }

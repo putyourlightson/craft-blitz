@@ -138,12 +138,14 @@ return [
         // The amount of time after which the cache should expire (if not 0). See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
         //'cacheDuration' => 0,
 
-        // Element types that should not be cached.
+        // Element types that should not be cached (in addition to the defaults).
         //'nonCacheableElementTypes' => [
-        //    'craft\elements\GlobalSet',
-        //    'craft\elements\MatrixBlock',
-        //    'benf\neo\elements\Block',
         //    'putyourlightson\campaign\elements\ContactElement',
+        //],
+
+        // Source ID attributes for element types (in addition to the defaults).
+        //'sourceIdAttributes' => [
+        //    'putyourlightson\campaign\elements\CampaignElement' => 'campaignTypeId',
         //],
 
         // The integrations to initialise.

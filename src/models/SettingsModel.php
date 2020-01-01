@@ -193,9 +193,14 @@ class SettingsModel extends Model
     public $cacheDuration;
 
     /**
-     * @var string[] Element types that should not be cached.
+     * @var string[] Element types that should not be cached (in addition to the defaults).
      */
     public $nonCacheableElementTypes = [];
+
+    /**
+     * @var string[] Source ID attributes for element types (in addition to the defaults).
+     */
+    public $sourceIdAttributes = [];
 
     /**
      * @var string[] The integrations to initialise.

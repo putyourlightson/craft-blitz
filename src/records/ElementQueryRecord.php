@@ -14,6 +14,7 @@ use yii\db\ActiveQueryInterface;
  * @property string $type
  * @property string $params
  * @property ElementQueryCacheRecord[] $elementQueryCaches
+ * @property ElementQuerySourceRecord[] $elementQuerySources
  */
 class ElementQueryRecord extends ActiveRecord
 {
@@ -38,5 +39,15 @@ class ElementQueryRecord extends ActiveRecord
     public function getElementQueryCaches(): ActiveQueryInterface
     {
         return $this->hasMany(ElementQueryCacheRecord::class, ['queryId' => 'id']);
+    }
+
+    /**
+     * Returns the associated element query sources
+     *
+     * @return ActiveQueryInterface
+     */
+    public function getElementQuerySources(): ActiveQueryInterface
+    {
+        return $this->hasMany(ElementQuerySourceRecord::class, ['queryId' => 'id']);
     }
 }

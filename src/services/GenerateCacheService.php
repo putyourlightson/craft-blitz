@@ -9,11 +9,11 @@ use Craft;
 use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
-use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
-use DateTime;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\SaveCacheEvent;
+use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -21,13 +21,23 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use yii\db\Exception;
-use yii\log\Logger;
 
 class GenerateCacheService extends Component
 {
     // Constants
     // =========================================================================
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_BEFORE_SAVE_CACHE = 'beforeSaveCache';
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_SAVE_CACHE = 'afterSaveCache';
 
     /**
      * @const string
@@ -50,17 +60,12 @@ class GenerateCacheService extends Component
     /**
      * @var int[]
      */
-    private $_elementCaches = [];
+    public $elementCaches = [];
 
     /**
      * @var int[]
      */
-    private $_elementQueryCaches = [];
-
-    /**
-     * @var array
-     */
-    private $_defaultElementQueryParams = [];
+    public $elementQueryCaches = [];
 
     // Public Methods
     // =========================================================================
@@ -95,8 +100,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        if (!in_array($element->getId(), $this->_elementCaches)) {
-            $this->_elementCaches[] = $element->getId();
+        if (!in_array($element->getId(), $this->elementCaches)) {
+            $this->elementCaches[] = $element->getId();
         }
     }
 
@@ -108,21 +113,17 @@ class GenerateCacheService extends Component
     public function addElementQuery(ElementQuery $elementQuery)
     {
         // Don't proceed if element query caching is disabled
-        if (!Blitz::$plugin->settings->cacheElementQueries
-            || !$this->options->cacheElementQueries
-        ) {
+        if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
             return;
         }
 
         // Don't proceed if not a cacheable element type
-        if (empty($elementQuery->elementType)
-            || !ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)
-        ) {
+        if (!ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)) {
             return;
         }
 
         // Don't proceed if the query has fixed IDs
-        if ($this->_hasFixedIds($elementQuery)) {
+        if (ElementQueryHelper::hasFixedIds($elementQuery)) {
             return;
         }
 
@@ -131,7 +132,17 @@ class GenerateCacheService extends Component
             return;
         }
 
-        $params = json_encode($this->_getUniqueElementQueryParams($elementQuery));
+        $this->saveElementQuery($elementQuery);
+    }
+
+    /**
+     * Saves an element query.
+     *
+     * @param ElementQuery $elementQuery
+     */
+    public function saveElementQuery(ElementQuery $elementQuery)
+    {
+        $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
 
         // Create a unique index from the element type and parameters for quicker indexing and less storage
         $index = sprintf('%u', crc32($elementQuery->elementType.$params));
@@ -143,7 +154,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Use DB connection so we can insert and exclude audit columns
+        // Use DB connection so we can exclude audit columns when inserting
         $db = Craft::$app->getDb();
 
         // Get element query record from index or create one if it does not exist
@@ -163,21 +174,61 @@ class GenerateCacheService extends Component
                     ->execute();
 
                 $queryId = $db->getLastInsertID();
+
+                $this->saveElementQuerySources($elementQuery, $queryId);
             }
             catch (Exception $e) {
-                Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
+                Blitz::$plugin->log($e->getMessage(), [], 'error');
             }
         }
 
-        if ($queryId && !in_array($queryId, $this->_elementQueryCaches)) {
-            $this->_elementQueryCaches[] = $queryId;
+        if ($queryId && !in_array($queryId, $this->elementQueryCaches)) {
+            $this->elementQueryCaches[] = $queryId;
         }
 
         $mutex->release($lockName);
     }
 
     /**
-     * Saves the cache and output for a site URI.
+     * Saves an element query's sources.
+     *
+     * @param ElementQuery $elementQuery
+     * @param string $queryId
+     *
+     * @throws Exception
+     */
+    public function saveElementQuerySources(ElementQuery $elementQuery, string $queryId)
+    {
+        $db = Craft::$app->getDb();
+
+        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
+        $sourceIds = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
+
+        // Normalize source IDs
+        $sourceIds = ElementQueryHelper::getNormalizedElementQueryIdParam($sourceIds);
+
+        // Convert to an array
+        if (!is_array($sourceIds)) {
+            $sourceIds = [$sourceIds];
+        }
+
+        foreach ($sourceIds as $sourceId) {
+            // Stop if a string is encountered
+            if (is_string($sourceId)) {
+                break;
+            }
+
+            $db->createCommand()
+                ->insert(ElementQuerySourceRecord::tableName(), [
+                    'sourceId' => $sourceId,
+                    'queryId' => $queryId,
+                ], false)
+                ->execute();
+        }
+    }
+
+    /**
+     * Saves the cache for a site URI.
      *
      * @param string $output
      * @param SiteUriModel $siteUri
@@ -228,7 +279,7 @@ class GenerateCacheService extends Component
         // Add element caches to database
         $values = [];
 
-        foreach ($this->_elementCaches as $elementId) {
+        foreach ($this->elementCaches as $elementId) {
             $values[] = [$cacheId, $elementId];
         }
 
@@ -242,7 +293,7 @@ class GenerateCacheService extends Component
         // Add element query caches to database
         $values = [];
 
-        foreach ($this->_elementQueryCaches as $queryId) {
+        foreach ($this->elementQueryCaches as $queryId) {
             $values[] = [$cacheId, $queryId];
         }
 
@@ -263,136 +314,31 @@ class GenerateCacheService extends Component
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
         }
 
-        Blitz::$plugin->cacheStorage->save($output, $siteUri);
+        $this->saveOutput($output, $siteUri);
 
         $mutex->release($lockName);
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
-     * Returns an element query's default parameters for a given element type.
+     * Saves the output for a site URI.
      *
-     * @param string $elementType
-     *
-     * @return array
+     * @param string $output
+     * @param SiteUriModel $siteUri
      */
-    private function _getDefaultElementQueryParams(string $elementType): array
+    public function saveOutput(string $output, SiteUriModel $siteUri)
     {
-        if (!empty($this->_defaultElementQueryParams[$elementType])) {
-            return $this->_defaultElementQueryParams[$elementType];
+        $event = new SaveCacheEvent([
+            'output' => $output,
+            'siteUri' => $siteUri,
+        ]);
+        $this->trigger(self::EVENT_BEFORE_SAVE_CACHE, $event);
+
+        if ($event->isValid) {
+            Blitz::$plugin->cacheStorage->save($output, $siteUri);
         }
 
-        $this->_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
-
-        $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
-
-        foreach ($ignoreParams as $key) {
-            unset($this->_defaultElementQueryParams[$elementType][$key]);
-        }
-
-        return $this->_defaultElementQueryParams[$elementType];
-    }
-
-    /**
-     * Returns the element query's unique parameters.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return array
-     */
-    private function _getUniqueElementQueryParams(ElementQuery $elementQuery): array
-    {
-        $params = [];
-
-        $defaultParams = $this->_getDefaultElementQueryParams($elementQuery->elementType);
-
-        foreach ($defaultParams as $key => $default) {
-            $value = $elementQuery->{$key};
-
-            if ($value !== $default) {
-                $params[$key] = $value;
-            }
-        }
-
-        // Ignore specific empty params as they are redundant
-        $ignoreEmptyParams = ['structureId', 'orderBy'];
-
-        foreach ($ignoreEmptyParams as $key) {
-            // Use `array_key_exists` rather than `isset` as it will return `true` for null results
-            if (array_key_exists($key, $params) && empty($params[$key])) {
-                unset($params[$key]);
-            }
-        }
-
-        // Convert the query parameter values recursively
-        array_walk_recursive($params, [$this, '_convertQueryParams']);
-
-        return $params;
-    }
-
-    /**
-     * Returns whether the element query has fixed IDs.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return bool
-     */
-    private function _hasFixedIds(ElementQuery $elementQuery): bool
-    {
-        // The query values to check
-        $values = [
-            $elementQuery->id,
-            $elementQuery->uid,
-            $elementQuery->where['elements.id'] ?? null,
-            $elementQuery->where['elements.uid'] ?? null,
-        ];
-
-        foreach ($values as $value) {
-            if (empty($value)) {
-                continue;
-            }
-
-            if (is_array($value)) {
-                $value = $value[0] ?? null;
-            }
-
-            if (is_int($value)) {
-                return true;
-            }
-
-            if (is_string($value) && stripos($value, 'not') !== 0) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Converts query parameter values to more concise formats.
-     *
-     * @param mixed $value
-     */
-    private function _convertQueryParams(&$value)
-    {
-        // Convert elements to their ID
-        if ($value instanceof ElementInterface) {
-            $value = $value->getId();
-            return;
-        }
-
-        // Convert element queries to element IDs
-        if ($value instanceof ElementQueryInterface) {
-            $value = $value->ids();
-            return;
-        }
-
-        // Convert DateTime objects to Unix timestamp
-        if ($value instanceof DateTime) {
-            $value = $value->getTimestamp();
-            return;
+        if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);
         }
     }
 }

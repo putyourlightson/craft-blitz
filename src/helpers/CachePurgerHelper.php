@@ -22,7 +22,7 @@ class CachePurgerHelper extends BaseDriverHelper
      */
     const EVENT_REGISTER_PURGER_TYPES = 'registerPurgerTypes';
 
-    // Static
+    // Public Methods
     // =========================================================================
 
     /**

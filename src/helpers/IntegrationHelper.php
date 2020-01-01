@@ -20,7 +20,7 @@ class IntegrationHelper
      */
     const EVENT_REGISTER_INTEGRATIONS = 'registerIntegrations';
 
-    // Static Methods
+    // Public Methods
     // =========================================================================
 
     /**

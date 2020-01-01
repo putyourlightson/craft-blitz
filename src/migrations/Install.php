@@ -9,7 +9,6 @@ use Craft;
 use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
-use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -17,6 +16,7 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
+use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use Throwable;
 
 class Install extends Migration
@@ -47,6 +47,7 @@ class Install extends Migration
     public function safeDown(): bool
     {
         $this->dropTableIfExists(DriverDataRecord::tableName());
+        $this->dropTableIfExists(ElementQuerySourceRecord::tableName());
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
         $this->dropTableIfExists(ElementQueryRecord::tableName());
         $this->dropTableIfExists(ElementCacheRecord::tableName());
@@ -97,6 +98,13 @@ class Install extends Migration
             ]);
         }
 
+        if (!$this->db->tableExists(ElementQuerySourceRecord::tableName())) {
+            $this->createTable(ElementQuerySourceRecord::tableName(), [
+                'sourceId' => $this->integer(),
+                'queryId' => $this->integer()->notNull(),
+            ]);
+        }
+
         if (!$this->db->tableExists(ElementQueryRecord::tableName())) {
             $this->createTable(ElementQueryRecord::tableName(), [
                 'id' => $this->primaryKey(),
@@ -139,6 +147,7 @@ class Install extends Migration
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'elementId', true);
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate', false);
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
+        $this->createIndex(null, ElementQuerySourceRecord::tableName(), ['sourceId', 'queryId'], true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag', false);
@@ -157,6 +166,7 @@ class Install extends Migration
         $this->addForeignKey(null, ElementExpiryDateRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementQuerySourceRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, CacheTagRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
     }
 }
