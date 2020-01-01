@@ -67,12 +67,16 @@ class ElementTypeHelper
     /**
      * Returns whether the element type is cacheable.
      *
-     * @param string $elementType
+     * @param string|null $elementType
      *
      * @return bool
      */
     public static function getIsCacheableElementType(string $elementType): bool
     {
+        if ($elementType === null) {
+            return false;
+        }
+
         // Don't proceed if this is a block element type
         if (is_subclass_of($elementType, BlockElementInterface::class)) {
             return false;

@@ -113,16 +113,12 @@ class GenerateCacheService extends Component
     public function addElementQuery(ElementQuery $elementQuery)
     {
         // Don't proceed if element query caching is disabled
-        if (!Blitz::$plugin->settings->cacheElementQueries
-            || !$this->options->cacheElementQueries
-        ) {
+        if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
             return;
         }
 
         // Don't proceed if not a cacheable element type
-        if (empty($elementQuery->elementType)
-            || !ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)
-        ) {
+        if (!ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)) {
             return;
         }
 
