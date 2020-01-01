@@ -89,12 +89,16 @@ class ElementTypeHelper
     /**
      * Returns the source ID attribute for the element types.
      *
-     * @param string $elementType
+     * @param string|null $elementType
      *
      * @return string|null
      */
-    public static function getSourceIdAttribute(string $elementType)
+    public static function getSourceIdAttribute($elementType)
     {
+        if ($elementType === null) {
+            return null;
+        }
+        
         $sourceIdAttributes = self::getSourceIdAttributes();
 
         return $sourceIdAttributes[$elementType] ?? null;
