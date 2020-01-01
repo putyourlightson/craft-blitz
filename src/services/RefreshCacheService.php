@@ -98,9 +98,8 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Returns cache IDs from entry queries of the provided element type that
-     * contain the provided element IDs, filtering by the provided source IDs
-     * and ignoring the provided cache IDs.
+     * Returns element queries of the provided element type that can be joined
+     * with the provided source IDs, ignoring the provided cache IDs.
      *
      * @param string $elementType
      * @param int[] $sourceIds
@@ -110,9 +109,8 @@ class RefreshCacheService extends Component
      */
     public function getElementTypeQueries(string $elementType, array $sourceIds, array $ignoreCacheIds): array
     {
-        // Get element query records of the provided element types without the cache IDs and without eager loading
+        // Get element query records without eager loading
         return ElementQueryRecord::find()
-            ->select(['id', 'type', 'params'])
             ->where(['type' => $elementType])
             ->innerJoinWith([
                 'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {

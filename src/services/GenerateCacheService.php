@@ -146,7 +146,7 @@ class GenerateCacheService extends Component
      */
     public function saveElementQuery(ElementQuery $elementQuery)
     {
-        $params = json_encode(ElementQueryHelper::getUniqueParams($elementQuery));
+        $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
 
         // Create a unique index from the element type and parameters for quicker indexing and less storage
         $index = sprintf('%u', crc32($elementQuery->elementType.$params));
@@ -209,7 +209,7 @@ class GenerateCacheService extends Component
         $sourceIds = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
 
         // Normalize source IDs
-        $sourceIds = ElementQueryHelper::getNormalizedIdParam($sourceIds);
+        $sourceIds = ElementQueryHelper::getNormalizedElementQueryIdParam($sourceIds);
 
         // Convert to an array
         if (!is_array($sourceIds)) {

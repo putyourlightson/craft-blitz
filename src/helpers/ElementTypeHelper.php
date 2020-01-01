@@ -61,7 +61,7 @@ class ElementTypeHelper
      */
     private static $_sourceIdAttributes;
 
-    // Static
+    // Public Methods
     // =========================================================================
 
     /**

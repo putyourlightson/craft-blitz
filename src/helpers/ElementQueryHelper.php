@@ -10,6 +10,8 @@ use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use DateTime;
+use putyourlightson\blitz\records\ElementQueryRecord;
+use yii\db\ActiveQuery;
 
 class ElementQueryHelper
 {
@@ -19,34 +21,10 @@ class ElementQueryHelper
     /**
      * @var array
      */
-    private static $_defaultParams = [];
+    private static $_defaultElementQueryParams = [];
 
-    // Static
+    // Public Methods
     // =========================================================================
-
-    /**
-     * Returns an element query's default parameters for a given element type.
-     *
-     * @param string $elementType
-     *
-     * @return array
-     */
-    public static function getDefaultParams(string $elementType): array
-    {
-        if (!empty(self::$_defaultParams[$elementType])) {
-            return self::$_defaultParams[$elementType];
-        }
-
-        self::$_defaultParams[$elementType] = get_object_vars($elementType::find());
-
-        $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
-
-        foreach ($ignoreParams as $key) {
-            unset(self::$_defaultParams[$elementType][$key]);
-        }
-
-        return self::$_defaultParams[$elementType];
-    }
 
     /**
      * Returns the element query's unique parameters.
@@ -55,11 +33,11 @@ class ElementQueryHelper
      *
      * @return array
      */
-    public static function getUniqueParams(ElementQuery $elementQuery): array
+    public static function getUniqueElementQueryParams(ElementQuery $elementQuery): array
     {
         $params = [];
 
-        $defaultParams = self::getDefaultParams($elementQuery->elementType);
+        $defaultParams = self::getDefaultElementQueryParams($elementQuery->elementType);
 
         foreach ($defaultParams as $key => $default) {
             $value = $elementQuery->{$key};
@@ -82,14 +60,38 @@ class ElementQueryHelper
         // Convert ID parameters to arrays
         foreach ($params as $key => $value) {
             if ($key == 'id' || substr($key, -2) == 'Id') {
-                $params[$key] = self::getNormalizedIdParam($value);
+                $params[$key] = self::getNormalizedElementQueryIdParam($value);
             }
         }
 
         // Convert the query parameter values recursively
-        array_walk_recursive($params, [__CLASS__ , 'convertQueryParamsRecursively']);
+        array_walk_recursive($params, [__CLASS__ , '_convertQueryParamsRecursively']);
 
         return $params;
+    }
+
+    /**
+     * Returns an element query's default parameters for a given element type.
+     *
+     * @param string $elementType
+     *
+     * @return array
+     */
+    public static function getDefaultElementQueryParams(string $elementType): array
+    {
+        if (!empty(self::$_defaultElementQueryParams[$elementType])) {
+            return self::$_defaultElementQueryParams[$elementType];
+        }
+
+        self::$_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
+
+        $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
+
+        foreach ($ignoreParams as $key) {
+            unset(self::$_defaultElementQueryParams[$elementType][$key]);
+        }
+
+        return self::$_defaultElementQueryParams[$elementType];
     }
 
     /**
@@ -99,7 +101,7 @@ class ElementQueryHelper
      *
      * @return mixed
      */
-    public static function getNormalizedIdParam($value)
+    public static function getNormalizedElementQueryIdParam($value)
     {
         if ($value === null || is_int($value)) {
             return $value;
@@ -183,12 +185,15 @@ class ElementQueryHelper
         return false;
     }
 
+    // Private Methods
+    // =========================================================================
+
     /**
      * Converts query parameter values to more concise formats recursively.
      *
      * @param mixed $value
      */
-    public static function convertQueryParamsRecursively(&$value)
+    private static function _convertQueryParamsRecursively(&$value)
     {
         // Convert elements to their ID
         if ($value instanceof ElementInterface) {

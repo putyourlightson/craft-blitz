@@ -24,7 +24,7 @@ class DeployerHelper extends BaseDriverHelper
      */
     const EVENT_REGISTER_DEPLOYER_TYPES = 'registerDeployerTypes';
 
-    // Static
+    // Public Methods
     // =========================================================================
 
     /**

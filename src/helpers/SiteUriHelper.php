@@ -14,6 +14,9 @@ use putyourlightson\blitz\records\CacheRecord;
 
 class SiteUriHelper
 {
+    // Public Methods
+    // =========================================================================
+
     /**
      * Returns all site URIs.
      *

@@ -15,7 +15,7 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 class BaseDriverHelper
 {
-    // Static
+    // Public Methods
     // =========================================================================
 
     /**
