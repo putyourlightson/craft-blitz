@@ -10,6 +10,7 @@ use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
+use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use DateTime;
@@ -167,29 +168,27 @@ class GenerateCacheService extends Component
 
                 // Add source IDs
                 $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-                $elementQuerySourceId = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
-                $sourceIds = [null];
+                $sourceIds = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
 
-                if (is_int($elementQuerySourceId)) {
-                    $sourceIds = [$elementQuerySourceId];
+                // Convert source IDs to an array
+                $this->_convertIdParamsToArrays($sourceIds, $sourceIdAttribute);
+
+                if (is_array($sourceIds)) {
+                    foreach ($sourceIds as $sourceId) {
+                        // Stop if a string is encountered
+                        if (is_string($sourceId)) {
+                            break;
+                        }
+
+                        $db->createCommand()
+                            ->insert(ElementQuerySourceRecord::tableName(), [
+                                'sourceId' => $sourceId,
+                                'queryId' => $queryId,
+                            ], false)
+                            ->execute();
+                    }
                 }
 
-                if (is_string($elementQuerySourceId)) {
-                    $sourceIds = StringHelper::split($elementQuerySourceId);
-                }
-
-                if (is_array($elementQuerySourceId) && stripos($elementQuerySourceId[0], 'not') !== 0) {
-                    $sourceIds = $elementQuerySourceId;
-                }
-
-                foreach ($sourceIds as $sourceId) {
-                    $db->createCommand()
-                        ->insert(ElementQuerySourceRecord::tableName(), [
-                            'sourceId' => $sourceId,
-                            'queryId' => $queryId,
-                        ], false)
-                        ->execute();
-                }
             }
             catch (Exception $e) {
                 Craft::getLogger()->log($e->getMessage(), Logger::LEVEL_ERROR, 'blitz');
@@ -353,8 +352,11 @@ class GenerateCacheService extends Component
             }
         }
 
+        // Convert ID parameters to arrays
+        array_walk($params, [$this, '_convertIdParamsToArrays']);
+
         // Convert the query parameter values recursively
-        array_walk_recursive($params, [$this, '_convertQueryParams']);
+        array_walk_recursive($params, [$this, '_convertQueryParamsRecursively']);
 
         return $params;
     }
@@ -398,11 +400,61 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Converts query parameter values to more concise formats.
+     * Converts ID parameters to arrays.
+     *
+     * @param mixed $value
+     * @param string $key
+     */
+    private function _convertIdParamsToArrays(&$value, $key)
+    {
+        // Only apply to `id` or parameters ending in `Id`
+        if ($key != 'id' && substr($key, -2) != 'Id') {
+            return;
+        }
+
+        if ($value === null || is_int($value)) {
+            $value = [$value];
+        }
+
+        /**
+         * Copied from Db helper
+         * @see \craft\helpers\Db::_toArray
+         */
+        if (is_string($value)) {
+            // Split it on the non-escaped commas
+            $value = preg_split('/(?<!\\\),/', $value);
+
+            // Remove any of the backslashes used to escape the commas
+            foreach ($value as $key => $val) {
+                // Remove leading/trailing whitespace
+                $val = trim($val);
+
+                // Remove any backslashes used to escape commas
+                $val = str_replace('\,', ',', $val);
+
+                $value[$key] = $val;
+            }
+
+            // Remove any empty elements and reset the keys
+            $value = array_values(ArrayHelper::filterEmptyStringsFromArray($value));
+        }
+
+        if (is_array($value)) {
+            // Convert numeric strings to integers
+            foreach ($value as $key => $val) {
+                if (is_string($val) && is_numeric($val)) {
+                    $value[$key] = (int)$val;
+                }
+            }
+        }
+    }
+
+    /**
+     * Converts query parameter values to more concise formats recursively.
      *
      * @param mixed $value
      */
-    private function _convertQueryParams(&$value)
+    private function _convertQueryParamsRecursively(&$value)
     {
         // Convert elements to their ID
         if ($value instanceof ElementInterface) {

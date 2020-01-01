@@ -14,6 +14,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use UnitTester;
 
 /**
@@ -50,7 +51,6 @@ class GenerateCacheTest extends Unit
         parent::_before();
 
         Blitz::$plugin->generateCache->options->cachingEnabled = true;
-
         Blitz::$plugin->cacheStorage->deleteAll();
         Blitz::$plugin->flushCache->flushAll();
 
@@ -67,7 +67,6 @@ class GenerateCacheTest extends Unit
     {
         // Save the output for the site URI
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-
         $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
 
         // Assert that the output (which may also contain a timestamp) contains the cached value
@@ -77,7 +76,6 @@ class GenerateCacheTest extends Unit
     public function testCacheRecordSaved()
     {
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-
         $count = CacheRecord::find()
             ->where($this->siteUri->toArray())
             ->count();
@@ -90,9 +88,7 @@ class GenerateCacheTest extends Unit
     {
         $element = User::find()->one();
         Blitz::$plugin->generateCache->addElement($element);
-
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-
         $count = ElementCacheRecord::find()
             ->where(['elementId' => $element->id])
             ->count();
@@ -101,62 +97,24 @@ class GenerateCacheTest extends Unit
         $this->assertEquals(1, $count);
     }
 
-    public function testElementQueryCacheRecordSaved()
-    {
-        $elementQuery = Entry::find()->sectionId('not 1');
-        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $count = ElementQueryCacheRecord::find()->count();
-
-        // Assert that the record was not saved
-        $this->assertEquals(0, $count);
-
-        $elementQuery = Entry::find()->sectionId(['not', 1]);
-        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $count = ElementQueryCacheRecord::find()->count();
-
-        // Assert that the record was not saved
-        $this->assertEquals(0, $count);
-
-        $elementQuery = Entry::find()->sectionId(1);
-        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $count = ElementQueryCacheRecord::find()->count();
-
-        // Assert that the record was saved
-        $this->assertEquals(1, $count);
-
-        $elementQuery = Entry::find()->sectionId('2');
-        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $count = ElementQueryCacheRecord::find()->count();
-
-        // Assert that the record was saved
-        $this->assertEquals(2, $count);
-
-        $elementQuery = Entry::find()->sectionId([3]);
-        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $count = ElementQueryCacheRecord::find()->count();
-
-        // Assert that the record was saved
-        $this->assertEquals(3, $count);
-    }
-
     public function testElementQueryRecordsSaved()
     {
         $elementQueries = [
             Entry::find(),
             Entry::find()->id('not 1'),
-            Entry::find()->id(['not', 1]),
-            Entry::find()->id(['not', '1']),
+            [
+                Entry::find()->id(['not', 1]),
+                Entry::find()->id(['not', '1']),
+            ],
+            [
+                Entry::find()->sectionId(1),
+                Entry::find()->sectionId('1'),
+                Entry::find()->sectionId([1]),
+                Entry::find()->sectionId(['1']),
+            ],
         ];
 
-        foreach ($elementQueries as $elementQuery) {
-            Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-        }
-
+        array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);
         $count = ElementQueryRecord::find()->count();
 
         // Assert that all records were saved
@@ -173,11 +131,53 @@ class GenerateCacheTest extends Unit
             Entry::find()->id(['1', '2', '3']),
         ];
 
-        foreach ($elementQueries as $elementQuery) {
-            Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-        }
-
+        array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);
         $count = ElementQueryRecord::find()->count();
+
+        // Assert that no records were saved
+        $this->assertEquals(0, $count);
+    }
+
+    public function testElementQueryCacheRecordSaved()
+    {
+        $elementQuery = Entry::find();
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        $count = ElementQueryCacheRecord::find()->count();
+
+        // Assert that the record was saved
+        $this->assertEquals(1, $count);
+    }
+
+    public function testElementQuerySourceRecordsSaved()
+    {
+        $elementQueries = [
+            Entry::find(),
+            Entry::find()->sectionId(1),
+            Entry::find()->sectionId([1, 2, 3]),
+            [],
+            [],
+        ];
+
+        array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);
+        $count = ElementQuerySourceRecord::find()->count();
+
+        // Assert that all records were saved
+        $this->assertEquals(count($elementQueries), $count);
+    }
+
+    public function testElementQuerySourceRecordsNotSaved()
+    {
+        $elementQueries = [
+            Entry::find()->sectionId('not 1'),
+            Entry::find()->sectionId('> 1'),
+            Entry::find()->sectionId(['not', 1]),
+            Entry::find()->sectionId(['not', '1']),
+            Entry::find()->sectionId(['>', '1']),
+        ];
+
+        array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);
+        $count = ElementQuerySourceRecord::find()->count();
 
         // Assert that no records were saved
         $this->assertEquals(0, $count);
