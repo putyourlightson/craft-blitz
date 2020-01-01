@@ -12,6 +12,7 @@ use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
@@ -27,6 +28,16 @@ class GenerateCacheService extends Component
 {
     // Constants
     // =========================================================================
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_BEFORE_SAVE_CACHE = 'beforeSaveCache';
+
+    /**
+     * @event RefreshCacheEvent
+     */
+    const EVENT_AFTER_SAVE_CACHE = 'afterSaveCache';
 
     /**
      * @const string
@@ -307,7 +318,19 @@ class GenerateCacheService extends Component
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
         }
 
-        Blitz::$plugin->cacheStorage->save($output, $siteUri);
+        $event = new SaveCacheEvent([
+            'output' => $output,
+            'siteUri' => $siteUri,
+        ]);
+        $this->trigger(self::EVENT_BEFORE_SAVE_CACHE, $event);
+
+        if ($event->isValid) {
+            Blitz::$plugin->cacheStorage->save($output, $siteUri);
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);
+        }
 
         $mutex->release($lockName);
     }

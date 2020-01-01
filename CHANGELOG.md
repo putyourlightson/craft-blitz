@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
 ## 3.1.0 - Unreleased
+> {tip} This update optimises the cache invalidation process, therefore the cache should be manually refreshed following the update.
+
 ### Added
 - Added source IDs to element queries for more performant refresh cache jobs.
+- Added `beforeSaveCache` and `afterSaveCache` events.
 
 ### Changed
 - Element query ID parameters are now normalized for more performant refresh cache jobs.
@@ -66,7 +69,7 @@
 - Improved element query caching to help catch exceptions ([#136](https://github.com/putyourlightson/craft-blitz/issues/136)).
 
 ## 2.3.3 - 2019-10-11
-> {tip} This release optimises the cache invalidation process therefore the cache should be refreshed following the update to take advantage of the improvements.
+> {tip} This update optimises the cache invalidation process therefore the cache should be refreshed following the update to take advantage of the improvements.
 
 ### Changed
 - Improved performance and stability of cache invalidation by removing redundant element queries. 
@@ -160,7 +163,7 @@
 - Fixed plugin integrations to only be loaded if the required plugin version is met.
 
 ## 2.1.0 - 2019-07-10
-> {note} This release requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/plugins/blitz#server-rewrites) for details.
+> {note} This update requires some changes to the server rewrite code in order to continue working with live preview. Please reference the [documentation](https://putyourlightson.com/plugins/blitz#server-rewrites) for details.
 
 ### Added
 - Added compatibility for drafts and revisions in Craft 3.2.0.
@@ -183,7 +186,7 @@
 - Added the `blitz/cache/generate-expiry-dates` console command that generates entry expiry dates and stores them to enable refreshing expired cache (this generally happens automatically)
 
 ## 2.0.9 - 2019-07-16
-> {note} This release adds better handling of drafts and revisions and is recommended to install before updating to Craft 3.2.
+> {note} This update adds better handling of drafts and revisions and is recommended to install before updating to Craft 3.2.
 
 ### Added
 - Added better handling of drafts and revisions for the update process to Craft 3.2.
@@ -298,7 +301,7 @@
 - Fixed bug when refreshing expired cache.
 
 ## 1.11.0 - 2019-01-01
-> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
+> {note} This update optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
 
 ### Added
 - Added expiry date to elements, specifically to entries with future post dates or expiry dates.
@@ -322,7 +325,7 @@
 - Fixed error when clearing the cache from the utility.
 
 ## 1.10.0 - 2018-12-17
-> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
+> {note} This update optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
 
 ### Added
 - Added optimisations to make the caching process faster and more performant.
@@ -357,7 +360,7 @@
 ## 1.8.0 - 2018-11-28
 > {tip} A new `concurrency` setting is available in the plugin settings for faster cache warming.
 
-> {note} This release optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
+> {note} This update optimises the plugin's database tables and the cache should therefore be warmed manually following the update.
 
 ### Added 
 - Added multiple concurrent requests when warming the cache with a new plugin setting.
