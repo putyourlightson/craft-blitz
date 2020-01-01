@@ -232,7 +232,7 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves the cache and output for a site URI.
+     * Saves the cache for a site URI.
      *
      * @param string $output
      * @param SiteUriModel $siteUri
@@ -318,6 +318,19 @@ class GenerateCacheService extends Component
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
         }
 
+        $this->saveOutput($output, $siteUri);
+
+        $mutex->release($lockName);
+    }
+
+    /**
+     * Saves the output for a site URI.
+     *
+     * @param string $output
+     * @param SiteUriModel $siteUri
+     */
+    public function saveOutput(string $output, SiteUriModel $siteUri)
+    {
         $event = new SaveCacheEvent([
             'output' => $output,
             'siteUri' => $siteUri,
@@ -331,7 +344,5 @@ class GenerateCacheService extends Component
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);
         }
-
-        $mutex->release($lockName);
     }
 }
