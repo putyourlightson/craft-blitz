@@ -1,7 +1,7 @@
 # Release Notes for Blitz
 
 ## 3.1.0 - Unreleased
-> {tip} This update optimises the cache invalidation process, therefore the cache should be manually refreshed following the update.
+> {tip} This update optimises the performance of refresh cache jobs, therefore the cache should be manually refreshed following the update.
 
 ### Added
 - Added source IDs to element queries for more performant refresh cache jobs.

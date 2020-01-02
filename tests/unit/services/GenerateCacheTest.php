@@ -182,7 +182,7 @@ class GenerateCacheTest extends Unit
         $this->assertEquals([null, 1, 1, 2, 3, 4, 5, 6], $sourceIds);
     }
 
-    public function xtestElementQuerySourceRecordsNotSaved()
+    public function testElementQuerySourceRecordsNotSaved()
     {
         $elementQueries = [
             Entry::find()->sectionId('not 1'),

@@ -334,7 +334,7 @@ class GenerateCacheService extends Component
         $this->trigger(self::EVENT_BEFORE_SAVE_CACHE, $event);
 
         if ($event->isValid) {
-            Blitz::$plugin->cacheStorage->save($output, $siteUri);
+            Blitz::$plugin->cacheStorage->save($event->output, $event->siteUri);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
