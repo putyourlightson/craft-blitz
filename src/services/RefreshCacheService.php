@@ -215,14 +215,10 @@ class RefreshCacheService extends Component
     /**
      * Adds expiry dates for a given element.
      *
-     * @param ElementInterface $element
+     * @param Element $element
      */
-    public function addElementExpiryDates(ElementInterface $element)
+    public function addElementExpiryDates(Element $element)
     {
-        if (!($element instanceof Element)) {
-            return;
-        }
-
         $expiryDate = null;
         $now = new DateTime();
 
@@ -241,16 +237,16 @@ class RefreshCacheService extends Component
     /**
      * Adds an expiry date for a given element.
      *
-     * @param ElementInterface $element
+     * @param Element $element
      * @param DateTime $expiryDate
      */
-    public function addElementExpiryDate(ElementInterface $element, DateTime $expiryDate)
+    public function addElementExpiryDate(Element $element, DateTime $expiryDate)
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
         /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
         $elementExpiryDateRecord = ElementExpiryDateRecord::find()
-            ->where(['elementId' => $element->getId()])
+            ->where(['elementId' => $element->id])
             ->one();
 
         if ($elementExpiryDateRecord !== null && $elementExpiryDateRecord->expiryDate < $expiryDate) {
@@ -260,7 +256,7 @@ class RefreshCacheService extends Component
         /** @noinspection MissedFieldInspection */
         Craft::$app->getDb()->createCommand()
             ->upsert(ElementExpiryDateRecord::tableName(), [
-                    'elementId' => $element->getId(),
+                    'elementId' => $element->id,
                     'expiryDate' => $expiryDate,
                 ],
                 ['expiryDate' => $expiryDate],
@@ -306,6 +302,7 @@ class RefreshCacheService extends Component
         $now = Db::prepareDateForDb(new DateTime());
 
         /** @var Element $elementType */
+        /** @var Element[] $elements */
         $elements = $elementType::find()
             ->where([
                 'or',

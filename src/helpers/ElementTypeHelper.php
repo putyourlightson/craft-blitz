@@ -46,6 +46,9 @@ class ElementTypeHelper
         Entry::class => 'sectionId',
         Category::class => 'groupId',
         Tag::class => 'groupId',
+        'craft\commerce\elements\Product' => 'typeId',
+        'putyourlightson\campaign\elements\CampaignElement' => 'campaignTypeId',
+        'putyourlightson\campaign\elements\MailingListElement' => 'mailingListTypeId',
     ];
 
     // Properties

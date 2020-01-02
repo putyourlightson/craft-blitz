@@ -196,9 +196,21 @@ class RefreshCacheTest extends Unit
 
     public function testAddElementExpiryDates()
     {
-        $now = new DateTime('now');
-        $this->entry1->postDate = $now->add(new DateInterval('P1D'));
-        $this->entry1->expiryDate = $now->add(new DateInterval('P2D'));
+        $this->entry1->expiryDate = (new DateTime('now'))->add(new DateInterval('P2D'));
+
+        Blitz::$plugin->refreshCache->addElementExpiryDates($this->entry1);
+
+        $elementExpiryDateRecord = ElementExpiryDateRecord::find()
+            ->where(['elementId' => $this->entry1->id])
+            ->one();
+
+        // Assert that the expiry date is correct
+        $this->assertEquals(
+            Db::prepareDateForDb($this->entry1->expiryDate),
+            $elementExpiryDateRecord->expiryDate
+        );
+
+        $this->entry1->postDate = (new DateTime('now'))->add(new DateInterval('P1D'));
 
         Blitz::$plugin->refreshCache->addElementExpiryDates($this->entry1);
 
