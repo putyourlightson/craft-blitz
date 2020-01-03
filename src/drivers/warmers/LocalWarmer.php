@@ -118,9 +118,6 @@ class LocalWarmer extends BaseCacheWarmer
         $_POST = [];
         $_REQUEST = [];
 
-        // Reset the raw body to avoid action params being pulled from it
-        //Craft::$app->getRequest()->setRawBody('');
-
         $this->_resetApplicationConfig('web');
 
         $request = Craft::$app->getRequest();
@@ -149,12 +146,10 @@ class LocalWarmer extends BaseCacheWarmer
             Craft::$app->trigger(Craft::$app::EVENT_AFTER_REQUEST);
 
             if ($response->getIsOk()) {
-                // Save the cached output
                 Blitz::$plugin->generateCache->save($response->data, $siteUri);
             }
             else {
-                // TODO: test the output of this
-                Blitz::$plugin->debug($response->content);
+                Blitz::$plugin->debug($response->data['error'] ?? '');
             }
         }
         catch (Exception $e) {

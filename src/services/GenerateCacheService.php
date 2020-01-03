@@ -242,7 +242,7 @@ class GenerateCacheService extends Component
         // Don't cache if the output contains any transform generation URLs
         // https://github.com/putyourlightson/craft-blitz/issues/125
         if (StringHelper::contains(stripslashes($output), 'assets/generate-transform')) {
-            Blitz::$plugin->debug('Page not cached because it contains transform generation URLs.');
+            Blitz::$plugin->debug('Page not cached because it contains transform generation URLs.', [], $siteUri->getUrl());
 
             return;
         }
@@ -251,7 +251,9 @@ class GenerateCacheService extends Component
         $lockName = self::MUTEX_LOCK_NAME_CACHE_RECORDS;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
-            Blitz::$plugin->debug('Page not cached because a `'.$lockName.'` mutex could not be acquired.');
+            Blitz::$plugin->debug('Page not cached because a `{lockName}` mutex could not be acquired.', [
+                'lockName' => $lockName,
+            ], $siteUri->getUrl());
 
             return;
         }
@@ -333,9 +335,15 @@ class GenerateCacheService extends Component
         ]);
         $this->trigger(self::EVENT_BEFORE_SAVE_CACHE, $event);
 
-        if ($event->isValid) {
-            Blitz::$plugin->cacheStorage->save($event->output, $event->siteUri);
+        if (!$event->isValid) {
+            Blitz::$plugin->debug('Page not cached because the `{event}` event is not valid.', [
+                'event' => self::EVENT_BEFORE_SAVE_CACHE,
+            ], $siteUri->getUrl());
+
+            return;
         }
+
+        Blitz::$plugin->cacheStorage->save($event->output, $event->siteUri);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);

@@ -14,6 +14,7 @@ use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\base\Exception;
 
 /**
  * @property bool $isCacheableRequest
@@ -77,27 +78,27 @@ class CacheRequestService extends Component
         if ($user !== null) {
             // Ensure that if the site is not live that the user has permission to access it
             if (!Craft::$app->getIsLive() && !$user->can('accessSiteWhenSystemIsOff')) {
-                Blitz::$plugin->debug('Page not cached because the site is not live and the user does not have permission to access it.');
+                Blitz::$plugin->debug('Page not cached because the site is not live and the user does not have permission to access it.', [], $request->getAbsoluteUrl());
 
                 return false;
             }
 
             // Ensure that the debug toolbar is not enabled
             if ($user->getPreference('enableDebugToolbarForSite')) {
-                Blitz::$plugin->debug('Page not cached because the debug toolbar is enabled.');
+                Blitz::$plugin->debug('Page not cached because the debug toolbar is enabled.', [], $request->getAbsoluteUrl());
 
                 return false;
             }
         }
 
         if (!empty($request->getParam('no-cache'))) {
-            Blitz::$plugin->debug('Page not cached because a `no-cache` request parameter was provided.');
+            Blitz::$plugin->debug('Page not cached because a `no-cache` request parameter was provided.', [], $request->getAbsoluteUrl());
 
             return false;
         }
 
         if (!empty($request->getParam('token'))) {
-            Blitz::$plugin->debug('Page not cached because a `token` request parameter was provided.');
+            Blitz::$plugin->debug('Page not cached because a `token` request parameter was provided.', [], $request->getAbsoluteUrl());
 
             return false;
         }
@@ -105,7 +106,7 @@ class CacheRequestService extends Component
         if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
             && !empty($request->getQueryStringWithoutPath())
         ) {
-            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.');
+            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $request->getAbsoluteUrl());
 
             return false;
         }
@@ -139,31 +140,41 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
     {
+        // Ignore URIs that are CP pages or resources
+        $generalConfig = Craft::$app->getConfig()->getGeneral();
+        $resourceBaseUri = parse_url(Craft::getAlias($generalConfig->resourceBaseUrl), PHP_URL_PATH);
+
+        if (strpos($siteUri->uri, $generalConfig->cpTrigger) !== false
+            || strpos($siteUri->uri, trim($resourceBaseUri, '/')) !== false
+        ) {
+            return false;
+        }
+
         // Ignore URIs that contain index.php
         if (strpos($siteUri->uri, 'index.php') !== false) {
-            Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.');
+            Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $siteUri->getUrl());
 
             return false;
         }
 
         // Ignore URIs that are longer than the max URI length
         if (strlen($siteUri->uri) > self::MAX_URI_LENGTH) {
-            Blitz::$plugin->debug('Page not cached because it exceeds the max URL length of {max} characters.', [
+            Blitz::$plugin->debug('Page not cached because it exceeds the max URI length of {max} characters.', [
                 'max' => self::MAX_URI_LENGTH
-            ]);
+            ], $siteUri->getUrl());
 
             return false;
         }
 
         // Excluded URI patterns take priority
         if ($this->_matchesUriPatterns($siteUri, Blitz::$plugin->settings->excludedUriPatterns)) {
-            Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.');
+            Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.', [], $siteUri->getUrl());
 
             return false;
         }
 
         if (!$this->_matchesUriPatterns($siteUri, Blitz::$plugin->settings->includedUriPatterns)) {
-            Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.');
+            Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.', [], $siteUri->getUrl());
 
             return false;
         }

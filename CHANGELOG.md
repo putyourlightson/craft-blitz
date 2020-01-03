@@ -9,6 +9,7 @@
 
 ### Changed
 - Element query ID parameters are now normalized for more performant refresh cache jobs.
+- Improved debug messages.
 
 ### Fixed
 - Fixed an error that could occur when a debug message was null.

@@ -142,10 +142,11 @@ class Blitz extends Plugin
     /**
      * Logs a debug message if debug mode is enabled
      *
-     * @param string|null $message
+     * @param string $message
      * @param array $params
+     * @param string $url
      */
-    public function debug($message, array $params = [])
+    public function debug(string $message, array $params = [], string $url = '')
     {
         if (!$this->settings->debug || empty($message)) {
             return;
@@ -156,9 +157,8 @@ class Blitz extends Plugin
 
         $message = Craft::t('blitz', $message, $params);
 
-        // Append URL if not a console request
-        if (!Craft::$app->getRequest()->getIsConsoleRequest()) {
-            $message .= ' ['.Craft::$app->getRequest()->getAbsoluteUrl().']';
+        if ($url) {
+            $message .= ' ['.$url.']';
         }
 
         LogToFile::log($message, 'blitz', 'debug');
