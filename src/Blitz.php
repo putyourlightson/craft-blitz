@@ -142,12 +142,12 @@ class Blitz extends Plugin
     /**
      * Logs a debug message if debug mode is enabled
      *
-     * @param string $message
+     * @param string|null $message
      * @param array $params
      */
-    public function debug(string $message, array $params = [])
+    public function debug($message, array $params = [])
     {
-        if (!$this->settings->debug) {
+        if (!$this->settings->debug || empty($message)) {
             return;
         }
 

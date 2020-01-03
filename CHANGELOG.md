@@ -10,6 +10,9 @@
 ### Changed
 - Element query ID parameters are now normalized for more performant refresh cache jobs.
 
+### Fixed
+- Fixed an error that could occur when a debug message was null.
+
 ## 3.0.3 - 2019-12-30
 ### Added
 - Added `beforeBlitzInject`, `afterBlitzInject`, `beforeBlitzInjectAll`, `afterBlitzInjectAll` events to inject script.
