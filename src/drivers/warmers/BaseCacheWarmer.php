@@ -40,6 +40,11 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      */
     const EVENT_AFTER_WARM_ALL_CACHE = 'afterWarmAllCache';
 
+    /**
+     * @const string
+     */
+    const WARMER_HEADER_NAME = 'X-Blitz-Warmer';
+
     // Public Methods
     // =========================================================================
 

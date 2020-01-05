@@ -5,6 +5,7 @@
 
 ### Added
 - Added source IDs to element queries for more performant refresh cache jobs.
+- Added `X-Blitz-Warmer` header to cache warming requests.
 - Added `beforeSaveCache` and `afterSaveCache` events.
 
 ### Changed

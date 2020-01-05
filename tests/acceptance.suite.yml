@@ -8,6 +8,6 @@ actor: AcceptanceTester
 modules:
     enabled:
         - PhpBrowser:
-            url: http://craft32
+            url: http://craft3
         - \Helper\Acceptance
     step_decorators: ~

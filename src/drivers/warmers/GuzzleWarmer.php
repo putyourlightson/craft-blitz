@@ -143,7 +143,9 @@ class GuzzleWarmer extends BaseCacheWarmer
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http
             if (stripos($url, 'http') === 0) {
-                yield new Request('GET', $url);
+                yield new Request('GET', $url, [
+                    self::WARMER_HEADER_NAME => get_class($this),
+                ]);
             }
         }
     }

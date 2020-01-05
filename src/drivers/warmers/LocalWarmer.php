@@ -122,6 +122,9 @@ class LocalWarmer extends BaseCacheWarmer
 
         $request = Craft::$app->getRequest();
 
+        // Set the headers
+        $request->getHeaders()->set(self::WARMER_HEADER_NAME, get_class($this));
+
         /**
          * Override the host info as it can be set unreliably
          * @see \yii\web\Request::getHostInfo

@@ -12,7 +12,7 @@ define('CRAFT_TRANSLATIONS_PATH', __DIR__ . '/_craft/translations');
 //define('CRAFT_VENDOR_PATH', dirname(__DIR__, 3));
 
 // Use absolute path if the plugin directory is a symlink
-define('CRAFT_VENDOR_PATH', '/Users/ben/Sites/craft32/vendor');
+define('CRAFT_VENDOR_PATH', '/Users/ben/Sites/craft3/vendor');
 
 $devMode = true;
 
