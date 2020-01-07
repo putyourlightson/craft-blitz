@@ -1,11 +1,11 @@
 # Release Notes for Blitz
 
-## 3.1.0 - Unreleased
-> {tip} This update optimises the performance of refresh cache jobs, therefore the cache should be manually refreshed following the update.
+## 3.1.0 - 2020-01-07
+> {tip} This update optimises the performance of refresh cache jobs. The cache should therefore be manually refreshed following the update.
 
 ### Added
-- Added source IDs to element queries for more performant refresh cache jobs.
-- Added `X-Blitz-Warmer` header to cache warming requests.
+- Added element query source IDs for more performant refresh cache jobs.
+- Added a `X-Blitz-Warmer` header to cache warming requests.
 - Added `beforeSaveCache` and `afterSaveCache` events.
 
 ### Changed
@@ -13,7 +13,7 @@
 - Improved debug messages.
 
 ### Fixed
-- Fixed an error that could occur when a debug message was null.
+- Fixed a debug message error that could affect the local cache warmer.
 
 ## 3.0.3 - 2019-12-30
 ### Added
