@@ -14,6 +14,7 @@ use craft\queue\BaseJob;
 use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use Throwable;
 
@@ -185,6 +186,7 @@ class RefreshCacheJob extends BaseJob
 
         if (!empty(array_intersect($elementIds, $elementQueryIds))) {
             // Get related element query cache records
+            /** @var ElementQueryCacheRecord[] $elementQueryCacheRecords */
             $elementQueryCacheRecords = $elementQueryRecord->getElementQueryCaches()->all();
 
             // Add cache IDs to the array that do not already exist
