@@ -9,7 +9,7 @@ use craft\feedme\services\Process;
 use putyourlightson\blitz\Blitz;
 use yii\base\Event;
 
-class FeedMeIntegration implements IntegrationInterface
+class FeedMeIntegration extends BaseIntegration
 {
     // Static Methods
     // =========================================================================

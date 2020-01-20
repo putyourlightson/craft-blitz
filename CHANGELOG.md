@@ -1,5 +1,13 @@
 # Release Notes for Blitz
 
+## 3.1.1 - Unreleased
+
+### Added
+- Added `BaseIntegration` class.
+
+### Changed
+- Element queries that are ordered by random are no longer stored in the database.
+
 ## 3.1.0 - 2020-01-07
 > {tip} This update optimises the performance of refresh cache jobs. The cache should therefore be manually refreshed following the update.
 

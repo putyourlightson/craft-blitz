@@ -13,7 +13,7 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
-class SeomaticIntegration implements IntegrationInterface
+class SeomaticIntegration extends BaseIntegration
 {
     // Static Methods
     // =========================================================================
