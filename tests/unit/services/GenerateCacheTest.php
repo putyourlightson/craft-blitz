@@ -140,6 +140,8 @@ class GenerateCacheTest extends Unit
             Entry::find()->id('1, 2, 3'),
             Entry::find()->id([1, 2, 3]),
             Entry::find()->id(['1', '2', '3']),
+            Entry::find()->orderBy('RAND()'),
+            Entry::find()->orderBy('Rand(123)'),
         ];
 
         array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);

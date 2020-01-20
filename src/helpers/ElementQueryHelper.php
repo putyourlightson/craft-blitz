@@ -187,6 +187,30 @@ class ElementQueryHelper
         return false;
     }
 
+    /**
+     * Returns whether the element query is randomly ordered.
+     *
+     * @param ElementQuery $elementQuery
+     *
+     * @return bool
+     */
+    public static function isOrderByRandom(ElementQuery $elementQuery): bool
+    {
+        if (empty($elementQuery->orderBy) || !is_array($elementQuery->orderBy)) {
+            return false;
+        }
+
+        $key = array_key_first($elementQuery->orderBy);
+
+        if (!is_string($key)) {
+            return false;
+        }
+
+        $hasMatch = preg_match('/RAND\(.*?\)/i', $key);
+
+        return (bool)$hasMatch;
+    }
+
     // Private Methods
     // =========================================================================
 
