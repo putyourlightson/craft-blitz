@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.1.1 - Unreleased
+## 3.1.1 - 2020-01-20
 
 ### Added
 - Added an autosuggest environment variable `Email` field to the Cloudflare Purger.
