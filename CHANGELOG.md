@@ -3,6 +3,7 @@
 ## 3.1.1 - Unreleased
 
 ### Added
+- Added an autosuggest environment variable `Email` field to the Cloudflare Purger.
 - Added `BaseIntegration` class.
 
 ### Changed

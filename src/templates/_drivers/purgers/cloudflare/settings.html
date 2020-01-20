@@ -39,9 +39,10 @@
 }) }}
 
 
-{{ forms.textField({
+{{ forms.autosuggestField({
     label: "Email"|t('blitz'),
     instructions: "The email address associated with your Cloudflare account."|t('blitz'),
+    suggestEnvVars: true,
     name: 'email',
     value: purger.email,
     errors: purger.getErrors('email'),

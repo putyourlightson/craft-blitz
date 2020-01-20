@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\purgers;
 
 use Craft;
+use craft\behaviors\EnvAttributeParserBehavior;
 use craft\db\Table;
 use craft\helpers\Db;
 use GuzzleHttp\Exception\RequestException;
@@ -62,6 +63,22 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
+    public function behaviors()
+    {
+        $behaviors = parent::behaviors();
+        $behaviors['parser'] = [
+            'class' => EnvAttributeParserBehavior::class,
+            'attributes' => [
+                'email',
+                'apiKey',
+            ],
+        ];
+        return $behaviors;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function attributeLabels(): array
     {
         return [
@@ -76,7 +93,7 @@ class CloudflarePurger extends BaseCachePurger
     public function rules(): array
     {
         return [
-            [['apiKey', 'email', 'warmCacheDelay'], 'required'],
+            [['email', 'apiKey', 'warmCacheDelay'], 'required'],
             [['email'], 'email'],
             [['warmCacheDelay'], 'integer', 'min' => 0, 'max' => 30],
         ];
@@ -172,7 +189,7 @@ class CloudflarePurger extends BaseCachePurger
             'base_uri' => self::API_ENDPOINT,
             'headers'  => [
                 'Content-Type' => 'application/json',
-                'X-Auth-Email' => $this->email,
+                'X-Auth-Email' => Craft::parseEnv($this->email),
                 'X-Auth-Key'   => Craft::parseEnv($this->apiKey),
             ]
         ]);
