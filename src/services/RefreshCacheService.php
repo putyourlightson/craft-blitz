@@ -29,6 +29,11 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\ActiveQuery;
 
 /**
+ * This class is responsible for keeping the cache fresh.
+ * When one or more cacheable element are updated, they are added to the `$elements` array.
+ * If `$batchMode` is false then the `refresh()` method is called immediately, otherwise it is triggered by a resave elements event.
+ * The `refresh()` method creates a `RefreshCacheJob` so that refreshing happens asynchronously.
+ *
  * @property SiteUriModel[] $allSiteUris
  */
 class RefreshCacheService extends Component
@@ -143,23 +148,13 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element)
     {
-        // Don't proceed if not an Element
-        if (!($element instanceof Element)) {
-            return;
-        }
-
-        // Don't proceed if propagating
-        if ($element->propagating) {
-            return;
-        }
-
-        // Don't proceed if element is draft or revision
-        if (ElementHelper::isDraftOrRevision($element)) {
-            return;
-        }
-
-        // Don't proceed if this element is an asset that is being indexed
-        if ($element instanceof Asset && $element->getScenario() == Asset::SCENARIO_INDEX) {
+        // Don't proceed if not an Element, if propagating, if element is a draft or revision,
+        // or if the element is an asset that is being indexed
+        if (!($element instanceof Element)
+            || $element->propagating
+            || ElementHelper::isDraftOrRevision($element)
+            || ($element instanceof Asset && $element->getScenario() == Asset::SCENARIO_INDEX)
+        ) {
             return;
         }
 

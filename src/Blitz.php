@@ -304,7 +304,7 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers resave element events
+     * Registers resave elements events
      */
     private function _registerResaveElementEvents()
     {

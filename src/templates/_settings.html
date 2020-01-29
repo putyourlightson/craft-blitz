@@ -43,6 +43,14 @@
 
         {% include 'blitz/_includes/welcome/top' %}
 
+        {% if craft.blitz.getWebAliasExists() %}
+            <div class="field">
+                <p class="warning">
+                    {{ "One or more sites use `@web` in their base URL. The `@web` alias is not recommended if it is determined automatically."|t('blitz')|md(inlineOnly=true) }}
+                </p>
+            </div>
+        {% endif %}
+
         <div class="flex">
             {% include 'blitz/_includes/welcome/step' with {step: 1, text: 'Enable caching'} %}
 
@@ -50,11 +58,10 @@
                 {% set info %}
                     <span class="info">{{ 'With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disabling this setting will prevent Blitz from caching any new pages.'|t('blitz') }}</span>
                 {% endset %}
-                {% set warning = craft.blitz.getWebAliasExists() ? "One or more sites use `@web` in their base URL. The `@web` alias is not recommended if it is determined automatically."|t('blitz') : "" %}
                 {{ forms.lightswitchField({
                     label: "Caching Enabled"|t('blitz'),
                     instructions: "Whether caching should be enabled."|t('blitz') ~ info,
-                    warning: warning ?: (config.cachingEnabled is defined ? configWarning('cachingEnabled')),
+                    warning: config.cachingEnabled is defined ? configWarning('cachingEnabled'),
                     name: 'settings[cachingEnabled]',
                     on: settings.cachingEnabled,
                     required: true,

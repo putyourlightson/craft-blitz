@@ -73,6 +73,7 @@ class CloudflarePurger extends BaseCachePurger
                 'apiKey',
             ],
         ];
+
         return $behaviors;
     }
 
