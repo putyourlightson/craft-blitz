@@ -13,7 +13,6 @@ use crafttests\fixtures\EntryFixture;
 use DateInterval;
 use DateTime;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;

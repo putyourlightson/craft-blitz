@@ -185,7 +185,7 @@ class RefreshCacheService extends Component
         }
 
         // Add element
-        $this->elements[$elementType]['elementIds'][] = $element->getId();
+        $this->elements[$elementType]['elementIds'][] = $element->id;
 
         // Add source ID
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);

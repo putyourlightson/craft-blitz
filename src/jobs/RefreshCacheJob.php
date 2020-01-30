@@ -59,7 +59,7 @@ class RefreshCacheJob extends BaseJob
             $this->cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds'], $this->cacheIds);
         }
 
-        // If clear cache is enabled then clear the site URIs now
+        // If clear cache is enabled then clear the site URIs early
         if ($this->clearCache) {
             $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
@@ -115,7 +115,12 @@ class RefreshCacheJob extends BaseJob
 
             $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
-            Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
+            // Merge in site URIs of element IDs to ensure that uncached elements are also warmed
+            foreach ($this->elements as $elementType => $elementData) {
+                $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementData['elementIds']));
+            }
+
+            Blitz::$plugin->refreshCache->refreshSiteUris(array_unique($siteUris, SORT_REGULAR));
         }
         else {
             Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);

@@ -73,7 +73,7 @@ class SeomaticIntegration extends BaseIntegration
         $query = $seoElement::sitemapElementsQuery($metaBundle);
         $elementIds = $query->ids();
 
-        $siteUris = SiteUriHelper::getElementSiteUris($elementIds);
+        $siteUris = SiteUriHelper::getCachedElementSiteUris($elementIds);
 
         return $siteUris;
     }

@@ -1,7 +1,8 @@
 # Release Notes for Blitz
 
-## 3.1.2 - Unreleased
-
+## 3.2.0 - Unreleased
+### Added
+- Added the automatic warming of new and updated elements that have not previously been cached.
 
 ## 3.1.1 - 2020-01-20
 ### Added
