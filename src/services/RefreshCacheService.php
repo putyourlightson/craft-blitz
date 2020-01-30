@@ -268,6 +268,10 @@ class RefreshCacheService extends Component
      */
     public function expireCacheIds(array $cacheIds, DateTime $expiryDate = null)
     {
+        if (empty($cacheIds)) {
+            return;
+        }
+
         if ($expiryDate === null) {
             $expiryDate = new DateTime();
         }

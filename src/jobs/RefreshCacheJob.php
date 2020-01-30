@@ -102,10 +102,6 @@ class RefreshCacheJob extends BaseJob
             }
         }
 
-        if (empty($this->cacheIds)) {
-            return;
-        }
-
         // If clear cache is enabled
         if ($this->clearCache) {
             // Set progress label
