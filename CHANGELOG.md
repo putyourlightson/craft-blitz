@@ -4,6 +4,9 @@
 ### Added
 - Added the automatic warming of new and updated elements that have not previously been cached.
 
+### Fixed
+- Fixed an error that could occur if `limit`  or `offset` was set to a string rather than an integer.
+
 ## 3.1.1 - 2020-01-20
 ### Added
 - Added an autosuggest environment variable `Email` field to the Cloudflare Purger.

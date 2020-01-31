@@ -176,7 +176,8 @@ class RefreshCacheJob extends BaseJob
         // If the element query has an offset then add it to the limit and make it null
         if ($elementQuery->offset) {
             if ($elementQuery->limit) {
-                $elementQuery->limit($elementQuery->limit + $elementQuery->offset);
+                // Cast values to integers before trying to add them, as they may have been set to strings
+                $elementQuery->limit((int)$elementQuery->limit + (int)$elementQuery->offset);
             }
 
             $elementQuery->offset(null);
