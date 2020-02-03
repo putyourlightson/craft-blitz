@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\services;
 use Craft;
 use craft\base\Component;
 use craft\elements\User;
+use craft\helpers\FileHelper;
 use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\ResponseEvent;
@@ -223,6 +224,14 @@ class CacheRequestService extends Component
         if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
             $tagsHeader = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
             $headers->set(Blitz::$plugin->cachePurger->tagHeaderName, $tagsHeader);
+        }
+
+        // Use a mime type if the URI has an extension
+        $mimeType = FileHelper::getMimeTypeByExtension($siteUri->uri);
+
+        if ($mimeType !== null) {
+            $response->format = Response::FORMAT_RAW;
+            $headers->set('Content-Type', $mimeType);
         }
 
         // Append served by comment

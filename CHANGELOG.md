@@ -4,6 +4,9 @@
 ### Added
 - Added the automatic warming of new and updated elements that have not previously been cached.
 
+### Changed
+- If the URI has an extension with a matching mime type then it is used in the response.
+
 ### Fixed
 - Fixed an error that could occur if `limit`  or `offset` was set to a string rather than an integer.
 
