@@ -77,7 +77,7 @@ class ElementQueryHelper
      */
     public static function getDefaultElementQueryParams($elementType): array
     {
-        if ($elementType === null) {
+        if ($elementType === null || !($elementType instanceof ElementInterface)) {
             return [];
         }
 
@@ -200,7 +200,7 @@ class ElementQueryHelper
             return false;
         }
 
-        $key = array_key_first($elementQuery->orderBy);
+        $key = key($elementQuery->orderBy);
 
         if (!is_string($key)) {
             return false;
