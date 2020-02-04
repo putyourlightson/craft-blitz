@@ -181,6 +181,7 @@ class SiteUriHelper
         $siteUris = Element_SiteSettings::find()
             ->select(['siteId', 'uri'])
             ->where(['elementId' => $elementIds])
+            ->andWhere(['not', ['uri' => null]])
             ->asArray()
             ->all();
 

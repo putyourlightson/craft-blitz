@@ -112,8 +112,11 @@ class RefreshCacheJob extends BaseJob
             $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
             // Merge in site URIs of element IDs to ensure that uncached elements are also warmed
+            /** @var ElementInterface $elementType */
             foreach ($this->elements as $elementType => $elementData) {
-                $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementData['elementIds']));
+                if ($elementType::hasUris()) {
+                    $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementData['elementIds']));
+                }
             }
 
             Blitz::$plugin->refreshCache->refreshSiteUris(array_unique($siteUris, SORT_REGULAR));
