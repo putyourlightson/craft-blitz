@@ -77,7 +77,7 @@ class ElementQueryHelper
      */
     public static function getDefaultElementQueryParams($elementType): array
     {
-        if ($elementType === null || !($elementType instanceof ElementInterface)) {
+        if ($elementType === null) {
             return [];
         }
 
