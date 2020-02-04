@@ -1,14 +1,15 @@
 # Release Notes for Blitz
 
-## 3.2.0 - Unreleased
+## 3.2.0 - 2020-02-04
 ### Added
-- Added the automatic warming of new and updated elements that have not previously been cached.
+- Added the automatic warming of new and updated elements that have not previously been cached ([#141](https://github.com/putyourlightson/craft-blitz/issues/141)).
 
 ### Changed
-- If the URI has an extension with a matching mime type then it is used in the response.
+- If the URI has an extension with a matching mime type then it is used in the response ([#167](https://github.com/putyourlightson/craft-blitz/issues/167)).
 
 ### Fixed
 - Fixed an error that could occur if `limit`  or `offset` was set to a string rather than an integer.
+- Fixed call to undefined function `array_key_first` error ([#168](https://github.com/putyourlightson/craft-blitz/issues/168)).
 
 ## 3.1.1 - 2020-01-20
 ### Added
