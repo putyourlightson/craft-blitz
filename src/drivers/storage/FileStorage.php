@@ -37,6 +37,11 @@ class FileStorage extends BaseCacheStorage
     public $folderPath = '@webroot/cache/blitz';
 
     /**
+     * @var bool
+     */
+    public $createGzipFiles = false;
+
+    /**
      * @var string|null
      */
     private $_cacheFolderPath;
@@ -102,6 +107,10 @@ class FileStorage extends BaseCacheStorage
 
         try {
             FileHelper::writeToFile($filePath, $value);
+
+            if ($this->createGzipFiles) {
+                FileHelper::writeToFile($filePath.'.gz', gzencode($value));
+            }
         }
         catch (ErrorException $e) {
             Blitz::$plugin->log($e->getMessage(), [], 'error');
@@ -122,6 +131,10 @@ class FileStorage extends BaseCacheStorage
             // Delete file if it exists
             if (is_file($filePath)) {
                 unlink($filePath);
+            }
+
+            if (is_file($filePath.'.gz')) {
+                unlink($filePath.'.gz');
             }
         }
     }

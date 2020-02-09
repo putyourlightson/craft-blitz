@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.3.0 - Unreleased
+### Added
+- Added a `Create Gzip File` setting to the File Storage driver.  
+
 ## 3.2.0 - 2020-02-04
 ### Added
 - Added the automatic warming of new and updated elements that have not previously been cached ([#141](https://github.com/putyourlightson/craft-blitz/issues/141)).
