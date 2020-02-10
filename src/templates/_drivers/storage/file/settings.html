@@ -17,11 +17,11 @@
 }) }}
 
 {% set info %}
-    <span class="info">{{ 'With this setting enabled, Blitz will pre-compress cached files using gzip and write them to `index.html.gz` for improved performance (requires extra code in server rewrites).'|t('blitz') }}</span>
+    <span class="info">{{ 'With this setting enabled, Blitz will compress cached files using gzip and write them to `index.html.gz` for improved performance (requires extra code in server rewrites).'|t('blitz') }}</span>
 {% endset %}
 {{ forms.lightswitchField({
     label: "Create Gzip Files"|t('blitz'),
-    instructions: "Whether cached files should be pre-compressed using gzip."|t('blitz') ~ info,
+    instructions: "Whether compressed versions of cached files should be created using gzip."|t('blitz') ~ info,
     name: 'createGzipFiles',
     on: driver.createGzipFiles,
 }) }}

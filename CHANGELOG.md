@@ -61,7 +61,7 @@
 - Fixed an error that could occur when updating the plugin without having previously ever saved the settings.
 
 ## 3.0.0 - 2019-12-10
-> {warning} The `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings have been replaced by a single new `refreshCacheAutomaticallyForGlobals` config setting. The URI patterns config setting format has been changed, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/3.1.0/src/config.php#L28-L38). 
+> {warning} The `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings have been replaced by a single new `refreshCacheAutomaticallyForGlobals` config setting. The URI patterns config setting format has been changed, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/3.1.0/src/config.php#L28-L46). The folder path config setting format has been changed, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/3.1.0/src/config.php#L51-L52). 
 
 ### Added
 - Added replaceable remote deployers (Git Deployer).
@@ -77,6 +77,7 @@
 
 ### Changed
 - Changed the URI patterns config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/3.1.0/src/config.php#L28-L38). 
+- Changed the File Storage folder path config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/3.1.0/src/config.php#L51-L52). 
 - Replaced the `clearCacheAutomaticallyForGlobals` and `warmCacheAutomaticallyForGlobals` config settings with a `refreshCacheAutomaticallyForGlobals` config setting.
 - Replaced the `warmCacheJobPriority` with a `deployJobPriority` config setting.
 - Replaced the `WarmCacheService` service with a `BaseCacheWarmer` driver.
