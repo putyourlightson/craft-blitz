@@ -26,7 +26,7 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Local Warmer');
+        return Craft::t('blitz', 'Local Warmer (experimental)');
     }
 
     // Public Methods

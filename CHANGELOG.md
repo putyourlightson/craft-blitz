@@ -3,6 +3,7 @@
 ## 3.3.0 - Unreleased
 ### Added
 - Added a `Create Gzip File` setting to the File Storage driver.  
+- Added `experimental` label to Local Warmer.
 
 ## 3.2.0 - 2020-02-04
 ### Added
@@ -42,7 +43,6 @@
 ### Added
 - Added `beforeBlitzInject`, `afterBlitzInject`, `beforeBlitzInjectAll`, `afterBlitzInjectAll` events to inject script.
 - Added more debug logs for cases in which pages are not cached.
-
 
 ## 3.0.2 - 2019-12-18
 ### Added
