@@ -5,6 +5,10 @@
 - Added a `Create Gzip File` setting to the File Storage driver.  
 - Added `experimental` label to Local Warmer.
 
+### Changed
+- Improved foreign key constraint checks before writing to the database ([#174](https://github.com/putyourlightson/craft-blitz/issues/174)).
+- Removed triggering of Blitz's garbage collection from Craft's garbage collection procedure.
+
 ## 3.2.0 - 2020-02-04
 ### Added
 - Added the automatic warming of new and updated elements that have not previously been cached ([#141](https://github.com/putyourlightson/craft-blitz/issues/141)).

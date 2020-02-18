@@ -11,6 +11,7 @@ use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
+use craft\records\Element;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -42,12 +43,13 @@ class GenerateCacheService extends Component
     /**
      * @const string
      */
-    const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
+    const MUTEX_LOCK_NAME_CACHE_RECORDS = 'blitz:cacheRecords';
 
     /**
      * @const string
      */
-    const MUTEX_LOCK_NAME_CACHE_RECORDS = 'blitz:cacheRecords';
+    const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
+
 
     // Properties
     // =========================================================================
@@ -152,6 +154,7 @@ class GenerateCacheService extends Component
         // Create a unique index from the element type and parameters for quicker indexing and less storage
         $index = sprintf('%u', crc32($elementQuery->elementType.$params));
 
+        // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
         $lockName = self::MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS.':'.$index;
 
@@ -266,52 +269,64 @@ class GenerateCacheService extends Component
         // Use DB connection so we can batch insert and exclude audit columns
         $db = Craft::$app->getDb();
 
-        $values = $siteUri->toArray();
+        $cacheValue = $siteUri->toArray();
 
         // Delete cache records so we get a fresh cache
-        CacheRecord::deleteAll($values);
+        CacheRecord::deleteAll($cacheValue);
 
         if (!empty($this->options->expiryDate)) {
-            $values = array_merge($values, [
+            $cacheValue = array_merge($cacheValue, [
                 'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
             ]);
         }
 
         $db->createCommand()
-            ->insert(CacheRecord::tableName(), $values, false)
+            ->insert(CacheRecord::tableName(), $cacheValue, false)
             ->execute();
 
         $cacheId = (int)$db->getLastInsertID();
 
-        // Add element caches to database
-        $values = [];
+        if (!empty($this->elementCaches)) {
+            // Get elements by selecting only elements that exist in the database table
+            $elementCacheValues = Element::find()
+                ->select('id')
+                ->where(['id' => $this->elementCaches])
+                ->column();
 
-        foreach ($this->elementCaches as $elementId) {
-            $values[] = [$cacheId, $elementId];
+            foreach ($elementCacheValues as $key => $value) {
+                $elementCacheValues[$key] = [$cacheId, $value];
+            }
+
+            // Batch insert element caches to database
+            $db->createCommand()
+                ->batchInsert(ElementCacheRecord::tableName(),
+                    ['cacheId', 'elementId'],
+                    $elementCacheValues,
+                    false)
+                ->execute();
         }
 
-        $db->createCommand()
-            ->batchInsert(ElementCacheRecord::tableName(),
-                ['cacheId', 'elementId'],
-                $values,
-                false)
-            ->execute();
+        if (!empty($this->elementQueryCaches)) {
+            // Get element queries by selecting only element queries that exist in the database table
+            $elementQueryCacheValues = ElementQueryRecord::find()
+                ->select('id')
+                ->where(['id' => $this->elementQueryCaches])
+                ->column();
 
-        // Add element query caches to database
-        $values = [];
+            foreach ($elementQueryCacheValues as $key => $value) {
+                $elementQueryCacheValues[$key] = [$cacheId, $value];
+            }
 
-        foreach ($this->elementQueryCaches as $queryId) {
-            $values[] = [$cacheId, $queryId];
+            // Batch insert element query caches to database
+            $db->createCommand()
+                ->batchInsert(ElementQueryCacheRecord::tableName(),
+                    ['cacheId', 'queryId'],
+                    $elementQueryCacheValues,
+                    false)
+                ->execute();
         }
 
-        $db->createCommand()
-            ->batchInsert(ElementQueryCacheRecord::tableName(),
-                ['cacheId', 'queryId'],
-                $values,
-                false)
-            ->execute();
-
-        // Add tag caches to database
+        // Save tag caches
         if (!empty($this->options->tags)) {
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
