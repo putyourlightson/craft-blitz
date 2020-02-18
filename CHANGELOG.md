@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.3.0 - Unreleased
+## 3.3.0 - 2020-02-18
 ### Added
 - Added a `Create Gzip File` setting to the File Storage driver.  
 - Added `experimental` label to Local Warmer.
