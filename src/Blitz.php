@@ -370,18 +370,6 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers garbage collection
-     */
-    private function _registerGarbageCollection()
-    {
-        Event::on(Gc::class, Gc::EVENT_RUN,
-            function() {
-                $this->flushCache->runGarbageCollection();
-            }
-        );
-    }
-
-    /**
      * Registers CP URL rules event
      */
     private function _registerCpUrlRules()
