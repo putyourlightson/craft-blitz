@@ -454,13 +454,13 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes tagged cache.
+     * Refreshes cache tags.
      *
      * @param string[] $tags
      */
-    public function refreshTaggedCache(array $tags)
+    public function refreshCacheTags(array $tags)
     {
-        // Check for tagged cache IDs to invalidate
+        // Get cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
         $this->cacheIds = array_merge($this->cacheIds, $cacheIds);

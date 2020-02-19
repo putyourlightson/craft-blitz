@@ -13,6 +13,7 @@ use craft\helpers\Json;
 use craft\queue\BaseJob;
 use Exception;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
@@ -66,6 +67,15 @@ class RefreshCacheJob extends BaseJob
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
+        // Merge in cache IDs that match any special source tags
+        foreach ($this->elements as $elementType => $elementData) {
+            $this->cacheIds = array_unique(array_merge(
+                $this->cacheIds,
+                $this->_getSourceTagCacheIds($elementType, $elementData['sourceIds'])
+            ));
+        }
+
+        // Merge in cache IDs match element query results
         /** @var ElementInterface|string $elementType */
         foreach ($this->elements as $elementType => $elementData) {
             // If we have element IDs then loop through element queries to check for matches
@@ -141,6 +151,27 @@ class RefreshCacheJob extends BaseJob
     // =========================================================================
 
     /**
+     * Returns cache IDs that match any special source tags
+     *
+     * @param string $elementType
+     * @param array $sourceIds
+     *
+     * @return int[]
+     */
+    private function _getSourceTagCacheIds(string $elementType, array $sourceIds)
+    {
+        $tags = [];
+
+        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
+
+        foreach ($sourceIds as $sourceId) {
+            $tags[] = $sourceIdAttribute.':'.$sourceId;
+        }
+
+        return Blitz::$plugin->cacheTags->getCacheIds($tags);
+    }
+
+    /**
      * Returns cache IDs from a given entry query that contains the provided element IDs,
      * ignoring the provided cache IDs.
      *
@@ -204,4 +235,5 @@ class RefreshCacheJob extends BaseJob
 
         return $cacheIds;
     }
+
 }

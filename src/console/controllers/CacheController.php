@@ -242,7 +242,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
+        Blitz::$plugin->refreshCache->refreshCacheTags($tags);
 
         Craft::$app->getQueue()->run();
 

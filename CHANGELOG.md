@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.4.0 - Unreleased
+### Added
+- Added the ability to tag source IDs.
+
 ## 3.3.0 - 2020-02-18
 ### Added
 - Added a `Create Gzip File` setting to the File Storage driver.  

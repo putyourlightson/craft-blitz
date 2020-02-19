@@ -200,4 +200,23 @@ class GenerateCacheTest extends Unit
         // Assert that no records were saved
         $this->assertEquals(0, $count);
     }
+
+    public function testCacheTagSaved()
+    {
+        $tags = ['tag1', 'tag2', 'tag3'];
+        Blitz::$plugin->generateCache->options->tags = $tags;
+
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        $cacheIds = Blitz::$plugin->cacheTags->getCacheIds(['xyz']);
+
+        // Assert that zero cache IDs were found
+        $this->assertEquals(0, count($cacheIds));
+
+        $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
+
+        // Assert that one cache ID was found
+        $this->assertEquals(1, count($cacheIds));
+    }
+
 }

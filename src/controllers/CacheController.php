@@ -220,7 +220,7 @@ class CacheController extends Controller
             return $this->_getResponse('At least one tag must be provided.', false);
         }
 
-        Blitz::$plugin->refreshCache->refreshTaggedCache($tags);
+        Blitz::$plugin->refreshCache->refreshCacheTags($tags);
 
         $message = 'Tagged cache successfully refreshed.';
         Blitz::$plugin->log($message);

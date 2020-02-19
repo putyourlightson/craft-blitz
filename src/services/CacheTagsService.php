@@ -57,6 +57,10 @@ class CacheTagsService extends Component
      */
     public function getCacheIds(array $tags): array
     {
+        if (empty($tags)) {
+            return [];
+        }
+
         return CacheTagRecord::find()
             ->select('cacheId')
             ->where(['tag' => $tags])

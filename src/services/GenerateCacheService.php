@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\services;
 use Craft;
 use craft\base\Component;
 use craft\base\ElementInterface;
+use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
@@ -266,7 +267,6 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Use DB connection so we can batch insert and exclude audit columns
         $db = Craft::$app->getDb();
 
         $cacheValue = $siteUri->toArray();
@@ -287,46 +287,29 @@ class GenerateCacheService extends Component
         $cacheId = (int)$db->getLastInsertID();
 
         if (!empty($this->elementCaches)) {
-            // Get elements by selecting only elements that exist in the database table
-            $elementCacheValues = Element::find()
-                ->select('id')
-                ->where(['id' => $this->elementCaches])
-                ->column();
-
-            foreach ($elementCacheValues as $key => $value) {
-                $elementCacheValues[$key] = [$cacheId, $value];
-            }
-
-            // Batch insert element caches to database
-            $db->createCommand()
-                ->batchInsert(ElementCacheRecord::tableName(),
-                    ['cacheId', 'elementId'],
-                    $elementCacheValues,
-                    false)
-                ->execute();
+            $this->_batchInsertCaches($cacheId,
+                $this->elementCaches,
+                Element::tableName(),
+                ElementCacheRecord::tableName(),
+                'elementId'
+            );
         }
 
         if (!empty($this->elementQueryCaches)) {
-            // Get element queries by selecting only element queries that exist in the database table
-            $elementQueryCacheValues = ElementQueryRecord::find()
-                ->select('id')
-                ->where(['id' => $this->elementQueryCaches])
-                ->column();
-
-            foreach ($elementQueryCacheValues as $key => $value) {
-                $elementQueryCacheValues[$key] = [$cacheId, $value];
-            }
-
-            // Batch insert element query caches to database
-            $db->createCommand()
-                ->batchInsert(ElementQueryCacheRecord::tableName(),
-                    ['cacheId', 'queryId'],
-                    $elementQueryCacheValues,
-                    false)
-                ->execute();
+            $this->_batchInsertCaches($cacheId,
+                $this->elementQueryCaches,
+                ElementQueryRecord::tableName(),
+                ElementQueryCacheRecord::tableName(),
+                'queryId'
+            );
         }
 
-        // Save tag caches
+        // Save cache sources
+        if (!empty($this->options->sources)) {
+            Blitz::$plugin->cacheSources->saveSources($this->options->sources, $cacheId);
+        }
+
+        // Save cache tags
         if (!empty($this->options->tags)) {
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
@@ -368,5 +351,34 @@ class GenerateCacheService extends Component
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);
         }
+    }
+
+    /**
+     * @param int $cacheId
+     * @param array $ids
+     * @param string $checkTable
+     * @param string $insertTable
+     * @param string $columnName
+     */
+    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName)
+    {
+        // Get values by selecting only records with existing IDs
+        $values = ActiveRecord::find()
+            ->select('id')
+            ->from($checkTable)
+            ->where(['id' => $ids])
+            ->column();
+
+        foreach ($values as $key => $value) {
+            $values[$key] = [$cacheId, $value];
+        }
+
+        // Batch insert cache values to database
+        Craft::$app->getDb()->createCommand()
+            ->batchInsert($insertTable,
+                ['cacheId', $columnName],
+                $values,
+                false)
+            ->execute();
     }
 }
