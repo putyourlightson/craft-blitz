@@ -224,9 +224,9 @@ class RefreshCacheTest extends Unit
         );
     }
 
-    public function testRefreshCacheJob()
+    public function testRefreshElementQuery()
     {
-        // Add element queries and save
+        // Add element query and save
         $elementQuery = Entry::find()->sectionId($this->entry1->sectionId);
         Blitz::$plugin->generateCache->addElementQuery($elementQuery);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
@@ -238,16 +238,26 @@ class RefreshCacheTest extends Unit
             'cacheIds' => [],
             'elements' => [
                 Entry::class => [
-                    'elementIds' => [$this->entry2->id],
-                    'sourceIds' => [$this->entry2->sectionId],
+                    'elementIds' => [$this->entry1->id],
+                    'sourceIds' => [$this->entry1->sectionId],
                 ],
             ],
             'clearCache' => true,
         ]);
         $refreshCacheJob->execute(Craft::$app->getQueue());
 
-        // Assert that zero cache IDs were found
-        $this->assertEquals(0, count($refreshCacheJob->cacheIds));
+        // Assert that the cache ID was found
+        $this->assertEquals([1], $refreshCacheJob->cacheIds);
+
+        // Assert that the cached value is a blank string
+        $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
+    }
+
+    public function testRefreshSourceTag()
+    {
+        // Add source tag and save
+        Blitz::$plugin->generateCache->options->tags('sectionId:'.$this->entry1->sectionId);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         // Assert that the output (which may also contain a timestamp) contains the cached value
         $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
@@ -256,7 +266,7 @@ class RefreshCacheTest extends Unit
             'cacheIds' => [],
             'elements' => [
                 Entry::class => [
-                    'elementIds' => [$this->entry1->id],
+                    'elementIds' => [],
                     'sourceIds' => [$this->entry1->sectionId],
                 ],
             ],
