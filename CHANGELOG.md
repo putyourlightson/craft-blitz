@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.4.1 - 2020-02-20
+### Fixed
+- Fixed incorrect cached page count in File Storage utility when the `Create Gzip Files` setting is enabled.
+
 ## 3.4.0 - 2020-02-20
 ### Added
 - Added refreshing of [source tags](https://putyourlightson.com/plugins/blitz#source-tags) to the refresh cache job.

@@ -171,7 +171,7 @@ class FileStorage extends BaseCacheStorage
             $sites[$site->id] = [
                 'name' => $site->name,
                 'path' => $sitePath,
-                'count' => is_dir($sitePath) ? count(FileHelper::findFiles($sitePath)) : 0,
+                'count' => is_dir($sitePath) ? count(FileHelper::findFiles($sitePath, ['only' => ['index.html']])) : 0,
             ];
         }
 
