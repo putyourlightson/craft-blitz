@@ -1,8 +1,8 @@
 # Release Notes for Blitz
 
-## 3.4.0 - Unreleased
+## 3.4.0 - 2020-02-20
 ### Added
-- Added the ability to tag source IDs.
+- Added refreshing of [source tags](https://putyourlightson.com/plugins/blitz#source-tags) to the refresh cache job.
 
 ## 3.3.0 - 2020-02-18
 ### Added

@@ -67,7 +67,7 @@ class RefreshCacheJob extends BaseJob
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
-        // Merge in cache IDs that match any special source tags
+        // Merge in cache IDs that match any source tags
         foreach ($this->elements as $elementType => $elementData) {
             $this->cacheIds = array_unique(array_merge(
                 $this->cacheIds,
@@ -160,9 +160,9 @@ class RefreshCacheJob extends BaseJob
      */
     private function _getSourceTagCacheIds(string $elementType, array $sourceIds)
     {
-        $tags = [];
-
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
+
+        $tags = [$sourceIdAttribute.':*'];
 
         foreach ($sourceIds as $sourceId) {
             $tags[] = $sourceIdAttribute.':'.$sourceId;
