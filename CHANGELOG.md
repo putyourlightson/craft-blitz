@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
 ## 3.4.1 - 2020-02-20
+### Changed
+- Improved File Storage utility UI.
+
 ### Fixed
 - Fixed incorrect cached page count in File Storage utility when the `Create Gzip Files` setting is enabled.
 
