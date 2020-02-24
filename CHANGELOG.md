@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.4.2 - Unreleased
+### Changed
+- Changed `getTemplate` tag to render a template as if it was a page.
+
 ## 3.4.1 - 2020-02-20
 ### Changed
 - Improved File Storage utility UI.

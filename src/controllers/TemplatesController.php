@@ -41,7 +41,7 @@ class TemplatesController extends Controller
 
         $params = Craft::$app->getRequest()->getParam('params', []);
 
-        $output = Craft::$app->getView()->renderTemplate($template, $params);
+        $output = Craft::$app->getView()->renderPageTemplate($template, $params);
 
         return $this->asRaw($output);
     }
