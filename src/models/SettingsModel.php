@@ -173,6 +173,11 @@ class SettingsModel extends Model
     public $queryStringCaching = self::QUERY_STRINGS_DO_NOT_CACHE_URLS;
 
     /**
+     * @var string[] The query string parameters to exclude when determining if and how a page should be cached.
+     */
+    public $excludedQueryStringParams = ['gclid', 'fbclid'];
+
+    /**
      * @var string An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
      */
     public $apiKey = '';

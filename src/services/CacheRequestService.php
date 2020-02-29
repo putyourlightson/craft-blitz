@@ -15,7 +15,6 @@ use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
-use yii\base\Exception;
 
 /**
  * @property bool $isCacheableRequest
@@ -40,6 +39,14 @@ class CacheRequestService extends Component
      * @const int
      */
     const MAX_URI_LENGTH = 255;
+
+    // Properties
+    // =========================================================================
+
+    /**
+     * @var string|null
+     */
+    private $_queryString;
 
     // Public Methods
     // =========================================================================
@@ -105,7 +112,7 @@ class CacheRequestService extends Component
         }
 
         if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
-            && !empty($request->getQueryStringWithoutPath())
+            && !empty($this->_getQueryString())
         ) {
             Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $request->getAbsoluteUrl());
 
@@ -124,9 +131,14 @@ class CacheRequestService extends Component
     {
         $url = Craft::$app->getRequest()->getAbsoluteUrl();
 
-        // Remove the query string if unique query strings should be cached as the same page
-        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE) {
-            $url = preg_replace('/\?.*/', '', $url);
+        // Remove the query string
+        $url = preg_replace('/\?.*/', '', $url);
+
+        // Add the query string if unique query strings should not be cached as the same page
+        if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
+            && !empty($this->_getQueryString()))
+        {
+            $url = $url.'?'.$this->_getQueryString();
         }
 
         return SiteUriHelper::getSiteUriFromUrl($url);
@@ -295,5 +307,32 @@ class CacheRequestService extends Component
         }
 
         return false;
+    }
+
+    /**
+     * Returns the query string without the excluded query string params.
+     *
+     * @return string
+     */
+    private function _getQueryString(): string
+    {
+        if ($this->_queryString !== null) {
+            return $this->_queryString;
+        }
+
+        $queryStringParams = explode('&', Craft::$app->getRequest()->getQueryStringWithoutPath());
+
+        foreach ($queryStringParams as $key => $queryStringParam) {
+            foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
+                if (strpos($queryStringParam, $excludedParam.'=') === 0) {
+                    unset($queryStringParams[$key]);
+                    break;
+                }
+            }
+        }
+
+        $this->_queryString = implode('&', $queryStringParams);
+
+        return $this->_queryString;
     }
 }

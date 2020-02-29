@@ -78,24 +78,30 @@ class CacheRequestTest extends Unit
 
     public function testGetRequestedCacheableSiteUri()
     {
-        $queryString = 'x=1';
+        $allowedQueryString = 'x=1&y=1';
+        $disallowedQueryString = 'gclid=123';
 
         // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl().'?'.$queryString);
+        $this->_mockRequest($this->siteUri->getUrl().'?'.$disallowedQueryString.'&'.$allowedQueryString);
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
         Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
 
-        // Assert that the URI contains the query string only if unique query strings should be cached as the same page
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS;
-        $this->assertStringContainsString($queryString, Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri);
+        $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
+        $this->assertStringContainsString($allowedQueryString, $uri);
+        $this->assertStringNotContainsString($disallowedQueryString, $uri);
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
-        $this->assertStringContainsString($queryString, Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri);
+        $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
+        $this->assertStringContainsString($allowedQueryString, $uri);
+        $this->assertStringNotContainsString($disallowedQueryString, $uri);
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE;
-        $this->assertStringNotContainsString($queryString, Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri);
+        $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
+        $this->assertStringNotContainsString($allowedQueryString, $uri);
+        $this->assertStringNotContainsString($disallowedQueryString, $uri);
     }
 
     public function testGetIsCacheableSiteUri()

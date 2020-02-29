@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
-## 3.4.2 - Unreleased
+## 3.5.0 - Unreleased
+### Added
+- Added `excludedQueryStringParams` config setting ([#177](https://github.com/putyourlightson/craft-blitz/issues/177)).
+
 ### Changed
 - Changed `getTemplate` tag to render a template as if it was a page.
 
