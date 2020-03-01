@@ -254,6 +254,11 @@ class SettingsModel extends Model
      */
     public $commands = [];
 
+    /**
+     * @var string The name of the event that will trigger a script inject.
+     */
+    public $injectScriptEvent = 'DOMContentLoaded';
+
     // Public Methods
     // =========================================================================
 

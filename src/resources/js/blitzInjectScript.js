@@ -5,7 +5,7 @@ var Blitz = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", blitzInject);
+document.addEventListener("{injectScriptEvent}", blitzInject);
 
 function blitzInject() {
     "use strict";

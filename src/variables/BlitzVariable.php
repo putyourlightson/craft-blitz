@@ -165,7 +165,8 @@ class BlitzVariable
             $blitzInjectScript = Craft::getAlias('@putyourlightson/blitz/resources/js/blitzInjectScript.js');
 
             if (file_exists($blitzInjectScript)) {
-                $js .= file_get_contents($blitzInjectScript);
+                $js = file_get_contents($blitzInjectScript);
+                $js = str_replace('{injectScriptEvent}', Blitz::$plugin->settings->injectScriptEvent, $js);
             }
         }
 

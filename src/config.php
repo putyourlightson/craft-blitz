@@ -179,5 +179,8 @@ return [
         //'commands' => [
         //    'git' => '/usr/bin/git',
         //],
+
+        // The name of the event that will trigger a script inject.
+        //'injectScriptEvent' => 'DOMContentLoaded',
     ]
 ];

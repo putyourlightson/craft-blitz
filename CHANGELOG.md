@@ -3,6 +3,7 @@
 ## 3.5.0 - Unreleased
 ### Added
 - Added `excludedQueryStringParams` config setting ([#177](https://github.com/putyourlightson/craft-blitz/issues/177)).
+- Added `injectScriptEvent` config setting.
 
 ### Changed
 - Changed `getTemplate` tag to render a template as if it was a page.
