@@ -3,7 +3,8 @@
 ## 3.5.0 - Unreleased
 ### Added
 - Added `excludedQueryStringParams` config setting ([#177](https://github.com/putyourlightson/craft-blitz/issues/177)).
-- Added `injectScriptEvent` config setting.
+- Added `injectScriptEvent` config setting ([#179](https://github.com/putyourlightson/craft-blitz/issues/179)).
+- Added Commerce Order as a non-cacheable element type ([#180](https://github.com/putyourlightson/craft-blitz/issues/180)).
 
 ### Changed
 - Changed `getTemplate` tag to render a template as if it was a page.
