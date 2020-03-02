@@ -180,7 +180,7 @@ return [
         //    'git' => '/usr/bin/git',
         //],
 
-        // The name of the event that will trigger a script inject.
+        // The name of the JavaScript event that will trigger a script inject.
         //'injectScriptEvent' => 'DOMContentLoaded',
     ]
 ];

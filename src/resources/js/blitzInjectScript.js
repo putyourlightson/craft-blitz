@@ -5,6 +5,7 @@ var Blitz = {
     }
 };
 
+// The event will be replaced with the `injectScriptEvent` config setting.
 document.addEventListener("{injectScriptEvent}", blitzInject);
 
 function blitzInject() {
