@@ -17,7 +17,7 @@
 }) }}
 
 {% set info %}
-    <span class="info">{{ 'With this setting enabled, Blitz will compress cached files using gzip and write them to `index.html.gz` for improved performance (requires extra code in server rewrites).'|t('blitz') }}</span>
+    <span class="info">{{ 'With this setting enabled, Blitz will compress cached files using gzip and write them to `index.html.gz` files for improved performance (requires extra code in server rewrites). <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#server-rewrites'})|raw }}</span>
 {% endset %}
 {{ forms.lightswitchField({
     label: "Create Gzip Files"|t('blitz'),

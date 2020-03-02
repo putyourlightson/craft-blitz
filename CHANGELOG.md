@@ -21,7 +21,7 @@
 
 ## 3.3.0 - 2020-02-18
 ### Added
-- Added a `Create Gzip File` setting to the File Storage driver.  
+- Added a `Create Gzip File` setting to the File Storage driver (credit to [Solvr AS](https://solvr.no)).  
 - Added `experimental` label to Local Warmer.
 
 ### Changed
