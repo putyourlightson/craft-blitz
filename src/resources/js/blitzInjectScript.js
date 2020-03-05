@@ -11,7 +11,7 @@ document.addEventListener("{injectScriptEvent}", blitzInject);
 function blitzInject() {
     "use strict";
 
-    var event = new Event("beforeBlitzInjectAll", {
+    var event = new CustomEvent("beforeBlitzInjectAll", {
         cancelable: true
     });
 
@@ -51,7 +51,7 @@ function blitzInject() {
             Blitz.inject.loaded++;
 
             if (Blitz.inject.loaded >= Blitz.inject.data.length) {
-                document.dispatchEvent(new Event("afterBlitzInjectAll"));
+                document.dispatchEvent(new CustomEvent("afterBlitzInjectAll"));
             }
         };
 

@@ -1,3 +1,7 @@
+table th.thin, table td.thin {
+    white-space: nowrap;
+}
+
 .welcome {
     position: relative;
     text-align: center;

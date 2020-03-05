@@ -1,13 +1,15 @@
 # Release Notes for Blitz
 
-## 3.5.0 - Unreleased
+## 3.5.0 - 2020-03-20
 ### Added
 - Added `excludedQueryStringParams` config setting ([#177](https://github.com/putyourlightson/craft-blitz/issues/177)).
 - Added `injectScriptEvent` config setting ([#179](https://github.com/putyourlightson/craft-blitz/issues/179)).
-- Added Commerce Order as a non-cacheable element type ([#180](https://github.com/putyourlightson/craft-blitz/issues/180)).
+- Added Commerce Order as a default non-cacheable element type ([#180](https://github.com/putyourlightson/craft-blitz/issues/180)).
 
 ### Changed
 - Changed `getTemplate` tag to render a template as if it was a page.
+- Changed Blitz inject script to use `CustomEvent` instead of the `Event` constructor ([#183](https://github.com/putyourlightson/craft-blitz/issues/183)).
+- Improved UI of tables in settings.
 
 ## 3.4.1 - 2020-02-20
 ### Changed
@@ -22,7 +24,7 @@
 
 ## 3.3.0 - 2020-02-18
 ### Added
-- Added a `Create Gzip File` setting to the File Storage driver (credit to [Solvr AS](https://solvr.no)).  
+- Added a `Create Gzip File` setting to the File Storage driver (credit to [solvr.no](https://solvr.no)).  
 - Added `experimental` label to Local Warmer.
 
 ### Changed
