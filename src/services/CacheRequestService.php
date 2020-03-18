@@ -123,7 +123,7 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the requested cacheable site URI if valid.
+     * Returns the cacheable requested site URI taking the query string into account.
      *
      * @return SiteUriModel|null
      */

@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\drivers\storage;
 
 use Craft;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\caching\CacheInterface;
 
 /**
  *
@@ -31,7 +32,7 @@ class YiiCacheStorage extends BaseCacheStorage
     public $cacheComponent = 'cache';
 
     /**
-     * @var object|null
+     * @var CacheInterface|null
      */
     private $_cache;
 

@@ -22,11 +22,11 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
-use craft\services\Gc;
 use craft\services\Plugins;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
+use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
@@ -92,21 +92,8 @@ class Blitz extends Plugin
         $this->_registerComponents();
         $this->_registerVariables();
 
-        // Process the request before registering the other events
-        if ($this->cacheRequest->getIsCacheableRequest()) {
-            $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
-            if ($siteUri && $this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-                if ($response = $this->cacheRequest->getResponse($siteUri)) {
-                    // Output the response and end the script
-                    Craft::$app->end(0, $response);
-                }
-                else {
-                    $this->_registerCacheableRequestEvents($siteUri);
-                }
-            }
-        }
-
         // Register events
+        $this->_registerCacheableRequestEvents();
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
         $this->_registerIntegrationEvents();
@@ -224,11 +211,31 @@ class Blitz extends Plugin
 
     /**
      * Registers cacheable request events
-     *
-     * @param SiteUriModel $siteUri
      */
-    private function _registerCacheableRequestEvents(SiteUriModel $siteUri)
+    private function _registerCacheableRequestEvents()
     {
+        // Ensure the request is cacheable
+        if (!$this->cacheRequest->getIsCacheableRequest()) {
+            return;
+        }
+
+        // Ensure the requested site URI is cacheable
+        $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
+
+        if ($siteUri && $this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+            return;
+        }
+
+        // Register application init event
+        Event::on(Application::class, Application::EVENT_INIT,
+            function() use ($siteUri) {
+                if ($response = $this->cacheRequest->getResponse($siteUri)) {
+                    // Output the response and end the script
+                    Craft::$app->end(0, $response);
+                }
+            }
+        );
+
         // Register element populate event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
             function(PopulateElementEvent $event) {
