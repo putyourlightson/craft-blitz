@@ -62,6 +62,9 @@ class CacheRequestTest extends Unit
 
     public function testGetIsCacheableRequest()
     {
+        // Mock a URL request
+        $this->_mockRequest($this->siteUri->getUrl());
+
         // Assert that the request is not cacheable
         $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableRequest());
 
@@ -74,6 +77,23 @@ class CacheRequestTest extends Unit
 
         // Assert that the request is cacheable
         $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableRequest());
+    }
+
+    public function testGetIsCacheableRequestWithPathParam()
+    {
+        // Mock a URL request
+        $this->_mockRequest($this->siteUri->getUrl().'?p=search');
+
+        // Enable caching and add an included URI pattern
+        Blitz::$plugin->settings->cachingEnabled = true;
+        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
+        Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
+
+        // Hide the fact that this is a console request
+        Craft::$app->getRequest()->isConsoleRequest = false;
+
+        // Assert that the request is not cacheable
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableRequest());
     }
 
     public function testGetRequestedCacheableSiteUri()
@@ -90,18 +110,15 @@ class CacheRequestTest extends Unit
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS;
         $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
-        $this->assertStringContainsString($allowedQueryString, $uri);
-        $this->assertStringNotContainsString($disallowedQueryString, $uri);
+        $this->assertEquals($this->siteUri->uri.'?'.$allowedQueryString, $uri);
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
         $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
-        $this->assertStringContainsString($allowedQueryString, $uri);
-        $this->assertStringNotContainsString($disallowedQueryString, $uri);
+        $this->assertEquals($this->siteUri->uri.'?'.$allowedQueryString, $uri);
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE;
         $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
-        $this->assertStringNotContainsString($allowedQueryString, $uri);
-        $this->assertStringNotContainsString($disallowedQueryString, $uri);
+        $this->assertEquals($this->siteUri->uri, $uri);
     }
 
     public function testGetIsCacheableSiteUri()

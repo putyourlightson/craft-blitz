@@ -1,5 +1,13 @@
 # Release Notes for Blitz
 
+## 3.5.1 - Unreleased
+### Changed
+- The cached response is now output when the `Application::EVENT_INIT` event is triggered so that other plugins can perform actions before Blitz ends the script ([#189](https://github.com/putyourlightson/craft-blitz/issues/189)).
+
+### Fixed
+- Fixed a bug in which pages were being cached when a path param was provided in the query string.
+
+### Added
 ## 3.5.0 - 2020-03-20
 ### Added
 - Added `excludedQueryStringParams` config setting ([#177](https://github.com/putyourlightson/craft-blitz/issues/177)).
