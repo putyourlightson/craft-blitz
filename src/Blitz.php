@@ -222,7 +222,7 @@ class Blitz extends Plugin
         // Ensure the requested site URI is cacheable
         $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
 
-        if ($siteUri && $this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+        if ($siteUri === null || !$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
             return;
         }
 

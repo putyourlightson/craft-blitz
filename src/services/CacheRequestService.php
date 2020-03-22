@@ -111,8 +111,9 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if ($request->getQueryString() != $request->getQueryStringWithoutPath()) {
-            Blitz::$plugin->debug('Page not cached because a path param was provided in the query string.', [], $request->getAbsoluteUrl());
+        // Check for path param in URL because `$request->getQueryString()` will contain it regardless
+        if (preg_match('/[?&]p=/', $request->getUrl()) === 1) {
+            Blitz::$plugin->debug('Page not cached because a path param was provided in the query string. ', [], $request->getAbsoluteUrl());
 
             return false;
         }
@@ -326,7 +327,7 @@ class CacheRequestService extends Component
             return $this->_queryString;
         }
 
-        $queryStringParams = explode('&', Craft::$app->getRequest()->getQueryString());
+        $queryStringParams = explode('&', Craft::$app->getRequest()->getQueryStringWithoutPath());
 
         foreach ($queryStringParams as $key => $queryStringParam) {
             foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
