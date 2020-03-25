@@ -11,6 +11,12 @@
 ### Fixed
 - Fixed alignment of the table in Blitz Cache Utility when the Yii Cache Storage is used.
 
+## 3.5.2 - 2020-03-25
+> {warning} This update contains an important bug fix when using Blitz with multi-site. Once updated, the included/excluded URI patterns should be checked that they apply to the correct sites.
+
+### Fixed
+- Fixed a bug in which the included/excluded URI patterns could be applied to the wrong sites if their IDs were out of original order.
+
 ## 3.5.1 - 2020-03-24
 ### Changed
 - The cached response is now output when the `Application::EVENT_INIT` event is triggered so that other plugins can perform actions before Blitz ends the script ([#189](https://github.com/putyourlightson/craft-blitz/issues/189)).

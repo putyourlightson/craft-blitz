@@ -40,7 +40,10 @@ class SettingsController extends Controller
         $siteOptions = [];
 
         foreach (Craft::$app->getSites()->getAllSites() as $site) {
-            $siteOptions[$site->id] = $site->name;
+            $siteOptions[] = [
+                'value' => $site->id,
+                'label' => $site->name,
+            ];
         }
 
         /** @var BaseCacheStorage $storageDriver */
