@@ -3,11 +3,11 @@
 ## 3.6.0 - Unreleased
 ### Added 
 - Added `beforeAddElement` and `afterAddElement` events to `RefreshCacheService`.
-- Added an optional `siteId` parameter to the `craft.blitz.getTemplate` tag to specify for which site the template should be rendered.
 
 ### Changed
 - Refreshing the cache will no longer happen when an element is saved but unchanged, configurable using the new `refreshCacheWhenElementSavedUnchanged` config setting.
 - Refreshing the cache will no longer happen when an element is saved but not live, configurable using the new `refreshCacheWhenElementSavedNotLive` config setting.
+- The `craft.blitz.getTemplate` tag now renders the template using the same site as the request originated from.
 
 ### Fixed
 - Fixed alignment of the table in Blitz Cache Utility when the Yii Cache Storage is used.
