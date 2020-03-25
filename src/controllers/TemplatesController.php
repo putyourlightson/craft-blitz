@@ -40,6 +40,11 @@ class TemplatesController extends Controller
         }
 
         $params = Craft::$app->getRequest()->getParam('params', []);
+        $siteId = Craft::$app->getRequest()->getParam('siteId');
+
+        if ($siteId !== null) {
+            Craft::$app->getSites()->setCurrentSite($siteId);
+        }
 
         $output = Craft::$app->getView()->renderPageTemplate($template, $params);
 

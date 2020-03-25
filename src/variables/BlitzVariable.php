@@ -43,10 +43,11 @@ class BlitzVariable
      *
      * @param string $template
      * @param array $params
+     * @param int|null $siteId
      *
      * @return Markup
      */
-    public function getTemplate(string $template, array $params = []): Markup
+    public function getTemplate(string $template, array $params = [], $siteId = null): Markup
     {
         // Ensure template exists
         if (!Craft::$app->getView()->resolveTemplate($template)) {
@@ -62,6 +63,7 @@ class BlitzVariable
         $params = [
             'template' => $template,
             'params' => $params,
+            'siteId' => $siteId,
         ];
 
         return $this->_getScript($uri, $params);

@@ -3,6 +3,7 @@
 ## 3.6.0 - Unreleased
 ### Added 
 - Added `beforeAddElement` and `afterAddElement` events to `RefreshCacheService`.
+- Added an optional `siteId` parameter to the `craft.blitz.getTemplate` tag to specify for which site the template should be rendered.
 
 ### Changed
 - Refreshing the cache will no longer happen when an element is saved but unchanged, configurable using the new `refreshCacheWhenElementSavedUnchanged` config setting.
