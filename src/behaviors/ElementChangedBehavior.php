@@ -52,7 +52,7 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns whether the element's fields or attributes have changed.
+     * Returns whether the element's fields, attributes or status have changed.
      *
      * @return bool
      */
@@ -61,6 +61,10 @@ class ElementChangedBehavior extends Behavior
         // Only works with Craft 3.4.0 using delta changes feature
         // TODO: remove in 4.0.0
         if (version_compare(Craft::$app->getVersion(), '3.4', '<')) {
+            return true;
+        }
+
+        if ($this->getHasStatusChanged()) {
             return true;
         }
 
