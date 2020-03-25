@@ -1,6 +1,11 @@
 # Release Notes for Blitz
 
 ## 3.6.0 - Unreleased
+### Added 
+
+### Changed
+- Refreshing the cache will no longer happen when an element is saved but unchanged, configurable using the new `refreshCacheWhenElementSavedUnchanged` config setting.
+- Refreshing the cache will no longer happen when an element is saved but not live, configurable using the new `refreshCacheWhenElementSavedNotLive` config setting.
 
 ### Fixed
 - Fixed alignment of the table in Blitz Cache Utility when the Yii Cache Storage is used.

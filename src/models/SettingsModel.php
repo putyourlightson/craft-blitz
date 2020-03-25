@@ -164,6 +164,16 @@ class SettingsModel extends Model
     public $refreshCacheAutomaticallyForGlobals = true;
 
     /**
+     * @var bool Whether the cache should be refreshed when an element is saved but unchanged.
+     */
+    public $refreshCacheWhenElementSavedUnchanged = false;
+
+    /**
+     * @var bool Whether the cache should be refreshed when an element is saved but not live.
+     */
+    public $refreshCacheWhenElementSavedNotLive = false;
+
+    /**
      * @var int Whether URLs with query strings should cached and how.
      *
      * 0: Do not cache URLs with query strings
@@ -206,6 +216,11 @@ class SettingsModel extends Model
      * @var string[] Source ID attributes for element types (in addition to the defaults).
      */
     public $sourceIdAttributes = [];
+
+    /**
+     * @var string[] Live statuses for element types (in addition to the defaults).
+     */
+    public $liveStatuses = [];
 
     /**
      * @var string[] The integrations to initialise.

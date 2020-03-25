@@ -30,13 +30,13 @@ use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
+use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\models\SettingsModel;
-use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\services\CacheTagsService;
 use putyourlightson\blitz\services\FlushCacheService;
@@ -288,17 +288,37 @@ class Blitz extends Plugin
             }
         );
 
-        // Invalidate elements
+        // Set previous status of element so we can compare later
         $events = [
-            [Elements::class, Elements::EVENT_AFTER_SAVE_ELEMENT],
-            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENT],
-            [Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI],
-            [Elements::class, Elements::EVENT_AFTER_DELETE_ELEMENT],
-            [Elements::class, Elements::EVENT_AFTER_RESTORE_ELEMENT],
+            Elements::EVENT_BEFORE_SAVE_ELEMENT,
+            Elements::EVENT_BEFORE_RESAVE_ELEMENT,
+            Elements::EVENT_BEFORE_UPDATE_SLUG_AND_URI,
+            Elements::EVENT_BEFORE_DELETE_ELEMENT,
+            Elements::EVENT_BEFORE_RESTORE_ELEMENT,
         ];
 
         foreach ($events as $event) {
-            Event::on($event[0], $event[1],
+            Event::on(Elements::class, $event,
+                /** @var ElementEvent|BatchElementActionEvent $event */
+                function($event) {
+                    if ($event->element !== null) {
+                        $event->element->attachBehavior('elementChanged', ElementChangedBehavior::class);
+                    }
+                }
+            );
+        }
+
+        // Invalidate elements
+        $events = [
+            Elements::EVENT_AFTER_SAVE_ELEMENT,
+            Elements::EVENT_AFTER_RESAVE_ELEMENT,
+            Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
+            Elements::EVENT_AFTER_DELETE_ELEMENT,
+            Elements::EVENT_AFTER_RESTORE_ELEMENT,
+        ];
+
+        foreach ($events as $event) {
+            Event::on(Elements::class, $event,
                 /** @var ElementEvent|BatchElementActionEvent $event */
                 function($event) {
                     if ($event->element !== null) {

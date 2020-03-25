@@ -31,7 +31,8 @@ use yii\db\ActiveQuery;
 /**
  * This class is responsible for keeping the cache fresh.
  * When one or more cacheable element are updated, they are added to the `$elements` array.
- * If `$batchMode` is false then the `refresh()` method is called immediately, otherwise it is triggered by a resave elements event.
+ * If `$batchMode` is false then the `refresh()` method is called immediately,
+ * otherwise it is triggered by a resave elements event.
  * The `refresh()` method creates a `RefreshCacheJob` so that refreshing happens asynchronously.
  *
  * @property SiteUriModel[] $allSiteUris
@@ -40,6 +41,16 @@ class RefreshCacheService extends Component
 {
     // Constants
     // =========================================================================
+
+    /**
+     * @event RefreshElementEvent
+     */
+    const EVENT_BEFORE_ADD_ELEMENT = 'beforeAddElement';
+
+    /**
+     * @event RefreshElementEvent
+     */
+    const EVENT_AFTER_ADD_ELEMENT = 'afterAddElement';
 
     /**
      * @event RefreshCacheEvent
@@ -181,6 +192,18 @@ class RefreshCacheService extends Component
 
         // Don't proceed if element has already been added
         if (in_array($element->getId(), $this->elements[$elementType]['elementIds'])) {
+            return;
+        }
+
+        // Don't proceed if element has not changed (and the config setting allows)
+        if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged && !$element->getHasChanged()) {
+            return;
+        }
+
+        // Don't proceed if element status has not changed and is not live (and the config setting allows)
+        if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive
+            && !$element->getHasStatusChanged() && !$element->getHasLiveStatus()
+        ) {
             return;
         }
 

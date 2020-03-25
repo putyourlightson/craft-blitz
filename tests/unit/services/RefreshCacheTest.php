@@ -7,11 +7,13 @@ namespace putyourlightson\blitztests\unit;
 
 use Codeception\Test\Unit;
 use Craft;
+use craft\base\Element;
 use craft\elements\Entry;
 use craft\helpers\Db;
 use crafttests\fixtures\EntryFixture;
 use DateInterval;
 use DateTime;
+use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -170,24 +172,59 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->refreshCache->elements = [];
         Blitz::$plugin->refreshCache->batchMode = true;
 
+        $this->entry1->attachBehavior('previousStatus', ElementChangedBehavior::class);
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        // Assert that the element and source IDs are empty
+        $this->assertEquals(
+            [
+                'elementIds' => [],
+                'sourceIds' => [],
+            ],
+            Blitz::$plugin->refreshCache->elements[Entry::class]
+        );
+
+        // Update the title
+        $this->entry1->title .= ' X';
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the element and source IDs are correct
         $this->assertEquals(
             [
                 'elementIds' => [$this->entry1->id],
-                'sourceIds' => [$this->entry1->sectionId]
+                'sourceIds' => [$this->entry1->sectionId],
             ],
             Blitz::$plugin->refreshCache->elements[Entry::class]
         );
 
+        $this->entry2->attachBehavior('previousStatus', ElementChangedBehavior::class);
+
+        // Update the title
+        $this->entry2->title .= ' X';
+
+        // Change the statuses to disabled
+        $this->entry2->previousStatus = Element::STATUS_DISABLED;
+        $this->entry2->enabled = false;
+        Blitz::$plugin->refreshCache->addElement($this->entry2);
+
+        // Assert that the element and source IDs are the same as before
+        $this->assertEquals(
+            [
+                'elementIds' => [$this->entry1->id],
+                'sourceIds' => [$this->entry1->sectionId],
+            ],
+            Blitz::$plugin->refreshCache->elements[Entry::class]
+        );
+
+        // Change the previous status to live
+        $this->entry2->previousStatus = Entry::STATUS_LIVE;
         Blitz::$plugin->refreshCache->addElement($this->entry2);
 
         // Assert that the element and source IDs are correct
         $this->assertEquals(
             [
                 'elementIds' => [$this->entry1->id, $this->entry2->id],
-                'sourceIds' => [$this->entry1->sectionId, $this->entry2->sectionId]
+                'sourceIds' => [$this->entry1->sectionId, $this->entry2->sectionId],
             ],
             Blitz::$plugin->refreshCache->elements[Entry::class]
         );

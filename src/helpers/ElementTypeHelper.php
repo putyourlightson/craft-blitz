@@ -6,11 +6,13 @@
 namespace putyourlightson\blitz\helpers;
 
 use craft\base\BlockElementInterface;
+use craft\base\Element;
 use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\elements\Tag;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\RegisterLiveStatusesEvent;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
 use putyourlightson\blitz\events\RegisterSourceIdAttributesEvent;
 use yii\base\Event;
@@ -29,6 +31,11 @@ class ElementTypeHelper
      * @event RegisterSourceIdAttributesEvent
      */
     const EVENT_REGISTER_SOURCE_ID_ATTRIBUTES = 'registerSourceIdAttributes';
+
+    /**
+     * @event RegisterLiveStatusesEvent
+     */
+    const EVENT_REGISTER_LIVE_STATUSES = 'registerLiveStatuses';
 
     /**
      * @const string[]
@@ -52,6 +59,14 @@ class ElementTypeHelper
         'putyourlightson\campaign\elements\MailingListElement' => 'mailingListTypeId',
     ];
 
+    /**
+     * @const string[]
+     */
+    const LIVE_STATUSES = [
+        Entry::class => Entry::STATUS_LIVE,
+        'craft\commerce\elements\Product' => 'live',
+    ];
+
     // Properties
     // =========================================================================
 
@@ -64,6 +79,11 @@ class ElementTypeHelper
      * @var string[]|null
      */
     private static $_sourceIdAttributes;
+
+    /**
+     * @var string[]|null
+     */
+    private static $_liveStatuses;
 
     // Public Methods
     // =========================================================================
@@ -95,7 +115,7 @@ class ElementTypeHelper
     }
 
     /**
-     * Returns the source ID attribute for the element types.
+     * Returns the source ID attribute for the element type.
      *
      * @param string|null $elementType
      *
@@ -110,6 +130,24 @@ class ElementTypeHelper
         $sourceIdAttributes = self::getSourceIdAttributes();
 
         return $sourceIdAttributes[$elementType] ?? null;
+    }
+
+    /**
+     * Returns the live status for the element type.
+     *
+     * @param string|null $elementType
+     *
+     * @return string|null
+     */
+    public static function getLiveStatus($elementType)
+    {
+        if ($elementType === null) {
+            return null;
+        }
+
+        $liveStatuses = self::getLiveStatuses();
+
+        return $liveStatuses[$elementType] ?? Element::STATUS_ENABLED;
     }
 
     /**
@@ -158,5 +196,29 @@ class ElementTypeHelper
         );
 
         return self::$_sourceIdAttributes;
+    }
+
+    /**
+     * Returns the live statuses for element types.
+     *
+     * @return string[]
+     */
+    public static function getLiveStatuses(): array
+    {
+        if (self::$_liveStatuses !== null) {
+            return self::$_liveStatuses;
+        }
+
+        $event = new RegisterLiveStatusesEvent([
+            'liveStatuses' => Blitz::$plugin->settings->liveStatuses,
+        ]);
+        Event::trigger(self::class, self::EVENT_REGISTER_LIVE_STATUSES, $event);
+
+        self::$_liveStatuses = array_merge(
+            self::LIVE_STATUSES,
+            $event->liveStatuses
+        );
+
+        return self::$_liveStatuses;
     }
 }
