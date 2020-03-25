@@ -125,6 +125,14 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
+    public function getUtilityHtml(): string
+    {
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/yii-cache/utility');
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSettingsHtml()
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/yii-cache/settings', [

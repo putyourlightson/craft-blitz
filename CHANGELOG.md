@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 3.6.0 - Unreleased
+
+### Fixed
+- Fixed alignment of the table in Blitz Cache Utility when the Yii Cache Storage is used.
+
 ## 3.5.1 - 2020-03-24
 ### Changed
 - The cached response is now output when the `Application::EVENT_INIT` event is triggered so that other plugins can perform actions before Blitz ends the script ([#189](https://github.com/putyourlightson/craft-blitz/issues/189)).
