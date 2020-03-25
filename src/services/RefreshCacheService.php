@@ -18,6 +18,7 @@ use craft\queue\Queue;
 use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\events\RefreshElementEvent;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
@@ -207,6 +208,13 @@ class RefreshCacheService extends Component
             return;
         }
 
+        $event = new RefreshElementEvent(['element' => $element]);
+        $this->trigger(self::EVENT_BEFORE_ADD_ELEMENT, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
         // Add element
         $this->elements[$elementType]['elementIds'][] = $element->id;
 
@@ -223,6 +231,10 @@ class RefreshCacheService extends Component
 
         // Add element expiry dates
         $this->addElementExpiryDates($element);
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_ADD_ELEMENT)) {
+            $this->trigger(self::EVENT_AFTER_ADD_ELEMENT, $event);
+        }
 
         // If batch mode is on then the refresh will be triggered later
         if ($this->batchMode === false) {

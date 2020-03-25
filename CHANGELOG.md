@@ -2,6 +2,7 @@
 
 ## 3.6.0 - Unreleased
 ### Added 
+- Added `beforeAddElement` and `afterAddElement` events to `RefreshCacheService`.
 
 ### Changed
 - Refreshing the cache will no longer happen when an element is saved but unchanged, configurable using the new `refreshCacheWhenElementSavedUnchanged` config setting.
