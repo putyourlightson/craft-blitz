@@ -86,7 +86,7 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasStatusChanged(): bool
     {
-        return $this->owner->getStatus() != $this->previousStatus;
+        return $this->previousStatus === null || $this->previousStatus != $this->owner->getStatus();
     }
 
     /**

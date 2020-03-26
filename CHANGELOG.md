@@ -2,15 +2,16 @@
 
 ## 3.6.0 - Unreleased
 ### Added 
+- Added `refreshCacheWhenElementSavedUnchanged` and `refreshCacheWhenElementSavedNotLive` config settings.
 - Added `beforeAddElement` and `afterAddElement` events to `RefreshCacheService`.
 
 ### Changed
-- Refreshing the cache will no longer happen when an element is saved but unchanged, configurable using the new `refreshCacheWhenElementSavedUnchanged` config setting.
-- Refreshing the cache will no longer happen when an element is saved but not live, configurable using the new `refreshCacheWhenElementSavedNotLive` config setting.
+- The cache will no longer be refreshed when an element is saved but unchanged (in Craft 3.4.0 or above), configurable using the new `refreshCacheWhenElementSavedUnchanged` config setting.
+- The cache will no longer be refreshed  when an element is saved but not live, configurable using the new `refreshCacheWhenElementSavedNotLive` config setting.
 - The `craft.blitz.getTemplate` tag now renders the template using the same site as the request originated from.
 
 ### Fixed
-- Fixed alignment of the table in Blitz Cache Utility when the Yii Cache Storage is used.
+- Fixed the table alignment in Blitz Cache Utility when the Yii Cache Storage was used.
 
 ## 3.5.2 - 2020-03-25
 > {warning} This update contains an important bug fix when using Blitz with multi-site. Once updated, the included/excluded URI patterns should be checked that they apply to the correct sites.

@@ -117,6 +117,12 @@ return [
         // Whether the cache should automatically be refreshed after a global set is updated.
         //'refreshCacheAutomaticallyForGlobals' => true,
 
+        // Whether the cache should be refreshed when an element is saved but unchanged.
+        //'refreshCacheWhenElementSavedUnchanged' => false,
+
+        // Whether the cache should be refreshed when an element is saved but not live.
+        //'refreshCacheWhenElementSavedNotLive' => false,
+
         // Whether URLs with query strings should cached and how.
         // 0: Do not cache URLs with query strings
         // 1: Cache URLs with query strings as unique pages
