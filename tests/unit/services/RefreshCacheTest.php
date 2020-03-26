@@ -172,7 +172,7 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->refreshCache->elements = [];
         Blitz::$plugin->refreshCache->batchMode = true;
 
-        $this->entry1->attachBehavior('previousStatus', ElementChangedBehavior::class);
+        $this->entry1->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the element and source IDs are empty
@@ -197,7 +197,7 @@ class RefreshCacheTest extends Unit
             Blitz::$plugin->refreshCache->elements[Entry::class]
         );
 
-        $this->entry2->attachBehavior('previousStatus', ElementChangedBehavior::class);
+        $this->entry2->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
         // Update the title
         $this->entry2->title .= ' X';

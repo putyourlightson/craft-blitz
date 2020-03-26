@@ -302,7 +302,7 @@ class Blitz extends Plugin
                 /** @var ElementEvent|BatchElementActionEvent $event */
                 function($event) {
                     if ($event->element !== null) {
-                        $event->element->attachBehavior('elementChanged', ElementChangedBehavior::class);
+                        $event->element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
                     }
                 }
             );

@@ -19,6 +19,14 @@ use yii\base\Behavior;
  */
 class ElementChangedBehavior extends Behavior
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @const string
+     */
+    const BEHAVIOR_NAME = 'elementChanged';
+
     // Properties
     // =========================================================================
 

@@ -16,6 +16,7 @@ use craft\helpers\Db;
 use craft\helpers\ElementHelper;
 use craft\queue\Queue;
 use DateTime;
+use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\events\RefreshElementEvent;
@@ -196,16 +197,22 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Don't proceed if element has not changed (and the config setting allows)
-        if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged && !$element->getHasChanged()) {
-            return;
-        }
+        // If the element has the element changed behavior
+        /** @var ElementChangedBehavior|null $elementChanged */
+        $elementChanged = $element->getBehavior(ElementChangedBehavior::BEHAVIOR_NAME);
 
-        // Don't proceed if element status has not changed and is not live (and the config setting allows)
-        if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive
-            && !$element->getHasStatusChanged() && !$element->getHasLiveStatus()
-        ) {
-            return;
+        if ($elementChanged !== null) {
+            // Don't proceed if element has not changed (and the config setting allows)
+            if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged && !$elementChanged->getHasChanged()) {
+                return;
+            }
+
+            // Don't proceed if element status has not changed and is not live (and the config setting allows)
+            if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive
+                && !$elementChanged->getHasStatusChanged() && !$elementChanged->getHasLiveStatus()
+            ) {
+                return;
+            }
         }
 
         $event = new RefreshElementEvent(['element' => $element]);
