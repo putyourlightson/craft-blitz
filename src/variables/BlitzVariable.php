@@ -171,13 +171,10 @@ class BlitzVariable
             }
         }
 
-        $this->_injected++;
-
-        $js .= 'Blitz.inject.data.push({id: '.$this->_injected.', uri: "'.$uri.'", params: "'.http_build_query($params).'"});';
-
         $view->registerJs($js, View::POS_END);
 
-        $output = '<span class="blitz-inject" id="'.'blitz-inject-'.$this->_injected.'"></span>';
+        $id = ++$this->_injected;
+        $output = '<span class="blitz-inject" id="blitz-inject-'.$id.'" data-blitz-id="'.$id.'" data-blitz-uri="'.$uri.'" data-blitz-params="'.http_build_query($params).'"></span>';
 
         return Template::raw($output);
     }
