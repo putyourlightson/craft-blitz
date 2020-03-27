@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.6.0 - Unreleased
+## 3.6.0 - 2020-03-27
 ### Added 
 - Added `refreshCacheWhenElementSavedUnchanged` and `refreshCacheWhenElementSavedNotLive` config settings.
 - Added `beforeAddElement` and `afterAddElement` events to `RefreshCacheService`.
