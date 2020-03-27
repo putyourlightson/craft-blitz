@@ -12,6 +12,7 @@
 
 ### Fixed
 - Fixed an error that could occur if a site defined in the Cloudflare Zone ID settings was deleted ([#192](https://github.com/putyourlightson/craft-blitz/issues/192)).
+- Fixed a bug that could prevent the homepage from being refreshed in some cases.
 - Fixed the table alignment in Blitz Cache Utility when the Yii Cache Storage was used.
 
 ## 3.5.2 - 2020-03-25

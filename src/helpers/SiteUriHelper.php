@@ -90,7 +90,7 @@ class SiteUriHelper
         foreach ($uris as $uri) {
             $siteUri = new SiteUriModel([
                 'siteId' => $siteId,
-                'uri' => str_replace('__home__', '', $uri),
+                'uri' => $uri,
             ]);
 
             if (!$cacheableOnly || Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
@@ -119,7 +119,7 @@ class SiteUriHelper
         $siteUris = CacheRecord::find()
             ->select(['siteId', 'uri'])
             ->where(['id' => $cacheIds])
-            ->asArray(true)
+            ->asArray()
             ->all();
 
         foreach ($siteUris as $siteUri) {
