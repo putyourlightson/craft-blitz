@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.1 - Unreleased
+### Changed
+- Changed the Blitz inject script so it will work with an XHR page navigation ([#179](https://github.com/putyourlightson/craft-blitz/issues/179)).
+
 ## 3.6.0 - 2020-03-27
 ### Added 
 - Added `refreshCacheWhenElementSavedUnchanged` and `refreshCacheWhenElementSavedNotLive` config settings.
