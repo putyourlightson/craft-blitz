@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\drivers\purgers;
 use Craft;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\db\Table;
+use craft\errors\SiteNotFoundException;
 use craft\helpers\Db;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
@@ -142,7 +143,14 @@ class CloudflarePurger extends BaseCachePurger
     {
         foreach ($this->zoneIds as $siteUid => $value) {
             if ($value['zoneId']) {
-                $site = Craft::$app->getSites()->getSiteByUid($siteUid);
+                try {
+                    $site = Craft::$app->getSites()->getSiteByUid($siteUid);
+                }
+                catch (SiteNotFoundException $e) {
+                    Blitz::$plugin->log($e->getMessage(), [], 'error');
+
+                    continue;
+                }
 
                 if ($site !== null) {
                     $response = $this->_sendRequest('get', '', $site->id);
