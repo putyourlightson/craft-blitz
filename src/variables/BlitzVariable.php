@@ -173,8 +173,20 @@ class BlitzVariable
 
         $view->registerJs($js, View::POS_END);
 
-        $id = ++$this->_injected;
-        $output = '<span class="blitz-inject" id="blitz-inject-'.$id.'" data-blitz-id="'.$id.'" data-blitz-uri="'.$uri.'" data-blitz-params="'.http_build_query($params).'"></span>';
+        $this->_injected++;
+        $id = $this->_injected;
+
+        $data = [
+            'id' => $id,
+            'uri' => $uri,
+            'params' => http_build_query($params),
+        ];
+
+        array_walk($data, function(&$value, $key) {
+            $value = 'data-blitz-'.$key.'="'.$value.'"';
+        });
+
+        $output = '<span class="blitz-inject" id="blitz-inject-'.$id.'" '.implode(' ', $data).'></span>';
 
         return Template::raw($output);
     }

@@ -1,17 +1,19 @@
-// The event will be replaced with the `injectScriptEvent` config setting.
+var Blitz = {};
+
+// The event name will be replaced with the `injectScriptEvent` config setting.
 document.addEventListener("{injectScriptEvent}", blitzInject);
 
 function blitzInject() {
     "use strict";
 
-    const Blitz = {
+    Blitz = {
         inject: {
             data: document.querySelectorAll('.blitz-inject:not(.blitz-inject--injected)'),
             loaded: 0
         }
     };
 
-    const event = new CustomEvent("beforeBlitzInjectAll", {
+    var event = new CustomEvent("beforeBlitzInjectAll", {
         cancelable: true
     });
 
@@ -20,14 +22,15 @@ function blitzInject() {
     }
 
     Blitz.inject.data.forEach(function(data, index) {
-        const dataUri = data.getAttribute('data-blitz-uri');
-        const dataParams = data.getAttribute('data-blitz-params')
-        const dataId = data.getAttribute('data-blitz-id')
+        var id = data.getAttribute('data-blitz-id');
+        var uri = data.getAttribute('data-blitz-uri');
+        var params = data.getAttribute('data-blitz-params');
 
-        const customEventInit = {
+        var customEventInit = {
             detail: {
-                uri: dataUri,
-                params: dataParams
+                id: id,
+                uri: uri,
+                params: params
             },
             cancelable: true
         };
@@ -36,10 +39,10 @@ function blitzInject() {
             return;
         }
 
-        const xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
         xhr.onload = function() {
             if (xhr.status >= 200 && xhr.status < 300) {
-                const element = document.getElementById("blitz-inject-" + dataId);
+                var element = document.getElementById("blitz-inject-" + id);
 
                 if (element) {
                     customEventInit.detail.element = element;
@@ -59,7 +62,7 @@ function blitzInject() {
             }
         };
 
-        xhr.open("GET", dataUri + (dataParams && "?" + dataParams));
+        xhr.open("GET", uri + (params && "?" + params));
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.send();
     });
