@@ -70,11 +70,10 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      */
     public function warmAll(callable $setProgressHandler = null, int $delay = null)
     {
-        $siteUris = SiteUriHelper::getAllSiteUris(true);
-
-        if (is_array(Blitz::$plugin->settings->customSiteUris)) {
-            $siteUris = array_merge($siteUris, Blitz::$plugin->settings->customSiteUris);
-        }
+        $siteUris = array_merge(
+            SiteUriHelper::getAllSiteUris(true),
+            Blitz::$plugin->settings->customSiteUris
+        );
 
         $this->warmUris($siteUris, $setProgressHandler, $delay);
     }

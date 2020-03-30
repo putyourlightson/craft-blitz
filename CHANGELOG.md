@@ -5,7 +5,8 @@
 - Changed the Blitz inject script so it will work with an XHR page navigation ([#179](https://github.com/putyourlightson/craft-blitz/issues/179)).
 
 ### Fixed
-- Fixed the console command to warm the cache that was unnecessarily trying to warm uncacheable pages ([#195](https://github.com/putyourlightson/craft-blitz/issues/195)).
+- Fixed the console command to warm the cache unnecessarily trying to warm uncacheable pages ([#195](https://github.com/putyourlightson/craft-blitz/issues/195)).
+- Fixed the console command to warm the cache not warming custom site URIs ([#196](https://github.com/putyourlightson/craft-blitz/issues/196)).
 
 ## 3.6.0 - 2020-03-27
 ### Added 

@@ -107,7 +107,7 @@ class SettingsModel extends Model
     public $cacheWarmerTypes = [];
 
     /**
-     * @var array|string Custom site URIs to warm when either a site or the entire cache is warmed.
+     * @var array Custom site URIs to warm when either a site or the entire cache is warmed.
      *
      * [
      *     [
