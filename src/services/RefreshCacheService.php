@@ -472,7 +472,10 @@ class RefreshCacheService extends Component
             foreach ($elementExpiryDates as $elementExpiryDate) {
                 /** @var ElementExpiryDateRecord $elementExpiryDate */
                 $elementType = $elementsService->getElementTypeById($elementExpiryDate->elementId);
-                $element = (new $elementType)->find()->id($elementExpiryDate->elementId)->site('*')->one();
+
+                if($elementType !== null) {
+                    $element = (new $elementType)->find()->id($elementExpiryDate->elementId)->site('*')->one();
+                }
 
                 // This should happen before invalidating the element so that other expiry dates will be saved
                 $elementExpiryDate->delete();
