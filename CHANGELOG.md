@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.3 - Unreleased
+### Fixed
+- Fixed a bug in which an expired element that did not exist in the primary site would not be refreshed ([#199](https://github.com/putyourlightson/craft-blitz/issues/199)).
+
 ## 3.6.2 - 2020-03-30
 ### Fixed
 - Fixed a potential error if the `customSiteUris` setting was set to a string.

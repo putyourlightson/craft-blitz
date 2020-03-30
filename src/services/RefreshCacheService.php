@@ -471,17 +471,22 @@ class RefreshCacheService extends Component
 
             foreach ($elementExpiryDates as $elementExpiryDate) {
                 /** @var ElementExpiryDateRecord $elementExpiryDate */
-                $elementType = $elementsService->getElementTypeById($elementExpiryDate->elementId);
-
-                if($elementType !== null) {
-                    $element = (new $elementType)->find()->id($elementExpiryDate->elementId)->site('*')->one();
-                }
+                $elementId = $elementExpiryDate->elementId;
 
                 // This should happen before invalidating the element so that other expiry dates will be saved
                 $elementExpiryDate->delete();
 
-                if ($element !== null) {
-                    $this->addElement($element);
+                // TODO: simplify using the following technique in 4.0.0 if PR is merged (https://github.com/craftcms/cms/pull/5861)
+                //$element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
+
+                $elementType = $elementsService->getElementTypeById($elementId);
+
+                if($elementType !== null) {
+                    $element = $elementType::find()->id($elementId)->site('*')->one();
+
+                    if ($element !== null) {
+                        $this->addElement($element);
+                    }
                 }
             }
         }
