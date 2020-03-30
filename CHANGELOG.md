@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.6.1 - Unreleased
+## 3.6.1 - 2020-03-30
 ### Changed
 - Changed the Blitz inject script so it will work with an XHR page navigation ([#179](https://github.com/putyourlightson/craft-blitz/issues/179)).
 
