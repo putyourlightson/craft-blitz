@@ -427,7 +427,7 @@ class RefreshCacheService extends Component
         // Get warmable site URIs before flushing the cache
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(true),
-            Blitz::$plugin->settings->customSiteUris
+            Blitz::$plugin->settings->getCustomSiteUris()
         );
 
         Blitz::$plugin->flushCache->flushAll();

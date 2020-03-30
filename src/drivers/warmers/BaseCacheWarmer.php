@@ -54,7 +54,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     public function warmSite(int $siteId, callable $setProgressHandler = null, int $delay = null)
     {
         // Get custom site URIs for the provided site only
-        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->customSiteUris);
+        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->getCustomSiteUris());
         $customSiteUris = $groupedSiteUris[$siteId] ?? [];
 
         $siteUris = array_merge(
@@ -72,7 +72,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     {
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(true),
-            Blitz::$plugin->settings->customSiteUris
+            Blitz::$plugin->settings->getCustomSiteUris()
         );
 
         $this->warmUris($siteUris, $setProgressHandler, $delay);

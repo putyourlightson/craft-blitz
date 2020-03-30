@@ -280,19 +280,6 @@ class SettingsModel extends Model
     /**
      * @inheritdoc
      */
-    public function init()
-    {
-        parent::init();
-
-        // Ensure custom site URIs is an array
-        if (!is_array($this->customSiteUris)) {
-            $this->customSiteUris = [];
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function behaviors(): array
     {
         return [
@@ -332,5 +319,13 @@ class SettingsModel extends Model
         $labels['apiKey'] = Craft::t('blitz', 'API Key');
 
         return $labels;
+    }
+
+    /**
+     * Returns custom site URIs as an array
+     */
+    public function getCustomSiteUris()
+    {
+        return is_array($this->customSiteUris) ? $this->customSiteUris : [];
     }
 }

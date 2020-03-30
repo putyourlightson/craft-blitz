@@ -305,7 +305,7 @@ class CacheController extends Controller
     {
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, Console::FG_YELLOW);
 
-        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->customSiteUris);
+        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
 
         Console::startProgress(0, count($siteUris), '', 0.8);
 
@@ -323,7 +323,7 @@ class CacheController extends Controller
     {
         $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, Console::FG_YELLOW);
 
-        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->customSiteUris);
+        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
 
         Console::startProgress(0, count($siteUris), '', 0.8);
 
