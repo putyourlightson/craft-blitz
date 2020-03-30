@@ -144,7 +144,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_warmCache(SiteUriHelper::getAllSiteUris());
+        $this->_warmCache(SiteUriHelper::getAllSiteUris(true));
 
         return ExitCode::OK;
     }
