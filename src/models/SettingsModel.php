@@ -280,6 +280,19 @@ class SettingsModel extends Model
     /**
      * @inheritdoc
      */
+    public function init()
+    {
+        parent::init();
+
+        // Ensure custom site URIs is an array
+        if (!is_array($this->customSiteUris)) {
+            $this->customSiteUris = [];
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function behaviors(): array
     {
         return [
