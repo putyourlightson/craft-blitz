@@ -2,7 +2,7 @@
 
 ## 3.6.2 - 2020-03-30
 ### Fixed
-- Fixed a possible error if `customSiteUris` was set to a string.
+- Fixed a potential error if the `customSiteUris` setting was set to a string.
 
 ## 3.6.1 - 2020-03-30
 ### Changed
