@@ -17,6 +17,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
@@ -314,8 +315,11 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        if (Blitz::$plugin->settings->outputComments) {
-            // Append timestamp
+        // Get the mime type from the URI
+        $mimeType = SiteUriHelper::getMimeType($siteUri);
+
+        // Append timestamp comment if html and config setting is true
+        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && Blitz::$plugin->settings->outputComments) {
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
         }
 

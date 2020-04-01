@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
+use craft\helpers\FileHelper;
 use craft\records\Element;
 use craft\records\Element_SiteSettings;
 use putyourlightson\blitz\Blitz;
@@ -14,8 +15,28 @@ use putyourlightson\blitz\records\CacheRecord;
 
 class SiteUriHelper
 {
+    // Constants
+    // =========================================================================
+
+    /**
+     * @const string
+     */
+    const MIME_TYPE_HTML = 'text/html';
+
     // Public Methods
     // =========================================================================
+
+    /**
+     * Returns the mime type of the given site URI.
+     *
+     * @param SiteUriModel $siteUri
+     *
+     * @return string
+     */
+    public static function getMimeType(SiteUriModel $siteUri)
+    {
+        return FileHelper::getMimeTypeByExtension($siteUri->uri) ?? self::MIME_TYPE_HTML;
+    }
 
     /**
      * Returns all site URIs.

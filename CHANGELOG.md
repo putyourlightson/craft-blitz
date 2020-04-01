@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
 ## 3.6.3 - Unreleased
+### Changed
+- Output comments are no longer included for URIs that have a mime type that is not HTML ([#76](https://github.com/putyourlightson/craft-blitz/issues/76)).
+
 ### Fixed
 - Fixed a bug in which an expired element that did not exist in the primary site would not be refreshed ([#199](https://github.com/putyourlightson/craft-blitz/issues/199)).
 
