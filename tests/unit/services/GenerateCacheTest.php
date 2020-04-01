@@ -72,8 +72,32 @@ class GenerateCacheTest extends Unit
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
         $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
 
-        // Assert that the output (which may also contain a timestamp) contains the cached value
+        // Assert that the output contains the cached value
         $this->assertStringContainsString($this->output, $value);
+
+        // Assert that the output contains a timestamp
+        $this->assertStringContainsString('Cached by Blitz on', $value);
+    }
+
+    public function testSaveCacheWithFileExtension()
+    {
+        $siteUri = new SiteUriModel(['siteId' => $this->siteUri->siteId]);
+
+        $siteUri->uri = $this->siteUri->uri.'.html';
+
+        Blitz::$plugin->generateCache->save($this->output, $siteUri);
+        $value = Blitz::$plugin->cacheStorage->get($siteUri);
+
+        // Assert that the output contains a timestamp
+        $this->assertStringContainsString('Cached by Blitz on', $value);
+
+        $siteUri->uri = $this->siteUri->uri.'.json';
+
+        Blitz::$plugin->generateCache->save($this->output, $siteUri);
+        $value = Blitz::$plugin->cacheStorage->get($siteUri);
+
+        // Assert that the output does not contain a timestamp
+        $this->assertStringNotContainsString('Cached by Blitz on', $value);
     }
 
     public function testSaveCacheRecord()
