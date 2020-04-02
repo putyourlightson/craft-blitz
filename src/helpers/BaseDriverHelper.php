@@ -85,7 +85,12 @@ class BaseDriverHelper
         // Add job to queue with a priority
         /** @var Queue $queue */
         $queue = Craft::$app->getQueue();
-        $queue->priority($priority);
+
+        // Set a priority only if it exists on the queue
+        if (method_exists($queue, 'priority')) {
+            $queue->priority($priority);
+        }
+
         $queue->push(new DriverJob([
             'siteUris' => $siteUris,
             'driverId' => $driverId,

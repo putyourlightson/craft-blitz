@@ -375,11 +375,14 @@ class RefreshCacheService extends Component
             'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
         ]);
 
-        // Add job to queue with a priority
-        /** @var Queue $queue */
         $queue = Craft::$app->getQueue();
-        $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
-            ->push($refreshCacheJob);
+
+        // Set a priority only if it exists on the queue
+        if (method_exists($queue, 'priority')) {
+            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority);
+        }
+
+        $queue->push($refreshCacheJob);
     }
 
     /**
