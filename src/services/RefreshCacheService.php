@@ -14,7 +14,6 @@ use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use craft\helpers\ElementHelper;
-use craft\queue\Queue;
 use DateTime;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
@@ -28,8 +27,8 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
-use yii\queue\redis\Queue as RedisQueue;
 
 /**
  * This class is responsible for keeping the cache fresh.
@@ -378,12 +377,13 @@ class RefreshCacheService extends Component
 
         $queue = Craft::$app->getQueue();
 
-        // Set a priority if not a redis queue (https://github.com/putyourlightson/craft-blitz/issues/201)
-        if (!($queue instanceof RedisQueue)) {
-            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority);
+        try {
+            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)->push($refreshCacheJob);
         }
-
-        $queue->push($refreshCacheJob);
+        catch (NotSupportedException $e) {
+            // The queue probably doesn't support custom push priorities. Try again without one.
+            $queue->push($refreshCacheJob);
+        }
     }
 
     /**

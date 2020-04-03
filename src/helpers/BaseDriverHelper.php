@@ -12,6 +12,7 @@ use craft\queue\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\base\NotSupportedException;
 use yii\queue\redis\Queue as RedisQueue;
 
 class BaseDriverHelper
@@ -83,21 +84,24 @@ class BaseDriverHelper
             }
         }
 
-        // Add job to queue with a priority
-        /** @var Queue $queue */
-        $queue = Craft::$app->getQueue();
-
-        // Set a priority if not a redis queue (https://github.com/putyourlightson/craft-blitz/issues/201)
-        if (!($queue instanceof RedisQueue)) {
-            $queue->priority($priority);
-        }
-
-        $queue->push(new DriverJob([
+        $job = new DriverJob([
             'siteUris' => $siteUris,
             'driverId' => $driverId,
             'driverMethod' => $driverMethod,
             'description' => $description,
             'delay' => $delay,
-        ]));
+        ]);
+
+        // Add job to queue with a priority
+        /** @var Queue $queue */
+        $queue = Craft::$app->getQueue();
+
+        try {
+            $queue->priority($priority)->push($job);
+        }
+        catch (NotSupportedException $e) {
+            // The queue probably doesn't support custom push priorities. Try again without one.
+            $queue->push($job);
+        }
     }
 }
