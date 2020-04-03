@@ -29,6 +29,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\ActiveQuery;
+use yii\queue\redis\Queue as RedisQueue;
 
 /**
  * This class is responsible for keeping the cache fresh.
@@ -377,8 +378,8 @@ class RefreshCacheService extends Component
 
         $queue = Craft::$app->getQueue();
 
-        // Set a priority only if it exists on the queue
-        if (method_exists($queue, 'priority')) {
+        // Set a priority if not a redis queue (https://github.com/putyourlightson/craft-blitz/issues/201)
+        if (!($queue instanceof RedisQueue)) {
             $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority);
         }
 

@@ -12,6 +12,7 @@ use craft\queue\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\queue\redis\Queue as RedisQueue;
 
 class BaseDriverHelper
 {
@@ -86,8 +87,8 @@ class BaseDriverHelper
         /** @var Queue $queue */
         $queue = Craft::$app->getQueue();
 
-        // Set a priority only if it exists on the queue
-        if (method_exists($queue, 'priority')) {
+        // Set a priority if not a redis queue (https://github.com/putyourlightson/craft-blitz/issues/201)
+        if (!($queue instanceof RedisQueue)) {
             $queue->priority($priority);
         }
 
