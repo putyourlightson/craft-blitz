@@ -200,7 +200,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
 
-        Craft::$app->getQueue()->run();
+        Craft::$app->runAction('queue/run');
 
         $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
@@ -222,7 +222,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
 
-        Craft::$app->getQueue()->run();
+        Craft::$app->runAction('queue/run');
 
         $this->stdout(Craft::t('blitz', 'Cached URLs successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
@@ -244,7 +244,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
 
-        Craft::$app->getQueue()->run();
+        Craft::$app->runAction('queue/run');
 
         $this->stdout(Craft::t('blitz', 'Tagged cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
