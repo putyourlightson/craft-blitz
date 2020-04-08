@@ -5,12 +5,13 @@
 
 namespace putyourlightson\blitz\drivers\integrations;
 
+use craft\elements\db\ElementQuery;
+use craft\elements\db\ElementQueryInterface;
 use nystudio107\seomatic\events\InvalidateContainerCachesEvent;
 use nystudio107\seomatic\Seomatic;
 use nystudio107\seomatic\services\MetaContainers;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\records\CacheRecord;
 use yii\base\Event;
 
 class SeomaticIntegration extends BaseIntegration
@@ -36,14 +37,27 @@ class SeomaticIntegration extends BaseIntegration
         // Set up invalidate container caches event listeners
         Event::on(MetaContainers::class, MetaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
             function(InvalidateContainerCachesEvent $event) {
-                if ($event->uri === null && $event->siteId === null) {
+                if ($event->uri === null && $event->siteId === null && $event->sourceId === null && $event->sourceType === null) {
                     // Refresh all cache
                     Blitz::$plugin->refreshCache->refreshAll();
                 }
-                elseif ($event->siteId !== null && $event->sourceId !== null && $event->sourceType) {
+                elseif ($event->uri === null && $event->siteId !== null && $event->sourceId !== null && $event->sourceType !== null) {
                     // Refresh cache for source
-                    $siteUris = self::_getSourceSiteUris($event->siteId, $event->sourceId, $event->sourceType);
-                    Blitz::$plugin->refreshCache->refreshSiteUris($siteUris);
+                    /** @var ElementQuery $elementQuery */
+                    $elementQuery = self::_getElementQuery($event->siteId, $event->sourceId, $event->sourceType);
+                    $elementIds = $elementQuery->ids();
+
+                    if (!empty($elementIds)) {
+                        Blitz::$plugin->refreshCache->addElementIds($elementQuery->elementType, $elementIds);
+                        Blitz::$plugin->refreshCache->refresh();
+                    }
+                }
+                elseif ($event->uri !== null && $event->siteId !== null && $event->sourceId === null && $event->sourceType === null) {
+                    // Refresh cache for URI
+                    if ($cacheIds = self::_getCacheIdsFromUri($event->uri, $event->siteId)) {
+                        Blitz::$plugin->refreshCache->addCacheIds($cacheIds);
+                        Blitz::$plugin->refreshCache->refresh();
+                    }
                 }
             }
         );
@@ -53,28 +67,39 @@ class SeomaticIntegration extends BaseIntegration
     // =========================================================================
 
     /**
-     * Returns the site URIs for the given source ID
+     * Returns the element IDs for the given site, source and type.
      *
      * @param int $siteId
      * @param int $sourceId
      * @param string $sourceType
      *
-     * @return SiteUriModel[]
+     * @return ElementQueryInterface
      */
-    private static function _getSourceSiteUris(int $siteId, int $sourceId, string $sourceType): array
+    private static function _getElementQuery(int $siteId, int $sourceId, string $sourceType): ElementQueryInterface
     {
-        $metaBundle = Seomatic::$plugin->metaBundles->getMetaBundleBySourceId(
-            $sourceType,
-            $sourceId,
-            $siteId
-        );
+        $metaBundle = Seomatic::$plugin->metaBundles->getMetaBundleBySourceId($sourceType, $sourceId, $siteId);
 
         $seoElement = Seomatic::$plugin->seoElements->getSeoElementByMetaBundleType($metaBundle->sourceBundleType);
-        $query = $seoElement::sitemapElementsQuery($metaBundle);
-        $elementIds = $query->ids();
 
-        $siteUris = SiteUriHelper::getCachedElementSiteUris($elementIds);
+        return $seoElement::sitemapElementsQuery($metaBundle);
+    }
 
-        return $siteUris;
+    /**
+     * Returns cache IDs from a given URI.
+     *
+     * @param string $uri
+     * @param int $siteId
+     *
+     * @return int[]
+     */
+    private static function _getCacheIdsFromUri(string $uri, int $siteId): array
+    {
+        return CacheRecord::find()
+            ->select('id')
+            ->where([
+                'uri' => $uri,
+                'siteId' => $siteId,
+            ])
+            ->column();
     }
 }

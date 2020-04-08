@@ -96,23 +96,19 @@ class RefreshCacheService extends Component
     // =========================================================================
 
     /**
-     * Returns an array of unique cache IDs given an array of elements and cache IDs.
+     * Returns cache IDs given an array of element IDs.
      *
      * @param int[] $elementIds
-     * @param int[] $cacheIds
      *
      * @return int[]
      */
-    public function getElementCacheIds(array $elementIds, array $cacheIds = []): array
+    public function getElementCacheIds(array $elementIds): array
     {
-        $elementCacheIds = ElementCacheRecord::find()
+        return ElementCacheRecord::find()
             ->select('cacheId')
             ->where(['elementId' => $elementIds])
-            ->andWhere(['not', ['cacheId' => $cacheIds]])
             ->groupBy('cacheId')
             ->column();
-
-        return array_merge($cacheIds, $elementCacheIds);
     }
 
     /**
@@ -145,13 +141,28 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Adds cache IDs to refresh given an element.
+     * Adds cache IDs to refresh.
      *
-     * @param ElementInterface $element
+     * @param array $cacheIds
      */
-    public function addCacheIds(ElementInterface $element)
+    public function addCacheIds(array $cacheIds)
     {
-        $this->cacheIds = $this->getElementCacheIds([$element->getId()], $this->cacheIds);
+        $this->cacheIds = array_merge($this->cacheIds, $cacheIds);
+    }
+
+    /**
+     * Adds element IDs to refresh.
+     *
+     * @param string $elementType
+     * @param array $elementIds
+     */
+    public function addElementIds(string $elementType, array $elementIds)
+    {
+        if (empty($this->elements[$elementType])) {
+            $this->elements[$elementType] = [];
+        }
+
+        $this->elements[$elementType] = array_merge($this->elements[$elementType], $elementIds);
     }
 
     /**
@@ -466,7 +477,7 @@ class RefreshCacheService extends Component
             ->where(['<', 'expiryDate', $now])
             ->column();
 
-        $this->cacheIds = array_merge($this->cacheIds, $cacheIds);
+        $this->addCacheIds($cacheIds);
 
         // Check for expired elements to invalidate
         $elementExpiryDates = ElementExpiryDateRecord::find()
@@ -524,7 +535,7 @@ class RefreshCacheService extends Component
         // Get cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
-        $this->cacheIds = array_merge($this->cacheIds, $cacheIds);
+        $this->addCacheIds($cacheIds);
 
         $this->refresh(true);
     }

@@ -151,39 +151,6 @@ class SiteUriHelper
     }
 
     /**
-     * Returns cached site URIs given an array of element IDs.
-     *
-     * @param int[] $elementIds
-     *
-     * @return SiteUriModel[]
-     */
-    public static function getCachedElementSiteUris(array $elementIds): array
-    {
-        if (empty($elementIds)) {
-            return [];
-        }
-
-        $siteUriModels = [];
-
-        // Get the site URIs of cached pages that reference the element IDs
-        $siteUris = CacheRecord::find()
-            // The `id` attribute is required to make the `elements` relation work
-            ->select(['id', 'siteId', 'uri'])
-            ->where(['elementId' => $elementIds])
-            ->joinWith('elements')
-            ->all();
-
-        foreach ($siteUris as $siteUri) {
-            $siteUriModels[] = new SiteUriModel(
-                // Convert to array here to remove the `id` attribute
-                $siteUri->toArray(['siteId', 'uri'])
-            );
-        }
-
-        return $siteUriModels;
-    }
-
-    /**
      * Returns the site URIs of an array of element IDs.
      *
      * @param int[] $elementIds

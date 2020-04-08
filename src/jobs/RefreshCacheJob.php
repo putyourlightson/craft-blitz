@@ -57,7 +57,7 @@ class RefreshCacheJob extends BaseJob
 
         // Merge in element cache IDs
         foreach ($this->elements as $elementType => $elementData) {
-            $this->cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds'], $this->cacheIds);
+            $this->cacheIds = array_merge($this->cacheIds, Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds']));
         }
 
         // If clear cache is enabled then clear the site URIs early

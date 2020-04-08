@@ -102,26 +102,10 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id], []
-        );
+        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds([$this->entry1->id]);
 
         // Assert that one cache ID was returned
         $this->assertEquals(1, count($cacheIds));
-
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id], $cacheIds
-        );
-
-        // Assert that one cache ID was returned
-        $this->assertEquals(1, count($cacheIds));
-
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id], [999]
-        );
-
-        // Assert that two cache ID were returned
-        $this->assertEquals(2, count($cacheIds));
     }
 
     public function testGetElementTypeQueries()
