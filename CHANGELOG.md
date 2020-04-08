@@ -7,6 +7,7 @@
 ### Fixed
 - Fixed a bug in which an expired element that did not exist in the primary site would not be refreshed ([#199](https://github.com/putyourlightson/craft-blitz/issues/199)).
 - Fixed a bug when trying to set a queue job priority when using a cache drive that does not support it ([#201](https://github.com/putyourlightson/craft-blitz/issues/201)).
+- Fixed an error that could be thrown in rare cases when saving an entry with Neo blocks ([#205](https://github.com/putyourlightson/craft-blitz/issues/205)).
 
 ## 3.6.2 - 2020-03-30
 ### Fixed

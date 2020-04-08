@@ -161,11 +161,9 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element)
     {
-        // Don't proceed if not an Element, if propagating, if element is a draft or revision,
-        // or if the element is an asset that is being indexed
+        // Don't proceed if not an Element, if propagating, or if the element is an asset that is being indexed
         if (!($element instanceof Element)
             || $element->propagating
-            || ElementHelper::isDraftOrRevision($element)
             || ($element instanceof Asset && $element->getScenario() == Asset::SCENARIO_INDEX)
         ) {
             return;
@@ -184,6 +182,11 @@ class RefreshCacheService extends Component
 
         // Don't proceed if not a cacheable element type
         if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
+            return;
+        }
+
+        // Don't proceed if element is a draft or revision
+        if (ElementHelper::isDraftOrRevision($element)) {
             return;
         }
 
