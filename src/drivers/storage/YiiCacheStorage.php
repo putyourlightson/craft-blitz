@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\drivers\storage;
 use Craft;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\caching\CacheInterface;
+use yii\db\Exception;
 
 /**
  *
@@ -69,15 +70,17 @@ class YiiCacheStorage extends BaseCacheStorage
             return '';
         }
 
-        $value = $this->_cache->get([
-            self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
-        ]);
+        $value = '';
 
-        if ($value === false) {
-            return '';
+        // Redis cache throws an exception if the connection is broken, so we catch it here
+        try {
+            $value = $this->_cache->get([
+                self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+            ]);
         }
+        catch (Exception $e) {}
 
-        return $value;
+        return $value ?: '';
     }
 
     /**
