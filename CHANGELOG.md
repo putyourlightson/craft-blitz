@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.6.3 - Unreleased
+## 3.6.3 - 2020-04-23
 ### Changed
 - Output comments are no longer included for URIs that have a mime type that is not HTML ([#76](https://github.com/putyourlightson/craft-blitz/issues/76)).
 - Changed how the SEOmatic integration works so it respects the `clearCacheAutomatically` setting ([#204](https://github.com/putyourlightson/craft-blitz/issues/204)).
