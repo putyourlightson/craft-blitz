@@ -23,6 +23,7 @@ use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Plugins;
+use craft\services\Sections;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
@@ -339,6 +340,8 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
+            [Sections::class, Sections::EVENT_BEFORE_SAVE_SECTION],
+            [Sections::class, Sections::EVENT_BEFORE_SAVE_ENTRY_TYPE],
             [ResaveController::class, ResaveController::EVENT_BEFORE_ACTION],
         ];
 
@@ -354,6 +357,8 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
+            [Sections::class, Sections::EVENT_AFTER_SAVE_SECTION],
+            [Sections::class, Sections::EVENT_AFTER_SAVE_ENTRY_TYPE],
             [ResaveController::class, ResaveController::EVENT_AFTER_ACTION],
         ];
 
