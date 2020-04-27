@@ -1,8 +1,7 @@
 # Release Notes for Blitz
 
-## 3.6.4 - 2020-04-27
+## 3.6.4 - Unreleased
 ### Changed
-- The cache is now refreshed in batch mode when a resave elements job is triggered by a saved section or entry type ([#213](https://github.com/putyourlightson/craft-blitz/issues/213)).
 
 ## 3.6.3 - 2020-04-23
 ### Changed
