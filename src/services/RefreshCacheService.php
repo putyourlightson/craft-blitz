@@ -158,11 +158,12 @@ class RefreshCacheService extends Component
      */
     public function addElementIds(string $elementType, array $elementIds)
     {
-        if (empty($this->elements[$elementType])) {
-            $this->elements[$elementType] = [];
-        }
+        $this->elements[$elementType] = $this->elements[$elementType] ?? [
+            'elementIds' => [],
+            'sourceIds' => [],
+        ];
 
-        $this->elements[$elementType] = array_merge($this->elements[$elementType], $elementIds);
+        $this->elements[$elementType]['elementIds'] = array_merge($this->elements[$elementType]['elementIds'], $elementIds);
     }
 
     /**
