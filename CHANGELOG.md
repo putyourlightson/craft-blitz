@@ -1,8 +1,8 @@
 # Release Notes for Blitz
 
-## 3.6.4 - Unreleased
+## 3.6.4 - 2020-04-29
 ### Fixed
-- Fixed bug with SEOmatic integration that could cause issues when saving or deleting entry types ([#215](https://github.com/putyourlightson/craft-blitz/issues/215)).
+- Fixed a bug with the SEOmatic integration that could cause issues when saving or deleting entry types ([#215](https://github.com/putyourlightson/craft-blitz/issues/215)).
 
 ## 3.6.3 - 2020-04-23
 ### Changed
