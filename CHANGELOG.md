@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.5 - Unreleased
+### Fixed
+- Fixed a bug with the SEOmatic integration that could cause refresh cache jobs to be recursively added to the queue.
+
 ## 3.6.4 - 2020-04-29
 ### Fixed
 - Fixed a bug with the SEOmatic integration that could cause issues when saving or deleting entry types ([#215](https://github.com/putyourlightson/craft-blitz/issues/215)).

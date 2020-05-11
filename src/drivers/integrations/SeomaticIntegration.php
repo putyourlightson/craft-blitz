@@ -49,14 +49,20 @@ class SeomaticIntegration extends BaseIntegration
 
                     if (!empty($elementIds)) {
                         Blitz::$plugin->refreshCache->addElementIds($elementQuery->elementType, $elementIds);
-                        Blitz::$plugin->refreshCache->refresh();
+
+                        if (Blitz::$plugin->refreshCache->batchMode === false) {
+                            Blitz::$plugin->refreshCache->refresh();
+                        }
                     }
                 }
                 elseif ($event->uri !== null && $event->siteId !== null && $event->sourceId === null && $event->sourceType === null) {
                     // Refresh cache for URI
                     if ($cacheIds = self::_getCacheIdsFromUri($event->uri, $event->siteId)) {
                         Blitz::$plugin->refreshCache->addCacheIds($cacheIds);
-                        Blitz::$plugin->refreshCache->refresh();
+
+                        if (Blitz::$plugin->refreshCache->batchMode === false) {
+                            Blitz::$plugin->refreshCache->refresh();
+                        }
                     }
                 }
             }

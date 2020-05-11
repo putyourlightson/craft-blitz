@@ -147,7 +147,7 @@ class RefreshCacheService extends Component
      */
     public function addCacheIds(array $cacheIds)
     {
-        $this->cacheIds = array_merge($this->cacheIds, $cacheIds);
+        $this->cacheIds = array_unique(array_merge($this->cacheIds, $cacheIds));
     }
 
     /**
@@ -163,7 +163,7 @@ class RefreshCacheService extends Component
             'sourceIds' => [],
         ];
 
-        $this->elements[$elementType]['elementIds'] = array_merge($this->elements[$elementType]['elementIds'], $elementIds);
+        $this->elements[$elementType]['elementIds'] = array_unique(array_merge($this->elements[$elementType]['elementIds'], $elementIds));
     }
 
     /**
