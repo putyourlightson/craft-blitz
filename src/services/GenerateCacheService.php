@@ -71,6 +71,11 @@ class GenerateCacheService extends Component
      */
     public $elementQueryCaches = [];
 
+    /**
+     * @var bool
+     */
+    private $_hasEagerLoadingOpportunity = false;
+
     // Public Methods
     // =========================================================================
 
@@ -136,8 +141,10 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has a join
+        // Check for an eager-loading opportunity and don't proceed if the query has a join
         if (!empty($elementQuery->join)) {
+            $this->_logEagerLoadingOpportunity($elementQuery);
+
             return;
         }
 
@@ -384,5 +391,25 @@ class GenerateCacheService extends Component
                 $values,
                 false)
             ->execute();
+    }
+
+    /**
+     * @param ElementQuery $elementQuery
+     */
+    private function _logEagerLoadingOpportunity(ElementQuery $elementQuery)
+    {
+        if ($this->_hasEagerLoadingOpportunity) {
+            return;
+        }
+
+        $join = $elementQuery->join[0];
+
+        if ($join[0] == 'INNER JOIN' && $join[1] == ['relations' => '{{%relations}}']) {
+            Blitz::$plugin->log('An opportunity for eager-loading elements was detected. [{url}]', [
+                'url' => Craft::$app->getRequest()->getAbsoluteUrl(),
+            ]);
+
+            $this->_hasEagerLoadingOpportunity = true;
+        }
     }
 }
