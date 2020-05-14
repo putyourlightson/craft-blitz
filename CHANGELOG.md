@@ -5,7 +5,7 @@
 - Added logging of opportunities for eager-loading elements.
 
 ### Changed
-- Optimised cached element query parameters. 
+- Optimised the element query parameters that are cached. 
 
 ## 3.6.5 - 2020-05-11
 ### Fixed
