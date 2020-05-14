@@ -4,6 +4,9 @@
 ### Added
 - Added logging of opportunities for eager-loading elements.
 
+### Changed
+- Optimised cached element query parameters. 
+
 ## 3.6.5 - 2020-05-11
 ### Fixed
 - Fixed a bug with the SEOmatic integration that could cause refresh cache jobs to be recursively added to the queue ([#213](https://github.com/putyourlightson/craft-blitz/issues/213), [#217](https://github.com/putyourlightson/craft-blitz/issues/217)).

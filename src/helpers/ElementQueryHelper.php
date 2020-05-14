@@ -87,7 +87,15 @@ class ElementQueryHelper
 
         self::$_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
 
-        $ignoreParams = ['select', 'with', 'query', 'subQuery', 'customFields'];
+        $ignoreParams = [
+            'select',
+            'with',
+            'query',
+            'subQuery',
+            'customFields',
+            'withStructure',
+            'descendantDist',
+        ];
 
         foreach ($ignoreParams as $key) {
             unset(self::$_defaultElementQueryParams[$elementType][$key]);
