@@ -1,9 +1,6 @@
 # Release Notes for Blitz
 
-## 3.7.0 - Unreleased
-### Added
-- Added logging of opportunities for eager-loading elements.
-
+## 3.6.6 - Unreleased
 ### Changed
 - Optimised the element query parameters that are cached. 
 
