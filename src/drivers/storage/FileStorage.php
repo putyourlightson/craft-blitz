@@ -114,9 +114,13 @@ class FileStorage extends BaseCacheStorage
 
             /**
              * If the filename includes URL encoded characters, create an extra copy with the characters decoded
+             *
+             * Solves:
+             * https://github.com/putyourlightson/craft-blitz/issues/222
              * https://github.com/putyourlightson/craft-blitz/issues/224
-             * https://www.drupal.org/project/boost/issues/1398578
-             * https://www.drupal.org/files/issues/boost-n1398578-19.patch
+             *
+             * Similar issue: https://www.drupal.org/project/boost/issues/1398578
+             * Solution: https://www.drupal.org/files/issues/boost-n1398578-19.patch
              */
             if (rawurldecode($filePath) != $filePath) {
                 FileHelper::writeToFile(rawurldecode($filePath), $value);
