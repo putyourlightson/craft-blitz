@@ -111,6 +111,20 @@ class FileStorage extends BaseCacheStorage
             if ($this->createGzipFiles) {
                 FileHelper::writeToFile($filePath.'.gz', gzencode($value));
             }
+
+            /**
+             * If the filename includes URL encoded characters, create an extra copy with the characters decoded
+             * https://github.com/putyourlightson/craft-blitz/issues/224
+             * https://www.drupal.org/project/boost/issues/1398578
+             * https://www.drupal.org/files/issues/boost-n1398578-19.patch
+             */
+            if (rawurldecode($filePath) != $filePath) {
+                FileHelper::writeToFile(rawurldecode($filePath), $value);
+
+                if ($this->createGzipFiles) {
+                    FileHelper::writeToFile(rawurldecode($filePath).'.gz', gzencode($value));
+                }
+            }
         }
         catch (ErrorException $e) {
             Blitz::$plugin->log($e->getMessage(), [], 'error');
