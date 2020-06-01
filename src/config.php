@@ -75,7 +75,16 @@ return [
         //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
 
         // The purger settings.
-        //'cachePurgerSettings' => [],
+        //'cachePurgerSettings' => [
+        //    'zoneIds' => [
+        //        'site-uid-f64d4923-f64d4923-f64d4923' => [
+        //            'zoneId' => '',
+        //        ],
+        //    ],
+        //    'email' => '',
+        //    'apiKey' => '',
+        //    'warmCacheDelay' => '3',
+        //],
 
         // The purger type classes to add to the plugin’s default purger types.
         //'cachePurgerTypes' => [
