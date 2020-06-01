@@ -74,10 +74,10 @@ return [
         // The purger type to use.
         //'cachePurgerType' => 'putyourlightson\blitz\drivers\purgers\CloudflarePurger',
 
-        // The purger settings.
+        // The purger settings (zone ID keys are site UIDs).
         //'cachePurgerSettings' => [
         //    'zoneIds' => [
-        //        'site-uid-f64d4923-f64d4923-f64d4923' => [
+        //        'f64d4923-f64d4923-f64d4923' => [
         //            'zoneId' => '',
         //        ],
         //    ],
@@ -94,10 +94,10 @@ return [
         // The deployer type to use.
         //'deployerType' => 'putyourlightson\blitz\drivers\deployers\GitDeployer',
 
-        // The deployer settings.
+        // The deployer settings (zone ID keys are site UIDs).
         //'deployerSettings' => [
         //    'gitRepositories' => [
-        //        'site-uid-f64d4923-f64d4923-f64d4923' => [
+        //        'f64d4923-f64d4923-f64d4923' => [
         //            'repositoryPath' => '@root/path/to/repo',
         //            'branch' => 'master',
         //            'remote' => 'origin',
