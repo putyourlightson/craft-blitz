@@ -11,6 +11,7 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\elements\Tag;
+use craft\elements\User;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterLiveStatusesEvent;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
@@ -64,6 +65,7 @@ class ElementTypeHelper
      */
     const LIVE_STATUSES = [
         Entry::class => Entry::STATUS_LIVE,
+        User::class => User::STATUS_ACTIVE,
         'craft\commerce\elements\Product' => 'live',
     ];
 

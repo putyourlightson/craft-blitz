@@ -37,4 +37,6 @@ To install the plugin, search for “Blitz” in the Craft Plugin Store, or inst
 composer require putyourlightson/craft-blitz
 ```
 
+---
+
 Created by [PutYourLightsOn](https://putyourlightson.com/).
