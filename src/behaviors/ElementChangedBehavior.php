@@ -52,6 +52,7 @@ class ElementChangedBehavior extends Behavior
             return;
         }
 
+        /** @var Element|null $originalElement */
         $originalElement = Craft::$app->getElements()->getElementById($element->id, get_class($element), $element->siteId);
 
         if ($originalElement !== null) {

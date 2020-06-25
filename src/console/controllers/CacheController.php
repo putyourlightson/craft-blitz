@@ -281,21 +281,21 @@ class CacheController extends Controller
     {
         Blitz::$plugin->clearCache->clearAll();
 
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully cleared.').PHP_EOL, Console::FG_GREEN);
+        $this->_output('Blitz cache successfully cleared.');
     }
 
     private function _flushCache()
     {
         Blitz::$plugin->flushCache->flushAll();
 
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully flushed.').PHP_EOL, Console::FG_GREEN);
+        $this->_output('Blitz cache successfully flushed.');
     }
 
     private function _purgeCache()
     {
         Blitz::$plugin->cachePurger->purgeAll();
 
-        $this->stdout(Craft::t('blitz', 'Blitz cache successfully purged.').PHP_EOL, Console::FG_GREEN);
+        $this->_output('Blitz cache successfully purged.');
     }
 
     /**
@@ -313,7 +313,7 @@ class CacheController extends Controller
 
         Console::endProgress();
 
-        $this->stdout(Craft::t('blitz', 'Blitz cache warming complete.').PHP_EOL, Console::FG_GREEN);
+        $this->_output('Blitz cache warming complete.');
     }
 
     /**
@@ -331,6 +331,16 @@ class CacheController extends Controller
 
         Console::endProgress();
 
-        $this->stdout(Craft::t('blitz', 'Deploying complete.').PHP_EOL, Console::FG_GREEN);
+        $this->_output('Deploying complete.');
+    }
+
+    /**
+     * @param string $message
+     */
+    private function _output(string $message)
+    {
+        Blitz::$plugin->log($message);
+
+        $this->stdout(Craft::t('blitz', $message).PHP_EOL, Console::FG_GREEN);
     }
 }
