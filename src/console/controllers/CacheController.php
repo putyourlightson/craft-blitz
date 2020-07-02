@@ -307,7 +307,7 @@ class CacheController extends Controller
 
         $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
 
-        Console::startProgress(0, count($siteUris), '', 0.8);
+        Console::startProgress(0, 0, '', 0.8);
 
         Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler']);
 

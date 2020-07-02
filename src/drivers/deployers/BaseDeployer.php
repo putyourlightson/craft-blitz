@@ -90,6 +90,7 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
         }
 
         $siteUris = SiteUriHelper::getAllSiteUris(true);
+
         $this->deployUris($siteUris, $setProgressHandler);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY_ALL)) {

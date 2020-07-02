@@ -14,7 +14,6 @@ use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
 /**
@@ -106,12 +105,7 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function purgeUris(array $siteUris)
     {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-        $this->trigger(self::EVENT_BEFORE_PURGE_CACHE, $event);
-
-        if (!$event->isValid) {
-            return;
-        }
+        $siteUris = $this->beforePurgeCache($siteUris);
 
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
@@ -121,9 +115,7 @@ class CloudflarePurger extends BaseCachePurger
             ]);
         }
 
-        if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_PURGE_CACHE, $event);
-        }
+        $this->afterPurgeCache($siteUris);
     }
 
     /**

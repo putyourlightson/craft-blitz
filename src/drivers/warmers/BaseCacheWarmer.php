@@ -70,12 +70,23 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      */
     public function warmAll(callable $setProgressHandler = null, int $delay = null)
     {
+        $event = new RefreshCacheEvent();
+        $this->trigger(self::EVENT_BEFORE_WARM_ALL_CACHE, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(true),
             Blitz::$plugin->settings->getCustomSiteUris()
         );
 
         $this->warmUris($siteUris, $setProgressHandler, $delay);
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_ALL_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_WARM_ALL_CACHE, $event);
+        }
     }
 
     /**
@@ -83,15 +94,17 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      *
      * @param callable|null $setProgressHandler
      * @param int|null $delay
+     * @param int $count
+     * @param int $total
      */
-    public function delay(callable $setProgressHandler = null, int $delay = null)
+    public function delay(callable $setProgressHandler = null, int $delay = null, int $count = 0, int $total = 0)
     {
         if (!empty($delay)) {
             if (is_callable($setProgressHandler)) {
                 $progressLabel = Craft::t('blitz', 'Waiting {delay} seconds before warming.', [
                     'delay' => $delay
                 ]);
-                call_user_func($setProgressHandler, 0, 0, $progressLabel);
+                call_user_func($setProgressHandler, $count, $total, $progressLabel);
             }
 
             sleep($delay);
@@ -122,14 +135,18 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      *
      * @param SiteUriModel[] $siteUris
      *
-     * @return bool
+     * @return SiteUriModel[]
      */
-    protected function beforeWarmCache(array $siteUris): bool
+    protected function beforeWarmCache(array $siteUris): array
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_WARM_CACHE, $event);
 
-        return $event->isValid;
+        if (!$event->isValid) {
+            return [];
+        }
+
+        return $event->siteUris;
     }
 
     /**

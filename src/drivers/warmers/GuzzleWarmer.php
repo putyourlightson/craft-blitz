@@ -46,9 +46,7 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
-        if (!$this->beforeWarmCache($siteUris)) {
-            return;
-        }
+        $siteUris = $this->beforeWarmCache($siteUris);
 
         if (Craft::$app->getRequest()->getIsConsoleRequest()) {
             $this->warmUrisWithProgress($siteUris, $setProgressHandler);
@@ -69,13 +67,13 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
-        $this->delay($setProgressHandler, $delay);
-
         $urls = SiteUriHelper::getUrlsFromSiteUris($siteUris);
 
         $count = 0;
         $total = count($urls);
         $label = 'Warming {count} of {total} pages.';
+
+        $this->delay($setProgressHandler, 5, $count, $total);
 
         $client = Craft::createGuzzleClient();
 

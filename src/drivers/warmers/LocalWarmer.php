@@ -37,7 +37,9 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
-        if (!$this->beforeWarmCache($siteUris)) {
+        $siteUris = $this->beforeWarmCache($siteUris);
+
+        if (empty($siteUris)) {
             return;
         }
 
@@ -62,11 +64,11 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
-        $this->delay($setProgressHandler, $delay);
-
         $count = 0;
         $total = count($siteUris);
         $label = 'Warming {count} of {total} pages.';
+
+        $this->delay($setProgressHandler, $delay, $count, $total);
 
         foreach ($siteUris as $siteUri) {
             $count++;
