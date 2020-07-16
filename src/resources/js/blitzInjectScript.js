@@ -43,7 +43,7 @@ function blitzInject() {
 
         var xhr = new XMLHttpRequest();
         xhr.onload = function() {
-            if (xhr.status >= 200 && xhr.status < 300) {
+            if (this.status >= 200 && this.status < 300) {
                 var element = document.getElementById('blitz-inject-' + id);
 
                 if (element) {
