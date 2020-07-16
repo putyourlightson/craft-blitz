@@ -6,7 +6,7 @@
 - Optimised the element query parameters that are cached. 
 - Reordering elements within in a structure now triggers a cache refresh.
 - The results of console commands are now logged.
-- Use IE compatible events in inject script.
+- Improved IE compatibility in inject script.
 
 ### Fixed
 - Fixed a bug in which URLs containing encoded characters would not be served from cached files ([#222](https://github.com/putyourlightson/craft-blitz/issues/222)).

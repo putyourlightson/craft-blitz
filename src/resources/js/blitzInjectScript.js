@@ -4,7 +4,7 @@ var Blitz = {};
 document.addEventListener('{injectScriptEvent}', blitzInject);
 
 function blitzInject() {
-    "use strict";
+    'use strict';
 
     Blitz = {
         inject: {
@@ -14,62 +14,65 @@ function blitzInject() {
     };
 
     // Use IE compatible events (https://caniuse.com/#feat=customevent)
-    var event = document.createEvent('CustomEvent');
-    event.initCustomEvent('beforeBlitzInjectAll', false, true, null);
+    var beforeBlitzInjectAll = document.createEvent('CustomEvent');
+    beforeBlitzInjectAll.initCustomEvent('beforeBlitzInjectAll', false, true, null);
 
-    if (!document.dispatchEvent(event)) {
+    if (!document.dispatchEvent(beforeBlitzInjectAll)) {
         return;
     }
 
     // Use IE compatible for loop
     for (var i = 0; i < Blitz.inject.data.length; i++) {
         var data = Blitz.inject.data[i];
-        var id = data.getAttribute('data-blitz-id');
-        var uri = data.getAttribute('data-blitz-uri');
-        var params = data.getAttribute('data-blitz-params');
 
-        var detail = {
-            id: id,
-            uri: uri,
-            params: params
+        var values = {
+            id: data.getAttribute('data-blitz-id'),
+            uri: data.getAttribute('data-blitz-uri'),
+            params: data.getAttribute('data-blitz-params')
         };
 
-        var event = document.createEvent('CustomEvent');
-        event.initCustomEvent('beforeBlitzInject', false, true, detail);
+        var beforeBlitzInject = document.createEvent('CustomEvent');
+        beforeBlitzInject.initCustomEvent('beforeBlitzInject', false, true, values);
 
-        if (!document.dispatchEvent(event)) {
+        if (!document.dispatchEvent(beforeBlitzInject)) {
             return;
         }
 
-        var xhr = new XMLHttpRequest();
-        xhr.onload = function() {
-            if (this.status >= 200 && this.status < 300) {
-                var element = document.getElementById('blitz-inject-' + id);
-
-                if (element) {
-                    detail.element = element;
-                    detail.responseText = this.responseText;
-
-                    element.innerHTML = this.responseText;
-                    element.classList.add('blitz-inject--injected');
-                }
-
-                var event = document.createEvent('CustomEvent');
-                event.initCustomEvent('afterBlitzInject', false, false, detail);
-                document.dispatchEvent(event);
-            }
-
-            Blitz.inject.loaded++;
-
-            if (Blitz.inject.loaded >= Blitz.inject.data.length) {
-                var event = document.createEvent('CustomEvent');
-                event.initCustomEvent('afterBlitzInjectAll', false, false, null);
-                document.dispatchEvent(event);
-            }
-        };
-
-        xhr.open("GET", uri + (params && "?" + params));
-        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-        xhr.send();
+        blitzReplace(values);
     }
+}
+
+function blitzReplace(values) {
+    'use strict';
+
+    var xhr = new XMLHttpRequest();
+    xhr.onload = function() {
+        if (this.status >= 200 && this.status < 300) {
+            var element = document.getElementById('blitz-inject-' + values.id);
+
+            if (element) {
+                values.element = element;
+                values.responseText = this.responseText;
+
+                element.innerHTML = this.responseText;
+                element.classList.add('blitz-inject--injected');
+            }
+
+            var afterBlitzInject = document.createEvent('CustomEvent');
+            afterBlitzInject.initCustomEvent('afterBlitzInject', false, false, values);
+            document.dispatchEvent(afterBlitzInject);
+        }
+
+        Blitz.inject.loaded++;
+
+        if (Blitz.inject.loaded >= Blitz.inject.data.length) {
+            var afterBlitzInjectAll = document.createEvent('CustomEvent');
+            afterBlitzInjectAll.initCustomEvent('afterBlitzInjectAll', false, false, null);
+            document.dispatchEvent(afterBlitzInjectAll);
+        }
+    };
+
+    xhr.open("GET", values.uri + (values.params && "?" + values.params));
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhr.send();
 }
