@@ -21,7 +21,9 @@ function blitzInject() {
         return;
     }
 
-    Blitz.inject.data.forEach(function(data, index) {
+    // Use IE compatible for loop
+    for (var i = 0; i < Blitz.inject.data.length; i++) {
+        var data = Blitz.inject.data[i];
         var id = data.getAttribute('data-blitz-id');
         var uri = data.getAttribute('data-blitz-uri');
         var params = data.getAttribute('data-blitz-params');
@@ -69,5 +71,5 @@ function blitzInject() {
         xhr.open("GET", uri + (params && "?" + params));
         xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
         xhr.send();
-    });
+    }
 }
