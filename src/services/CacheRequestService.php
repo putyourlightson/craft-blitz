@@ -291,9 +291,9 @@ class CacheRequestService extends Component
 
             $uriPattern = $siteUriPattern['uriPattern'];
 
-            // Replace a blank string with the homepage
+            // Replace a blank string with the homepage with query strings allowed
             if ($uriPattern == '') {
-                $uriPattern = '^$';
+                $uriPattern = '^(\?.*)?$';
             }
 
             // Replace "*" with 0 or more characters as otherwise it'll throw an error

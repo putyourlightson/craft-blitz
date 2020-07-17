@@ -12,6 +12,7 @@
 - Fixed a bug in which URLs containing encoded characters would not be served from cached files ([#222](https://github.com/putyourlightson/craft-blitz/issues/222)).
 - Fixed a bug in which query string containing encoded characters could result in a 404 error using the file storage driver ([#224](https://github.com/putyourlightson/craft-blitz/issues/224)).
 - Fixed a bug in which updated User elements were not triggering the clearing of the cache. 
+- Fixed a bug in which the homepage was not being cached if it had query strings. 
 
 ## 3.6.5 - 2020-05-11
 ### Fixed
