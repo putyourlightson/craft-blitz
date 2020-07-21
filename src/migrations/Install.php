@@ -81,6 +81,7 @@ class Install extends Migration
             $this->createTable(ElementCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
+                'PRIMARY KEY([[cacheId]], [[elementId]])',
             ]);
         }
 
@@ -88,6 +89,7 @@ class Install extends Migration
             $this->createTable(ElementExpiryDateRecord::tableName(), [
                 'elementId' => $this->integer()->notNull(),
                 'expiryDate' => $this->dateTime(),
+                'PRIMARY KEY([[elementId]])',
             ]);
         }
 
@@ -95,11 +97,14 @@ class Install extends Migration
             $this->createTable(ElementQueryCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'queryId' => $this->integer()->notNull(),
+                'PRIMARY KEY([[cacheId]], [[queryId]])',
             ]);
         }
 
         if (!$this->db->tableExists(ElementQuerySourceRecord::tableName())) {
             $this->createTable(ElementQuerySourceRecord::tableName(), [
+                // Use a primary key as we cannot create a composite one since `sourceId` can be `null`.
+                'id' => $this->primaryKey(),
                 'sourceId' => $this->integer(),
                 'queryId' => $this->integer()->notNull(),
             ]);
@@ -118,6 +123,7 @@ class Install extends Migration
             $this->createTable(CacheTagRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'tag' => $this->string()->notNull(),
+                'PRIMARY KEY([[cacheId]], [[tag]])',
             ]);
         }
 

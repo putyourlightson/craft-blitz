@@ -41,9 +41,9 @@
         "developer": "PutYourLightsOn",
         "developerUrl": "https://putyourlightson.com/",
         "documentationUrl": "https://putyourlightson.com/plugins/blitz",
-        "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v2/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v3/CHANGELOG.md",
         "class": "putyourlightson\\blitz\\Blitz",
-        "schemaVersion": "3.1.0",
+        "schemaVersion": "3.6.6",
         "hasCpSettings": true
     }
 }
