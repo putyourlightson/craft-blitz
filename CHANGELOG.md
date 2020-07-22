@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.6.6 - Unreleased
+## 3.6.6 - 2020-07-22
 ### Changed
 - Added the ability to override site URIs before they are warmed ([#230](https://github.com/putyourlightson/craft-blitz/issues/230)).
 - Added primary keys to all database tables ([#237](https://github.com/putyourlightson/craft-blitz/issues/237)).
