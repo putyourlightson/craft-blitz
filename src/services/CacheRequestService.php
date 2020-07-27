@@ -151,7 +151,7 @@ class CacheRequestService extends Component
 
         // Log a debug message if no site URI could be determined from the requested URL
         if ($siteUri === null) {
-            Blitz::$plugin->debug('No site URI could be determined from the requested URL.', [], $siteUri->getUrl());
+            Blitz::$plugin->debug('No site URI could be determined from the requested URL – ensure that the base site URL is correctly set.', [], $siteUri->getUrl());
         }
 
         return $siteUri;
