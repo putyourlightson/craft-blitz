@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.7 - Unreleased
+### Added
+- Added a debug message if no site URI could be determined from the requested URL.
+
 ## 3.6.6 - 2020-07-27
 ### Changed
 - Added the ability to override site URIs before they are warmed ([#230](https://github.com/putyourlightson/craft-blitz/issues/230)).

@@ -147,7 +147,14 @@ class CacheRequestService extends Component
             $url = $url.'?'.$this->_getQueryString();
         }
 
-        return SiteUriHelper::getSiteUriFromUrl($url);
+        $siteUri = SiteUriHelper::getSiteUriFromUrl($url);
+
+        // Log a debug message if no site URI could be determined from the requested URL
+        if ($siteUri === null) {
+            Blitz::$plugin->debug('No site URI could be determined from the requested URL.', [], $siteUri->getUrl());
+        }
+
+        return $siteUri;
     }
 
     /**
