@@ -4,6 +4,7 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
+use craft\records\Element;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
@@ -26,7 +27,18 @@ class m200721_120000_add_primary_keys extends Migration
         }
 
         if ($this->db->tableExists(ElementExpiryDateRecord::tableName())) {
+            // Drop existing indexes first to avoid duplicate error (https://github.com/putyourlightson/craft-blitz/issues/240)
+            $this->dropForeignKey(
+                $this->getDb()->getForeignKeyName(ElementExpiryDateRecord::tableName(), 'elementId'),
+                ElementExpiryDateRecord::tableName()
+            );
+            $this->dropIndex(
+                $this->getDb()->getIndexName(ElementExpiryDateRecord::tableName(), 'elementId', true),
+                ElementExpiryDateRecord::tableName()
+            );
+
             $this->addPrimaryKey(null, ElementExpiryDateRecord::tableName(), ['elementId']);
+            $this->addForeignKey(null, ElementExpiryDateRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
         }
 
         if ($this->db->tableExists(ElementQueryCacheRecord::tableName())) {
