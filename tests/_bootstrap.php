@@ -19,5 +19,8 @@ $devMode = true;
 
 TestSetup::configureCraft();
 
+// Set the @webroot alias so that the cpresources folder is created in the correct directory
+Craft::setAlias('@webroot', __DIR__ . '/_craft/web');
+
 // Prevent `headers already sent` error
 ob_start();

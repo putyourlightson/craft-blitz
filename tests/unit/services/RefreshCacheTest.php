@@ -10,7 +10,6 @@ use Craft;
 use craft\base\Element;
 use craft\elements\Entry;
 use craft\helpers\Db;
-use crafttests\fixtures\EntryFixture;
 use DateInterval;
 use DateTime;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
@@ -20,6 +19,8 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use putyourlightson\blitztests\fixtures\EntriesFixture;
+use putyourlightson\blitztests\fixtures\SitesGroupsFixture;
 use UnitTester;
 
 /**
@@ -68,7 +69,7 @@ class RefreshCacheTest extends Unit
     {
         return [
             'entries' => [
-                'class' => EntryFixture::class
+                'class' => EntriesFixture::class
             ],
         ];
     }
@@ -90,8 +91,30 @@ class RefreshCacheTest extends Unit
             'uri' => 'page',
         ]);
 
-        $this->entry1 = Entry::find()->sectionId(1000)->one();
-        $this->entry2 = Entry::find()->sectionId(1003)->one();
+        $this->entry1 = Entry::find()->slug('entry-1')->one();
+        $this->entry2 = Entry::find()->slug('entry-2')->one();
+
+        if ($this->entry1 === null) {
+            $this->entry1 = new Entry([
+                'authorId' => '1',
+                'sectionId' => '1',
+                'typeId' => '1',
+                'title' => 'Entry 1',
+                'slug' => 'entry-1',
+            ]);
+            Craft::$app->getElements()->saveElement($this->entry1);
+        }
+
+        if ($this->entry2 === null) {
+            $this->entry2 = new Entry([
+                'authorId' => '1',
+                'sectionId' => '2',
+                'typeId' => '2',
+                'title' => 'Entry 2',
+                'slug' => 'entry-2',
+            ]);
+            Craft::$app->getElements()->saveElement($this->entry2);
+        }
     }
 
     // Public methods
@@ -209,6 +232,19 @@ class RefreshCacheTest extends Unit
             [
                 'elementIds' => [$this->entry1->id, $this->entry2->id],
                 'sourceIds' => [$this->entry1->sectionId, $this->entry2->sectionId],
+            ],
+            Blitz::$plugin->refreshCache->elements[Entry::class]
+        );
+
+        // Delete the element
+        Blitz::$plugin->refreshCache->elements = [];
+        Craft::$app->getElements()->deleteElement($this->entry1);
+
+        // Assert that the element and source IDs are correct
+        $this->assertEquals(
+            [
+                'elementIds' => [$this->entry1->id],
+                'sourceIds' => [$this->entry1->sectionId],
             ],
             Blitz::$plugin->refreshCache->elements[Entry::class]
         );
