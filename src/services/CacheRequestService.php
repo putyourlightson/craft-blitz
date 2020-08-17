@@ -259,8 +259,11 @@ class CacheRequestService extends Component
             $headers->set('Content-Type', $mimeType);
         }
 
-        // Append served by comment if html and config setting is true
-        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && Blitz::$plugin->settings->outputComments) {
+        $outputComments = Blitz::$plugin->settings->outputComments === true
+            || Blitz::$plugin->settings->outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED;
+
+        // Append served by comment if html mime type and allowed
+        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
             $value .= '<!-- Served by Blitz on '.date('c').' -->';
         }
 

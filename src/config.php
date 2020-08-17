@@ -133,9 +133,9 @@ return [
         //'refreshCacheWhenElementSavedNotLive' => false,
 
         // Whether URLs with query strings should cached and how.
-        // 0: Do not cache URLs with query strings
-        // 1: Cache URLs with query strings as unique pages
-        // 2: Cache URLs with query strings as the same page
+        // - `0`: Do not cache URLs with query strings
+        // - `1`: Cache URLs with query strings as unique pages
+        // - `2`: Cache URLs with query strings as the same page
         //'queryStringCaching' => 0,
 
         // The query string parameters to exclude when determining if and how a page should be cached.
@@ -178,7 +178,11 @@ return [
         // Whether an `X-Powered-By: Blitz` header should be sent.
         //'sendPoweredByHeader' => true,
 
-        // Whether the timestamp and served by comments should be appended to the cached output.
+        // Whether the "cached on" and "served by" timestamp comments should be appended to the cached output.
+        // - `false`: Do not append any comments
+        // - `true`: Append all comments
+        // - `2`: Append "cached on" comment only
+        // - `3`: Append "served by" comment only
         //'outputComments' => true,
 
         // The priority to give the refresh cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.

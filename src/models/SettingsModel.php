@@ -35,6 +35,16 @@ class SettingsModel extends Model
      */
     const QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE = 2;
 
+    /**
+     * @const int
+     */
+    const OUTPUT_COMMENTS_CACHED = 2;
+
+    /**
+     * @const int
+     */
+    const OUTPUT_COMMENTS_SERVED = 3;
+
     // Public Properties
     // =========================================================================
 
@@ -176,9 +186,11 @@ class SettingsModel extends Model
     /**
      * @var int Whether URLs with query strings should cached and how.
      *
-     * 0: Do not cache URLs with query strings
-     * 1: Cache URLs with query strings as unique pages
-     * 2: Cache URLs with query strings as the same page
+     * Can be set to any of the following:
+     *
+     * - `self::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
+     * - `self::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES`: Cache URLs with query strings as unique pages
+     * - `self::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE`: Cache URLs with query strings as the same page
      */
     public $queryStringCaching = self::QUERY_STRINGS_DO_NOT_CACHE_URLS;
 
@@ -203,7 +215,8 @@ class SettingsModel extends Model
     public $cacheElementQueries = true;
 
     /**
-     * @var int|null The amount of time after which the cache should expire (if not 0). See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
+     * @var int|null The amount of time after which the cache should expire (if not 0).
+     * See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
      */
     public $cacheDuration;
 
@@ -241,7 +254,14 @@ class SettingsModel extends Model
     public $sendPoweredByHeader = true;
 
     /**
-     * @var bool Whether the timestamp and served by comments should be appended to the cached output.
+     * @var int|bool Whether the "cached on" and "served by" timestamp comments should be appended to the cached output.
+     *
+     * Can be set to any of the following:
+     *
+     * - `false`: Do not append any comments
+     * - `true`: Append all comments
+     * - `self::OUTPUT_COMMENTS_CACHED`: Append "cached on" comment only
+     * - `self::OUTPUT_COMMENTS_SERVED`: Append "served by" comment only
      */
     public $outputComments = true;
 

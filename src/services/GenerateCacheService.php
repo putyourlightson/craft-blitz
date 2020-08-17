@@ -19,6 +19,7 @@ use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
+use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -318,8 +319,11 @@ class GenerateCacheService extends Component
         // Get the mime type from the URI
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
-        // Append timestamp comment if html and config setting is true
-        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && Blitz::$plugin->settings->outputComments) {
+        $outputComments = $this->options->outputComments === true
+            || $this->options->outputComments == SettingsModel::OUTPUT_COMMENTS_CACHED;
+
+        // Append timestamp comment only if html mime type and allowed
+        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
         }
 

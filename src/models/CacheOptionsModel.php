@@ -32,6 +32,11 @@ class CacheOptionsModel extends Model
     public $cacheElementQueries = true;
 
     /**
+     * @var int|bool
+     */
+    public $outputComments = true;
+
+    /**
      * @var string[]|null
      */
     public $tags;
@@ -40,6 +45,7 @@ class CacheOptionsModel extends Model
      * @var DateTime|null
      */
     public $expiryDate;
+
 
     // Public Methods
     // =========================================================================
@@ -78,7 +84,7 @@ class CacheOptionsModel extends Model
     public function rules(): array
     {
         return [
-            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
+            [['cachingEnabled', 'cacheElements', 'cacheElementQueries', 'outputComments'], 'boolean'],
             [['expiryDate'], DateTimeValidator::class],
         ];
     }
@@ -115,6 +121,18 @@ class CacheOptionsModel extends Model
     public function cacheElementQueries(bool $value)
     {
         $this->cacheElementQueries = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param int|bool $value
+     *
+     * @return static self reference
+     */
+    public function outputComments($value)
+    {
+        $this->outputComments = $value;
 
         return $this;
     }

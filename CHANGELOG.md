@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.8 - Unreleased
+### Added
+- Added `outputComments` as a page specific option ([#243](https://github.com/putyourlightson/craft-blitz/issues/243)).
+
 ## 3.6.7 - 2020-08-17
 ### Added
 - Added a debug message if no site URI could be determined from the requested URL.
