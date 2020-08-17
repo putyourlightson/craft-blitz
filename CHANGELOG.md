@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.6.7 - Unreleased
+## 3.6.7 - 2020-08-17
 ### Added
 - Added a debug message if no site URI could be determined from the requested URL.
 
