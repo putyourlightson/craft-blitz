@@ -6,6 +6,7 @@
 
 ### Fixed
 - Fixed an edge case migration error that could occur when updating to version 3.6.6 ([#240](https://github.com/putyourlightson/craft-blitz/issues/240)).
+- Fixed a bug which could prevent element listing pages from being refreshed when an element was deleted ([#241](https://github.com/putyourlightson/craft-blitz/issues/241)).
 
 ## 3.6.6 - 2020-07-27
 ### Changed

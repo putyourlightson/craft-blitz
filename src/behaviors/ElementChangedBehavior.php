@@ -7,8 +7,12 @@ namespace putyourlightson\blitz\behaviors;
 
 use Craft;
 use craft\base\Element;
+use craft\events\BatchElementActionEvent;
+use craft\events\ElementEvent;
+use craft\services\Elements;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
+use yii\base\Event;
 
 /**
  * This class attaches behavior to detect whether an element has changed.
@@ -35,6 +39,11 @@ class ElementChangedBehavior extends Behavior
      */
     public $previousStatus;
 
+    /**
+     * @var bool
+     */
+    public $deleted = false;
+
     // Public Methods
     // =========================================================================
 
@@ -58,6 +67,10 @@ class ElementChangedBehavior extends Behavior
         if ($originalElement !== null) {
             $this->previousStatus = $originalElement->getStatus();
         }
+
+        $element->on(Element::EVENT_AFTER_DELETE, function() {
+            $this->deleted = true;
+        });
     }
 
     /**
@@ -70,6 +83,10 @@ class ElementChangedBehavior extends Behavior
         // Only works with Craft 3.4.0 using delta changes feature
         // TODO: remove in 4.0.0
         if (version_compare(Craft::$app->getVersion(), '3.4', '<')) {
+            return true;
+        }
+
+        if ($this->deleted) {
             return true;
         }
 
