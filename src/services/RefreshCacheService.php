@@ -399,6 +399,8 @@ class RefreshCacheService extends Component
             // The queue probably doesn't support custom push priorities. Try again without one.
             $queue->push($refreshCacheJob);
         }
+
+        $this->reset();
     }
 
     /**
@@ -539,5 +541,15 @@ class RefreshCacheService extends Component
         $this->addCacheIds($cacheIds);
 
         $this->refresh(true);
+    }
+
+    /**
+     * Reset service to initial state
+     */
+    public function reset()
+    {
+        $this->batchMode = false;
+        $this->cacheIds = [];
+        $this->elements = [];
     }
 }
