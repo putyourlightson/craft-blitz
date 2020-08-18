@@ -4,6 +4,9 @@
 ### Added
 - Added `outputComments` as a page specific option ([#243](https://github.com/putyourlightson/craft-blitz/issues/243)).
 
+### Changed
+- Cache IDs and elements are now reset after a refresh cache job is created for them ([#245](https://github.com/putyourlightson/craft-blitz/issues/245)).
+
 ## 3.6.7 - 2020-08-17
 ### Added
 - Added a debug message if no site URI could be determined from the requested URL.

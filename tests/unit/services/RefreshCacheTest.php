@@ -281,6 +281,18 @@ class RefreshCacheTest extends Unit
         );
     }
 
+    public function testRefreshReset()
+    {
+        Blitz::$plugin->refreshCache->cacheIds = [1];
+        Blitz::$plugin->refreshCache->elements = [$this->entry1];
+
+        Blitz::$plugin->refreshCache->refresh();
+
+        // Assert that the values are empty
+        $this->assertEmpty(Blitz::$plugin->refreshCache->cacheIds);
+        $this->assertEmpty(Blitz::$plugin->refreshCache->elements);
+    }
+
     public function testRefreshElementQuery()
     {
         // Add element query and save
