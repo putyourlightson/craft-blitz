@@ -4,10 +4,13 @@ namespace putyourlightson\blitz\migrations;
 
 use craft\db\Migration;
 use craft\records\Element;
+use Exception;
+use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
 class m200721_120000_add_primary_keys extends Migration
@@ -28,7 +31,7 @@ class m200721_120000_add_primary_keys extends Migration
                     ElementCacheRecord::tableName()
                 );
             }
-            catch (\Exception $exception) {}
+            catch (Exception $exception) {}
 
             $this->addPrimaryKey(null, ElementCacheRecord::tableName(), ['cacheId', 'elementId']);
         }
@@ -40,28 +43,42 @@ class m200721_120000_add_primary_keys extends Migration
                     $this->getDb()->getForeignKeyName(ElementExpiryDateRecord::tableName(), 'elementId'),
                     ElementExpiryDateRecord::tableName()
                 );
+
                 $this->dropIndex(
                     $this->getDb()->getIndexName(ElementExpiryDateRecord::tableName(), 'elementId', true),
                     ElementExpiryDateRecord::tableName()
                 );
             }
-            catch (\Exception $exception) {}
+            catch (Exception $exception) {}
 
             $this->addPrimaryKey(null, ElementExpiryDateRecord::tableName(), ['elementId']);
+
             $this->addForeignKey(null, ElementExpiryDateRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
         }
 
         if ($this->db->tableExists(ElementQueryCacheRecord::tableName())) {
             // Drop existing indexes first to avoid duplicate error (https://github.com/putyourlightson/craft-blitz/issues/240)
             try {
+                $this->dropForeignKey(
+                    $this->getDb()->getForeignKeyName(ElementQueryCacheRecord::tableName(), 'cacheId'),
+                    ElementQueryCacheRecord::tableName()
+                );
+                $this->dropForeignKey(
+                    $this->getDb()->getForeignKeyName(ElementQueryCacheRecord::tableName(), 'queryId'),
+                    ElementQueryCacheRecord::tableName()
+                );
+
                 $this->dropIndex(
                     $this->getDb()->getIndexName(ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true),
                     ElementQueryCacheRecord::tableName()
                 );
             }
-            catch (\Exception $exception) {}
+            catch (Exception $exception) {}
 
             $this->addPrimaryKey(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId']);
+
+            $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+           $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         }
 
         if ($this->db->tableExists(ElementQuerySourceRecord::tableName())) {
@@ -76,7 +93,7 @@ class m200721_120000_add_primary_keys extends Migration
                     CacheTagRecord::tableName()
                 );
             }
-            catch (\Exception $exception) {}
+            catch (Exception $exception) {}
 
             $this->addPrimaryKey(null, CacheTagRecord::tableName(), ['cacheId', 'tag']);
         }

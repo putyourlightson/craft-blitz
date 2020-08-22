@@ -47,14 +47,4 @@ class TemplatesControllerTest extends BaseControllerTest
             'template' => '_nonexistant',
         ]);
     }
-
-    public function testGetTemplateLoaderException()
-    {
-        // Expect an exception
-        $this->expectException(TemplateLoaderException::class);
-
-        $this->runActionWithParams('templates/get', [
-            'template' => Craft::$app->getSecurity()->hashData('_nonexistant'),
-        ]);
-    }
 }
