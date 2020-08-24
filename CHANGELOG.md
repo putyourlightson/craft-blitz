@@ -6,6 +6,7 @@
 
 ### Changed
 - Cache IDs and elements are now reset after a refresh cache job is created for them ([#245](https://github.com/putyourlightson/craft-blitz/issues/245)).
+- Improved primary key migration introduced in version 3.6.6 ([#240](https://github.com/putyourlightson/craft-blitz/issues/240)).
 
 ## 3.6.7 - 2020-08-17
 ### Added
