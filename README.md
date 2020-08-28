@@ -6,7 +6,7 @@
 
 # Blitz Plugin for Craft CMS 3
 
-> Blitz 3 was recently released!! Read the [announcement here](https://putyourlightson.com/articles/blitz-3-embracing-the-jamstack).
+> Read the [Blitz 3 announcement](https://putyourlightson.com/articles/blitz-3-embracing-the-jamstack).
 
 Blitz provides intelligent static page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
