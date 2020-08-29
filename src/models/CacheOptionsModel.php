@@ -84,7 +84,7 @@ class CacheOptionsModel extends Model
     public function rules(): array
     {
         return [
-            [['cachingEnabled', 'cacheElements', 'cacheElementQueries', 'outputComments'], 'boolean'],
+            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
             [['expiryDate'], DateTimeValidator::class],
         ];
     }

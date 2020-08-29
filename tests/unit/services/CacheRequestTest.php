@@ -148,9 +148,32 @@ class CacheRequestTest extends Unit
 
         // Save a value for the site URI
         Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
+        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->data;
 
         // Assert that the response is not null
-        $this->assertNotNull(Blitz::$plugin->cacheRequest->getResponse($this->siteUri));
+        $this->assertStringContainsString('xyz', $value);
+    }
+
+    public function testGetResponseWithOutputComments()
+    {
+        // Save a value for the site URI
+        Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
+
+        Blitz::$plugin->settings->outputComments = false;
+        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->data;
+        $this->assertStringNotContainsString('Served by Blitz on', $value);
+
+        Blitz::$plugin->settings->outputComments = true;
+        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->data;
+        $this->assertStringContainsString('Served by Blitz on', $value);
+
+        Blitz::$plugin->settings->outputComments = SettingsModel::OUTPUT_COMMENTS_CACHED;
+        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->data;
+        $this->assertStringNotContainsString('Served by Blitz on', $value);
+
+        Blitz::$plugin->settings->outputComments = SettingsModel::OUTPUT_COMMENTS_SERVED;
+        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->data;
+        $this->assertStringContainsString('Served by Blitz on', $value);
     }
 
     // Private methods

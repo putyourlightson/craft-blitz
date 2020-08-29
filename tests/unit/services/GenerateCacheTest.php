@@ -10,6 +10,7 @@ use craft\commerce\elements\Product;
 use craft\elements\Entry;
 use craft\elements\User;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -77,6 +78,29 @@ class GenerateCacheTest extends Unit
 
         // Assert that the output contains a timestamp
         $this->assertStringContainsString('Cached by Blitz on', $value);
+    }
+
+    public function testSaveCacheWithOutputComments()
+    {
+        Blitz::$plugin->generateCache->options->outputComments = false;
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $this->assertStringNotContainsString('Cached by Blitz on', $value);
+
+        Blitz::$plugin->generateCache->options->outputComments = true;
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $this->assertStringContainsString('Cached by Blitz on', $value);
+
+        Blitz::$plugin->generateCache->options->outputComments = SettingsModel::OUTPUT_COMMENTS_CACHED;
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $this->assertStringContainsString('Cached by Blitz on', $value);
+
+        Blitz::$plugin->generateCache->options->outputComments = SettingsModel::OUTPUT_COMMENTS_SERVED;
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $this->assertStringNotContainsString('Cached by Blitz on', $value);
     }
 
     public function testSaveCacheWithFileExtension()
