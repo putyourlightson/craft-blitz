@@ -4,6 +4,9 @@
 ### Added
 - Added `outputComments` as a page specific option ([#243](https://github.com/putyourlightson/craft-blitz/issues/243)).
 
+### Fixed
+- Fixed Guzzle warmer delay that was hard-coded to 5 seconds.
+
 ### Changed
 - Cache IDs and elements are now reset after a refresh cache job is created for them ([#245](https://github.com/putyourlightson/craft-blitz/issues/245)).
 - Improved primary key migration introduced in version 3.6.6 ([#240](https://github.com/putyourlightson/craft-blitz/issues/240)).

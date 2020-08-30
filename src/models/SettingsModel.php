@@ -266,12 +266,12 @@ class SettingsModel extends Model
     public $outputComments = true;
 
     /**
-     * @var int The priority to give the refresh cache job (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
+     * @var int The priority to give the refresh cache job (the lower the number, the higher the priority).
      */
     public $refreshCacheJobPriority = 10;
 
     /**
-     * @var int The priority to give driver jobs (the lower number the number, the higher the priority). Set to `null` to inherit the default priority.
+     * @var int The priority to give driver jobs (the lower the number, the higher the priority).
      */
     public $driverJobPriority = 100;
 

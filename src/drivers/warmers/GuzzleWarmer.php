@@ -73,7 +73,7 @@ class GuzzleWarmer extends BaseCacheWarmer
         $total = count($urls);
         $label = 'Warming {count} of {total} pages.';
 
-        $this->delay($setProgressHandler, 5, $count, $total);
+        $this->delay($setProgressHandler, $delay, $count, $total);
 
         $client = Craft::createGuzzleClient();
 
