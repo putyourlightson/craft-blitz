@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
 ## 3.6.9 - Unreleased
+### Changed
+- Changed how cached files are counted to improve the performance of the Blitz cache utility.
+
 ### Fixed
-- Fixed a bug in which cached files containing encoded characters would not be cleared correctly ([#255](https://github.com/putyourlightson/craft-blitz/issues/255)).
+- Fixed a bug in which cached files containing encoded characters would not be cleared correctly ([#252](https://github.com/putyourlightson/craft-blitz/issues/252)).
 
 ## 3.6.8 - 2020-08-26
 ### Added

@@ -175,7 +175,7 @@ class FileStorage extends BaseCacheStorage
             $sites[$site->id] = [
                 'name' => $site->name,
                 'path' => $sitePath,
-                'count' => is_dir($sitePath) ? count(FileHelper::findFiles($sitePath, ['only' => ['index.html']])) : 0,
+                'count' => $this->_getCachedFileCount($sitePath),
             ];
         }
 
@@ -281,5 +281,23 @@ class FileStorage extends BaseCacheStorage
         $this->_sitePaths[$siteId] = FileHelper::normalizePath($this->_cacheFolderPath.'/'.$siteHostPath);
 
         return $this->_sitePaths[$siteId];
+    }
+
+    /**
+     * Returns the number of cached files in the provided path.
+     *
+     * @param string $path
+     *
+     * @return int
+     */
+    private function _getCachedFileCount(string $path): int
+    {
+        /*
+         * Use the file system to calculate this for us as quickly as possible
+         * in order to prevent the request from timing out.
+         *
+         * https://stackoverflow.com/a/20263674/1769259
+         */
+        return system('find '.$path.' -type f -name index.html -print | wc -l');
     }
 }
