@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.9 - Unreleased
+### Fixed
+- Fixed a bug in which cached files containing encoded characters would not be cleared correctly ([#255](https://github.com/putyourlightson/craft-blitz/issues/255)).
+
 ## 3.6.8 - 2020-08-26
 ### Added
 - Added `outputComments` as a page specific option ([#243](https://github.com/putyourlightson/craft-blitz/issues/243)).

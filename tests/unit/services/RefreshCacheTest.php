@@ -349,4 +349,22 @@ class RefreshCacheTest extends Unit
         // Assert that the cached value is a blank string
         $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
     }
+
+    public function testRefreshCacheTags()
+    {
+        // Add tag and save
+        $tag = 'abc';
+        Blitz::$plugin->generateCache->options->tags($tag);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        // Assert that the output (which may also contain a timestamp) contains the cached value
+        $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
+
+        Blitz::$plugin->refreshCache->refreshCacheTags([$tag]);
+
+        Craft::$app->runAction('queue/run');
+
+        // Assert that the cached value is a blank string
+        $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
+    }
 }

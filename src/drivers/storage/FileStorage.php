@@ -83,15 +83,15 @@ class FileStorage extends BaseCacheStorage
      */
     public function get(SiteUriModel $siteUri): string
     {
-        $value = '';
+        $filePaths = $this->_getFilePaths($siteUri);
 
-        $filePath = $this->_getFilePath($siteUri);
-
-        if (is_file($filePath)) {
-            $value = file_get_contents($filePath);
+        foreach ($filePaths as $filePath) {
+            if (is_file($filePath)) {
+                return file_get_contents($filePath);
+            }
         }
 
-        return $value;
+        return '';
     }
 
     /**
@@ -99,34 +99,18 @@ class FileStorage extends BaseCacheStorage
      */
     public function save(string $value, SiteUriModel $siteUri)
     {
-        $filePath = $this->_getFilePath($siteUri);
+        $filePaths = $this->_getFilePaths($siteUri);
 
-        if (empty($filePath)) {
+        if (empty($filePaths)) {
             return;
         }
 
         try {
-            FileHelper::writeToFile($filePath, $value);
-
-            if ($this->createGzipFiles) {
-                FileHelper::writeToFile($filePath.'.gz', gzencode($value));
-            }
-
-            /**
-             * If the filename includes URL encoded characters, create an extra copy with the characters decoded
-             *
-             * Solves:
-             * https://github.com/putyourlightson/craft-blitz/issues/222
-             * https://github.com/putyourlightson/craft-blitz/issues/224
-             *
-             * Similar issue: https://www.drupal.org/project/boost/issues/1398578
-             * Solution: https://www.drupal.org/files/issues/boost-n1398578-19.patch
-             */
-            if (rawurldecode($filePath) != $filePath) {
-                FileHelper::writeToFile(rawurldecode($filePath), $value);
+            foreach ($filePaths as $filePath) {
+                FileHelper::writeToFile($filePath, $value);
 
                 if ($this->createGzipFiles) {
-                    FileHelper::writeToFile(rawurldecode($filePath).'.gz', gzencode($value));
+                    FileHelper::writeToFile($filePath.'.gz', gzencode($value));
                 }
             }
         }
@@ -144,15 +128,17 @@ class FileStorage extends BaseCacheStorage
     public function deleteUris(array $siteUris)
     {
         foreach ($siteUris as $siteUri) {
-            $filePath = $this->_getFilePath($siteUri);
+            $filePaths = $this->_getFilePaths($siteUri);
 
-            // Delete file if it exists
-            if (is_file($filePath)) {
-                unlink($filePath);
-            }
+            foreach ($filePaths as $filePath) {
+                // Delete file if it exists
+                if (is_file($filePath)) {
+                    unlink($filePath);
+                }
 
-            if (is_file($filePath.'.gz')) {
-                unlink($filePath.'.gz');
+                if (is_file($filePath.'.gz')) {
+                    unlink($filePath.'.gz');
+                }
             }
         }
     }
@@ -225,13 +211,13 @@ class FileStorage extends BaseCacheStorage
     // =========================================================================
 
     /**
-     * Returns file path from provided site ID and URI.
+     * Returns file paths for the provided site ID and URI.
      *
      * @param SiteUriModel $siteUri
      *
-     * @return string
+     * @return string[]
      */
-    private function _getFilePath(SiteUriModel $siteUri): string
+    private function _getFilePaths(SiteUriModel $siteUri): array
     {
         $sitePath = $this->_getSitePath($siteUri->siteId);
 
@@ -247,10 +233,27 @@ class FileStorage extends BaseCacheStorage
 
         // Ensure that file path is a sub path of the site path
         if (strpos($filePath, $sitePath) === false) {
-            return '';
+            return [];
         }
 
-        return $filePath;
+        $filePaths = [$filePath];
+
+        /**
+         * If the filename includes URL encoded characters, create a copy with the characters decoded
+         *
+         * Solves:
+         * https://github.com/putyourlightson/craft-blitz/issues/222
+         * https://github.com/putyourlightson/craft-blitz/issues/224
+         * https://github.com/putyourlightson/craft-blitz/issues/252
+         *
+         * Similar issue: https://www.drupal.org/project/boost/issues/1398578
+         * Solution: https://www.drupal.org/files/issues/boost-n1398578-19.patch
+         */
+        if (rawurldecode($filePath) != $filePath) {
+            $filePaths[] = rawurldecode($filePath);
+        }
+
+        return $filePaths;
     }
 
     /**
