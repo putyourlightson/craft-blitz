@@ -42,6 +42,11 @@ class FileStorage extends BaseCacheStorage
     public $createGzipFiles = false;
 
     /**
+     * @var bool
+     */
+    public $countCachedFiles = true;
+
+    /**
      * @var string|null
      */
     private $_cacheFolderPath;
@@ -83,7 +88,7 @@ class FileStorage extends BaseCacheStorage
      */
     public function get(SiteUriModel $siteUri): string
     {
-        $filePaths = $this->_getFilePaths($siteUri);
+        $filePaths = $this->getFilePaths($siteUri);
 
         foreach ($filePaths as $filePath) {
             if (is_file($filePath)) {
@@ -99,7 +104,7 @@ class FileStorage extends BaseCacheStorage
      */
     public function save(string $value, SiteUriModel $siteUri)
     {
-        $filePaths = $this->_getFilePaths($siteUri);
+        $filePaths = $this->getFilePaths($siteUri);
 
         if (empty($filePaths)) {
             return;
@@ -128,7 +133,7 @@ class FileStorage extends BaseCacheStorage
     public function deleteUris(array $siteUris)
     {
         foreach ($siteUris as $siteUri) {
-            $filePaths = $this->_getFilePaths($siteUri);
+            $filePaths = $this->getFilePaths($siteUri);
 
             foreach ($filePaths as $filePath) {
                 // Delete file if it exists
@@ -170,12 +175,12 @@ class FileStorage extends BaseCacheStorage
         $allSites = Craft::$app->getSites()->getAllSites();
 
         foreach ($allSites as $site) {
-            $sitePath = $this->_getSitePath($site->id);
+            $sitePath = $this->getSitePath($site->id);
 
             $sites[$site->id] = [
                 'name' => $site->name,
                 'path' => $sitePath,
-                'count' => $this->_getCachedFileCount($sitePath),
+                'count' => $this->getCachedFileCount($sitePath),
             ];
         }
 
@@ -207,9 +212,6 @@ class FileStorage extends BaseCacheStorage
         ]);
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Returns file paths for the provided site ID and URI.
      *
@@ -217,9 +219,9 @@ class FileStorage extends BaseCacheStorage
      *
      * @return string[]
      */
-    private function _getFilePaths(SiteUriModel $siteUri): array
+    public function getFilePaths(SiteUriModel $siteUri): array
     {
-        $sitePath = $this->_getSitePath($siteUri->siteId);
+        $sitePath = $this->getSitePath($siteUri->siteId);
 
         if ($sitePath == '') {
             return '';
@@ -263,7 +265,7 @@ class FileStorage extends BaseCacheStorage
      *
      * @return string
      */
-    private function _getSitePath(int $siteId): string
+    public function getSitePath(int $siteId): string
     {
         if (!empty($this->_sitePaths[$siteId])) {
             return $this->_sitePaths[$siteId];
@@ -288,16 +290,14 @@ class FileStorage extends BaseCacheStorage
      *
      * @param string $path
      *
-     * @return int
+     * @return int|string
      */
-    private function _getCachedFileCount(string $path): int
+    public function getCachedFileCount(string $path)
     {
-        /*
-         * Use the file system to calculate this for us as quickly as possible
-         * in order to prevent the request from timing out.
-         *
-         * https://stackoverflow.com/a/20263674/1769259
-         */
-        return system('find '.$path.' -type f -name index.html -print | wc -l');
+        if (!$this->countCachedFiles) {
+            return '-';
+        }
+
+        return is_dir($path) ? count(FileHelper::findFiles($path, ['only' => ['index.html']])) : 0;
     }
 }

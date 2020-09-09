@@ -6,7 +6,9 @@
 namespace putyourlightson\blitztests\unit;
 
 use Codeception\Test\Unit;
+use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
 
@@ -25,6 +27,11 @@ class FileStorageTest extends Unit
      * @var UnitTester
      */
     protected $tester;
+
+    /**
+     * @var FileStorage
+     */
+    private $cacheStorage;
 
     /**
      * @var SiteUriModel
@@ -47,6 +54,8 @@ class FileStorageTest extends Unit
         Blitz::$plugin->cacheStorage->deleteAll();
         Blitz::$plugin->flushCache->flushAll();
 
+        $this->cacheStorage = Blitz::$plugin->cacheStorage;
+
         $this->siteUri = new SiteUriModel([
             'siteId' => 1,
             'uri' => 'möbelträgerfüße',
@@ -60,29 +69,43 @@ class FileStorageTest extends Unit
 
     public function testSave()
     {
-        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $value = $this->cacheStorage->get($this->siteUri);
         $this->assertStringContainsString($this->output, $value);
     }
 
     public function testSaveDecoded()
     {
         $this->siteUri->uri = rawurldecode($this->siteUri->uri);
-        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $value = $this->cacheStorage->get($this->siteUri);
         $this->assertStringContainsString($this->output, $value);
     }
 
     public function testDelete()
     {
-        Blitz::$plugin->cacheStorage->deleteUris([$this->siteUri]);
-        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $this->cacheStorage->deleteUris([$this->siteUri]);
+        $value = $this->cacheStorage->get($this->siteUri);
         $this->assertEmpty($value);
     }
 
     public function testDeleteDecoded()
     {
         $this->siteUri->uri = rawurldecode($this->siteUri->uri);
-        Blitz::$plugin->cacheStorage->deleteUris([$this->siteUri]);
-        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $this->cacheStorage->deleteUris([$this->siteUri]);
+        $value = $this->cacheStorage->get($this->siteUri);
         $this->assertEmpty($value);
+    }
+
+    public function testGetCachedFileCount()
+    {
+        $this->cacheStorage->deleteAll();
+
+        $path = $this->cacheStorage->getSitePath(1);
+        $total = 10;
+
+        for ($i = 0; $i < $total; $i++) {
+            FileHelper::writeToFile($path.'/test-'.$i.'/index.html', 'test');
+        }
+
+        $this->assertEquals($total, $this->cacheStorage->getCachedFileCount($path));
     }
 }

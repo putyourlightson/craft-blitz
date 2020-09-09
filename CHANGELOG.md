@@ -1,8 +1,8 @@
 # Release Notes for Blitz
 
 ## 3.6.9 - Unreleased
-### Changed
-- Changed how cached files are counted to improve the performance of the Blitz cache utility.
+### Added
+- Added the `countCachedFiles` config setting to the file storage driver.
 
 ### Fixed
 - Fixed a bug in which cached files containing encoded characters would not be cleared correctly ([#252](https://github.com/putyourlightson/craft-blitz/issues/252)).
