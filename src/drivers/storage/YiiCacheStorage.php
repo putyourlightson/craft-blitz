@@ -74,8 +74,10 @@ class YiiCacheStorage extends BaseCacheStorage
 
         // Redis cache throws an exception if the connection is broken, so we catch it here
         try {
+            // Cast the site ID to an integer to avoid an incorrect key
+            // https://github.com/putyourlightson/craft-blitz/issues/257
             $value = $this->_cache->get([
-                self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
             ]);
         }
         catch (Exception $e) {}
@@ -92,8 +94,10 @@ class YiiCacheStorage extends BaseCacheStorage
             return;
         }
 
+        // Cast the site ID to an integer to avoid an incorrect key
+        // https://github.com/putyourlightson/craft-blitz/issues/257
         $this->_cache->set([
-            self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+            self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
         ], $value);
     }
 
@@ -107,8 +111,10 @@ class YiiCacheStorage extends BaseCacheStorage
         }
 
         foreach ($siteUris as $siteUri) {
+            // Cast the site ID to an integer to avoid an incorrect key
+            // https://github.com/putyourlightson/craft-blitz/issues/257
             $this->_cache->delete([
-                self::KEY_PREFIX, $siteUri->siteId, $siteUri->uri
+                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
             ]);
         }
     }
