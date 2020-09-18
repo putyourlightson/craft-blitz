@@ -50,6 +50,9 @@ class FileStorageTest extends Unit
     {
         parent::_before();
 
+        // Set cache storage to FileStorage
+        Blitz::$plugin->set('cacheStorage', FileStorage::class);
+
         Blitz::$plugin->generateCache->options->cachingEnabled = true;
         Blitz::$plugin->cacheStorage->deleteAll();
         Blitz::$plugin->flushCache->flushAll();

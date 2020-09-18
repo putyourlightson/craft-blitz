@@ -12,6 +12,8 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
+use yii\redis\Cache;
+use yii\redis\Connection;
 
 /**
  * @author    PutYourLightsOn
@@ -19,7 +21,7 @@ use UnitTester;
  * @since     3.6.9
  */
 
-class YiiCacheStorageTest extends Unit
+class RedisStorageTest extends Unit
 {
     // Properties
     // =========================================================================
@@ -51,8 +53,17 @@ class YiiCacheStorageTest extends Unit
     {
         parent::_before();
 
-        // Set cache component to Craft's default
-        Craft::$app->set('cache', App::cacheConfig());
+        // Set cache component to Redis
+        Craft::$app->set('redis', [
+            'class' => Connection::class,
+            'hostname' => 'localhost',
+            'port' => 6379,
+        ]);
+        Craft::$app->set('cache', [
+            'class' => Cache::class,
+            'defaultDuration' => 86400,
+            'keyPrefix' => 'CraftCMS',
+        ]);
 
         // Set cache storage to YiiCacheStorage
         Blitz::$plugin->set('cacheStorage', YiiCacheStorage::class);
