@@ -70,7 +70,6 @@ class CacheRequestTest extends Unit
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
-        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
 
         // Hide the fact that this is a console request
         Craft::$app->getRequest()->isConsoleRequest = false;
@@ -82,7 +81,7 @@ class CacheRequestTest extends Unit
     public function testGetIsCacheableRequestWithPathParam()
     {
         // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl().'?p=search');
+        $this->_mockRequest($this->siteUri->getUrl().'?'.Craft::$app->config->general->pathParam.'=search');
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
@@ -130,6 +129,12 @@ class CacheRequestTest extends Unit
         Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
 
         // Assert that the site URI is cacheable
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+
+        // Ensure that catch-all pattern works
+        Blitz::$plugin->settings->includedUriPatterns = [['siteId' => 1, 'uriPattern' => '.*']];
+
+        // Assert that the request is cacheable
         $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
 
         // Exclude the URI pattern
