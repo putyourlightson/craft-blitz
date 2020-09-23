@@ -97,7 +97,7 @@ class ElementTypeHelper
      *
      * @return bool
      */
-    public static function getIsCacheableElementType($elementType): bool
+    public static function getIsCacheableElementType(string $elementType = null): bool
     {
         if ($elementType === null) {
             return false;
@@ -123,7 +123,7 @@ class ElementTypeHelper
      *
      * @return string|null
      */
-    public static function getSourceIdAttribute($elementType)
+    public static function getSourceIdAttribute(string $elementType = null)
     {
         if ($elementType === null) {
             return null;
@@ -141,7 +141,7 @@ class ElementTypeHelper
      *
      * @return string|null
      */
-    public static function getLiveStatus($elementType)
+    public static function getLiveStatus(string $elementType = null)
     {
         if ($elementType === null) {
             return null;

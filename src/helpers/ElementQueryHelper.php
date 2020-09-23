@@ -85,7 +85,7 @@ class ElementQueryHelper
             return self::$_defaultElementQueryParams[$elementType];
         }
 
-        /** @var ElementInterface $elementType */
+        /** @var ElementInterface|string $elementType */
         self::$_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
 
         $ignoreParams = [
