@@ -67,9 +67,7 @@ class SiteUriHelper
             $siteUriSets[] = self::getSiteUrisForSite($site->id, $cacheableOnly);
         }
 
-        $siteUris = array_merge(...$siteUriSets);
-
-        return $siteUris;
+        return array_merge(...$siteUriSets);
     }
 
     /**

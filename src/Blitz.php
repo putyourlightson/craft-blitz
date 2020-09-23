@@ -32,6 +32,7 @@ use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
+use putyourlightson\blitz\drivers\integrations\IntegrationInterface;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
@@ -373,6 +374,7 @@ class Blitz extends Plugin
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
             function() {
+                /** @var IntegrationInterface $integration */
                 foreach (IntegrationHelper::getActiveIntegrations() as $integration) {
                     $integration::registerEvents();
                 }

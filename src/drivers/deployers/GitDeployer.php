@@ -504,6 +504,7 @@ class GitDeployer extends BaseDeployer
                 $process = Process::fromShellCommandline($command);
             }
             else {
+                /** @noinspection PhpParamsInspection */
                 $process = new Process($command);
             }
 

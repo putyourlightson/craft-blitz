@@ -75,7 +75,7 @@ class ElementQueryHelper
      *
      * @return array
      */
-    public static function getDefaultElementQueryParams($elementType): array
+    public static function getDefaultElementQueryParams(string $elementType = null): array
     {
         if ($elementType === null) {
             return [];
@@ -85,6 +85,7 @@ class ElementQueryHelper
             return self::$_defaultElementQueryParams[$elementType];
         }
 
+        /** @var ElementInterface $elementType */
         self::$_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
 
         $ignoreParams = [

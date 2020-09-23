@@ -174,7 +174,7 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function expiryDate($value)
+    public function expiryDate(DateTime $value = null)
     {
         $this->expiryDate = $value;
 

@@ -7,18 +7,17 @@ namespace putyourlightson\blitz\behaviors;
 
 use Craft;
 use craft\base\Element;
-use craft\events\BatchElementActionEvent;
-use craft\events\ElementEvent;
-use craft\services\Elements;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
-use yii\base\Event;
 
 /**
  * This class attaches behavior to detect whether an element has changed.
  *
  * @since 3.6.0
  *
+ * @property-read bool $hasStatusChanged
+ * @property-read bool $hasChanged
+ * @property-read bool $hasLiveStatus
  * @property Element $owner
  */
 class ElementChangedBehavior extends Behavior

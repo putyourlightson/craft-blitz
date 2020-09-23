@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\integrations\IntegrationInterface;
 use yii\base\Event;
 
 class IntegrationHelper
@@ -52,6 +53,7 @@ class IntegrationHelper
         $integrations = [];
         $pluginsService = Craft::$app->getPlugins();
 
+        /** @var IntegrationInterface $integration */
         foreach (self::getAllIntegrations() as $integration) {
             $enabled = true;
 

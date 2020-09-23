@@ -13,7 +13,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\NotSupportedException;
-use yii\queue\redis\Queue as RedisQueue;
 
 class BaseDriverHelper
 {
