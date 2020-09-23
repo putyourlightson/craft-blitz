@@ -306,11 +306,6 @@ class GenerateCacheService extends Component
             );
         }
 
-        // Save cache sources
-        if (!empty($this->options->sources)) {
-            Blitz::$plugin->cacheSources->saveSources($this->options->sources, $cacheId);
-        }
-
         // Save cache tags
         if (!empty($this->options->tags)) {
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
