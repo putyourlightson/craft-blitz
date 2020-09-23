@@ -224,7 +224,7 @@ class FileStorage extends BaseCacheStorage
         $sitePath = $this->getSitePath($siteUri->siteId);
 
         if ($sitePath == '') {
-            return '';
+            return [];
         }
 
         // Replace ? with / in URI
