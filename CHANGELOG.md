@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.10 - 2020-09-23
+### Fixed
+- Fixed a bug introduced in version 3.6.9 that could prevent URL patterns being matched.
+
 ## 3.6.9 - 2020-09-23
 ### Added
 - Added the `countCachedFiles` config setting to the file storage driver.

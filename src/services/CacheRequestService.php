@@ -314,7 +314,10 @@ class CacheRequestService extends Component
             // Trim slashes
             $uriPattern = trim($uriPattern, '/');
 
-            if (preg_match('/'.preg_quote($uriPattern, '/').'/', trim($siteUri->uri, '/'))) {
+            // Escape delimiter
+            $uriPattern = str_replace('/', '\/', $uriPattern);
+
+            if (preg_match('/'.$uriPattern.'/', trim($siteUri->uri, '/'))) {
                 return true;
             }
         }
