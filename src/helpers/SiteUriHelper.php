@@ -242,11 +242,7 @@ class SiteUriHelper
             $baseUrl = trim(Craft::getAlias($site->getBaseUrl()), '/');
 
             if (stripos($url, $baseUrl) === 0) {
-                $uri = preg_replace(
-                    '/'.preg_quote($baseUrl, '/').'/',
-                    '',
-                    $url,
-                    1);
+                $uri = preg_replace('/'.preg_quote($baseUrl, '/').'/', '', $url, 1);
                 $uri = trim($uri, '/');
 
                 return new SiteUriModel([

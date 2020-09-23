@@ -7,6 +7,8 @@
 ### Fixed
 - Fixed a bug in which cached files containing encoded characters would not be cleared correctly ([#252](https://github.com/putyourlightson/craft-blitz/issues/252)).
 - Fixed a bug in which cached pages were not being correctly refreshed by the Yii Cache Storage driver ([#257](https://github.com/putyourlightson/craft-blitz/issues/257)).
+- Fixed a bug in the base site URL replacement logic ([#258](https://github.com/putyourlightson/craft-blitz/pull/258)).
+- Fixed hard-coded path param in check for cacheable request.
 
 ## 3.6.8 - 2020-08-26
 ### Added

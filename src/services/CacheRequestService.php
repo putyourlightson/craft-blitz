@@ -111,7 +111,7 @@ class CacheRequestService extends Component
         }
 
         // Check for path param in URL because `$request->getQueryString()` will contain it regardless
-        if (preg_match('/[?&]p=/', $request->getUrl()) === 1) {
+        if (preg_match('/[?&]'.Craft::$app->config->general->pathParam.'=/', $request->getUrl()) === 1) {
             Blitz::$plugin->debug('Page not cached because a path param was provided in the query string. ', [], $request->getAbsoluteUrl());
 
             return false;
@@ -314,10 +314,7 @@ class CacheRequestService extends Component
             // Trim slashes
             $uriPattern = trim($uriPattern, '/');
 
-            // Escape hash symbols
-            $uriPattern = str_replace('#', '\#', $uriPattern);
-
-            if (preg_match('#'.$uriPattern.'#', trim($siteUri->uri, '/'))) {
+            if (preg_match('/'.preg_quote($uriPattern, '/').'/', trim($siteUri->uri, '/'))) {
                 return true;
             }
         }
