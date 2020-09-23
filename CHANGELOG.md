@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.6.9 - Unreleased
+## 3.6.9 - 2020-09-23
 ### Added
 - Added the `countCachedFiles` config setting to the file storage driver.
 
