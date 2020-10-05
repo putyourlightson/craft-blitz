@@ -49,7 +49,10 @@ class CacheController extends Controller
      */
     public function options($actionID): array
     {
-        return array_merge(parent::options($actionID), ['queue']);
+        $options = parent::options($actionID);
+        $options[] = 'queue';
+
+        return $options;
     }
 
     /**
