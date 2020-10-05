@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.11 - 2020-10-05
+### Added
+- Added a `--queue` flag that can be used with some console commands to cause job to be queued but not run ([#260](https://github.com/putyourlightson/craft-blitz/issues/260)).
+
 ## 3.6.10 - 2020-09-23
 ### Fixed
 - Fixed a bug introduced in version 3.6.9 that could prevent URL patterns being matched.

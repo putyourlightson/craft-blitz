@@ -16,16 +16,15 @@ use yii\console\ExitCode;
 
 class CacheController extends Controller
 {
-    // Properties
-    // =========================================================================
+    /**
+     * @var bool Whether jobs should be queued only and not run
+     */
+    public $queue = false;
 
     /**
      * @var array
      */
     private $_actions = [];
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -43,6 +42,14 @@ class CacheController extends Controller
             'label' => Craft::t('blitz', 'Generate Expiry Dates'),
             'instructions' => Craft::t('blitz', 'Generates and stores entry expiry dates.'),
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function options($actionID): array
+    {
+        return array_merge(parent::options($actionID), ['queue']);
     }
 
     /**
@@ -200,7 +207,9 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
 
-        Craft::$app->runAction('queue/run');
+        if (!$this->queue) {
+            Craft::$app->runAction('queue/run');
+        }
 
         $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
@@ -222,7 +231,9 @@ class CacheController extends Controller
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
 
-        Craft::$app->runAction('queue/run');
+        if (!$this->queue) {
+            Craft::$app->runAction('queue/run');
+        }
 
         $this->stdout(Craft::t('blitz', 'Cached URLs successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
@@ -244,7 +255,9 @@ class CacheController extends Controller
 
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
 
-        Craft::$app->runAction('queue/run');
+        if (!$this->queue) {
+            Craft::$app->runAction('queue/run');
+        }
 
         $this->stdout(Craft::t('blitz', 'Tagged cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
