@@ -314,8 +314,9 @@ class CacheRequestService extends Component
             // Trim slashes
             $uriPattern = trim($uriPattern, '/');
 
-            // Escape delimiter
-            $uriPattern = str_replace('/', '\/', $uriPattern);
+            // Escape delimiters, removing already escaped delimiters first
+            // https://github.com/putyourlightson/craft-blitz/issues/261
+            $uriPattern = str_replace(['\/', '/'], ['/', '\/'], $uriPattern);
 
             if (preg_match('/'.$uriPattern.'/', trim($siteUri->uri, '/'))) {
                 return true;

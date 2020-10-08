@@ -142,6 +142,12 @@ class CacheRequestTest extends Unit
 
         // Assert that the site URI is not cacheable
         $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+
+        // Ensure that pattern with escaped delimiter works
+        Blitz::$plugin->settings->excludedUriPatterns = [['siteId' => 1, 'uriPattern' => '(\/?)']];
+
+        // Assert that the request is not cacheable
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
     }
 
     public function testGetResponse()
