@@ -39,28 +39,54 @@
 }) }}
 
 
-{{ forms.autosuggestField({
-    label: "Email"|t('blitz'),
-    instructions: "The email address associated with your Cloudflare account."|t('blitz'),
+{{ forms.selectField({
+    label: "Authentication Method"|t('blitz'),
+    instructions: "The authentication method for connecting to the Cloudflare API."|t('blitz'),
     suggestEnvVars: true,
-    name: 'email',
-    value: purger.email,
-    errors: purger.getErrors('email'),
+    name: 'authenticationMethod',
+    value: purger.authenticationMethod,
+    options: {
+        apiToken: "API Token"|t('blitz'),
+        apiKey: "API Key"|t('blitz'),
+    },
+    toggle: true,
+    errors: purger.getErrors('authenticationMethod'),
     required: true,
 }) }}
 
-{% set info %}
-    <span class="info">{{ "The global API key can be found under “My Profile” in your Cloudflare account."|t('blitz') }}</span>
-{% endset %}
-{{ forms.autosuggestField({
-    label: "Global API Key"|t('blitz'),
-    instructions: "The global API key for your Cloudflare account."|t('blitz') ~ info,
-    suggestEnvVars: true,
-    name: 'apiKey',
-    value: purger.apiKey,
-    errors: purger.getErrors('apiKey'),
-    required: true,
-}) }}
+<div id="apiToken" class="hidden">
+    {{ forms.autosuggestField({
+        label: "API Token"|t('blitz'),
+        instructions: "The API token for your Cloudflare account (API tokens can be created [here]({url}))."|t('blitz', {url: 'https://dash.cloudflare.com/profile/api-tokens'}),
+        suggestEnvVars: true,
+        name: 'apiToken',
+        value: purger.apiToken,
+        errors: purger.getErrors('apiToken'),
+        required: true,
+    }) }}
+</div>
+
+<div id="apiKey" class="hidden">
+    {{ forms.autosuggestField({
+        label: "API Key"|t('blitz'),
+        instructions: "The global API key for your Cloudflare account (API keys can be created [here]({url}))."|t('blitz', {url: 'https://dash.cloudflare.com/profile/api-tokens'}),
+        suggestEnvVars: true,
+        name: 'apiKey',
+        value: purger.apiKey,
+        errors: purger.getErrors('apiKey'),
+        required: true,
+    }) }}
+
+    {{ forms.autosuggestField({
+        label: "Email"|t('blitz'),
+        instructions: "The email address associated with your Cloudflare account."|t('blitz'),
+        suggestEnvVars: true,
+        name: 'email',
+        value: purger.email,
+        errors: purger.getErrors('email'),
+        required: true,
+    }) }}
+</div>
 
 {% set info %}
     <span class="info">{{ "According to Cloudflare, it can take up to 30 seconds for cached files to be purged across all of its edge nodes. Adding a delay between purging the cache and warming it will slow down the process but may help to ensure that the updated pages really are warmed. A value of 5 is recommended."|t('blitz') }}</span>

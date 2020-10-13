@@ -34,12 +34,22 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @var string
      */
-    public $email;
+    public $authenticationMethod = 'apiKey';
+
+    /**
+     * @var string
+     */
+    public $apiToken;
 
     /**
      * @var string
      */
     public $apiKey;
+
+    /**
+     * @var string
+     */
+    public $email;
 
     /**
      * @var array
@@ -69,8 +79,9 @@ class CloudflarePurger extends BaseCachePurger
         $behaviors['parser'] = [
             'class' => EnvAttributeParserBehavior::class,
             'attributes' => [
-                'email',
+                'apiToken',
                 'apiKey',
+                'email',
             ],
         ];
 
@@ -83,6 +94,7 @@ class CloudflarePurger extends BaseCachePurger
     public function attributeLabels(): array
     {
         return [
+            'apiToken' => Craft::t('blitz', 'API Token'),
             'apiKey' => Craft::t('blitz', 'API Key'),
             'zoneIds' => Craft::t('blitz', 'Zone IDs'),
         ];
@@ -94,7 +106,12 @@ class CloudflarePurger extends BaseCachePurger
     public function rules(): array
     {
         return [
-            [['email', 'apiKey', 'warmCacheDelay'], 'required'],
+            [['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
+                return $purger->authenticationMethod == 'apiToken';
+            }],
+            [['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
+                return $purger->authenticationMethod == 'apiKey';
+            }],
             [['email'], 'email'],
             [['warmCacheDelay'], 'integer', 'min' => 0, 'max' => 30],
         ];
@@ -186,13 +203,19 @@ class CloudflarePurger extends BaseCachePurger
     {
         $response = false;
 
+        $headers = ['Content-Type' => 'application/json'];
+
+        if ($this->authenticationMethod == 'apiKey') {
+            $headers['X-Auth-Key'] = Craft::parseEnv($this->apiKey);
+            $headers['X-Auth-Email'] = Craft::parseEnv($this->email);
+        }
+        else {
+            $headers['Authorization'] = 'Bearer '.Craft::parseEnv($this->apiToken);
+        }
+
         $client = Craft::createGuzzleClient([
             'base_uri' => self::API_ENDPOINT,
-            'headers'  => [
-                'Content-Type' => 'application/json',
-                'X-Auth-Email' => Craft::parseEnv($this->email),
-                'X-Auth-Key'   => Craft::parseEnv($this->apiKey),
-            ]
+            'headers'  => $headers,
         ]);
 
         $siteUid = Db::uidById(Table::SITES, $siteId);
