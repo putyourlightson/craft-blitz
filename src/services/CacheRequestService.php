@@ -21,9 +21,6 @@ use putyourlightson\blitz\models\SiteUriModel;
  */
 class CacheRequestService extends Component
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @const ResponseEvent
      */
@@ -39,16 +36,10 @@ class CacheRequestService extends Component
      */
     const MAX_URI_LENGTH = 255;
 
-    // Properties
-    // =========================================================================
-
     /**
      * @var string|null
      */
     private $_queryString;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * Returns whether the request is cacheable.
@@ -197,13 +188,13 @@ class CacheRequestService extends Component
         }
 
         // Excluded URI patterns take priority
-        if ($this->_matchesUriPatterns($siteUri, Blitz::$plugin->settings->excludedUriPatterns)) {
+        if ($this->matchesUriPatterns($siteUri, Blitz::$plugin->settings->excludedUriPatterns)) {
             Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.', [], $siteUri->getUrl());
 
             return false;
         }
 
-        if (!$this->_matchesUriPatterns($siteUri, Blitz::$plugin->settings->includedUriPatterns)) {
+        if (!$this->matchesUriPatterns($siteUri, Blitz::$plugin->settings->includedUriPatterns)) {
             Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.', [], $siteUri->getUrl());
 
             return false;
@@ -280,9 +271,6 @@ class CacheRequestService extends Component
         return $response;
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Returns true if the URI matches a set of patterns.
      *
@@ -291,7 +279,7 @@ class CacheRequestService extends Component
      *
      * @return bool
      */
-    private function _matchesUriPatterns(SiteUriModel $siteUri, $siteUriPatterns): bool
+    public function matchesUriPatterns(SiteUriModel $siteUri, $siteUriPatterns): bool
     {
         if (!is_array($siteUriPatterns)) {
             return false;

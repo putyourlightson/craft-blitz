@@ -127,27 +127,44 @@ class CacheRequestTest extends Unit
 
         // Include the URI pattern
         Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
-
-        // Assert that the site URI is cacheable
         $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
 
-        // Ensure that catch-all pattern works
-        Blitz::$plugin->settings->includedUriPatterns = [['siteId' => 1, 'uriPattern' => '.*']];
-
-        // Assert that the request is cacheable
-        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
-
-        // Exclude the URI pattern
+        // Exclude the excluded URI pattern works
         Blitz::$plugin->settings->excludedUriPatterns = [$this->uriPattern];
-
-        // Assert that the site URI is not cacheable
         $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+    }
+
+    public function testMatchesUriPatterns()
+    {
+        // Ensure that catch-all pattern works
+        $this->assertTrue(
+            Blitz::$plugin->cacheRequest->matchesUriPatterns(
+                $this->siteUri,
+                [['siteId' => 1, 'uriPattern' => '.*']]
+            )
+        );
 
         // Ensure that pattern with escaped delimiter works
-        Blitz::$plugin->settings->excludedUriPatterns = [['siteId' => 1, 'uriPattern' => '(\/?)']];
+        $this->assertTrue(
+            Blitz::$plugin->cacheRequest->matchesUriPatterns(
+                $this->siteUri,
+                [['siteId' => 1, 'uriPattern' => '(\/?)']]
+            )
+        );
 
-        // Assert that the request is not cacheable
-        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+        // Ensure that pattern with start and end characters works
+        $this->assertTrue(
+            Blitz::$plugin->cacheRequest->matchesUriPatterns(
+                $this->siteUri,
+                [['siteId' => 1, 'uriPattern' => '^'.$this->siteUri->uri.'$']]
+            )
+        );
+        $this->assertFalse(
+            Blitz::$plugin->cacheRequest->matchesUriPatterns(
+                $this->siteUri,
+                [['siteId' => 1, 'uriPattern' => '^'.substr($this->siteUri->uri, 0, -1).'$']]
+            )
+        );
     }
 
     public function testGetResponse()
