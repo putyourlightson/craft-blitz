@@ -3,11 +3,10 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitztests\unit;
+namespace putyourlightson\blitztests\unit\controllers;
 
 use Craft;
 use craft\web\Response;
-use craft\web\twig\TemplateLoaderException;
 use yii\web\BadRequestHttpException;
 
 /**

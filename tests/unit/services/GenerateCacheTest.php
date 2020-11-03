@@ -3,7 +3,7 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitztests\unit;
+namespace putyourlightson\blitztests\unit\services;
 
 use Codeception\Test\Unit;
 use craft\commerce\elements\Product;

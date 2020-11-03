@@ -3,11 +3,10 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitztests\unit;
+namespace putyourlightson\blitztests\unit\drivers;
 
 use Codeception\Test\Unit;
 use Craft;
-use craft\helpers\App;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use putyourlightson\blitz\models\SiteUriModel;
