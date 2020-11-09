@@ -212,21 +212,22 @@ class CacheRequestService extends Component
      */
     public function getResponse(SiteUriModel $siteUri)
     {
-        $value = Blitz::$plugin->cacheStorage->get($siteUri);
-
-        if (empty($value)) {
-            return null;
-        }
-
         /** @var Response $response */
         $response = Craft::$app->getResponse();
 
         $event = new ResponseEvent([
+            'siteUri' => $siteUri,
             'response' => $response,
         ]);
         $this->trigger(self::EVENT_BEFORE_GET_RESPONSE, $event);
 
-        if (!$event->isValid || !$value) {
+        if (!$event->isValid) {
+            return null;
+        }
+
+        $value = Blitz::$plugin->cacheStorage->get($siteUri);
+
+        if (empty($value)) {
             return null;
         }
 
