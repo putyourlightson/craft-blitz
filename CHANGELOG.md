@@ -3,6 +3,7 @@
 ## 3.6.12 - Unreleased
 ### Added
 - Added the API token authentication method to the Cloudflare purger ([#263](https://github.com/putyourlightson/craft-blitz/issues/263)).
+- Added a site URI model to the ResponseEvent class.
 
 ### Fixed
 - Fixed an error that could occur if the CP trigger was set to `null` ([#264](https://github.com/putyourlightson/craft-blitz/issues/264)).
