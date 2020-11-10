@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.6.12 - Unreleased
+## 3.6.12 - 2020-11-10
 ### Added
 - Added the API token authentication method to the Cloudflare purger ([#263](https://github.com/putyourlightson/craft-blitz/issues/263)).
 - Added a site URI model to the ResponseEvent class.
