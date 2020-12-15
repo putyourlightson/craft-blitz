@@ -87,7 +87,7 @@ return [
         //    ],
         //    'email' => '',
         //    'apiKey' => '',
-        //    'warmCacheDelay' => '3',
+        //    'warmCacheDelay' => '5',
         //],
 
         // The purger type classes to add to the plugin’s default purger types.

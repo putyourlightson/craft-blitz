@@ -89,7 +89,7 @@
 </div>
 
 {% set info %}
-    <span class="info">{{ "According to Cloudflare, it can take up to 30 seconds for cached files to be purged across all of its edge nodes. Adding a delay between purging the cache and warming it will slow down the process but may help to ensure that the updated pages really are warmed. A value of 5 is recommended."|t('blitz') }}</span>
+    <span class="info">{{ "It can take up to 30 seconds for cached files to be purged across all edge nodes. Adding a delay between purging the cache and warming it will prevent stale versions of pages from being warmed. A value of `5` is recommended."|t('blitz') }}</span>
 {% endset %}
 {{ forms.textField({
     type: 'number',
