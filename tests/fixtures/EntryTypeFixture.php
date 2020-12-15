@@ -6,9 +6,9 @@
 namespace putyourlightson\blitztests\fixtures;
 
 use craft\records\EntryType;
-use craft\test\Fixture;
+use craft\test\ActiveFixture;
 
-class EntryTypeFixture extends Fixture
+class EntryTypeFixture extends ActiveFixture
 {
     /**
      * @inheritdoc

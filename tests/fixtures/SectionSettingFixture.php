@@ -6,9 +6,9 @@
 namespace putyourlightson\blitztests\fixtures;
 
 use craft\records\Section_SiteSettings;
-use craft\test\Fixture;
+use craft\test\ActiveFixture;
 
-class SectionSettingFixture extends Fixture
+class SectionSettingFixture extends ActiveFixture
 {
     /**
      * @inheritdoc
