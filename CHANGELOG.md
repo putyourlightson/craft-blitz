@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.6.13 - Unreleased
+### Added
+- Added the ability to disable the warm cache utility by setting the cache warmer to “None” ([#275](https://github.com/putyourlightson/craft-blitz/issues/275)).
+
 ## 3.6.12 - 2020-11-10
 ### Added
 - Added the API token authentication method to the Cloudflare purger ([#263](https://github.com/putyourlightson/craft-blitz/issues/263)).

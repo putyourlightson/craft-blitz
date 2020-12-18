@@ -17,6 +17,11 @@ use putyourlightson\blitz\models\SiteUriModel;
  */
 abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerInterface
 {
+    // Traits
+    // =========================================================================
+
+    use CacheWarmerTrait;
+
     // Constants
     // =========================================================================
 

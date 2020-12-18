@@ -87,11 +87,13 @@ class CacheUtility extends Utility
             ];
         }
 
-        $actions[] = [
-            'id' => 'warm',
-            'label' => Craft::t('blitz', 'Warm Cache'),
-            'instructions' => Craft::t('blitz', 'Warms all of the cacheable pages.'),
-        ];
+        if ($showAll || !Blitz::$plugin->cacheWarmer->isDummy) {
+            $actions[] = [
+                'id' => 'warm',
+                'label' => Craft::t('blitz', 'Warm Cache'),
+                'instructions' => Craft::t('blitz', 'Warms all of the cacheable pages.'),
+            ];
+        }
 
         if ($showAll || !Blitz::$plugin->deployer->isDummy) {
             $actions[] = [

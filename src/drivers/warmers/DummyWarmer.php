@@ -1,0 +1,51 @@
+<?php
+/**
+ * @copyright Copyright (c) PutYourLightsOn
+ */
+
+namespace putyourlightson\blitz\drivers\warmers;
+
+use Craft;
+
+/**
+ * @since 3.6.13
+ */
+class DummyWarmer extends BaseCacheWarmer
+{
+    // Static
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    public static function displayName(): string
+    {
+        return Craft::t('blitz', 'None');
+    }
+
+    // Properties
+    // =========================================================================
+
+    /**
+     * @var bool
+     */
+    public $isDummy = true;
+
+    // Public Methods
+    // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null) { }
+
+    /**
+     * @inheritdoc
+     */
+    public function warmSite(int $siteId, callable $setProgressHandler = null, int $delay = null) { }
+
+    /**
+     * @inheritdoc
+     */
+    public function warmAll(callable $setProgressHandler = null, int $delay = null) { }
+}
