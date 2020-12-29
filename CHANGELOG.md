@@ -1,9 +1,12 @@
 # Release Notes for Blitz
 
-## 3.6.13 - Unreleased
+## 3.7.0 - Unreleased
 ### Added
 - Added the ability to disable the warm cache utility by setting the cache warmer to “None” ([#275](https://github.com/putyourlightson/craft-blitz/issues/275)).
 - Added compatibility with Solspace Calendar and other plugins that use joins in their element queries.
+
+### Changed
+- Optimised the element query parameters that are cached. 
 
 ## 3.6.12 - 2020-11-10
 ### Added

@@ -165,14 +165,16 @@ class ElementQueryHelper
      *
      * @return bool
      */
-    public static function hasFixedIds(ElementQuery $elementQuery): bool
+    public static function hasFixedIdsOrSlugs(ElementQuery $elementQuery): bool
     {
         // The query values to check
         $values = [
             $elementQuery->id,
             $elementQuery->uid,
+            $elementQuery->slug,
             $elementQuery->where['elements.id'] ?? null,
             $elementQuery->where['elements.uid'] ?? null,
+            $elementQuery->where['elements.slug'] ?? null,
         ];
 
         foreach ($values as $value) {

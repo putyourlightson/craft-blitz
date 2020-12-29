@@ -128,8 +128,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has fixed IDs
-        if (ElementQueryHelper::hasFixedIds($elementQuery)) {
+        // Don't proceed if the query has fixed IDs or slugs
+        if (ElementQueryHelper::hasFixedIdsOrSlugs($elementQuery)) {
             return;
         }
 
