@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\db\ActiveRecord;
+use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
@@ -137,8 +138,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don't proceed if the query has a join
-        if (!empty($elementQuery->join)) {
+        // Don't proceed if this is a relation query
+        if (ElementQueryHelper::isRelationQuery($elementQuery)) {
             return;
         }
 

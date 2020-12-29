@@ -220,6 +220,37 @@ class ElementQueryHelper
         return (bool)$hasMatch;
     }
 
+    /**
+     * Returns whether the element query is a relation query.
+     *
+     * @param ElementQuery $elementQuery
+     *
+     * @return bool
+     */
+    public static function isRelationQuery(ElementQuery $elementQuery): bool
+    {
+        if (empty($elementQuery->join)) {
+            return false;
+        }
+
+        $join = $elementQuery->join[0] ?? null;
+
+        if ($join === null) {
+            return false;
+        }
+
+        $relationTypes = [
+            ['relations' => '{{%relations}}'],
+            '{{%relations}} relations',
+        ];
+
+        if ($join[0] == 'INNER JOIN' && in_array($join[1], $relationTypes)) {
+            return true;
+        }
+
+        return false;
+    }
+
     // Private Methods
     // =========================================================================
 
