@@ -221,6 +221,22 @@ class ElementQueryHelper
     }
 
     /**
+     * Returns whether the element query is a draft or revision query.
+     *
+     * @param ElementQuery $elementQuery
+     *
+     * @return bool
+     */
+    public static function isDraftOrRevisionQuery(ElementQuery $elementQuery): bool
+    {
+        if ($elementQuery->drafts || $elementQuery->revisions) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns whether the element query is a relation query.
      *
      * @param ElementQuery $elementQuery
