@@ -46,7 +46,7 @@ class ElementQueryHelper
         }
 
         // Ignore specific empty params as they are redundant
-        $ignoreEmptyParams = ['orderBy', 'limit', 'offset'];
+        $ignoreEmptyParams = ['structureId', 'orderBy', 'limit', 'offset'];
 
         foreach ($ignoreEmptyParams as $key) {
             // Use `array_key_exists` rather than `isset` as it will return `true` for null results
@@ -94,7 +94,6 @@ class ElementQueryHelper
             'query',
             'subQuery',
             'customFields',
-            'structureId',
             'withStructure',
             'descendantDist',
         ];
