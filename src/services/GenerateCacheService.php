@@ -254,7 +254,7 @@ class GenerateCacheService extends Component
         // Don't cache if the output contains any transform generation URLs
         // https://github.com/putyourlightson/craft-blitz/issues/125
         if (StringHelper::contains(stripslashes($output), 'assets/generate-transform')) {
-            Blitz::$plugin->debug('Page not cached because it contains transform generation URLs.', [], $siteUri->getUrl());
+            Blitz::$plugin->debug('Page not cached because it contains transform generation URLs. Consider setting the `generateTransformsBeforePageLoad` general config setting to `true` to fix this.', [], $siteUri->getUrl());
 
             return;
         }
