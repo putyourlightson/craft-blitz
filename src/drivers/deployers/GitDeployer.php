@@ -142,10 +142,10 @@ class GitDeployer extends BaseDeployer
         $deployGroupedSiteUris = [];
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
-        foreach ($groupedSiteUris as $siteId => $siteUris) {
+        foreach ($groupedSiteUris as $siteId => $siteUriGroup) {
             if ($this->_hasRepository($siteId)) {
-                $deployGroupedSiteUris[$siteId] = $siteUris;
-                $total += count($siteUris);
+                $deployGroupedSiteUris[$siteId] = $siteUriGroup;
+                $total += count($siteUriGroup);
             }
         }
 
@@ -154,14 +154,14 @@ class GitDeployer extends BaseDeployer
             call_user_func($setProgressHandler, $count, $total, $progressLabel);
         }
 
-        foreach ($deployGroupedSiteUris as $siteId => $siteUris) {
+        foreach ($deployGroupedSiteUris as $siteId => $siteUriGroup) {
             $repository = $this->_getRepository($siteId);
 
             if ($repository === null) {
                 continue;
             }
 
-            foreach ($siteUris as $siteUri) {
+            foreach ($siteUriGroup as $siteUri) {
                 $count++;
 
                 if (is_callable($setProgressHandler)) {

@@ -126,9 +126,9 @@ class CloudflarePurger extends BaseCachePurger
 
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
-        foreach ($groupedSiteUris as $siteId => $siteUris) {
+        foreach ($groupedSiteUris as $siteId => $siteUriGroup) {
             $this->_sendRequest('delete', 'purge_cache', $siteId, [
-                'files' => SiteUriHelper::getUrlsFromSiteUris($siteUris)
+                'files' => SiteUriHelper::getUrlsFromSiteUris($siteUriGroup)
             ]);
         }
 

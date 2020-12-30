@@ -135,7 +135,7 @@ class CacheRequestService extends Component
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
             && !empty($this->_getQueryString()))
         {
-            $url = $url.'?'.$this->_getQueryString();
+            $url .= '?'.$this->_getQueryString();
         }
 
         $siteUri = SiteUriHelper::getSiteUriFromUrl($url);
