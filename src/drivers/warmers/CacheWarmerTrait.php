@@ -17,4 +17,9 @@ trait CacheWarmerTrait
      * @var bool
      */
     public $isDummy = false;
+
+    /**
+     * @var int
+     */
+    public $warmed = 0;
 }

@@ -329,6 +329,13 @@ class CacheController extends Controller
 
         Console::endProgress();
 
+        $warmed = Blitz::$plugin->cacheWarmer->warmed;
+        $total = count($siteUris);
+
+        if ($warmed < $total) {
+            $this->stdout(Craft::t('blitz', 'Warmed {warmed} of {total} pages. To see why pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['warmed' => $warmed, 'total' => $total]).PHP_EOL, Console::FG_CYAN);
+        }
+
         $this->_output('Blitz cache warming complete.');
     }
 

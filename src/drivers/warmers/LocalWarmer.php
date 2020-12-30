@@ -83,7 +83,11 @@ class LocalWarmer extends BaseCacheWarmer
                 $siteUri = new SiteUriModel($siteUri);
             }
 
-            $this->_warmUri($siteUri);
+            $success = $this->_warmUri($siteUri);
+
+            if ($success) {
+                $this->warmed++;
+            }
         }
     }
 
@@ -94,8 +98,9 @@ class LocalWarmer extends BaseCacheWarmer
      * Warms a site URI.
      *
      * @param SiteUriModel $siteUri
+     * @return bool
      */
-    private function _warmUri(SiteUriModel $siteUri)
+    private function _warmUri(SiteUriModel $siteUri): bool
     {
         $url = $siteUri->getUrl();
 
@@ -141,7 +146,7 @@ class LocalWarmer extends BaseCacheWarmer
 
         // Only proceed if this is a cacheable site URI
         if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-            return;
+            return false;
         }
 
         // Handle the request with before/after events
@@ -150,16 +155,21 @@ class LocalWarmer extends BaseCacheWarmer
             $response = Craft::$app->handleRequest($request);
             Craft::$app->trigger(Craft::$app::EVENT_AFTER_REQUEST);
 
-            if ($response->getIsOk()) {
-                Blitz::$plugin->generateCache->save($response->data, $siteUri);
-            }
-            else {
+            if (!$response->getIsOk()) {
                 Blitz::$plugin->debug($response->data['error'] ?? '');
+
+                return false;
             }
+
+            Blitz::$plugin->generateCache->save($response->data, $siteUri);
         }
         catch (Exception $e) {
             Blitz::$plugin->debug($e->getMessage());
+
+            return false;
         }
+
+        return true;
     }
 
     /**

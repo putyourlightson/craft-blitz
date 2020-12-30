@@ -82,6 +82,7 @@ class GuzzleWarmer extends BaseCacheWarmer
             'concurrency' => $this->concurrency,
             'fulfilled' => function() use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
+                $this->warmed++;
 
                 if (is_callable($setProgressHandler)) {
                     $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
