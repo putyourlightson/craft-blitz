@@ -157,6 +157,7 @@ class GenerateCacheTest extends Unit
             Entry::find()->id('1, 2, 3'),
             Entry::find()->id([1, 2, 3]),
             Entry::find()->id(['1', '2', '3']),
+            Entry::find()->slug('slug'),
             Entry::find()->orderBy('RAND()'),
             Entry::find()->orderBy('Rand(123)'),
         ];
@@ -175,6 +176,7 @@ class GenerateCacheTest extends Unit
             ],
             Entry::find()->id('not 1'),
             [
+                Entry::find()->id('not 1'),
                 Entry::find()->id(['not', 1]),
                 Entry::find()->id(['not', '1']),
             ],

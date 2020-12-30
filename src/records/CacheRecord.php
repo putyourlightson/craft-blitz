@@ -6,12 +6,14 @@
 namespace putyourlightson\blitz\records;
 
 use craft\db\ActiveRecord;
+use DateTime;
 use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
  * @property int $siteId
  * @property string $uri
+ * @property DateTime|null $expiryDate
  * @property ActiveQueryInterface $elements
  */
 class CacheRecord extends ActiveRecord

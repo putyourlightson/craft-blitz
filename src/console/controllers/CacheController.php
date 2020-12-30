@@ -104,7 +104,7 @@ class CacheController extends Controller
 
         foreach ($this->_actions as $action) {
             $this->stdout('- ');
-            $this->stdout(str_pad($action['id'], $maxLength, ' '), Console::FG_YELLOW);
+            $this->stdout(str_pad($action['id'], $maxLength), Console::FG_YELLOW);
             $this->stdout('  '.$action['instructions'].PHP_EOL);
         }
 

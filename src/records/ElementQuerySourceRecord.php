@@ -9,6 +9,7 @@ use craft\db\ActiveRecord;
 use yii\db\ActiveQueryInterface;
 
 /**
+ * @property int $id
  * @property int $sourceId
  * @property int $queryId
  * @property ElementQueryRecord $elementQuery

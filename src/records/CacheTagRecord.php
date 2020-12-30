@@ -10,7 +10,7 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $cacheId
- * @property int $elementId
+ * @property string $tag
  * @property CacheRecord $cache
  */
 class CacheTagRecord extends ActiveRecord

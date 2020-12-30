@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\db\ActiveRecord;
-use craft\db\Table;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
