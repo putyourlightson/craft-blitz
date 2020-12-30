@@ -20,6 +20,7 @@ trait CacheWarmerTrait
 
     /**
      * @var int
+     * @since 3.7.0
      */
     public $warmed = 0;
 }

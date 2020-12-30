@@ -7,6 +7,7 @@
 - Added the ability to disable the warm cache utility by setting the cache warmer to “None” ([#275](https://github.com/putyourlightson/craft-blitz/issues/275)).
 
 ### Changed
+- The deployer now removes files when pages are cleared from the cache ([#218](https://github.com/putyourlightson/craft-blitz/issues/218)).
 - Optimised cached element queries. 
 
 ## 3.6.12 - 2020-11-10
