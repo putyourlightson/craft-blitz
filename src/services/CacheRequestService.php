@@ -236,7 +236,8 @@ class CacheRequestService extends Component
         $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $headers->add('X-Powered-By', Blitz::$plugin->name);
+            $original = $headers->get('X-Powered-By');
+            $headers->set('X-Powered-By', $original.($original ? ',' : '').'Blitz');
         }
 
         // Add cache tag header if set

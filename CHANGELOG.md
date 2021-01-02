@@ -8,6 +8,7 @@
 
 ### Changed
 - The deployer now removes files when pages are cleared from the cache ([#218](https://github.com/putyourlightson/craft-blitz/issues/218)).
+- The value of the `X-Powered-By` header is now appended, rather than added.
 - Optimised cached element queries. 
 
 ## 3.6.12 - 2020-11-10
