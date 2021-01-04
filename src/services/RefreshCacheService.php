@@ -278,7 +278,7 @@ class RefreshCacheService extends Component
         if (!empty($element->postDate) && $element->postDate > $now) {
             $expiryDate = $element->postDate;
         }
-        else if (!empty($element->expiryDate) && $element->expiryDate > $now) {
+        elseif (!empty($element->expiryDate) && $element->expiryDate > $now) {
             $expiryDate = $element->expiryDate;
         }
 
@@ -396,7 +396,7 @@ class RefreshCacheService extends Component
         try {
             $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)->push($refreshCacheJob);
         }
-        catch (NotSupportedException $e) {
+        catch (NotSupportedException $exception) {
             // The queue probably doesn't support custom push priorities. Try again without one.
             $queue->push($refreshCacheJob);
         }

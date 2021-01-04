@@ -162,7 +162,7 @@ class FlushCacheService extends Component
         if ($dbDriver == 'mysql') {
             $sql = 'ALTER TABLE '.$table.' AUTO_INCREMENT = 1';
         }
-        else if ($dbDriver == 'postgres') {
+        elseif ($dbDriver == 'postgres') {
             $sql = 'ALTER SEQUENCE '.$table.'_id_seq RESTART WITH 1';
         }
 
