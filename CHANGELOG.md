@@ -11,6 +11,9 @@
 - The value of the `X-Powered-By` header is now appended, rather than added.
 - Optimised cached element queries. 
 
+### Fixed
+- Fixed a bug in which expired entries were not being cleared ([#267](https://github.com/putyourlightson/craft-blitz/issues/267)).
+
 ## 3.6.12 - 2020-11-10
 ### Added
 - Added the API token authentication method to the Cloudflare purger ([#263](https://github.com/putyourlightson/craft-blitz/issues/263)).

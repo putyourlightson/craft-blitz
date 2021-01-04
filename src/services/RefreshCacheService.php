@@ -222,9 +222,10 @@ class RefreshCacheService extends Component
                 return;
             }
 
-            // Don't proceed if element status has not changed and is not live (and the config setting allows)
+            // Don't proceed if element status has not changed and is not live or expired (and the config setting allows)
             if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive
-                && !$elementChanged->getHasStatusChanged() && !$elementChanged->getHasLiveStatus()
+                && !$elementChanged->getHasStatusChanged()
+                && !$elementChanged->getHasLiveOrExpiredStatus()
             ) {
                 return;
             }
@@ -489,29 +490,27 @@ class RefreshCacheService extends Component
             ->where(['<', 'expiryDate', $now])
             ->all();
 
-        if (!empty($elementExpiryDates)) {
-            $elementsService = Craft::$app->getElements();
+        $elementsService = Craft::$app->getElements();
 
-            foreach ($elementExpiryDates as $elementExpiryDate) {
-                /** @var ElementExpiryDateRecord $elementExpiryDate */
-                $elementId = $elementExpiryDate->elementId;
+        foreach ($elementExpiryDates as $elementExpiryDate) {
+            /** @var ElementExpiryDateRecord $elementExpiryDate */
+            $elementId = $elementExpiryDate->elementId;
 
-                // This should happen before invalidating the element so that other expiry dates will be saved
-                $elementExpiryDate->delete();
+            // This should happen before invalidating the element so that other expiry dates will be saved
+            $elementExpiryDate->delete();
 
-                // TODO: simplify using the following technique in 4.0.0
-                // https://github.com/craftcms/cms/pull/5861
-                //$element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
+            // TODO: simplify using the following technique in 4.0.0
+            // https://github.com/craftcms/cms/pull/5861
+            //$element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
 
-                $elementType = $elementsService->getElementTypeById($elementId);
+            $elementType = $elementsService->getElementTypeById($elementId);
 
-                if ($elementType !== null) {
-                    /** @var ElementInterface $elementType */
-                    $element = $elementType::find()->id($elementId)->site('*')->one();
+            if ($elementType !== null) {
+                /** @var ElementInterface $elementType */
+                $element = $elementType::find()->id($elementId)->site('*')->one();
 
-                    if ($element !== null) {
-                        $this->addElement($element);
-                    }
+                if ($element !== null) {
+                    $this->addElement($element);
                 }
             }
         }

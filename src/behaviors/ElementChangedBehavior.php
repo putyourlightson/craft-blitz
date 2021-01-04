@@ -107,14 +107,14 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns whether the element has a live status.
+     * Returns whether the element has a live or expired status.
      *
      * @return bool
      */
-    public function getHasLiveStatus(): bool
+    public function getHasLiveOrExpiredStatus(): bool
     {
         $liveStatus = ElementTypeHelper::getLiveStatus(get_class($this->owner));
 
-        return $this->owner->getStatus() == $liveStatus;
+        return $this->owner->getStatus() == $liveStatus || 'expired';
     }
 }
