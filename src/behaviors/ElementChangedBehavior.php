@@ -113,8 +113,9 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasLiveOrExpiredStatus(): bool
     {
+        $elementStatus = $this->owner->getStatus();
         $liveStatus = ElementTypeHelper::getLiveStatus(get_class($this->owner));
 
-        return $this->owner->getStatus() == $liveStatus || 'expired';
+        return ($elementStatus == $liveStatus || $elementStatus == 'expired');
     }
 }
