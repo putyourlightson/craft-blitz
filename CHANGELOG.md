@@ -1,6 +1,8 @@
 # Release Notes for Blitz
 
-## 3.7.0 - Unreleased
+## 3.7.0 - 2021-01-05
+> {tip} This update optimises the performance of refresh cache jobs. The cache should be manually refreshed following the update in order to get the full performance benefits.
+
 ### Added
 - Added compatibility with Solspace Calendar and other plugins that use joins in element queries.
 - Added an indication of how many pages were not warmed, if any, in console commands ([#221](https://github.com/putyourlightson/craft-blitz/issues/221)).
