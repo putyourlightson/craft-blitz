@@ -222,7 +222,7 @@ class RefreshCacheService extends Component
                 return;
             }
 
-            // Don't proceed if element status has not changed and is not live or expired (and the config setting allows)
+            // Don't proceed if element status has not changed and is not live or expired (and the config setting allows). Refreshing expired elements is necessary so as to clear cached pages (https://github.com/putyourlightson/craft-blitz/issues/267).
             if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive
                 && !$elementChanged->getHasStatusChanged()
                 && !$elementChanged->getHasLiveOrExpiredStatus()

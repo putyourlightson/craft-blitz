@@ -59,6 +59,14 @@ class RefreshCacheTest extends Unit
      */
     private $entry2;
 
+    /**
+     * @var array
+     */
+    private $emptyElements = [
+        'elementIds' => [],
+        'sourceIds' => [],
+    ];
+
     // Fixtures
     // =========================================================================
 
@@ -115,6 +123,11 @@ class RefreshCacheTest extends Unit
             ]);
             Craft::$app->getElements()->saveElement($this->entry2);
         }
+
+        $this->entry1->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+
+        Blitz::$plugin->refreshCache->elements = [];
+        Blitz::$plugin->refreshCache->batchMode = true;
     }
 
     // Public methods
@@ -174,22 +187,12 @@ class RefreshCacheTest extends Unit
         $this->assertEquals(1, count($elementTypeQueries));
     }
 
-    public function testAddElement()
+    public function testAddElementWhenChanged()
     {
-        Blitz::$plugin->refreshCache->elements = [];
-        Blitz::$plugin->refreshCache->batchMode = true;
-
-        $this->entry1->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the element and source IDs are empty
-        $this->assertEquals(
-            [
-                'elementIds' => [],
-                'sourceIds' => [],
-            ],
-            Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        // Assert that the elements are empty
+        $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[Entry::class]);
 
         // Update the title
         $this->entry1->title .= ' X';
@@ -203,18 +206,26 @@ class RefreshCacheTest extends Unit
             ],
             Blitz::$plugin->refreshCache->elements[Entry::class]
         );
+    }
 
-        $this->entry2->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
-
+    public function testAddElementWhenStatusChanged()
+    {
         // Update the title
-        $this->entry2->title .= ' X';
+        $this->entry1->title .= ' X';
 
         // Change the statuses to disabled
-        $this->entry2->previousStatus = Element::STATUS_DISABLED;
-        $this->entry2->enabled = false;
-        Blitz::$plugin->refreshCache->addElement($this->entry2);
+        $this->entry1->previousStatus = Element::STATUS_DISABLED;
+        $this->entry1->enabled = false;
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the element and source IDs are the same as before
+        // Assert that the elements are empty
+        $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[Entry::class]);
+
+        // Change the previous status to live
+        $this->entry1->previousStatus = Entry::STATUS_LIVE;
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        // Assert that the element and source IDs are correct
         $this->assertEquals(
             [
                 'elementIds' => [$this->entry1->id],
@@ -222,22 +233,27 @@ class RefreshCacheTest extends Unit
             ],
             Blitz::$plugin->refreshCache->elements[Entry::class]
         );
+    }
 
-        // Change the previous status to live
-        $this->entry2->previousStatus = Entry::STATUS_LIVE;
-        Blitz::$plugin->refreshCache->addElement($this->entry2);
+    public function testAddElementWhenExpired()
+    {
+        // Set the expiryData in the past
+        $this->entry1->expiryDate = new DateTime('20010101');
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the element and source IDs are correct
         $this->assertEquals(
             [
-                'elementIds' => [$this->entry1->id, $this->entry2->id],
-                'sourceIds' => [$this->entry1->sectionId, $this->entry2->sectionId],
+                'elementIds' => [$this->entry1->id],
+                'sourceIds' => [$this->entry1->sectionId],
             ],
             Blitz::$plugin->refreshCache->elements[Entry::class]
         );
+    }
 
+    public function testAddElementWhenDeleted()
+    {
         // Delete the element
-        Blitz::$plugin->refreshCache->elements = [];
         Craft::$app->getElements()->deleteElement($this->entry1);
 
         // Assert that the element and source IDs are correct
@@ -284,7 +300,7 @@ class RefreshCacheTest extends Unit
     public function testRefreshReset()
     {
         Blitz::$plugin->refreshCache->cacheIds = [1];
-        Blitz::$plugin->refreshCache->elements = [$this->entry1];
+        Blitz::$plugin->refreshCache->elements = [Entry::class => $this->emptyElements];
 
         Blitz::$plugin->refreshCache->refresh();
 
