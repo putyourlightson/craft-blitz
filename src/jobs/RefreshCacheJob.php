@@ -10,6 +10,7 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
+use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
 use Exception;
 use putyourlightson\blitz\Blitz;
@@ -101,7 +102,9 @@ class RefreshCacheJob extends BaseJob
                             Craft::t('blitz', 'Checking {count} of {total} {elementType} queries.', [
                                 'count' => $count,
                                 'total' => $total,
-                                'elementType' => $elementType::lowerDisplayName()
+                                // Don't use `lowerDisplayName` which was only introduced in Craft 3.3.17
+                                // https://github.com/putyourlightson/craft-blitz/issues/285
+                                'elementType' => StringHelper::toLowerCase($elementType::displayName()),
                             ])
                         );
                     }

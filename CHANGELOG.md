@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.7.1 - 2021-01-05
+### Fixed
+- Fixed an error that could occur when running refresh cache jobs with Craft 3.3.16 and below ([#285](https://github.com/putyourlightson/craft-blitz/issues/285)).
+
 ## 3.7.0 - 2021-01-05
 > {tip} This update optimises the performance of refresh cache jobs. The cache should be manually refreshed following the update in order to get the full performance benefits.
 
