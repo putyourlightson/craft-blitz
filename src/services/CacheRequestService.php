@@ -157,18 +157,18 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
     {
-        // Ignore URIs that are CP pages or resources
+        // Ignore URIs that are CP pages
         $generalConfig = Craft::$app->getConfig()->getGeneral();
-        $resourceBaseUri = parse_url(Craft::getAlias($generalConfig->resourceBaseUrl), PHP_URL_PATH);
 
-        // Ensure the CP trigger is not null first
-        // https://github.com/putyourlightson/craft-blitz/issues/264
-        if ($generalConfig->cpTrigger) {
-            if (strpos($siteUri->uri, $generalConfig->cpTrigger) !== false
-                || strpos($siteUri->uri, trim($resourceBaseUri, '/')) !== false
-            ) {
-                return false;
-            }
+        if ($generalConfig->cpTrigger && strpos($siteUri->uri, $generalConfig->cpTrigger) !== false) {
+            return false;
+        }
+
+        // Ignore URIs that are resources
+        $resourceBaseUri = trim(parse_url(Craft::getAlias($generalConfig->resourceBaseUrl), PHP_URL_PATH), '/');
+
+        if ($resourceBaseUri && strpos($siteUri->uri, $resourceBaseUri) !== false) {
+            return false;
         }
 
         // Ignore URIs that contain index.php

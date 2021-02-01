@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.7.2 - Unreleased
+### Fixed
+- Fixed a bug that was throwing an error message if the resource base URL was set to the site URL ([#287](https://github.com/putyourlightson/craft-blitz/issues/287)).
+
 ## 3.7.1 - 2021-01-05
 ### Fixed
 - Fixed an error that could occur when running refresh cache jobs with Craft 3.3.16 and below ([#285](https://github.com/putyourlightson/craft-blitz/issues/285)).
