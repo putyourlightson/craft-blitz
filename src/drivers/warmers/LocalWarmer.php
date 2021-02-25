@@ -35,7 +35,7 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null)
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null, bool $queue = true)
     {
         $siteUris = $this->beforeWarmCache($siteUris);
 
@@ -43,13 +43,13 @@ class LocalWarmer extends BaseCacheWarmer
             return;
         }
 
-        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
+        if ($queue) {
+            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
+        }
+        else {
             $this->warmUrisWithProgress($siteUris, $setProgressHandler);
 
             $this->_resetApplicationConfig('console');
-        }
-        else {
-            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
         }
 
         $this->afterWarmCache($siteUris);

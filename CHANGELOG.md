@@ -3,6 +3,7 @@
 ## 3.7.2 - Unreleased
 ### Fixed
 - Fixed a bug that was throwing an error message if the resource base URL was set to the site URL ([#287](https://github.com/putyourlightson/craft-blitz/issues/287)).
+- Fixed a bug in which the `queue` flag was not being respected in console commands ([#294](https://github.com/putyourlightson/craft-blitz/issues/294)).
 
 ## 3.7.1 - 2021-01-05
 ### Fixed

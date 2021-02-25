@@ -37,15 +37,15 @@ class DummyWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null) { }
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null, bool $queue = true) { }
 
     /**
      * @inheritdoc
      */
-    public function warmSite(int $siteId, callable $setProgressHandler = null, int $delay = null) { }
+    public function warmSite(int $siteId, callable $setProgressHandler = null, int $delay = null, bool $queue = true) { }
 
     /**
      * @inheritdoc
      */
-    public function warmAll(callable $setProgressHandler = null, int $delay = null) { }
+    public function warmAll(callable $setProgressHandler = null, int $delay = null, bool $queue = true) { }
 }

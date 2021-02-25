@@ -44,15 +44,15 @@ class GuzzleWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null)
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null, bool $queue = true)
     {
         $siteUris = $this->beforeWarmCache($siteUris);
 
-        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
-            $this->warmUrisWithProgress($siteUris, $setProgressHandler);
+        if ($queue) {
+            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
         }
         else {
-            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
+            $this->warmUrisWithProgress($siteUris, $setProgressHandler);
         }
 
         $this->afterWarmCache($siteUris);
