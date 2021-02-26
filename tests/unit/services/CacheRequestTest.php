@@ -120,6 +120,25 @@ class CacheRequestTest extends Unit
         $this->assertEquals($this->siteUri->uri, $uri);
     }
 
+    public function testGetRequestedCacheableSiteUriWithRegularExpression()
+    {
+        $allowedQueryString = 'sort=asc&search=waldo';
+        $disallowedQueryString = 'spidy=123';
+
+        Blitz::$plugin->settings->excludedQueryStringParams = ['^(?!sort$|search$).*'];
+
+        // Mock a URL request
+        $this->_mockRequest($this->siteUri->getUrl().'?'.$disallowedQueryString.'&'.$allowedQueryString);
+
+        // Enable caching and add an included URI pattern
+        Blitz::$plugin->settings->cachingEnabled = true;
+        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
+
+        Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
+        $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
+        $this->assertEquals($this->siteUri->uri.'?'.$allowedQueryString, $uri);
+    }
+
     public function testGetIsCacheableSiteUri()
     {
         // Assert that the site URI is not cacheable

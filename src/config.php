@@ -142,7 +142,7 @@ return [
         // - `2`: Cache URLs with query strings as the same page
         //'queryStringCaching' => 0,
 
-        // The query string parameters to exclude when determining if and how a page should be cached.
+        // The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
         //'excludedQueryStringParams' => ['gclid', 'fbclid'],
 
         // An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).

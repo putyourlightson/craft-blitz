@@ -195,7 +195,7 @@ class SettingsModel extends Model
     public $queryStringCaching = self::QUERY_STRINGS_DO_NOT_CACHE_URLS;
 
     /**
-     * @var string[] The query string parameters to exclude when determining if and how a page should be cached.
+     * @var string[] The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
      */
     public $excludedQueryStringParams = ['gclid', 'fbclid'];
 

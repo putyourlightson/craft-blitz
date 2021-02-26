@@ -109,7 +109,7 @@ class CacheRequestService extends Component
         }
 
         if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
-            && !empty($this->_getQueryString())
+            && !empty($this->_getAllowedQueryString())
         ) {
             Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $request->getAbsoluteUrl());
 
@@ -131,11 +131,11 @@ class CacheRequestService extends Component
         // Remove the query string
         $url = preg_replace('/\?.*/', '', $url);
 
-        // Add the query string if unique query strings should not be cached as the same page
+        // Add the allowed query string if unique query strings should not be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
-            && !empty($this->_getQueryString()))
+            && !empty($this->_getAllowedQueryString()))
         {
-            $url .= '?'.$this->_getQueryString();
+            $url .= '?'.$this->_getAllowedQueryString();
         }
 
         $siteUri = SiteUriHelper::getSiteUriFromUrl($url);
@@ -325,7 +325,7 @@ class CacheRequestService extends Component
      *
      * @return string
      */
-    private function _getQueryString(): string
+    private function _getAllowedQueryString(): string
     {
         if ($this->_queryString !== null) {
             return $this->_queryString;
@@ -334,8 +334,10 @@ class CacheRequestService extends Component
         $queryStringParams = explode('&', Craft::$app->getRequest()->getQueryStringWithoutPath());
 
         foreach ($queryStringParams as $key => $queryStringParam) {
+            $queryParam = explode('=', $queryStringParam);
+
             foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
-                if (strpos($queryStringParam, $excludedParam.'=') === 0) {
+                if (preg_match('/'.$excludedParam.'/', $queryParam[0])) {
                     unset($queryStringParams[$key]);
                     break;
                 }
