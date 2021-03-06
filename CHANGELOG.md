@@ -1,16 +1,13 @@
 # Release Notes for Blitz
 
-## 3.7.2 - Unreleased
+## 3.8.0 - Unreleased
 ### Changed
 - The values in the `excludedQueryStringParams` are now compared to query string params using regular expressions ([#272](https://github.com/putyourlightson/craft-blitz/issues/272)).
 
 ### Fixed
+- Fixed an error that could occur when running refresh cache jobs with Craft 3.3.16 and below ([#285](https://github.com/putyourlightson/craft-blitz/issues/285)).
 - Fixed a bug that was throwing an error message if the resource base URL was set to the site URL ([#287](https://github.com/putyourlightson/craft-blitz/issues/287)).
 - Fixed a bug in which the `queue` flag was not being respected in console commands ([#294](https://github.com/putyourlightson/craft-blitz/issues/294)).
-
-## 3.7.1 - 2021-01-05
-### Fixed
-- Fixed an error that could occur when running refresh cache jobs with Craft 3.3.16 and below ([#285](https://github.com/putyourlightson/craft-blitz/issues/285)).
 
 ## 3.7.0 - 2021-01-05
 > {tip} This update optimises the performance of refresh cache jobs. The cache should be manually refreshed following the update in order to get the full performance benefits.
