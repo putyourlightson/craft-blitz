@@ -26,6 +26,16 @@
     on: driver.createGzipFiles,
 }) }}
 
+{% set info %}
+    <span class="info">{{ 'With this setting enabled, Blitz will compress cached files using brotli and write them to `index.html.br` files for improved performance (requires that the Brotli PHP extension is installed and extra code in server rewrites). <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#server-rewrites'})|raw }}</span>
+{% endset %}
+{{ forms.lightswitchField({
+    label: "Create Brotli Files"|t('blitz'),
+    instructions: "Whether compressed versions of cached files should be created using brotli."|t('blitz') ~ info,
+    name: 'createBrotliFiles',
+    on: driver.createBrotliFiles,
+}) }}
+
 <p class="light">
     {{ 'Use server rewrites for significant performance improvements. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#server-rewrites'})|raw }}
 </p>

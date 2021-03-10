@@ -44,6 +44,11 @@ class FileStorage extends BaseCacheStorage
     /**
      * @var bool
      */
+    public $createBrotliFiles = false;
+
+    /**
+     * @var bool
+     */
     public $countCachedFiles = true;
 
     /**
@@ -116,6 +121,10 @@ class FileStorage extends BaseCacheStorage
 
                 if ($this->createGzipFiles) {
                     FileHelper::writeToFile($filePath.'.gz', gzencode($value));
+                }
+
+                if ($this->createBrotliFiles && function_exists('brotli_compress')) {
+                    FileHelper::writeToFile($filePath.'.br', brotli_compress($value) );
                 }
             }
         }

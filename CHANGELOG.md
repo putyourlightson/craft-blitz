@@ -1,6 +1,8 @@
 # Release Notes for Blitz
 
 ## 3.8.0 - Unreleased
+- Added a `Create Brotli File` setting to the File Storage driver ([#297](https://github.com/putyourlightson/craft-blitz/issues/297)).
+
 ### Changed
 - The values in the `excludedQueryStringParams` are now compared to query string params using regular expressions ([#272](https://github.com/putyourlightson/craft-blitz/issues/272)).
 
