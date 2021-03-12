@@ -5,6 +5,7 @@
 
 ### Changed
 - The values in the `excludedQueryStringParams` are now compared to query string params using regular expressions ([#272](https://github.com/putyourlightson/craft-blitz/issues/272)).
+- The check for a cacheable request is now done inside the `Application::EVENT_INIT` event ([#299](https://github.com/putyourlightson/craft-blitz/issues/299)).
 
 ### Fixed
 - Fixed an error that could occur when running refresh cache jobs with Craft 3.3.16 and below ([#285](https://github.com/putyourlightson/craft-blitz/issues/285)).
