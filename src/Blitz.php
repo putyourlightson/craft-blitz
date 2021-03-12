@@ -215,62 +215,62 @@ class Blitz extends Plugin
      */
     private function _registerCacheableRequestEvents()
     {
-        // Ensure the request is cacheable
-        if (!$this->cacheRequest->getIsCacheableRequest()) {
-            return;
-        }
-
-        // Ensure the requested site URI is cacheable
-        $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
-
-        if ($siteUri === null || !$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-            return;
-        }
-
         // Register application init event
         Event::on(Application::class, Application::EVENT_INIT,
-            function() use ($siteUri) {
+            function() {
+                // Ensure the request is cacheable
+                if (!$this->cacheRequest->getIsCacheableRequest()) {
+                    return;
+                }
+
+                // Ensure the requested site URI is cacheable
+                $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
+
+                if ($siteUri === null || !$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+                    return;
+                }
+
                 if ($response = $this->cacheRequest->getResponse($siteUri)) {
                     // Output the response and end the script
                     Craft::$app->end(0, $response);
                 }
-            }
-        );
 
-        // Register element populate event
-        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event) {
-                if (Craft::$app->getResponse()->getIsOk() && $event->element !== null) {
-                    $this->generateCache->addElement($event->element);
-                }
-            }
-        );
-
-        // Register element query prepare event
-        Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
-            function(CancelableEvent $event) {
-                if (Craft::$app->getResponse()->getIsOk()) {
-                    /** @var ElementQuery $elementQuery */
-                    $elementQuery = $event->sender;
-                    $this->generateCache->addElementQuery($elementQuery);
-                }
-            }
-        );
-
-        // Register after render page template event
-        Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-            function(TemplateEvent $event) use ($siteUri) {
-                if (Craft::$app->getResponse()->getIsOk()) {
-                    // Save the cached output
-                    $this->generateCache->save($event->output, $siteUri);
-
-                    $response = $this->cacheRequest->getResponse($siteUri);
-
-                    if ($response !== null) {
-                        // Output the response and end the script
-                        Craft::$app->end(0, $response);
+                // Register element populate event
+                Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
+                    function(PopulateElementEvent $event) {
+                        if (Craft::$app->getResponse()->getIsOk() && $event->element !== null) {
+                            $this->generateCache->addElement($event->element);
+                        }
                     }
-                }
+                );
+
+                // Register element query prepare event
+                Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
+                    function(CancelableEvent $event) {
+                        if (Craft::$app->getResponse()->getIsOk()) {
+                            /** @var ElementQuery $elementQuery */
+                            $elementQuery = $event->sender;
+                            $this->generateCache->addElementQuery($elementQuery);
+                        }
+                    }
+                );
+
+                // Register after render page template event
+                Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
+                    function(TemplateEvent $event) use ($siteUri) {
+                        if (Craft::$app->getResponse()->getIsOk()) {
+                            // Save the cached output
+                            $this->generateCache->save($event->output, $siteUri);
+
+                            $response = $this->cacheRequest->getResponse($siteUri);
+
+                            if ($response !== null) {
+                                // Output the response and end the script
+                                Craft::$app->end(0, $response);
+                            }
+                        }
+                    }
+                );
             }
         );
     }
