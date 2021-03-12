@@ -55,7 +55,7 @@ class RedisStorageTest extends Unit
         // Set cache component to Redis
         Craft::$app->set('redis', [
             'class' => Connection::class,
-            'hostname' => 'localhost',
+            'hostname' => 'redis.service.nitro',
             'port' => 6379,
         ]);
         Craft::$app->set('cache', [
