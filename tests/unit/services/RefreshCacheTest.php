@@ -366,6 +366,37 @@ class RefreshCacheTest extends Unit
         $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
     }
 
+    public function testRefreshCachedUrls()
+    {
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        // Assert that the output (which may also contain a timestamp) contains the cached value
+        $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
+
+        Blitz::$plugin->refreshCache->refreshCachedUrls([$this->siteUri->url]);
+
+        Craft::$app->runAction('queue/run');
+
+        // Assert that the cached value is a blank string
+        $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
+    }
+
+    public function testRefreshCachedUrlsWithWildcard()
+    {
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        // Assert that the output (which may also contain a timestamp) contains the cached value
+        $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
+
+        $url = substr($this->siteUri->url, 0, -1).'*';
+        Blitz::$plugin->refreshCache->refreshCachedUrls([$url]);
+
+        Craft::$app->runAction('queue/run');
+
+        // Assert that the cached value is a blank string
+        $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
+    }
+
     public function testRefreshCacheTags()
     {
         // Add tag and save

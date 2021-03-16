@@ -43,7 +43,9 @@ class CacheController extends Controller
      */
     public function beforeAction($action): bool
     {
-        parent::beforeAction($action);
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
 
         $request = Craft::$app->getRequest();
 

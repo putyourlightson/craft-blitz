@@ -89,7 +89,7 @@ class SiteUriHelper
 
         // Get URIs from all elements in the site
         $elementUris = Element_SiteSettings::find()
-            ->select(['uri'])
+            ->select('uri')
             ->where([
                 'siteId' => $siteId,
                 'draftId' => null,
@@ -219,7 +219,26 @@ class SiteUriHelper
         foreach ($urls as $url) {
             $siteUri = self::getSiteUriFromUrl($url);
 
-            if ($siteUri !== null) {
+            if ($siteUri === null) {
+                continue;
+            }
+
+            // Deal with wildcard in URL
+            if (strpos($url, '*') !== false) {
+                $wildcardUris = CacheRecord::find()
+                    ->select('uri')
+                    ->where(['siteId' => $siteUri->siteId])
+                    ->andWhere(['like', 'uri', str_replace('*', '%', $siteUri->uri), false])
+                    ->column();
+
+                foreach ($wildcardUris as $wildcardUri) {
+                    $siteUris[] = new SiteUriModel([
+                        'siteId' => $siteUri->siteId,
+                        'uri' => $wildcardUri,
+                    ]);
+                }
+            }
+            else {
                 $siteUris[] = $siteUri;
             }
         }

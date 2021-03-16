@@ -118,7 +118,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh-urls',
             'label' => Craft::t('blitz', 'Refresh Cached URLs'),
-            'instructions' => Craft::t('blitz', 'Refreshes pages with the provided URLs.'),
+            'instructions' => Craft::t('blitz', 'Refreshes pages with the provided URLs (the `*` wildcard is supported).'),
         ];
 
         $actions[] = [
