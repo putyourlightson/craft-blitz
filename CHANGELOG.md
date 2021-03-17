@@ -1,6 +1,11 @@
 # Release Notes for Blitz
 
+## 3.8.1 - Unreleased
+### Changed
+- Improved console command messaging when a component is disabled.
+
 ## 3.8.0 - 2021-03-16
+### Added
 - Added a `Create Brotli File` setting to the File Storage driver ([#297](https://github.com/putyourlightson/craft-blitz/issues/297)).
 - Added the ability to use `*` as a wildcard in the `Refresh Cached URLs` utility and `refresh-urls` console command ([#300](https://github.com/putyourlightson/craft-blitz/issues/300)).
 

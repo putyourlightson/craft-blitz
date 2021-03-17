@@ -309,6 +309,12 @@ class CacheController extends Controller
 
     private function _purgeCache()
     {
+        if (Blitz::$plugin->cachePurger->isDummy) {
+            $this->stderr(Craft::t('blitz', 'Cache purging is disabled.').PHP_EOL, Console::FG_GREEN);
+
+            return ExitCode::OK;
+        }
+
         Blitz::$plugin->cachePurger->purgeAll();
 
         $this->_output('Blitz cache successfully purged.');
@@ -319,6 +325,12 @@ class CacheController extends Controller
      */
     private function _warmCache(array $siteUris)
     {
+        if (Blitz::$plugin->cacheWarmer->isDummy) {
+            $this->stderr(Craft::t('blitz', 'Cache warming is disabled.').PHP_EOL, Console::FG_GREEN);
+
+            return ExitCode::OK;
+        }
+
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, Console::FG_YELLOW);
 
         $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
@@ -350,6 +362,12 @@ class CacheController extends Controller
      */
     private function _deploy(array $siteUris)
     {
+        if (Blitz::$plugin->deployer->isDummy) {
+            $this->stderr(Craft::t('blitz', 'Deploying is disabled.').PHP_EOL, Console::FG_GREEN);
+
+            return ExitCode::OK;
+        }
+
         $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, Console::FG_YELLOW);
 
         $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
