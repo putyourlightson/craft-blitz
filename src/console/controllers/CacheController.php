@@ -180,8 +180,11 @@ class CacheController extends Controller
      */
     public function actionRefresh(): int
     {
-        // Get cached site URIs before flushing the cache
-        $siteUris = SiteUriHelper::getAllSiteUris(true);
+        // Get warmable site URIs before flushing the cache
+        $siteUris = array_merge(
+            SiteUriHelper::getAllSiteUris(true),
+            Blitz::$plugin->settings->getCustomSiteUris()
+        );
 
         $this->_clearCache();
         $this->_flushCache();
@@ -191,7 +194,7 @@ class CacheController extends Controller
             $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
 
             if ($warmCacheDelay) {
-                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) for the cache to be purged...', ['seconds' => $warmCacheDelay]).PHP_EOL, Console::FG_YELLOW);
+                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) before warming...', ['seconds' => $warmCacheDelay]).PHP_EOL, Console::FG_YELLOW);
 
                 sleep($warmCacheDelay);
             }
@@ -199,6 +202,55 @@ class CacheController extends Controller
             $this->_warmCache($siteUris);
             $this->_deploy($siteUris);
         }
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * @param int|null $siteId
+     *
+     * @return int
+     */
+    public function actionRefreshSite(int $siteId = null): int
+    {
+        if (empty($siteId)) {
+            $this->stderr(Craft::t('blitz', 'A site ID must be provided as an argument.').PHP_EOL, Console::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        // Get warmable site URIs before flushing the cache
+        $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
+
+        foreach (Blitz::$plugin->settings->getCustomSiteUris() as $customSiteUri) {
+            if ($customSiteUri['siteId'] == $siteId) {
+                $siteUris[] = $customSiteUri;
+            }
+        }
+
+        $this->_clearCache($siteUris);
+        $this->_flushCache($siteUris);
+        $this->_purgeCache($siteUris);
+
+        // Warm and deploy if enabled
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+            $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
+
+            if ($warmCacheDelay) {
+                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) before warming...', ['seconds' => $warmCacheDelay]).PHP_EOL, Console::FG_YELLOW);
+
+                sleep($warmCacheDelay);
+            }
+
+            $this->_warmCache($siteUris);
+            $this->_deploy($siteUris);
+        }
+
+        if (!$this->queue) {
+            Craft::$app->runAction('queue/run');
+        }
+
+        $this->stdout(Craft::t('blitz', 'Site successfully refreshed.').PHP_EOL, Console::FG_GREEN);
 
         return ExitCode::OK;
     }
@@ -220,11 +272,11 @@ class CacheController extends Controller
     }
 
     /**
-     * @param array $urls
+     * @param array|null $urls
      *
      * @return int
      */
-    public function actionRefreshUrls(array $urls): int
+    public function actionRefreshUrls(array $urls = null): int
     {
         if (empty($urls)) {
             $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.').PHP_EOL, Console::FG_RED);
@@ -244,11 +296,11 @@ class CacheController extends Controller
     }
 
     /**
-     * @param array $tags
+     * @param array|null $tags
      *
      * @return int
      */
-    public function actionRefreshTagged(array $tags): int
+    public function actionRefreshTagged(array $tags = null): int
     {
         if (empty($tags)) {
             $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.').PHP_EOL, Console::FG_RED);
@@ -293,21 +345,31 @@ class CacheController extends Controller
     // Private Methods
     // =========================================================================
 
-    private function _clearCache()
+    private function _clearCache(array $siteUris = null)
     {
-        Blitz::$plugin->clearCache->clearAll();
+        if ($siteUris !== null) {
+            Blitz::$plugin->clearCache->clearUris($siteUris);
+        }
+        else {
+            Blitz::$plugin->clearCache->clearAll();
+        }
 
         $this->_output('Blitz cache successfully cleared.');
     }
 
-    private function _flushCache()
+    private function _flushCache(array $siteUris = null)
     {
-        Blitz::$plugin->flushCache->flushAll();
+        if ($siteUris !== null) {
+            Blitz::$plugin->flushCache->flushUris($siteUris);
+        }
+        else {
+            Blitz::$plugin->flushCache->flushAll();
+        }
 
         $this->_output('Blitz cache successfully flushed.');
     }
 
-    private function _purgeCache()
+    private function _purgeCache(array $siteUris = null)
     {
         if (Blitz::$plugin->cachePurger->isDummy) {
             $this->stderr(Craft::t('blitz', 'Cache purging is disabled.').PHP_EOL, Console::FG_GREEN);
@@ -315,7 +377,12 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        Blitz::$plugin->cachePurger->purgeAll();
+        if ($siteUris !== null) {
+            Blitz::$plugin->cachePurger->purgeUris($siteUris);
+        }
+        else {
+            Blitz::$plugin->cachePurger->purgeAll();
+        }
 
         $this->_output('Blitz cache successfully purged.');
     }
@@ -328,7 +395,7 @@ class CacheController extends Controller
         if (Blitz::$plugin->cacheWarmer->isDummy) {
             $this->stderr(Craft::t('blitz', 'Cache warming is disabled.').PHP_EOL, Console::FG_GREEN);
 
-            return ExitCode::OK;
+            return;
         }
 
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, Console::FG_YELLOW);
@@ -365,7 +432,7 @@ class CacheController extends Controller
         if (Blitz::$plugin->deployer->isDummy) {
             $this->stderr(Craft::t('blitz', 'Deploying is disabled.').PHP_EOL, Console::FG_GREEN);
 
-            return ExitCode::OK;
+            return;
         }
 
         $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, Console::FG_YELLOW);

@@ -27,7 +27,14 @@
 
                     <p class="light">{{ action.instructions|t('blitz') }}</p>
 
-                    {% if action.id == 'refresh-urls' %}
+                    {% if action.id == 'refresh-site' %}
+                        {{ forms.selectField({
+                            name: 'siteId',
+                            id: 'siteId',
+                            options: action.options,
+                            first: true,
+                        }) }}
+                    {% elseif action.id == 'refresh-urls' %}
                         {{ forms.editableTableField({
                             name: 'urls',
                             id: 'urls',

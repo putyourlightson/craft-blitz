@@ -19,6 +19,7 @@ use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\events\RefreshElementEvent;
+use putyourlightson\blitz\events\RefreshSiteCacheEvent;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
@@ -73,6 +74,16 @@ class RefreshCacheService extends Component
      * @event RefreshCacheEvent
      */
     const EVENT_AFTER_REFRESH_ALL_CACHE = 'afterRefreshAllCache';
+
+    /**
+     * @event RefreshSiteCacheEvent
+     */
+    const EVENT_BEFORE_REFRESH_SITE_CACHE = 'beforeRefreshSiteCache';
+
+    /**
+     * @event RefreshSiteCacheEvent
+     */
+    const EVENT_AFTER_REFRESH_SITE_CACHE = 'afterRefreshSiteCache';
 
     // Properties
     // =========================================================================
@@ -466,6 +477,44 @@ class RefreshCacheService extends Component
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_ALL_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_ALL_CACHE, $event);
+        }
+    }
+
+    /**
+     * Refreshes a site.
+     *
+     * @param int $siteId
+     */
+    public function refreshSite(int $siteId)
+    {
+        $event = new RefreshSiteCacheEvent(['siteId' => $siteId]);
+        $this->trigger(self::EVENT_BEFORE_REFRESH_SITE_CACHE, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        // Get warmable site URIs before flushing the cache
+        $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
+
+        foreach (Blitz::$plugin->settings->getCustomSiteUris() as $customSiteUri) {
+            if ($customSiteUri['siteId'] == $siteId) {
+                $siteUris[] = $customSiteUri;
+            }
+        }
+
+        Blitz::$plugin->flushCache->flushUris($siteUris);
+        Blitz::$plugin->clearCache->clearUris($siteUris);
+
+        // Warm and deploy if enabled
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
+
+            Blitz::$plugin->deployer->deployUris($siteUris);
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_SITE_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_REFRESH_SITE_CACHE, $event);
         }
     }
 

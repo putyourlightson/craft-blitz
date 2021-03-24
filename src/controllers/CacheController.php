@@ -170,6 +170,32 @@ class CacheController extends Controller
     }
 
     /**
+     * Refreshes site cache.
+     *
+     * @return Response
+     */
+    public function actionRefreshSite(): Response
+    {
+        $siteId = Craft::$app->getRequest()->getParam('siteId');
+
+        if (empty($siteId)) {
+            return $this->_getResponse('A site ID must be provided.', false);
+        }
+
+        Blitz::$plugin->refreshCache->refreshSite($siteId);
+
+        $message = 'Site successfully refreshed.';
+
+        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+            $message = 'Site successfully refreshed and queued for warming.';
+        }
+
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
+    }
+
+    /**
      * Refreshes expired cache.
      *
      * @return Response

@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
-## 3.8.1 - Unreleased
+## 3.9.0 - Unreleased
+### Added
+- Added the ability to refresh a cached site with the new `Refresh Site` utility and `refresh-site` console command ([#214](https://github.com/putyourlightson/craft-blitz/issues/214)).
+
 ### Changed
 - Improved console command messaging when a component is disabled.
 

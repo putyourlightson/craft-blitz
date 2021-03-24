@@ -115,6 +115,22 @@ class CacheUtility extends Utility
             'instructions' => Craft::t('blitz', 'Refreshes pages that have expired since they were cached.'),
         ];
 
+        if (Craft::$app->getIsMultiSite()) {
+            $options = [];
+            $sites = Craft::$app->getSites()->getAllSites();
+
+            foreach ($sites as $site) {
+                $options[$site->id] = $site->name;
+            }
+
+            $actions[] = [
+                'id' => 'refresh-site',
+                'label' => Craft::t('blitz', 'Refresh Site Cache'),
+                'instructions' => Craft::t('blitz', 'Refreshes all of the pages in the selected site.'),
+                'options' => $options,
+            ];
+        }
+
         $actions[] = [
             'id' => 'refresh-urls',
             'label' => Craft::t('blitz', 'Refresh Cached URLs'),
