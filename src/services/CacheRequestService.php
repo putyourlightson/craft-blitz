@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\services;
 use Craft;
 use craft\base\Component;
 use craft\elements\User;
+use craft\events\CancelableEvent;
 use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\ResponseEvent;
@@ -21,6 +22,11 @@ use putyourlightson\blitz\models\SiteUriModel;
  */
 class CacheRequestService extends Component
 {
+    /**
+     * @const CancelableEvent
+     */
+    const EVENT_IS_CACHEABLE_REQUEST = 'isCacheableRequest';
+
     /**
      * @const ResponseEvent
      */
@@ -113,6 +119,13 @@ class CacheRequestService extends Component
         ) {
             Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $request->getAbsoluteUrl());
 
+            return false;
+        }
+
+        $event = new CancelableEvent();
+        $this->trigger(self::EVENT_IS_CACHEABLE_REQUEST, $event);
+
+        if (!$event->isValid) {
             return false;
         }
 

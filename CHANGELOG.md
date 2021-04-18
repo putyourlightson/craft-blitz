@@ -3,6 +3,7 @@
 ## 3.9.0 - Unreleased
 ### Added
 - Added the ability to refresh a cached site with the new `Refresh Site` utility and `refresh-site` console command ([#214](https://github.com/putyourlightson/craft-blitz/issues/214)).
+- Added the `isCacheableRequest` event to `CacheRequestService` ([#306](https://github.com/putyourlightson/craft-blitz/issues/306)).
 
 ### Changed
 - Improved console command messaging when a component is disabled.
