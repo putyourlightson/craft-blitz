@@ -95,8 +95,8 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if (!empty($request->getParam('token'))) {
-            Blitz::$plugin->debug('Page not cached because a `token` request parameter was provided.', [], $request->getAbsoluteUrl());
+        if (!empty($request->getParam(Craft::$app->config->general->tokenParam))) {
+            Blitz::$plugin->debug('Page not cached because a token request parameter was provided.', [], $request->getAbsoluteUrl());
 
             return false;
         }
