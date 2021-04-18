@@ -133,8 +133,8 @@ class CacheRequestService extends Component
 
         // Add the allowed query string if unique query strings should not be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
-            && !empty($this->_getAllowedQueryString()))
-        {
+            && !empty($this->_getAllowedQueryString())
+        ) {
             $url .= '?'.$this->_getAllowedQueryString();
         }
 

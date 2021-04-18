@@ -161,6 +161,12 @@ class LocalWarmer extends BaseCacheWarmer
                 return false;
             }
 
+            if (empty($response->data)) {
+                Blitz::$plugin->debug('Response is empty.');
+
+                return false;
+            }
+
             Blitz::$plugin->generateCache->save($response->data, $siteUri);
         }
         catch (Exception $e) {

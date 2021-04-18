@@ -7,6 +7,9 @@
 ### Changed
 - Improved console command messaging when a component is disabled.
 
+### Fixed
+- Fixed an error that could occur when an empty response was encountered with the local warmer ([#305](https://github.com/putyourlightson/craft-blitz/issues/305)).
+
 ## 3.8.0 - 2021-03-16
 ### Added
 - Added a `Create Brotli File` setting to the File Storage driver ([#297](https://github.com/putyourlightson/craft-blitz/issues/297)).
