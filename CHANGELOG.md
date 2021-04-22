@@ -8,6 +8,7 @@
 ### Changed
 - Improved console command messaging when a component is disabled.
 - Changed the token request parameter check to use the value defined in the general config settings ([#307](https://github.com/putyourlightson/craft-blitz/issues/307)).
+- The site is now determined by matching the site with the longest base URL that matches a provided URL ([#309](https://github.com/putyourlightson/craft-blitz/issues/309), [#310](https://github.com/putyourlightson/craft-blitz/issues/310)).
 
 ### Fixed
 - Fixed an error that could occur when an empty response was encountered with the local warmer ([#305](https://github.com/putyourlightson/craft-blitz/issues/305)).

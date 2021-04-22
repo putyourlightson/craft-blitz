@@ -1,0 +1,66 @@
+<?php
+/**
+ * @copyright Copyright (c) PutYourLightsOn
+ */
+
+namespace putyourlightson\blitztests\unit\helpers;
+
+use Codeception\Test\Unit;
+use Craft;
+use craft\models\Site;
+use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitztests\fixtures\SitesFixture;
+use UnitTester;
+
+/**
+ * @author    PutYourLightsOn
+ * @package   Blitz
+ * @since     3.9.0
+ */
+
+class SiteUriHelperTest extends Unit
+{
+    // Properties
+    // =========================================================================
+
+    /**
+     * @var UnitTester
+     */
+    protected $tester;
+
+    /**
+     * @var Site
+     */
+    private $secondarySite;
+
+    // Protected methods
+    // =========================================================================
+
+    protected function _before()
+    {
+        parent::_before();
+
+        if ($this->secondarySite === null) {
+            $primarySite = Craft::$app->sites->getPrimarySite();
+            $this->secondarySite = new Site([
+                'groupId' => $primarySite->groupId,
+                'name' => 'Secondary',
+                'handle' => 'secondary',
+                'language' => $primarySite->language,
+                'baseUrl' => trim($primarySite->baseUrl, '/').'/secondary/',
+            ]);
+
+            Craft::$app->sites->saveSite($this->secondarySite);
+        }
+    }
+
+    // Public methods
+    // =========================================================================
+
+    public function testGetSiteUriFromUrl()
+    {
+        $siteUri = SiteUriHelper::getSiteUriFromUrl($this->secondarySite->getBaseUrl().'page');
+
+        $this->assertEquals($this->secondarySite->id, $siteUri->siteId);
+    }
+}

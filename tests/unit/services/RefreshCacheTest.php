@@ -20,7 +20,6 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitztests\fixtures\EntriesFixture;
-use putyourlightson\blitztests\fixtures\SitesGroupsFixture;
 use UnitTester;
 
 /**

@@ -249,27 +249,37 @@ class SiteUriHelper
     /**
      * Returns site URI from a given URL.
      *
+     * This method looks for the site with the longest base URL that matches
+     * the provided URL. For example, the URL `site.com/en/page` will match
+     * the site with base URL `site.com/en` over `site.com`.
+     *
      * @param string $url
      *
      * @return SiteUriModel|null
      */
     public static function getSiteUriFromUrl(string $url)
     {
+        $siteUri = null;
+        $siteBaseUrl = '';
+
         foreach (Craft::$app->getSites()->getAllSites() as $site) {
             $baseUrl = trim(Craft::getAlias($site->getBaseUrl()), '/');
 
-            if (stripos($url, $baseUrl) === 0) {
+            // If the URL begins with the base URL and the base URL is longer than any already found.
+            if (stripos($url, $baseUrl) === 0 && strlen($baseUrl) > strlen($siteBaseUrl)) {
+                $siteBaseUrl = $baseUrl;
+
                 $uri = preg_replace('/'.preg_quote($baseUrl, '/').'/', '', $url, 1);
                 $uri = trim($uri, '/');
 
-                return new SiteUriModel([
+                $siteUri = new SiteUriModel([
                     'siteId' => $site->id,
                     'uri' => $uri,
                 ]);
             }
         }
 
-        return null;
+        return $siteUri;
     }
 
     /**
