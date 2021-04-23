@@ -8,7 +8,9 @@ assignees: ''
 ---
 
 ### Describe the bug
-A clear and concise description of what the bug is. Please check the [common-issues](https://putyourlightson.com/plugins/blitz#common-issues) section of the docs to see if they can help you solve your issue.
+A clear and concise description of what the bug is.
+Please check the common-issues section of the docs to see if they can help you solve your issue:
+https://putyourlightson.com/plugins/blitz#common-issues
 
 ### To reproduce
 Steps to reproduce the behaviour:
