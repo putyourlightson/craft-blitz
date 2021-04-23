@@ -19,8 +19,12 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use Throwable;
+use yii\queue\RetryableJobInterface;
 
-class RefreshCacheJob extends BaseJob
+/**
+ * @property-read int $ttr
+ */
+class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 {
     // Properties
     // =========================================================================
@@ -45,6 +49,22 @@ class RefreshCacheJob extends BaseJob
 
     /**
      * @inheritdoc
+     */
+    public function getTtr(): int
+    {
+        return Blitz::$plugin->settings->queueJobTtr;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canRetry($attempt, $error): bool
+    {
+        return $attempt < Blitz::$plugin->settings->maxRetryAttempts;
+    }
+
+    /**
+     * @inheritdoc
      *
      * @throws Exception
      * @throws Throwable
@@ -57,7 +77,7 @@ class RefreshCacheJob extends BaseJob
         );
 
         // Merge in element cache IDs
-        foreach ($this->elements as $elementType => $elementData) {
+        foreach ($this->elements as $elementData) {
             $this->cacheIds = array_merge($this->cacheIds, Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds']));
         }
 
@@ -158,10 +178,9 @@ class RefreshCacheJob extends BaseJob
      *
      * @param string $elementType
      * @param array $sourceIds
-     *
      * @return int[]
      */
-    private function _getSourceTagCacheIds(string $elementType, array $sourceIds)
+    private function _getSourceTagCacheIds(string $elementType, array $sourceIds): array
     {
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
 

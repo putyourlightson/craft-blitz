@@ -195,6 +195,12 @@ return [
         // The priority to give driver jobs (the lower the number, the higher the priority). Set to `null` to inherit the default priority.
         //'driverJobPriority' => 100,
 
+        // The time to reserve for queue jobs in seconds.
+        //'queueJobTtr' => 300,
+
+        // The maximum number of times to attempt retrying a failed queue job.
+        //'maxRetryAttempts' => 10,
+
         // The time in seconds to wait for mutex locks to be released.
         //'mutexTimeout' => 1,
 

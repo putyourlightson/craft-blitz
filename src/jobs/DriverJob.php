@@ -10,8 +10,12 @@ use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\queue\Queue;
+use yii\queue\RetryableJobInterface;
 
-class DriverJob extends BaseJob
+/**
+ * @property-read int $ttr
+ */
+class DriverJob extends BaseJob implements RetryableJobInterface
 {
     // Properties
     // =========================================================================
@@ -43,6 +47,22 @@ class DriverJob extends BaseJob
 
     // Public Methods
     // =========================================================================
+
+    /**
+     * @inheritdoc
+     */
+    public function getTtr(): int
+    {
+        return Blitz::$plugin->settings->queueJobTtr;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canRetry($attempt, $error): bool
+    {
+        return $attempt < Blitz::$plugin->settings->maxRetryAttempts;
+    }
 
     /**
      * @inheritdoc

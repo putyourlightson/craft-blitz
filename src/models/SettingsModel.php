@@ -276,6 +276,16 @@ class SettingsModel extends Model
     public $driverJobPriority = 100;
 
     /**
+     * @var int The time to reserve for queue jobs in seconds.
+     */
+    public $queueJobTtr = 300;
+
+    /**
+     * @var int The maximum number of times to attempt retrying a failed queue job.
+     */
+    public $maxRetryAttempts = 10;
+
+    /**
      * @var int The time in seconds to wait for mutex locks to be released.
      */
     public $mutexTimeout = 1;
