@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.9.0 - Unreleased
+## 3.9.0 - 2021-05-03
 ### Added
 - Added the ability to refresh a cached site with the new `Refresh Site` utility and `refresh-site` console command ([#214](https://github.com/putyourlightson/craft-blitz/issues/214)).
 - Added the `isCacheableRequest` event to `CacheRequestService` ([#306](https://github.com/putyourlightson/craft-blitz/issues/306)).
