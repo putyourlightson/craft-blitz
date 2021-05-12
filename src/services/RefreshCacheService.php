@@ -556,7 +556,7 @@ class RefreshCacheService extends Component
 
             if ($elementType !== null) {
                 /** @var ElementInterface $elementType */
-                $element = $elementType::find()->id($elementId)->site('*')->one();
+                $element = $elementType::find()->id($elementId)->status(null)->site('*')->one();
 
                 if ($element !== null) {
                     $this->addElement($element);
