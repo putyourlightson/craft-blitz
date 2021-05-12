@@ -281,11 +281,10 @@ class GenerateCacheService extends Component
         // Delete cache records so we get a fresh cache
         CacheRecord::deleteAll($cacheValue);
 
-        if (!empty($this->options->expiryDate)) {
-            $cacheValue = array_merge($cacheValue, [
-                'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
-            ]);
-        }
+        $cacheValue = array_merge($cacheValue, [
+            'paginate' => $this->options->paginate,
+            'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
+        ]);
 
         $db->createCommand()
             ->insert(CacheRecord::tableName(), $cacheValue, false)

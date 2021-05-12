@@ -87,6 +87,8 @@ class SiteUriHelper
             ->where(['siteId' => $siteId])
             ->column();
 
+        $paginatedUris = self::getPaginatedUrisForSite($siteId);
+
         // Get URIs from all elements in the site
         $elementUris = Element_SiteSettings::find()
             ->select('uri')
@@ -104,7 +106,7 @@ class SiteUriHelper
             ->column();
 
         // Merge arrays and keep unique values only
-        $uris = array_unique(array_merge($cachedUris, $elementUris));
+        $uris = array_unique(array_merge($cachedUris, $paginatedUris, $elementUris));
 
         foreach ($uris as $uri) {
             $siteUri = new SiteUriModel([
@@ -118,6 +120,34 @@ class SiteUriHelper
         }
 
         return $siteUris;
+    }
+
+    /**
+     * Returns paginated URIs for a given site.
+     *
+     * @param int $siteId
+     *
+     * @return string[]
+     */
+    public static function getPaginatedUrisForSite(int $siteId): array
+    {
+        $paginatedUris = [];
+
+        $pageTrigger = Craft::$app->getConfig()->getGeneral()->getPageTrigger();
+
+        $cacheRecords = CacheRecord::find()
+            ->select(['uri', 'paginate'])
+            ->where(['siteId' => $siteId])
+            ->andWhere(['not', ['paginate' => null]])
+            ->all();
+
+        foreach ($cacheRecords as $cacheRecord) {
+            for ($page = 2; $page <= $cacheRecord->paginate; $page++) {
+                $paginatedUris[] = $cacheRecord->uri.'/'.$pageTrigger.$page;
+            }
+        }
+
+        return $paginatedUris;
     }
 
     /**

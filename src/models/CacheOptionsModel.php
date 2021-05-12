@@ -42,6 +42,11 @@ class CacheOptionsModel extends Model
     public $tags;
 
     /**
+     * @var int|null
+     */
+    public $paginate;
+
+    /**
      * @var DateTime|null
      */
     public $expiryDate;
@@ -73,9 +78,8 @@ class CacheOptionsModel extends Model
     public function attributes(): array
     {
         $names = parent::attributes();
-        $names = array_merge($names, ['cacheDuration']);
 
-        return $names;
+        return array_merge($names, ['cacheDuration']);
     }
 
     /**
@@ -85,6 +89,7 @@ class CacheOptionsModel extends Model
     {
         return [
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
+            [['paginate'], 'integer'],
             [['expiryDate'], DateTimeValidator::class],
         ];
     }
@@ -94,7 +99,7 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function cachingEnabled(bool $value)
+    public function cachingEnabled(bool $value): self
     {
         $this->cachingEnabled = $value;
 
@@ -106,7 +111,7 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function cacheElements(bool $value)
+    public function cacheElements(bool $value): self
     {
         $this->cacheElements = $value;
 
@@ -118,7 +123,7 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function cacheElementQueries(bool $value)
+    public function cacheElementQueries(bool $value): self
     {
         $this->cacheElementQueries = $value;
 
@@ -130,7 +135,7 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function outputComments($value)
+    public function outputComments($value): self
     {
         $this->outputComments = $value;
 
@@ -142,7 +147,7 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function cacheDuration($value)
+    public function cacheDuration($value): self
     {
         // Set default cache duration if greater than 0
         $cacheDuration = ConfigHelper::durationInSeconds($value);
@@ -162,9 +167,21 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function tags($value)
+    public function tags($value): self
     {
         $this->tags = is_string($value) ? StringHelper::split($value) : $value;
+
+        return $this;
+    }
+
+    /**
+     * @param int|null $value
+     *
+     * @return static self reference
+     */
+    public function paginate(int $value = null): self
+    {
+        $this->paginate = $value;
 
         return $this;
     }
@@ -174,7 +191,7 @@ class CacheOptionsModel extends Model
      *
      * @return static self reference
      */
-    public function expiryDate(DateTime $value = null)
+    public function expiryDate(DateTime $value = null): self
     {
         $this->expiryDate = $value;
 

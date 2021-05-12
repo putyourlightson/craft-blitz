@@ -13,6 +13,7 @@ use yii\db\ActiveQueryInterface;
  * @property int $id
  * @property int $siteId
  * @property string $uri
+ * @property int|null $paginate
  * @property DateTime|null $expiryDate
  * @property ActiveQueryInterface $elements
  */

@@ -73,6 +73,7 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
                 'uri' => $this->string()->notNull(),
+                'paginate' => $this->integer(),
                 'expiryDate' => $this->dateTime(),
             ]);
         }
