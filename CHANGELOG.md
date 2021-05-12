@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.9.1 - Unreleased
+### Fixed
+- Fixed a bug in which expired entries were not being refreshed ([#320](https://github.com/putyourlightson/craft-blitz/issues/320)).
+
 ## 3.9.0 - 2021-05-03
 ### Added
 - Added the ability to refresh a cached site with the new `Refresh Site` utility and `refresh-site` console command ([#214](https://github.com/putyourlightson/craft-blitz/issues/214)).
