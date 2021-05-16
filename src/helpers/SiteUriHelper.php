@@ -7,8 +7,11 @@ namespace putyourlightson\blitz\helpers;
 
 use Craft;
 use craft\helpers\FileHelper;
+use craft\helpers\UrlHelper;
 use craft\records\Element;
 use craft\records\Element_SiteSettings;
+use craft\web\Request;
+use craft\web\twig\variables\Paginate;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
@@ -33,7 +36,7 @@ class SiteUriHelper
      *
      * @return string
      */
-    public static function getMimeType(SiteUriModel $siteUri)
+    public static function getMimeType(SiteUriModel $siteUri): string
     {
         return FileHelper::getMimeTypeByExtension($siteUri->uri) ?? self::MIME_TYPE_HTML;
     }
@@ -124,6 +127,7 @@ class SiteUriHelper
 
     /**
      * Returns paginated URIs for a given site.
+     * @see Paginate::getPageUrl()
      *
      * @param int $siteId
      *
@@ -133,21 +137,53 @@ class SiteUriHelper
     {
         $paginatedUris = [];
 
-        $pageTrigger = Craft::$app->getConfig()->getGeneral()->getPageTrigger();
-
         $cacheRecords = CacheRecord::find()
             ->select(['uri', 'paginate'])
             ->where(['siteId' => $siteId])
             ->andWhere(['not', ['paginate' => null]])
             ->all();
 
+        $pageTrigger = Craft::$app->getConfig()->getGeneral()->getPageTrigger();
+        $useQueryParam = strpos($pageTrigger, '?') === 0;
+
         foreach ($cacheRecords as $cacheRecord) {
             for ($page = 2; $page <= $cacheRecord->paginate; $page++) {
-                $paginatedUris[] = $cacheRecord->uri.'/'.$pageTrigger.$page;
+                $uri = $cacheRecord->uri;
+
+                if ($useQueryParam) {
+                    $param = trim($pageTrigger, '?=');
+                    $uri = UrlHelper::urlWithParams($uri, [$param => $page]);
+                }
+                else {
+                    $uri = $uri ? trim($uri, '/').'/' : $uri;
+                    $uri = $uri.$pageTrigger.$page;
+                }
+
+                $paginatedUris[] = $uri;
             }
         }
 
         return $paginatedUris;
+    }
+
+    /**
+     * Returns whether the provided URI is a paginated URI.
+     * @see Request::init()
+     */
+    public static function isPaginatedUri(string $uri): bool
+    {
+        $pageTrigger = Craft::$app->getConfig()->getGeneral()->getPageTrigger();
+
+        if (strpos($pageTrigger, '?') === 0) {
+            $pageTrigger = trim($pageTrigger, '?=');
+
+            return (bool)preg_match('/\?(.*\&)?'.$pageTrigger.'=/', $uri);
+        }
+        else {
+            $pageTrigger = preg_quote($pageTrigger, '/');
+
+            return (bool)preg_match('/^(.*\/)?'.$pageTrigger.'\d+$/', $uri);
+        }
     }
 
     /**

@@ -278,11 +278,14 @@ class GenerateCacheService extends Component
 
         $cacheValue = $siteUri->toArray();
 
-        // Delete cache records so we get a fresh cache
+        // Delete cache records so we get a fresh cache.
         CacheRecord::deleteAll($cacheValue);
 
+        // Don't paginate URIs that are already paginated.
+        $paginate = SiteUriHelper::isPaginatedUri($siteUri->uri) ? null : $this->options->paginate;
+
         $cacheValue = array_merge($cacheValue, [
-            'paginate' => $this->options->paginate,
+            'paginate' => $paginate,
             'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
         ]);
 

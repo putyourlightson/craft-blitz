@@ -63,4 +63,18 @@ class SiteUriHelperTest extends Unit
 
         $this->assertEquals($this->secondarySite->id, $siteUri->siteId);
     }
+
+    public function testIsPaginatedUri()
+    {
+        $this->assertEquals(SiteUriHelper::isPaginatedUri('xyz'), false);
+
+        Craft::$app->config->general->pageTrigger = 'page';
+        $this->assertEquals(SiteUriHelper::isPaginatedUri('xyz/page4'), true);
+
+        Craft::$app->config->general->pageTrigger = 'page/';
+        $this->assertEquals(SiteUriHelper::isPaginatedUri('xyz/page/4'), true);
+
+        Craft::$app->config->general->pageTrigger = '?page=';
+        $this->assertEquals(SiteUriHelper::isPaginatedUri('xyz?t=1&page=4'), true);
+    }
 }

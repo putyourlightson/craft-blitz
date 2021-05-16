@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
-## 3.9.1 - Unreleased
+## 3.10.0 - Unreleased
+### Added
+- Added `paginate` as a page specific option for automating the warming of paginated URIs ([#319](https://github.com/putyourlightson/craft-blitz/issues/319)).
+
 ### Fixed
 - Fixed a bug in which expired entries were not being refreshed ([#320](https://github.com/putyourlightson/craft-blitz/issues/320)).
 
