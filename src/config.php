@@ -142,6 +142,9 @@ return [
         // - `2`: Cache URLs with query strings as the same page
         //'queryStringCaching' => 0,
 
+        // The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
+        //'includedQueryStringParams' => ['.*'],
+
         // The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
         //'excludedQueryStringParams' => ['gclid', 'fbclid'],
 

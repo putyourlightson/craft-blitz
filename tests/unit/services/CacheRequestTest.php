@@ -186,6 +186,14 @@ class CacheRequestTest extends Unit
         );
     }
 
+    public function testGetAllowedQueryString()
+    {
+        // Mock a URL request
+        $this->_mockRequest($this->siteUri->getUrl().'?gclid=1&fbclid=2&page=3');
+
+        $this->assertEquals('page=3', Blitz::$plugin->cacheRequest->getAllowedQueryString());
+    }
+
     public function testGetResponse()
     {
         Blitz::$plugin->cacheStorage->deleteAll();

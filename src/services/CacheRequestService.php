@@ -115,7 +115,7 @@ class CacheRequestService extends Component
         }
 
         if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
-            && !empty($this->_getAllowedQueryString())
+            && !empty($this->getAllowedQueryString())
         ) {
             Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $request->getAbsoluteUrl());
 
@@ -146,9 +146,9 @@ class CacheRequestService extends Component
 
         // Add the allowed query string if unique query strings should not be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
-            && !empty($this->_getAllowedQueryString())
+            && !empty($this->getAllowedQueryString())
         ) {
-            $url .= '?'.$this->_getAllowedQueryString();
+            $url .= '?'.$this->getAllowedQueryString();
         }
 
         $siteUri = SiteUriHelper::getSiteUriFromUrl($url);
@@ -334,11 +334,11 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the query string without the excluded query string params.
+     * Returns the query string after processing the included and excluded query string params.
      *
      * @return string
      */
-    private function _getAllowedQueryString(): string
+    public function getAllowedQueryString(): string
     {
         if ($this->_queryString !== null) {
             return $this->_queryString;
@@ -347,18 +347,32 @@ class CacheRequestService extends Component
         $queryStringParams = explode('&', Craft::$app->getRequest()->getQueryStringWithoutPath());
 
         foreach ($queryStringParams as $key => $queryStringParam) {
-            $queryParam = explode('=', $queryStringParam);
+            $param = explode('=', $queryStringParam);
 
-            foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
-                if (preg_match('/'.$excludedParam.'/', $queryParam[0])) {
-                    unset($queryStringParams[$key]);
-                    break;
-                }
+            if (!$this->getIsAllowedQueryStringParam($param[0])) {
+                unset($queryStringParams[$key]);
             }
         }
 
         $this->_queryString = implode('&', $queryStringParams);
 
         return $this->_queryString;
+    }
+
+    public function getIsAllowedQueryStringParam(string $param): bool
+    {
+        foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
+            if (preg_match('/'.$excludedParam.'/', $param)) {
+                return false;
+            }
+        }
+
+        foreach (Blitz::$plugin->settings->includedQueryStringParams as $includedParam) {
+            if (preg_match('/'.$includedParam.'/', $param)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
