@@ -46,6 +46,10 @@
         url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }),
     },
     {
+        action: "Refresh Site Cache"|t('blitz'),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-site', { key: apiKey, siteId: currentSite.id }),
+    },
+    {
         action: "Refresh Cached URLs"|t('blitz'),
         url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-urls', { key: apiKey, urls: siteUrl('page1') ~ ',' ~ siteUrl('page2') }),
     },

@@ -170,6 +170,21 @@ class CacheController extends Controller
     }
 
     /**
+     * Refreshes expired cache.
+     *
+     * @return Response
+     */
+    public function actionRefreshExpired(): Response
+    {
+        Blitz::$plugin->refreshCache->refreshExpiredCache();
+
+        $message = 'Expired cache successfully refreshed.';
+        Blitz::$plugin->log($message);
+
+        return $this->_getResponse($message);
+    }
+
+    /**
      * Refreshes site cache.
      *
      * @return Response
@@ -190,21 +205,6 @@ class CacheController extends Controller
             $message = 'Site successfully refreshed and queued for warming.';
         }
 
-        Blitz::$plugin->log($message);
-
-        return $this->_getResponse($message);
-    }
-
-    /**
-     * Refreshes expired cache.
-     *
-     * @return Response
-     */
-    public function actionRefreshExpired(): Response
-    {
-        Blitz::$plugin->refreshCache->refreshExpiredCache();
-
-        $message = 'Expired cache successfully refreshed.';
         Blitz::$plugin->log($message);
 
         return $this->_getResponse($message);
