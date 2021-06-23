@@ -66,6 +66,16 @@ class CacheController extends Controller
         return true;
     }
 
+    public function afterAction($action, $result)
+    {
+        // If front-end request, run the queue to ensure action is completed in full
+        if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE) {
+            Craft::$app->runAction('queue/run');
+        }
+
+        return parent::afterAction($action, $result);
+    }
+
     /**
      * Clears the cache.
      *
@@ -271,7 +281,7 @@ class CacheController extends Controller
     {
         $request = Craft::$app->getRequest();
 
-        // If front-end site or JSON request
+        // If front-end or JSON request
         if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE || $request->getAcceptsJson()) {
             return $this->asJson([
                 'success' => $success,

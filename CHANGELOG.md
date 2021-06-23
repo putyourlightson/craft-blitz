@@ -6,6 +6,9 @@
 - Added the `includedQueryStringParams` config setting that compares query string params using regular expressions ([#326](https://github.com/putyourlightson/craft-blitz/issues/326)).
 - Added user permissions for the refresh site utility ([#214](https://github.com/putyourlightson/craft-blitz/issues/214)).
 
+### Changed
+- Front-end API requests now run the queue so that actions complete fully.
+
 ### Fixed
 - Fixed a bug in which expired entries were not being refreshed ([#320](https://github.com/putyourlightson/craft-blitz/issues/320)).
 
