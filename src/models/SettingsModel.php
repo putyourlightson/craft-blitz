@@ -169,6 +169,11 @@ class SettingsModel extends Model
     public $warmCacheAutomatically = true;
 
     /**
+     * @var bool Whether pages containing query string parameters should be warmed.
+     */
+    public $warmPagesWithQueryStringParams = true;
+
+    /**
      * @var bool Whether the cache should automatically be refreshed after a global set is updated.
      */
     public $refreshCacheAutomaticallyForGlobals = true;
@@ -200,7 +205,7 @@ class SettingsModel extends Model
     public $includedQueryStringParams = ['.*'];
 
     /**
-     * @var string[] The query string parameters to exclude (overrides any matching params to include) when determining if and how a page should be cached (regular expressions may be used).
+     * @var string[] The query string parameters to exclude (overrides any matching parameters to include) when determining if and how a page should be cached (regular expressions may be used).
      */
     public $excludedQueryStringParams = ['gclid', 'fbclid'];
 

@@ -4,6 +4,7 @@
 ### Added
 - Added `paginate` as a page specific option for automating the warming of paginated URIs ([#319](https://github.com/putyourlightson/craft-blitz/issues/319)).
 - Added the `includedQueryStringParams` config setting that compares query string params using regular expressions ([#326](https://github.com/putyourlightson/craft-blitz/issues/326)).
+- Added the `warmPagesWithQueryStringParams` config setting that determines whether pages containing query string parameters should be warmed ([#326](https://github.com/putyourlightson/craft-blitz/issues/326)).
 - Added user permissions for the refresh site utility ([#214](https://github.com/putyourlightson/craft-blitz/issues/214)).
 
 ### Changed

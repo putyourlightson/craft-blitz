@@ -117,9 +117,17 @@ class SiteUriHelper
                 'uri' => $uri,
             ]);
 
-            if (!$cacheableOnly || Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-                $siteUris[] = $siteUri;
+            if ($cacheableOnly) {
+                if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+                    continue;
+                }
+
+                if (!Blitz::$plugin->settings->warmPagesWithQueryStringParams && strpos($uri, '?') !== false) {
+                    continue;
+                }
             }
+
+            $siteUris[] = $siteUri;
         }
 
         return $siteUris;

@@ -127,6 +127,9 @@ return [
         // Whether the cache should automatically be warmed after clearing.
         //'warmCacheAutomatically' => true,
 
+        // Whether pages containing query string parameters should be warmed.
+        //'warmPagesWithQueryStringParams' => true,
+
         // Whether the cache should automatically be refreshed after a global set is updated.
         //'refreshCacheAutomaticallyForGlobals' => true,
 
