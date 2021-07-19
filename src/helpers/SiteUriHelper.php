@@ -143,6 +143,13 @@ class SiteUriHelper
      */
     public static function getPaginatedUrisForSite(int $siteId): array
     {
+        // TODO: remove this condition after the next breakpoint
+        $schemaVersion = Craft::$app->projectConfig->get('plugins.blitz.schemaVersion', true);
+
+        if (version_compare($schemaVersion, '3.10.0', '<')) {
+            return [];
+        }
+
         $paginatedUris = [];
 
         $cacheRecords = CacheRecord::find()

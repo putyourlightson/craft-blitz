@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.10.1 - 2021-07-19
+### Fixed
+- Fixed a database migration error that could occur when Craft CMS is updated to version 3.7.0 before Blitz’s own migrations have run ([#332](https://github.com/putyourlightson/craft-blitz/issues/332)).
+
 ## 3.10.0 - 2021-07-05
 ### Added
 - Added `paginate` as a page specific option for automating the warming of paginated URIs ([#319](https://github.com/putyourlightson/craft-blitz/issues/319)).
