@@ -79,9 +79,11 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasChanged(): bool
     {
-        // Only works with Craft 3.4.0 using delta changes feature
-        // TODO: remove in 4.0.0
-        if (version_compare(Craft::$app->getVersion(), '3.4', '<')) {
+        // Only works with Craft 3.4 to 3.6 using delta changes feature
+        // TODO: remove in 3.11.0
+        if (version_compare(Craft::$app->getVersion(), '3.4', '<')
+            || version_compare(Craft::$app->getVersion(), '3.6.99', '>')
+        ) {
             return true;
         }
 

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.10.2 - 2021-07-21
+### Fixed
+- Fixed the cache not being refreshed when a new entry was created with Craft CMS version 3.7.x installed.
+
 ## 3.10.1 - 2021-07-19
 ### Fixed
 - Fixed a database migration error that could occur when Craft CMS is updated to version 3.7.0 before Blitz’s own migrations have run ([#332](https://github.com/putyourlightson/craft-blitz/issues/332)).
