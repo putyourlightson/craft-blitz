@@ -15,9 +15,9 @@ use yii\base\Behavior;
  *
  * @since 3.6.0
  *
- * @property-read bool $hasStatusChanged
  * @property-read bool $hasChanged
- * @property-read bool $hasLiveStatus
+ * @property-read bool $hasStatusChanged
+ * @property-read bool $hasLiveOrExpiredStatus
  * @property Element $owner
  */
 class ElementChangedBehavior extends Behavior
@@ -41,7 +41,7 @@ class ElementChangedBehavior extends Behavior
     /**
      * @var bool
      */
-    public $deleted = false;
+    public $isDeleted = false;
 
     // Public Methods
     // =========================================================================
@@ -68,7 +68,7 @@ class ElementChangedBehavior extends Behavior
         }
 
         $element->on(Element::EVENT_AFTER_DELETE, function() {
-            $this->deleted = true;
+            $this->isDeleted = true;
         });
     }
 
@@ -79,15 +79,24 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasChanged(): bool
     {
-        // Only works with Craft 3.4 to 3.6 using delta changes feature
-        // TODO: remove in 3.11.0
-        if (version_compare(Craft::$app->getVersion(), '3.4', '<')
-            || version_compare(Craft::$app->getVersion(), '3.6.99', '>')
-        ) {
+        // TODO: remove in 4.0.0
+        // Detection of changes not possible before Craft 3.4, therefore assume true
+        if (version_compare(Craft::$app->getVersion(), '3.4', '<')) {
             return true;
         }
 
-        if ($this->deleted) {
+        // TODO: remove in 4.0.0
+        if (version_compare(Craft::$app->getVersion(), '3.7.0', '>=')) {
+            // Detection of first save not possible before Craft 3.7.5, therefore assume true
+            if (version_compare(Craft::$app->getVersion(), '3.7.5', '<')) {
+                return true;
+            }
+            elseif ($this->owner->firstSave) {
+                return true;
+            }
+        }
+
+        if ($this->isDeleted) {
             return true;
         }
 
@@ -95,7 +104,11 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        return !empty($this->owner->getDirtyAttributes()) || !empty($this->owner->getDirtyFields());
+        if (!empty($this->owner->getDirtyAttributes()) || !empty($this->owner->getDirtyFields())) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
