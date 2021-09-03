@@ -262,7 +262,8 @@ class FileStorage extends BaseCacheStorage
         $filePaths = [$filePath];
 
         /**
-         * If the filename includes URL encoded characters, create a copy with the characters decoded
+         * If the filename includes URL encoded characters, create a copy with the characters decoded.
+         * Use `rawurldecode()` which does not decode plus symbols ('+') into spaces (`urldecode()` does).
          *
          * Solves:
          * https://github.com/putyourlightson/craft-blitz/issues/222
