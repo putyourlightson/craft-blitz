@@ -5,7 +5,7 @@
 - Improved the detection of whether a new entry was created in Craft CMS version 3.7.5 and above.
 
 ### Security
-- Caching URLs with query strings that are not at least one level deep is now disallowed.
+- Caching URLs with query string paths that are not at least one level deep is now disallowed.
 
 ## 3.10.2 - 2021-07-21
 ### Fixed

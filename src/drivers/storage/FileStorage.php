@@ -241,8 +241,9 @@ class FileStorage extends BaseCacheStorage
         if (strpos($siteUri->uri, '?') !== false) {
             $queryString = substr($siteUri->uri, strpos($siteUri->uri, '?') + 1);
             $queryString = rawurldecode($queryString);
+            $queryStringPath = FileHelper::normalizePath($queryString);
 
-            if (substr(FileHelper::normalizePath($queryString), 0, 1) == '.') {
+            if (empty($queryStringPath) || substr($queryStringPath, 0, 1) == '.') {
                 return [];
             }
         }
