@@ -236,6 +236,17 @@ class FileStorage extends BaseCacheStorage
             return [];
         }
 
+        // Ensure that the query string path is at least one level deep
+        // https://github.com/putyourlightson/craft-blitz/issues/343
+        if (strpos($siteUri->uri, '?') !== false) {
+            $queryString = substr($siteUri->uri, strpos($siteUri->uri, '?') + 1);
+            $queryString = rawurldecode($queryString);
+
+            if (substr(FileHelper::normalizePath($queryString), 0, 1) == '.') {
+                return [];
+            }
+        }
+
         // Replace ? with / in URI
         $uri = str_replace('?', '/', $siteUri->uri);
 
