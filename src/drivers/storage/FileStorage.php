@@ -201,7 +201,7 @@ class FileStorage extends BaseCacheStorage
                 }
 
                 if (strpos($otherSite['path'], $site['path'].'/') === 0) {
-                    $site['count'] -= is_dir($otherSite['path']) ? $sites[$otherSiteId]['count'] : 0;
+                    $site['count'] -= is_dir($otherSite['path']) ? $otherSite['count'] : 0;
                 }
             }
         }
@@ -236,16 +236,8 @@ class FileStorage extends BaseCacheStorage
             return [];
         }
 
-        // Ensure that the query string path is at least one level deep
-        // https://github.com/putyourlightson/craft-blitz/issues/343
-        if (strpos($siteUri->uri, '?') !== false) {
-            $queryString = substr($siteUri->uri, strpos($siteUri->uri, '?') + 1);
-            $queryString = rawurldecode($queryString);
-            $queryStringPath = FileHelper::normalizePath($queryString);
-
-            if (empty($queryStringPath) || substr($queryStringPath, 0, 1) == '.') {
-                return [];
-            }
+        if ($this->_hasInvalidQueryString($siteUri->uri)) {
+            return [];
         }
 
         // Replace ? with / in URI
@@ -321,5 +313,24 @@ class FileStorage extends BaseCacheStorage
         }
 
         return is_dir($path) ? count(FileHelper::findFiles($path, ['only' => ['index.html']])) : 0;
+    }
+
+    private function _hasInvalidQueryString(string $uri): bool
+    {
+        if (strpos($uri, '?') === false) {
+            return false;
+        }
+
+        // Ensure that the query string path is at least one level deep
+        // https://github.com/putyourlightson/craft-blitz/issues/343
+        $queryString = substr($uri, strpos($uri, '?') + 1);
+        $queryString = rawurldecode($queryString);
+        $queryStringPath = FileHelper::normalizePath($queryString);
+
+        if (empty($queryStringPath) || substr($queryStringPath, 0, 1) == '.') {
+            return true;
+        }
+
+        return false;
     }
 }

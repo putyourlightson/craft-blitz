@@ -51,7 +51,7 @@ class BaseDriverHelper
      *
      * @return SavableComponent
      */
-    public static function createDriver(string $type, array $settings = [])
+    public static function createDriver(string $type, array $settings = []): SavableComponent
     {
         /** @var SavableComponent $driver */
         $driver = Component::createComponent([

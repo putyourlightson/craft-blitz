@@ -364,7 +364,7 @@ class SettingsModel extends Model
     /**
      * Returns custom site URIs as an array
      */
-    public function getCustomSiteUris()
+    public function getCustomSiteUris(): array
     {
         return is_array($this->customSiteUris) ? $this->customSiteUris : [];
     }

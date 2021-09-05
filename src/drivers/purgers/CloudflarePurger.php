@@ -73,7 +73,7 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function behaviors()
+    public function behaviors(): array
     {
         $behaviors = parent::behaviors();
         $behaviors['parser'] = [

@@ -17,8 +17,10 @@ use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 
 /**
- * @property bool $isCacheableRequest
- * @property SiteUriModel $requestedCacheableSiteUri
+ *
+ * @property-read bool $isCacheableRequest
+ * @property-read null|SiteUriModel $requestedCacheableSiteUri
+ * @property-read string $allowedQueryString
  */
 class CacheRequestService extends Component
 {

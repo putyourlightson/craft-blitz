@@ -2,7 +2,6 @@
 
 namespace putyourlightson\blitz\migrations;
 
-use Craft;
 use craft\db\Migration;
 use putyourlightson\blitz\records\CacheRecord;
 

@@ -17,7 +17,7 @@ class SiteUriModel extends Model
     // =========================================================================
 
     /**
-     * @var int
+     * @var int|string
      */
     public $siteId;
 

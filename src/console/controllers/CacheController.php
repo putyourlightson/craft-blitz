@@ -374,7 +374,7 @@ class CacheController extends Controller
         if (Blitz::$plugin->cachePurger->isDummy) {
             $this->stderr(Craft::t('blitz', 'Cache purging is disabled.').PHP_EOL, Console::FG_GREEN);
 
-            return ExitCode::OK;
+            return;
         }
 
         if ($siteUris !== null) {

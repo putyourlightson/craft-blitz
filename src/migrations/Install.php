@@ -25,7 +25,7 @@ class Install extends Migration
     // =========================================================================
 
     /**
-     * @return boolean
+     * @return bool
      */
     public function safeUp(): bool
     {
@@ -41,7 +41,7 @@ class Install extends Migration
     }
 
     /**
-     * @return boolean
+     * @return bool
      * @throws Throwable
      */
     public function safeDown(): bool
@@ -64,7 +64,7 @@ class Install extends Migration
     /**
      * Creates the tables needed for the Records used by the plugin
      *
-     * @return boolean
+     * @return bool
      */
     protected function createTables(): bool
     {

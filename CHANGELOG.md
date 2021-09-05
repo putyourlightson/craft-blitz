@@ -1,11 +1,11 @@
 # Release Notes for Blitz
 
-## 3.10.3 - Unreleased
+## 3.10.3 - 2021-09-05
 ### Changed
 - Improved the detection of whether a new entry was created in Craft CMS version 3.7.5 and above.
 
 ### Security
-- Caching URLs with query string paths that are not at least one level deep is now disallowed ([#343](https://github.com/putyourlightson/craft-blitz/issues/343)).
+- Query string paths are now validated to be at least one level deep if URLs with query strings are set to be cached as unique pages ([#343](https://github.com/putyourlightson/craft-blitz/issues/343)).
 
 ## 3.10.2 - 2021-07-21
 ### Fixed
