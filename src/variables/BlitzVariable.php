@@ -53,7 +53,7 @@ class BlitzVariable
             throw new NotFoundHttpException('Template not found: '.$template);
         }
 
-        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/templates/get';
+        $uri = Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/templates/get';
 
         // Hash the template
         $template = Craft::$app->getSecurity()->hashData($template);
@@ -75,7 +75,7 @@ class BlitzVariable
      */
     public function csrfInput(): Markup
     {
-        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/input';
+        $uri = Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/input';
 
         return $this->_getScript($uri);
     }
@@ -87,7 +87,7 @@ class BlitzVariable
      */
     public function csrfParam(): Markup
     {
-        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/param';
+        $uri = Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/param';
 
         return $this->_getScript($uri);
     }
@@ -99,7 +99,7 @@ class BlitzVariable
      */
     public function csrfToken(): Markup
     {
-        $uri = '/'.Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/token';
+        $uri = Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/token';
 
         return $this->_getScript($uri);
     }

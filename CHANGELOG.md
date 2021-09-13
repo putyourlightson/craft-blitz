@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.10.4 - Unreleased
+### Changed
+- Changed action URIs to relative URIs in template tags ([#345](https://github.com/putyourlightson/craft-blitz/issues/345)).
+
 ## 3.10.3 - 2021-09-05
 ### Changed
 - Improved the detection of whether a new entry was created in Craft CMS version 3.7.5 and above.
