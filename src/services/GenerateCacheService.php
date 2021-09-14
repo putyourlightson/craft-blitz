@@ -132,6 +132,11 @@ class GenerateCacheService extends Component
             return;
         }
 
+        // Don't proceed if the query contains an expression criteria
+        if (ElementQueryHelper::containsExpressionCriteria($elementQuery)) {
+            return;
+        }
+
         // Don't proceed if the order is random
         if (ElementQueryHelper::isOrderByRandom($elementQuery)) {
             return;

@@ -6,7 +6,9 @@
 namespace putyourlightson\blitztests\unit\services;
 
 use Codeception\Test\Unit;
+use Craft;
 use craft\commerce\elements\Product;
+use craft\db\FixedOrderExpression;
 use craft\elements\Entry;
 use craft\elements\User;
 use putyourlightson\blitz\Blitz;
@@ -207,9 +209,18 @@ class GenerateCacheTest extends Unit
         $this->assertEquals(1, ElementQueryRecord::find()->count());
     }
 
-    public function testSaveElementQueryWithoutRelations()
+    public function testSaveElementQueryWithRelations()
     {
         $elementQuery = Entry::find()->innerJoin('{{%relations}} relations');
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+        $this->assertEquals(0, ElementQueryRecord::find()->count());
+    }
+
+    public function testSaveElementQueryWithExpression()
+    {
+        $expression = new FixedOrderExpression('elements.id', [], Craft::$app->db);
+        $elementQuery = Entry::find()->orderBy($expression);
         Blitz::$plugin->generateCache->addElementQuery($elementQuery);
 
         $this->assertEquals(0, ElementQueryRecord::find()->count());
@@ -272,11 +283,11 @@ class GenerateCacheTest extends Unit
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds(['xyz']);
 
         // Assert that zero cache IDs were found
-        $this->assertEquals(0, count($cacheIds));
+        $this->assertCount(0, $cacheIds);
 
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
         // Assert that one cache ID was found
-        $this->assertEquals(1, count($cacheIds));
+        $this->assertCount(1, $cacheIds);
     }
 }

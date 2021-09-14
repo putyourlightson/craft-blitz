@@ -10,6 +10,7 @@ use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use DateTime;
+use yii\db\Expression;
 
 class ElementQueryHelper
 {
@@ -192,6 +193,32 @@ class ElementQueryHelper
 
             if (is_string($value) && stripos($value, 'not') !== 0) {
                 return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns whether the element query contains an expression on any of its criteria.
+     *
+     * @param ElementQuery $elementQuery
+     *
+     * @return bool
+     */
+    public static function containsExpressionCriteria(ElementQuery $elementQuery): bool
+    {
+        foreach ($elementQuery->getCriteria() as $criteria) {
+            if ($criteria instanceof Expression) {
+                return true;
+            }
+
+            if (is_array($criteria)) {
+                foreach ($criteria as $criterion) {
+                    if ($criterion instanceof Expression) {
+                        return true;
+                    }
+                }
             }
         }
 
