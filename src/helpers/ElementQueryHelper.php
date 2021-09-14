@@ -10,6 +10,7 @@ use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use DateTime;
+use craft\db\FixedOrderExpression;
 
 class ElementQueryHelper
 {
@@ -267,6 +268,20 @@ class ElementQueryHelper
         }
 
         return false;
+    }
+
+    /**
+     * Returns whether the element query is order by a FixedOrderExpression
+     *
+     * @param ElementQuery $elementQuery
+     *
+     * @return bool
+     */
+    public static function isOrderByFixedOrderExpression(ElementQuery $elementQuery): bool
+    {
+        $orderBy = $elementQuery->orderBy;
+
+        return $orderBy instanceof FixedOrderExpression;
     }
 
     // Private Methods

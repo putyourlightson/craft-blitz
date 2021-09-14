@@ -147,6 +147,11 @@ class GenerateCacheService extends Component
             return;
         }
 
+        // Don't proceed if this is a query orderby FixedOrderExpression
+        if (ElementQueryHelper::isOrderByFixedOrderExpression($elementQuery)) {
+            return;
+        }
+
         $this->saveElementQuery($elementQuery);
     }
 
