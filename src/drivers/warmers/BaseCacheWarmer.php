@@ -54,7 +54,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     const EVENT_BEFORE_WARM_CACHE = 'beforeWarmCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered after the cache is warmed.
      */
     const EVENT_AFTER_WARM_CACHE = 'afterWarmCache';
 
@@ -77,7 +77,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     const EVENT_BEFORE_WARM_ALL_CACHE = 'beforeWarmAllCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered after the entire cache is warmed.
      */
     const EVENT_AFTER_WARM_ALL_CACHE = 'afterWarmAllCache';
 
