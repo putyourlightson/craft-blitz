@@ -26,7 +26,30 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     // =========================================================================
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered before the cache is warmed.
+     *
+     * You may set [[\yii\base\ModelEvent::$isValid]] to `false` to prevent the cache from being warmed.
+     *
+     * ```php
+     * use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
+     * use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
+     * use putyourlightson\blitz\events\RefreshCacheEvent;
+     * use yii\base\Event;
+     *
+     * Event::on(GuzzleWarmer::class, BaseCacheWarmer::EVENT_BEFORE_WARM_CACHE, function(RefreshCacheEvent $e) {
+     *     foreach ($e->siteUris as $key => $siteUri) {
+     *         if (strpos($siteUri->uri, 'leave-me-out-of-this') !== false) {
+     *             // Removes a single site URI.
+     *             unset($e->siteUris[$key]);
+     *         }
+     *
+     *         if (strpos($siteUri->uri, 'leave-us-all-out-of-this') !== false) {
+     *             // Prevents the cache from being warmed.
+     *             return false;
+     *         }
+     *     }
+     * });
+     * ```
      */
     const EVENT_BEFORE_WARM_CACHE = 'beforeWarmCache';
 
@@ -36,7 +59,20 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     const EVENT_AFTER_WARM_CACHE = 'afterWarmCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered before the entire cache is warmed.
+     *
+     * You may set [[\yii\base\ModelEvent::$isValid]] to `false` to prevent the cache from being warmed.
+     *
+     * ```php
+     * use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
+     * use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
+     * use putyourlightson\blitz\events\RefreshCacheEvent;
+     * use yii\base\Event;
+     *
+     * Event::on(GuzzleWarmer::class, BaseCacheWarmer::EVENT_BEFORE_WARM_ALL_CACHE, function(RefreshCacheEvent $e) {
+     *     return false;
+     * });
+     * ```
      */
     const EVENT_BEFORE_WARM_ALL_CACHE = 'beforeWarmAllCache';
 
