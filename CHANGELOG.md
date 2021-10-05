@@ -4,6 +4,7 @@
 ### Changed
 - Changed action URIs to relative URIs in template tags ([#345](https://github.com/putyourlightson/craft-blitz/issues/345)).
 - Element queries are no longer cached when a query contains an expression criteria ([#346](https://github.com/putyourlightson/craft-blitz/issues/346)).
+- The deployer no longer removes files when pages are cleared from the cache ([#348](https://github.com/putyourlightson/craft-blitz/issues/348)).
 
 ## 3.10.3 - 2021-09-05
 ### Changed
