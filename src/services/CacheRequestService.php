@@ -141,7 +141,7 @@ class CacheRequestService extends Component
      */
     public function getRequestedCacheableSiteUri()
     {
-        $url = Craft::$app->getRequest()->getAbsoluteUrl();
+        $url = rawurldecode(Craft::$app->getRequest()->getAbsoluteUrl());
 
         // Remove the query string
         $url = preg_replace('/\?.*/', '', $url);
