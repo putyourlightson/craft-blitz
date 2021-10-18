@@ -8,6 +8,7 @@ namespace putyourlightson\blitztests\unit\services;
 use Codeception\Test\Unit;
 use Craft;
 use craft\helpers\App;
+use craft\web\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -106,10 +107,6 @@ class CacheRequestTest extends Unit
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
         Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
-
-        Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS;
-        $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
-        $this->assertEquals($this->siteUri->uri.'?'.$allowedQueryString, $uri);
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
         $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
@@ -250,10 +247,12 @@ class CacheRequestTest extends Unit
             'REQUEST_METHOD' => 'GET',
             'REQUEST_URI' => '/'.$uri.'?'.parse_url($url, PHP_URL_QUERY),
             'QUERY_STRING' => parse_url($url, PHP_URL_QUERY),
+            'SCRIPT_NAME' => '/index.php',
         ]);
         $_POST = [];
         $_REQUEST = [];
 
+        /** @var Request $request */
         $request = Craft::createObject(App::webRequestConfig());
 
         Craft::$app->set('request', $request);

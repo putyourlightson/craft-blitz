@@ -141,26 +141,29 @@ class CacheRequestService extends Component
      */
     public function getRequestedCacheableSiteUri()
     {
-        $url = rawurldecode(Craft::$app->getRequest()->getAbsoluteUrl());
+        $site = Craft::$app->getSites()->getCurrentSite();
 
-        // Remove the query string
-        $url = preg_replace('/\?.*/', '', $url);
+        // Log a debug message if no site was matched from the requested URL
+        if ($site === null) {
+            Blitz::$plugin->debug('No site URI could be determined from the requested URL – ensure that the base site URL is correctly set.', [], Craft::$app->getRequest()->getAbsoluteUrl());
+
+            return null;
+        }
+
+        // Gets the URI with the site base URL already removed
+        $uri = Craft::$app->getRequest()->getPathInfo();
 
         // Add the allowed query string if unique query strings should not be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
             && !empty($this->getAllowedQueryString())
         ) {
-            $url .= '?'.$this->getAllowedQueryString();
+            $uri .= '?'.$this->getAllowedQueryString();
         }
 
-        $siteUri = SiteUriHelper::getSiteUriFromUrl($url);
-
-        // Log a debug message if no site URI could be determined from the requested URL
-        if ($siteUri === null) {
-            Blitz::$plugin->debug('No site URI could be determined from the requested URL – ensure that the base site URL is correctly set.', [], $url);
-        }
-
-        return $siteUri;
+        return new SiteUriModel([
+            'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
+            'uri' => $uri,
+        ]);
     }
 
     /**
@@ -346,7 +349,8 @@ class CacheRequestService extends Component
             return $this->_queryString;
         }
 
-        $queryStringParams = explode('&', Craft::$app->getRequest()->getQueryStringWithoutPath());
+        $queryString = rawurldecode(Craft::$app->getRequest()->getQueryStringWithoutPath());
+        $queryStringParams = explode('&', $queryString);
 
         foreach ($queryStringParams as $key => $queryStringParam) {
             $param = explode('=', $queryStringParam);
