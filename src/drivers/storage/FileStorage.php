@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\drivers\storage;
 use Craft;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
@@ -141,6 +142,13 @@ class FileStorage extends BaseCacheStorage
      */
     public function deleteUris(array $siteUris)
     {
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_DELETE_URIS, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
         foreach ($siteUris as $siteUri) {
             $filePaths = $this->getFilePaths($siteUri);
 
@@ -155,6 +163,10 @@ class FileStorage extends BaseCacheStorage
                 }
             }
         }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_URIS)) {
+            $this->trigger(self::EVENT_AFTER_DELETE_URIS, $event);
+        }
     }
 
     /**
@@ -162,6 +174,13 @@ class FileStorage extends BaseCacheStorage
      */
     public function deleteAll()
     {
+        $event = new RefreshCacheEvent();
+        $this->trigger(self::EVENT_BEFORE_DELETE_ALL, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
         if (empty($this->_cacheFolderPath)) {
             return;
         }
@@ -171,6 +190,10 @@ class FileStorage extends BaseCacheStorage
         }
         catch (ErrorException $e) {
             Blitz::$plugin->log($e->getMessage(), [], 'error');
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_ALL)) {
+            $this->trigger(self::EVENT_AFTER_DELETE_ALL, $event);
         }
     }
 

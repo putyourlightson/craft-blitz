@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\storage;
 
 use Craft;
+use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\caching\CacheInterface;
 use yii\db\Exception;
@@ -106,6 +107,13 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function deleteUris(array $siteUris)
     {
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_DELETE_URIS, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
         if ($this->_cache === null) {
             return;
         }
@@ -117,6 +125,10 @@ class YiiCacheStorage extends BaseCacheStorage
                 self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
             ]);
         }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_URIS)) {
+            $this->trigger(self::EVENT_AFTER_DELETE_URIS, $event);
+        }
     }
 
     /**
@@ -124,11 +136,22 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function deleteAll()
     {
+        $event = new RefreshCacheEvent();
+        $this->trigger(self::EVENT_BEFORE_DELETE_ALL, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
         if ($this->_cache === null) {
             return;
         }
 
         $this->_cache->flush();
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_ALL)) {
+            $this->trigger(self::EVENT_AFTER_DELETE_ALL, $event);
+        }
     }
 
     /**

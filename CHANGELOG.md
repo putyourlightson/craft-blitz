@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.10.5 - Unreleased
+### Added
+- Added `beforeDeleteUris`, `afterDeleteUris`, `beforeDeleteAll` and `afterDeleteAll` events to `BaseCacheStorage` ([#337](https://github.com/putyourlightson/craft-blitz/issues/337)).
+
 ## 3.10.4 - 2021-10-18
 ### Changed
 - The URL and query string is now URL-decoded in order to ensure that the requested site URI should be cached ([#344](https://github.com/putyourlightson/craft-blitz/issues/344)).
