@@ -151,7 +151,7 @@ class CacheRequestService extends Component
         }
 
         // Gets the URI with the site base URL already removed
-        $uri = Craft::$app->getRequest()->getPathInfo();
+        $uri = Craft::$app->getRequest()->getFullPath();
 
         // Add the allowed query string if unique query strings should not be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE

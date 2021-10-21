@@ -117,6 +117,19 @@ class CacheRequestTest extends Unit
         $this->assertEquals($this->siteUri->uri, $uri);
     }
 
+    public function testGetRequestedCacheableSiteUriWithPageTrigger()
+    {
+        // Mock a URL request
+        $this->_mockRequest($this->siteUri->getUrl().'/'.Craft::$app->config->general->pageTrigger.'1');
+
+        // Enable caching and add an included URI pattern
+        Blitz::$plugin->settings->cachingEnabled = true;
+        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
+
+        $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
+        $this->assertEquals($this->siteUri->uri.'/'.Craft::$app->config->general->pageTrigger.'1', $uri);
+    }
+
     public function testGetRequestedCacheableSiteUriWithRegularExpression()
     {
         $allowedQueryString = 'sort=asc&search=waldo';
