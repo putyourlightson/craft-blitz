@@ -64,8 +64,6 @@ use yii\base\Event;
  * @property SettingsModel $settings
  * @property mixed $settingsResponse
  * @property array $cpRoutes
- *
- * @method SettingsModel getSettings()
  */
 class Blitz extends Plugin
 {

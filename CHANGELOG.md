@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.10.6 - Unreleased
+### Fixed
+- Fixed a bug in which pages in multi-site setups with subdirectories were not being cached to the correct URI ([#351](https://github.com/putyourlightson/craft-blitz/issues/351)).
+
 ## 3.10.5 - 2021-10-21
 ### Added
 - Added `beforeDeleteUris`, `afterDeleteUris`, `beforeDeleteAll` and `afterDeleteAll` events to `BaseCacheStorage` ([#337](https://github.com/putyourlightson/craft-blitz/issues/337)).

@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Component;
 use craft\elements\User;
 use craft\events\CancelableEvent;
+use craft\web\Request;
 use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\ResponseEvent;
@@ -150,8 +151,15 @@ class CacheRequestService extends Component
             return null;
         }
 
-        // Gets the URI with the site base URL already removed
-        $uri = Craft::$app->getRequest()->getFullPath();
+        $uri = $this->_getFullUri();
+
+        // Remove the base site path from the full URI
+        $baseSitePath = parse_url($site->getBaseUrl(), PHP_URL_PATH);
+
+        if ($baseSitePath !== null) {
+            $uri = str_replace(trim($baseSitePath, '/'), '', $uri);
+            $uri = trim($uri, '/');
+        }
 
         // Add the allowed query string if unique query strings should not be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
@@ -380,5 +388,20 @@ class CacheRequestService extends Component
         }
 
         return false;
+    }
+
+    /**
+     * Returns the full requested URI.
+     * TODO: replace with Request::getFullUri() in version 4.0.0.
+     * @see Request::getFullUri()
+     * @since 3.10.6
+     */
+    private function _getFullUri(): string
+    {
+        $baseUrl = Craft::$app->getRequest()->getBaseUrl();
+        $baseUrl = preg_replace('/\/\/+/', '/', trim($baseUrl, '/'));
+        $path = Craft::$app->getRequest()->getFullPath();
+
+        return $baseUrl . ($baseUrl && $path ? '/' : '') . $path;
     }
 }
