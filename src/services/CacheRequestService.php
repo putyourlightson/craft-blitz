@@ -153,12 +153,18 @@ class CacheRequestService extends Component
 
         $uri = $this->_getFullUri();
 
-        // Remove the base site path from the full URI
+        /**
+         * Remove the base site path from the full URI
+         * @see Request::init()
+         */
         $baseSitePath = parse_url($site->getBaseUrl(), PHP_URL_PATH);
 
         if ($baseSitePath !== null) {
-            $uri = str_replace(trim($baseSitePath, '/'), '', $uri);
-            $uri = trim($uri, '/');
+            $baseSitePath = $this->_normalizePath($baseSitePath);
+
+            if (strpos($uri . '/', $baseSitePath . '/') === 0) {
+                $uri = ltrim(substr($uri, strlen($baseSitePath)), '/');
+            }
         }
 
         // Add the allowed query string if unique query strings should not be cached as the same page
@@ -393,15 +399,26 @@ class CacheRequestService extends Component
     /**
      * Returns the full requested URI.
      * TODO: replace with Request::getFullUri() in version 4.0.0.
+     *
      * @see Request::getFullUri()
      * @since 3.10.6
      */
     private function _getFullUri(): string
     {
-        $baseUrl = Craft::$app->getRequest()->getBaseUrl();
-        $baseUrl = preg_replace('/\/\/+/', '/', trim($baseUrl, '/'));
+        $baseUrl = $this->_normalizePath(Craft::$app->getRequest()->getBaseUrl());
         $path = Craft::$app->getRequest()->getFullPath();
 
         return $baseUrl . ($baseUrl && $path ? '/' : '') . $path;
+    }
+
+    /**
+     * Normalizes a URI path by trimming leading/trailing slashes and removing double slashes.
+     *
+     * @see Request::_normalizePath()
+     * @since 3.10.6
+     */
+    private function _normalizePath(string $path): string
+    {
+        return preg_replace('/\/\/+/', '/', trim($path, '/'));
     }
 }

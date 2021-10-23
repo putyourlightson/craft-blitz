@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.10.7 - 2021-10-23
+### Fixed
+- Fixed another bug in which pages in multi-site setups with subdirectories were not being cached to the correct URI ([#351](https://github.com/putyourlightson/craft-blitz/issues/351)).
+
 ## 3.10.6 - 2021-10-22
 ### Fixed
 - Fixed a bug in which pages in multi-site setups with subdirectories were not being cached to the correct URI ([#351](https://github.com/putyourlightson/craft-blitz/issues/351)).
