@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\variables;
 
 use Craft;
 use craft\helpers\Template;
+use craft\helpers\UrlHelper;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
@@ -53,7 +54,7 @@ class BlitzVariable
             throw new NotFoundHttpException('Template not found: '.$template);
         }
 
-        $uri = Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/templates/get';
+        $uri = 'blitz/templates/get';
 
         // Hash the template
         $template = Craft::$app->getSecurity()->hashData($template);
@@ -75,7 +76,7 @@ class BlitzVariable
      */
     public function csrfInput(): Markup
     {
-        $uri = Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/input';
+        $uri = 'blitz/csrf/input';
 
         return $this->_getScript($uri);
     }
@@ -87,7 +88,7 @@ class BlitzVariable
      */
     public function csrfParam(): Markup
     {
-        $uri = Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/param';
+        $uri = 'blitz/csrf/param';
 
         return $this->_getScript($uri);
     }
@@ -99,7 +100,7 @@ class BlitzVariable
      */
     public function csrfToken(): Markup
     {
-        $uri = Craft::$app->getConfig()->getGeneral()->actionTrigger.'/blitz/csrf/token';
+        $uri = 'blitz/csrf/token';
 
         return $this->_getScript($uri);
     }
@@ -178,7 +179,7 @@ class BlitzVariable
 
         $data = [
             'id' => $id,
-            'uri' => $uri,
+            'uri' => UrlHelper::actionUrl($uri, null, null, false),
             'params' => http_build_query($params),
         ];
 
