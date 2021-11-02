@@ -2,6 +2,7 @@
 
 ## 3.10.8 - 2021-11-02
 > {tip} The cache should be manually refreshed following this update in order to ensure the fix is applied.
+
 ### Fixed
 - Fixed action URIs by switching to using absolute URIs in template tags ([#352](https://github.com/putyourlightson/craft-blitz/issues/352)).
 
