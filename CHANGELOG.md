@@ -1,8 +1,9 @@
 # Release Notes for Blitz
 
-## 3.10.8 - Unreleased
-### Changed
-- Changed action URIs to absolute URIs in template tags ([#352](https://github.com/putyourlightson/craft-blitz/issues/352)).
+## 3.10.8 - 2021-11-02
+> {tip} The cache should be manually refreshed following this update in order to ensure the fix is applied.
+### Fixed
+- Fixed action URIs by switching to using absolute URIs in template tags ([#352](https://github.com/putyourlightson/craft-blitz/issues/352)).
 
 ## 3.10.7 - 2021-10-23
 ### Fixed
