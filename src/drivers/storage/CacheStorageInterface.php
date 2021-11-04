@@ -21,10 +21,11 @@ interface CacheStorageInterface
     /**
      * Saves the cache value for the provided site and URI.
      *
-     * @param string $value
-     * @param SiteUriModel $siteUri
+     * @param string $value The value to be cached.
+     * @param SiteUriModel $siteUri The site URI that is being cached.
+     * @param int|null $duration The duration in seconds, to save the cached value.
      */
-    public function save(string $value, SiteUriModel $siteUri);
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null);
 
     /**
      * Deletes the cache values for the provided site URIs.

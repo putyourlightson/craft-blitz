@@ -334,7 +334,7 @@ class GenerateCacheService extends Component
             $output .= '<!-- Cached by Blitz on '.date('c').' -->';
         }
 
-        $this->saveOutput($output, $siteUri);
+        $this->saveOutput($output, $siteUri, $this->options->getCacheDuration());
 
         $mutex->release($lockName);
     }
@@ -344,12 +344,14 @@ class GenerateCacheService extends Component
      *
      * @param string $output
      * @param SiteUriModel $siteUri
+     * @param int|null $duration
      */
-    public function saveOutput(string $output, SiteUriModel $siteUri)
+    public function saveOutput(string $output, SiteUriModel $siteUri, int $duration = null)
     {
         $event = new SaveCacheEvent([
             'output' => $output,
             'siteUri' => $siteUri,
+            'duration' => $duration,
         ]);
         $this->trigger(self::EVENT_BEFORE_SAVE_CACHE, $event);
 
@@ -361,7 +363,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        Blitz::$plugin->cacheStorage->save($event->output, $event->siteUri);
+        Blitz::$plugin->cacheStorage->save($event->output, $event->siteUri, $event->duration);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);

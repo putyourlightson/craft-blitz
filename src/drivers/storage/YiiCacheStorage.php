@@ -89,7 +89,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function save(string $value, SiteUriModel $siteUri)
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null)
     {
         if ($this->_cache === null) {
             return;
@@ -99,7 +99,7 @@ class YiiCacheStorage extends BaseCacheStorage
         // https://github.com/putyourlightson/craft-blitz/issues/257
         $this->_cache->set([
             self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
-        ], $value);
+        ], $value, $duration);
     }
 
     /**

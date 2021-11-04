@@ -108,7 +108,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function save(string $value, SiteUriModel $siteUri)
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null)
     {
         $filePaths = $this->getFilePaths($siteUri);
 

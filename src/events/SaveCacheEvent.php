@@ -22,4 +22,9 @@ class SaveCacheEvent extends CancelableEvent
      * @var SiteUriModel
      */
     public $siteUri;
+
+    /**
+     * @var int|null
+     */
+    public $duration;
 }

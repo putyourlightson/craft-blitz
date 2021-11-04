@@ -11,6 +11,9 @@ use craft\helpers\StringHelper;
 use craft\validators\DateTimeValidator;
 use DateTime;
 
+/**
+ * @property int|null $cacheDuration
+ */
 class CacheOptionsModel extends Model
 {
     // Public Properties
@@ -50,6 +53,11 @@ class CacheOptionsModel extends Model
      * @var DateTime|null
      */
     public $expiryDate;
+
+    /**
+     * @var int|null
+     */
+    private $_cacheDuration;
 
 
     // Public Methods
@@ -92,6 +100,14 @@ class CacheOptionsModel extends Model
             [['paginate'], 'integer'],
             [['expiryDate'], DateTimeValidator::class],
         ];
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getCacheDuration()
+    {
+        return $this->_cacheDuration;
     }
 
     /**
@@ -149,14 +165,16 @@ class CacheOptionsModel extends Model
      */
     public function cacheDuration($value): self
     {
-        // Set default cache duration if greater than 0
+        // Set cache duration if greater than 0 seconds
         $cacheDuration = ConfigHelper::durationInSeconds($value);
 
         if ($cacheDuration > 0) {
-            $cacheDuration += time();
+            $this->_cacheDuration = $cacheDuration;
+
+            $timestamp = $cacheDuration + time();
 
             // Prepend with @ symbol to specify a timestamp
-            $this->expiryDate = new DateTime('@'.$cacheDuration);
+            $this->expiryDate = new DateTime('@'.$timestamp);
         }
 
         return $this;

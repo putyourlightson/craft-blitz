@@ -40,6 +40,11 @@ class YiiCacheStorageTest extends Unit
     private $siteUri;
 
     /**
+     * @var int
+     */
+    private $duration = 60;
+
+    /**
      * @var string
      */
     private $output = 'xyz';
@@ -68,7 +73,7 @@ class YiiCacheStorageTest extends Unit
             'uri' => 'möbelträgerfüße',
         ]);
 
-        Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri);
+        Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri, $this->duration);
     }
 
     // Public methods

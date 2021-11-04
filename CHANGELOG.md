@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.10.9 - Unreleased
+### Added
+- Added a duration to the Yii cache storage driver that is set from the value of the cache options `cacheDuration` property, which defaults to the `cacheDuration` config setting ([#353](https://github.com/putyourlightson/craft-blitz/issues/353)).
+
 ## 3.10.8 - 2021-11-02
 > {tip} The cache should be manually refreshed following this update in order to ensure the fix is applied.
 
