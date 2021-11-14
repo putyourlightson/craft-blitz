@@ -119,6 +119,8 @@ class CacheRequestTest extends Unit
 
     public function testGetRequestedCacheableSiteUriWithPageTrigger()
     {
+        Craft::$app->config->general->pageTrigger = 'p';
+
         // Mock a URL request
         $this->_mockRequest($this->siteUri->getUrl().'/'.Craft::$app->config->general->pageTrigger.'1');
 

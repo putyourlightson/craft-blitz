@@ -4,6 +4,9 @@
 ### Added
 - Added a duration to the Yii cache storage driver that is set from the value of the cache options `cacheDuration` property, which defaults to the `cacheDuration` config setting ([#353](https://github.com/putyourlightson/craft-blitz/issues/353)).
 
+### Fixed
+- Fixed a bug in the element changed behavior logic that was not detecting modified fields and attributes in updated entries and therefore not refreshing cached pages in Craft 3.7.5 and above.
+
 ## 3.10.8 - 2021-11-02
 > {tip} The cache should be manually refreshed following this update in order to ensure the fix is applied.
 

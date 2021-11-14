@@ -79,20 +79,56 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasChanged(): bool
     {
-        // TODO: remove in 4.0.0
-        // Detection of changes not possible before Craft 3.4, therefore assume true
-        if (version_compare(Craft::$app->getVersion(), '3.4', '<')) {
+        $version = Craft::$app->getVersion();
+
+        /**
+         * Detection of changes are not possible before Craft 3.4, therefore
+         * we always assume true.
+         * TODO: remove in 4.0.0
+         */
+        if (version_compare($version, '3.4', '<')) {
             return true;
         }
 
-        // TODO: remove in 4.0.0
-        if (version_compare(Craft::$app->getVersion(), '3.7.0', '>=')) {
-            // Detection of first save not possible before Craft 3.7.5, therefore assume true
-            if (version_compare(Craft::$app->getVersion(), '3.7.5', '<')) {
+        /**
+         * Before Craft 3.7, it is sufficient to check whether the element being saved
+         * has any dirty attributes or fields.
+         * TODO: remove in 4.0.0
+         */
+        if (version_compare($version, '3.7', '<')) {
+            if (!empty($this->owner->getDirtyAttributes()) || !empty($this->owner->getDirtyFields())) {
                 return true;
             }
-            elseif ($this->owner->firstSave) {
+        }
+
+        /**
+         * Detection of first save is not possible before Craft 3.7.5, therefore
+         * we always assume true.
+         * TODO: remove in 4.0.0
+         */
+        if (version_compare($version, '3.7.0', '>=')
+            && version_compare($version, '3.7.5', '<')
+        ) {
+            return true;
+        }
+
+        /**
+         * Craft 3.7.5 introduced detection of first save. Craft 3.7 saves canonical
+         * entries by duplicating a draft or revision, so we need to check whether
+         * the original element has any modified attributes or fields.
+         * TODO: remove in 4.0.0
+         */
+        if (version_compare($version, '3.7.5', '>=')) {
+            if ($this->owner->firstSave) {
                 return true;
+            }
+
+            $original = $this->owner->duplicateOf;
+
+            if ($original !== null) {
+                if (!empty($original->getModifiedAttributes()) || !empty($original->getModifiedFields())) {
+                    return true;
+                }
             }
         }
 
@@ -101,10 +137,6 @@ class ElementChangedBehavior extends Behavior
         }
 
         if ($this->getHasStatusChanged()) {
-            return true;
-        }
-
-        if (!empty($this->owner->getDirtyAttributes()) || !empty($this->owner->getDirtyFields())) {
             return true;
         }
 
