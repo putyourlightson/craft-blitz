@@ -79,6 +79,7 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasChanged(): bool
     {
+        $element = $this->owner;
         $version = Craft::$app->getVersion();
 
         /**
@@ -96,7 +97,7 @@ class ElementChangedBehavior extends Behavior
          * TODO: remove in 4.0.0
          */
         if (version_compare($version, '3.7', '<')) {
-            if (!empty($this->owner->getDirtyAttributes()) || !empty($this->owner->getDirtyFields())) {
+            if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
                 return true;
             }
         }
@@ -113,17 +114,22 @@ class ElementChangedBehavior extends Behavior
         }
 
         /**
-         * Craft 3.7.5 introduced detection of first save. Craft 3.7 saves canonical
-         * entries by duplicating a draft or revision, so we need to check whether
-         * the original element has any modified attributes or fields.
+         * Craft 3.7.5 introduced detection of first save. Craft 3.7 can save
+         * canonical entries by duplicating a draft or revision, so we need to
+         * additionally check whether the original element has any modified
+         * attributes or fields.
          * TODO: remove in 4.0.0
          */
         if (version_compare($version, '3.7.5', '>=')) {
-            if ($this->owner->firstSave) {
+            if ($element->firstSave) {
                 return true;
             }
 
-            $original = $this->owner->duplicateOf;
+            if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
+                return true;
+            }
+
+            $original = $element->duplicateOf;
 
             if ($original !== null) {
                 if (!empty($original->getModifiedAttributes()) || !empty($original->getModifiedFields())) {
