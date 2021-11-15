@@ -184,11 +184,18 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element)
     {
-        // Don't proceed if not an Element, if propagating, or if the element is an asset that is being indexed
-        if (!($element instanceof Element)
-            || $element->propagating
-            || ($element instanceof Asset && $element->getScenario() == Asset::SCENARIO_INDEX)
-        ) {
+        // Don't proceed if not an actual element
+        if (!($element instanceof Element)) {
+            return;
+        }
+
+        // Don't proceed if the element is an asset that is being indexed
+        if ($element instanceof Asset && $element->getScenario() == Asset::SCENARIO_INDEX) {
+            return;
+        }
+
+        // Don't proceed if propagating
+        if ($element->propagating) {
             return;
         }
 
@@ -233,7 +240,7 @@ class RefreshCacheService extends Component
                 return;
             }
 
-            // Don't proceed if element status has not changed and is not live or expired (and the config setting allows). Refreshing expired elements is necessary so as to clear cached pages (https://github.com/putyourlightson/craft-blitz/issues/267).
+            // Don't proceed if element status has not changed and is not live or expired (and the config setting allows). Refreshing expired elements is necessary to clear cached pages (https://github.com/putyourlightson/craft-blitz/issues/267).
             if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive
                 && !$elementChanged->getHasStatusChanged()
                 && !$elementChanged->getHasLiveOrExpiredStatus()
