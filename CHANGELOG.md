@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.11.1 - Unreleased
+### Changed
+- The refresh cache job now ignores exceptions when executing element queries ([#355](https://github.com/putyourlightson/craft-blitz/issues/355)).
+
 ## 3.11.0 - 2021-11-15
 ### Added
 - Added a duration to the Yii cache storage driver that is set from the value of the cache options `cacheDuration` property, which defaults to the `cacheDuration` config setting ([#353](https://github.com/putyourlightson/craft-blitz/issues/353)).

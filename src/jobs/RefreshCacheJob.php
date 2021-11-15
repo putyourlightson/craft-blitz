@@ -19,6 +19,7 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use Throwable;
+use yii\db\Exception as DbException;
 use yii\queue\RetryableJobInterface;
 
 /**
@@ -239,9 +240,15 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             $elementQuery->offset(null);
         }
 
-        // If one or more of the element IDs are in the element query's IDs
-        $elementQueryIds = $elementQuery->ids();
+        $elementQueryIds = [];
 
+        // Execute the element query, ignoring any exceptions.
+        try {
+            $elementQueryIds = $elementQuery->ids();
+        }
+        catch (DbException $exception) {}
+
+        // If one or more of the element IDs are in the element query's IDs
         if (!empty(array_intersect($elementIds, $elementQueryIds))) {
             // Get related element query cache records
             /** @var ElementQueryCacheRecord[] $elementQueryCacheRecords */
