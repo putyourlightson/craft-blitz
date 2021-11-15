@@ -8,6 +8,7 @@ namespace putyourlightson\blitztests\unit\controllers;
 use Codeception\Test\Unit;
 use Craft;
 use putyourlightson\blitz\Blitz;
+use yii\base\InvalidRouteException;
 
 /**
  * @author    PutYourLightsOn

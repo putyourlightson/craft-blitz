@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
-## 3.10.9 - Unreleased
+## 3.11.0 - 2021-11-15
 ### Added
 - Added a duration to the Yii cache storage driver that is set from the value of the cache options `cacheDuration` property, which defaults to the `cacheDuration` config setting ([#353](https://github.com/putyourlightson/craft-blitz/issues/353)).
+
+### Changed
+- Changed the SEOmatic integration to no longer trigger a refresh of single URIs, since Blitz takes care of those cases.  
 
 ### Fixed
 - Fixed a bug in the element changed behavior logic that was not detecting modified fields and attributes in updated entries and therefore not refreshing cached pages in Craft 3.7.5 and above.

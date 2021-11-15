@@ -38,11 +38,11 @@ class SeomaticIntegration extends BaseIntegration
         Event::on(MetaContainers::class, MetaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
             function(InvalidateContainerCachesEvent $event) {
                 if ($event->uri === null && $event->siteId === null && $event->sourceId === null && $event->sourceType === null) {
-                    // Refresh all cache
+                    // Refresh the entire cache.
                     Blitz::$plugin->refreshCache->refreshAll();
                 }
                 elseif ($event->uri === null && $event->siteId !== null && $event->sourceId !== null && $event->sourceType !== null) {
-                    // Refresh cache for source
+                    // Refresh the cache for the provided source only.
                     /** @var ElementQuery $elementQuery */
                     $elementQuery = self::_getElementQuery($event->siteId, $event->sourceId, $event->sourceType);
                     $elementIds = $elementQuery->ids();
@@ -55,16 +55,7 @@ class SeomaticIntegration extends BaseIntegration
                         }
                     }
                 }
-                elseif ($event->uri !== null && $event->siteId !== null && $event->sourceId === null && $event->sourceType === null) {
-                    // Refresh cache for URI
-                    if ($cacheIds = self::_getCacheIdsFromUri($event->uri, $event->siteId)) {
-                        Blitz::$plugin->refreshCache->addCacheIds($cacheIds);
-
-                        if (Blitz::$plugin->refreshCache->batchMode === false) {
-                            Blitz::$plugin->refreshCache->refresh();
-                        }
-                    }
-                }
+                // Don't refresh cache for single URIs, since Blitz takes care of that for us.
             }
         );
     }
