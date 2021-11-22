@@ -30,7 +30,9 @@ var Blitz = (function () {
                     return response.text();
                 }
             })
-                .then(function (response) { return _this.replaceUrls(urls[key], response); });
+                .then(function (response) {
+                _this.replaceUrls(urls[key], response);
+            });
         };
         for (var key in urls) {
             _loop_1(key);

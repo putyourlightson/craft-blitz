@@ -42,7 +42,9 @@ class Blitz {
                         return response.text();
                     }
                 })
-                .then(response => this.replaceUrls(urls[key], response));
+                .then(response => {
+                    this.replaceUrls(urls[key], response);
+                });
         }
     }
 
