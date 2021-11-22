@@ -1,78 +1,69 @@
-var Blitz = {};
-
-// The event name will be replaced with the `injectScriptEvent` config setting.
-document.addEventListener('{injectScriptEvent}', blitzInject);
-
-function blitzInject() {
-    'use strict';
-
-    Blitz = {
-        inject: {
-            data: document.querySelectorAll('.blitz-inject:not(.blitz-inject--injected)'),
-            loaded: 0
-        }
-    };
-
-    // Use IE compatible events (https://caniuse.com/#feat=customevent)
-    var beforeBlitzInjectAll = document.createEvent('CustomEvent');
-    beforeBlitzInjectAll.initCustomEvent('beforeBlitzInjectAll', false, true, null);
-
-    if (!document.dispatchEvent(beforeBlitzInjectAll)) {
-        return;
-    }
-
-    // Use IE compatible for loop
-    for (var i = 0; i < Blitz.inject.data.length; i++) {
-        var data = Blitz.inject.data[i];
-
-        var values = {
-            id: data.getAttribute('data-blitz-id'),
-            uri: data.getAttribute('data-blitz-uri'),
-            params: data.getAttribute('data-blitz-params')
-        };
-
-        var beforeBlitzInject = document.createEvent('CustomEvent');
-        beforeBlitzInject.initCustomEvent('beforeBlitzInject', false, true, values);
-
-        if (!document.dispatchEvent(beforeBlitzInject)) {
+var Blitz = (function () {
+    function Blitz() {
+        var _this = this;
+        this.processed = 0;
+        var beforeBlitzInjectAll = document.createEvent('CustomEvent');
+        beforeBlitzInjectAll.initCustomEvent('beforeBlitzInjectAll', false, true, null);
+        if (!document.dispatchEvent(beforeBlitzInjectAll)) {
             return;
         }
-
-        blitzReplace(values);
+        var urls = {};
+        var elements = document.querySelectorAll('.blitz-inject:not(.blitz-inject--injected)');
+        this.elementsToProcess = elements.length;
+        elements.forEach(function (element) {
+            var _a;
+            var priority = element.getAttribute('data-blitz-priority');
+            var url = {
+                id: element.getAttribute('data-blitz-id'),
+                uri: element.getAttribute('data-blitz-uri'),
+                params: element.getAttribute('data-blitz-params'),
+                response: '',
+            };
+            var beforeBlitzInject = document.createEvent('CustomEvent');
+            beforeBlitzInject.initCustomEvent('beforeBlitzInject', false, true, url);
+            if (!document.dispatchEvent(beforeBlitzInject)) {
+                return;
+            }
+            var key = url.uri + (url.params && '?' + url.params);
+            urls[key] = (_a = urls[key]) !== null && _a !== void 0 ? _a : [];
+            urls[key].push(url);
+        });
+        var _loop_1 = function (key) {
+            fetch(key)
+                .then(function (response) {
+                if (response.status >= 200 && response.status < 300) {
+                    return response.text();
+                }
+            })
+                .then(function (response) { return _this.replaceUrls(urls[key], response); });
+        };
+        for (var key in urls) {
+            _loop_1(key);
+        }
     }
-}
-
-function blitzReplace(values) {
-    'use strict';
-
-    var xhr = new XMLHttpRequest();
-    xhr.onload = function() {
-        if (this.status >= 200 && this.status < 300) {
-            var element = document.getElementById('blitz-inject-' + values.id);
-
+    Blitz.prototype.replaceUrls = function (urls, response) {
+        var _this = this;
+        urls.forEach(function (url) {
+            url.response = response;
+            var element = document.getElementById('blitz-inject-' + url.id);
             if (element) {
-                values.element = element;
-                values.responseText = this.responseText;
-
-                element.innerHTML = this.responseText;
+                element.innerHTML = response;
                 element.classList.add('blitz-inject--injected');
             }
-
             var afterBlitzInject = document.createEvent('CustomEvent');
-            afterBlitzInject.initCustomEvent('afterBlitzInject', false, false, values);
+            afterBlitzInject.initCustomEvent('afterBlitzInject', false, false, url);
             document.dispatchEvent(afterBlitzInject);
-        }
-
-        Blitz.inject.loaded++;
-
-        if (Blitz.inject.loaded >= Blitz.inject.data.length) {
+            _this.processed++;
+        });
+        if (this.processed >= this.elementsToProcess) {
             var afterBlitzInjectAll = document.createEvent('CustomEvent');
             afterBlitzInjectAll.initCustomEvent('afterBlitzInjectAll', false, false, null);
             document.dispatchEvent(afterBlitzInjectAll);
         }
     };
-
-    xhr.open("GET", values.uri + (values.params && "?" + values.params));
-    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
-    xhr.send();
-}
+    return Blitz;
+}());
+;
+document.addEventListener('{injectScriptEvent}', function () {
+    new Blitz();
+});

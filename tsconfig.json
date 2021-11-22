@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "target": "ES5",
+    "removeComments": true,
+  },
+  "include": [
+    "./src/resources/js/*.ts"
+  ]
+}

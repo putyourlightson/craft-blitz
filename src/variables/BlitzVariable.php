@@ -29,7 +29,6 @@ class BlitzVariable
      *
      * @param string $uri
      * @param array $params
-     *
      * @return Markup
      */
     public function getUri(string $uri, array $params = []): Markup
@@ -44,7 +43,6 @@ class BlitzVariable
      *
      * @param string $template
      * @param array $params
-     *
      * @return Markup
      */
     public function getTemplate(string $template, array $params = []): Markup
@@ -151,11 +149,10 @@ class BlitzVariable
     // =========================================================================
 
     /**
-     * Returns a script to inject the output of a URI into a div.
+     * Returns a script to inject the output of a URI.
      *
      * @param string $uri
      * @param array $params
-     *
      * @return Markup
      */
     private function _getScript(string $uri, array $params = []): Markup
@@ -172,6 +169,8 @@ class BlitzVariable
             }
         }
 
+        // Register polyfills for Fetch and Promise for IE11 support.
+        $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise');
         $view->registerJs($js, View::POS_END);
 
         $this->_injected++;
@@ -183,9 +182,9 @@ class BlitzVariable
             'params' => http_build_query($params),
         ];
 
-        array_walk($data, function(&$value, $key) {
+        foreach ($data as $key => &$value) {
             $value = 'data-blitz-'.$key.'="'.$value.'"';
-        });
+        }
 
         $output = '<span class="blitz-inject" id="blitz-inject-'.$id.'" '.implode(' ', $data).'></span>';
 
