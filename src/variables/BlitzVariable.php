@@ -169,8 +169,9 @@ class BlitzVariable
             }
         }
 
-        // Register polyfills for Fetch and Promise for IE11 support.
-        $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise');
+        // Register polyfills for Fetch and Promise in IE11 only.
+        // https://3perf.com/blog/polyfills/#modulenomodule
+        $view->registerJsFile('https://polyfill.io/v3/polyfill.min.js?features=fetch%2CPromise', ['nomodule' => true]);
         $view->registerJs($js, View::POS_END);
 
         $this->_injected++;
