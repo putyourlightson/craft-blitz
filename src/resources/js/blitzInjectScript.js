@@ -2,9 +2,7 @@ var Blitz = (function () {
     function Blitz() {
         var _this = this;
         this.processed = 0;
-        var beforeBlitzInjectAll = document.createEvent('CustomEvent');
-        beforeBlitzInjectAll.initCustomEvent('beforeBlitzInjectAll', false, true, null);
-        if (!document.dispatchEvent(beforeBlitzInjectAll)) {
+        if (!document.dispatchEvent(new CustomEvent('beforeBlitzInjectAll', { cancelable: true }))) {
             return;
         }
         var urls = {};
@@ -17,11 +15,8 @@ var Blitz = (function () {
                 id: element.getAttribute('data-blitz-id'),
                 uri: element.getAttribute('data-blitz-uri'),
                 params: element.getAttribute('data-blitz-params'),
-                response: '',
             };
-            var beforeBlitzInject = document.createEvent('CustomEvent');
-            beforeBlitzInject.initCustomEvent('beforeBlitzInject', false, true, url);
-            if (!document.dispatchEvent(beforeBlitzInject)) {
+            if (!document.dispatchEvent(new CustomEvent('beforeBlitzInject', { cancelable: true, detail: url }))) {
                 return;
             }
             var key = url.uri + (url.params && '?' + url.params);
@@ -44,21 +39,16 @@ var Blitz = (function () {
     Blitz.prototype.replaceUrls = function (urls, response) {
         var _this = this;
         urls.forEach(function (url) {
-            url.response = response;
             var element = document.getElementById('blitz-inject-' + url.id);
             if (element) {
                 element.innerHTML = response;
                 element.classList.add('blitz-inject--injected');
             }
-            var afterBlitzInject = document.createEvent('CustomEvent');
-            afterBlitzInject.initCustomEvent('afterBlitzInject', false, false, url);
-            document.dispatchEvent(afterBlitzInject);
+            document.dispatchEvent(new CustomEvent('afterBlitzInject', { detail: url }));
             _this.processed++;
         });
         if (this.processed >= this.elementsToProcess) {
-            var afterBlitzInjectAll = document.createEvent('CustomEvent');
-            afterBlitzInjectAll.initCustomEvent('afterBlitzInjectAll', false, false, null);
-            document.dispatchEvent(afterBlitzInjectAll);
+            document.dispatchEvent(new CustomEvent('afterBlitzInjectAll'));
         }
     };
     return Blitz;
