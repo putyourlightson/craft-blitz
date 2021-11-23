@@ -9,7 +9,7 @@ class Blitz {
     processed: number = 0;
 
     constructor() {
-        if (!document.dispatchEvent(new CustomEvent('beforeBlitzInjectAll', {cancelable: true}))) {
+        if (!document.dispatchEvent(new CustomEvent('beforeBlitzInjectAll', { cancelable: true }))) {
             return;
         }
 
@@ -25,7 +25,7 @@ class Blitz {
                 params: element.getAttribute('data-blitz-params'),
             };
 
-            if (!document.dispatchEvent(new CustomEvent('beforeBlitzInject', {cancelable: true, detail: url}))) {
+            if (!document.dispatchEvent(new CustomEvent('beforeBlitzInject', { cancelable: true, detail: url }))) {
                 return;
             }
 
@@ -56,7 +56,7 @@ class Blitz {
                 element.classList.add('blitz-inject--injected');
             }
 
-            document.dispatchEvent(new CustomEvent('afterBlitzInject', {detail: url}));
+            document.dispatchEvent(new CustomEvent('afterBlitzInject', { detail: url }));
             this.processed++;
         });
 
