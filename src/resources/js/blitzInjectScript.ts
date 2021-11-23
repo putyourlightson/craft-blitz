@@ -2,6 +2,8 @@ interface Url {
   id: string;
   uri: string;
   params: string;
+  element: Element;
+  response: string;
 }
 
 class Blitz {
@@ -23,6 +25,8 @@ class Blitz {
                 id: element.getAttribute('data-blitz-id'),
                 uri: element.getAttribute('data-blitz-uri'),
                 params: element.getAttribute('data-blitz-params'),
+                element: null,
+                response: null,
             };
 
             if (!document.dispatchEvent(new CustomEvent('beforeBlitzInject', { cancelable: true, detail: url }))) {
@@ -52,9 +56,12 @@ class Blitz {
         urls.forEach(url => {
             const element = document.getElementById('blitz-inject-' + url.id);
             if (element) {
+                url.element = element;
                 element.innerHTML = response;
                 element.classList.add('blitz-inject--injected');
             }
+
+            url.response = response;
 
             document.dispatchEvent(new CustomEvent('afterBlitzInject', { detail: url }));
             this.processed++;

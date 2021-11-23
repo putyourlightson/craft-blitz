@@ -15,6 +15,8 @@ var Blitz = (function () {
                 id: element.getAttribute('data-blitz-id'),
                 uri: element.getAttribute('data-blitz-uri'),
                 params: element.getAttribute('data-blitz-params'),
+                element: null,
+                response: null,
             };
             if (!document.dispatchEvent(new CustomEvent('beforeBlitzInject', { cancelable: true, detail: url }))) {
                 return;
@@ -43,9 +45,11 @@ var Blitz = (function () {
         urls.forEach(function (url) {
             var element = document.getElementById('blitz-inject-' + url.id);
             if (element) {
+                url.element = element;
                 element.innerHTML = response;
                 element.classList.add('blitz-inject--injected');
             }
+            url.response = response;
             document.dispatchEvent(new CustomEvent('afterBlitzInject', { detail: url }));
             _this.processed++;
         });
