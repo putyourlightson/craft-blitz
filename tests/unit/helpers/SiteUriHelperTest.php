@@ -9,7 +9,7 @@ use Codeception\Test\Unit;
 use Craft;
 use craft\models\Site;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitztests\fixtures\SitesFixture;
+use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
 
 /**
@@ -56,6 +56,17 @@ class SiteUriHelperTest extends Unit
 
     // Public methods
     // =========================================================================
+
+    public function testGetMimeType()
+    {
+        $siteUri = new SiteUriModel(['siteId' => 1]);
+
+        $siteUri->uri = 'xyz.txt';
+        $this->assertEquals('text/plain', SiteUriHelper::getMimeType($siteUri));
+
+        $siteUri->uri = 'xyz?test.txt';
+        $this->assertEquals(SiteUriHelper::MIME_TYPE_HTML, SiteUriHelper::getMimeType($siteUri));
+    }
 
     public function testGetSiteUriFromUrl()
     {
