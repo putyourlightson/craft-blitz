@@ -38,7 +38,14 @@ class SiteUriHelper
      */
     public static function getMimeType(SiteUriModel $siteUri): string
     {
-        return FileHelper::getMimeTypeByExtension($siteUri->uri) ?? self::MIME_TYPE_HTML;
+        $uri = $siteUri->uri;
+
+        // Remove any query string from the URI
+        if (strpos($uri, '?') !== false) {
+            $uri = substr($uri, 0, strpos($uri, '?'));
+        }
+
+        return FileHelper::getMimeTypeByExtension($uri) ?? self::MIME_TYPE_HTML;
     }
 
     /**

@@ -236,7 +236,7 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the response of a given site URI if cached.
+     * Returns the response of a given site URI, if cached.
      *
      * @param SiteUriModel $siteUri
      *
@@ -280,7 +280,7 @@ class CacheRequestService extends Component
             $headers->set(Blitz::$plugin->cachePurger->tagHeaderName, $tagsHeader);
         }
 
-        // Get the mime type from the URI
+        // Get the mime type from the site URI
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
         if ($mimeType != SiteUriHelper::MIME_TYPE_HTML) {

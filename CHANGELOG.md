@@ -5,6 +5,9 @@
 - The dynamic content inject script now only makes a single AJAX request per unique URL, including CSRF inputs and tokens ([#329](https://github.com/putyourlightson/craft-blitz/issues/329)).
 - The refresh cache job now ignores exceptions when executing element queries ([#355](https://github.com/putyourlightson/craft-blitz/issues/355)).
 
+### Fixed
+- Fixed a bug in which the query string was not being removed from a requested URI before determining the mime type.
+
 ## 3.11.0 - 2021-11-15
 ### Added
 - Added a duration to the Yii cache storage driver that is set from the value of the cache options `cacheDuration` property, which defaults to the `cacheDuration` config setting ([#353](https://github.com/putyourlightson/craft-blitz/issues/353)).
