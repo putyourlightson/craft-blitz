@@ -52,7 +52,7 @@ class BlitzVariable
             throw new NotFoundHttpException('Template not found: '.$template);
         }
 
-        $uri = 'blitz/templates/get';
+        $uri = $this->_getActionUrl('blitz/templates/get');
 
         // Hash the template
         $template = Craft::$app->getSecurity()->hashData($template);
@@ -74,7 +74,7 @@ class BlitzVariable
      */
     public function csrfInput(): Markup
     {
-        $uri = 'blitz/csrf/input';
+        $uri = $this->_getActionUrl('blitz/csrf/input');
 
         return $this->_getScript($uri);
     }
@@ -86,7 +86,7 @@ class BlitzVariable
      */
     public function csrfParam(): Markup
     {
-        $uri = 'blitz/csrf/param';
+        $uri = $this->_getActionUrl('blitz/csrf/param');
 
         return $this->_getScript($uri);
     }
@@ -98,7 +98,7 @@ class BlitzVariable
      */
     public function csrfToken(): Markup
     {
-        $uri = 'blitz/csrf/token';
+        $uri = $this->_getActionUrl('blitz/csrf/token');
 
         return $this->_getScript($uri);
     }
@@ -149,6 +149,17 @@ class BlitzVariable
     // =========================================================================
 
     /**
+     * Returns an absolute action URL for a URI.
+     *
+     * @param string $uri
+     * @return string
+     */
+    private function _getActionUrl(string $uri): string
+    {
+        return UrlHelper::actionUrl($uri, null, null, false);
+    }
+
+    /**
      * Returns a script to inject the output of a URI.
      *
      * @param string $uri
@@ -183,7 +194,7 @@ class BlitzVariable
 
         $data = [
             'id' => $id,
-            'uri' => UrlHelper::actionUrl($uri, null, null, false),
+            'uri' => $uri,
             'params' => http_build_query($params),
         ];
 

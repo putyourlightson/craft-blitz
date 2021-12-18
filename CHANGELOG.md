@@ -6,6 +6,7 @@
 - The refresh cache job now ignores exceptions when executing element queries ([#355](https://github.com/putyourlightson/craft-blitz/issues/355)).
 
 ### Fixed
+- Fixed a bug in which the URI passed into `craft.blitz.getUri()` was being converted into an action URL ([#361](https://github.com/putyourlightson/craft-blitz/issues/361)).
 - Fixed a bug in which the query string was not being removed from a requested URI before determining the mime type.
 
 ## 3.11.0 - 2021-11-15
