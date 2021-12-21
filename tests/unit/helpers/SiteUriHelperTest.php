@@ -71,8 +71,8 @@ class SiteUriHelperTest extends Unit
     public function testGetSiteUriFromUrl()
     {
         $siteUri = SiteUriHelper::getSiteUriFromUrl($this->secondarySite->getBaseUrl().'page');
-
-        $this->assertEquals($this->secondarySite->id, $siteUri->siteId);
+        $siteId = Craft::$app->sites->getSiteByHandle('secondary')->id;
+        $this->assertEquals($siteId, $siteUri->siteId);
     }
 
     public function testIsPaginatedUri()
