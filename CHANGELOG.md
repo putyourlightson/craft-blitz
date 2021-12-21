@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.11.1 - Unreleased
+## 3.11.1 - 2021-12-21
 ### Changed
 - The dynamic content inject script now only makes a single AJAX request per unique URL, including CSRF inputs and tokens ([#329](https://github.com/putyourlightson/craft-blitz/issues/329)).
 - The refresh cache job now ignores exceptions when executing element queries ([#355](https://github.com/putyourlightson/craft-blitz/issues/355)).

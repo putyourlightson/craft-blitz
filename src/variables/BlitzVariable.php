@@ -74,9 +74,7 @@ class BlitzVariable
      */
     public function csrfInput(): Markup
     {
-        $uri = $this->_getActionUrl('blitz/csrf/input');
-
-        return $this->_getScript($uri);
+        return $this->_getCsrfScript('input');
     }
 
     /**
@@ -86,9 +84,7 @@ class BlitzVariable
      */
     public function csrfParam(): Markup
     {
-        $uri = $this->_getActionUrl('blitz/csrf/param');
-
-        return $this->_getScript($uri);
+        return $this->_getCsrfScript('param');
     }
 
     /**
@@ -98,9 +94,7 @@ class BlitzVariable
      */
     public function csrfToken(): Markup
     {
-        $uri = $this->_getActionUrl('blitz/csrf/token');
-
-        return $this->_getScript($uri);
+        return $this->_getCsrfScript('token');
     }
 
     /**
@@ -160,13 +154,27 @@ class BlitzVariable
     }
 
     /**
+     * Returns a script to inject the output of a CSRF property.
+     *
+     * @param string $property
+     * @return Markup
+     */
+    private function _getCsrfScript(string $property): Markup
+    {
+        $uri = $this->_getActionUrl('blitz/csrf/json');
+
+        return $this->_getScript($uri, [], $property);
+    }
+
+    /**
      * Returns a script to inject the output of a URI.
      *
      * @param string $uri
      * @param array $params
+     * @param string|null $property
      * @return Markup
      */
-    private function _getScript(string $uri, array $params = []): Markup
+    private function _getScript(string $uri, array $params = [], string $property = null): Markup
     {
         $view = Craft::$app->getView();
         $js = '';
@@ -196,6 +204,7 @@ class BlitzVariable
             'id' => $id,
             'uri' => $uri,
             'params' => http_build_query($params),
+            'property' => $property,
         ];
 
         foreach ($data as $key => &$value) {

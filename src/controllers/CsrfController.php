@@ -55,4 +55,18 @@ class CsrfController extends Controller
     {
         return $this->asRaw(Craft::$app->getRequest()->getCsrfToken());
     }
+
+    /**
+     * Returns all CSRF options in a single JSON response.
+     *
+     * @return Response
+     */
+    public function actionJson(): Response
+    {
+        return $this->asJson([
+            'input' => $this->actionInput()->data,
+            'param' => $this->actionParam()->data,
+            'token' => $this->actionToken()->data,
+        ]);
+    }
 }

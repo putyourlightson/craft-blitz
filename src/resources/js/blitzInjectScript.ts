@@ -1,79 +1,75 @@
-interface Url {
-  id: string;
-  uri: string;
-  params: string;
-  element: Element;
-  response: string;
+// The event name will be replaced with the `injectScriptEvent` config setting.
+document.addEventListener('{injectScriptEvent}', injectElements);
+
+interface InjectElement {
+    element: Element;
+    id: string;
+    uri: string;
+    params: string;
+    property: string;
 }
 
-class Blitz {
-    elementsToProcess: number;
-    processed: number = 0;
-
-    constructor() {
-        if (!document.dispatchEvent(new CustomEvent('beforeBlitzInjectAll', { cancelable: true }))) {
-            return;
-        }
-
-        const urls = {};
-        const elements = document.querySelectorAll('.blitz-inject:not(.blitz-inject--injected)');
-        this.elementsToProcess = elements.length;
-
-        elements.forEach(element => {
-            const priority = element.getAttribute('data-blitz-priority');
-            const url: Url = {
-                id: element.getAttribute('data-blitz-id'),
-                uri: element.getAttribute('data-blitz-uri'),
-                params: element.getAttribute('data-blitz-params'),
-                element: null,
-                response: null,
-            };
-
-            if (!document.dispatchEvent(new CustomEvent('beforeBlitzInject', { cancelable: true, detail: url }))) {
-                return;
-            }
-
-            const key = url.uri + (url.params && '?' + url.params);
-            urls[key] = urls[key] ?? [];
-            urls[key].push(url);
-        });
-
-        for (const key in urls) {
-            // Use fetch over XMLHttpRequest and register polyfills for IE11.
-            fetch(key)
-                .then(response => {
-                    if (response.status >= 200 && response.status < 300) {
-                        return response.text();
-                    }
-                })
-                .then(response => {
-                    this.replaceUrls(urls[key], response);
-                });
-        }
+async function injectElements()
+{
+    if (!document.dispatchEvent(new CustomEvent('beforeBlitzInjectAll', { cancelable: true }))) {
+        return;
     }
 
-    replaceUrls(urls: Url[], response: string) {
-        urls.forEach(url => {
-            const element = document.getElementById('blitz-inject-' + url.id);
-            if (element) {
-                url.element = element;
-                element.innerHTML = response;
-                element.classList.add('blitz-inject--injected');
-            }
+    const elements = document.querySelectorAll('.blitz-inject:not(.blitz-inject--injected)');
+    const injectElements = {};
+    const promises = [];
 
-            url.response = response;
+    elements.forEach(element => {
+        const priority = element.getAttribute('data-blitz-priority');
+        const injectElement: InjectElement = {
+            element: element,
+            id: element.getAttribute('data-blitz-id'),
+            uri: element.getAttribute('data-blitz-uri'),
+            params: element.getAttribute('data-blitz-params'),
+            property: element.getAttribute('data-blitz-property'),
+        };
 
-            document.dispatchEvent(new CustomEvent('afterBlitzInject', { detail: url }));
-            this.processed++;
-        });
-
-        if (this.processed >= this.elementsToProcess) {
-            document.dispatchEvent(new CustomEvent('afterBlitzInjectAll'));
+        if (document.dispatchEvent(new CustomEvent('beforeBlitzInject', { cancelable: true, detail: injectElement }))) {
+            const url = injectElement.uri + (injectElement.params && '?' + injectElement.params);
+            injectElements[url] = injectElements[url] ?? [];
+            injectElements[url].push(injectElement);
         }
-    }
-};
+    });
 
-// The event name will be replaced with the `injectScriptEvent` config setting.
-document.addEventListener('{injectScriptEvent}', () => {
-    new Blitz();
-});
+    for (const url in injectElements) {
+        promises.push(replaceUrls(url, injectElements[url]));
+    }
+
+    await Promise.all(promises);
+
+    document.dispatchEvent(new CustomEvent('afterBlitzInjectAll'));
+}
+
+async function replaceUrls(url: string, injectElements: InjectElement[])
+{
+    const response = await fetch(url);
+
+    if (response.status >= 300) {
+        return null;
+    }
+
+    const responseText = await response.text();
+    let responseJson;
+
+    if (url.indexOf('blitz/csrf/json') !== -1) {
+        responseJson = JSON.parse(responseText);
+    }
+
+    injectElements.forEach(injectElement => {
+        if (injectElement.property) {
+             injectElement.element.innerHTML = responseJson[injectElement.property] ?? '';
+        }
+        else {
+            injectElement.element.innerHTML = responseText;
+        }
+
+        injectElement.element.classList.add('blitz-inject--injected');
+
+        document.dispatchEvent(new CustomEvent('afterBlitzInject', { detail: injectElement }));
+    });
+}
