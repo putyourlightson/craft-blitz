@@ -363,7 +363,7 @@ class CacheRequestService extends Component
             return $this->_queryString;
         }
 
-        $queryString = rawurldecode(Craft::$app->getRequest()->getQueryStringWithoutPath());
+        $queryString = Craft::$app->getRequest()->getQueryStringWithoutPath();
         $queryStringParams = explode('&', $queryString);
 
         foreach ($queryStringParams as $key => $queryStringParam) {

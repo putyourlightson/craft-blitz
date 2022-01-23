@@ -116,13 +116,13 @@ class FileStorageTest extends Unit
     {
         $siteUri = new SiteUriModel([
             'siteId' => 1,
-            'uri' => 'test?q=1',
+            'uri' => 'test?q=x%2Cy',
         ]);
 
         $filePath = $this->cacheStorage->getFilePaths($siteUri)[0] ?? '';
-        $this->assertStringContainsString('test/q=1', $filePath);
+        $this->assertStringContainsString('test/q=x%2C', $filePath);
 
-        $siteUri->uri = 'test?q=1/..';
+        $siteUri->uri = 'test?q=x%2C/..';
         $this->assertEquals([], $this->cacheStorage->getFilePaths($siteUri));
     }
 }
