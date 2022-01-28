@@ -317,6 +317,10 @@ class FileStorage extends BaseCacheStorage
         $siteUrl = Craft::getAlias($site->getBaseUrl());
         $siteHostPath = preg_replace('/^(http|https):\/\//i', '', $siteUrl);
 
+        // Remove colons in path, for port numbers for example
+        // https://github.com/putyourlightson/craft-blitz/issues/369
+        $siteHostPath = str_replace(':', '', $siteHostPath);
+
         $this->_sitePaths[$siteId] = FileHelper::normalizePath($this->_cacheFolderPath.'/'.$siteHostPath);
 
         return $this->_sitePaths[$siteId];
