@@ -15,9 +15,6 @@ use putyourlightson\blitz\records\CacheTagRecord;
  */
 class CacheTagsService extends Component
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Returns all unique tags.
      *
@@ -33,8 +30,6 @@ class CacheTagsService extends Component
 
     /**
      * Returns tags for the given site URI.
-     *
-     * @param SiteUriModel $siteUri
      *
      * @return string[]
      */
@@ -52,7 +47,6 @@ class CacheTagsService extends Component
      * Returns cache IDs for the given tags.
      *
      * @param string[] $tags
-     *
      * @return int[]
      */
     public function getCacheIds(array $tags): array

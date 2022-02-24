@@ -16,14 +16,10 @@ use yii\base\NotSupportedException;
 
 class BaseDriverHelper
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Creates drivers of the provided types.
      *
      * @param array $types
-     *
      * @return SavableComponent[]
      */
     public static function createDrivers(array $types): array
@@ -32,11 +28,7 @@ class BaseDriverHelper
 
         foreach ($types as $type) {
             if ($type::isSelectable()) {
-                $driver = self::createDriver($type);
-
-                if ($driver !== null) {
-                    $drivers[] = $driver;
-                }
+                $drivers[] = self::createDriver($type);
             }
         }
 
@@ -45,11 +37,6 @@ class BaseDriverHelper
 
     /**
      * Creates a driver of the provided type with the optional settings.
-     *
-     * @param string $type
-     * @param array $settings
-     *
-     * @return SavableComponent
      */
     public static function createDriver(string $type, array $settings = []): SavableComponent
     {

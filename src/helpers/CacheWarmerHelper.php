@@ -17,16 +17,10 @@ use yii\base\Event;
 
 class CacheWarmerHelper extends BaseDriverHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_WARMER_TYPES = 'registerWarmerTypes';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_REGISTER_WARMER_TYPES = 'registerWarmerTypes';
 
     /**
      * Returns all warmer types.
@@ -65,10 +59,7 @@ class CacheWarmerHelper extends BaseDriverHelper
     }
 
     /**
-     * @param SiteUriModel[] $siteUris
-     * @param string $driverMethod
-     * @param int|null $delay
-     * @param int|null $priority
+     * Adds a warmer job to the queue.
      */
     public static function addWarmerJob(array $siteUris, string $driverMethod, int $delay = null, int $priority = null)
     {

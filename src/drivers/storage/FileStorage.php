@@ -129,11 +129,8 @@ class FileStorage extends BaseCacheStorage
                 }
             }
         }
-        catch (ErrorException $e) {
-            Blitz::$plugin->log($e->getMessage(), [], 'error');
-        }
-        catch (InvalidArgumentException $e) {
-            Blitz::$plugin->log($e->getMessage(), [], 'error');
+        catch (ErrorException|InvalidArgumentException $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], 'error');
         }
     }
 

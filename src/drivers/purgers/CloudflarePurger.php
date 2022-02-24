@@ -9,6 +9,7 @@ use Craft;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\db\Table;
 use craft\errors\SiteNotFoundException;
+use craft\helpers\App;
 use craft\helpers\Db;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
@@ -21,43 +22,40 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
  */
 class CloudflarePurger extends BaseCachePurger
 {
-    // Constants
-    // =========================================================================
-
-    const API_ENDPOINT = 'https://api.cloudflare.com/client/v4/';
-
-    const API_URL_LIMIT = 30;
-
-    // Properties
-    // =========================================================================
+    /**
+     * @const The API endpoint URL.
+     */
+    public const API_ENDPOINT = 'https://api.cloudflare.com/client/v4/';
 
     /**
-     * @var string
+     * @const The API URL limit.
      */
-    public $authenticationMethod = 'apiKey';
+    public const API_URL_LIMIT = 30;
 
     /**
-     * @var string
+     * @var string The API authentication method.
      */
-    public $apiToken;
+    public string $authenticationMethod = 'apiKey';
 
     /**
-     * @var string
+     * @var string The API token.
      */
-    public $apiKey;
+    public string $apiToken;
 
     /**
-     * @var string
+     * @var string The API key.
      */
-    public $email;
+    public string $apiKey;
 
     /**
-     * @var array
+     * @var string The email address to use.
      */
-    public $zoneIds = [];
+    public string $email;
 
-    // Static
-    // =========================================================================
+    /**
+     * @var array The zone IDs to purge.
+     */
+    public array $zoneIds = [];
 
     /**
      * @inheritdoc
@@ -66,9 +64,6 @@ class CloudflarePurger extends BaseCachePurger
     {
         return Craft::t('blitz', 'Cloudflare Purger');
     }
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -161,14 +156,12 @@ class CloudflarePurger extends BaseCachePurger
                     continue;
                 }
 
-                if ($site !== null) {
-                    $response = $this->_sendRequest('get', '', $site->id);
+                $response = $this->_sendRequest('get', '', $site->id);
 
-                    if ($response === false) {
-                        $error = Craft::t('blitz', 'Error connecting to Cloudflare using zone ID for “{site}”.', ['site' => $site->name]);
+                if ($response === false) {
+                    $error = Craft::t('blitz', 'Error connecting to Cloudflare using zone ID for “{site}”.', ['site' => $site->name]);
 
-                        $this->addError('zoneIds', $error);
-                    }
+                    $this->addError('zoneIds', $error);
                 }
             }
         }
@@ -179,25 +172,15 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/purgers/cloudflare/settings', [
             'purger' => $this,
         ]);
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Sends a request to the API.
-     *
-     * @param string $method
-     * @param string $action
-     * @param int $siteId
-     * @param array $params
-     *
-     * @return bool
      */
     private function _sendRequest(string $method, string $action, int $siteId, array $params = []): bool
     {
@@ -206,11 +189,11 @@ class CloudflarePurger extends BaseCachePurger
         $headers = ['Content-Type' => 'application/json'];
 
         if ($this->authenticationMethod == 'apiKey') {
-            $headers['X-Auth-Key'] = Craft::parseEnv($this->apiKey);
-            $headers['X-Auth-Email'] = Craft::parseEnv($this->email);
+            $headers['X-Auth-Key'] = App::parseEnv($this->apiKey);
+            $headers['X-Auth-Email'] = App::parseEnv($this->email);
         }
         else {
-            $headers['Authorization'] = 'Bearer '.Craft::parseEnv($this->apiToken);
+            $headers['Authorization'] = 'Bearer '.App::parseEnv($this->apiToken);
         }
 
         $client = Craft::createGuzzleClient([
@@ -228,11 +211,11 @@ class CloudflarePurger extends BaseCachePurger
             return false;
         }
 
-        $uri = 'zones/'.Craft::parseEnv($this->zoneIds[$siteUid]['zoneId']).'/'.$action;
+        $uri = 'zones/'.App::parseEnv($this->zoneIds[$siteUid]['zoneId']).'/'.$action;
 
         $requests = [];
 
-        // If files requested then create requests from chunks to respect Cloudflare's limit
+        // If files requested then create requests from chunks to respect Cloudflare’s limit
         if (!empty($params['files'])) {
             $files = $params['files'];
             $batches = array_chunk($files, self::API_URL_LIMIT);

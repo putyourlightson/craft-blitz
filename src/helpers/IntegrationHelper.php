@@ -38,9 +38,7 @@ class IntegrationHelper
         ]);
         Event::trigger(static::class, self::EVENT_REGISTER_INTEGRATIONS, $event);
 
-        $integrations = $event->types;
-
-        return $integrations;
+        return $event->types;
     }
 
     /**

@@ -13,18 +13,19 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\utilities\CacheUtility;
 use yii\console\Controller;
 use yii\console\ExitCode;
+use yii\helpers\BaseConsole;
 
 class CacheController extends Controller
 {
     /**
      * @var bool Whether jobs should be queued only and not run
      */
-    public $queue = false;
+    public bool $queue = false;
 
     /**
      * @var array
      */
-    private $_actions = [];
+    private array $_actions = [];
 
     /**
      * @inheritdoc
@@ -89,12 +90,10 @@ class CacheController extends Controller
 
     /**
      * Lists the actions that can be taken.
-     *
-     * @return int
      */
     public function actionIndex(): int
     {
-        $this->stdout(Craft::t('blitz', 'The following actions can be taken:').PHP_EOL.PHP_EOL, Console::FG_YELLOW);
+        $this->stdout(Craft::t('blitz', 'The following actions can be taken:').PHP_EOL.PHP_EOL, BaseConsole::FG_YELLOW);
 
         $lengths = [];
         foreach ($this->_actions as $action) {
@@ -104,7 +103,7 @@ class CacheController extends Controller
 
         foreach ($this->_actions as $action) {
             $this->stdout('- ');
-            $this->stdout(str_pad($action['id'], $maxLength), Console::FG_YELLOW);
+            $this->stdout(str_pad($action['id'], $maxLength), BaseConsole::FG_YELLOW);
             $this->stdout('  '.$action['instructions'].PHP_EOL);
         }
 
@@ -114,7 +113,7 @@ class CacheController extends Controller
     }
 
     /**
-     * @return int
+     * Clears the cache.
      */
     public function actionClear(): int
     {
@@ -124,7 +123,7 @@ class CacheController extends Controller
     }
 
     /**
-     * @return int
+     * Flushes the cache.
      */
     public function actionFlush(): int
     {
@@ -134,7 +133,7 @@ class CacheController extends Controller
     }
 
     /**
-     * @return int
+     * Purges the cache.
      */
     public function actionPurge(): int
     {
@@ -144,12 +143,12 @@ class CacheController extends Controller
     }
 
     /**
-     * @return int
+     * Warms the cache.
      */
     public function actionWarm(): int
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
+            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, BaseConsole::FG_RED);
 
             return ExitCode::OK;
         }
@@ -160,12 +159,12 @@ class CacheController extends Controller
     }
 
     /**
-     * @return int
+     * Deploys cached files.
      */
     public function actionDeploy(): int
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, Console::FG_RED);
+            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.').PHP_EOL, BaseConsole::FG_RED);
 
             return ExitCode::OK;
         }
@@ -176,7 +175,7 @@ class CacheController extends Controller
     }
 
     /**
-     * @return int
+     * Refreshes the cache.
      */
     public function actionRefresh(): int
     {
@@ -194,7 +193,7 @@ class CacheController extends Controller
             $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
 
             if ($warmCacheDelay) {
-                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) before warming...', ['seconds' => $warmCacheDelay]).PHP_EOL, Console::FG_YELLOW);
+                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) before warming...', ['seconds' => $warmCacheDelay]).PHP_EOL, BaseConsole::FG_YELLOW);
 
                 sleep($warmCacheDelay);
             }
@@ -207,14 +206,12 @@ class CacheController extends Controller
     }
 
     /**
-     * @param int|null $siteId
-     *
-     * @return int
+     * Refreshes the cache for a site.
      */
     public function actionRefreshSite(int $siteId = null): int
     {
         if (empty($siteId)) {
-            $this->stderr(Craft::t('blitz', 'A site ID must be provided as an argument.').PHP_EOL, Console::FG_RED);
+            $this->stderr(Craft::t('blitz', 'A site ID must be provided as an argument.').PHP_EOL, BaseConsole::FG_RED);
 
             return ExitCode::OK;
         }
@@ -237,7 +234,7 @@ class CacheController extends Controller
             $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
 
             if ($warmCacheDelay) {
-                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) before warming...', ['seconds' => $warmCacheDelay]).PHP_EOL, Console::FG_YELLOW);
+                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) before warming...', ['seconds' => $warmCacheDelay]).PHP_EOL, BaseConsole::FG_YELLOW);
 
                 sleep($warmCacheDelay);
             }
@@ -250,13 +247,13 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->stdout(Craft::t('blitz', 'Site successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Site successfully refreshed.').PHP_EOL, BaseConsole::FG_GREEN);
 
         return ExitCode::OK;
     }
 
     /**
-     * @return int
+     * Refreshes expired cache.
      */
     public function actionRefreshExpired(): int
     {
@@ -266,20 +263,18 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.').PHP_EOL, BaseConsole::FG_GREEN);
 
         return ExitCode::OK;
     }
 
     /**
-     * @param array|null $urls
-     *
-     * @return int
+     * Refreshes cached URLs.
      */
     public function actionRefreshUrls(array $urls = null): int
     {
         if (empty($urls)) {
-            $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.').PHP_EOL, Console::FG_RED);
+            $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.').PHP_EOL, BaseConsole::FG_RED);
 
             return ExitCode::OK;
         }
@@ -290,20 +285,18 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->stdout(Craft::t('blitz', 'Cached URLs successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Cached URLs successfully refreshed.').PHP_EOL, BaseConsole::FG_GREEN);
 
         return ExitCode::OK;
     }
 
     /**
-     * @param array|null $tags
-     *
-     * @return int
+     * Refreshes tagged cached pages.
      */
     public function actionRefreshTagged(array $tags = null): int
     {
         if (empty($tags)) {
-            $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.').PHP_EOL, Console::FG_RED);
+            $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.').PHP_EOL, BaseConsole::FG_RED);
 
             return ExitCode::OK;
         }
@@ -314,36 +307,30 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->stdout(Craft::t('blitz', 'Tagged cache successfully refreshed.').PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Tagged cache successfully refreshed.').PHP_EOL, BaseConsole::FG_GREEN);
 
         return ExitCode::OK;
     }
 
     /**
-     * @return int
+     * Generates expiry dates.
      */
     public function actionGenerateExpiryDates(): int
     {
         Blitz::$plugin->refreshCache->generateExpiryDates();
 
-        $this->stdout(Craft::t('blitz', 'Entry expiry dates successfully generated.').PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', 'Entry expiry dates successfully generated.').PHP_EOL, BaseConsole::FG_GREEN);
 
         return ExitCode::OK;
     }
 
     /**
      * Handles setting the progress.
-     *
-     * @param int $count
-     * @param int $total
      */
     public function setProgressHandler(int $count, int $total)
     {
         Console::updateProgress($count, $total);
     }
-
-    // Private Methods
-    // =========================================================================
 
     private function _clearCache(array $siteUris = null)
     {
@@ -372,7 +359,7 @@ class CacheController extends Controller
     private function _purgeCache(array $siteUris = null)
     {
         if (Blitz::$plugin->cachePurger->isDummy) {
-            $this->stderr(Craft::t('blitz', 'Cache purging is disabled.').PHP_EOL, Console::FG_GREEN);
+            $this->stderr(Craft::t('blitz', 'Cache purging is disabled.').PHP_EOL, BaseConsole::FG_GREEN);
 
             return;
         }
@@ -393,12 +380,12 @@ class CacheController extends Controller
     private function _warmCache(array $siteUris)
     {
         if (Blitz::$plugin->cacheWarmer->isDummy) {
-            $this->stderr(Craft::t('blitz', 'Cache warming is disabled.').PHP_EOL, Console::FG_GREEN);
+            $this->stderr(Craft::t('blitz', 'Cache warming is disabled.').PHP_EOL, BaseConsole::FG_GREEN);
 
             return;
         }
 
-        $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, Console::FG_YELLOW);
+        $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, BaseConsole::FG_YELLOW);
 
         $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
 
@@ -418,7 +405,7 @@ class CacheController extends Controller
         $total = count($siteUris);
 
         if ($warmed < $total) {
-            $this->stdout(Craft::t('blitz', 'Warmed {warmed} of {total} pages. To see why pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['warmed' => $warmed, 'total' => $total]).PHP_EOL, Console::FG_CYAN);
+            $this->stdout(Craft::t('blitz', 'Warmed {warmed} of {total} pages. To see why pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['warmed' => $warmed, 'total' => $total]).PHP_EOL, BaseConsole::FG_CYAN);
         }
 
         $this->_output('Blitz cache warming complete.');
@@ -430,12 +417,12 @@ class CacheController extends Controller
     private function _deploy(array $siteUris)
     {
         if (Blitz::$plugin->deployer->isDummy) {
-            $this->stderr(Craft::t('blitz', 'Deploying is disabled.').PHP_EOL, Console::FG_GREEN);
+            $this->stderr(Craft::t('blitz', 'Deploying is disabled.').PHP_EOL, BaseConsole::FG_GREEN);
 
             return;
         }
 
-        $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, Console::FG_YELLOW);
+        $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, BaseConsole::FG_YELLOW);
 
         $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
 
@@ -455,6 +442,6 @@ class CacheController extends Controller
     {
         Blitz::$plugin->log($message);
 
-        $this->stdout(Craft::t('blitz', $message).PHP_EOL, Console::FG_GREEN);
+        $this->stdout(Craft::t('blitz', $message).PHP_EOL, BaseConsole::FG_GREEN);
     }
 }

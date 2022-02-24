@@ -17,31 +17,25 @@ use yii\db\Exception;
 
 class FlushCacheService extends Component
 {
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent
+     */
+    public const EVENT_BEFORE_FLUSH_CACHE = 'beforeFlushCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_FLUSH_CACHE = 'beforeFlushCache';
+    public const EVENT_AFTER_FLUSH_CACHE = 'afterFlushCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_AFTER_FLUSH_CACHE = 'afterFlushCache';
+    public const EVENT_BEFORE_FLUSH_ALL_CACHE = 'beforeFlushAllCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_FLUSH_ALL_CACHE = 'beforeFlushAllCache';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_FLUSH_ALL_CACHE = 'afterFlushAllCache';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_AFTER_FLUSH_ALL_CACHE = 'afterFlushAllCache';
 
     /**
      * Flushes cache records given an array of site URIs.
@@ -82,8 +76,6 @@ class FlushCacheService extends Component
 
     /**
      * Flushes the cache for a given site.
-     *
-     * @param int $siteId
      */
     public function flushSite(int $siteId)
     {
@@ -145,13 +137,8 @@ class FlushCacheService extends Component
         }
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Resets auto increment values of the given table.
-     *
-     * @param string $table
      */
     private function _resetAutoIncrement(string $table)
     {

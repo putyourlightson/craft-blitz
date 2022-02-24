@@ -35,82 +35,72 @@ use yii\db\ActiveQuery;
  * This class is responsible for keeping the cache fresh.
  * When one or more cacheable element are updated, they are added to the `$elements` array.
  * If `$batchMode` is false then the `refresh()` method is called immediately,
- * otherwise it is triggered by a resave elements event.
+ * otherwise it is triggered by a resave event.
  * The `refresh()` method creates a `RefreshCacheJob` so that refreshing happens asynchronously.
  *
  * @property SiteUriModel[] $allSiteUris
  */
 class RefreshCacheService extends Component
 {
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshElementEvent
+     */
+    public const EVENT_BEFORE_ADD_ELEMENT = 'beforeAddElement';
 
     /**
      * @event RefreshElementEvent
      */
-    const EVENT_BEFORE_ADD_ELEMENT = 'beforeAddElement';
-
-    /**
-     * @event RefreshElementEvent
-     */
-    const EVENT_AFTER_ADD_ELEMENT = 'afterAddElement';
+    public const EVENT_AFTER_ADD_ELEMENT = 'afterAddElement';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_REFRESH_CACHE = 'beforeRefreshCache';
+    public const EVENT_BEFORE_REFRESH_CACHE = 'beforeRefreshCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
+    public const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_REFRESH_ALL_CACHE = 'beforeRefreshAllCache';
+    public const EVENT_BEFORE_REFRESH_ALL_CACHE = 'beforeRefreshAllCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_AFTER_REFRESH_ALL_CACHE = 'afterRefreshAllCache';
+    public const EVENT_AFTER_REFRESH_ALL_CACHE = 'afterRefreshAllCache';
 
     /**
      * @event RefreshSiteCacheEvent
      */
-    const EVENT_BEFORE_REFRESH_SITE_CACHE = 'beforeRefreshSiteCache';
+    public const EVENT_BEFORE_REFRESH_SITE_CACHE = 'beforeRefreshSiteCache';
 
     /**
      * @event RefreshSiteCacheEvent
      */
-    const EVENT_AFTER_REFRESH_SITE_CACHE = 'afterRefreshSiteCache';
-
-    // Properties
-    // =========================================================================
+    public const EVENT_AFTER_REFRESH_SITE_CACHE = 'afterRefreshSiteCache';
 
     /**
      * @var bool
      */
-    public $batchMode = false;
+    public bool $batchMode = false;
 
     /**
      * @var int[]
      */
-    public $cacheIds = [];
+    public array $cacheIds = [];
 
     /**
      * @var array
      */
-    public $elements = [];
-
-    // Public Methods
-    // =========================================================================
+    public array $elements = [];
 
     /**
      * Returns cache IDs given an array of element IDs.
      *
      * @param int[] $elementIds
-     *
      * @return int[]
      */
     public function getElementCacheIds(array $elementIds): array
@@ -129,7 +119,6 @@ class RefreshCacheService extends Component
      * @param string $elementType
      * @param int[] $sourceIds
      * @param int[] $ignoreCacheIds
-     *
      * @return ElementQueryRecord[]
      */
     public function getElementTypeQueries(string $elementType, array $sourceIds, array $ignoreCacheIds): array
@@ -153,8 +142,6 @@ class RefreshCacheService extends Component
 
     /**
      * Adds cache IDs to refresh.
-     *
-     * @param array $cacheIds
      */
     public function addCacheIds(array $cacheIds)
     {
@@ -163,9 +150,6 @@ class RefreshCacheService extends Component
 
     /**
      * Adds element IDs to refresh.
-     *
-     * @param string $elementType
-     * @param array $elementIds
      */
     public function addElementIds(string $elementType, array $elementIds)
     {
@@ -179,8 +163,6 @@ class RefreshCacheService extends Component
 
     /**
      * Adds an element to refresh.
-     *
-     * @param ElementInterface $element
      */
     public function addElement(ElementInterface $element)
     {
@@ -285,8 +267,6 @@ class RefreshCacheService extends Component
 
     /**
      * Adds expiry dates for a given element.
-     *
-     * @param Element $element
      */
     public function addElementExpiryDates(Element $element)
     {
@@ -307,9 +287,6 @@ class RefreshCacheService extends Component
 
     /**
      * Adds an expiry date for a given element.
-     *
-     * @param Element $element
-     * @param DateTime $expiryDate
      */
     public function addElementExpiryDate(Element $element, DateTime $expiryDate)
     {
@@ -365,8 +342,6 @@ class RefreshCacheService extends Component
 
     /**
      * Generates element expiry dates.
-     *
-     * @param string|null $elementType
      */
     public function generateExpiryDates(string $elementType = null)
     {
@@ -384,7 +359,7 @@ class RefreshCacheService extends Component
                 ['>', 'postDate', $now],
                 ['>', 'expiryDate', $now],
             ])
-            ->anyStatus()
+            ->status(null)
             ->all();
 
         foreach ($elements as $element) {
@@ -394,8 +369,6 @@ class RefreshCacheService extends Component
 
     /**
      * Refreshes the cache.
-     *
-     * @param bool $forceClear
      */
     public function refresh(bool $forceClear = false)
     {
@@ -415,7 +388,8 @@ class RefreshCacheService extends Component
             $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
                 ->push($refreshCacheJob);
         }
-        catch (NotSupportedException $exception) {
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (NotSupportedException) {
             // The queue probably doesn't support custom push priorities. Try again without one.
             $queue->push($refreshCacheJob);
         }
@@ -490,8 +464,6 @@ class RefreshCacheService extends Component
 
     /**
      * Refreshes a site.
-     *
-     * @param int $siteId
      */
     public function refreshSite(int $siteId)
     {

@@ -321,9 +321,7 @@ class CacheController extends Controller
             });
 
             // Remove empty values
-            $values = array_filter($values);
-
-            return $values;
+            return array_filter($values);
         }
 
         return [];

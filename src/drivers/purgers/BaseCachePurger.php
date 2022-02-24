@@ -13,36 +13,27 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 abstract class BaseCachePurger extends SavableComponent implements CachePurgerInterface
 {
-    // Traits
-    // =========================================================================
-
     use CachePurgerTrait;
 
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent The event that is triggered before the cache is purged.
+     */
+    public const EVENT_BEFORE_PURGE_CACHE = 'beforePurgeCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered after the cache is purged.
      */
-    const EVENT_BEFORE_PURGE_CACHE = 'beforePurgeCache';
+    public const EVENT_AFTER_PURGE_CACHE = 'afterPurgeCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered before all cache is purged.
      */
-    const EVENT_AFTER_PURGE_CACHE = 'afterPurgeCache';
+    public const EVENT_BEFORE_PURGE_ALL_CACHE = 'beforePurgeAllCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered after all cache is purged.
      */
-    const EVENT_BEFORE_PURGE_ALL_CACHE = 'beforePurgeAllCache';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_PURGE_ALL_CACHE = 'afterPurgeAllCache';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_AFTER_PURGE_ALL_CACHE = 'afterPurgeAllCache';
 
     /**
      * @inheritdoc
@@ -87,7 +78,6 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
      * Triggers the `beforePurgeCache` event.
      *
      * @param SiteUriModel[] $siteUris
-     *
      * @return SiteUriModel[]
      */
     protected function beforePurgeCache(array $siteUris): array

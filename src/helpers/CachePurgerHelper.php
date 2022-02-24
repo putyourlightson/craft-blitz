@@ -14,16 +14,10 @@ use yii\base\Event;
 
 class CachePurgerHelper extends BaseDriverHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_PURGER_TYPES = 'registerPurgerTypes';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_REGISTER_PURGER_TYPES = 'registerPurgerTypes';
 
     /**
      * Returns all purger types.

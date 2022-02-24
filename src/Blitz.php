@@ -47,6 +47,7 @@ use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\logtofile\LogToFile;
+use yii\base\Controller;
 use yii\base\Event;
 
 /**
@@ -73,7 +74,7 @@ class Blitz extends Plugin
     /**
      * @var Blitz
      */
-    public static $plugin;
+    public static Blitz $plugin;
 
     // Public Methods
     // =========================================================================
@@ -236,7 +237,7 @@ class Blitz extends Plugin
                 // Register element populate event
                 Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
                     function(PopulateElementEvent $event) {
-                        if (Craft::$app->getResponse()->getIsOk() && $event->element !== null) {
+                        if (Craft::$app->getResponse()->getIsOk()) {
                             $this->generateCache->addElement($event->element);
                         }
                     }
@@ -278,10 +279,10 @@ class Blitz extends Plugin
      */
     private function _registerElementEvents()
     {
-        // Add cache IDs before hard deleting elements so we can refresh them
+        // Add cache IDs before hard deleting elements, so we can refresh them
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(DeleteElementEvent $event) {
-                if ($event->hardDelete && $event->element !== null) {
+                if ($event->hardDelete) {
                     $cacheIds = $this->refreshCache->getElementCacheIds([$event->element->getId()]);
                     $this->refreshCache->addCacheIds($cacheIds);
                 }
@@ -299,11 +300,8 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on(Elements::class, $event,
-                /** @var ElementEvent|BatchElementActionEvent $event */
-                function($event) {
-                    if ($event->element !== null) {
-                        $event->element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
-                    }
+                function(ElementEvent|BatchElementActionEvent $event) {
+                    $event->element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
                 }
             );
         }
@@ -319,11 +317,8 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on(Elements::class, $event,
-                /** @var ElementEvent|BatchElementActionEvent $event */
-                function($event) {
-                    if ($event->element !== null) {
-                        $this->refreshCache->addElement($event->element);
-                    }
+                function(ElementEvent|BatchElementActionEvent $event) {
+                    $this->refreshCache->addElement($event->element);
                 }
             );
         }
@@ -338,7 +333,7 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
-            [ResaveController::class, ResaveController::EVENT_BEFORE_ACTION],
+            [ResaveController::class, Controller::EVENT_BEFORE_ACTION],
         ];
 
         foreach ($events as $event) {
@@ -353,7 +348,7 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
-            [ResaveController::class, ResaveController::EVENT_AFTER_ACTION],
+            [ResaveController::class, Controller::EVENT_AFTER_ACTION],
         ];
 
         foreach ($events as $event) {

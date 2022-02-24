@@ -414,11 +414,8 @@ class GitDeployer extends BaseDeployer
         try {
             FileHelper::writeToFile($filePath, $value);
         }
-        catch (ErrorException $e) {
-            Blitz::$plugin->log($e->getMessage(), [], 'error');
-        }
-        catch (InvalidArgumentException $e) {
-            Blitz::$plugin->log($e->getMessage(), [], 'error');
+        catch (ErrorException|InvalidArgumentException $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], 'error');
         }
     }
 

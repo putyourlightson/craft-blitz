@@ -17,13 +17,7 @@ use putyourlightson\blitz\models\SiteUriModel;
  */
 abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerInterface
 {
-    // Traits
-    // =========================================================================
-
     use CacheWarmerTrait;
-
-    // Constants
-    // =========================================================================
 
     /**
      * @event RefreshCacheEvent The event that is triggered before the cache is warmed.
@@ -51,12 +45,12 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      * });
      * ```
      */
-    const EVENT_BEFORE_WARM_CACHE = 'beforeWarmCache';
+    public const EVENT_BEFORE_WARM_CACHE = 'beforeWarmCache';
 
     /**
      * @event RefreshCacheEvent The event that is triggered after the cache is warmed.
      */
-    const EVENT_AFTER_WARM_CACHE = 'afterWarmCache';
+    public const EVENT_AFTER_WARM_CACHE = 'afterWarmCache';
 
     /**
      * @event RefreshCacheEvent The event that is triggered before the entire cache is warmed.
@@ -74,20 +68,17 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      * });
      * ```
      */
-    const EVENT_BEFORE_WARM_ALL_CACHE = 'beforeWarmAllCache';
+    public const EVENT_BEFORE_WARM_ALL_CACHE = 'beforeWarmAllCache';
 
     /**
      * @event RefreshCacheEvent The event that is triggered after the entire cache is warmed.
      */
-    const EVENT_AFTER_WARM_ALL_CACHE = 'afterWarmAllCache';
+    public const EVENT_AFTER_WARM_ALL_CACHE = 'afterWarmAllCache';
 
     /**
      * @const string
      */
-    const WARMER_HEADER_NAME = 'X-Blitz-Warmer';
-
-    // Public Methods
-    // =========================================================================
+    public const WARMER_HEADER_NAME = 'X-Blitz-Warmer';
 
     /**
      * @inheritdoc
@@ -132,11 +123,6 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
 
     /**
      * Delays warming by the provided delay value.
-     *
-     * @param callable|null $setProgressHandler
-     * @param int|null $delay
-     * @param int $count
-     * @param int $total
      */
     public function delay(callable $setProgressHandler = null, int $delay = null, int $count = 0, int $total = 0)
     {
@@ -152,13 +138,8 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
         }
     }
 
-    // Protected Methods
-    // =========================================================================
-
     /**
      * Gets site options.
-     *
-     * @return array
      */
     protected function getSiteOptions(): array
     {
@@ -175,7 +156,6 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
      * Triggers the `beforeWarmCache` event.
      *
      * @param SiteUriModel[] $siteUris
-     *
      * @return SiteUriModel[]
      */
     protected function beforeWarmCache(array $siteUris): array

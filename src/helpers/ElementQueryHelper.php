@@ -321,7 +321,6 @@ class ElementQueryHelper
         // Convert DateTime objects to Unix timestamp
         if ($value instanceof DateTime) {
             $value = $value->getTimestamp();
-            return;
         }
     }
 }

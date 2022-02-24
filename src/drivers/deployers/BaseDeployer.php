@@ -18,31 +18,25 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
 
     use DeployerTrait;
 
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent The event that is triggered before files are deployed.
+     */
+    public const EVENT_BEFORE_DEPLOY = 'beforeDeploy';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered after files are deployed.
      */
-    const EVENT_BEFORE_DEPLOY = 'beforeDeploy';
+    public const EVENT_AFTER_DEPLOY = 'afterDeploy';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered before all files are deployed.
      */
-    const EVENT_AFTER_DEPLOY = 'afterDeploy';
+    public const EVENT_BEFORE_DEPLOY_ALL = 'beforeDeployAll';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered after all files are deployed.
      */
-    const EVENT_BEFORE_DEPLOY_ALL = 'beforeDeployAll';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_DEPLOY_ALL = 'afterDeployAll';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_AFTER_DEPLOY_ALL = 'afterDeployAll';
 
     /**
      * @inheritdoc
@@ -100,13 +94,9 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
 
     /**
      * Deploys site URIs with progress.
-     *
-     * @param array $siteUris
-     * @param callable|null $setProgressHandler
      */
     public function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
-
     }
 
     /**

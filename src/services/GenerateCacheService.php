@@ -30,55 +30,45 @@ use yii\db\Exception;
 
 class GenerateCacheService extends Component
 {
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent
+     */
+    public const EVENT_BEFORE_SAVE_CACHE = 'beforeSaveCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_SAVE_CACHE = 'beforeSaveCache';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_SAVE_CACHE = 'afterSaveCache';
+    public const EVENT_AFTER_SAVE_CACHE = 'afterSaveCache';
 
     /**
      * @const string
      */
-    const MUTEX_LOCK_NAME_CACHE_RECORDS = 'blitz:cacheRecords';
+    public const MUTEX_LOCK_NAME_CACHE_RECORDS = 'blitz:cacheRecords';
 
     /**
      * @const string
      */
-    const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
-
-
-    // Properties
-    // =========================================================================
+    public const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
 
     /**
      * @var CacheOptionsModel
      */
-    public $options;
+    public CacheOptionsModel $options;
 
     /**
      * @var int[]
      */
-    public $elementCaches = [];
+    public array $elementCaches = [];
 
     /**
      * @var int[]
      */
-    public $elementQueryCaches = [];
-
-    // Public Methods
-    // =========================================================================
+    public array $elementQueryCaches = [];
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -175,7 +165,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Use DB connection so we can exclude audit columns when inserting
+        // Use DB connection, so we can exclude audit columns when inserting
         $db = Craft::$app->getDb();
 
         // Get element query record from index or create one if it does not exist
@@ -250,9 +240,6 @@ class GenerateCacheService extends Component
 
     /**
      * Saves the cache for a site URI.
-     *
-     * @param string $output
-     * @param SiteUriModel $siteUri
      */
     public function save(string $output, SiteUriModel $siteUri)
     {
@@ -341,10 +328,6 @@ class GenerateCacheService extends Component
 
     /**
      * Saves the output for a site URI.
-     *
-     * @param string $output
-     * @param SiteUriModel $siteUri
-     * @param int|null $duration
      */
     public function saveOutput(string $output, SiteUriModel $siteUri, int $duration = null)
     {
@@ -371,11 +354,7 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * @param int $cacheId
-     * @param array $ids
-     * @param string $checkTable
-     * @param string $insertTable
-     * @param string $columnName
+     * Batch inserts cache values to database.
      */
     private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName)
     {
@@ -390,7 +369,6 @@ class GenerateCacheService extends Component
             $values[$key] = [$cacheId, $value];
         }
 
-        // Batch insert cache values to database
         Craft::$app->getDb()->createCommand()
             ->batchInsert($insertTable,
                 ['cacheId', $columnName],

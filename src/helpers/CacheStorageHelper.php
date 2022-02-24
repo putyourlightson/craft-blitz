@@ -14,16 +14,10 @@ use yii\base\Event;
 
 class CacheStorageHelper extends BaseDriverHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_STORAGE_TYPES = 'registerStorageTypes';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_REGISTER_STORAGE_TYPES = 'registerStorageTypes';
 
     /**
      * Returns all storage types.

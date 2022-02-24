@@ -16,6 +16,7 @@ use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\web\Response as BaseResponse;
 
 /**
  *
@@ -28,32 +29,30 @@ class CacheRequestService extends Component
     /**
      * @const CancelableEvent
      */
-    const EVENT_IS_CACHEABLE_REQUEST = 'isCacheableRequest';
+    public const EVENT_IS_CACHEABLE_REQUEST = 'isCacheableRequest';
 
     /**
      * @const ResponseEvent
      */
-    const EVENT_BEFORE_GET_RESPONSE = 'beforeGetResponse';
+    public const EVENT_BEFORE_GET_RESPONSE = 'beforeGetResponse';
 
     /**
      * @const ResponseEvent
      */
-    const EVENT_AFTER_GET_RESPONSE = 'afterGetResponse';
+    public const EVENT_AFTER_GET_RESPONSE = 'afterGetResponse';
 
     /**
      * @const int
      */
-    const MAX_URI_LENGTH = 255;
+    public const MAX_URI_LENGTH = 255;
 
     /**
      * @var string|null
      */
-    private $_queryString;
+    private ?string $_queryString;
 
     /**
      * Returns whether the request is cacheable.
-     *
-     * @return bool
      */
     public function getIsCacheableRequest(): bool
     {
@@ -137,21 +136,11 @@ class CacheRequestService extends Component
 
     /**
      * Returns the cacheable requested site URI taking the query string into account.
-     *
-     * @return SiteUriModel|null
      */
-    public function getRequestedCacheableSiteUri()
+    public function getRequestedCacheableSiteUri(): ?SiteUriModel
     {
         $site = Craft::$app->getSites()->getCurrentSite();
-
-        // Log a debug message if no site was matched from the requested URL
-        if ($site === null) {
-            Blitz::$plugin->debug('No site URI could be determined from the requested URL – ensure that the base site URL is correctly set.', [], Craft::$app->getRequest()->getAbsoluteUrl());
-
-            return null;
-        }
-
-        $uri = $this->_getFullUri();
+        $uri = Craft::$app->getRequest()->getFullUri();
 
         /**
          * Remove the base site path from the full URI
@@ -162,7 +151,7 @@ class CacheRequestService extends Component
         if ($baseSitePath !== null) {
             $baseSitePath = $this->_normalizePath($baseSitePath);
 
-            if (strpos($uri . '/', $baseSitePath . '/') === 0) {
+            if (str_starts_with($uri . '/', $baseSitePath . '/')) {
                 $uri = ltrim(substr($uri, strlen($baseSitePath)), '/');
             }
         }
@@ -182,29 +171,25 @@ class CacheRequestService extends Component
 
     /**
      * Returns whether the site URI is cacheable.
-     *
-     * @param SiteUriModel $siteUri
-     *
-     * @return bool
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
     {
         // Ignore URIs that are CP pages
         $generalConfig = Craft::$app->getConfig()->getGeneral();
 
-        if ($generalConfig->cpTrigger && strpos($siteUri->uri, $generalConfig->cpTrigger) !== false) {
+        if ($generalConfig->cpTrigger && str_contains($siteUri->uri, $generalConfig->cpTrigger)) {
             return false;
         }
 
         // Ignore URIs that are resources
         $resourceBaseUri = trim(parse_url(Craft::getAlias($generalConfig->resourceBaseUrl), PHP_URL_PATH), '/');
 
-        if ($resourceBaseUri && strpos($siteUri->uri, $resourceBaseUri) !== false) {
+        if ($resourceBaseUri && str_contains($siteUri->uri, $resourceBaseUri)) {
             return false;
         }
 
         // Ignore URIs that contain index.php
-        if (strpos($siteUri->uri, 'index.php') !== false) {
+        if (str_contains($siteUri->uri, 'index.php')) {
             Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $siteUri->getUrl());
 
             return false;
@@ -237,12 +222,8 @@ class CacheRequestService extends Component
 
     /**
      * Returns the response of a given site URI, if cached.
-     *
-     * @param SiteUriModel $siteUri
-     *
-     * @return Response|null
      */
-    public function getResponse(SiteUriModel $siteUri)
+    public function getResponse(SiteUriModel $siteUri): ?Response
     {
         /** @var Response $response */
         $response = Craft::$app->getResponse();
@@ -284,7 +265,7 @@ class CacheRequestService extends Component
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
         if ($mimeType != SiteUriHelper::MIME_TYPE_HTML) {
-            $response->format = Response::FORMAT_RAW;
+            $response->format = BaseResponse::FORMAT_RAW;
             $headers->set('Content-Type', $mimeType);
         }
 
@@ -307,13 +288,8 @@ class CacheRequestService extends Component
 
     /**
      * Returns true if the URI matches a set of patterns.
-     *
-     * @param SiteUriModel $siteUri
-     * @param array|string $siteUriPatterns
-     *
-     * @return bool
      */
-    public function matchesUriPatterns(SiteUriModel $siteUri, $siteUriPatterns): bool
+    public function matchesUriPatterns(SiteUriModel $siteUri, array|string $siteUriPatterns): bool
     {
         if (!is_array($siteUriPatterns)) {
             return false;
@@ -354,8 +330,6 @@ class CacheRequestService extends Component
 
     /**
      * Returns the query string after processing the included and excluded query string params.
-     *
-     * @return string
      */
     public function getAllowedQueryString(): string
     {
@@ -379,6 +353,9 @@ class CacheRequestService extends Component
         return $this->_queryString;
     }
 
+    /**
+     * Returns whether the query string parameter is allowed.
+     */
     public function getIsAllowedQueryStringParam(string $param): bool
     {
         foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
@@ -394,21 +371,6 @@ class CacheRequestService extends Component
         }
 
         return false;
-    }
-
-    /**
-     * Returns the full requested URI.
-     * TODO: replace with Request::getFullUri() in version 4.0.0.
-     *
-     * @see Request::getFullUri()
-     * @since 3.10.6
-     */
-    private function _getFullUri(): string
-    {
-        $baseUrl = $this->_normalizePath(Craft::$app->getRequest()->getBaseUrl());
-        $path = Craft::$app->getRequest()->getFullPath();
-
-        return $baseUrl . ($baseUrl && $path ? '/' : '') . $path;
     }
 
     /**

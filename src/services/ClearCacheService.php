@@ -13,31 +13,25 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 class ClearCacheService extends Component
 {
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent
+     */
+    public const EVENT_BEFORE_CLEAR_CACHE = 'beforeClearCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_CLEAR_CACHE = 'beforeClearCache';
+    public const EVENT_AFTER_CLEAR_CACHE = 'afterClearCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_AFTER_CLEAR_CACHE = 'afterClearCache';
+    public const EVENT_BEFORE_CLEAR_ALL_CACHE = 'beforeClearAllCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_CLEAR_ALL_CACHE = 'beforeClearAllCache';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_CLEAR_ALL_CACHE = 'afterClearAllCache';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_AFTER_CLEAR_ALL_CACHE = 'afterClearAllCache';
 
     /**
      * Clears the cache given an array of site URIs.
@@ -64,8 +58,6 @@ class ClearCacheService extends Component
 
     /**
      * Clears the cache for a given site.
-     *
-     * @param int $siteId
      */
     public function clearSite(int $siteId)
     {
