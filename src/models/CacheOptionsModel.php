@@ -16,52 +16,45 @@ use DateTime;
  */
 class CacheOptionsModel extends Model
 {
-    // Public Properties
-    // =========================================================================
+    /**
+     * @var bool
+     */
+    public bool $cachingEnabled = true;
 
     /**
      * @var bool
      */
-    public $cachingEnabled = true;
+    public bool $cacheElements = true;
 
     /**
      * @var bool
      */
-    public $cacheElements = true;
-
-    /**
-     * @var bool
-     */
-    public $cacheElementQueries = true;
+    public bool $cacheElementQueries = true;
 
     /**
      * @var int|bool
      */
-    public $outputComments = true;
+    public int|bool $outputComments = true;
 
     /**
      * @var string[]|null
      */
-    public $tags;
+    public ?array $tags;
 
     /**
      * @var int|null
      */
-    public $paginate;
+    public ?int $paginate;
 
     /**
      * @var DateTime|null
      */
-    public $expiryDate;
+    public ?DateTime $expiryDate;
 
     /**
      * @var int|null
      */
-    private $_cacheDuration;
-
-
-    // Public Methods
-    // =========================================================================
+    private ?int $_cacheDuration;
 
     /**
      * @inheritdoc
@@ -102,19 +95,11 @@ class CacheOptionsModel extends Model
         ];
     }
 
-    /**
-     * @return int|null
-     */
-    public function getCacheDuration()
+    public function getCacheDuration(): ?int
     {
         return $this->_cacheDuration;
     }
 
-    /**
-     * @param bool $value
-     *
-     * @return static self reference
-     */
     public function cachingEnabled(bool $value): self
     {
         $this->cachingEnabled = $value;
@@ -122,11 +107,6 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
-    /**
-     * @param bool $value
-     *
-     * @return static self reference
-     */
     public function cacheElements(bool $value): self
     {
         $this->cacheElements = $value;
@@ -134,11 +114,6 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
-    /**
-     * @param bool $value
-     *
-     * @return static self reference
-     */
     public function cacheElementQueries(bool $value): self
     {
         $this->cacheElementQueries = $value;
@@ -146,24 +121,14 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
-    /**
-     * @param int|bool $value
-     *
-     * @return static self reference
-     */
-    public function outputComments($value): self
+    public function outputComments(bool|int $value): self
     {
         $this->outputComments = $value;
 
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     *
-     * @return static self reference
-     */
-    public function cacheDuration($value): self
+    public function cacheDuration(mixed $value): self
     {
         // Set cache duration if greater than 0 seconds
         $cacheDuration = ConfigHelper::durationInSeconds($value);
@@ -180,23 +145,13 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
-    /**
-     * @param string|string[]|null $value
-     *
-     * @return static self reference
-     */
-    public function tags($value): self
+    public function tags(array|string|null $value): self
     {
         $this->tags = is_string($value) ? StringHelper::split($value) : $value;
 
         return $this;
     }
 
-    /**
-     * @param int|null $value
-     *
-     * @return static self reference
-     */
     public function paginate(int $value = null): self
     {
         $this->paginate = $value;
@@ -204,11 +159,6 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
-    /**
-     * @param DateTime|null $value
-     *
-     * @return static self reference
-     */
     public function expiryDate(DateTime $value = null): self
     {
         $this->expiryDate = $value;

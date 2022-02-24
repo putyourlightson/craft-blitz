@@ -41,10 +41,11 @@ class BaseDriverHelper
     public static function createDriver(string $type, array $settings = []): SavableComponent
     {
         /** @var SavableComponent $driver */
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $driver = Component::createComponent([
             'type' => $type,
             'settings' => $settings,
-        ], SavableComponent::class);
+        ],                                   SavableComponent::class);
 
         return $driver;
     }
@@ -85,7 +86,7 @@ class BaseDriverHelper
         try {
             $queue->priority($priority)->push($job);
         }
-        catch (NotSupportedException $e) {
+        catch (NotSupportedException) {
             // The queue probably doesn't support custom push priorities. Try again without one.
             $queue->push($job);
         }

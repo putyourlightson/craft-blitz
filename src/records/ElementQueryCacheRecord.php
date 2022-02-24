@@ -16,9 +16,6 @@ use yii\db\ActiveQueryInterface;
  */
 class ElementQueryCacheRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      *

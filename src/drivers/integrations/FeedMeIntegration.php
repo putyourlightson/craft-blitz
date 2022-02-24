@@ -11,9 +11,6 @@ use yii\base\Event;
 
 class FeedMeIntegration extends BaseIntegration
 {
-    // Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

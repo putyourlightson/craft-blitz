@@ -10,17 +10,14 @@ namespace putyourlightson\blitz\drivers\warmers;
  */
 trait CacheWarmerTrait
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var bool
      */
-    public $isDummy = false;
+    public bool $isDummy = false;
 
     /**
      * @var int
      * @since 3.7.0
      */
-    public $warmed = 0;
+    public int $warmed = 0;
 }

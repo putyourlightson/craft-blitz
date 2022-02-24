@@ -9,11 +9,12 @@ use Craft;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\db\Table;
 use craft\events\CancelableEvent;
+use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
-use GitWrapper\GitException;
-use GitWrapper\GitWorkingCopy;
-use GitWrapper\GitWrapper;
+use Symplify\GitWrapper\Exception\GitException;
+use Symplify\GitWrapper\GitWorkingCopy;
+use Symplify\GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use Symfony\Component\Process\Process;
@@ -26,21 +27,15 @@ use yii\base\InvalidArgumentException;
  */
 class GitDeployer extends BaseDeployer
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event CancelableEvent
      */
-    const EVENT_BEFORE_COMMIT = 'beforeCommit';
+    public const EVENT_BEFORE_COMMIT = 'beforeCommit';
 
     /**
      * @event Event
      */
-    const EVENT_AFTER_COMMIT = 'afterCommit';
-
-    // Static
-    // =========================================================================
+    public const EVENT_AFTER_COMMIT = 'afterCommit';
 
     /**
      * @inheritdoc
@@ -50,61 +45,55 @@ class GitDeployer extends BaseDeployer
         return Craft::t('blitz', 'Git Deployer');
     }
 
-    // Properties
-    // =========================================================================
+    /**
+     * @var array The git repositories to deploy to.
+     */
+    public array $gitRepositories = [];
 
     /**
-     * @var array
+     * @var string The default commit message.
      */
-    public $gitRepositories = [];
+    public string $commitMessage = 'Blitz auto commit';
 
     /**
-     * @var string
+     * @var string|null A username for authentication.
      */
-    public $commitMessage = 'Blitz auto commit';
+    public ?string $username = null;
 
     /**
-     * @var string|null
+     * @var string|null A personal access token for authentication.
      */
-    public $username;
+    public ?string $personalAccessToken = null;
 
     /**
-     * @var string|null
+     * @var string|null A name.
      */
-    public $personalAccessToken;
+    public ?string $name = null;
 
     /**
-     * @var string|null
+     * @var string|null An email address.
      */
-    public $name;
+    public ?string $email = null;
 
     /**
-     * @var string|null
+     * @var string Commands to run before deploying.
      */
-    public $email;
+    public string $commandsBefore = '';
 
     /**
-     * @var string
+     * @var string Commands to run after deploying.
      */
-    public $commandsBefore = '';
+    public string $commandsAfter = '';
 
     /**
-     * @var string
+     * @var string The default branch to deploy.
      */
-    public $commandsAfter = '';
+    public string $defaultBranch = 'master';
 
     /**
-     * @var string
+     * @var string The default remote to deploy.
      */
-    public $defaultBranch = 'master';
-
-    /**
-     * @var string
-     */
-    public $defaultRemote = 'origin';
-
-    // Public Methods
-    // =========================================================================
+    public string $defaultRemote = 'origin';
 
     /**
      * @inheritdoc
@@ -247,11 +236,11 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
-     * @return string
+     * Returns the personal access token.
      */
     public function getPersonalAccessToken(): string
     {
-        $personalAccessToken = Craft::parseEnv($this->personalAccessToken);
+        $personalAccessToken = App::parseEnv($this->personalAccessToken);
 
         if (!is_string($personalAccessToken)) {
             return '';
@@ -263,24 +252,17 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/deployers/git/settings', [
             'deployer' => $this,
         ]);
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
-     * Returns the repository for a given site UID
-     *
-     * @param int $siteId
-     *
-     * @return array|null
+     * Returns the repository for a given site UID.
      */
-    private function _getRepository(int $siteId)
+    private function _getRepository(int $siteId): ?array
     {
         $siteUid = Db::uidById(Table::SITES, $siteId);
 
@@ -292,13 +274,9 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
-     * Returns the repository path for a given site UID
-     *
-     * @param string $siteUid
-     *
-     * @return array|null
+     * Returns the repository path for a given site UID.
      */
-    private function _getRepositoryBySiteUid(string $siteUid)
+    private function _getRepositoryBySiteUid(string $siteUid): ?array
     {
         $repository = $this->gitRepositories[$siteUid] ?? null;
 
@@ -310,7 +288,7 @@ class GitDeployer extends BaseDeployer
             return null;
         }
 
-        $repositoryPath = Craft::parseEnv($repository['repositoryPath']);
+        $repositoryPath = App::parseEnv($repository['repositoryPath']);
 
         if (!is_string($repositoryPath)) {
             return null;
@@ -324,11 +302,7 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
-     * Returns whether the site has a writeable repository path
-     *
-     * @param int $siteId
-     *
-     * @return bool
+     * Returns whether the site has a writeable repository path.
      */
     private function _hasRepository(int $siteId): bool
     {
@@ -338,12 +312,7 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
-     * Returns a git working copy
-     *
-     * @param string $repositoryPath
-     * @param string $remote
-     *
-     * @return GitWorkingCopy
+     * Returns a git working copy.
      */
     private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
     {
@@ -375,12 +344,6 @@ class GitDeployer extends BaseDeployer
         // Set user in config
         $git->config('user.name', $this->name);
         $git->config('user.email', $this->email);
-
-        // Clear output (important!)
-        // TODO: remove in Blitz 4 when GitWrapper 2 is forced
-        if (method_exists($git, 'clearOutput')) {
-            $git->clearOutput();
-        }
 
         $remoteUrl = $git->getRemote($remote)['push'];
 
@@ -476,15 +439,12 @@ class GitDeployer extends BaseDeployer
         $this->_runCommands($this->commandsAfter);
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Runs one or more commands.
      *
      * @param string|string[] $commands
      */
-    private function _runCommands($commands)
+    private function _runCommands(array|string $commands)
     {
         if (empty($commands)) {
             return;
@@ -496,15 +456,7 @@ class GitDeployer extends BaseDeployer
 
         /** @var string $command */
         foreach ($commands as $command) {
-            // TODO: remove condition in Blitz 4 when Process 4 is forced
-            if (method_exists(Process::class, 'fromShellCommandline')) {
-                $process = Process::fromShellCommandline($command);
-            }
-            else {
-                /** @noinspection PhpParamsInspection */
-                $process = new Process($command);
-            }
-
+            $process = Process::fromShellCommandline($command);
             $process->mustRun();
         }
     }

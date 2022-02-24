@@ -3,7 +3,6 @@
 namespace putyourlightson\blitz\migrations;
 
 use craft\db\Migration;
-use craft\helpers\MigrationHelper;
 use craft\records\Element;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
@@ -15,9 +14,6 @@ use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
 class m200721_120000_add_primary_keys extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -25,15 +21,15 @@ class m200721_120000_add_primary_keys extends Migration
     {
         if ($this->db->tableExists(ElementCacheRecord::tableName())) {
             // Drop existing indexes first to avoid duplicate error (https://github.com/putyourlightson/craft-blitz/issues/240)
-            MigrationHelper::dropIndexIfExists(ElementCacheRecord::tableName(), ['cacheId', 'elementId'], true, $this);
+            $this->dropIndexIfExists(ElementCacheRecord::tableName(), ['cacheId', 'elementId'], true);
 
             $this->addPrimaryKey(null, ElementCacheRecord::tableName(), ['cacheId', 'elementId']);
         }
 
         if ($this->db->tableExists(ElementExpiryDateRecord::tableName())) {
             // Drop existing indexes first to avoid duplicate error (https://github.com/putyourlightson/craft-blitz/issues/240)
-            MigrationHelper::dropForeignKeyIfExists(ElementExpiryDateRecord::tableName(), ['elementId'], $this);
-            MigrationHelper::dropIndexIfExists(ElementExpiryDateRecord::tableName(), ['elementId'], true, $this);
+            $this->dropForeignKeyIfExists(ElementExpiryDateRecord::tableName(), ['elementId']);
+            $this->dropIndexIfExists(ElementExpiryDateRecord::tableName(), ['elementId'], true);
 
             $this->addPrimaryKey(null, ElementExpiryDateRecord::tableName(), ['elementId']);
 
@@ -42,9 +38,9 @@ class m200721_120000_add_primary_keys extends Migration
 
         if ($this->db->tableExists(ElementQueryCacheRecord::tableName())) {
             // Drop existing indexes first to avoid duplicate error (https://github.com/putyourlightson/craft-blitz/issues/240)
-            MigrationHelper::dropForeignKeyIfExists(ElementQueryCacheRecord::tableName(), ['cacheId'], $this);
-            MigrationHelper::dropForeignKeyIfExists(ElementQueryCacheRecord::tableName(), ['queryId'], $this);
-            MigrationHelper::dropIndexIfExists(ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true, $this);
+            $this->dropForeignKeyIfExists(ElementQueryCacheRecord::tableName(), ['cacheId']);
+            $this->dropForeignKeyIfExists(ElementQueryCacheRecord::tableName(), ['queryId']);
+            $this->dropIndexIfExists(ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
 
             $this->addPrimaryKey(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId']);
 
@@ -58,7 +54,7 @@ class m200721_120000_add_primary_keys extends Migration
 
         if ($this->db->tableExists(CacheTagRecord::tableName())) {
             // Drop existing indexes first to avoid duplicate error (https://github.com/putyourlightson/craft-blitz/issues/240)
-            MigrationHelper::dropIndexIfExists(CacheTagRecord::tableName(), ['cacheId', 'tag'], true, $this);
+            $this->dropIndexIfExists(CacheTagRecord::tableName(), ['cacheId', 'tag'], true);
 
             $this->addPrimaryKey(null, CacheTagRecord::tableName(), ['cacheId', 'tag']);
         }

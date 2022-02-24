@@ -8,9 +8,6 @@ use putyourlightson\blitz\records\CacheRecord;
 
 class m190518_120000_alter_uri_column extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

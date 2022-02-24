@@ -9,11 +9,8 @@ use yii\base\Event;
 
 class RegisterSourceIdAttributesEvent extends Event
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var string[]
      */
-    public $sourceIdAttributes = [];
+    public array $sourceIdAttributes = [];
 }

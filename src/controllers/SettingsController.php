@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\base\ComponentInterface;
-use craft\errors\MissingComponentException;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
@@ -19,20 +18,14 @@ use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
-use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 class SettingsController extends Controller
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Edit the plugin settings.
-     *
-     * @return Response|null
      */
-    public function actionEdit()
+    public function actionEdit(): ?Response
     {
         $settings = Blitz::$plugin->settings;
 
@@ -113,12 +106,8 @@ class SettingsController extends Controller
 
     /**
      * Saves the plugin settings.
-     *
-     * @return Response|null
-     * @throws BadRequestHttpException
-     * @throws MissingComponentException
      */
-    public function actionSave()
+    public function actionSave(): ?Response
     {
         $this->requirePostRequest();
 
@@ -212,15 +201,8 @@ class SettingsController extends Controller
         return $this->redirectToPostedUrl();
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Gets select option from a component.
-     *
-     * @param ComponentInterface $component
-     *
-     * @return array
      */
     private function _getSelectOption(ComponentInterface $component): array
     {

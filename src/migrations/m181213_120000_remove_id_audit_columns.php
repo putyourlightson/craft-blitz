@@ -11,9 +11,6 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 
 class m181213_120000_remove_id_audit_columns extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

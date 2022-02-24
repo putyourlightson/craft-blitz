@@ -9,9 +9,6 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 
 class m190105_120000_add_elementexpirydates_table extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

@@ -11,9 +11,6 @@ use putyourlightson\blitz\Blitz;
 
 class m181122_120000_change_querystringcaching_setting extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

@@ -29,9 +29,6 @@ class LocalWarmer extends BaseCacheWarmer
         return Craft::t('blitz', 'Local Warmer (experimental)');
     }
 
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -90,9 +87,6 @@ class LocalWarmer extends BaseCacheWarmer
             }
         }
     }
-
-    // Private Methods
-    // =========================================================================
 
     /**
      * Warms a site URI.

@@ -14,9 +14,6 @@ use DateTime;
  */
 class ElementExpiryDateRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      *

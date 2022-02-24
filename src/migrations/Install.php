@@ -17,16 +17,9 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
-use Throwable;
 
 class Install extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
-    /**
-     * @return bool
-     */
     public function safeUp(): bool
     {
         if ($this->createTables()) {
@@ -40,10 +33,6 @@ class Install extends Migration
         return true;
     }
 
-    /**
-     * @return bool
-     * @throws Throwable
-     */
     public function safeDown(): bool
     {
         $this->dropTableIfExists(DriverDataRecord::tableName());
@@ -58,13 +47,8 @@ class Install extends Migration
         return true;
     }
 
-    // Protected Methods
-    // =========================================================================
-
     /**
-     * Creates the tables needed for the Records used by the plugin
-     *
-     * @return bool
+     * Creates the tables needed for the Records used by the plugin.
      */
     protected function createTables(): bool
     {
@@ -143,9 +127,7 @@ class Install extends Migration
     }
 
     /**
-     * Creates the indexes needed for the Records used by the plugin
-     *
-     * @return void
+     * Creates the indexes needed for the Records used by the plugin.
      */
     protected function createIndexes()
     {
@@ -161,9 +143,7 @@ class Install extends Migration
     }
 
     /**
-     * Creates the foreign keys needed for the Records used by the plugin
-     *
-     * @return void
+     * Creates the foreign keys needed for the Records used by the plugin.
      */
     protected function addForeignKeys()
     {

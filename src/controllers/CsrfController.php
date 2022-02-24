@@ -11,16 +11,10 @@ use yii\web\Response;
 
 class CsrfController extends Controller
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
     protected $allowAnonymous = true;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * Returns a CSRF input field.

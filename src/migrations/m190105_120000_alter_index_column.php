@@ -8,9 +8,6 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 
 class m190105_120000_alter_index_column extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

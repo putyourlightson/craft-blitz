@@ -19,16 +19,10 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
  */
 class GuzzleWarmer extends BaseCacheWarmer
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var int
      */
-    public $concurrency = 3;
-
-    // Static
-    // =========================================================================
+    public int $concurrency = 3;
 
     /**
      * @inheritdoc
@@ -37,9 +31,6 @@ class GuzzleWarmer extends BaseCacheWarmer
     {
         return Craft::t('blitz', 'Guzzle Warmer (recommended)');
     }
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -60,10 +51,6 @@ class GuzzleWarmer extends BaseCacheWarmer
 
     /**
      * Warms site URIs with progress.
-     *
-     * @param array $siteUris
-     * @param callable|null $setProgressHandler
-     * @param int|null $delay
      */
     public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
@@ -119,23 +106,16 @@ class GuzzleWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/guzzle/settings', [
             'warmer' => $this,
         ]);
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Returns a generator to return the URL requests in a memory efficient manner
      * https://medium.com/tech-tajawal/use-memory-gently-with-yield-in-php-7e62e2480b8d
-     *
-     * @param array $urls
-     *
-     * @return Generator
      */
     private function _getRequests(array $urls): Generator
     {

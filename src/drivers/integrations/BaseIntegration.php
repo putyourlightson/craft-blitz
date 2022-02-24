@@ -7,9 +7,6 @@ namespace putyourlightson\blitz\drivers\integrations;
 
 abstract class BaseIntegration implements IntegrationInterface
 {
-    // Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

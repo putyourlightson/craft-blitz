@@ -12,16 +12,10 @@ use yii\web\Response;
 
 class TemplatesController extends Controller
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
     protected $allowAnonymous = true;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * Returns a rendered template.

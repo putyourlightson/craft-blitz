@@ -9,9 +9,6 @@ use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 
 class m190921_120000_change_zoneid_setting extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

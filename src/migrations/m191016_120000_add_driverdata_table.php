@@ -7,9 +7,6 @@ use putyourlightson\blitz\records\DriverDataRecord;
 
 class m191016_120000_add_driverdata_table extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

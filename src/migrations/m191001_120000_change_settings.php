@@ -9,9 +9,6 @@ use putyourlightson\blitz\drivers\storage\FileStorage;
 
 class m191001_120000_change_settings extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -64,9 +61,6 @@ class m191001_120000_change_settings extends Migration
 
         return false;
     }
-
-    // Private Methods
-    // =========================================================================
 
     /**
      * @param array $settings

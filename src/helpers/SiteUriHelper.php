@@ -18,30 +18,20 @@ use putyourlightson\blitz\records\CacheRecord;
 
 class SiteUriHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @const string
      */
-    const MIME_TYPE_HTML = 'text/html';
-
-    // Public Methods
-    // =========================================================================
+    public const MIME_TYPE_HTML = 'text/html';
 
     /**
      * Returns the mime type of the given site URI.
-     *
-     * @param SiteUriModel $siteUri
-     *
-     * @return string
      */
     public static function getMimeType(SiteUriModel $siteUri): string
     {
         $uri = $siteUri->uri;
 
         // Remove any query string from the URI
-        if (strpos($uri, '?') !== false) {
+        if (str_contains($uri, '?')) {
             $uri = substr($uri, 0, strpos($uri, '?'));
         }
 
@@ -50,8 +40,6 @@ class SiteUriHelper
 
     /**
      * Returns all site URIs.
-     *
-     * @param bool $cacheableOnly
      *
      * @return SiteUriModel[]
      */
@@ -82,9 +70,6 @@ class SiteUriHelper
 
     /**
      * Returns site URIs for a given site.
-     *
-     * @param int $siteId
-     * @param bool $cacheableOnly
      *
      * @return SiteUriModel[]
      */
@@ -129,7 +114,7 @@ class SiteUriHelper
                     continue;
                 }
 
-                if (!Blitz::$plugin->settings->warmPagesWithQueryStringParams && strpos($uri, '?') !== false) {
+                if (!Blitz::$plugin->settings->warmPagesWithQueryStringParams && str_contains($uri, '?')) {
                     continue;
                 }
             }
@@ -144,19 +129,10 @@ class SiteUriHelper
      * Returns paginated URIs for a given site.
      * @see Paginate::getPageUrl()
      *
-     * @param int $siteId
-     *
      * @return string[]
      */
     public static function getPaginatedUrisForSite(int $siteId): array
     {
-        // TODO: remove this condition after the next breakpoint
-        $schemaVersion = Craft::$app->projectConfig->get('plugins.blitz.schemaVersion', true);
-
-        if (version_compare($schemaVersion, '3.10.0', '<')) {
-            return [];
-        }
-
         $paginatedUris = [];
 
         /** @var CacheRecord[] $cacheRecords */
@@ -167,7 +143,7 @@ class SiteUriHelper
             ->all();
 
         $pageTrigger = Craft::$app->getConfig()->getGeneral()->getPageTrigger();
-        $useQueryParam = strpos($pageTrigger, '?') === 0;
+        $useQueryParam = str_starts_with($pageTrigger, '?');
 
         foreach ($cacheRecords as $cacheRecord) {
             for ($page = 2; $page <= $cacheRecord->paginate; $page++) {
@@ -197,7 +173,7 @@ class SiteUriHelper
     {
         $pageTrigger = Craft::$app->getConfig()->getGeneral()->getPageTrigger();
 
-        if (strpos($pageTrigger, '?') === 0) {
+        if (str_starts_with($pageTrigger, '?')) {
             $pageTrigger = trim($pageTrigger, '?=');
 
             return (bool)preg_match('/\?(.*\&)?'.$pageTrigger.'=/', $uri);
@@ -213,7 +189,6 @@ class SiteUriHelper
      * Returns cached site URIs given an array of cache IDs.
      *
      * @param int[] $cacheIds
-     *
      * @return SiteUriModel[]
      */
     public static function getCachedSiteUris(array $cacheIds): array
@@ -241,7 +216,6 @@ class SiteUriHelper
      * Returns the site URIs of an array of element IDs.
      *
      * @param int[] $elementIds
-     *
      * @return SiteUriModel[]
      */
     public static function getElementSiteUris(array $elementIds): array
@@ -270,8 +244,6 @@ class SiteUriHelper
     /**
      * Returns URLs from the given site URIs.
      *
-     * @param array $siteUris
-     *
      * @return string[]
      */
     public static function getUrlsFromSiteUris(array $siteUris): array
@@ -298,7 +270,6 @@ class SiteUriHelper
      * Returns site URIs from the given URLs.
      *
      * @param string[] $urls
-     *
      * @return SiteUriModel[]
      */
     public static function getSiteUrisFromUrls(array $urls): array
@@ -313,7 +284,7 @@ class SiteUriHelper
             }
 
             // Deal with wildcard in URL
-            if (strpos($url, '*') !== false) {
+            if (str_contains($url, '*')) {
                 $wildcardUris = CacheRecord::find()
                     ->select('uri')
                     ->where(['siteId' => $siteUri->siteId])
@@ -341,12 +312,8 @@ class SiteUriHelper
      * This method looks for the site with the longest base URL that matches
      * the provided URL. For example, the URL `site.com/en/page` will match
      * the site with base URL `site.com/en` over `site.com`.
-     *
-     * @param string $url
-     *
-     * @return SiteUriModel|null
      */
-    public static function getSiteUriFromUrl(string $url)
+    public static function getSiteUriFromUrl(string $url): ?SiteUriModel
     {
         $siteUri = null;
         $siteBaseUrl = '';
@@ -373,10 +340,6 @@ class SiteUriHelper
 
     /**
      * Returns site URIs grouped by site.
-     *
-     * @param array $siteUris
-     *
-     * @return array
      */
     public static function getSiteUrisGroupedBySite(array $siteUris): array
     {

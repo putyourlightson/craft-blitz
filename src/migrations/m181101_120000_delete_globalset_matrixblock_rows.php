@@ -11,9 +11,6 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
 
 class m181101_120000_delete_globalset_matrixblock_rows extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

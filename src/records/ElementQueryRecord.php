@@ -18,9 +18,6 @@ use yii\db\ActiveQueryInterface;
  */
 class ElementQueryRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      *

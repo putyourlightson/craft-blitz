@@ -9,11 +9,8 @@ use yii\base\Event;
 
 class RegisterLiveStatusesEvent extends Event
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var string[]
      */
-    public $liveStatuses = [];
+    public array $liveStatuses = [];
 }

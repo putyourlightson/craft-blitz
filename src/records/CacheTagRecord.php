@@ -15,9 +15,6 @@ use yii\db\ActiveQueryInterface;
  */
 class CacheTagRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      *

@@ -6,9 +6,6 @@ use craft\db\Migration;
 
 class m180704_120000_add_caches_elementquerycaches_tables extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

@@ -38,19 +38,19 @@ class CloudflarePurger extends BaseCachePurger
     public string $authenticationMethod = 'apiKey';
 
     /**
-     * @var string The API token.
+     * @var string|null The API token.
      */
-    public string $apiToken;
+    public ?string $apiToken = null;
 
     /**
-     * @var string The API key.
+     * @var string|null The API key.
      */
-    public string $apiKey;
+    public ?string $apiKey = null;
 
     /**
-     * @var string The email address to use.
+     * @var string|null The email address to use.
      */
-    public string $email;
+    public ?string $email = null;
 
     /**
      * @var array The zone IDs to purge.

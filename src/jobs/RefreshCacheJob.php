@@ -12,13 +12,11 @@ use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
-use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use Throwable;
 use yii\db\Exception as DbException;
 use yii\queue\RetryableJobInterface;
 
@@ -27,26 +25,20 @@ use yii\queue\RetryableJobInterface;
  */
 class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var int[]
      */
-    public $cacheIds = [];
+    public array $cacheIds = [];
 
     /**
      * @var array
      */
-    public $elements = [];
+    public array $elements = [];
 
     /**
      * @var bool
      */
-    public $clearCache = false;
-
-    // Public Methods
-    // =========================================================================
+    public bool $clearCache = false;
 
     /**
      * @inheritdoc
@@ -66,11 +58,8 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
     /**
      * @inheritdoc
-     *
-     * @throws Exception
-     * @throws Throwable
      */
-    public function execute($queue)
+    public function execute($queue): void
     {
         // Set progress label
         $this->setProgress($queue, 0,
@@ -160,9 +149,6 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         }
     }
 
-    // Protected Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -171,14 +157,9 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         return Craft::t('blitz', 'Refreshing Blitz cache');
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
-     * Returns cache IDs that match any special source tags
+     * Returns cache IDs that match any special source tags.
      *
-     * @param string $elementType
-     * @param array $sourceIds
      * @return int[]
      */
     private function _getSourceTagCacheIds(string $elementType, array $sourceIds): array
@@ -197,10 +178,6 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * Returns cache IDs from a given entry query that contains the provided element IDs,
      * ignoring the provided cache IDs.
-     *
-     * @param ElementQueryRecord $elementQueryRecord
-     * @param array $elementIds
-     * @param array $ignoreCacheIds
      *
      * @return int[]
      */
@@ -246,7 +223,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         try {
             $elementQueryIds = $elementQuery->ids();
         }
-        catch (DbException $exception) {}
+        catch (DbException) {}
 
         // If one or more of the element IDs are in the element query's IDs
         if (!empty(array_intersect($elementIds, $elementQueryIds))) {

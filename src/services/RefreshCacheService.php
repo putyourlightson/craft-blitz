@@ -444,7 +444,7 @@ class RefreshCacheService extends Component
         // Get warmable site URIs before flushing the cache
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(true),
-            Blitz::$plugin->settings->getCustomSiteUris()
+            Blitz::$plugin->settings->customSiteUris
         );
 
         Blitz::$plugin->flushCache->flushAll();
@@ -477,7 +477,7 @@ class RefreshCacheService extends Component
         // Get warmable site URIs before flushing the cache
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
 
-        foreach (Blitz::$plugin->settings->getCustomSiteUris() as $customSiteUri) {
+        foreach (Blitz::$plugin->settings->customSiteUris as $customSiteUri) {
             if ($customSiteUri['siteId'] == $siteId) {
                 $siteUris[] = $customSiteUri;
             }
@@ -522,29 +522,13 @@ class RefreshCacheService extends Component
         $elementsService = Craft::$app->getElements();
 
         foreach ($elementExpiryDates as $elementExpiryDate) {
-            /** @var ElementExpiryDateRecord $elementExpiryDate */
-            $elementId = $elementExpiryDate->elementId;
+            $element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
 
             // This should happen before invalidating the element so that other expiry dates will be saved
             $elementExpiryDate->delete();
 
-            // TODO: simplify using the following technique in 4.0.0
-            // https://github.com/craftcms/cms/pull/5861
-            //$element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
-
-            $elementType = $elementsService->getElementTypeById($elementId);
-
-            if ($elementType !== null) {
-                /** @var ElementInterface $elementType */
-                $element = $elementType::find()
-                    ->id($elementId)
-                    ->site('*')
-                    ->status(null)
-                    ->one();
-
-                if ($element !== null) {
-                    $this->addElement($element);
-                }
+            if ($element !== null) {
+                $this->addElement($element);
             }
         }
 

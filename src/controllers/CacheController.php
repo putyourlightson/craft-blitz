@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\View;
@@ -15,9 +16,6 @@ use yii\web\Response;
 
 class CacheController extends Controller
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -26,20 +24,15 @@ class CacheController extends Controller
     /**
      * @var bool Disable Snaptcha validation
      */
-    public $enableSnaptchaValidation = false;
+    public bool $enableSnaptchaValidation = false;
 
     /**
      * @inheritdoc
      */
     protected $allowAnonymous = true;
 
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
-     *
-     * @throws ForbiddenHttpException
      */
     public function beforeAction($action): bool
     {
@@ -56,7 +49,7 @@ class CacheController extends Controller
         else {
             // Verify API key
             $key = $request->getParam('key');
-            $apiKey = Craft::parseEnv(Blitz::$plugin->settings->apiKey);
+            $apiKey = App::parseEnv(Blitz::$plugin->settings->apiKey);
 
             if (empty($key) || empty($apiKey) || $key != $apiKey) {
                 throw new ForbiddenHttpException('Unauthorised access.');
@@ -78,8 +71,6 @@ class CacheController extends Controller
 
     /**
      * Clears the cache.
-     *
-     * @return Response
      */
     public function actionClear(): Response
     {
@@ -93,8 +84,6 @@ class CacheController extends Controller
 
     /**
      * Flushes the cache.
-     *
-     * @return Response
      */
     public function actionFlush(): Response
     {
@@ -108,8 +97,6 @@ class CacheController extends Controller
 
     /**
      * Purges the cache.
-     *
-     * @return Response
      */
     public function actionPurge(): Response
     {
@@ -123,8 +110,6 @@ class CacheController extends Controller
 
     /**
      * Warms the cache.
-     *
-     * @return Response
      */
     public function actionWarm(): Response
     {
@@ -142,8 +127,6 @@ class CacheController extends Controller
 
     /**
      * Deploys the cache.
-     *
-     * @return Response
      */
     public function actionDeploy(): Response
     {
@@ -161,8 +144,6 @@ class CacheController extends Controller
 
     /**
      * Refreshes the entire cache.
-     *
-     * @return Response
      */
     public function actionRefresh(): Response
     {
@@ -181,8 +162,6 @@ class CacheController extends Controller
 
     /**
      * Refreshes expired cache.
-     *
-     * @return Response
      */
     public function actionRefreshExpired(): Response
     {
@@ -196,8 +175,6 @@ class CacheController extends Controller
 
     /**
      * Refreshes site cache.
-     *
-     * @return Response
      */
     public function actionRefreshSite(): Response
     {
@@ -222,8 +199,6 @@ class CacheController extends Controller
 
     /**
      * Refreshes cached URLs.
-     *
-     * @return Response
      */
     public function actionRefreshUrls(): Response
     {
@@ -245,8 +220,6 @@ class CacheController extends Controller
 
     /**
      * Refreshes tagged cache.
-     *
-     * @return Response
      */
     public function actionRefreshTagged(): Response
     {
@@ -266,16 +239,8 @@ class CacheController extends Controller
         return $this->_getResponse($message);
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Returns a response.
-     *
-     * @param string $message
-     * @param bool $success
-     *
-     * @return Response
      */
     private function _getResponse(string $message, bool $success = true): Response
     {
@@ -302,11 +267,9 @@ class CacheController extends Controller
     /**
      * Normalizes values as an array of arguments.
      *
-     * @param string|array|null $values
-     *
      * @return string[]
      */
-    private function _normalizeArguments($values): array
+    private function _normalizeArguments(array|string|null $values): array
     {
         if (is_string($values)) {
             $values = StringHelper::split($values);

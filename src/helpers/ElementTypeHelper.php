@@ -20,28 +20,25 @@ use yii\base\Event;
 
 class ElementTypeHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event RegisterNonCacheableElementTypesEvent
      */
-    const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
+    public const EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES = 'registerNonCacheableElementTypes';
 
     /**
      * @event RegisterSourceIdAttributesEvent
      */
-    const EVENT_REGISTER_SOURCE_ID_ATTRIBUTES = 'registerSourceIdAttributes';
+    public const EVENT_REGISTER_SOURCE_ID_ATTRIBUTES = 'registerSourceIdAttributes';
 
     /**
      * @event RegisterLiveStatusesEvent
      */
-    const EVENT_REGISTER_LIVE_STATUSES = 'registerLiveStatuses';
+    public const EVENT_REGISTER_LIVE_STATUSES = 'registerLiveStatuses';
 
     /**
      * @const string[]
      */
-    const NON_CACHEABLE_ELEMENT_TYPES = [
+    public const NON_CACHEABLE_ELEMENT_TYPES = [
         GlobalSet::class,
         'benf\neo\elements\Block',
         'craft\commerce\elements\Order',
@@ -51,7 +48,7 @@ class ElementTypeHelper
     /**
      * @const string[]
      */
-    const SOURCE_ID_ATTRIBUTES = [
+    public const SOURCE_ID_ATTRIBUTES = [
         Entry::class => 'sectionId',
         Category::class => 'groupId',
         Tag::class => 'groupId',
@@ -63,39 +60,29 @@ class ElementTypeHelper
     /**
      * @const string[]
      */
-    const LIVE_STATUSES = [
+    public const LIVE_STATUSES = [
         Entry::class => Entry::STATUS_LIVE,
         User::class => User::STATUS_ACTIVE,
         'craft\commerce\elements\Product' => 'live',
     ];
 
-    // Properties
-    // =========================================================================
+    /**
+     * @var string[]|null
+     */
+    private static ?array $_nonCacheableElementTypes;
 
     /**
      * @var string[]|null
      */
-    private static $_nonCacheableElementTypes;
+    private static ?array $_sourceIdAttributes;
 
     /**
      * @var string[]|null
      */
-    private static $_sourceIdAttributes;
-
-    /**
-     * @var string[]|null
-     */
-    private static $_liveStatuses;
-
-    // Public Methods
-    // =========================================================================
+    private static ?array $_liveStatuses;
 
     /**
      * Returns whether the element type is cacheable.
-     *
-     * @param string|null $elementType
-     *
-     * @return bool
      */
     public static function getIsCacheableElementType(string $elementType = null): bool
     {
@@ -118,12 +105,8 @@ class ElementTypeHelper
 
     /**
      * Returns the source ID attribute for the element type.
-     *
-     * @param string|null $elementType
-     *
-     * @return string|null
      */
-    public static function getSourceIdAttribute(string $elementType = null)
+    public static function getSourceIdAttribute(string $elementType = null): ?string
     {
         if ($elementType === null) {
             return null;
@@ -136,12 +119,8 @@ class ElementTypeHelper
 
     /**
      * Returns the live status for the element type.
-     *
-     * @param string|null $elementType
-     *
-     * @return string|null
      */
-    public static function getLiveStatus(string $elementType = null)
+    public static function getLiveStatus(string $elementType = null): ?string
     {
         if ($elementType === null) {
             return null;

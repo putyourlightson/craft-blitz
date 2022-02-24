@@ -10,11 +10,8 @@ use craft\events\CancelableEvent;
 
 class RefreshElementEvent extends CancelableEvent
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var ElementInterface|null
      */
-    public $element;
+    public ?ElementInterface $element;
 }

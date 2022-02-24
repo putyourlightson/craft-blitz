@@ -13,26 +13,20 @@ use craft\helpers\UrlHelper;
  */
 class SiteUriModel extends Model
 {
-    // Public Properties
-    // =========================================================================
-
     /**
-     * @var int|string
+     * @var string|int
      */
-    public $siteId;
+    public string|int $siteId;
 
     /**
      * @var string
      */
-    public $uri;
-
-    // Public Methods
-    // =========================================================================
+    public string $uri;
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 

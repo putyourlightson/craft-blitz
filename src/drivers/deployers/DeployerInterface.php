@@ -10,9 +10,6 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 interface DeployerInterface extends SavableComponentInterface
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Deploys the cache given an array of site URIs.
      *

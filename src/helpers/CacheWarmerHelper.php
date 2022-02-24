@@ -12,7 +12,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\warmers\DummyWarmer;
 use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
 use putyourlightson\blitz\drivers\warmers\LocalWarmer;
-use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
 class CacheWarmerHelper extends BaseDriverHelper

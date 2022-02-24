@@ -10,9 +10,6 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 interface CacheWarmerInterface extends SavableComponentInterface
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Warms the cache given an array of site URIs.
      *

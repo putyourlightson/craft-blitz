@@ -9,9 +9,6 @@ use putyourlightson\blitz\records\CacheTagRecord;
 
 class m190227_120000_add_cachetags_table extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

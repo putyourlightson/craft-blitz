@@ -9,9 +9,6 @@ use Craft;
 
 class DummyDeployer extends BaseDeployer
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -20,16 +17,10 @@ class DummyDeployer extends BaseDeployer
         return Craft::t('blitz', 'None');
     }
 
-    // Properties
-    // =========================================================================
-
     /**
      * @var bool
      */
-    public $isDummy = true;
-
-    // Public Methods
-    // =========================================================================
+    public bool $isDummy = true;
 
     /**
      * @inheritdoc

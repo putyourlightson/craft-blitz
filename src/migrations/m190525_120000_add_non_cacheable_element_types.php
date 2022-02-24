@@ -9,9 +9,6 @@ use putyourlightson\blitz\models\SettingsModel;
 
 class m190525_120000_add_non_cacheable_element_types extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

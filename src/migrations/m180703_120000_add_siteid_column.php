@@ -6,9 +6,6 @@ use craft\db\Migration;
 
 class m180703_120000_add_siteid_column extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

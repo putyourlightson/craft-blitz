@@ -14,9 +14,6 @@ use craft\db\ActiveRecord;
  */
 class DriverDataRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      *

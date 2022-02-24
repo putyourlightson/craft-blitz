@@ -17,36 +17,30 @@ use yii\queue\RetryableJobInterface;
  */
 class DriverJob extends BaseJob implements RetryableJobInterface
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var SiteUriModel[]
      */
-    public $siteUris;
+    public array $siteUris;
 
     /**
      * @var string
      */
-    public $driverId;
+    public string $driverId;
 
     /**
      * @var string
      */
-    public $driverMethod;
+    public string $driverMethod;
 
     /**
      * @var int|null
      */
-    public $delay;
+    public ?int $delay;
 
     /**
      * @var Queue
      */
-    private $_queue;
-
-    // Public Methods
-    // =========================================================================
+    private Queue $_queue;
 
     /**
      * @inheritdoc
@@ -67,7 +61,7 @@ class DriverJob extends BaseJob implements RetryableJobInterface
     /**
      * @inheritdoc
      */
-    public function execute($queue)
+    public function execute($queue): void
     {
         App::maxPowerCaptain();
 
@@ -83,10 +77,6 @@ class DriverJob extends BaseJob implements RetryableJobInterface
 
     /**
      * Handles setting the progress.
-     *
-     * @param int $count
-     * @param int $total
-     * @param string|null $label
      */
     public function setProgressHandler(int $count, int $total, string $label = null)
     {

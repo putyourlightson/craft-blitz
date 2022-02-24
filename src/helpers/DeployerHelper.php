@@ -16,16 +16,10 @@ use yii\base\Event;
 
 class DeployerHelper extends BaseDriverHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_DEPLOYER_TYPES = 'registerDeployerTypes';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_REGISTER_DEPLOYER_TYPES = 'registerDeployerTypes';
 
     /**
      * Returns all deployer types.
@@ -63,6 +57,8 @@ class DeployerHelper extends BaseDriverHelper
     }
 
     /**
+     * Adds a deploy job to the queue.
+     *
      * @param SiteUriModel[] $siteUris
      * @param string $driverMethod
      * @param int|null $delay

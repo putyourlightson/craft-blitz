@@ -182,7 +182,7 @@ class CacheController extends Controller
         // Get warmable site URIs before flushing the cache
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(true),
-            Blitz::$plugin->settings->getCustomSiteUris()
+            Blitz::$plugin->settings->customSiteUris,
         );
 
         $this->_clearCache();
@@ -219,7 +219,7 @@ class CacheController extends Controller
         // Get warmable site URIs before flushing the cache
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
 
-        foreach (Blitz::$plugin->settings->getCustomSiteUris() as $customSiteUri) {
+        foreach (Blitz::$plugin->settings->customSiteUris as $customSiteUri) {
             if ($customSiteUri['siteId'] == $siteId) {
                 $siteUris[] = $customSiteUri;
             }
@@ -387,7 +387,7 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, BaseConsole::FG_YELLOW);
 
-        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
+        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->customSiteUris);
 
         if ($this->queue) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler']);
@@ -424,7 +424,7 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, BaseConsole::FG_YELLOW);
 
-        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
+        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->customSiteUris);
 
         Console::startProgress(0, count($siteUris), '', 0.8);
 

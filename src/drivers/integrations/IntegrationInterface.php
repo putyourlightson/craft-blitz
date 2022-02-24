@@ -7,9 +7,6 @@ namespace putyourlightson\blitz\drivers\integrations;
 
 interface IntegrationInterface
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Returns the required plugins.
      *

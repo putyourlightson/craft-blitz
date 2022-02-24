@@ -23,16 +23,10 @@ class DummyWarmer extends BaseCacheWarmer
         return Craft::t('blitz', 'None');
     }
 
-    // Properties
-    // =========================================================================
-
     /**
      * @var bool
      */
-    public $isDummy = true;
-
-    // Public Methods
-    // =========================================================================
+    public bool $isDummy = true;
 
     /**
      * @inheritdoc

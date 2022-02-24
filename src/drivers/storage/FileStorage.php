@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\storage;
 
 use Craft;
+use craft\helpers\App;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
@@ -18,9 +19,6 @@ use yii\base\InvalidArgumentException;
  */
 class FileStorage extends BaseCacheStorage
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -29,52 +27,46 @@ class FileStorage extends BaseCacheStorage
         return Craft::t('blitz', 'Blitz File Storage (recommended)');
     }
 
-    // Properties
-    // =========================================================================
+    /**
+     * @var string The storage folder path.
+     */
+    public string $folderPath = '@webroot/cache/blitz';
 
     /**
-     * @var string
+     * @var bool Whether Gzip files should be created.
      */
-    public $folderPath = '@webroot/cache/blitz';
+    public bool $createGzipFiles = false;
 
     /**
-     * @var bool
+     * @var bool Whether Brotli files should be created.
      */
-    public $createGzipFiles = false;
-
-    /**
-     * @var bool
-     */
-    public $createBrotliFiles = false;
+    public bool $createBrotliFiles = false;
 
     /**
      * @var bool
      */
-    public $countCachedFiles = true;
+    public bool $countCachedFiles = true;
 
     /**
      * @var string|null
      */
-    private $_cacheFolderPath;
+    private ?string $_cacheFolderPath;
 
     /**
      * @var array|null
      */
-    private $_sitePaths;
-
-    // Public Methods
-    // =========================================================================
+    private ?array $_sitePaths;
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
         if (!empty($this->folderPath)) {
             $this->_cacheFolderPath = FileHelper::normalizePath(
-                Craft::parseEnv($this->folderPath)
+                App::parseEnv($this->folderPath)
             );
         }
     }
@@ -220,7 +212,7 @@ class FileStorage extends BaseCacheStorage
                     continue;
                 }
 
-                if (strpos($otherSite['path'], $site['path'].'/') === 0) {
+                if (str_starts_with($otherSite['path'], $site['path'] . '/')) {
                     $site['count'] -= is_dir($otherSite['path']) ? $otherSite['count'] : 0;
                 }
             }
@@ -234,7 +226,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/settings', [
             'driver' => $this,
@@ -245,7 +237,6 @@ class FileStorage extends BaseCacheStorage
      * Returns file paths for the provided site ID and URI.
      *
      * @param SiteUriModel $siteUri
-     *
      * @return string[]
      */
     public function getFilePaths(SiteUriModel $siteUri): array
@@ -267,7 +258,7 @@ class FileStorage extends BaseCacheStorage
         $filePath = FileHelper::normalizePath($sitePath.'/'.$uri.'/index.html');
 
         // Ensure that file path is a sub path of the site path
-        if (strpos($filePath, $sitePath) === false) {
+        if (!str_contains($filePath, $sitePath)) {
             return [];
         }
 
@@ -294,10 +285,6 @@ class FileStorage extends BaseCacheStorage
 
     /**
      * Returns site path from provided site ID.
-     *
-     * @param int $siteId
-     *
-     * @return string
      */
     public function getSitePath(int $siteId): string
     {
@@ -325,12 +312,8 @@ class FileStorage extends BaseCacheStorage
 
     /**
      * Returns the number of cached files in the provided path.
-     *
-     * @param string $path
-     *
-     * @return int|string
      */
-    public function getCachedFileCount(string $path)
+    public function getCachedFileCount(string $path): int|string
     {
         if (!$this->countCachedFiles) {
             return '-';
@@ -341,7 +324,7 @@ class FileStorage extends BaseCacheStorage
 
     private function _hasInvalidQueryString(string $uri): bool
     {
-        if (strpos($uri, '?') === false) {
+        if (!str_contains($uri, '?')) {
             return false;
         }
 
@@ -351,7 +334,7 @@ class FileStorage extends BaseCacheStorage
         $queryString = rawurldecode($queryString);
         $queryStringPath = FileHelper::normalizePath($queryString);
 
-        if (empty($queryStringPath) || substr($queryStringPath, 0, 1) == '.') {
+        if (empty($queryStringPath) || str_starts_with($queryStringPath, '.')) {
             return true;
         }
 

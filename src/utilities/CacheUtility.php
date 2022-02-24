@@ -11,9 +11,6 @@ use putyourlightson\blitz\Blitz;
 
 class CacheUtility extends Utility
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -33,7 +30,7 @@ class CacheUtility extends Utility
     /**
      * @inheritdoc
      */
-    public static function iconPath()
+    public static function iconPath(): ?string
     {
         $iconPath = Craft::getAlias('@vendor/putyourlightson/craft-blitz/src/icon-mask.svg');
 

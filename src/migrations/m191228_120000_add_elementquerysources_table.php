@@ -9,9 +9,6 @@ use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
 class m191228_120000_add_elementquerysources_table extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -32,7 +29,7 @@ class m191228_120000_add_elementquerysources_table extends Migration
                 ->select('id')
                 ->column();
 
-            // Use DB connection so we can exclude audit columns when inserting
+            // Use DB connection, so we can exclude audit columns when inserting
             $db = Craft::$app->getDb();
 
             foreach ($queryIds as $queryId) {

@@ -8,9 +8,6 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 
 class m181228_120000_optimise_elementqueries extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

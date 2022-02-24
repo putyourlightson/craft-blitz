@@ -13,16 +13,10 @@ use yii\base\Event;
 
 class IntegrationHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_INTEGRATIONS = 'registerIntegrations';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_REGISTER_INTEGRATIONS = 'registerIntegrations';
 
     /**
      * Returns all integrations.

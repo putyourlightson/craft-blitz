@@ -8,9 +8,6 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 
 class m180628_120000_add_elementcaches_table extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

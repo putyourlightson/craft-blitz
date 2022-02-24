@@ -10,9 +10,6 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 interface CachePurgerInterface extends SavableComponentInterface
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Purges the cache given an array of site URIs.
      *

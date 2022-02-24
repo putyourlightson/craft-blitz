@@ -9,9 +9,6 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 
 class m181214_120000_add_indexes_hash_column extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

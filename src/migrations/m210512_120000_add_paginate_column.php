@@ -7,9 +7,6 @@ use putyourlightson\blitz\records\CacheRecord;
 
 class m210512_120000_add_paginate_column extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

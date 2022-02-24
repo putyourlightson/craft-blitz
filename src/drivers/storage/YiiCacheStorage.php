@@ -12,34 +12,24 @@ use yii\caching\CacheInterface;
 use yii\db\Exception;
 
 /**
- *
  * @property mixed $settingsHtml
  */
 class YiiCacheStorage extends BaseCacheStorage
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @const string
      */
-    const KEY_PREFIX = 'blitz';
-
-    // Properties
-    // =========================================================================
+    public const KEY_PREFIX = 'blitz';
 
     /**
      * @var string
      */
-    public $cacheComponent = 'cache';
+    public string $cacheComponent = 'cache';
 
     /**
      * @var CacheInterface|null
      */
-    private $_cache;
-
-    // Static
-    // =========================================================================
+    private ?CacheInterface $_cache;
 
     /**
      * @inheritdoc
@@ -49,13 +39,10 @@ class YiiCacheStorage extends BaseCacheStorage
         return Craft::t('blitz', 'Yii Cache Storage');
     }
 
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -81,7 +68,7 @@ class YiiCacheStorage extends BaseCacheStorage
                 self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
             ]);
         }
-        catch (Exception $e) {}
+        catch (Exception) {}
 
         return $value ?: '';
     }
@@ -165,7 +152,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/yii-cache/settings', [
             'driver' => $this,

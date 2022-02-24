@@ -10,9 +10,6 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 
 class m181125_120000_add_elementqueries_table extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */

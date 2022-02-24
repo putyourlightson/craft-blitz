@@ -7,26 +7,23 @@ namespace putyourlightson\blitz\drivers\purgers;
 
 trait CachePurgerTrait
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var bool
      */
-    public $isDummy = false;
+    public bool $isDummy = false;
 
     /**
      * @var string
      */
-    public $tagHeaderName = 'Cache-Tag';
+    public string $tagHeaderName = 'Cache-Tag';
 
     /**
      * @var string
      */
-    public $tagHeaderDelimiter = ',';
+    public string $tagHeaderDelimiter = ',';
 
     /**
      * @var int
      */
-    public $warmCacheDelay = 0;
+    public int $warmCacheDelay = 0;
 }

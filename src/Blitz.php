@@ -68,16 +68,10 @@ use yii\base\Event;
  */
 class Blitz extends Plugin
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var Blitz
      */
     public static Blitz $plugin;
-
-    // Public Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -150,9 +144,6 @@ class Blitz extends Plugin
         LogToFile::log($message, 'blitz', 'debug');
     }
 
-    // Protected Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -160,9 +151,6 @@ class Blitz extends Plugin
     {
         return new SettingsModel();
     }
-
-    // Private Methods
-    // =========================================================================
 
     /**
      * Registers the components
