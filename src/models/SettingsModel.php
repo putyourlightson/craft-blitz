@@ -111,7 +111,7 @@ class SettingsModel extends Model
     public array $cacheWarmerTypes = [];
 
     /**
-     * @var array Custom site URIs to warm when either a site or the entire cache is warmed.
+     * @var array|string Custom site URIs to warm when either a site or the entire cache is warmed.
      *
      * [
      *     [
@@ -120,7 +120,7 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array $customSiteUris = [];
+    public array|string $customSiteUris = [];
 
     /**
      * @var string The purger type to use.
@@ -222,7 +222,7 @@ class SettingsModel extends Model
      * @var int|null The amount of time after which the cache should expire (if not 0).
      * See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
      */
-    public ?int $cacheDuration;
+    public ?int $cacheDuration = null;
 
     /**
      * @var string[] Element types that should not be cached (in addition to the defaults).

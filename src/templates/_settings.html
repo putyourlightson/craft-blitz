@@ -1,11 +1,10 @@
 {% extends '_layouts/cp' %}
 
-{% import "_includes/forms" as forms %}
+{% import '_includes/forms' as forms %}
+{% from 'blitz/_macros' import configWarning %}
+{% from 'blitz/_macros' import configFieldWarning %}
 
-{% from "blitz/_macros" import configWarning %}
-{% from "blitz/_macros" import configFieldWarning %}
-
-{% do view.registerAssetBundle("putyourlightson\\blitz\\assets\\BlitzAsset") %}
+{% do view.registerAssetBundle('putyourlightson\\blitz\\assets\\BlitzAsset') %}
 
 {% set crumbs = [
     { label: 'Settings'|t('app'), url: url('settings') },
@@ -25,7 +24,7 @@
 
 {% set fullPageForm = true %}
 {% set welcome = craft.app.request.getParam('welcome') %}
-{% set docs = 'https://putyourlightson.com/plugins/blitz#' %}
+{% set docs = 'https://putyourlightson.com/plugins/blitz' %}
 
 {% block actionButton %}
 
@@ -41,7 +40,7 @@
 
     <div id="general">
 
-        {% include 'blitz/_includes/welcome/top' %}
+        {{ include('blitz/_includes/welcome/top') }}
 
         {% if craft.blitz.getWebAliasExists() %}
             <div class="field">
@@ -52,7 +51,7 @@
         {% endif %}
 
         <div class="flex">
-            {% include 'blitz/_includes/welcome/step' with {step: 1, text: 'Enable caching'} %}
+            {{ include('blitz/_includes/welcome/step', { step: 1, text: 'Enable caching' }) }}
 
             <div class="flex-grow">
                 {% set info %}
@@ -70,7 +69,7 @@
         </div>
 
         <div class="flex">
-            {% include 'blitz/_includes/welcome/step' with {step: 2, text: 'Add at least one included URI pattern'} %}
+            {{ include('blitz/_includes/welcome/step', { step: 2, text: 'Add at least one included URI pattern' }) }}
 
             <div class="flex-grow">
                 {% set cols = [] %}
@@ -89,7 +88,7 @@
                 {% endif %}
 
                 {% set info -%}
-                    {% include 'blitz/_includes/uri-pattern-info' with {docs: docs} %}
+                    {{ include('blitz/_includes/uri-pattern-info', { docs: docs }) }}
                 {%- endset %}
                 {% set cols = cols|merge({
                     uriPattern: {
@@ -113,6 +112,9 @@
                     id: 'includedUriPatterns',
                     cols: cols,
                     rows: settings.includedUriPatterns,
+                    allowAdd: true,
+                    allowDelete: true,
+                    allowReorder: true,
                     addRowLabel: "Add a URI pattern"|t('blitz'),
                 }) }}
 
@@ -128,12 +130,15 @@
                     id: 'excludedUriPatterns',
                     cols: cols,
                     rows: settings.excludedUriPatterns,
+                    allowAdd: true,
+                    allowDelete: true,
+                    allowReorder: true,
                     addRowLabel: "Add a URI pattern"|t('blitz'),
                 }) }}
             </div>
         </div>
 
-        {% include 'blitz/_includes/welcome/bottom' with {docs: docs} %}
+        {{ include('blitz/_includes/welcome/bottom', { docs: docs }) }}
     </div>
 
     <div id="storage" class="hidden">
@@ -217,6 +222,9 @@
             id: 'customSiteUris',
             cols: cols,
             rows: settings.customSiteUris,
+            allowAdd: true,
+            allowDelete: true,
+            allowReorder: true,
             addRowLabel: "Add a custom site URI"|t('blitz'),
         }) }}
     </div>
@@ -327,7 +335,7 @@
         }) }}
 
         {% if settings.apiKey and not settings.getErrors('apiKey') %}
-            {% include 'blitz/_includes/api-urls' with {docs: docs} %}
+            {{ include('blitz/_includes/api-urls', { docs: docs }) }}
         {% endif %}
 
         <p class="light">
