@@ -98,7 +98,7 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function rules(): array
+    public function defineRules(): array
     {
         return [
             [['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {

@@ -74,7 +74,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function rules(): array
+    public function defineRules(): array
     {
         return [
             [['folderPath'], 'required'],

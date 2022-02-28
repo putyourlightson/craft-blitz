@@ -53,7 +53,7 @@ class SettingsModel extends Model
     public bool $cachingEnabled = false;
 
     /**
-     * @var array|string The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
+     * @var array The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
      *
      * [
      *     [
@@ -66,10 +66,10 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array|string $includedUriPatterns = [];
+    public array $includedUriPatterns = [];
 
     /**
-     * @var array|string The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
+     * @var array The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
      *
      * [
      *     [
@@ -78,7 +78,7 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array|string $excludedUriPatterns = [];
+    public array $excludedUriPatterns = [];
 
     /**
      * @var string The storage type to use.
@@ -313,18 +313,20 @@ class SettingsModel extends Model
      */
     public function behaviors(): array
     {
-        return [
-            'parser' => [
-                'class' => EnvAttributeParserBehavior::class,
-                'attributes' => ['apiKey'],
-            ],
+        $behaviors = parent::behaviors();
+        $behaviors['parser'] = [
+            'class' => EnvAttributeParserBehavior::class,
+            'attributes' => ['apiKey'],
         ];
+
+        return $behaviors;
     }
+
 
     /**
      * @inheritdoc
      */
-    public function rules(): array
+    public function defineRules(): array
     {
         return [
             [['cacheStorageType', 'cacheWarmerType', 'queryStringCaching'], 'required'],

@@ -111,7 +111,7 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function rules(): array
+    public function defineRules(): array
     {
         return [
             [['username', 'personalAccessToken', 'name', 'email', 'commitMessage'], 'required'],

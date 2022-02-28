@@ -95,7 +95,7 @@ class GuzzleWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function rules(): array
+    public function defineRules(): array
     {
         return [
             [['concurrency'], 'required'],
