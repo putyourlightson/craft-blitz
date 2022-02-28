@@ -16,10 +16,9 @@
         "speed"
     ],
     "require": {
-        "craftcms/cms": "^4.0.0",
+        "craftcms/cms": "^4.0.0-alpha",
         "putyourlightson/craft-log-to-file": "^2.0.0",
-        "symplify/git-wrapper": "^10.0.0",
-        "ext-json": "*"
+        "symplify/git-wrapper": "^10.0.0"
     },
     "require-dev": {
         "codeception/codeception": "^4.0.0",
@@ -44,7 +43,7 @@
         "developer": "PutYourLightsOn",
         "developerUrl": "https://putyourlightson.com/",
         "documentationUrl": "https://putyourlightson.com/plugins/blitz",
-        "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v3/CHANGELOG.md",
+        "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v4/CHANGELOG.md",
         "class": "putyourlightson\\blitz\\Blitz",
         "schemaVersion": "3.10.0",
         "hasCpSettings": true

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.0.0 - Unreleased
+### Added
+- Added compatibility with Craft 4.
+
 ## 3.11.2 - Unreleased
 ### Fixed
 - Fixed URL encoding of query strings which could prevent server rewrites from finding cached URIs ([#365](https://github.com/putyourlightson/craft-blitz/issues/365)). 

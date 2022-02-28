@@ -434,36 +434,39 @@ class Blitz extends Plugin
     {
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {
-                $event->permissions['Blitz'] = [
-                    'blitz:clear' => [
-                        'label' => Craft::t('blitz', 'Clear cache')
-                    ],
-                    'blitz:flush' => [
-                        'label' => Craft::t('blitz', 'Flush cache')
-                    ],
-                    'blitz:purge' => [
-                        'label' => Craft::t('blitz', 'Purge cache')
-                    ],
-                    'blitz:warm' => [
-                        'label' => Craft::t('blitz', 'Warm cache')
-                    ],
-                    'blitz:deploy' => [
-                        'label' => Craft::t('blitz', 'Remote deploy')
-                    ],
-                    'blitz:refresh' => [
-                        'label' => Craft::t('blitz', 'Refresh cache')
-                    ],
-                    'blitz:refresh-expired' => [
-                        'label' => Craft::t('blitz', 'Refresh expired cache')
-                    ],
-                    'blitz:refresh-site' => [
-                        'label' => Craft::t('blitz', 'Refresh site cache')
-                    ],
-                    'blitz:refresh-urls' => [
-                        'label' => Craft::t('blitz', 'Refresh cached URLs')
-                    ],
-                    'blitz:refresh-tagged' => [
-                        'label' => Craft::t('blitz', 'Refresh tagged cache')
+                $event->permissions[] = [
+                    'heading' => 'Blitz',
+                    'permissions' => [
+                        'blitz:clear' => [
+                            'label' => Craft::t('blitz', 'Clear cache')
+                        ],
+                        'blitz:flush' => [
+                            'label' => Craft::t('blitz', 'Flush cache')
+                        ],
+                        'blitz:purge' => [
+                            'label' => Craft::t('blitz', 'Purge cache')
+                        ],
+                        'blitz:warm' => [
+                            'label' => Craft::t('blitz', 'Warm cache')
+                        ],
+                        'blitz:deploy' => [
+                            'label' => Craft::t('blitz', 'Remote deploy')
+                        ],
+                        'blitz:refresh' => [
+                            'label' => Craft::t('blitz', 'Refresh cache')
+                        ],
+                        'blitz:refresh-expired' => [
+                            'label' => Craft::t('blitz', 'Refresh expired cache')
+                        ],
+                        'blitz:refresh-site' => [
+                            'label' => Craft::t('blitz', 'Refresh site cache')
+                        ],
+                        'blitz:refresh-urls' => [
+                            'label' => Craft::t('blitz', 'Refresh cached URLs')
+                        ],
+                        'blitz:refresh-tagged' => [
+                            'label' => Craft::t('blitz', 'Refresh tagged cache')
+                        ],
                     ],
                 ];
             }
