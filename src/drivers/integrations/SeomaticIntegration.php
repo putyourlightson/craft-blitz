@@ -58,12 +58,6 @@ class SeomaticIntegration extends BaseIntegration
 
     /**
      * Returns the element IDs for the given site, source and type.
-     *
-     * @param int $siteId
-     * @param int $sourceId
-     * @param string $sourceType
-     *
-     * @return ElementQueryInterface
      */
     private static function _getElementQuery(int $siteId, int $sourceId, string $sourceType): ElementQueryInterface
     {

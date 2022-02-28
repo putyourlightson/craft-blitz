@@ -18,8 +18,6 @@ class CsrfController extends Controller
 
     /**
      * Returns a CSRF input field.
-     *
-     * @return Response
      */
     public function actionInput(): Response
     {
@@ -32,8 +30,6 @@ class CsrfController extends Controller
 
     /**
      * Returns the CSRF param.
-     *
-     * @return Response
      */
     public function actionParam(): Response
     {
@@ -42,8 +38,6 @@ class CsrfController extends Controller
 
     /**
      * Returns a CSRF token.
-     *
-     * @return Response
      */
     public function actionToken(): Response
     {
@@ -52,8 +46,6 @@ class CsrfController extends Controller
 
     /**
      * Returns all CSRF options in a single JSON response.
-     *
-     * @return Response
      */
     public function actionJson(): Response
     {

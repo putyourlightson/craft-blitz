@@ -19,8 +19,6 @@ interface CachePurgerInterface extends SavableComponentInterface
 
     /**
      * Purges the cache for a given site ID.
-     *
-     * @param int $siteId
      */
     public function purgeSite(int $siteId);
 
@@ -31,8 +29,6 @@ interface CachePurgerInterface extends SavableComponentInterface
 
     /**
      * Tests the purger settings.
-     *
-     * @return bool
      */
     public function test(): bool;
 }

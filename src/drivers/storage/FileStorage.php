@@ -236,7 +236,6 @@ class FileStorage extends BaseCacheStorage
     /**
      * Returns file paths for the provided site ID and URI.
      *
-     * @param SiteUriModel $siteUri
      * @return string[]
      */
     public function getFilePaths(SiteUriModel $siteUri): array

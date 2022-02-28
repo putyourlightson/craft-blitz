@@ -55,10 +55,6 @@ class CacheUtility extends Utility
 
     /**
      * Returns available actions.
-     *
-     * @param bool $showAll
-     *
-     * @return array
      */
     public static function getActions(bool $showAll = false): array
     {
@@ -145,8 +141,6 @@ class CacheUtility extends Utility
 
     /**
      * Returns tag suggestions.
-     *
-     * @return array
      */
     public static function getTagSuggestions(): array
     {

@@ -21,8 +21,6 @@ class CacheRecord extends ActiveRecord
 {
     /**
      * @inheritdoc
-     *
-     * @return string
      */
     public static function tableName(): string
     {
@@ -31,8 +29,6 @@ class CacheRecord extends ActiveRecord
 
     /**
      * Returns the associated elements
-     *
-     * @return ActiveQueryInterface
      */
     public function getElements(): ActiveQueryInterface
     {

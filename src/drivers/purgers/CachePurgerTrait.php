@@ -8,7 +8,7 @@ namespace putyourlightson\blitz\drivers\purgers;
 trait CachePurgerTrait
 {
     /**
-     * @var bool
+     * @var bool Whether this is a dummy purger.
      */
     public bool $isDummy = false;
 

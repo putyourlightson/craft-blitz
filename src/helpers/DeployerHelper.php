@@ -60,9 +60,6 @@ class DeployerHelper extends BaseDriverHelper
      * Adds a deploy job to the queue.
      *
      * @param SiteUriModel[] $siteUris
-     * @param string $driverMethod
-     * @param int|null $delay
-     * @param int|null $priority
      */
     public static function addDeployerJob(array $siteUris, string $driverMethod, int $delay = null, int $priority = null)
     {

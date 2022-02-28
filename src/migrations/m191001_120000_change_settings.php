@@ -63,9 +63,7 @@ class m191001_120000_change_settings extends Migration
     }
 
     /**
-     * @param array $settings
-     *
-     * @return array
+     * Updates the cache storage settings.
      */
     private function _updateCacheStorage(array $settings): array
     {
@@ -84,10 +82,7 @@ class m191001_120000_change_settings extends Migration
     }
 
     /**
-     * @param array $settings
-     * @param string $key
-     *
-     * @return array
+     * Updates the URI pattern settings.
      */
     private function _updateUriPatterns(array $settings, string $key): array
     {

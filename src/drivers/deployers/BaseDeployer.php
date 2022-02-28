@@ -13,9 +13,6 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 
 abstract class BaseDeployer extends SavableComponent implements DeployerInterface
 {
-    // Traits
-    // =========================================================================
-
     use DeployerTrait;
 
     /**

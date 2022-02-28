@@ -80,8 +80,6 @@ class GenerateCacheService extends Component
 
     /**
      * Adds an element to be cached.
-     *
-     * @param ElementInterface $element
      */
     public function addElement(ElementInterface $element)
     {
@@ -102,8 +100,6 @@ class GenerateCacheService extends Component
 
     /**
      * Adds an element query to be cached.
-     *
-     * @param ElementQuery $elementQuery
      */
     public function addElementQuery(ElementQuery $elementQuery)
     {
@@ -147,8 +143,6 @@ class GenerateCacheService extends Component
 
     /**
      * Saves an element query.
-     *
-     * @param ElementQuery $elementQuery
      */
     public function saveElementQuery(ElementQuery $elementQuery)
     {
@@ -202,11 +196,6 @@ class GenerateCacheService extends Component
 
     /**
      * Saves an element query's sources.
-     *
-     * @param ElementQuery $elementQuery
-     * @param string $queryId
-     *
-     * @throws Exception
      */
     public function saveElementQuerySources(ElementQuery $elementQuery, string $queryId)
     {

@@ -11,7 +11,7 @@ namespace putyourlightson\blitz\drivers\warmers;
 trait CacheWarmerTrait
 {
     /**
-     * @var bool
+     * @var bool Whether this is a dummy warmer.
      */
     public bool $isDummy = false;
 

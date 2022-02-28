@@ -360,9 +360,6 @@ class GitDeployer extends BaseDeployer
 
     /**
      * Updates a file by saving the value or deleting the file if empty.
-     *
-     * @param string $value
-     * @param string $filePath
      */
     private function _updateFile(string $value, string $filePath)
     {
@@ -384,8 +381,6 @@ class GitDeployer extends BaseDeployer
 
     /**
      * Deploys to the remote repository.
-     *
-     * @param int $siteId
      */
     private function _deploy(int $siteId)
     {
@@ -442,7 +437,7 @@ class GitDeployer extends BaseDeployer
     /**
      * Runs one or more commands.
      *
-     * @param string|string[] $commands
+     * @param string[]|string $commands
      */
     private function _runCommands(array|string $commands)
     {

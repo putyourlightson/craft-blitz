@@ -9,9 +9,6 @@ use Craft;
 
 class DummyPurger extends BaseCachePurger
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -21,7 +18,7 @@ class DummyPurger extends BaseCachePurger
     }
 
     /**
-     * @var bool
+     * @inerhitdoc
      */
     public bool $isDummy = true;
 

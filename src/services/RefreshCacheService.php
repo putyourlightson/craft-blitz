@@ -116,7 +116,6 @@ class RefreshCacheService extends Component
      * Returns element queries of the provided element type that can be joined
      * with the provided source IDs, ignoring the provided cache IDs.
      *
-     * @param string $elementType
      * @param int[] $sourceIds
      * @param int[] $ignoreCacheIds
      * @return ElementQueryRecord[]
@@ -317,7 +316,6 @@ class RefreshCacheService extends Component
      * Adds an expiry date for the given cache IDs.
      *
      * @param int[] $cacheIds
-     * @param DateTime|null $expiryDate
      */
     public function expireCacheIds(array $cacheIds, DateTime $expiryDate = null)
     {

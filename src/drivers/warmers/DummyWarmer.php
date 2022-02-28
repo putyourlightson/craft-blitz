@@ -12,9 +12,6 @@ use Craft;
  */
 class DummyWarmer extends BaseCacheWarmer
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -24,7 +21,7 @@ class DummyWarmer extends BaseCacheWarmer
     }
 
     /**
-     * @var bool
+     * @inheritdoc
      */
     public bool $isDummy = true;
 

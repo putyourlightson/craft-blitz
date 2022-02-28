@@ -66,7 +66,6 @@ class CacheTagsService extends Component
      * Saves one or more tags given a cache ID.
      *
      * @param string[] $tags
-     * @param int $cacheId
      */
     public function saveTags(array $tags, int $cacheId)
     {

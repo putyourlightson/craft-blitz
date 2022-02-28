@@ -18,9 +18,6 @@ use yii\console\Response;
  */
 class LocalWarmer extends BaseCacheWarmer
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -54,10 +51,6 @@ class LocalWarmer extends BaseCacheWarmer
 
     /**
      * Warms site URIs with progress.
-     *
-     * @param array $siteUris
-     * @param callable|null $setProgressHandler
-     * @param int|null $delay
      */
     public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
     {
@@ -90,9 +83,6 @@ class LocalWarmer extends BaseCacheWarmer
 
     /**
      * Warms a site URI.
-     *
-     * @param SiteUriModel $siteUri
-     * @return bool
      */
     private function _warmUri(SiteUriModel $siteUri): bool
     {
@@ -175,8 +165,6 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * Resets the application based on the provided app type (`web` or `console`).
      * @see vendor/craftcms/cms/bootstrap/bootstrap.php
-     *
-     * @param string $appType
      */
     private function _resetApplicationConfig(string $appType)
     {

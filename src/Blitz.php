@@ -107,10 +107,6 @@ class Blitz extends Plugin
 
     /**
      * Logs an action
-     *
-     * @param string $message
-     * @param array $params
-     * @param string $type
      */
     public function log(string $message, array $params = [], string $type = 'info')
     {
@@ -121,10 +117,6 @@ class Blitz extends Plugin
 
     /**
      * Logs a debug message if debug mode is enabled
-     *
-     * @param string $message
-     * @param array $params
-     * @param string $url
      */
     public function debug(string $message, array $params = [], string $url = '')
     {

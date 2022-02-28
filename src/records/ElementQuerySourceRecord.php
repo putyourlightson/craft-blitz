@@ -18,8 +18,6 @@ class ElementQuerySourceRecord extends ActiveRecord
 {
     /**
      * @inheritdoc
-     *
-     * @return string
      */
     public static function tableName(): string
     {
@@ -28,8 +26,6 @@ class ElementQuerySourceRecord extends ActiveRecord
 
     /**
      * Returns the associated element query
-     *
-     * @return ActiveQueryInterface
      */
     public function getElementQuery(): ActiveQueryInterface
     {

@@ -19,8 +19,6 @@ class TemplatesController extends Controller
 
     /**
      * Returns a rendered template.
-     *
-     * @return Response
      */
     public function actionGet(): Response
     {

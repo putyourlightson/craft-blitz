@@ -17,8 +17,6 @@ class CacheTagRecord extends ActiveRecord
 {
     /**
      * @inheritdoc
-     *
-     * @return string
      */
     public static function tableName(): string
     {
@@ -27,8 +25,6 @@ class CacheTagRecord extends ActiveRecord
 
     /**
      * Returns the associated cache
-     *
-     * @return ActiveQueryInterface
      */
     public function getCache(): ActiveQueryInterface
     {

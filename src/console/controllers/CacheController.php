@@ -436,7 +436,7 @@ class CacheController extends Controller
     }
 
     /**
-     * @param string $message
+     * Logs and outputs a message to the console.
      */
     private function _output(string $message)
     {

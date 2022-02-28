@@ -19,7 +19,6 @@ class BaseDriverHelper
     /**
      * Creates drivers of the provided types.
      *
-     * @param array $types
      * @return SavableComponent[]
      */
     public static function createDrivers(array $types): array
@@ -54,11 +53,6 @@ class BaseDriverHelper
      * Adds a driver job to the queue.
      *
      * @param SiteUriModel[] $siteUris
-     * @param string $driverId
-     * @param string $driverMethod
-     * @param string|null $description
-     * @param int|null $delay
-     * @param int|null $priority
      */
     public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $delay = null, int $priority = null)
     {
