@@ -15,7 +15,7 @@ class TemplatesController extends Controller
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = true;
+    protected int|bool|array $allowAnonymous = true;
 
     /**
      * Returns a rendered template.

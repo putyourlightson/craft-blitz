@@ -29,7 +29,7 @@ class CacheController extends Controller
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = true;
+    protected array|bool|int $allowAnonymous = true;
 
     /**
      * @inheritdoc
