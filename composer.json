@@ -17,7 +17,7 @@
     ],
     "require": {
         "craftcms/cms": "^4.0.0-alpha",
-        "putyourlightson/craft-log-to-file": "^2.0.0",
+        "putyourlightson/craft-log-to-file": "^2.0.0-alpha",
         "symplify/git-wrapper": "^10.0.0"
     },
     "require-dev": {
