@@ -151,7 +151,7 @@ class CacheController extends Controller
 
         $message = 'Blitz cache successfully refreshed.';
 
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->shouldWarmCache()) {
             $message = 'Blitz cache successfully refreshed and queued for warming.';
         }
 
@@ -188,7 +188,7 @@ class CacheController extends Controller
 
         $message = 'Site successfully refreshed.';
 
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->shouldWarmCache()) {
             $message = 'Site successfully refreshed and queued for warming.';
         }
 

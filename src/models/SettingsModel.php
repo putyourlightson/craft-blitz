@@ -353,4 +353,12 @@ class SettingsModel extends Model
 
         return $labels;
     }
+
+    /**
+     * Returns whether the cache should be warmed.
+     */
+    public function shouldWarmCache(): bool
+    {
+        return $this->cachingEnabled && $this->warmCacheAutomatically;
+    }
 }

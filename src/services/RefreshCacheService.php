@@ -416,7 +416,7 @@ class RefreshCacheService extends Component
         Blitz::$plugin->clearCache->clearUris($siteUris);
 
         // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->shouldWarmCache()) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
 
             Blitz::$plugin->deployer->deployUris($siteUris);
@@ -449,7 +449,7 @@ class RefreshCacheService extends Component
         Blitz::$plugin->clearCache->clearAll();
 
         // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->shouldWarmCache()) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
 
             Blitz::$plugin->deployer->deployUris($siteUris);
@@ -485,7 +485,7 @@ class RefreshCacheService extends Component
         Blitz::$plugin->clearCache->clearUris($siteUris);
 
         // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->shouldWarmCache()) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
 
             Blitz::$plugin->deployer->deployUris($siteUris);

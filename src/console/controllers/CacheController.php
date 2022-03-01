@@ -189,7 +189,7 @@ class CacheController extends Controller
         $this->_flushCache();
         $this->_purgeCache();
 
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->shouldWarmCache()) {
             $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
 
             if ($warmCacheDelay) {
@@ -230,7 +230,7 @@ class CacheController extends Controller
         $this->_purgeCache($siteUris);
 
         // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+        if (Blitz::$plugin->settings->shouldWarmCache()) {
             $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
 
             if ($warmCacheDelay) {
