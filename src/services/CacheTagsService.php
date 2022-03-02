@@ -76,10 +76,11 @@ class CacheTagsService extends Component
         }
 
         Craft::$app->getDb()->createCommand()
-            ->batchInsert(CacheTagRecord::tableName(),
+            ->batchInsert(
+                CacheTagRecord::tableName(),
                 ['cacheId', 'tag'],
                 $values,
-                false)
+            )
             ->execute();
     }
 }

@@ -171,11 +171,14 @@ class GenerateCacheService extends Component
         if (!$queryId) {
             try {
                 $db->createCommand()
-                    ->insert(ElementQueryRecord::tableName(), [
-                        'index' => $index,
-                        'type' => $elementQuery->elementType,
-                        'params' => $params,
-                    ], false)
+                    ->insert(
+                        ElementQueryRecord::tableName(),
+                        [
+                            'index' => $index,
+                            'type' => $elementQuery->elementType,
+                            'params' => $params,
+                        ],
+                    )
                     ->execute();
 
                 $queryId = $db->getLastInsertID();
@@ -219,10 +222,13 @@ class GenerateCacheService extends Component
             }
 
             $db->createCommand()
-                ->insert(ElementQuerySourceRecord::tableName(), [
-                    'sourceId' => $sourceId,
-                    'queryId' => $queryId,
-                ], false)
+                ->insert(
+                    ElementQuerySourceRecord::tableName(),
+                    [
+                        'sourceId' => $sourceId,
+                        'queryId' => $queryId,
+                    ],
+                )
                 ->execute();
         }
     }
@@ -271,7 +277,7 @@ class GenerateCacheService extends Component
         ]);
 
         $db->createCommand()
-            ->insert(CacheRecord::tableName(), $cacheValue, false)
+            ->insert(CacheRecord::tableName(), $cacheValue)
             ->execute();
 
         $cacheId = (int)$db->getLastInsertID();
@@ -359,10 +365,11 @@ class GenerateCacheService extends Component
         }
 
         Craft::$app->getDb()->createCommand()
-            ->batchInsert($insertTable,
+            ->batchInsert(
+                $insertTable,
                 ['cacheId', $columnName],
                 $values,
-                false)
+            )
             ->execute();
     }
 }

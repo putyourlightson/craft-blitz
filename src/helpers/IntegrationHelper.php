@@ -38,7 +38,7 @@ class IntegrationHelper
     /**
      * Returns active integrations.
      *
-     * @return string[]
+     * @return IntegrationInterface[]
      */
     public static function getActiveIntegrations(): array
     {
