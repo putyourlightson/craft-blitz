@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\helpers\Html;
 use craft\web\Controller;
 use yii\web\Response;
 
@@ -22,8 +23,7 @@ class CsrfController extends Controller
     public function actionInput(): Response
     {
         $request = Craft::$app->getRequest();
-
-        $input = '<input type="hidden" name="'.$request->csrfParam.'" value="'.$request->getCsrfToken().'">';
+        $input = Html::hiddenInput($request->csrfParam, $request->getCsrfToken());
 
         return $this->asRaw($input);
     }

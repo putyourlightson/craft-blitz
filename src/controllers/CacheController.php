@@ -75,7 +75,6 @@ class CacheController extends Controller
     public function actionClear(): Response
     {
         Blitz::$plugin->clearCache->clearAll();
-
         $message = 'Blitz cache successfully cleared.';
         Blitz::$plugin->log($message);
 
@@ -88,7 +87,6 @@ class CacheController extends Controller
     public function actionFlush(): Response
     {
         Blitz::$plugin->flushCache->flushAll();
-
         $message = 'Blitz cache successfully flushed.';
         Blitz::$plugin->log($message);
 
@@ -101,7 +99,6 @@ class CacheController extends Controller
     public function actionPurge(): Response
     {
         Blitz::$plugin->cachePurger->purgeAll();
-
         $message = 'Blitz cache successfully purged.';
         Blitz::$plugin->log($message);
 
@@ -118,7 +115,6 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->cacheWarmer->warmAll();
-
         $message = 'Blitz cache successfully queued for warming.';
         Blitz::$plugin->log($message);
 
@@ -135,7 +131,6 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->deployer->deployAll();
-
         $message = 'Blitz cache successfully queued for deployment.';
         Blitz::$plugin->log($message);
 
@@ -148,7 +143,6 @@ class CacheController extends Controller
     public function actionRefresh(): Response
     {
         Blitz::$plugin->refreshCache->refreshAll();
-
         $message = 'Blitz cache successfully refreshed.';
 
         if (Blitz::$plugin->settings->shouldWarmCache()) {
@@ -166,7 +160,6 @@ class CacheController extends Controller
     public function actionRefreshExpired(): Response
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
-
         $message = 'Expired cache successfully refreshed.';
         Blitz::$plugin->log($message);
 
@@ -185,7 +178,6 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->refreshCache->refreshSite($siteId);
-
         $message = 'Site successfully refreshed.';
 
         if (Blitz::$plugin->settings->shouldWarmCache()) {
@@ -203,7 +195,6 @@ class CacheController extends Controller
     public function actionRefreshUrls(): Response
     {
         $urls = Craft::$app->getRequest()->getParam('urls');
-
         $urls = $this->_normalizeArguments($urls);
 
         if (empty($urls)) {
@@ -211,7 +202,6 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
-
         $message = 'Cached URLs successfully refreshed.';
         Blitz::$plugin->log($message);
 
@@ -224,7 +214,6 @@ class CacheController extends Controller
     public function actionRefreshTagged(): Response
     {
         $tags = Craft::$app->getRequest()->getParam('tags');
-
         $tags = $this->_normalizeArguments($tags);
 
         if (empty($tags)) {
@@ -232,7 +221,6 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
-
         $message = 'Tagged cache successfully refreshed.';
         Blitz::$plugin->log($message);
 
