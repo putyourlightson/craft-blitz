@@ -69,17 +69,17 @@ class ElementTypeHelper
     /**
      * @var string[]|null
      */
-    private static ?array $_nonCacheableElementTypes;
+    private static ?array $_nonCacheableElementTypes = null;
 
     /**
      * @var string[]|null
      */
-    private static ?array $_sourceIdAttributes;
+    private static ?array $_sourceIdAttributes = null;
 
     /**
      * @var string[]|null
      */
-    private static ?array $_liveStatuses;
+    private static ?array $_liveStatuses = null;
 
     /**
      * Returns whether the element type is cacheable.

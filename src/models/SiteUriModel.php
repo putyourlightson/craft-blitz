@@ -14,14 +14,14 @@ use craft\helpers\UrlHelper;
 class SiteUriModel extends Model
 {
     /**
-     * @var string|int
+     * @var string|int|null
      */
-    public string|int $siteId;
+    public string|int|null $siteId = null;
 
     /**
      * @var string
      */
-    public string $uri;
+    public string $uri = '';
 
     /**
      * @inheritdoc

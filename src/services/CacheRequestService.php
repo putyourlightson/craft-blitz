@@ -49,7 +49,7 @@ class CacheRequestService extends Component
     /**
      * @var string|null
      */
-    private ?string $_queryString;
+    private ?string $_queryString = null;
 
     /**
      * Returns whether the request is cacheable.

@@ -37,24 +37,24 @@ class CacheOptionsModel extends Model
     public int|bool $outputComments = true;
 
     /**
-     * @var string[]|null
+     * @var string[]
      */
-    public ?array $tags;
+    public array $tags = [];
 
     /**
      * @var int|null
      */
-    public ?int $paginate;
+    public ?int $paginate = null;
 
     /**
      * @var DateTime|null
      */
-    public ?DateTime $expiryDate;
+    public ?DateTime $expiryDate = null;
 
     /**
      * @var int|null
      */
-    private ?int $_cacheDuration;
+    private ?int $_cacheDuration = null;
 
     /**
      * @inheritdoc

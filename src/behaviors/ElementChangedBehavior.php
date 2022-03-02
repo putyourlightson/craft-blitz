@@ -30,7 +30,7 @@ class ElementChangedBehavior extends Behavior
     /**
      * @var string|null The previous status of the element.
      */
-    public ?string $previousStatus;
+    public ?string $previousStatus = null;
 
     /**
      * @var bool Whether the element was deleted.
