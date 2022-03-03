@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.11.2 - Unreleased
+## 3.11.2 - 2022-03-03
 ### Fixed
 - Fixed URL encoding of query strings which could prevent server rewrites from finding cached URIs ([#365](https://github.com/putyourlightson/craft-blitz/issues/365)). 
 - Fixed a bug in which an error was thrown if a site URL contained a colon in the path using the file storage driver ([#369](https://github.com/putyourlightson/craft-blitz/issues/369)). 
