@@ -32,7 +32,6 @@ use craft\web\UrlManager;
 use craft\web\View;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
-use putyourlightson\blitz\drivers\integrations\IntegrationInterface;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
@@ -51,7 +50,6 @@ use yii\base\Controller;
 use yii\base\Event;
 
 /**
- *
  * @property CacheRequestService $cacheRequest
  * @property CacheTagsService $cacheTags
  * @property ClearCacheService $clearCache
@@ -72,6 +70,21 @@ class Blitz extends Plugin
      * @var Blitz
      */
     public static Blitz $plugin;
+
+    /**
+     * @inheritdoc
+     */
+    public bool $hasCpSettings = true;
+
+    /**
+     * @inheritdoc
+     */
+    public string $schemaVersion = '3.10.0';
+
+    /**
+     * @inheritdoc
+     */
+    public string $minVersionRequired = '3.10.0';
 
     /**
      * @inheritdoc
@@ -347,7 +360,6 @@ class Blitz extends Plugin
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
             function() {
-                /** @var IntegrationInterface $integration */
                 foreach (IntegrationHelper::getActiveIntegrations() as $integration) {
                     $integration::registerEvents();
                 }

@@ -5,6 +5,8 @@ parameters:
         - src
         - tests
     excludePaths:
+        # TODO: remove once Feed Me becomes available for Craft 4
+        - src/drivers/integrations/FeedMeIntegration.php
         - tests/_craft/*
         - tests/_data/*
         - tests/_output/*
