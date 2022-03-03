@@ -4,6 +4,16 @@ parameters:
     paths:
         - src
         - tests
+    excludePaths:
+        - tests/_craft/*
+        - tests/_data/*
+        - tests/_output/*
     bootstrapFiles:
         - tests/_bootstrap.php
-
+    earlyTerminatingMethodCalls:
+        Craft:
+            - dd
+        yii\base\Application:
+            - end
+        yii\base\ErrorHandler:
+            - convertExceptionToError
