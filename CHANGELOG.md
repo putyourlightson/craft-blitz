@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.0.0-alpha.1 - Unreleased
+## 4.0.0-alpha.1 - 2022-03-03
 ### Added
 - Added compatibility with Craft 4.
 
