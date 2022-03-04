@@ -205,7 +205,7 @@ class GenerateCacheService extends Component
         $db = Craft::$app->getDb();
 
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-        $sourceIds = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
+        $sourceIds = $sourceIdAttribute ? $elementQuery->{$sourceIdAttribute} : null;
 
         // Normalize source IDs
         $sourceIds = ElementQueryHelper::getNormalizedElementQueryIdParam($sourceIds);

@@ -244,7 +244,7 @@ class RefreshCacheService extends Component
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
 
         if ($sourceIdAttribute !== null) {
-            $sourceId = $element->$sourceIdAttribute;
+            $sourceId = $element->{$sourceIdAttribute};
 
             if (!in_array($sourceId, $this->elements[$elementType]['sourceIds'])) {
                 $this->elements[$elementType]['sourceIds'][] = $sourceId;

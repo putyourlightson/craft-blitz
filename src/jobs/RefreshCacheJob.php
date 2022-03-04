@@ -223,6 +223,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         try {
             $elementQueryIds = $elementQuery->ids();
         }
+        /** @noinspection PhpRedundantCatchClauseInspection */
         catch (DbException) {}
 
         // If one or more of the element IDs are in the element query's IDs

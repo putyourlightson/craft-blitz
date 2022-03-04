@@ -12,7 +12,6 @@ use craft\queue\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
-use yii\base\NotSupportedException;
 
 class BaseDriverHelper
 {
@@ -77,11 +76,11 @@ class BaseDriverHelper
         /** @var Queue $queue */
         $queue = Craft::$app->getQueue();
 
-        try {
+        // Some queues don't support custom push priorities.
+        if (method_exists($queue, 'priority')) {
             $queue->priority($priority)->push($job);
         }
-        catch (NotSupportedException) {
-            // The queue probably doesn't support custom push priorities. Try again without one.
+        else {
             $queue->push($job);
         }
     }

@@ -59,6 +59,9 @@ class CacheController extends Controller
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function afterAction($action, $result)
     {
         // If front-end request, run the queue to ensure action is completed in full

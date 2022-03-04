@@ -60,7 +60,7 @@ class YiiCacheStorage extends BaseCacheStorage
 
         $value = '';
 
-        // Redis cache throws an exception if the connection is broken, so we catch it here
+        // Redis cache can throw an exception if the connection is broken
         try {
             // Cast the site ID to an integer to avoid an incorrect key
             // https://github.com/putyourlightson/craft-blitz/issues/257
@@ -68,6 +68,7 @@ class YiiCacheStorage extends BaseCacheStorage
                 self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
             ]);
         }
+        /** @noinspection PhpRedundantCatchClauseInspection */
         catch (Exception) {}
 
         return $value ?: '';
