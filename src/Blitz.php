@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
 use craft\elements\db\ElementQuery;
@@ -292,7 +293,9 @@ class Blitz extends Plugin
         foreach ($events as $event) {
             Event::on(Elements::class, $event,
                 function(ElementEvent|BatchElementActionEvent $event) {
-                    $event->element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+                    /** @var Element $element */
+                    $element = $event->element;
+                    $element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
                 }
             );
         }

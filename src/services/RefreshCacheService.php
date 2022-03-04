@@ -105,11 +105,15 @@ class RefreshCacheService extends Component
      */
     public function getElementCacheIds(array $elementIds): array
     {
-        return ElementCacheRecord::find()
+        /** @var int[] $ids */
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
+        $ids = ElementCacheRecord::find()
             ->select('cacheId')
             ->where(['elementId' => $elementIds])
             ->groupBy('cacheId')
             ->column();
+
+        return $ids;
     }
 
     /**
@@ -123,7 +127,9 @@ class RefreshCacheService extends Component
     public function getElementTypeQueries(string $elementType, array $sourceIds, array $ignoreCacheIds): array
     {
         // Get element query records without eager loading
-        return ElementQueryRecord::find()
+        /** @var ElementQueryRecord[] $records */
+        /** @noinspection PhpUnnecessaryLocalVariableInspection */
+        $records = ElementQueryRecord::find()
             ->where(['type' => $elementType])
             ->innerJoinWith([
                 'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
@@ -137,6 +143,8 @@ class RefreshCacheService extends Component
                 }
             ], false)
             ->all();
+
+        return $records;
     }
 
     /**
@@ -513,6 +521,7 @@ class RefreshCacheService extends Component
         $this->addCacheIds($cacheIds);
 
         // Check for expired elements to invalidate
+        /** @var ElementExpiryDateRecord[] $elementExpiryDates */
         $elementExpiryDates = ElementExpiryDateRecord::find()
             ->where(['<', 'expiryDate', $now])
             ->all();

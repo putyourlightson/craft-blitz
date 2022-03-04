@@ -199,6 +199,7 @@ class SiteUriHelper
 
         $siteUriModels = [];
 
+        /** @var array $siteUris */
         $siteUris = CacheRecord::find()
             ->select(['siteId', 'uri'])
             ->where(['id' => $cacheIds])
@@ -227,6 +228,7 @@ class SiteUriHelper
         $siteUriModels = [];
 
         // Get the site URIs of the elements themselves
+        /** @var array $siteUris */
         $siteUris = Element_SiteSettings::find()
             ->select(['siteId', 'uri'])
             ->where(['elementId' => $elementIds])

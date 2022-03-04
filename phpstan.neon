@@ -1,21 +1,9 @@
-# Based on https://github.com/craftcms/cms/blob/4.0/phpstan.neon
+includes:
+    - /app/vendor/craftcms/phpstan/phpstan.neon
 parameters:
-    level: 1
+    level: 5
     paths:
         - src
-        - tests
     excludePaths:
         # TODO: remove once Feed Me becomes available for Craft 4
         - src/drivers/integrations/FeedMeIntegration.php
-        - tests/_craft/*
-        - tests/_data/*
-        - tests/_output/*
-    bootstrapFiles:
-        - tests/_bootstrap.php
-    earlyTerminatingMethodCalls:
-        Craft:
-            - dd
-        yii\base\Application:
-            - end
-        yii\base\ErrorHandler:
-            - convertExceptionToError
