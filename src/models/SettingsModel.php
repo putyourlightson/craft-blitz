@@ -14,6 +14,8 @@ use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
+use putyourlightson\blitz\validators\ArrayTypeValidator;
+use yii\behaviors\AttributeTypecastBehavior;
 
 class SettingsModel extends Model
 {
@@ -318,6 +320,9 @@ class SettingsModel extends Model
             'class' => EnvAttributeParserBehavior::class,
             'attributes' => ['apiKey'],
         ];
+        $behaviors['typecast'] = [
+            'class' => AttributeTypecastBehavior::class,
+        ];
 
         return $behaviors;
     }
@@ -338,6 +343,7 @@ class SettingsModel extends Model
             ]],
             [['apiKey'], 'string', 'length' => [16]],
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
+            [['includedUriPatterns', 'excludedUriPatterns', 'customSiteUris'], ArrayTypeValidator::class],
         ];
     }
 
@@ -352,35 +358,6 @@ class SettingsModel extends Model
         $labels['apiKey'] = Craft::t('blitz', 'API Key');
 
         return $labels;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function setAttributes($values, $safeOnly = true): void
-    {
-        // Normalize the array attributes
-        foreach ($this->arrayAttributes() as $name) {
-            if (isset($values[$name])) {
-                $values[$name] = is_array($values[$name]) ? $values[$name] : [];
-            }
-        }
-
-        parent::setAttributes($values, $safeOnly);
-    }
-
-    /**
-     * Returns the names of any attributes that must hold array values.
-     *
-     * @since 4.0.0
-     */
-    public function arrayAttributes(): array
-    {
-        return [
-            'includedUriPatterns',
-            'excludedUriPatterns',
-            'customSiteUris',
-        ];
     }
 
     /**
