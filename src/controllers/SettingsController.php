@@ -169,8 +169,11 @@ class SettingsController extends Controller
         $purgerDriver->validate();
         $deployerDriver->validate();
 
-        if ($settings->hasErrors() || $storageDriver->hasErrors() || $warmerDriver->hasErrors()
-            || $purgerDriver->hasErrors() || $deployerDriver->hasErrors()
+        if ($settings->hasErrors()
+            || $storageDriver->hasErrors()
+            || $warmerDriver->hasErrors()
+            || $purgerDriver->hasErrors()
+            || $deployerDriver->hasErrors()
         ) {
             Craft::$app->getSession()->setError(Craft::t('blitz', 'Couldn’t save plugin settings.'));
 
