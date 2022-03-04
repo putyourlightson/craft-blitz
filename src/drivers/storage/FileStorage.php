@@ -15,7 +15,7 @@ use yii\base\ErrorException;
 use yii\base\InvalidArgumentException;
 
 /**
- * @property mixed $settingsHtml
+ * @property-read null|string $settingsHtml
  */
 class FileStorage extends BaseCacheStorage
 {

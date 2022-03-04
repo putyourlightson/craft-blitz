@@ -20,6 +20,9 @@ use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
 class Install extends Migration
 {
+    /**
+     * @inheritdoc
+     */
     public function safeUp(): bool
     {
         if ($this->createTables()) {
@@ -33,6 +36,9 @@ class Install extends Migration
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function safeDown(): bool
     {
         $this->dropTableIfExists(DriverDataRecord::tableName());

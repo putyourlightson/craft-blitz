@@ -50,19 +50,17 @@ use yii\base\Controller;
 use yii\base\Event;
 
 /**
- * @property CacheRequestService $cacheRequest
- * @property CacheTagsService $cacheTags
- * @property ClearCacheService $clearCache
- * @property FlushCacheService $flushCache
- * @property GenerateCacheService $generateCache
- * @property RefreshCacheService $refreshCache
- * @property BaseCacheStorage $cacheStorage
- * @property BaseCacheWarmer $cacheWarmer
- * @property BaseCachePurger $cachePurger
- * @property BaseDeployer $deployer
- * @property SettingsModel $settings
- * @property mixed $settingsResponse
- * @property array $cpRoutes
+ * @property-read CacheRequestService $cacheRequest
+ * @property-read CacheTagsService $cacheTags
+ * @property-read ClearCacheService $clearCache
+ * @property-read FlushCacheService $flushCache
+ * @property-read GenerateCacheService $generateCache
+ * @property-read RefreshCacheService $refreshCache
+ * @property-read BaseCacheStorage $cacheStorage
+ * @property-read BaseCacheWarmer $cacheWarmer
+ * @property-read BaseCachePurger $cachePurger
+ * @property-read BaseDeployer $deployer
+ * @property-read SettingsModel $settings
  */
 class Blitz extends Plugin
 {

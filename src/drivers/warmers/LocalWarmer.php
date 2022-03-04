@@ -13,9 +13,6 @@ use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\console\Response;
 
-/**
- * @property mixed $settingsHtml
- */
 class LocalWarmer extends BaseCacheWarmer
 {
     /**

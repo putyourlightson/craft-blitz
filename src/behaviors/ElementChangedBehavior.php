@@ -11,7 +11,7 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
 
 /**
- * This class attaches behavior to detect whether an element has changed.
+ * This behavior detects whether an element has changed.
  *
  * @since 3.6.0
  *

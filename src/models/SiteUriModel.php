@@ -9,7 +9,7 @@ use craft\base\Model;
 use craft\helpers\UrlHelper;
 
 /**
- * @property string $url
+ * @property-read string $url
  */
 class SiteUriModel extends Model
 {

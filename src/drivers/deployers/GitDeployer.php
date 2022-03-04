@@ -23,7 +23,7 @@ use yii\base\Event;
 use yii\base\InvalidArgumentException;
 
 /**
- * @property mixed $settingsHtml
+ * @property-read null|string $settingsHtml
  */
 class GitDeployer extends BaseDeployer
 {

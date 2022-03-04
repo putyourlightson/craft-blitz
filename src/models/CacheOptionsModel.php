@@ -12,7 +12,7 @@ use craft\validators\DateTimeValidator;
 use DateTime;
 
 /**
- * @property int|null $cacheDuration
+ * @property-read null|int $cacheDuration
  */
 class CacheOptionsModel extends Model
 {
@@ -95,11 +95,17 @@ class CacheOptionsModel extends Model
         ];
     }
 
+    /**
+     * Returns the cache duration option.
+     */
     public function getCacheDuration(): ?int
     {
         return $this->_cacheDuration;
     }
 
+    /**
+     * Sets the caching enabled option.
+     */
     public function cachingEnabled(bool $value): self
     {
         $this->cachingEnabled = $value;
@@ -107,6 +113,9 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
+    /**
+     * Sets the cache elements option.
+     */
     public function cacheElements(bool $value): self
     {
         $this->cacheElements = $value;
@@ -114,6 +123,9 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
+    /**
+     * Sets the cache element queries option.
+     */
     public function cacheElementQueries(bool $value): self
     {
         $this->cacheElementQueries = $value;
@@ -121,6 +133,9 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
+    /**
+     * Sets the output comments option.
+     */
     public function outputComments(bool|int $value): self
     {
         $this->outputComments = $value;
@@ -128,6 +143,9 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
+    /**
+     * Sets the cache duration option.
+     */
     public function cacheDuration(mixed $value): self
     {
         // Set cache duration if greater than 0 seconds
@@ -145,6 +163,9 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
+    /**
+     * Sets the tags option.
+     */
     public function tags(array|string|null $value): self
     {
         $this->tags = is_string($value) ? StringHelper::split($value) : $value;
@@ -152,6 +173,9 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
+    /**
+     * Sets the paginate option.
+     */
     public function paginate(int $value = null): self
     {
         $this->paginate = $value;
@@ -159,6 +183,9 @@ class CacheOptionsModel extends Model
         return $this;
     }
 
+    /**
+     * Sets the expiry date option.
+     */
     public function expiryDate(DateTime $value = null): self
     {
         $this->expiryDate = $value;

@@ -8,7 +8,7 @@ namespace putyourlightson\blitz\drivers\storage;
 use craft\base\SavableComponent;
 
 /**
- * @property string $utilityHtml
+ * @property-read string $utilityHtml
  */
 abstract class BaseCacheStorage extends SavableComponent implements CacheStorageInterface
 {

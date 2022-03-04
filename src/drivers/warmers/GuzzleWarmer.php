@@ -15,7 +15,7 @@ use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
 /**
- * @property mixed $settingsHtml
+ * @property-read null|string $settingsHtml
  */
 class GuzzleWarmer extends BaseCacheWarmer
 {

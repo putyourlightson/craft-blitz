@@ -15,7 +15,7 @@ use yii\db\ActiveQueryInterface;
  * @property string $uri
  * @property int|null $paginate
  * @property DateTime|null $expiryDate
- * @property ActiveQueryInterface $elements
+ * @property-read ActiveQueryInterface $elements
  */
 class CacheRecord extends ActiveRecord
 {

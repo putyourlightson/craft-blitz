@@ -18,7 +18,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
 /**
- * @property mixed $settingsHtml
+ * @property-read null|string $settingsHtml
  */
 class CloudflarePurger extends BaseCachePurger
 {

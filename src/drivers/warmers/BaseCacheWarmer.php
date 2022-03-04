@@ -13,7 +13,7 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 
 /**
- * @property array $siteOptions
+ * @property-read array $siteOptions
  */
 abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerInterface
 {

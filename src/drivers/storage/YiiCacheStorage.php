@@ -12,7 +12,7 @@ use yii\caching\CacheInterface;
 use yii\db\Exception;
 
 /**
- * @property mixed $settingsHtml
+ * @property-read null|string $settingsHtml
  */
 class YiiCacheStorage extends BaseCacheStorage
 {
