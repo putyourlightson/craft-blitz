@@ -54,7 +54,7 @@ class SettingsModel extends Model
     public bool $cachingEnabled = false;
 
     /**
-     * @var array The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
+     * @var array|string The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
      *
      * [
      *     [
@@ -67,10 +67,10 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array $includedUriPatterns = [];
+    public array|string $includedUriPatterns = [];
 
     /**
-     * @var array The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
+     * @var array|string The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
      *
      * [
      *     [
@@ -79,7 +79,7 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array $excludedUriPatterns = [];
+    public array|string $excludedUriPatterns = [];
 
     /**
      * @var string The storage type to use.
@@ -112,7 +112,7 @@ class SettingsModel extends Model
     public array $cacheWarmerTypes = [];
 
     /**
-     * @var array Custom site URIs to warm when either a site or the entire cache is warmed.
+     * @var array|string Custom site URIs to warm when either a site or the entire cache is warmed.
      *
      * [
      *     [
@@ -121,7 +121,7 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array $customSiteUris = [];
+    public array|string $customSiteUris = [];
 
     /**
      * @var string The purger type to use.
