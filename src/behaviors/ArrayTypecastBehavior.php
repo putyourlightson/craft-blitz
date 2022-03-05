@@ -9,7 +9,7 @@ use yii\base\Behavior;
 use yii\base\Model;
 
 /**
- * Typecasts a value to an array.
+ * Typecasts a model's attributes to arrays before validation.
  *
  * @since 4.0.0
  */
@@ -25,7 +25,9 @@ class ArrayTypecastBehavior extends Behavior
      */
     public function events(): array
     {
-        return [Model::EVENT_BEFORE_VALIDATE => 'typecastAttributes'];
+        return [
+            Model::EVENT_BEFORE_VALIDATE => 'typecastAttributes',
+        ];
     }
 
     /**
