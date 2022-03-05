@@ -14,8 +14,7 @@ use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
-use putyourlightson\blitz\validators\ArrayTypeValidator;
-use yii\behaviors\AttributeTypecastBehavior;
+use putyourlightson\blitz\behaviors\ArrayTypecastBehavior;
 
 class SettingsModel extends Model
 {
@@ -321,7 +320,8 @@ class SettingsModel extends Model
             'attributes' => ['apiKey'],
         ];
         $behaviors['typecast'] = [
-            'class' => AttributeTypecastBehavior::class,
+            'class' => ArrayTypecastBehavior::class,
+            'attributes' => ['includedUriPatterns', 'excludedUriPatterns', 'customSiteUris'],
         ];
 
         return $behaviors;
@@ -343,7 +343,6 @@ class SettingsModel extends Model
             ]],
             [['apiKey'], 'string', 'length' => [16]],
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
-            [['includedUriPatterns', 'excludedUriPatterns', 'customSiteUris'], ArrayTypeValidator::class],
         ];
     }
 
