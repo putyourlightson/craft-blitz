@@ -95,22 +95,22 @@ class GuzzleWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function defineRules(): array
-    {
-        return [
-            [['concurrency'], 'required'],
-            [['concurrency'], 'integer', 'min' => 1, 'max' => 100],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/guzzle/settings', [
             'warmer' => $this,
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        return [
+            [['concurrency'], 'required'],
+            [['concurrency'], 'integer', 'min' => 1, 'max' => 100],
+        ];
     }
 
     /**

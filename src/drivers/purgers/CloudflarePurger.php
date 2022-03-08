@@ -68,47 +68,12 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function behaviors(): array
-    {
-        $behaviors = parent::behaviors();
-        $behaviors['parser'] = [
-            'class' => EnvAttributeParserBehavior::class,
-            'attributes' => [
-                'apiToken',
-                'apiKey',
-                'email',
-            ],
-        ];
-
-        return $behaviors;
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function attributeLabels(): array
     {
         return [
             'apiToken' => Craft::t('blitz', 'API Token'),
             'apiKey' => Craft::t('blitz', 'API Key'),
             'zoneIds' => Craft::t('blitz', 'Zone IDs'),
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function defineRules(): array
-    {
-        return [
-            [['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
-                return $purger->authenticationMethod == 'apiToken';
-            }],
-            [['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
-                return $purger->authenticationMethod == 'apiKey';
-            }],
-            [['email'], 'email'],
-            [['warmCacheDelay'], 'integer', 'min' => 0, 'max' => 30],
         ];
     }
 
@@ -177,6 +142,40 @@ class CloudflarePurger extends BaseCachePurger
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/purgers/cloudflare/settings', [
             'purger' => $this,
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineBehaviors(): array
+    {
+        return[
+            'parser' => [
+                'class' => EnvAttributeParserBehavior::class,
+                'attributes' => [
+                    'apiToken',
+                    'apiKey',
+                    'email',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        return [
+            [['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
+                return $purger->authenticationMethod == 'apiToken';
+            }],
+            [['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
+                return $purger->authenticationMethod == 'apiKey';
+            }],
+            [['email'], 'email'],
+            [['warmCacheDelay'], 'integer', 'min' => 0, 'max' => 30],
+        ];
     }
 
     /**

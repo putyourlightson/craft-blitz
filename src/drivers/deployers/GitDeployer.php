@@ -98,30 +98,6 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function behaviors(): array
-    {
-        return [
-            'parser' => [
-                'class' => EnvAttributeParserBehavior::class,
-                'attributes' => ['personalAccessToken'],
-            ],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function defineRules(): array
-    {
-        return [
-            [['username', 'personalAccessToken', 'name', 'email', 'commitMessage'], 'required'],
-            [['email'], 'email'],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $count = 0;
@@ -257,6 +233,30 @@ class GitDeployer extends BaseDeployer
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/deployers/git/settings', [
             'deployer' => $this,
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineBehaviors(): array
+    {
+        return [
+            'parser' => [
+                'class' => EnvAttributeParserBehavior::class,
+                'attributes' => ['personalAccessToken'],
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        return [
+            [['username', 'personalAccessToken', 'name', 'email', 'commitMessage'], 'required'],
+            [['email'], 'email'],
+        ];
     }
 
     /**

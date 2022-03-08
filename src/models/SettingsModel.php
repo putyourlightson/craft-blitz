@@ -14,7 +14,6 @@ use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
-use putyourlightson\blitz\behaviors\ArrayTypecastBehavior;
 
 class SettingsModel extends Model
 {
@@ -312,43 +311,6 @@ class SettingsModel extends Model
     /**
      * @inheritdoc
      */
-    public function behaviors(): array
-    {
-        $behaviors = parent::behaviors();
-        $behaviors['parser'] = [
-            'class' => EnvAttributeParserBehavior::class,
-            'attributes' => ['apiKey'],
-        ];
-        $behaviors['typecast'] = [
-            'class' => ArrayTypecastBehavior::class,
-            'attributes' => ['includedUriPatterns', 'excludedUriPatterns', 'customSiteUris'],
-        ];
-
-        return $behaviors;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function defineRules(): array
-    {
-        return [
-            [['cacheStorageType', 'cacheWarmerType', 'queryStringCaching'], 'required'],
-            [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
-            [['queryStringCaching'], 'in', 'range' => [
-                self::QUERY_STRINGS_DO_NOT_CACHE_URLS,
-                self::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES,
-                self::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE,
-            ]],
-            [['apiKey'], 'string', 'length' => [16]],
-            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function attributeLabels(): array
     {
         $labels = parent::attributeLabels();
@@ -367,5 +329,36 @@ class SettingsModel extends Model
     public function shouldWarmCache(): bool
     {
         return $this->cachingEnabled && $this->warmCacheAutomatically;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineBehaviors(): array
+    {
+        return [
+            'parser' => [
+                'class' => EnvAttributeParserBehavior::class,
+                'attributes' => ['apiKey'],
+            ],
+            ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        return [
+            [['cacheStorageType', 'cacheWarmerType', 'queryStringCaching'], 'required'],
+            [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
+            [['queryStringCaching'], 'in', 'range' => [
+                self::QUERY_STRINGS_DO_NOT_CACHE_URLS,
+                self::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES,
+                self::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE,
+            ]],
+            [['apiKey'], 'string', 'length' => [16]],
+            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
+        ];
     }
 }

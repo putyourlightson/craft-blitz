@@ -84,18 +84,6 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * @inheritdoc
-     */
-    public function defineRules(): array
-    {
-        return [
-            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
-            [['paginate'], 'integer'],
-            [['expiryDate'], DateTimeValidator::class],
-        ];
-    }
-
-    /**
      * Returns the cache duration option.
      */
     public function getCacheDuration(): ?int
@@ -191,5 +179,17 @@ class CacheOptionsModel extends Model
         $this->expiryDate = $value;
 
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        return [
+            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
+            [['paginate'], 'integer'],
+            [['expiryDate'], DateTimeValidator::class],
+        ];
     }
 }

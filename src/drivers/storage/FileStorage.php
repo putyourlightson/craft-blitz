@@ -74,16 +74,6 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function defineRules(): array
-    {
-        return [
-            [['folderPath'], 'required'],
-        ];
-    }
-
-    /**
-     * @inheritdoc
-     */
     public function get(SiteUriModel $siteUri): string
     {
         $filePaths = $this->getFilePaths($siteUri);
@@ -319,6 +309,16 @@ class FileStorage extends BaseCacheStorage
         }
 
         return is_dir($path) ? count(FileHelper::findFiles($path, ['only' => ['index.html']])) : 0;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        return [
+            [['folderPath'], 'required'],
+        ];
     }
 
     private function _hasInvalidQueryString(string $uri): bool
