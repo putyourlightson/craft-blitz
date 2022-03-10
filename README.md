@@ -5,8 +5,6 @@
 
 # Blitz Plugin for Craft CMS
 
-> Read the [Blitz 3 announcement](https://putyourlightson.com/articles/blitz-3-embracing-the-jamstack).
-
 Blitz provides intelligent static page caching for creating lightning-fast sites with [Craft CMS](https://craftcms.com/).
 
 - Blitz makes your site fly and feel light-weight and instantaneous to navigate.
@@ -25,13 +23,13 @@ This plugin requires a commercial license purchasable through the [Craft Plugin 
 
 ## Requirements
 
-This plugin requires [Craft CMS](https://craftcms.com/) 3.2.1 or later.
+This plugin requires [Craft CMS](https://craftcms.com/) 3.2.1 or later, or 4.0.0 or later.
 
 ## Installation
 
 To install the plugin, search for “Blitz” in the Craft Plugin Store, or install manually using composer.
 
-```
+```shell
 composer require putyourlightson/craft-blitz
 ```
 
