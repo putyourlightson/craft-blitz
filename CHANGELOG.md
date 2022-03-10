@@ -1,10 +1,6 @@
 # Release Notes for Blitz
 
-## 4.0.0-alpha.2 - 2022-03-04
-### Fixed
-- Fixed a bug with saving settings.
-
-## 4.0.0-alpha.1 - 2022-03-03
+## 4.0.0-beta.1 - 2022-03-10
 ### Added
 - Added compatibility with Craft 4.
 
