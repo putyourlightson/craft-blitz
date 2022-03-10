@@ -82,7 +82,7 @@ class CacheRequestTest extends Unit
     public function testGetIsCacheableRequestWithPathParam()
     {
         // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl().'?'.Craft::$app->config->general->pathParam.'=search');
+        $this->_mockRequest($this->siteUri->getUrl() . '?' . Craft::$app->config->general->pathParam . '=search');
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
@@ -102,7 +102,7 @@ class CacheRequestTest extends Unit
         $disallowedQueryString = 'gclid=123';
 
         // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl().'?'.$disallowedQueryString.'&'.$allowedQueryString);
+        $this->_mockRequest($this->siteUri->getUrl() . '?' . $disallowedQueryString . '&' . $allowedQueryString);
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
@@ -110,7 +110,7 @@ class CacheRequestTest extends Unit
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
         $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
-        $this->assertEquals($this->siteUri->uri.'?'.$allowedQueryString, $uri);
+        $this->assertEquals($this->siteUri->uri . '?' . $allowedQueryString, $uri);
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE;
         $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
@@ -122,14 +122,14 @@ class CacheRequestTest extends Unit
         Craft::$app->config->general->pageTrigger = 'p';
 
         // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl().'/'.Craft::$app->config->general->pageTrigger.'1');
+        $this->_mockRequest($this->siteUri->getUrl() . '/' . Craft::$app->config->general->pageTrigger . '1');
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
         Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
 
         $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
-        $this->assertEquals($this->siteUri->uri.'/'.Craft::$app->config->general->pageTrigger.'1', $uri);
+        $this->assertEquals($this->siteUri->uri . '/' . Craft::$app->config->general->pageTrigger . '1', $uri);
     }
 
     public function testGetRequestedCacheableSiteUriWithRegularExpression()
@@ -140,7 +140,7 @@ class CacheRequestTest extends Unit
         Blitz::$plugin->settings->excludedQueryStringParams = ['^(?!sort$|search$).*'];
 
         // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl().'?'.$disallowedQueryString.'&'.$allowedQueryString);
+        $this->_mockRequest($this->siteUri->getUrl() . '?' . $disallowedQueryString . '&' . $allowedQueryString);
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
@@ -148,7 +148,7 @@ class CacheRequestTest extends Unit
 
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
         $uri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri()->uri;
-        $this->assertEquals($this->siteUri->uri.'?'.$allowedQueryString, $uri);
+        $this->assertEquals($this->siteUri->uri . '?' . $allowedQueryString, $uri);
     }
 
     public function testGetIsCacheableSiteUri()
@@ -187,13 +187,13 @@ class CacheRequestTest extends Unit
         $this->assertTrue(
             Blitz::$plugin->cacheRequest->matchesUriPatterns(
                 $this->siteUri,
-                [['siteId' => 1, 'uriPattern' => '^'.$this->siteUri->uri.'$']]
+                [['siteId' => 1, 'uriPattern' => '^' . $this->siteUri->uri . '$']]
             )
         );
         $this->assertFalse(
             Blitz::$plugin->cacheRequest->matchesUriPatterns(
                 $this->siteUri,
-                [['siteId' => 1, 'uriPattern' => '^'.substr($this->siteUri->uri, 0, -1).'$']]
+                [['siteId' => 1, 'uriPattern' => '^' . substr($this->siteUri->uri, 0, -1) . '$']]
             )
         );
     }
@@ -201,7 +201,7 @@ class CacheRequestTest extends Unit
     public function testGetAllowedQueryString()
     {
         // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl().'?gclid=1&fbclid=2&page=3');
+        $this->_mockRequest($this->siteUri->getUrl() . '?gclid=1&fbclid=2&page=3');
 
         $this->assertEquals('page=3', Blitz::$plugin->cacheRequest->getAllowedQueryString());
     }
@@ -260,7 +260,7 @@ class CacheRequestTest extends Unit
             'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
             'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https',
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/'.$uri.'?'.parse_url($url, PHP_URL_QUERY),
+            'REQUEST_URI' => '/' . $uri . '?' . parse_url($url, PHP_URL_QUERY),
             'QUERY_STRING' => parse_url($url, PHP_URL_QUERY),
             'SCRIPT_NAME' => '/index.php',
         ]);

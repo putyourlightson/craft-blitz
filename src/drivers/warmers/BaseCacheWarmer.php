@@ -129,7 +129,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
         if ($delay !== null) {
             if (is_callable($setProgressHandler)) {
                 $progressLabel = Craft::t('blitz', 'Waiting {delay} seconds before warming.', [
-                    'delay' => $delay
+                    'delay' => $delay,
                 ]);
                 call_user_func($setProgressHandler, $count, $total, $progressLabel);
             }
@@ -179,7 +179,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     {
         if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_CACHE)) {
             $this->trigger(self::EVENT_AFTER_WARM_CACHE, new RefreshCacheEvent([
-                'siteUris' => $siteUris
+                'siteUris' => $siteUris,
             ]));
         }
     }

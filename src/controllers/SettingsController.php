@@ -10,12 +10,12 @@ use craft\base\ComponentInterface;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
+use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\helpers\BaseDriverHelper;
-use putyourlightson\blitz\helpers\CacheStorageHelper;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
-use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
+use putyourlightson\blitz\helpers\CacheStorageHelper;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use yii\web\Response;
@@ -194,7 +194,7 @@ class SettingsController extends Controller
         }
 
         if (!empty($errors)) {
-            Craft::$app->getSession()->setError($notice.' '.implode(' ', $errors));
+            Craft::$app->getSession()->setError($notice . ' ' . implode(' ', $errors));
 
             return null;
         }

@@ -135,12 +135,12 @@ class RefreshCacheService extends Component
                 'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
                     $query->where(['sourceId' => $sourceIds])
                         ->orWhere(['sourceId' => null]);
-                }
+                },
             ], false)
             ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
                     $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
-                }
+                },
             ], false)
             ->all();
 
@@ -282,8 +282,7 @@ class RefreshCacheService extends Component
 
         if (!empty($element->postDate) && $element->postDate > $now) {
             $expiryDate = $element->postDate;
-        }
-        elseif (!empty($element->expiryDate) && $element->expiryDate > $now) {
+        } elseif (!empty($element->expiryDate) && $element->expiryDate > $now) {
             $expiryDate = $element->expiryDate;
         }
 

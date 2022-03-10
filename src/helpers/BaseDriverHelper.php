@@ -79,8 +79,7 @@ class BaseDriverHelper
         // Some queues don't support custom push priorities.
         if (method_exists($queue, 'priority')) {
             $queue->priority($priority)->push($job);
-        }
-        else {
+        } else {
             $queue->push($job);
         }
     }

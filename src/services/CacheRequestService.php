@@ -110,7 +110,7 @@ class CacheRequestService extends Component
         }
 
         // Check for path param in URL because `$request->getQueryString()` will contain it regardless
-        if (preg_match('/[?&]'.Craft::$app->config->general->pathParam.'=/', $request->getUrl()) === 1) {
+        if (preg_match('/[?&]' . Craft::$app->config->general->pathParam . '=/', $request->getUrl()) === 1) {
             Blitz::$plugin->debug('Page not cached because a path param was provided in the query string. ', [], $request->getAbsoluteUrl());
 
             return false;
@@ -160,7 +160,7 @@ class CacheRequestService extends Component
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
             && !empty($this->getAllowedQueryString())
         ) {
-            $uri .= '?'.$this->getAllowedQueryString();
+            $uri .= '?' . $this->getAllowedQueryString();
         }
 
         return new SiteUriModel([
@@ -198,7 +198,7 @@ class CacheRequestService extends Component
         // Ignore URIs that are longer than the max URI length
         if (strlen($siteUri->uri) > self::MAX_URI_LENGTH) {
             Blitz::$plugin->debug('Page not cached because it exceeds the max URI length of {max} characters.', [
-                'max' => self::MAX_URI_LENGTH
+                'max' => self::MAX_URI_LENGTH,
             ], $siteUri->getUrl());
 
             return false;
@@ -250,7 +250,7 @@ class CacheRequestService extends Component
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
             $original = $headers->get('X-Powered-By');
-            $headers->set('X-Powered-By', $original.($original ? ',' : '').'Blitz');
+            $headers->set('X-Powered-By', $original . ($original ? ',' : '') . 'Blitz');
         }
 
         // Add cache tag header if set
@@ -274,7 +274,7 @@ class CacheRequestService extends Component
 
         // Append served by comment if html mime type and allowed
         if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
-            $value .= '<!-- Served by Blitz on '.date('c').' -->';
+            $value .= '<!-- Served by Blitz on ' . date('c') . ' -->';
         }
 
         $response->data = $value;
@@ -320,7 +320,7 @@ class CacheRequestService extends Component
             // https://github.com/putyourlightson/craft-blitz/issues/261
             $uriPattern = str_replace(['\/', '/'], ['/', '\/'], $uriPattern);
 
-            if (preg_match('/'.$uriPattern.'/', trim($siteUri->uri, '/'))) {
+            if (preg_match('/' . $uriPattern . '/', trim($siteUri->uri, '/'))) {
                 return true;
             }
         }
@@ -359,13 +359,13 @@ class CacheRequestService extends Component
     public function getIsAllowedQueryStringParam(string $param): bool
     {
         foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
-            if (preg_match('/'.$excludedParam.'/', $param)) {
+            if (preg_match('/' . $excludedParam . '/', $param)) {
                 return false;
             }
         }
 
         foreach (Blitz::$plugin->settings->includedQueryStringParams as $includedParam) {
-            if (preg_match('/'.$includedParam.'/', $param)) {
+            if (preg_match('/' . $includedParam . '/', $param)) {
                 return true;
             }
         }

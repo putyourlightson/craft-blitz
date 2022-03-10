@@ -149,11 +149,11 @@ class GenerateCacheService extends Component
         $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
 
         // Create a unique index from the element type and parameters for quicker indexing and less storage
-        $index = sprintf('%u', crc32($elementQuery->elementType.$params));
+        $index = sprintf('%u', crc32($elementQuery->elementType . $params));
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
-        $lockName = self::MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS.':'.$index;
+        $lockName = self::MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS . ':' . $index;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
@@ -184,8 +184,7 @@ class GenerateCacheService extends Component
                 $queryId = $db->getLastInsertID();
 
                 $this->saveElementQuerySources($elementQuery, $queryId);
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 Blitz::$plugin->log($e->getMessage(), [], 'error');
             }
         }
@@ -313,7 +312,7 @@ class GenerateCacheService extends Component
 
         // Append timestamp comment only if html mime type and allowed
         if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
-            $output .= '<!-- Cached by Blitz on '.date('c').' -->';
+            $output .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
         }
 
         $this->saveOutput($output, $siteUri, $this->options->getCacheDuration());

@@ -36,8 +36,7 @@ class LocalWarmer extends BaseCacheWarmer
 
         if ($queue) {
             CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
-        }
-        else {
+        } else {
             $this->warmUrisWithProgress($siteUris, $setProgressHandler);
 
             $this->_resetApplicationConfig('console');
@@ -97,8 +96,8 @@ class LocalWarmer extends BaseCacheWarmer
             'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
             'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https',
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/'.$uri,
-            'QUERY_STRING' => 'p='.$uri,
+            'REQUEST_URI' => '/' . $uri,
+            'QUERY_STRING' => 'p=' . $uri,
         ]);
         $_GET = array_merge($_GET, [
             'p' => $uri,
@@ -118,8 +117,8 @@ class LocalWarmer extends BaseCacheWarmer
          * @see \yii\web\Request::getHostInfo
          */
         $request->setHostInfo(
-            parse_url($url, PHP_URL_SCHEME).'://'
-            .parse_url($url, PHP_URL_HOST)
+            parse_url($url, PHP_URL_SCHEME) . '://'
+            . parse_url($url, PHP_URL_HOST)
         );
 
         // Set the template mode to front-end site
@@ -149,8 +148,7 @@ class LocalWarmer extends BaseCacheWarmer
             }
 
             Blitz::$plugin->generateCache->save($response->data, $siteUri);
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             Blitz::$plugin->debug($e->getMessage());
 
             return false;
@@ -167,8 +165,8 @@ class LocalWarmer extends BaseCacheWarmer
     {
         // Merge default app.{appType}.php config with user-defined config
         $config = ArrayHelper::merge(
-            require Craft::getAlias('@craft/config/app.'.$appType.'.php'),
-            Craft::$app->getConfig()->getConfigFromFile('app.'.$appType)
+            require Craft::getAlias('@craft/config/app.' . $appType . '.php'),
+            Craft::$app->getConfig()->getConfigFromFile('app.' . $appType)
         );
 
         // Recreate components from config

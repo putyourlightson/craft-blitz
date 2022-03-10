@@ -101,7 +101,7 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     {
         if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_PURGE_CACHE, new RefreshCacheEvent([
-                'siteUris' => $siteUris
+                'siteUris' => $siteUris,
             ]));
         }
     }

@@ -109,7 +109,7 @@ class GenerateCacheTest extends Unit
     {
         $siteUri = new SiteUriModel(['siteId' => $this->siteUri->siteId]);
 
-        $siteUri->uri = $this->siteUri->uri.'.html';
+        $siteUri->uri = $this->siteUri->uri . '.html';
 
         Blitz::$plugin->generateCache->save($this->output, $siteUri);
         $value = Blitz::$plugin->cacheStorage->get($siteUri);
@@ -117,7 +117,7 @@ class GenerateCacheTest extends Unit
         // Assert that the output contains a timestamp
         $this->assertStringContainsString('Cached by Blitz on', $value);
 
-        $siteUri->uri = $this->siteUri->uri.'.json';
+        $siteUri->uri = $this->siteUri->uri . '.json';
 
         Blitz::$plugin->generateCache->save($this->output, $siteUri);
         $value = Blitz::$plugin->cacheStorage->get($siteUri);

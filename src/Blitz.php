@@ -40,9 +40,9 @@ use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\services\CacheTagsService;
+use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
-use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
@@ -142,7 +142,7 @@ class Blitz extends Plugin
         $message = Craft::t('blitz', $message, $params);
 
         if ($url) {
-            $message .= ' ['.$url.']';
+            $message .= ' [' . $url . ']';
         }
 
         LogToFile::log($message, 'blitz', 'debug');
@@ -424,7 +424,7 @@ class Blitz extends Plugin
                     // Redirect to settings page with welcome
                     Craft::$app->getResponse()->redirect(
                         UrlHelper::cpUrl('settings/plugins/blitz', [
-                            'welcome' => 1
+                            'welcome' => 1,
                         ])
                     )->send();
                 }
@@ -443,34 +443,34 @@ class Blitz extends Plugin
                     'heading' => 'Blitz',
                     'permissions' => [
                         'blitz:clear' => [
-                            'label' => Craft::t('blitz', 'Clear cache')
+                            'label' => Craft::t('blitz', 'Clear cache'),
                         ],
                         'blitz:flush' => [
-                            'label' => Craft::t('blitz', 'Flush cache')
+                            'label' => Craft::t('blitz', 'Flush cache'),
                         ],
                         'blitz:purge' => [
-                            'label' => Craft::t('blitz', 'Purge cache')
+                            'label' => Craft::t('blitz', 'Purge cache'),
                         ],
                         'blitz:warm' => [
-                            'label' => Craft::t('blitz', 'Warm cache')
+                            'label' => Craft::t('blitz', 'Warm cache'),
                         ],
                         'blitz:deploy' => [
-                            'label' => Craft::t('blitz', 'Remote deploy')
+                            'label' => Craft::t('blitz', 'Remote deploy'),
                         ],
                         'blitz:refresh' => [
-                            'label' => Craft::t('blitz', 'Refresh cache')
+                            'label' => Craft::t('blitz', 'Refresh cache'),
                         ],
                         'blitz:refresh-expired' => [
-                            'label' => Craft::t('blitz', 'Refresh expired cache')
+                            'label' => Craft::t('blitz', 'Refresh expired cache'),
                         ],
                         'blitz:refresh-site' => [
-                            'label' => Craft::t('blitz', 'Refresh site cache')
+                            'label' => Craft::t('blitz', 'Refresh site cache'),
                         ],
                         'blitz:refresh-urls' => [
-                            'label' => Craft::t('blitz', 'Refresh cached URLs')
+                            'label' => Craft::t('blitz', 'Refresh cached URLs'),
                         ],
                         'blitz:refresh-tagged' => [
-                            'label' => Craft::t('blitz', 'Refresh tagged cache')
+                            'label' => Craft::t('blitz', 'Refresh tagged cache'),
                         ],
                     ],
                 ];
