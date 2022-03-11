@@ -1,12 +1,6 @@
-# Static Analysis
+# Testing
 
-To run static analysis on the plugin, install PHPStan and run the following command from the root of your project.
-
-```shell
-./vendor/bin/phpstan analyse -c vendor/putyourlightson/craft-blitz/phpstan.neon
-```
-
-# Static Analysis
+## Static Analysis
 
 To run static analysis on the plugin, install [PHPStan for Craft CMS](https://github.com/craftcms/phpstan) and run the following command from the root of your project.
 
@@ -14,7 +8,7 @@ To run static analysis on the plugin, install [PHPStan for Craft CMS](https://gi
 ./vendor/bin/phpstan analyse -c vendor/putyourlightson/craft-blitz/phpstan.neon  --memory-limit 1G
 ```
 
-# Easy Coding Standard
+## Easy Coding Standard
 
 To run the Easy Coding Standard on the plugin, install [ECS for Craft CMS](https://github.com/craftcms/ecs) and run the following command from the root of your project.
 
@@ -22,9 +16,9 @@ To run the Easy Coding Standard on the plugin, install [ECS for Craft CMS](https
  ./vendor/bin/ecs check -c vendor/putyourlightson/craft-blitz/ecs.php
 ```
 
-# Testing
+## Unit Tests
 
-To test the plugin, install Codeception, update `.env` and run the following command from the root of your project.
+To unit test the plugin, install Codeception, update `.env` and run the following command from the root of your project.
 
 ```shell
 ./vendor/bin/codecept run -c vendor/putyourlightson/craft-blitz unit
