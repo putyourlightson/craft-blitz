@@ -617,6 +617,8 @@ class RefreshCacheService extends Component
             return;
         }
 
+        $tags = $event->tags;
+
         // Get cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
