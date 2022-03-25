@@ -341,7 +341,7 @@ class SettingsModel extends Model
                 'class' => EnvAttributeParserBehavior::class,
                 'attributes' => ['apiKey'],
             ],
-            ];
+        ];
     }
 
     /**

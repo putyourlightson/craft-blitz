@@ -4,6 +4,10 @@
 ### Added
 - Added compatibility with Craft 4.
 
+## 3.11.3 - Unreleased
+### Added
+- Added `beforeRefreshCacheTags` and `afterRefreshCacheTags` events to the `RefreshCacheService` class ([#386](https://github.com/putyourlightson/craft-blitz/issues/386)).
+
 ## 3.11.2 - 2022-03-03
 ### Fixed
 - Fixed URL encoding of query strings which could prevent server rewrites from finding cached URIs ([#365](https://github.com/putyourlightson/craft-blitz/issues/365)). 

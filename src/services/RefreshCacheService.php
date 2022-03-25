@@ -18,6 +18,7 @@ use DateTime;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\events\RefreshCacheTagsEvent;
 use putyourlightson\blitz\events\RefreshElementEvent;
 use putyourlightson\blitz\events\RefreshSiteCacheEvent;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
@@ -61,6 +62,16 @@ class RefreshCacheService extends Component
      * @event RefreshCacheEvent
      */
     public const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
+
+    /**
+     * @event RefreshCacheTagsEvent
+     */
+    public const EVENT_BEFORE_REFRESH_CACHE_TAGS = 'beforeRefreshCacheTags';
+
+    /**
+     * @event RefreshCacheTagsEvent
+     */
+    public const EVENT_AFTER_REFRESH_CACHE_TAGS = 'afterRefreshCacheTags';
 
     /**
      * @event RefreshCacheEvent
@@ -561,11 +572,24 @@ class RefreshCacheService extends Component
      */
     public function refreshCacheTags(array $tags)
     {
+        $event = new RefreshCacheTagsEvent(['tags' => $tags]);
+        $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE_TAGS, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        $tags = $event->tags;
+
         // Get cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
         $this->addCacheIds($cacheIds);
 
         $this->refresh(true);
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE_TAGS)) {
+            $this->trigger(self::EVENT_AFTER_REFRESH_CACHE_TAGS, $event);
+        }
     }
 }

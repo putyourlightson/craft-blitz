@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use craft\ecs\SetList;
+use PhpCsFixer\Fixer\ControlStructure\ControlStructureContinuationPositionFixer;
 use Symfony\Component\DependencyInjection\Loader\Configurator\ContainerConfigurator;
 use Symplify\EasyCodingStandard\ValueObject\Option;
 
@@ -16,4 +17,11 @@ return static function(ContainerConfigurator $containerConfigurator): void {
     ]);
 
     $containerConfigurator->import(SetList::CRAFT_CMS_4);
+
+    // Sets the control structure continuation keyword to be on the next line.
+    $services = $containerConfigurator->services();
+    $services->set(ControlStructureContinuationPositionFixer::class)
+        ->call('configure', [[
+            'position' => ControlStructureContinuationPositionFixer::NEXT_LINE,
+        ]]);
 };
