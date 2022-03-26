@@ -249,23 +249,24 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves the cache for a site URI.
+     * Saves the content for a site URI to the cache.
      *
-     * @param string $output
+     * @param string $content
      * @param SiteUriModel $siteUri
+     * @return string|null
      */
-    public function save(string $output, SiteUriModel $siteUri)
+    public function save(string $content, SiteUriModel $siteUri)
     {
         if (!$this->options->cachingEnabled) {
-            return;
+            return null;
         }
 
         // Don't cache if the output contains any transform generation URLs
         // https://github.com/putyourlightson/craft-blitz/issues/125
-        if (StringHelper::contains(stripslashes($output), 'assets/generate-transform')) {
+        if (StringHelper::contains(stripslashes($content), 'assets/generate-transform')) {
             Blitz::$plugin->debug('Page not cached because it contains transform generation URLs. Consider setting the `generateTransformsBeforePageLoad` general config setting to `true` to fix this.', [], $siteUri->getUrl());
 
-            return;
+            return null;
         }
 
         $mutex = Craft::$app->getMutex();
@@ -276,7 +277,7 @@ class GenerateCacheService extends Component
                 'lockName' => $lockName,
             ], $siteUri->getUrl());
 
-            return;
+            return null;
         }
 
         $db = Craft::$app->getDb();
@@ -331,12 +332,14 @@ class GenerateCacheService extends Component
 
         // Append timestamp comment only if html mime type and allowed
         if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
-            $output .= '<!-- Cached by Blitz on '.date('c').' -->';
+            $content .= '<!-- Cached by Blitz on '.date('c').' -->';
         }
 
-        $this->saveOutput($output, $siteUri, $this->options->getCacheDuration());
+        $this->saveOutput($content, $siteUri, $this->options->getCacheDuration());
 
         $mutex->release($lockName);
+
+        return $content;
     }
 
     /**

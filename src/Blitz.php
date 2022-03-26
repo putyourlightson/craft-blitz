@@ -19,7 +19,6 @@ use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
-use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Plugins;
@@ -29,7 +28,6 @@ use craft\utilities\ClearCaches;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
-use craft\web\View;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
 use putyourlightson\blitz\drivers\integrations\IntegrationInterface;
@@ -48,6 +46,7 @@ use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\logtofile\LogToFile;
 use yii\base\Event;
+use yii\web\Response;
 
 /**
  *
@@ -253,18 +252,14 @@ class Blitz extends Plugin
                     }
                 );
 
-                // Register after render page template event
-                Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-                    function(TemplateEvent $event) use ($siteUri) {
-                        if (Craft::$app->getResponse()->getIsOk()) {
-                            // Save the cached output
-                            $this->generateCache->save($event->output, $siteUri);
-
-                            $response = $this->cacheRequest->getResponse($siteUri);
-
-                            if ($response !== null) {
-                                // Output the response and end the script
-                                Craft::$app->end(0, $response);
+                // Register after prepare response event
+                Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
+                    function() use ($siteUri) {
+                        $response = Craft::$app->getResponse();
+                        if ($response->getIsOk()) {
+                            // Save the content and prepare the response
+                            if ($content = $this->generateCache->save($response->content, $siteUri)) {
+                                $this->cacheRequest->prepareResponse($response, $content, $siteUri);
                             }
                         }
                     }

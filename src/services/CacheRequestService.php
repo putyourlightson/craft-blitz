@@ -16,6 +16,7 @@ use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
+use yii\web\Response as BaseResponse;
 
 /**
  *
@@ -143,14 +144,6 @@ class CacheRequestService extends Component
     public function getRequestedCacheableSiteUri()
     {
         $site = Craft::$app->getSites()->getCurrentSite();
-
-        // Log a debug message if no site was matched from the requested URL
-        if ($site === null) {
-            Blitz::$plugin->debug('No site URI could be determined from the requested URL – ensure that the base site URL is correctly set.', [], Craft::$app->getRequest()->getAbsoluteUrl());
-
-            return null;
-        }
-
         $uri = $this->_getFullUri();
 
         /**
@@ -239,7 +232,6 @@ class CacheRequestService extends Component
      * Returns the response of a given site URI, if cached.
      *
      * @param SiteUriModel $siteUri
-     *
      * @return Response|null
      */
     public function getResponse(SiteUriModel $siteUri)
@@ -257,19 +249,49 @@ class CacheRequestService extends Component
             return null;
         }
 
-        $value = Blitz::$plugin->cacheStorage->get($siteUri);
+        $siteUri = $event->siteUri;
+        $content = Blitz::$plugin->cacheStorage->get($siteUri);
 
-        if (empty($value)) {
+        if (empty($content)) {
             return null;
         }
 
-        $headers = $response->getHeaders();
+        $response = $event->response;
+        $this->_addCraftHeaders($response);
+        $this->prepareResponse($response, $content, $siteUri);
 
+        $outputComments = Blitz::$plugin->settings->outputComments === true
+            || Blitz::$plugin->settings->outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED;
+
+        // Append served by comment if allowed and has HTML mime type
+        if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
+            $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
+        }
+
+        $response->content = $content;
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_GET_RESPONSE)) {
+            $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Prepares the response for a given site URI.
+     *
+     * @since 3.12.0
+     */
+    public function prepareResponse(Response $response, string $content, SiteUriModel $siteUri)
+    {
+        $response->content = $content;
+
+        $headers = $response->getHeaders();
         $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
             $original = $headers->get('X-Powered-By');
-            $headers->set('X-Powered-By', $original.($original ? ',' : '').'Blitz');
+            $headers->set('X-Powered-By', $original . ($original ? ',' : '') . 'Blitz');
         }
 
         // Add cache tag header if set
@@ -283,26 +305,13 @@ class CacheRequestService extends Component
         // Get the mime type from the site URI
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
-        if ($mimeType != SiteUriHelper::MIME_TYPE_HTML) {
-            $response->format = Response::FORMAT_RAW;
+        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML) {
+            $response->format = BaseResponse::FORMAT_HTML;
+        }
+        else {
+            $response->format = BaseResponse::FORMAT_RAW;
             $headers->set('Content-Type', $mimeType);
         }
-
-        $outputComments = Blitz::$plugin->settings->outputComments === true
-            || Blitz::$plugin->settings->outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED;
-
-        // Append served by comment if html mime type and allowed
-        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
-            $value .= '<!-- Served by Blitz on '.date('c').' -->';
-        }
-
-        $response->data = $value;
-
-        if ($this->hasEventHandlers(self::EVENT_AFTER_GET_RESPONSE)) {
-            $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
-        }
-
-        return $response;
     }
 
     /**
@@ -379,6 +388,13 @@ class CacheRequestService extends Component
         return $this->_queryString;
     }
 
+    /**
+     * Returns whether the query string parameter is allowed.
+     *
+     * @param string $param
+     *
+     * @return bool
+     */
     public function getIsAllowedQueryStringParam(string $param): bool
     {
         foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
@@ -409,6 +425,39 @@ class CacheRequestService extends Component
         $path = Craft::$app->getRequest()->getFullPath();
 
         return $baseUrl . ($baseUrl && $path ? '/' : '') . $path;
+    }
+
+    /**
+     * Adds headers that Craft normally would.
+     *
+     * @param Response $response
+     *
+     * @see Application::handleRequest()
+     * @since 3.12.0
+     */
+    private function _addCraftHeaders(Response $response)
+    {
+        $headers = $response->getHeaders();
+        $generalConfig = Craft::$app->getConfig()->getGeneral();
+
+        if ($generalConfig->permissionsPolicyHeader) {
+            $headers->set('Permissions-Policy', $generalConfig->permissionsPolicyHeader);
+        }
+
+        // Tell bots not to index/follow CP and tokenized pages
+        if ($generalConfig->disallowRobots) {
+            $headers->set('X-Robots-Tag', 'none');
+        }
+
+        // Send the X-Powered-By header?
+        if ($generalConfig->sendPoweredByHeader) {
+            $original = $headers->get('X-Powered-By');
+            $headers->set('X-Powered-By', $original . ($original ? ',' : '') . Craft::$app->name);
+        }
+        else {
+            // In case PHP is already setting one
+            header_remove('X-Powered-By');
+        }
     }
 
     /**
