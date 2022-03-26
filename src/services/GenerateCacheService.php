@@ -233,9 +233,9 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves the cache for a site URI.
+     * Saves the content for a site URI to the cache.
      */
-    public function save(string $output, SiteUriModel $siteUri): ?string
+    public function save(string $content, SiteUriModel $siteUri): ?string
     {
         if (!$this->options->cachingEnabled) {
             return null;
@@ -243,7 +243,7 @@ class GenerateCacheService extends Component
 
         // Don't cache if the output contains any transform generation URLs
         // https://github.com/putyourlightson/craft-blitz/issues/125
-        if (StringHelper::contains(stripslashes($output), 'assets/generate-transform')) {
+        if (StringHelper::contains(stripslashes($content), 'assets/generate-transform')) {
             Blitz::$plugin->debug('Page not cached because it contains transform generation URLs. Consider setting the `generateTransformsBeforePageLoad` general config setting to `true` to fix this.', [], $siteUri->getUrl());
 
             return null;
@@ -309,14 +309,14 @@ class GenerateCacheService extends Component
 
         // Append cached by comment if allowed and has HTML mime type
         if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
-            $output .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
+            $content .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
         }
 
-        $this->saveOutput($output, $siteUri, $this->options->getCacheDuration());
+        $this->saveOutput($content, $siteUri, $this->options->getCacheDuration());
 
         $mutex->release($lockName);
 
-        return $output;
+        return $content;
     }
 
     /**
