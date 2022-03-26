@@ -39,6 +39,14 @@ class SiteUriHelper
     }
 
     /**
+     * Returns the mime type of the given site URI.
+     */
+    public static function hasHtmlMimeType(SiteUriModel $siteUri): string
+    {
+        return self::getMimeType($siteUri) == self::MIME_TYPE_HTML;
+    }
+
+    /**
      * Returns all site URIs.
      *
      * @return SiteUriModel[]

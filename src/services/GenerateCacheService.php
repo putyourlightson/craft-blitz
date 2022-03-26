@@ -235,10 +235,10 @@ class GenerateCacheService extends Component
     /**
      * Saves the cache for a site URI.
      */
-    public function save(string $output, SiteUriModel $siteUri)
+    public function save(string $output, SiteUriModel $siteUri): ?string
     {
         if (!$this->options->cachingEnabled) {
-            return;
+            return null;
         }
 
         // Don't cache if the output contains any transform generation URLs
@@ -246,7 +246,7 @@ class GenerateCacheService extends Component
         if (StringHelper::contains(stripslashes($output), 'assets/generate-transform')) {
             Blitz::$plugin->debug('Page not cached because it contains transform generation URLs. Consider setting the `generateTransformsBeforePageLoad` general config setting to `true` to fix this.', [], $siteUri->getUrl());
 
-            return;
+            return null;
         }
 
         $mutex = Craft::$app->getMutex();
@@ -257,7 +257,7 @@ class GenerateCacheService extends Component
                 'lockName' => $lockName,
             ], $siteUri->getUrl());
 
-            return;
+            return null;
         }
 
         $db = Craft::$app->getDb();
@@ -304,20 +304,19 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        // Get the mime type from the URI
-        $mimeType = SiteUriHelper::getMimeType($siteUri);
-
         $outputComments = $this->options->outputComments === true
             || $this->options->outputComments == SettingsModel::OUTPUT_COMMENTS_CACHED;
 
-        // Append timestamp comment only if html mime type and allowed
-        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
+        // Append cached by comment if allowed and has HTML mime type
+        if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
             $output .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
         }
 
         $this->saveOutput($output, $siteUri, $this->options->getCacheDuration());
 
         $mutex->release($lockName);
+
+        return $output;
     }
 
     /**
