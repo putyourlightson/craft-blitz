@@ -65,11 +65,12 @@ class YiiCacheStorage extends BaseCacheStorage
             // Cast the site ID to an integer to avoid an incorrect key
             // https://github.com/putyourlightson/craft-blitz/issues/257
             $value = $this->_cache->get([
-                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
+                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
             ]);
         }
         /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (Exception) {}
+        catch (Exception) {
+        }
 
         return $value ?: '';
     }
@@ -86,7 +87,7 @@ class YiiCacheStorage extends BaseCacheStorage
         // Cast the site ID to an integer to avoid an incorrect key
         // https://github.com/putyourlightson/craft-blitz/issues/257
         $this->_cache->set([
-            self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
+            self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
         ], $value, $duration);
     }
 
@@ -110,7 +111,7 @@ class YiiCacheStorage extends BaseCacheStorage
             // Cast the site ID to an integer to avoid an incorrect key
             // https://github.com/putyourlightson/craft-blitz/issues/257
             $this->_cache->delete([
-                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
+                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
             ]);
         }
 

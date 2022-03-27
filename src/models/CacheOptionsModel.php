@@ -145,7 +145,7 @@ class CacheOptionsModel extends Model
             $timestamp = $cacheDuration + time();
 
             // Prepend with @ symbol to specify a timestamp
-            $this->expiryDate = new DateTime('@'.$timestamp);
+            $this->expiryDate = new DateTime('@' . $timestamp);
         }
 
         return $this;

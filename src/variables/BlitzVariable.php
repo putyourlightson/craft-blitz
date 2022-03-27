@@ -38,7 +38,7 @@ class BlitzVariable
     {
         // Ensure template exists
         if (!Craft::$app->getView()->resolveTemplate($template)) {
-            throw new NotFoundHttpException('Template not found: '.$template);
+            throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
         $uri = $this->_getActionUrl('blitz/templates/get');
@@ -153,7 +153,7 @@ class BlitzVariable
 
         // Create polyfills using https://polyfill.io/v3/url-builder/.
         $polyfills = ['fetch', 'Promise', 'CustomEvent'];
-        $polyfillUrl = 'https://polyfill.io/v3/polyfill.min.js?features='.implode('%2C', $polyfills);
+        $polyfillUrl = 'https://polyfill.io/v3/polyfill.min.js?features=' . implode('%2C', $polyfills);
 
         // Register polyfills for IE11 only, using the `module/nomodule` pattern.
         // https://3perf.com/blog/polyfills/#modulenomodule
@@ -171,10 +171,10 @@ class BlitzVariable
         ];
 
         foreach ($data as $key => &$value) {
-            $value = 'data-blitz-'.$key.'="'.$value.'"';
+            $value = 'data-blitz-' . $key . '="' . $value . '"';
         }
 
-        $output = '<span class="blitz-inject" id="blitz-inject-'.$id.'" '.implode(' ', $data).'></span>';
+        $output = '<span class="blitz-inject" id="blitz-inject-' . $id . '" ' . implode(' ', $data) . '></span>';
 
         return Template::raw($output);
     }

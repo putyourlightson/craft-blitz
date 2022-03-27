@@ -12,12 +12,12 @@ use craft\events\CancelableEvent;
 use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
-use Symplify\GitWrapper\Exception\GitException;
-use Symplify\GitWrapper\GitWorkingCopy;
-use Symplify\GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use Symfony\Component\Process\Process;
+use Symplify\GitWrapper\Exception\GitException;
+use Symplify\GitWrapper\GitWorkingCopy;
+use Symplify\GitWrapper\GitWrapper;
 use yii\base\ErrorException;
 use yii\base\Event;
 use yii\base\InvalidArgumentException;
@@ -134,7 +134,7 @@ class GitDeployer extends BaseDeployer
                     call_user_func($setProgressHandler, $count, $total, $progressLabel);
                 }
 
-                $filePath = FileHelper::normalizePath($repository['repositoryPath'].'/'.$siteUri->uri.'/index.html');
+                $filePath = FileHelper::normalizePath($repository['repositoryPath'] . '/' . $siteUri->uri . '/index.html');
 
                 $value = Blitz::$plugin->cacheStorage->get($siteUri);
 
@@ -186,8 +186,7 @@ class GitDeployer extends BaseDeployer
                 $git = $this->_getGitWorkingCopy($repository['repositoryPath'], $repository['remote']);
 
                 $git->fetch();
-            }
-            catch (GitException $e) {
+            } catch (GitException $e) {
                 $this->addError('gitRepositories',
                     Craft::t('blitz',
                         'Error connecting to repository: {error}',
@@ -348,10 +347,10 @@ class GitDeployer extends BaseDeployer
         $remoteUrl = $git->getRemote($remote)['push'];
 
         // Break the URL into parts and reconstruct with personal access token
-        $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https').'://'
-            .$this->username.':'.$this->getPersonalAccessToken().'@'
-            .parse_url($remoteUrl, PHP_URL_HOST)
-            .parse_url($remoteUrl, PHP_URL_PATH);
+        $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https') . '://'
+            . $this->username . ':' . $this->getPersonalAccessToken() . '@'
+            . parse_url($remoteUrl, PHP_URL_HOST)
+            . parse_url($remoteUrl, PHP_URL_PATH);
 
         $git->remote('set-url', $remote, $remoteUrl);
 
@@ -373,8 +372,7 @@ class GitDeployer extends BaseDeployer
 
         try {
             FileHelper::writeToFile($filePath, $value);
-        }
-        catch (ErrorException|InvalidArgumentException $exception) {
+        } catch (ErrorException|InvalidArgumentException $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], 'error');
         }
     }
@@ -418,8 +416,7 @@ class GitDeployer extends BaseDeployer
             }
 
             $git->push();
-        }
-        catch (GitException $e) {
+        } catch (GitException $e) {
             Blitz::$plugin->log('Remote deploy failed: {error}', [
                 'error' => $e->getMessage(),
             ], 'error');

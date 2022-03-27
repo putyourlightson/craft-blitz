@@ -76,7 +76,7 @@ class RefreshCacheTest extends Unit
     {
         return [
             'entries' => [
-                'class' => EntriesFixture::class
+                'class' => EntriesFixture::class,
             ],
         ];
     }
@@ -340,7 +340,7 @@ class RefreshCacheTest extends Unit
     public function testRefreshSourceTag()
     {
         // Add source tag and save
-        Blitz::$plugin->generateCache->options->tags('sectionId:'.$this->entry1->sectionId);
+        Blitz::$plugin->generateCache->options->tags('sectionId:' . $this->entry1->sectionId);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         // Assert that the output (which may also contain a timestamp) contains the cached value
@@ -387,7 +387,7 @@ class RefreshCacheTest extends Unit
         // Assert that the output (which may also contain a timestamp) contains the cached value
         $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
 
-        $url = substr($this->siteUri->url, 0, -1).'*';
+        $url = substr($this->siteUri->url, 0, -1) . '*';
         Blitz::$plugin->refreshCache->refreshCachedUrls([$url]);
 
         Craft::$app->runAction('queue/run');

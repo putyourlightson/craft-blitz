@@ -149,11 +149,11 @@ class GenerateCacheService extends Component
         $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
 
         // Create a unique index from the element type and parameters for quicker indexing and less storage
-        $index = sprintf('%u', crc32($elementQuery->elementType.$params));
+        $index = sprintf('%u', crc32($elementQuery->elementType . $params));
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
-        $lockName = self::MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS.':'.$index;
+        $lockName = self::MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS . ':' . $index;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
@@ -184,8 +184,7 @@ class GenerateCacheService extends Component
                 $queryId = $db->getLastInsertID();
 
                 $this->saveElementQuerySources($elementQuery, $queryId);
-            }
-            catch (Exception $e) {
+            } catch (Exception $e) {
                 Blitz::$plugin->log($e->getMessage(), [], 'error');
             }
         }
@@ -234,20 +233,20 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves the cache for a site URI.
+     * Saves the content for a site URI to the cache.
      */
-    public function save(string $output, SiteUriModel $siteUri)
+    public function save(string $content, SiteUriModel $siteUri): ?string
     {
         if (!$this->options->cachingEnabled) {
-            return;
+            return null;
         }
 
         // Don't cache if the output contains any transform generation URLs
         // https://github.com/putyourlightson/craft-blitz/issues/125
-        if (StringHelper::contains(stripslashes($output), 'assets/generate-transform')) {
+        if (StringHelper::contains(stripslashes($content), 'assets/generate-transform')) {
             Blitz::$plugin->debug('Page not cached because it contains transform generation URLs. Consider setting the `generateTransformsBeforePageLoad` general config setting to `true` to fix this.', [], $siteUri->getUrl());
 
-            return;
+            return null;
         }
 
         $mutex = Craft::$app->getMutex();
@@ -258,7 +257,7 @@ class GenerateCacheService extends Component
                 'lockName' => $lockName,
             ], $siteUri->getUrl());
 
-            return;
+            return null;
         }
 
         $db = Craft::$app->getDb();
@@ -305,20 +304,19 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        // Get the mime type from the URI
-        $mimeType = SiteUriHelper::getMimeType($siteUri);
-
         $outputComments = $this->options->outputComments === true
             || $this->options->outputComments == SettingsModel::OUTPUT_COMMENTS_CACHED;
 
-        // Append timestamp comment only if html mime type and allowed
-        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
-            $output .= '<!-- Cached by Blitz on '.date('c').' -->';
+        // Append cached by comment if allowed and has HTML mime type
+        if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
+            $content .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
         }
 
-        $this->saveOutput($output, $siteUri, $this->options->getCacheDuration());
+        $this->saveOutput($content, $siteUri, $this->options->getCacheDuration());
 
         $mutex->release($lockName);
+
+        return $content;
     }
 
     /**

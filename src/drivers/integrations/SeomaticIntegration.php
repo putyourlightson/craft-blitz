@@ -21,7 +21,7 @@ class SeomaticIntegration extends BaseIntegration
     public static function getRequiredPlugins(): array
     {
         return [
-            ['handle' => 'seomatic', 'version' => '4.0.0-beta.1']
+            ['handle' => 'seomatic', 'version' => '4.0.0-beta.1'],
         ];
     }
 
@@ -36,8 +36,7 @@ class SeomaticIntegration extends BaseIntegration
                 if ($event->uri === null && $event->siteId === null && $event->sourceId === null && $event->sourceType === null) {
                     // Refresh the entire cache.
                     Blitz::$plugin->refreshCache->refreshAll();
-                }
-                elseif ($event->uri === null && $event->siteId !== null && $event->sourceId !== null && $event->sourceType !== null) {
+                } elseif ($event->uri === null && $event->siteId !== null && $event->sourceId !== null && $event->sourceType !== null) {
                     // Refresh the cache for the provided source only.
                     /** @var ElementQuery $elementQuery */
                     $elementQuery = self::_getElementQuery($event->siteId, $event->sourceId, $event->sourceType);

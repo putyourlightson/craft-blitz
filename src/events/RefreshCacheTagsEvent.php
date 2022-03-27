@@ -6,12 +6,14 @@
 namespace putyourlightson\blitz\events;
 
 use craft\events\CancelableEvent;
-use putyourlightson\blitz\models\SiteUriModel;
 
-class RefreshCacheEvent extends CancelableEvent
+/**
+ * @since 3.12.0
+ */
+class RefreshCacheTagsEvent extends CancelableEvent
 {
     /**
-     * @var SiteUriModel[]
+     * @var string[]
      */
-    public array $siteUris = [];
+    public array $tags = [];
 }

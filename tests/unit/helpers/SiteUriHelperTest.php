@@ -47,7 +47,7 @@ class SiteUriHelperTest extends Unit
                 'name' => 'Secondary',
                 'handle' => 'secondary',
                 'language' => $primarySite->language,
-                'baseUrl' => trim($primarySite->baseUrl, '/').'/secondary/',
+                'baseUrl' => trim($primarySite->baseUrl, '/') . '/secondary/',
             ]);
 
             Craft::$app->sites->saveSite($this->secondarySite);
@@ -70,7 +70,7 @@ class SiteUriHelperTest extends Unit
 
     public function testGetSiteUriFromUrl()
     {
-        $siteUri = SiteUriHelper::getSiteUriFromUrl($this->secondarySite->getBaseUrl().'page');
+        $siteUri = SiteUriHelper::getSiteUriFromUrl($this->secondarySite->getBaseUrl() . 'page');
         $siteId = Craft::$app->sites->getSiteByHandle('secondary')->id;
         $this->assertEquals($siteId, $siteUri->siteId);
     }

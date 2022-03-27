@@ -10,12 +10,12 @@ use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
 use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
 class Install extends Migration

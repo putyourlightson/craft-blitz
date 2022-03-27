@@ -8,7 +8,7 @@ return [
         'type' => 'channel',
         'enableVersioning' => false,
         'propagationMethod' => 'all',
-        'uid' => 'section-1---------------------uid'
+        'uid' => 'section-1---------------------uid',
     ],
     [
         'id' => '2',
@@ -17,6 +17,6 @@ return [
         'type' => 'channel',
         'enableVersioning' => false,
         'propagationMethod' => 'all',
-        'uid' => 'section-2---------------------uid'
+        'uid' => 'section-2---------------------uid',
     ],
 ];

@@ -39,6 +39,16 @@ class SiteUriHelper
     }
 
     /**
+     * Returns the mime type of the given site URI.
+     *
+     * @since 3.12.0
+     */
+    public static function hasHtmlMimeType(SiteUriModel $siteUri): bool
+    {
+        return self::getMimeType($siteUri) == self::MIME_TYPE_HTML;
+    }
+
+    /**
      * Returns all site URIs.
      *
      * @return SiteUriModel[]
@@ -93,8 +103,8 @@ class SiteUriHelper
                 'revisionId' => null,
                 'dateDeleted' => null,
                 'archived' => false,
-                Element_SiteSettings::tableName().'.enabled' => true,
-                Element::tableName().'.enabled' => true,
+                Element_SiteSettings::tableName() . '.enabled' => true,
+                Element::tableName() . '.enabled' => true,
             ])
             ->andWhere(['not', ['uri' => null]])
             ->joinWith('element')
@@ -152,10 +162,9 @@ class SiteUriHelper
                 if ($useQueryParam) {
                     $param = trim($pageTrigger, '?=');
                     $uri = UrlHelper::urlWithParams($uri, [$param => $page]);
-                }
-                else {
-                    $uri = $uri ? trim($uri, '/').'/' : $uri;
-                    $uri = $uri.$pageTrigger.$page;
+                } else {
+                    $uri = $uri ? trim($uri, '/') . '/' : $uri;
+                    $uri = $uri . $pageTrigger . $page;
                 }
 
                 $paginatedUris[] = $uri;
@@ -176,12 +185,11 @@ class SiteUriHelper
         if (str_starts_with($pageTrigger, '?')) {
             $pageTrigger = trim($pageTrigger, '?=');
 
-            return (bool)preg_match('/\?(.*\&)?'.$pageTrigger.'=/', $uri);
-        }
-        else {
+            return (bool)preg_match('/\?(.*\&)?' . $pageTrigger . '=/', $uri);
+        } else {
             $pageTrigger = preg_quote($pageTrigger, '/');
 
-            return (bool)preg_match('/^(.*\/)?'.$pageTrigger.'\d+$/', $uri);
+            return (bool)preg_match('/^(.*\/)?' . $pageTrigger . '\d+$/', $uri);
         }
     }
 
@@ -299,8 +307,7 @@ class SiteUriHelper
                         'uri' => $wildcardUri,
                     ]);
                 }
-            }
-            else {
+            } else {
                 $siteUris[] = $siteUri;
             }
         }
@@ -327,7 +334,7 @@ class SiteUriHelper
             if (stripos($url, $baseUrl) === 0 && strlen($baseUrl) > strlen($siteBaseUrl)) {
                 $siteBaseUrl = $baseUrl;
 
-                $uri = preg_replace('/'.preg_quote($baseUrl, '/').'/', '', $url, 1);
+                $uri = preg_replace('/' . preg_quote($baseUrl, '/') . '/', '', $url, 1);
                 $uri = trim($uri, '/');
 
                 $siteUri = new SiteUriModel([

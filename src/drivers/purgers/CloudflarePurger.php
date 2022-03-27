@@ -88,7 +88,7 @@ class CloudflarePurger extends BaseCachePurger
 
         foreach ($groupedSiteUris as $siteId => $siteUriGroup) {
             $this->_sendRequest('delete', 'purge_cache', $siteId, [
-                'files' => SiteUriHelper::getUrlsFromSiteUris($siteUriGroup)
+                'files' => SiteUriHelper::getUrlsFromSiteUris($siteUriGroup),
             ]);
         }
 
@@ -101,7 +101,7 @@ class CloudflarePurger extends BaseCachePurger
     public function purgeSite(int $siteId)
     {
         $this->_sendRequest('delete', 'purge_cache', $siteId, [
-            'purge_everything' => true
+            'purge_everything' => true,
         ]);
     }
 
@@ -114,8 +114,7 @@ class CloudflarePurger extends BaseCachePurger
             if ($value['zoneId']) {
                 try {
                     $site = Craft::$app->getSites()->getSiteByUid($siteUid);
-                }
-                catch (SiteNotFoundException $e) {
+                } catch (SiteNotFoundException $e) {
                     Blitz::$plugin->log($e->getMessage(), [], 'error');
 
                     continue;
@@ -190,14 +189,13 @@ class CloudflarePurger extends BaseCachePurger
         if ($this->authenticationMethod == 'apiKey') {
             $headers['X-Auth-Key'] = App::parseEnv($this->apiKey);
             $headers['X-Auth-Email'] = App::parseEnv($this->email);
-        }
-        else {
-            $headers['Authorization'] = 'Bearer '.App::parseEnv($this->apiToken);
+        } else {
+            $headers['Authorization'] = 'Bearer ' . App::parseEnv($this->apiToken);
         }
 
         $client = Craft::createGuzzleClient([
             'base_uri' => self::API_ENDPOINT,
-            'headers'  => $headers,
+            'headers' => $headers,
         ]);
 
         $siteUid = Db::uidById(Table::SITES, $siteId);
@@ -210,7 +208,7 @@ class CloudflarePurger extends BaseCachePurger
             return false;
         }
 
-        $uri = 'zones/'.App::parseEnv($this->zoneIds[$siteUid]['zoneId']).'/'.$action;
+        $uri = 'zones/' . App::parseEnv($this->zoneIds[$siteUid]['zoneId']) . '/' . $action;
 
         $requests = [];
 
@@ -224,8 +222,7 @@ class CloudflarePurger extends BaseCachePurger
                     json_encode(['files' => $batch])
                 );
             }
-        }
-        else {
+        } else {
             $requests[] = new Request($method, $uri, [], json_encode($params));
         }
 

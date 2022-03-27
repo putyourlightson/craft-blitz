@@ -17,7 +17,7 @@ class FeedMeIntegration extends BaseIntegration
     public static function getRequiredPlugins(): array
     {
         return [
-            ['handle' => 'feed-me', 'version' => '4.0.0']
+            ['handle' => 'feed-me', 'version' => '4.0.0'],
         ];
     }
 

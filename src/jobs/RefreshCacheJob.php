@@ -143,8 +143,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             }
 
             Blitz::$plugin->refreshCache->refreshSiteUris(array_unique($siteUris, SORT_REGULAR));
-        }
-        else {
+        } else {
             Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
         }
     }
@@ -166,10 +165,10 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     {
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
 
-        $tags = [$sourceIdAttribute.':*'];
+        $tags = [$sourceIdAttribute . ':*'];
 
         foreach ($sourceIds as $sourceId) {
-            $tags[] = $sourceIdAttribute.':'.$sourceId;
+            $tags[] = $sourceIdAttribute . ':' . $sourceId;
         }
 
         return Blitz::$plugin->cacheTags->getCacheIds($tags);
@@ -224,7 +223,8 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             $elementQueryIds = $elementQuery->ids();
         }
         /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (DbException) {}
+        catch (DbException) {
+        }
 
         // If one or more of the element IDs are in the element query's IDs
         if (!empty(array_intersect($elementIds, $elementQueryIds))) {
@@ -242,5 +242,4 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         return $cacheIds;
     }
-
 }

@@ -103,15 +103,14 @@ class FileStorage extends BaseCacheStorage
                 FileHelper::writeToFile($filePath, $value);
 
                 if ($this->createGzipFiles) {
-                    FileHelper::writeToFile($filePath.'.gz', gzencode($value));
+                    FileHelper::writeToFile($filePath . '.gz', gzencode($value));
                 }
 
                 if ($this->createBrotliFiles && function_exists('brotli_compress')) {
-                    FileHelper::writeToFile($filePath.'.br', brotli_compress($value) );
+                    FileHelper::writeToFile($filePath . '.br', brotli_compress($value));
                 }
             }
-        }
-        catch (ErrorException|InvalidArgumentException $exception) {
+        } catch (ErrorException|InvalidArgumentException $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], 'error');
         }
     }
@@ -137,8 +136,8 @@ class FileStorage extends BaseCacheStorage
                     unlink($filePath);
                 }
 
-                if (is_file($filePath.'.gz')) {
-                    unlink($filePath.'.gz');
+                if (is_file($filePath . '.gz')) {
+                    unlink($filePath . '.gz');
                 }
             }
         }
@@ -166,8 +165,7 @@ class FileStorage extends BaseCacheStorage
 
         try {
             FileHelper::removeDirectory($this->_cacheFolderPath);
-        }
-        catch (ErrorException $e) {
+        } catch (ErrorException $e) {
             Blitz::$plugin->log($e->getMessage(), [], 'error');
         }
 
@@ -244,7 +242,7 @@ class FileStorage extends BaseCacheStorage
         $uri = str_replace('?', '/', $siteUri->uri);
 
         // Create normalized file path
-        $filePath = FileHelper::normalizePath($sitePath.'/'.$uri.'/index.html');
+        $filePath = FileHelper::normalizePath($sitePath . '/' . $uri . '/index.html');
 
         // Ensure that file path is a sub path of the site path
         if (!str_contains($filePath, $sitePath)) {
@@ -294,7 +292,7 @@ class FileStorage extends BaseCacheStorage
         // https://github.com/putyourlightson/craft-blitz/issues/369
         $siteHostPath = str_replace(':', '', $siteHostPath);
 
-        $this->_sitePaths[$siteId] = FileHelper::normalizePath($this->_cacheFolderPath.'/'.$siteHostPath);
+        $this->_sitePaths[$siteId] = FileHelper::normalizePath($this->_cacheFolderPath . '/' . $siteHostPath);
 
         return $this->_sitePaths[$siteId];
     }

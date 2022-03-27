@@ -106,7 +106,7 @@ class FileStorageTest extends Unit
         $total = 10;
 
         for ($i = 0; $i < $total; $i++) {
-            FileHelper::writeToFile($path.'/test-'.$i.'/index.html', 'test');
+            FileHelper::writeToFile($path . '/test-' . $i . '/index.html', 'test');
         }
 
         $this->assertEquals($total, $this->cacheStorage->getCachedFileCount($path));
