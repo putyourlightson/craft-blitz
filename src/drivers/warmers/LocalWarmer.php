@@ -8,14 +8,23 @@ namespace putyourlightson\blitz\drivers\warmers;
 use Craft;
 use craft\helpers\ArrayHelper;
 use craft\web\Request;
+use craft\web\UrlManager;
+use craft\web\UrlRule;
 use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\models\SiteUriModel;
-use yii\console\Response;
+use yii\console\Response as ConsoleResponse;
+use yii\web\Response;
+use yii\web\ResponseFormatterInterface;
 
 class LocalWarmer extends BaseCacheWarmer
 {
+    /**
+     * @var mixed
+     */
+    private mixed $_requestConfig = null;
+
     /**
      * @inheritdoc
      */
@@ -52,6 +61,10 @@ class LocalWarmer extends BaseCacheWarmer
     {
         $isConsoleRequest = Craft::$app->getRequest()->getIsConsoleRequest();
 
+        if ($isConsoleRequest) {
+            $this->_configureApplication('web');
+        }
+
         $count = 0;
         $total = count($siteUris);
         $label = 'Warming {count} of {total} pages.';
@@ -80,7 +93,7 @@ class LocalWarmer extends BaseCacheWarmer
 
         // Set back to console request
         if ($isConsoleRequest) {
-            $this->_recreateApplication('console');
+            $this->_configureApplication('console');
         }
     }
 
@@ -89,111 +102,109 @@ class LocalWarmer extends BaseCacheWarmer
      */
     private function _warmUri(SiteUriModel $siteUri): bool
     {
-        $request = $this->_createWebRequest($siteUri->getUrl());
-
-        // Set the template mode to front-end site
-        Craft::$app->getView()->setTemplateMode('site');
-
         // Only proceed if this is a cacheable site URI
         if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
             return false;
         }
 
-        // Handle the request with before/after events
+        // Set the template mode to front-end site
+        Craft::$app->getView()->setTemplateMode('site');
+
         try {
+            // Handle the request with before/after events for modules/plugins
             Craft::$app->trigger(Craft::$app::EVENT_BEFORE_REQUEST);
-            $response = Craft::$app->handleRequest($request);
+
+            $request = $this->_createWebRequest($siteUri->getUrl());
+            [$route, $params] = $request->resolve();
+
             Craft::$app->trigger(Craft::$app::EVENT_AFTER_REQUEST);
 
+            $response = Craft::$app->runAction($route, $params);
+
             if (!$response->getIsOk()) {
-                Blitz::$plugin->debug($response->data['error'] ?? '');
+                Blitz::$plugin->debug($response->data['error'] ?? '', [], $siteUri->getUrl());
 
                 return false;
             }
 
-            if (empty($response->data)) {
-                Blitz::$plugin->debug('Response is empty.');
+            $this->_prepareResponse($response);
+
+            if (empty($response->content)) {
+                Blitz::$plugin->debug('Response content is empty.', [], $siteUri->getUrl());
 
                 return false;
             }
         }
         catch (Exception $exception) {
-            Blitz::$plugin->debug($exception->getMessage());
+            Blitz::$plugin->debug($exception->getMessage(), [], $siteUri->getUrl());
 
+            var_dump($exception->getMessage() . $exception->getTraceAsString());die();
             return false;
         }
 
-        return true;
+        if (Blitz::$plugin->generateCache->save($response->content, $siteUri)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * Creates a web request as if coming from the provided URL.
+     * Creates a web request to the provided URL.
      */
     private function _createWebRequest(string $url): Request
     {
-        /**
-         * Mock a web server request
-         * @see \craft\test\Craft::recreateClient
-         */
-//        $_SERVER = array_merge($_SERVER, [
-//            'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https',
-//            'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
-//            'REQUEST_URI' => parse_url($url, PHP_URL_PATH),
-//            'QUERY_STRING' => parse_url($url, PHP_URL_QUERY),
-//            'REQUEST_METHOD' => 'GET',
-//        ]);
-
         // Parse the URI rather than getting it from `$siteUri` to ensure we have the full request URI (important!)
         $uri = trim(parse_url($url, PHP_URL_PATH), '/');
 
         /**
-         * Mock the web server request
+         * Mock a web request
          * @see \craft\test\Craft::recreateClient
          */
         $_SERVER = array_merge($_SERVER, [
-            'HTTP_HOST' => parse_url($url, PHP_URL_HOST),
             'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
+            'SERVER_PORT' => parse_url($url, PHP_URL_PORT) ?: '80',
             'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https' ? 1 : 0,
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/'.$uri,
-            'QUERY_STRING' => 'p='.$uri,
+            'REQUEST_URI' => parse_url($url, PHP_URL_PATH),
+            'QUERY_STRING' => parse_url($url, PHP_URL_QUERY),
         ]);
+
         $_GET = array_merge($_GET, [
             'p' => $uri,
         ]);
-        $_POST = [];
-        $_REQUEST = [];
 
-        $this->_recreateApplication('web');
-
-        $request = Craft::$app->getRequest();
-
-        // Set the headers
-        $request->getHeaders()->set(self::WARMER_HEADER_NAME, get_class($this));
+        /** @var Request $request */
+        $request = Craft::createObject($this->_requestConfig);
 
         /**
-         * Override the host info as it can be set unreliably
-         * @see \yii\web\Request::getHostInfo
+         * Set this explicitly as it may be set by `PHP_SAPI`
+         * @see \yii\base\Request::getIsConsoleRequest
          */
-        $request->setHostInfo(
-            parse_url($url, PHP_URL_SCHEME).'://'
-            .parse_url($url, PHP_URL_HOST)
-        );
+        $request->setIsConsoleRequest(false);
 
         return $request;
     }
 
     /**
-     * Recreates the application based on the provided type (`web` or `console`).
+     * Configures the existing application using the provided type (`web` or `console`).
      * @see vendor/craftcms/cms/bootstrap/bootstrap.php
      */
-    private function _recreateApplication(string $type)
+    private function _configureApplication(string $type)
     {
-        // Merge default app.{appType}.php config with user-defined config
+        // Merge default app.{type}.php config with user-defined config
         $config = ArrayHelper::merge(
             require Craft::getAlias('@craft/config/app.'.$type.'.php'),
             Craft::$app->getConfig()->getConfigFromFile('app.'.$type)
         );
+
+        $config['components']['urlManager'] = [
+            'class' => UrlManager::class,
+            'enablePrettyUrl' => true,
+            'ruleConfig' => ['class' => UrlRule::class],
+        ];
+
+        $this->_requestConfig = $config['components']['request'] ?? null;
 
         // Recreate components from config
         foreach ($config['components'] as $id => $component) {
@@ -206,15 +217,33 @@ class LocalWarmer extends BaseCacheWarmer
         // Set the controller namespace from config
         Craft::$app->controllerNamespace = $config['controllerNamespace'];
 
-        /**
-         * Set this explicitly as it may be set by `PHP_SAPI`
-         * @see \yii\base\Request::getIsConsoleRequest
-         */
-        Craft::$app->getRequest()->setIsConsoleRequest(($type == 'console'));
-
         // If a console request then override the web response with a console response
         if ($type == 'console') {
-            Craft::$app->set('response', Response::class);
+            Craft::$app->set('response', ConsoleResponse::class);
+        }
+    }
+
+    /**
+     * Prepares the response.
+     *
+     * @see Response::prepare()
+     * @since 2.0.0
+     */
+    private function _prepareResponse(Response $response)
+    {
+        if (isset($response->formatters[$response->format])) {
+            $formatter = $response->formatters[$response->format];
+            if (!is_object($formatter)) {
+                $response->formatters[$response->format] = $formatter = Craft::createObject($formatter);
+            }
+            if ($formatter instanceof ResponseFormatterInterface) {
+                $formatter->format($response);
+            }
+        }
+        elseif ($response->format === Response::FORMAT_RAW) {
+            if ($response->data !== null) {
+                $response->content = $response->data;
+            }
         }
     }
 }
