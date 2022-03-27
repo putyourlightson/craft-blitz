@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\warmers;
 
 use Craft;
+use craft\controllers\PreviewController;
 use craft\helpers\ArrayHelper;
 use craft\web\Request;
 use craft\web\UrlManager;
@@ -183,6 +184,14 @@ class LocalWarmer extends BaseCacheWarmer
          */
         $request->setIsConsoleRequest(false);
 
+        /**
+         * Re-route the request.
+         * @see PreviewController::actionPreview()
+         */
+        $urlManager = Craft::$app->getUrlManager();
+        $urlManager->setRouteParams([], false);
+        $urlManager->setMatchedElement(null);
+
         return $request;
     }
 
@@ -198,14 +207,6 @@ class LocalWarmer extends BaseCacheWarmer
             Craft::$app->getConfig()->getConfigFromFile('app.'.$type)
         );
 
-        $config['components']['urlManager'] = [
-            'class' => UrlManager::class,
-            'enablePrettyUrl' => true,
-            'ruleConfig' => ['class' => UrlRule::class],
-        ];
-
-        $this->_requestConfig = $config['components']['request'] ?? null;
-
         // Recreate components from config
         foreach ($config['components'] as $id => $component) {
             // Don't recreate user as it could give errors regarding sessions/cookies
@@ -214,13 +215,27 @@ class LocalWarmer extends BaseCacheWarmer
             }
         }
 
+        // Store request config for later use
+        $this->_requestConfig = $config['components']['request'] ?? null;
+
         // Set the controller namespace from config
         Craft::$app->controllerNamespace = $config['controllerNamespace'];
 
-        // If a console request then override the web response with a console response
-        if ($type == 'console') {
+        // Set up the initial response.
+        if ($type == 'web') {
+            Craft::$app->getRequest()->setIsConsoleRequest(false);
+        }
+        else {
+            // Override the web response with a console response
             Craft::$app->set('response', ConsoleResponse::class);
         }
+
+        // Recreate the URL manager config component, now that we've set the correct response.
+        Craft::$app->set('urlManager', [
+            'class' => UrlManager::class,
+            'enablePrettyUrl' => true,
+            'ruleConfig' => ['class' => UrlRule::class],
+        ]);
     }
 
     /**
