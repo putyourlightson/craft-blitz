@@ -49,7 +49,8 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
 
         if (Craft::$app->getRequest()->getIsConsoleRequest()) {
             $this->deployUrisWithProgress($siteUris, $setProgressHandler);
-        } else {
+        }
+        else {
             DeployerHelper::addDeployerJob($siteUris, 'deployUrisWithProgress');
         }
 

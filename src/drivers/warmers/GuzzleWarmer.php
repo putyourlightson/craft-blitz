@@ -41,7 +41,8 @@ class GuzzleWarmer extends BaseCacheWarmer
 
         if ($queue) {
             CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
-        } else {
+        }
+        else {
             $this->warmUrisWithProgress($siteUris, $setProgressHandler);
         }
 

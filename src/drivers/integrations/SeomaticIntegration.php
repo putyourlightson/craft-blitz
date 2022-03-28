@@ -36,7 +36,8 @@ class SeomaticIntegration extends BaseIntegration
                 if ($event->uri === null && $event->siteId === null && $event->sourceId === null && $event->sourceType === null) {
                     // Refresh the entire cache.
                     Blitz::$plugin->refreshCache->refreshAll();
-                } elseif ($event->uri === null && $event->siteId !== null && $event->sourceId !== null && $event->sourceType !== null) {
+                }
+                elseif ($event->uri === null && $event->siteId !== null && $event->sourceId !== null && $event->sourceType !== null) {
                     // Refresh the cache for the provided source only.
                     /** @var ElementQuery $elementQuery */
                     $elementQuery = self::_getElementQuery($event->siteId, $event->sourceId, $event->sourceType);

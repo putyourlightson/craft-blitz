@@ -143,7 +143,8 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             }
 
             Blitz::$plugin->refreshCache->refreshSiteUris(array_unique($siteUris, SORT_REGULAR));
-        } else {
+        }
+        else {
             Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
         }
     }

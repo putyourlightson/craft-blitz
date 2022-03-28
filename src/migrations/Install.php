@@ -138,14 +138,14 @@ class Install extends Migration
     protected function createIndexes()
     {
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
-        $this->createIndex(null, CacheRecord::tableName(), 'expiryDate', false);
+        $this->createIndex(null, CacheRecord::tableName(), 'expiryDate');
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'elementId', true);
-        $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate', false);
+        $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate');
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
         $this->createIndex(null, ElementQuerySourceRecord::tableName(), ['sourceId', 'queryId'], true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
-        $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
-        $this->createIndex(null, CacheTagRecord::tableName(), 'tag', false);
+        $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
+        $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
     }
 
     /**

@@ -114,7 +114,8 @@ class CloudflarePurger extends BaseCachePurger
             if ($value['zoneId']) {
                 try {
                     $site = Craft::$app->getSites()->getSiteByUid($siteUid);
-                } catch (SiteNotFoundException $e) {
+                }
+                catch (SiteNotFoundException $e) {
                     Blitz::$plugin->log($e->getMessage(), [], 'error');
 
                     continue;
@@ -189,7 +190,8 @@ class CloudflarePurger extends BaseCachePurger
         if ($this->authenticationMethod == 'apiKey') {
             $headers['X-Auth-Key'] = App::parseEnv($this->apiKey);
             $headers['X-Auth-Email'] = App::parseEnv($this->email);
-        } else {
+        }
+        else {
             $headers['Authorization'] = 'Bearer ' . App::parseEnv($this->apiToken);
         }
 
@@ -222,7 +224,8 @@ class CloudflarePurger extends BaseCachePurger
                     json_encode(['files' => $batch])
                 );
             }
-        } else {
+        }
+        else {
             $requests[] = new Request($method, $uri, [], json_encode($params));
         }
 

@@ -336,7 +336,8 @@ class CacheController extends Controller
     {
         if ($siteUris !== null) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
-        } else {
+        }
+        else {
             Blitz::$plugin->clearCache->clearAll();
         }
 
@@ -347,7 +348,8 @@ class CacheController extends Controller
     {
         if ($siteUris !== null) {
             Blitz::$plugin->flushCache->flushUris($siteUris);
-        } else {
+        }
+        else {
             Blitz::$plugin->flushCache->flushAll();
         }
 
@@ -364,7 +366,8 @@ class CacheController extends Controller
 
         if ($siteUris !== null) {
             Blitz::$plugin->cachePurger->purgeUris($siteUris);
-        } else {
+        }
+        else {
             Blitz::$plugin->cachePurger->purgeAll();
         }
 

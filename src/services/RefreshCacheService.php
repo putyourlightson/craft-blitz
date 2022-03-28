@@ -293,7 +293,8 @@ class RefreshCacheService extends Component
 
         if (!empty($element->postDate) && $element->postDate > $now) {
             $expiryDate = $element->postDate;
-        } elseif (!empty($element->expiryDate) && $element->expiryDate > $now) {
+        }
+        elseif (!empty($element->expiryDate) && $element->expiryDate > $now) {
             $expiryDate = $element->expiryDate;
         }
 

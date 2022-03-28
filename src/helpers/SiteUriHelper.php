@@ -162,7 +162,8 @@ class SiteUriHelper
                 if ($useQueryParam) {
                     $param = trim($pageTrigger, '?=');
                     $uri = UrlHelper::urlWithParams($uri, [$param => $page]);
-                } else {
+                }
+                else {
                     $uri = $uri ? trim($uri, '/') . '/' : $uri;
                     $uri = $uri . $pageTrigger . $page;
                 }
@@ -186,7 +187,8 @@ class SiteUriHelper
             $pageTrigger = trim($pageTrigger, '?=');
 
             return (bool)preg_match('/\?(.*\&)?' . $pageTrigger . '=/', $uri);
-        } else {
+        }
+        else {
             $pageTrigger = preg_quote($pageTrigger, '/');
 
             return (bool)preg_match('/^(.*\/)?' . $pageTrigger . '\d+$/', $uri);
@@ -307,7 +309,8 @@ class SiteUriHelper
                         'uri' => $wildcardUri,
                     ]);
                 }
-            } else {
+            }
+            else {
                 $siteUris[] = $siteUri;
             }
         }
