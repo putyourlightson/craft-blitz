@@ -15,7 +15,6 @@ use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\models\SiteUriModel;
-use yii\console\Request as ConsoleRequest;
 use yii\console\Response as ConsoleResponse;
 use yii\web\Response;
 use yii\web\ResponseFormatterInterface;
@@ -32,7 +31,7 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Local Warmer (experimental)');
+        return Craft::t('blitz', 'Local Warmer');
     }
 
     /**
@@ -175,6 +174,10 @@ class LocalWarmer extends BaseCacheWarmer
             'p' => $uri,
         ]);
 
+        /** @var Request $request */
+        $request = Craft::createObject($this->_requestConfig);
+        $request->setIsConsoleRequest(false);
+
         /**
          * Re-route the request.
          * @see PreviewController::actionPreview()
@@ -182,20 +185,6 @@ class LocalWarmer extends BaseCacheWarmer
         $urlManager = Craft::$app->getUrlManager();
         $urlManager->setRouteParams([], false);
         $urlManager->setMatchedElement(null);
-
-        return $this->_createRequest('web');
-    }
-
-    private function _createRequest(string $type): Request|ConsoleRequest
-    {
-        /** @var Request $request */
-        $request = Craft::createObject($this->_requestConfig);
-
-        /**
-         * Set this explicitly as it may be set by `PHP_SAPI`
-         * @see \yii\base\Request::getIsConsoleRequest
-         */
-        $request->setIsConsoleRequest($type == 'console');
 
         return $request;
     }
@@ -217,30 +206,31 @@ class LocalWarmer extends BaseCacheWarmer
             ],
         ];
 
-        // Merge in the default app.{type}.php config and user-defined config
+        // Merge in the default app.{type}.php config and user-defined config.
         $config = ArrayHelper::merge(
             $config,
             require Craft::getAlias('@craft/config/app.' . $type . '.php'),
             Craft::$app->getConfig()->getConfigFromFile('app.' . $type)
         );
 
-        // Store request config for later use and remove from config
+        // Store the request config for later use.
         $this->_requestConfig = $config['components']['request'] ?? null;
-        unset($config['components']['request']);
 
-        // Create the request component first, so that the other components
-        // respect the application type.
-        Craft::$app->set('request', $this->_createRequest($type));
+        // Unset the user as recreating it can throw an errors.
+        unset($config['components']['user']);
 
         // Recreate components from config
         foreach ($config['components'] as $id => $component) {
-            // Don't recreate user as it could give errors regarding sessions/cookies
-            if ($id != 'user') {
-                Craft::$app->set($id, $component);
-            }
+            Craft::$app->set($id, $component);
         }
 
-        // Set the controller namespace from config
+        /**
+         * Set this explicitly as it may be set by `PHP_SAPI`
+         * @see \yii\base\Request::getIsConsoleRequest
+         */
+        Craft::$app->getRequest()->setIsConsoleRequest($type == 'console');
+
+        // Set the controller namespace from config.
         Craft::$app->controllerNamespace = $config['controllerNamespace'];
 
         if ($type == 'console') {

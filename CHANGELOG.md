@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
-## 4.0.0-beta.1 - 2022-03-10
+## 4.0.0-beta.2 - Unreleased
 ### Added
 - Added compatibility with Craft 4.
+
+### Changed
+- The Local warmer is no longer marked as “experimental”.
 
 ## 3.12.0 - Unreleased
 ### Added
