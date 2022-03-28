@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\warmers;
 
 use Craft;
+use craft\helpers\UrlHelper;
 use Generator;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Pool;
@@ -13,6 +14,7 @@ use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheWarmerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\services\CacheRequestService;
 
 /**
  * @property-read null|string $settingsHtml
@@ -29,7 +31,7 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Guzzle Warmer (recommended)');
+        return Craft::t('blitz', 'Guzzle Warmer');
     }
 
     /**
@@ -119,13 +121,22 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     private function _getRequests(array $urls): Generator
     {
+        $token = Craft::$app->getTokens()->createPreviewToken(CacheRequestService::REVALIDATE_ROUTE);
+
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http
-            if (stripos($url, 'http') === 0) {
-                yield new Request('GET', $url, [
-                    self::WARMER_HEADER_NAME => get_class($this),
-                ]);
+            if (stripos($url, 'http') !== 0) {
+                continue;
             }
+
+            // Add the token to the URL to help break through reverse proxy CDN caches.
+            $url = UrlHelper::url($url, [
+                'token' => $token,
+            ]);
+
+            yield new Request('GET', $url, [
+                self::WARMER_HEADER_NAME => get_class($this),
+            ]);
         }
     }
 }

@@ -116,11 +116,9 @@ class LocalWarmer extends BaseCacheWarmer
             Craft::$app->trigger(Craft::$app::EVENT_BEFORE_REQUEST);
 
             $request = $this->_createWebRequest($siteUri->getUrl());
-            [$route, $params] = $request->resolve();
+            $response = Craft::$app->handleRequest($request, true);
 
             Craft::$app->trigger(Craft::$app::EVENT_AFTER_REQUEST);
-
-            $response = Craft::$app->runAction($route, $params);
 
             if (!$response->getIsOk()) {
                 Blitz::$plugin->debug($response->data['error'] ?? '', [], $siteUri->getUrl());

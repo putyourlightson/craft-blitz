@@ -23,6 +23,7 @@ use yii\web\Response as BaseResponse;
  *
  * @property-read bool $isCacheableRequest
  * @property-read null|SiteUriModel $requestedCacheableSiteUri
+ * @property-read bool $isRevalidateRequest
  * @property-read string $allowedQueryString
  */
 class CacheRequestService extends Component
@@ -41,6 +42,11 @@ class CacheRequestService extends Component
      * @const ResponseEvent
      */
     public const EVENT_AFTER_GET_RESPONSE = 'afterGetResponse';
+
+    /**
+     * @const string
+     */
+    public const REVALIDATE_ROUTE = 'blitz/revalidate/revalidate';
 
     /**
      * @const int
@@ -104,8 +110,8 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if (!empty($request->getParam(Craft::$app->config->general->tokenParam))) {
-            Blitz::$plugin->debug('Page not cached because a token request parameter was provided.', [], $request->getAbsoluteUrl());
+        if ($request->getToken() && !$this->getIsRevalidateRequest()) {
+            Blitz::$plugin->debug('Page not cached because a token request header/parameter was provided.', [], $request->getAbsoluteUrl());
 
             return false;
         }
@@ -222,10 +228,30 @@ class CacheRequestService extends Component
     }
 
     /**
+     * Returns whether this is a revalidate request.
+     *
+     * @since 4.0.0
+     */
+    public function getIsRevalidateRequest(): bool
+    {
+        $token = Craft::$app->getRequest()->getToken();
+
+        if ($token == null) {
+            return false;
+        }
+
+        return Craft::$app->getTokens()->getTokenRoute($token) == self::REVALIDATE_ROUTE;
+    }
+
+    /**
      * Returns the response of a given site URI, if cached.
      */
     public function getResponse(SiteUriModel $siteUri): ?Response
     {
+        if ($this->getIsRevalidateRequest()) {
+            return null;
+        }
+
         /** @var Response $response */
         $response = Craft::$app->getResponse();
 
@@ -376,6 +402,10 @@ class CacheRequestService extends Component
      */
     public function getIsAllowedQueryStringParam(string $param): bool
     {
+        if ($param == Craft::$app->config->general->tokenParam) {
+            return false;
+        }
+
         foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
             if (preg_match('/' . $excludedParam . '/', $param)) {
                 return false;
