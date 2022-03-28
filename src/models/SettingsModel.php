@@ -249,6 +249,9 @@ class SettingsModel extends Model
 
     /**
      * @var string The value to send in the cache control header.
+     *
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+     * https://developers.cloudflare.com/cache/about/cache-control/
      */
     public string $cacheControlHeader = 'public, s-maxage=31536000, max-age=0';
 
