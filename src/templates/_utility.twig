@@ -45,6 +45,9 @@
                                 code: true,
                             }],
                             addRowLabel: "Add a URL"|t('blitz'),
+                            allowAdd: true,
+                            allowDelete: true,
+                            allowReorder: true,
                             first: true,
                         }) }}
                     {% elseif action.id == 'refresh-tagged' %}
@@ -59,6 +62,9 @@
                                 code: true,
                             }],
                             addRowLabel: "Add a Tag"|t('blitz'),
+                            allowAdd: true,
+                            allowDelete: true,
+                            allowReorder: true,
                             first: true,
                         }) }}
                     {% endif %}
