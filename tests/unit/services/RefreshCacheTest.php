@@ -125,7 +125,7 @@ class RefreshCacheTest extends Unit
 
         $this->entry1->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
-        Blitz::$plugin->refreshCache->elements = [];
+        Blitz::$plugin->refreshCache->reset();
         Blitz::$plugin->refreshCache->batchMode = true;
     }
 
@@ -326,7 +326,7 @@ class RefreshCacheTest extends Unit
                     'sourceIds' => [$this->entry1->sectionId],
                 ],
             ],
-            'clearCache' => true,
+            'forceClear' => true,
         ]);
         $refreshCacheJob->execute(Craft::$app->getQueue());
 
@@ -354,7 +354,7 @@ class RefreshCacheTest extends Unit
                     'sourceIds' => [$this->entry1->sectionId],
                 ],
             ],
-            'clearCache' => true,
+            'forceClear' => true,
         ]);
         $refreshCacheJob->execute(Craft::$app->getQueue());
 
