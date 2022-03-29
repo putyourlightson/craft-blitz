@@ -78,7 +78,7 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     /**
      * @inheritdoc
      */
-    public function warmSite(int $siteId, callable $setProgressHandler = null, int $delay = null, bool $queue = true)
+    public function warmSite(int $siteId, callable $setProgressHandler = null, bool $queue = true)
     {
         // Get custom site URIs for the provided site only
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->customSiteUris);
@@ -89,13 +89,13 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
             $customSiteUris
         );
 
-        $this->warmUris($siteUris, $setProgressHandler, $delay, $queue);
+        $this->warmUris($siteUris, $setProgressHandler, $queue);
     }
 
     /**
      * @inheritdoc
      */
-    public function warmAll(callable $setProgressHandler = null, int $delay = null, bool $queue = true)
+    public function warmAll(callable $setProgressHandler = null, bool $queue = true)
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_WARM_ALL_CACHE, $event);
@@ -109,27 +109,10 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
             Blitz::$plugin->settings->customSiteUris
         );
 
-        $this->warmUris($siteUris, $setProgressHandler, $delay, $queue);
+        $this->warmUris($siteUris, $setProgressHandler, $queue);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_WARM_ALL_CACHE)) {
             $this->trigger(self::EVENT_AFTER_WARM_ALL_CACHE, $event);
-        }
-    }
-
-    /**
-     * Delays warming by the provided delay value.
-     */
-    public function delay(callable $setProgressHandler = null, int $delay = null, int $count = 0, int $total = 0)
-    {
-        if ($delay !== null) {
-            if (is_callable($setProgressHandler)) {
-                $progressLabel = Craft::t('blitz', 'Waiting {delay} seconds before warming.', [
-                    'delay' => $delay,
-                ]);
-                call_user_func($setProgressHandler, $count, $total, $progressLabel);
-            }
-
-            sleep($delay);
         }
     }
 

@@ -37,7 +37,7 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null, bool $queue = true)
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true)
     {
         $siteUris = $this->beforeWarmCache($siteUris);
 
@@ -46,7 +46,7 @@ class LocalWarmer extends BaseCacheWarmer
         }
 
         if ($queue) {
-            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
+            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress');
         }
         else {
             $this->warmUrisWithProgress($siteUris, $setProgressHandler);
@@ -58,7 +58,7 @@ class LocalWarmer extends BaseCacheWarmer
     /**
      * Warms site URIs with progress.
      */
-    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
+    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $isConsoleRequest = Craft::$app->getRequest()->getIsConsoleRequest();
 
@@ -71,8 +71,6 @@ class LocalWarmer extends BaseCacheWarmer
         $count = 0;
         $total = count($siteUris);
         $label = 'Warming {count} of {total} pages.';
-
-        $this->delay($setProgressHandler, $delay, $count, $total);
 
         foreach ($siteUris as $siteUri) {
             $count++;

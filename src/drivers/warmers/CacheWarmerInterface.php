@@ -15,15 +15,15 @@ interface CacheWarmerInterface extends SavableComponentInterface
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null, bool $queue = true);
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true);
 
     /**
      * Warms the cache for a given site ID.
      */
-    public function warmSite(int $siteId, callable $setProgressHandler = null, int $delay = null, bool $queue = true);
+    public function warmSite(int $siteId, callable $setProgressHandler = null, bool $queue = true);
 
     /**
      * Warms the entire cache.
      */
-    public function warmAll(callable $setProgressHandler = null, int $delay = null, bool $queue = true);
+    public function warmAll(callable $setProgressHandler = null, bool $queue = true);
 }

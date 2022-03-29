@@ -470,8 +470,7 @@ class RefreshCacheService extends Component
         }
 
         if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
-
+            Blitz::$plugin->cacheWarmer->warmUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
@@ -603,8 +602,7 @@ class RefreshCacheService extends Component
         }
 
         if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
-
+            Blitz::$plugin->cacheWarmer->warmUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 

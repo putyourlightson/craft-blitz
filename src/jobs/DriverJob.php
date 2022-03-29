@@ -33,11 +33,6 @@ class DriverJob extends BaseJob implements RetryableJobInterface
     public string $driverMethod;
 
     /**
-     * @var int|null
-     */
-    public ?int $delay;
-
-    /**
      * @var Queue
      */
     private Queue $_queue;
@@ -71,7 +66,7 @@ class DriverJob extends BaseJob implements RetryableJobInterface
         $driver = Blitz::$plugin->get($this->driverId);
 
         if ($driver !== null && is_callable([$driver, $this->driverMethod])) {
-            call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler'], $this->delay);
+            call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler']);
         }
     }
 

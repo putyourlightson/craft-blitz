@@ -88,21 +88,6 @@
     }) }}
 </div>
 
-{% set info %}
-    <span class="info">{{ "It can take up to 30 seconds for cached files to be purged across all edge nodes. Adding a delay between purging the cache and warming it will prevent stale versions of pages from being warmed. A value of `5` is recommended."|t('blitz') }}</span>
-{% endset %}
-{{ forms.textField({
-    type: 'number',
-    min: 0,
-    max: 30,
-    unit: "seconds"|t('blitz'),
-    label: "Warm Cache Delay"|t('blitz'),
-    instructions: "The number of seconds to wait after purging the cache before warming the cache should begin."|t('blitz') ~ info,
-    name: 'warmCacheDelay',
-    value: purger.warmCacheDelay,
-    errors: purger.getErrors('warmCacheDelay'),
-}) }}
-
 {% set helpText %}
 Cloudflare does not cache HTML by default. To enable static page caching, first set “Browser Cache TTL” to “Respect Existing Headers” in the  “Caching” page of the domain in your account. Then create a new page rule in the “Page Rules” page (you get 3 rules with a free plan). Enter a URL pattern such as `domain.com/*` and add a “Cache Level” setting with a value of “Cache Everything”. Click “Save and Deploy” and then visit your site. With dev tools open you should see a cache response (`HIT`, `MISS`, etc.) in the `CF-Cache-Status` header.
 {% endset %}

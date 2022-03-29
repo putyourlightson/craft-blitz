@@ -37,12 +37,12 @@ class GuzzleWarmer extends BaseCacheWarmer
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, callable $setProgressHandler = null, int $delay = null, bool $queue = true)
+    public function warmUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true)
     {
         $siteUris = $this->beforeWarmCache($siteUris);
 
         if ($queue) {
-            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress', $delay);
+            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress');
         }
         else {
             $this->warmUrisWithProgress($siteUris, $setProgressHandler);
@@ -54,15 +54,13 @@ class GuzzleWarmer extends BaseCacheWarmer
     /**
      * Warms site URIs with progress.
      */
-    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null, int $delay = null)
+    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $urls = SiteUriHelper::getUrlsFromSiteUris($siteUris);
 
         $count = 0;
         $total = count($urls);
         $label = 'Warming {count} of {total} pages.';
-
-        $this->delay($setProgressHandler, $delay, $count, $total);
 
         $client = Craft::createGuzzleClient();
 

@@ -61,10 +61,10 @@ class DeployerHelper extends BaseDriverHelper
      *
      * @param SiteUriModel[] $siteUris
      */
-    public static function addDeployerJob(array $siteUris, string $driverMethod, int $delay = null, int $priority = null)
+    public static function addDeployerJob(array $siteUris, string $driverMethod, int $priority = null)
     {
         $description = Craft::t('blitz', 'Deploying files');
 
-        self::addDriverJob($siteUris, 'deployer', $driverMethod, $description, $delay, $priority);
+        self::addDriverJob($siteUris, 'deployer', $driverMethod, $description, $priority);
     }
 }

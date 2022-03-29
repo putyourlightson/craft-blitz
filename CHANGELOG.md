@@ -8,6 +8,12 @@
 - The Guzzle and Local warmers now revalidate cached pages during the warming process, meaning that a stale-while-revalidate setup can be achieved by disabling the "Clear Cache Automatically" setting.
 - The Local warmer is no longer marked as "experimental".
 
+### Removed
+- Removed the `Warm Cache Delay` setting on cache purgers.
+- Removed the `warmCacheDelay` property from the `CachePurgerTrait` class.
+- Removed the `delay` property from the `DriverJob` class. 
+- Removed the `delay` parameter from all methods in the `CacheWarmerInterface` class.  
+
 ## 3.12.0 - Unreleased
 ### Added
 - Added `beforeRefreshCacheTags` and `afterRefreshCacheTags` events to the `RefreshCacheService` class ([#386](https://github.com/putyourlightson/craft-blitz/issues/386)).

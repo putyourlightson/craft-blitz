@@ -53,7 +53,7 @@ class BaseDriverHelper
      *
      * @param SiteUriModel[] $siteUris
      */
-    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $delay = null, int $priority = null)
+    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $priority = null)
     {
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
 
@@ -69,7 +69,6 @@ class BaseDriverHelper
             'driverId' => $driverId,
             'driverMethod' => $driverMethod,
             'description' => $description,
-            'delay' => $delay,
         ]);
 
         // Add job to queue with a priority

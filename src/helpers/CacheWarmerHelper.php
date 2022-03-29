@@ -60,10 +60,10 @@ class CacheWarmerHelper extends BaseDriverHelper
     /**
      * Adds a warmer job to the queue.
      */
-    public static function addWarmerJob(array $siteUris, string $driverMethod, int $delay = null, int $priority = null)
+    public static function addWarmerJob(array $siteUris, string $driverMethod, int $priority = null)
     {
         $description = Craft::t('blitz', 'Warming Blitz cache');
 
-        self::addDriverJob($siteUris, 'cacheWarmer', $driverMethod, $description, $delay, $priority);
+        self::addDriverJob($siteUris, 'cacheWarmer', $driverMethod, $description, $priority);
     }
 }

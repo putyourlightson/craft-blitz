@@ -189,14 +189,6 @@ class CacheController extends Controller
         $this->_flushCache();
 
         if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
-
-            if ($warmCacheDelay) {
-                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) before warming...', ['seconds' => $warmCacheDelay]) . PHP_EOL, BaseConsole::FG_YELLOW);
-
-                sleep($warmCacheDelay);
-            }
-
             $this->_warmCache($siteUris);
             $this->_deploy($siteUris);
         }
@@ -228,21 +220,13 @@ class CacheController extends Controller
 
         $this->_clearCache($siteUris);
         $this->_flushCache($siteUris);
-        $this->_purgeCache($siteUris);
 
-        // Warm and deploy if enabled
         if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            $warmCacheDelay = Blitz::$plugin->cachePurger->warmCacheDelay;
-
-            if ($warmCacheDelay) {
-                $this->stdout(Craft::t('blitz', 'Waiting {seconds} second(s) before warming...', ['seconds' => $warmCacheDelay]) . PHP_EOL, BaseConsole::FG_YELLOW);
-
-                sleep($warmCacheDelay);
-            }
-
             $this->_warmCache($siteUris);
             $this->_deploy($siteUris);
         }
+
+        $this->_purgeCache($siteUris);
 
         if (!$this->queue) {
             Craft::$app->runAction('queue/run');
@@ -399,7 +383,7 @@ class CacheController extends Controller
         }
 
         Console::startProgress(0, count($siteUris), '', 0.8);
-        Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler'], null, false);
+        Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler']);
         Console::endProgress();
 
         $warmed = Blitz::$plugin->cacheWarmer->warmed;
