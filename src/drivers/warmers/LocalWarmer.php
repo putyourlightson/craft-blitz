@@ -66,6 +66,8 @@ class LocalWarmer extends BaseCacheWarmer
             $this->_configureApplication('web');
         }
 
+        Blitz::$plugin->generateCache->registerElementPrepareEvents();
+
         $count = 0;
         $total = count($siteUris);
         $label = 'Warming {count} of {total} pages.';

@@ -10,6 +10,8 @@ use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
+use craft\events\CancelableEvent;
+use craft\events\PopulateElementEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
@@ -26,6 +28,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use yii\base\Event;
 use yii\db\Exception;
 
 class GenerateCacheService extends Component
@@ -72,10 +75,46 @@ class GenerateCacheService extends Component
     {
         parent::init();
 
+        $this->reset();
+    }
+
+    /**
+     * Resets the component, so it can be used multiple times in the same request.
+     */
+    public function reset()
+    {
+        $this->elementCaches = [];
+        $this->elementQueryCaches = [];
         $this->options = new CacheOptionsModel();
 
         // Set default attributes from the plugin settings
         $this->options->setAttributes(Blitz::$plugin->settings->getAttributes(), false);
+    }
+
+    /**
+     * Registers element prepare events.
+     */
+    public function registerElementPrepareEvents()
+    {
+        // Register element populate event
+        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
+            function(PopulateElementEvent $event) {
+                if (Craft::$app->getResponse()->getIsOk()) {
+                    $this->addElement($event->element);
+                }
+            }
+        );
+
+        // Register element query prepare event
+        Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
+            function(CancelableEvent $event) {
+                if (Craft::$app->getResponse()->getIsOk()) {
+                    /** @var ElementQuery $elementQuery */
+                    $elementQuery = $event->sender;
+                    $this->addElementQuery($elementQuery);
+                }
+            }
+        );
     }
 
     /**
@@ -314,6 +353,8 @@ class GenerateCacheService extends Component
         }
 
         $this->saveOutput($content, $siteUri, $this->options->getCacheDuration());
+
+        $this->reset();
 
         $mutex->release($lockName);
 

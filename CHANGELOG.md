@@ -5,7 +5,8 @@
 - Added compatibility with Craft 4.
 
 ### Changed
-- The Local warmer is no longer marked as “experimental”.
+- The Guzzle and Local warmers now revalidate cached pages during the warming process, meaning that a stale-while-revalidate setup can be achieved by disabling the "Clear Cache Automatically" setting.
+- The Local warmer is no longer marked as "experimental".
 
 ## 3.12.0 - Unreleased
 ### Added

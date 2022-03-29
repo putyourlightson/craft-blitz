@@ -9,13 +9,10 @@ use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
-use craft\elements\db\ElementQuery;
 use craft\events\BatchElementActionEvent;
-use craft\events\CancelableEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
 use craft\events\PluginEvent;
-use craft\events\PopulateElementEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
@@ -225,25 +222,7 @@ class Blitz extends Plugin
                     Craft::$app->end(0, $response);
                 }
 
-                // Register element populate event
-                Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-                    function(PopulateElementEvent $event) {
-                        if (Craft::$app->getResponse()->getIsOk()) {
-                            $this->generateCache->addElement($event->element);
-                        }
-                    }
-                );
-
-                // Register element query prepare event
-                Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
-                    function(CancelableEvent $event) {
-                        if (Craft::$app->getResponse()->getIsOk()) {
-                            /** @var ElementQuery $elementQuery */
-                            $elementQuery = $event->sender;
-                            $this->generateCache->addElementQuery($elementQuery);
-                        }
-                    }
-                );
+                $this->generateCache->registerElementPrepareEvents();
 
                 // Register after prepare response event
                 Event::on(Response::class, Response::EVENT_AFTER_PREPARE,

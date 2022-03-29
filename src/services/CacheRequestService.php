@@ -52,9 +52,14 @@ class CacheRequestService extends Component
     public const MAX_URI_LENGTH = 255;
 
     /**
+     * @var bool|null
+     */
+    private ?bool $_isRevalidateRequest = null;
+
+    /**
      * @var string|null
      */
-    private ?string $_queryString = null;
+    private ?string $_allowedQueryString = null;
 
     /**
      * Returns whether the request is cacheable.
@@ -140,41 +145,6 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the cacheable requested site URI taking the query string into account.
-     */
-    public function getRequestedCacheableSiteUri(): ?SiteUriModel
-    {
-        $site = Craft::$app->getSites()->getCurrentSite();
-        $uri = Craft::$app->getRequest()->getFullUri();
-
-        /**
-         * Remove the base site path from the full URI
-         * @see Request::init()
-         */
-        $baseSitePath = parse_url($site->getBaseUrl(), PHP_URL_PATH);
-
-        if ($baseSitePath !== null) {
-            $baseSitePath = $this->_normalizePath($baseSitePath);
-
-            if (str_starts_with($uri . '/', $baseSitePath . '/')) {
-                $uri = ltrim(substr($uri, strlen($baseSitePath)), '/');
-            }
-        }
-
-        // Add the allowed query string if unique query strings should not be cached as the same page
-        if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
-            && !empty($this->getAllowedQueryString())
-        ) {
-            $uri .= '?' . $this->getAllowedQueryString();
-        }
-
-        return new SiteUriModel([
-            'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
-            'uri' => $uri,
-        ]);
-    }
-
-    /**
      * Returns whether the site URI is cacheable.
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
@@ -232,13 +202,55 @@ class CacheRequestService extends Component
      */
     public function getIsRevalidateRequest(): bool
     {
+        if ($this->_isRevalidateRequest !== null) {
+            return $this->_isRevalidateRequest;
+        }
+
         $token = Craft::$app->getRequest()->getToken();
 
         if ($token == null) {
-            return false;
+            $this->_isRevalidateRequest = false;
+        }
+        else {
+            $this->_isRevalidateRequest = Craft::$app->getTokens()->getTokenRoute($token) == [self::REVALIDATE_ROUTE];
         }
 
-        return Craft::$app->getTokens()->getTokenRoute($token) == [self::REVALIDATE_ROUTE];
+        return $this->_isRevalidateRequest;
+    }
+
+    /**
+     * Returns the cacheable requested site URI taking the query string into account.
+     */
+    public function getRequestedCacheableSiteUri(): ?SiteUriModel
+    {
+        $site = Craft::$app->getSites()->getCurrentSite();
+        $uri = Craft::$app->getRequest()->getFullUri();
+
+        /**
+         * Remove the base site path from the full URI
+         * @see Request::init()
+         */
+        $baseSitePath = parse_url($site->getBaseUrl(), PHP_URL_PATH);
+
+        if ($baseSitePath !== null) {
+            $baseSitePath = $this->_normalizePath($baseSitePath);
+
+            if (str_starts_with($uri . '/', $baseSitePath . '/')) {
+                $uri = ltrim(substr($uri, strlen($baseSitePath)), '/');
+            }
+        }
+
+        // Add the allowed query string if unique query strings should not be cached as the same page
+        if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
+            && !empty($this->getAllowedQueryString())
+        ) {
+            $uri .= '?' . $this->getAllowedQueryString();
+        }
+
+        return new SiteUriModel([
+            'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
+            'uri' => $uri,
+        ]);
     }
 
     /**
@@ -354,8 +366,8 @@ class CacheRequestService extends Component
      */
     public function getAllowedQueryString(): string
     {
-        if ($this->_queryString !== null) {
-            return $this->_queryString;
+        if ($this->_allowedQueryString !== null) {
+            return $this->_allowedQueryString;
         }
 
         $queryString = Craft::$app->getRequest()->getQueryStringWithoutPath();
@@ -369,9 +381,9 @@ class CacheRequestService extends Component
             }
         }
 
-        $this->_queryString = implode('&', $queryStringParams);
+        $this->_allowedQueryString = implode('&', $queryStringParams);
 
-        return $this->_queryString;
+        return $this->_allowedQueryString;
     }
 
     /**
