@@ -247,14 +247,10 @@ class Blitz extends Plugin
 
                 // Register after prepare response event
                 Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
-                    function() use ($siteUri) {
-                        $response = Craft::$app->getResponse();
-                        if ($response->getIsOk()) {
-                            // Save the content and prepare the response
-                            if ($content = $this->generateCache->save($response->content, $siteUri)) {
-                                $this->cacheRequest->prepareResponse($response, $content, $siteUri);
-                            }
-                        }
+                    function(Event $event) use ($siteUri) {
+                        /** @var Response $response */
+                        $response = $event->sender;
+                        $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
                     }
                 );
             }

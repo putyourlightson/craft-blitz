@@ -11,13 +11,12 @@ use craft\elements\User;
 use craft\events\CancelableEvent;
 use craft\web\Application;
 use craft\web\Request;
-use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
-use yii\web\Response as BaseResponse;
+use yii\web\Response;
 
 /**
  *
@@ -240,7 +239,7 @@ class CacheRequestService extends Component
             return false;
         }
 
-        return Craft::$app->getTokens()->getTokenRoute($token) == self::REVALIDATE_ROUTE;
+        return Craft::$app->getTokens()->getTokenRoute($token) == [self::REVALIDATE_ROUTE];
     }
 
     /**
@@ -252,7 +251,6 @@ class CacheRequestService extends Component
             return null;
         }
 
-        /** @var Response $response */
         $response = Craft::$app->getResponse();
 
         $event = new ResponseEvent([
@@ -274,7 +272,7 @@ class CacheRequestService extends Component
 
         $response = $event->response;
         $this->_addCraftHeaders($response);
-        $this->prepareResponse($response, $content, $siteUri);
+        $this->_prepareResponse($response, $content, $siteUri);
 
         $outputComments = Blitz::$plugin->settings->outputComments === true
             || Blitz::$plugin->settings->outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED;
@@ -294,39 +292,19 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Prepares the response for a given site URI.
+     * Saves and prepares the response for a given site URI.
      *
      * @since 3.12.0
      */
-    public function prepareResponse(Response $response, string $content, SiteUriModel $siteUri)
+    public function saveAndPrepareResponse(Response $response, SiteUriModel $siteUri)
     {
-        $response->content = $content;
-
-        $headers = $response->getHeaders();
-        $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
-
-        if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $original = $headers->get('X-Powered-By');
-            $headers->set('X-Powered-By', $original . ($original ? ',' : '') . 'Blitz');
+        if (!$response->getIsOk()) {
+            return;
         }
 
-        // Add cache tag header if set
-        $tags = Blitz::$plugin->cacheTags->getSiteUriTags($siteUri);
-
-        if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
-            $tagsHeader = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
-            $headers->set(Blitz::$plugin->cachePurger->tagHeaderName, $tagsHeader);
-        }
-
-        // Get the mime type from the site URI
-        $mimeType = SiteUriHelper::getMimeType($siteUri);
-
-        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML) {
-            $response->format = BaseResponse::FORMAT_HTML;
-        }
-        else {
-            $response->format = BaseResponse::FORMAT_RAW;
-            $headers->set('Content-Type', $mimeType);
+        // Save the content and prepare the response
+        if ($content = Blitz::$plugin->generateCache->save($response->content, $siteUri)) {
+            $this->_prepareResponse($response, $content, $siteUri);
         }
     }
 
@@ -449,6 +427,43 @@ class CacheRequestService extends Component
         else {
             // In case PHP is already setting one
             header_remove('X-Powered-By');
+        }
+    }
+
+    /**
+     * Prepares the response for a given site URI.
+     *
+     * @since 3.12.0
+     */
+    private function _prepareResponse(Response $response, string $content, SiteUriModel $siteUri)
+    {
+        $response->content = $content;
+
+        $headers = $response->getHeaders();
+        $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
+
+        if (Blitz::$plugin->settings->sendPoweredByHeader) {
+            $original = $headers->get('X-Powered-By');
+            $headers->set('X-Powered-By', $original . ($original ? ',' : '') . 'Blitz');
+        }
+
+        // Add cache tag header if set
+        $tags = Blitz::$plugin->cacheTags->getSiteUriTags($siteUri);
+
+        if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
+            $tagsHeader = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
+            $headers->set(Blitz::$plugin->cachePurger->tagHeaderName, $tagsHeader);
+        }
+
+        // Get the mime type from the site URI
+        $mimeType = SiteUriHelper::getMimeType($siteUri);
+
+        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML) {
+            $response->format = Response::FORMAT_HTML;
+        }
+        else {
+            $response->format = Response::FORMAT_RAW;
+            $headers->set('Content-Type', $mimeType);
         }
     }
 

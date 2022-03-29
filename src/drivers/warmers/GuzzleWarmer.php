@@ -134,9 +134,7 @@ class GuzzleWarmer extends BaseCacheWarmer
                 'token' => $token,
             ]);
 
-            yield new Request('GET', $url, [
-                self::WARMER_HEADER_NAME => get_class($this),
-            ]);
+            yield new Request('GET', $url);
         }
     }
 }

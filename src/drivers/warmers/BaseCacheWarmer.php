@@ -76,11 +76,6 @@ abstract class BaseCacheWarmer extends SavableComponent implements CacheWarmerIn
     public const EVENT_AFTER_WARM_ALL_CACHE = 'afterWarmAllCache';
 
     /**
-     * @const string
-     */
-    public const WARMER_HEADER_NAME = 'X-Blitz-Warmer';
-
-    /**
      * @inheritdoc
      */
     public function warmSite(int $siteId, callable $setProgressHandler = null, int $delay = null, bool $queue = true)
