@@ -6,7 +6,9 @@
 
 ### Changed
 - The Guzzle and Local warmers now revalidate cached pages during the warming process, meaning that a stale-while-revalidate setup can be achieved by disabling the "Clear Cache Automatically" setting.
+- The Guzzle warmer now bypasses origin server and reverse proxy caches.
 - The Local warmer is no longer marked as "experimental".
+- Cache purging now takes place after cache warming.
 
 ### Removed
 - Removed the `Warm Cache Delay` setting on cache purgers.

@@ -185,15 +185,19 @@ class CacheController extends Controller
             Blitz::$plugin->settings->customSiteUris,
         );
 
-        $this->_clearCache();
-        $this->_flushCache();
+        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
+            $this->_clearCache();
+            $this->_flushCache();
+        }
 
         if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
             $this->_warmCache($siteUris);
             $this->_deploy($siteUris);
         }
 
-        $this->_purgeCache();
+        if (Blitz::$plugin->settings->shouldPurgeOnRefresh()) {
+            $this->_purgeCache();
+        }
 
         return ExitCode::OK;
     }
@@ -218,15 +222,19 @@ class CacheController extends Controller
             }
         }
 
-        $this->_clearCache($siteUris);
-        $this->_flushCache($siteUris);
+        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
+            $this->_clearCache($siteUris);
+            $this->_flushCache($siteUris);
+        }
 
         if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
             $this->_warmCache($siteUris);
             $this->_deploy($siteUris);
         }
 
-        $this->_purgeCache($siteUris);
+        if (Blitz::$plugin->settings->shouldPurgeOnRefresh()) {
+            $this->_purgeCache($siteUris);
+        }
 
         if (!$this->queue) {
             Craft::$app->runAction('queue/run');

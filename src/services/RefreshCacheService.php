@@ -465,8 +465,8 @@ class RefreshCacheService extends Component
         );
 
         if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
-            Blitz::$plugin->flushCache->flushAll();
             Blitz::$plugin->clearCache->clearAll();
+            Blitz::$plugin->flushCache->flushAll();
         }
 
         if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
