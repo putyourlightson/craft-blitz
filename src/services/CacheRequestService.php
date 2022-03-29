@@ -19,10 +19,10 @@ use putyourlightson\blitz\models\SiteUriModel;
 use yii\web\Response;
 
 /**
- *
  * @property-read bool $isCacheableRequest
- * @property-read null|SiteUriModel $requestedCacheableSiteUri
  * @property-read bool $isRevalidateRequest
+ * @property-read bool $isTokenRequest
+ * @property-read null|SiteUriModel $requestedCacheableSiteUri
  * @property-read string $allowedQueryString
  */
 class CacheRequestService extends Component
@@ -56,6 +56,11 @@ class CacheRequestService extends Component
      * @var string|null
      */
     private ?string $_queryString = null;
+
+    /**
+     * @var array|bool|null
+     */
+    private array|bool|null $_tokenRoute = null;
 
     /**
      * Returns whether the request is cacheable.
@@ -109,8 +114,8 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if ($request->getToken() && !$this->getIsRevalidateRequest()) {
-            Blitz::$plugin->debug('Page not cached because a token request header/parameter was provided.', [], $request->getAbsoluteUrl());
+        if ($this->getIsTokenRequest() && !$this->getIsRevalidateRequest()) {
+            Blitz::$plugin->debug('Page not cached because a token request was provided.', [], $request->getAbsoluteUrl());
 
             return false;
         }
@@ -138,6 +143,26 @@ class CacheRequestService extends Component
         }
 
         return true;
+    }
+
+    /**
+     * Returns whether this is a revalidate request.
+     *
+     * @since 4.0.0
+     */
+    public function getIsRevalidateRequest(): bool
+    {
+        return $this->_getTokenRoute() == [self::REVALIDATE_ROUTE];
+    }
+
+    /**
+     * Returns whether this is a valid token request.
+     *
+     * @since 4.0.0
+     */
+    public function getIsTokenRequest(): bool
+    {
+        return $this->_getTokenRoute() !== false;
     }
 
     /**
@@ -224,22 +249,6 @@ class CacheRequestService extends Component
         }
 
         return true;
-    }
-
-    /**
-     * Returns whether this is a revalidate request.
-     *
-     * @since 4.0.0
-     */
-    public function getIsRevalidateRequest(): bool
-    {
-        $token = Craft::$app->getRequest()->getToken();
-
-        if ($token == null) {
-            return false;
-        }
-
-        return Craft::$app->getTokens()->getTokenRoute($token) == [self::REVALIDATE_ROUTE];
     }
 
     /**
@@ -397,6 +406,29 @@ class CacheRequestService extends Component
         }
 
         return false;
+    }
+
+    /**
+     * Returns the token route of the current request.
+     *
+     * @since 4.0.0
+     */
+    private function _getTokenRoute(): array|bool
+    {
+        if ($this->_tokenRoute !== null) {
+            return $this->_tokenRoute;
+        }
+
+        $token = Craft::$app->getRequest()->getToken();
+
+        if ($token === null) {
+            $this->_tokenRoute = false;
+        }
+        else {
+            $this->_tokenRoute = Craft::$app->getTokens()->getTokenRoute($token);
+        }
+
+        return $this->_tokenRoute;
     }
 
     /**
