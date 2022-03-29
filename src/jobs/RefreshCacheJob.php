@@ -38,7 +38,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * @var bool
      */
-    public bool $clearCache = false;
+    public bool $forceClear = false;
 
     /**
      * @inheritdoc
@@ -61,20 +61,16 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
      */
     public function execute($queue): void
     {
-        // Set progress label
-        $this->setProgress($queue, 0,
-            Craft::t('blitz', 'Clearing cached pages.')
-        );
-
         // Merge in element cache IDs
         foreach ($this->elements as $elementData) {
             $this->cacheIds = array_merge($this->cacheIds, Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds']));
         }
 
-        // If clear cache is enabled then clear the site URIs early
-        if ($this->clearCache) {
-            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
+        $clearCache = Blitz::$plugin->settings->shouldClearOnRefresh() || $this->forceClear;
 
+        // If clear cache is enabled then clear the site URIs early
+        if ($clearCache) {
+            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
@@ -125,28 +121,24 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             }
         }
 
-        // If clear cache is enabled
-        if ($this->clearCache) {
-            // Set progress label
-            $this->setProgress($queue, 1,
-                Craft::t('blitz', 'Clearing cached pages.')
-            );
-
-            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
-
-            // Merge in site URIs of element IDs to ensure that uncached elements are also warmed
-            /** @var ElementInterface $elementType */
-            foreach ($this->elements as $elementType => $elementData) {
-                if ($elementType::hasUris()) {
-                    $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementData['elementIds']));
-                }
-            }
-
-            Blitz::$plugin->refreshCache->refreshSiteUris(array_unique($siteUris, SORT_REGULAR));
-        }
-        else {
+        // If clear cache is disabled then expire the cache IDs.
+        if (!$clearCache) {
             Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
         }
+
+        $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
+
+        // Merge in site URIs of element IDs to ensure that uncached elements are also warmed
+        /** @var ElementInterface $elementType */
+        foreach ($this->elements as $elementType => $elementData) {
+            if ($elementType::hasUris()) {
+                $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementData['elementIds']));
+            }
+        }
+
+        $siteUris = array_unique($siteUris, SORT_REGULAR);
+
+        Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $this->forceClear);
     }
 
     /**

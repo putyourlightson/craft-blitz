@@ -285,11 +285,11 @@
 
     <div id="advanced" class="hidden">
         {% set info %}
-            <span class="info">{{ 'With this setting disabled, Blitz will mark affected cached pages as expired but not actually delete them. In order to delete them, the “Refresh Expired Cache” utility or console command should be used. Disabling this setting may make sense if your site gets heavy traffic and clearing cache should be limited to specific times or intervals.'|t('blitz') }}</span>
+            <span class="info">{{ 'With this setting disabled, Blitz will mark affected cached pages as expired but not actually delete them. Cache warming will revalidate expired cached pages, resulting in a stale-while-revalidate setup. In order to manually delete expired cached pages, the “Refresh Expired Cache” utility or console command should be used. Disabling this setting may make sense if your site gets heavy traffic and clearing cache should be limited to specific times or intervals.'|t('blitz') }}</span>
         {% endset %}
         {{ forms.lightswitchField({
             label: "Clear Cache Automatically"|t('blitz'),
-            instructions: "Whether the cache should automatically be cleared (and purged) when elements are updated."|t('blitz') ~ info,
+            instructions: "Whether the cache should automatically be cleared when elements are updated."|t('blitz') ~ info,
             warning: (config.clearCacheAutomatically is defined ? configWarning('clearCacheAutomatically')),
             name: 'settings[clearCacheAutomatically]',
             on: settings.clearCacheAutomatically,

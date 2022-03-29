@@ -158,7 +158,7 @@ class SettingsModel extends Model
     public bool $clearCacheAutomatically = true;
 
     /**
-     * @var bool Whether the cache should automatically be warmed after clearing.
+     * @var bool Whether the cache should automatically be warmed (and deployed) after clearing.
      */
     public bool $warmCacheAutomatically = true;
 
@@ -325,13 +325,33 @@ class SettingsModel extends Model
     }
 
     /**
-     * Returns whether the cache should be warmed.
+     * Returns whether the cache should be cleared on refresh.
      *
      * @since 4.0.0
      */
-    public function shouldWarmCache(): bool
+    public function shouldClearOnRefresh(): bool
+    {
+        return $this->clearCacheAutomatically;
+    }
+
+    /**
+     * Returns whether the cache should be warmed on refresh.
+     *
+     * @since 4.0.0
+     */
+    public function shouldWarmOnRefresh(): bool
     {
         return $this->cachingEnabled && $this->warmCacheAutomatically;
+    }
+
+    /**
+     * Returns whether the cache should be purged on refresh.
+     *
+     * @since 4.0.0
+     */
+    public function shouldPurgeOnRefresh(): bool
+    {
+        return $this->shouldClearOnRefresh() || $this->shouldWarmOnRefresh();
     }
 
     /**

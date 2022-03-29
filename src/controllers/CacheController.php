@@ -148,7 +148,7 @@ class CacheController extends Controller
         Blitz::$plugin->refreshCache->refreshAll();
         $message = 'Blitz cache successfully refreshed.';
 
-        if (Blitz::$plugin->settings->shouldWarmCache()) {
+        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
             $message = 'Blitz cache successfully refreshed and queued for warming.';
         }
 
@@ -183,7 +183,7 @@ class CacheController extends Controller
         Blitz::$plugin->refreshCache->refreshSite($siteId);
         $message = 'Site successfully refreshed.';
 
-        if (Blitz::$plugin->settings->shouldWarmCache()) {
+        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
             $message = 'Site successfully refreshed and queued for warming.';
         }
 

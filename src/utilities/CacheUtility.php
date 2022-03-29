@@ -99,7 +99,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh',
             'label' => Craft::t('blitz', 'Refresh Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshes (clears, purges, flushes, warms, deploys) all of the pages.'),
+            'instructions' => Craft::t('blitz', 'Refreshes (clears, flushes, warms) all of the pages.'),
         ];
 
         $actions[] = [

@@ -124,7 +124,7 @@ return [
         // Whether the cache should automatically be cleared when elements are updated.
         //'clearCacheAutomatically' => true,
 
-        // Whether the cache should automatically be warmed after clearing.
+        // Whether the cache should automatically be warmed (and deployed) after clearing.
         //'warmCacheAutomatically' => true,
 
         // Whether pages containing query string parameters should be warmed.

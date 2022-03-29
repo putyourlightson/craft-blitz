@@ -109,6 +109,15 @@ class RefreshCacheService extends Component
     public array $elements = [];
 
     /**
+     * Resets the component, so it can be used multiple times in the same request.
+     */
+    public function reset()
+    {
+        $this->cacheIds = [];
+        $this->elements = [];
+    }
+
+    /**
      * Returns cache IDs given an array of element IDs.
      *
      * @param int[] $elementIds
@@ -396,7 +405,7 @@ class RefreshCacheService extends Component
         $refreshCacheJob = new RefreshCacheJob([
             'cacheIds' => $this->cacheIds,
             'elements' => $this->elements,
-            'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
+            'forceClear' => $forceClear,
         ]);
 
         $queue = Craft::$app->getQueue();
@@ -411,9 +420,7 @@ class RefreshCacheService extends Component
             $queue->push($refreshCacheJob);
         }
 
-        // Reset values
-        $this->cacheIds = [];
-        $this->elements = [];
+        $this->reset();
     }
 
     /**
@@ -421,7 +428,7 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function refreshSiteUris(array $siteUris)
+    public function refreshSiteUris(array $siteUris, bool $forceClear = false)
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
@@ -432,14 +439,7 @@ class RefreshCacheService extends Component
 
         $siteUris = $event->siteUris;
 
-        Blitz::$plugin->clearCache->clearUris($siteUris);
-
-        // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->shouldWarmCache()) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
-
-            Blitz::$plugin->deployer->deployUris($siteUris);
-        }
+        $this->_refreshSiteUris($siteUris, $forceClear);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
@@ -464,14 +464,19 @@ class RefreshCacheService extends Component
             Blitz::$plugin->settings->customSiteUris
         );
 
-        Blitz::$plugin->flushCache->flushAll();
-        Blitz::$plugin->clearCache->clearAll();
+        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
+            Blitz::$plugin->flushCache->flushAll();
+            Blitz::$plugin->clearCache->clearAll();
+        }
 
-        // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->shouldWarmCache()) {
+        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
 
             Blitz::$plugin->deployer->deployUris($siteUris);
+        }
+
+        if (Blitz::$plugin->settings->shouldPurgeOnRefresh()) {
+            Blitz::$plugin->cachePurger->purgeUris($siteUris);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_ALL_CACHE)) {
@@ -500,15 +505,7 @@ class RefreshCacheService extends Component
             }
         }
 
-        Blitz::$plugin->flushCache->flushUris($siteUris);
-        Blitz::$plugin->clearCache->clearUris($siteUris);
-
-        // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->shouldWarmCache()) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
-
-            Blitz::$plugin->deployer->deployUris($siteUris);
-        }
+        $this->_refreshSiteUris($siteUris);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_SITE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_SITE_CACHE, $event);
@@ -591,6 +588,28 @@ class RefreshCacheService extends Component
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE_TAGS)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE_TAGS, $event);
+        }
+    }
+
+    /**
+     * Refreshes site URIs.
+     *
+     * @param SiteUriModel[] $siteUris
+     */
+    private function _refreshSiteUris(array $siteUris, bool $forceClear = false)
+    {
+        if (Blitz::$plugin->settings->shouldClearOnRefresh() || $forceClear) {
+            Blitz::$plugin->clearCache->clearUris($siteUris);
+        }
+
+        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
+            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
+
+            Blitz::$plugin->deployer->deployUris($siteUris);
+        }
+
+        if (Blitz::$plugin->settings->shouldPurgeOnRefresh()) {
+            Blitz::$plugin->cachePurger->purgeUris($siteUris);
         }
     }
 }
