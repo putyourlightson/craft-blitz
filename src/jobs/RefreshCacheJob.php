@@ -41,6 +41,11 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     public bool $forceClear = false;
 
     /**
+     * @var bool
+     */
+    public bool $forceWarm = false;
+
+    /**
      * @inheritdoc
      */
     public function getTtr(): int
@@ -138,7 +143,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         $siteUris = array_unique($siteUris, SORT_REGULAR);
 
-        Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $this->forceClear);
+        Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $this->forceClear, $this->forceWarm);
     }
 
     /**

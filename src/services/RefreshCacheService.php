@@ -396,7 +396,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes the cache.
      */
-    public function refresh(bool $forceClear = false)
+    public function refresh(bool $forceClear = false, bool $forceWarm = false)
     {
         if (empty($this->cacheIds) && empty($this->elements)) {
             return;
@@ -406,6 +406,7 @@ class RefreshCacheService extends Component
             'cacheIds' => $this->cacheIds,
             'elements' => $this->elements,
             'forceClear' => $forceClear,
+            'forceWarm' => $forceWarm,
         ]);
 
         $queue = Craft::$app->getQueue();
@@ -428,7 +429,7 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function refreshSiteUris(array $siteUris, bool $forceClear = false)
+    public function refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceWarm = false)
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
@@ -439,11 +440,33 @@ class RefreshCacheService extends Component
 
         $siteUris = $event->siteUris;
 
-        $this->_refreshSiteUris($siteUris, $forceClear);
+        $this->_refreshSiteUris($siteUris, $forceClear, $forceWarm);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
         }
+    }
+
+    /**
+     * Refreshes a site URI if it has expired.
+     */
+    public function refreshSiteUriIfExpired(SiteUriModel $siteUri)
+    {
+        $now = Db::prepareDateForDb(new DateTime());
+
+        // Get the cache IDs of expired site URIs
+        $cacheIds = CacheRecord::find()
+            ->select('id')
+            ->where($siteUri->toArray())
+            ->andWhere(['<', 'expiryDate', $now])
+            ->column();
+
+        if (empty($cacheIds)) {
+            return;
+        }
+
+        $this->addCacheIds($cacheIds);
+        $this->refresh(false, true);
     }
 
     /**
@@ -595,18 +618,18 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    private function _refreshSiteUris(array $siteUris, bool $forceClear = false)
+    private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceWarm = false)
     {
         if (Blitz::$plugin->settings->shouldClearOnRefresh() || $forceClear) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldWarmOnRefresh() || $forceWarm) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldPurgeOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldPurgeOnRefresh() || $forceWarm) {
             Blitz::$plugin->cachePurger->purgeUris($siteUris);
         }
     }

@@ -217,9 +217,9 @@ class Blitz extends Plugin
                     return;
                 }
 
-                if ($response = $this->cacheRequest->getResponse($siteUri)) {
-                    // Output the response and end the script
-                    Craft::$app->end(0, $response);
+                if ($cachedResponse = $this->cacheRequest->getCachedResponse($siteUri)) {
+                    // Output the cached response and end the script
+                    Craft::$app->end(0, $cachedResponse);
                 }
 
                 $this->generateCache->registerElementPrepareEvents();

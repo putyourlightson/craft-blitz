@@ -3,9 +3,10 @@
 ## 4.0.0-beta.2 - Unreleased
 ### Added
 - Added compatibility with Craft 4.
+- Added the ability to revalidate cached pages that have expired when serving cached responses, meaning that a stale-while-revalidate setup can be achieved by disabling the "Clear Cache Automatically" setting ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
+- Added the ability for the Guzzle and Local warmers to revalidate cached pages during the warming process, meaning that a stale-while-revalidate setup can be achieved by disabling the "Clear Cache Automatically" setting.
 
 ### Changed
-- The Guzzle and Local warmers now revalidate cached pages during the warming process, meaning that a stale-while-revalidate setup can be achieved by disabling the "Clear Cache Automatically" setting ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
 - The Guzzle warmer now bypasses origin server and reverse proxy caches.
 - The Local warmer is no longer marked as "experimental".
 - Cache purging now takes place after cache warming.

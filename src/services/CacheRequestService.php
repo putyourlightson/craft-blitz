@@ -254,9 +254,9 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the response of a given site URI, if cached.
+     * Returns the cached response of a site URI.
      */
-    public function getResponse(SiteUriModel $siteUri): ?Response
+    public function getCachedResponse(SiteUriModel $siteUri): ?Response
     {
         if ($this->getIsRevalidateRequest()) {
             return null;
@@ -298,6 +298,8 @@ class CacheRequestService extends Component
         if ($this->hasEventHandlers(self::EVENT_AFTER_GET_RESPONSE)) {
             $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
         }
+
+        Blitz::$plugin->refreshCache->refreshSiteUriIfExpired($siteUri);
 
         return $response;
     }

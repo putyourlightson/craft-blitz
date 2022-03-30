@@ -211,11 +211,11 @@ class CacheRequestTest extends Unit
         Blitz::$plugin->cacheStorage->deleteAll();
 
         // Assert that the response is null
-        $this->assertNull(Blitz::$plugin->cacheRequest->getResponse($this->siteUri));
+        $this->assertNull(Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri));
 
         // Save a value for the site URI
         Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
-        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
+        $value = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri)->content;
 
         // Assert that the response is not null
         $this->assertStringContainsString('xyz', $value);
@@ -227,19 +227,19 @@ class CacheRequestTest extends Unit
         Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
 
         Blitz::$plugin->settings->outputComments = false;
-        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
+        $value = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri)->content;
         $this->assertStringNotContainsString('Served by Blitz on', $value);
 
         Blitz::$plugin->settings->outputComments = true;
-        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
+        $value = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri)->content;
         $this->assertStringContainsString('Served by Blitz on', $value);
 
         Blitz::$plugin->settings->outputComments = SettingsModel::OUTPUT_COMMENTS_CACHED;
-        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
+        $value = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri)->content;
         $this->assertStringNotContainsString('Served by Blitz on', $value);
 
         Blitz::$plugin->settings->outputComments = SettingsModel::OUTPUT_COMMENTS_SERVED;
-        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
+        $value = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri)->content;
         $this->assertStringContainsString('Served by Blitz on', $value);
     }
 
