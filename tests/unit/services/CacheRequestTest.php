@@ -203,7 +203,7 @@ class CacheRequestTest extends Unit
         // Mock a URL request
         $this->_mockRequest($this->siteUri->getUrl() . '?gclid=1&fbclid=2&page=3');
 
-        $this->assertEquals('page=3', Blitz::$plugin->cacheRequest->getAllowedQueryString());
+        $this->assertEquals('page=3', Blitz::$plugin->cacheRequest->getAllowedQueryString($this->siteUri->siteId));
     }
 
     public function testGetResponse()

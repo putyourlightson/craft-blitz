@@ -20,6 +20,25 @@ class SettingsModel extends Model
     /**
      * @const int
      */
+    public const INVALIDATION_MODE_EXPIRE = 0;
+
+    /**
+     * @const int
+     */
+    public const INVALIDATION_MODE_CLEAR = 1;
+
+    /**
+     * @const int
+     */
+    public const INVALIDATION_MODE_EXPIRE_AND_WARM = 2;
+    /**
+     * @const int
+     */
+    public const INVALIDATION_MODE_CLEAR_AND_WARM = 3;
+
+    /**
+     * @const int
+     */
     public const QUERY_STRINGS_DO_NOT_CACHE_URLS = 0;
 
     /**
@@ -51,6 +70,16 @@ class SettingsModel extends Model
      * @var bool With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
      */
     public bool $cachingEnabled = false;
+
+    /**
+     * @var int How cache invalidation should be handled.
+     *
+     * - `self::INVALIDATION_MODE_EXPIRE`: Expire the cache only
+     * - `self::INVALIDATION_MODE_CLEAR`: Clear the cache only
+     * - `self::INVALIDATION_MODE_EXPIRE_AND_WARM`: Expire and warm the cache
+     * - `self::INVALIDATION_MODE_CLEAR_AND_WARM`: Clear and warm the cache
+     */
+    public int $invalidationMode = self::INVALIDATION_MODE_CLEAR_AND_WARM;
 
     /**
      * @var array The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
@@ -153,16 +182,6 @@ class SettingsModel extends Model
     public array $deployerTypes = [];
 
     /**
-     * @var bool Whether the cache should automatically be cleared when elements are updated.
-     */
-    public bool $clearCacheAutomatically = true;
-
-    /**
-     * @var bool Whether the cache should automatically be warmed (and deployed) after clearing.
-     */
-    public bool $warmCacheAutomatically = true;
-
-    /**
      * @var bool Whether pages containing query string parameters should be warmed.
      */
     public bool $warmPagesWithQueryStringParams = true;
@@ -185,8 +204,6 @@ class SettingsModel extends Model
     /**
      * @var int Whether URLs with query strings should be cached and how.
      *
-     * Can be set to any of the following:
-     *
      * - `self::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
      * - `self::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES`: Cache URLs with query strings as unique pages
      * - `self::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE`: Cache URLs with query strings as the same page
@@ -195,13 +212,45 @@ class SettingsModel extends Model
 
     /**
      * @var string[] The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
+     *
+     * [
+     *     [
+     *         'siteId' => '',
+     *         'queryStringParam' => '.*',
+     *     ],
+     * ]
      */
-    public array $includedQueryStringParams = ['.*'];
+    public array $includedQueryStringParams = [
+        [
+            'siteId' => '',
+            'queryStringParam' => '.*',
+        ],
+    ];
 
     /**
-     * @var string[] The query string parameters to exclude (overrides any matching parameters to include) when determining if and how a page should be cached (regular expressions may be used).
+     * @var string[] The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
+     *
+     * [
+     *     [
+     *         'siteId' => '',
+     *         'queryStringParam' => 'gclid',
+     *     ],
+     *     [
+     *         'siteId' => '',
+     *         'queryStringParam' => 'fbclid',
+     *     ],
+     * ]
      */
-    public array $excludedQueryStringParams = ['gclid', 'fbclid'];
+    public array $excludedQueryStringParams = [
+        [
+            'siteId' => '',
+            'queryStringParam' => 'gclid',
+        ],
+        [
+            'siteId' => '',
+            'queryStringParam' => 'fbclid',
+        ],
+    ];
 
     /**
      * @var string An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
@@ -331,7 +380,8 @@ class SettingsModel extends Model
      */
     public function shouldClearOnRefresh(): bool
     {
-        return $this->clearCacheAutomatically;
+        return $this->invalidationMode == self::INVALIDATION_MODE_CLEAR
+            || $this->invalidationMode == self::INVALIDATION_MODE_CLEAR_AND_WARM;
     }
 
     /**
@@ -341,7 +391,12 @@ class SettingsModel extends Model
      */
     public function shouldWarmOnRefresh(): bool
     {
-        return $this->cachingEnabled && $this->warmCacheAutomatically;
+        if (!$this->cachingEnabled) {
+            return false;
+        }
+
+        return $this->invalidationMode == self::INVALIDATION_MODE_EXPIRE_AND_WARM
+            || $this->invalidationMode == self::INVALIDATION_MODE_CLEAR_AND_WARM;
     }
 
     /**
@@ -375,6 +430,12 @@ class SettingsModel extends Model
         return [
             [['cacheStorageType', 'cacheWarmerType', 'queryStringCaching'], 'required'],
             [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
+            [['queryStringCaching'], 'in', 'range' => [
+                self::INVALIDATION_MODE_EXPIRE,
+                self::INVALIDATION_MODE_CLEAR,
+                self::INVALIDATION_MODE_EXPIRE_AND_WARM,
+                self::INVALIDATION_MODE_CLEAR_AND_WARM,
+            ]],
             [['queryStringCaching'], 'in', 'range' => [
                 self::QUERY_STRINGS_DO_NOT_CACHE_URLS,
                 self::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES,

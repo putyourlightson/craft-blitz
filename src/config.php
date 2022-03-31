@@ -25,6 +25,13 @@ return [
         // With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 
+        // How cache invalidation should be handled.
+        // - `0`: Expire the cache only
+        // - `1`: Clear the cache only
+        // - `2`: Expire and warm the cache
+        // - `3`: Clear and warm the cache
+        //'invalidationMode' => 3,
+
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
         //'includedUriPatterns' => [
         //    [
@@ -120,12 +127,6 @@ return [
         //    'putyourlightson\blitzshell\ShellDeployer',
         //],
 
-        // Whether the cache should automatically be cleared when elements are updated.
-        //'clearCacheAutomatically' => true,
-
-        // Whether the cache should automatically be warmed (and deployed) after clearing.
-        //'warmCacheAutomatically' => true,
-
         // Whether pages containing query string parameters should be warmed.
         //'warmPagesWithQueryStringParams' => true,
 
@@ -145,10 +146,21 @@ return [
         //'queryStringCaching' => 0,
 
         // The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
-        //'includedQueryStringParams' => ['.*'],
+        //'includedQueryStringParams' => [
+        //    [
+        //        'queryStringParam' => '.*',
+        //    ],
+        //],
 
         // The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
-        //'excludedQueryStringParams' => ['gclid', 'fbclid'],
+        //'excludedQueryStringParams' => [
+        //    [
+        //        'queryStringParam' => 'gclid',
+        //    ],
+        //    [
+        //        'queryStringParam' => 'fbclid',
+        //    ],
+        //],
 
         // An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
         //'apiKey' => '',

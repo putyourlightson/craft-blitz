@@ -57,9 +57,9 @@ class CacheRequestService extends Component
     private ?bool $_isRevalidateRequest = null;
 
     /**
-     * @var string|null
+     * @var array|null
      */
-    private ?string $_allowedQueryString = null;
+    private ?array $_allowedQueryStrings = [];
 
     /**
      * Returns whether the request is cacheable.
@@ -126,14 +126,6 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
-            && !empty($this->getAllowedQueryString())
-        ) {
-            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $request->getAbsoluteUrl());
-
-            return false;
-        }
-
         $event = new CancelableEvent();
         $this->trigger(self::EVENT_IS_CACHEABLE_REQUEST, $event);
 
@@ -192,6 +184,14 @@ class CacheRequestService extends Component
             return false;
         }
 
+        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
+            && !empty($this->getAllowedQueryString($siteUri->siteId))
+        ) {
+            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $siteUri->getUrl());
+
+            return false;
+        }
+
         return true;
     }
 
@@ -242,9 +242,9 @@ class CacheRequestService extends Component
 
         // Add the allowed query string if unique query strings should not be cached as the same page
         if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
-            && !empty($this->getAllowedQueryString())
+            && ($allowedQueryString = $this->getAllowedQueryString($site->id))
         ) {
-            $uri .= '?' . $this->getAllowedQueryString();
+            $uri .= '?' . $allowedQueryString;
         }
 
         return new SiteUriModel([
@@ -331,32 +331,49 @@ class CacheRequestService extends Component
         }
 
         foreach ($siteUriPatterns as $siteUriPattern) {
-            // Don't proceed if site is not empty and does not match the provided site ID
-            if (!empty($siteUriPattern['siteId']) && $siteUriPattern['siteId'] != $siteUri->siteId) {
-                continue;
+            if (empty($siteUriPattern['siteId']) || $siteUriPattern['siteId'] == $siteUri->siteId) {
+                $uriPattern = $siteUriPattern['uriPattern'];
+
+                // Replace a blank string with the homepage with query strings allowed
+                if ($uriPattern == '') {
+                    $uriPattern = '^(\?.*)?$';
+                }
+
+                // Replace "*" with 0 or more characters as otherwise it'll throw an error
+                if ($uriPattern == '*') {
+                    $uriPattern = '.*';
+                }
+
+                // Trim slashes
+                $uriPattern = trim($uriPattern, '/');
+
+                // Escape delimiters, removing already escaped delimiters first
+                // https://github.com/putyourlightson/craft-blitz/issues/261
+                $uriPattern = str_replace(['\/', '/'], ['/', '\/'], $uriPattern);
+
+                if (preg_match('/' . $uriPattern . '/', trim($siteUri->uri, '/'))) {
+                    return true;
+                }
             }
+        }
 
-            $uriPattern = $siteUriPattern['uriPattern'];
+        return false;
+    }
 
-            // Replace a blank string with the homepage with query strings allowed
-            if ($uriPattern == '') {
-                $uriPattern = '^(\?.*)?$';
-            }
+    /**
+     * Returns true if the site and parameter match a set of query string parameters.
+     */
+    public function matchesQueryStringParams(int $siteId, string $param, array|string $queryStringParams): bool
+    {
+        if (!is_array($queryStringParams)) {
+            return false;
+        }
 
-            // Replace "*" with 0 or more characters as otherwise it'll throw an error
-            if ($uriPattern == '*') {
-                $uriPattern = '.*';
-            }
-
-            // Trim slashes
-            $uriPattern = trim($uriPattern, '/');
-
-            // Escape delimiters, removing already escaped delimiters first
-            // https://github.com/putyourlightson/craft-blitz/issues/261
-            $uriPattern = str_replace(['\/', '/'], ['/', '\/'], $uriPattern);
-
-            if (preg_match('/' . $uriPattern . '/', trim($siteUri->uri, '/'))) {
-                return true;
+        foreach ($queryStringParams as $queryStringParam) {
+            if (empty($queryStringParam['siteId']) || $queryStringParam['siteId'] == $siteId) {
+                if (preg_match('/' . $queryStringParam . '/', $param)) {
+                    return true;
+                }
             }
         }
 
@@ -366,10 +383,10 @@ class CacheRequestService extends Component
     /**
      * Returns the query string after processing the included and excluded query string params.
      */
-    public function getAllowedQueryString(): string
+    public function getAllowedQueryString(int $siteId): string
     {
-        if ($this->_allowedQueryString !== null) {
-            return $this->_allowedQueryString;
+        if (!empty($this->_allowedQueryStrings[$siteId])) {
+            return $this->_allowedQueryStrings[$siteId];
         }
 
         $queryString = Craft::$app->getRequest()->getQueryStringWithoutPath();
@@ -378,35 +395,31 @@ class CacheRequestService extends Component
         foreach ($queryStringParams as $key => $queryStringParam) {
             $param = explode('=', $queryStringParam);
 
-            if (!$this->getIsAllowedQueryStringParam($param[0])) {
+            if (!$this->getIsAllowedQueryStringParam($siteId, $param[0])) {
                 unset($queryStringParams[$key]);
             }
         }
 
-        $this->_allowedQueryString = implode('&', $queryStringParams);
+        $this->_allowedQueryStrings[$siteId] = implode('&', $queryStringParams);
 
-        return $this->_allowedQueryString;
+        return $this->_allowedQueryStrings[$siteId];
     }
 
     /**
      * Returns whether the query string parameter is allowed.
      */
-    public function getIsAllowedQueryStringParam(string $param): bool
+    public function getIsAllowedQueryStringParam(int $siteId, string $param): bool
     {
         if ($param == Craft::$app->config->general->tokenParam) {
             return false;
         }
 
-        foreach (Blitz::$plugin->settings->excludedQueryStringParams as $excludedParam) {
-            if (preg_match('/' . $excludedParam . '/', $param)) {
-                return false;
-            }
+        if ($this->matchesQueryStringParams($siteId, $param, Blitz::$plugin->settings->excludedQueryStringParams)) {
+            return false;
         }
 
-        foreach (Blitz::$plugin->settings->includedQueryStringParams as $includedParam) {
-            if (preg_match('/' . $includedParam . '/', $param)) {
-                return true;
-            }
+        if ($this->matchesQueryStringParams($siteId, $param, Blitz::$plugin->settings->includedQueryStringParams)) {
+            return true;
         }
 
         return false;

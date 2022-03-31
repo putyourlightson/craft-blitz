@@ -26,6 +26,19 @@
 {% set welcome = craft.app.request.getParam('welcome') %}
 {% set docs = 'https://putyourlightson.com/plugins/blitz#' %}
 
+{% set siteColumn = [] %}
+{% if craft.app.getIsMultiSite() %}
+    {% set allSiteOptions = [{value: '', label: 'All Sites'|t('blitz')}]|merge(siteOptions) %}
+    {% set siteColumn = {
+        siteId: {
+            type: 'select',
+            heading: 'Site'|t('blitz'),
+            options: allSiteOptions,
+            thin: true,
+        }
+    } %}
+{% endif %}
+
 {% block actionButton %}
 
     <input type="submit" class="btn submit" value="{{ 'Save'|t('app') }}">
@@ -53,7 +66,7 @@
         <div class="flex">
             {{ include('blitz/_includes/welcome/step', { step: 1, text: 'Enable caching' }) }}
 
-            <div class="flex-grow">
+            <div class="flex-grow field">
                 {% set info %}
                     <span class="info">{{ 'With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disabling this setting will prevent Blitz from caching any new pages.'|t('blitz') }}</span>
                 {% endset %}
@@ -69,28 +82,39 @@
         </div>
 
         <div class="flex">
-            {{ include('blitz/_includes/welcome/step', { step: 2, text: 'Add at least one included URI pattern' }) }}
+            {{ include('blitz/_includes/welcome/step', { step: 2, text: 'Select an invalidation mode' }) }}
 
             <div class="flex-grow">
-                {% set cols = [] %}
+                {# An empty span ensures that the field is not the first element, which throws off vertical margin. #}
+                <span></span>
+                {% set info %}
+                    <span class="info">{{ ''|t('blitz') }}</span>
+                {% endset %}
+                {{ forms.selectField({
+                    label: "Invalidation Mode"|t('blitz'),
+                    instructions: "How cache invalidation should be handled."|t('blitz') ~ info,
+                    warning: config.invalidationMode is defined ? configWarning('invalidationMode'),
+                    name: 'settings[invalidationMode]',
+                    options: {
+                        3: "Clear and Warm (high refresh rate, medium availability)"|t('blitz'),
+                        2: "Expire and Warm (medium refresh rate, high availability)"|t('blitz'),
+                        1: "Clear only (high refresh rate, low availability)"|t('blitz'),
+                        0: "Expire only (low refresh rate, high availability)"|t('blitz'),
+                    },
+                    value: settings.invalidationMode,
+                }) }}
+            </div>
+        </div>
 
-                {% if craft.app.getIsMultiSite() %}
-                    {% set allSiteOptions = [{value: '', label: 'All Sites'|t('blitz')}]|merge(siteOptions) %}
+        <div class="flex">
+            {{ include('blitz/_includes/welcome/step', { step: 3, text: 'Add at least one included URI pattern' }) }}
 
-                    {% set cols = cols|merge({
-                        siteId: {
-                            type: 'select',
-                            heading: 'Site'|t('blitz'),
-                            options: allSiteOptions,
-                            thin: true,
-                        }
-                    }) %}
-                {% endif %}
+            <div class="flex-grow">
 
                 {% set info -%}
                     {{ include('blitz/_includes/uri-pattern-info', { docs: docs }) }}
                 {%- endset %}
-                {% set cols = cols|merge({
+                {% set cols = siteColumn|merge({
                     uriPattern: {
                         type: 'singleline',
                         heading: 'URI Pattern'|t('blitz'),
@@ -158,7 +182,7 @@
 
         {% for driver in storageDrivers %}
             {% set isCurrent = (className(driver) == className(storageDriver)) %}
-            <div id="{{ className(driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+            <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
                 {% namespace 'cacheStorageSettings[' ~ className(driver) ~ ']' %}
                     {{ (isCurrent ? storageDriver : driver).getSettingsHtml()|raw }}
                 {% endnamespace %}
@@ -185,7 +209,7 @@
 
         {% for driver in warmerDrivers %}
             {% set isCurrent = (className(driver) == className(warmerDriver)) %}
-            <div id="{{ className(driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+            <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
                 {% namespace 'cacheWarmerSettings[' ~ className(driver) ~ ']' %}
                     {{ (isCurrent ? warmerDriver : driver).getSettingsHtml()|raw }}
                 {% endnamespace %}
@@ -246,7 +270,7 @@
 
         {% for driver in purgerDrivers %}
             {% set isCurrent = (className(driver) == className(purgerDriver)) %}
-            <div id="{{ className(driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+            <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
                 {% namespace 'cachePurgerSettings[' ~ className(driver) ~ ']' %}
                     {{ (isCurrent ? purgerDriver : driver).getSettingsHtml()|raw }}
                 {% endnamespace %}
@@ -273,7 +297,7 @@
 
         {% for driver in deployerDrivers %}
             {% set isCurrent = (className(driver) == className(deployerDriver)) %}
-            <div id="{{ className(driver)|id }}"{% if not isCurrent %} class="hidden"{% endif %}>
+            <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
                 {% namespace 'deployerSettings[' ~ className(driver) ~ ']' %}
                     {{ (isCurrent ? deployerDriver : driver).getSettingsHtml()|raw }}
                 {% endnamespace %}
@@ -284,29 +308,6 @@
     </div>
 
     <div id="advanced" class="hidden">
-        {% set info %}
-            <span class="info">{{ 'With this setting disabled, Blitz will mark affected cached pages as expired but not actually delete them. Cache warming will revalidate expired cached pages, resulting in a stale-while-revalidate setup. In order to manually delete expired cached pages, the “Refresh Expired Cache” utility or console command should be used. Disabling this setting may make sense if your site gets heavy traffic and clearing cache should be limited to specific times or intervals.'|t('blitz') }}</span>
-        {% endset %}
-        {{ forms.lightswitchField({
-            label: "Clear Cache Automatically"|t('blitz'),
-            instructions: "Whether the cache should automatically be cleared when elements are updated."|t('blitz') ~ info,
-            warning: (config.clearCacheAutomatically is defined ? configWarning('clearCacheAutomatically')),
-            name: 'settings[clearCacheAutomatically]',
-            on: settings.clearCacheAutomatically,
-            required: true,
-        }) }}
-
-        {% set info %}
-            <span class="info">{{ 'With this setting enabled, Blitz will create a queue job to automatically visit pages whose cache has been cleared in the background. If a deployer has been selected then the warmed pages will be deployed. Disabling this setting may make sense if your site is very large and has many related elements.'|t('blitz') }}</span>
-        {% endset %}
-        {{ forms.lightswitchField({
-            label: "Warm Cache Automatically"|t('blitz'),
-            instructions: "Whether the cache should automatically be warmed (and deployed) after clearing."|t('blitz') ~ info,
-            warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
-            name: 'settings[warmCacheAutomatically]',
-            on: settings.warmCacheAutomatically,
-            required: true,
-        }) }}
 
         {% set info %}
             <span class="info">{{ 'This setting determines how URLs with query strings will be cached. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'query-string-caching'})|raw }}</span>
@@ -323,6 +324,44 @@
             },
             value: settings.queryStringCaching,
             required: true,
+        }) }}
+
+        {% set cols = siteColumn|merge({
+            queryStringParam: {
+                type: 'singleline',
+                heading: 'Query String Parameter'|t('blitz'),
+                code: true,
+            }
+        }) %}
+
+        <input type="hidden" name="includedQueryStringParams" value="" />
+        {{ forms.editableTableField({
+            label: "Included Query String Parameters"|t('blitz'),
+            instructions: "The query string parameters to include when determining if and how a page should be cached (regular expressions may be used)."|t('blitz'),
+            warning: (config.includedQueryStringParams is defined ? configWarning('includedQueryStringParams')),
+            name: 'settings[includedQueryStringParams]',
+            id: 'includedQueryStringParams',
+            cols: cols,
+            rows: settings.includedQueryStringParams,
+            addRowLabel: "Add a query string parameter"|t('blitz'),
+            allowAdd: true,
+            allowDelete: true,
+            allowReorder: true,
+        }) }}
+
+        <input type="hidden" name="excludedQueryStringParams" value="" />
+        {{ forms.editableTableField({
+            label: "Excluded Query String Parameters"|t('blitz'),
+            instructions: "The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used)."|t('blitz'),
+            warning: (config.excludedQueryStringParams is defined ? configWarning('excludedQueryStringParams')),
+            name: 'settings[excludedQueryStringParams]',
+            id: 'excludedQueryStringParams',
+            cols: cols,
+            rows: settings.excludedQueryStringParams,
+            addRowLabel: "Add a query string parameter"|t('blitz'),
+            allowAdd: true,
+            allowDelete: true,
+            allowReorder: true,
         }) }}
 
         {{ forms.autosuggestField({
