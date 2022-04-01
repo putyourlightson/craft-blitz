@@ -371,7 +371,7 @@ class CacheRequestService extends Component
 
         foreach ($queryStringParams as $queryStringParam) {
             if (empty($queryStringParam['siteId']) || $queryStringParam['siteId'] == $siteId) {
-                if (preg_match('/' . $queryStringParam . '/', $param)) {
+                if (preg_match('/' . $queryStringParam['queryStringParam'] . '/', $param)) {
                     return true;
                 }
             }
