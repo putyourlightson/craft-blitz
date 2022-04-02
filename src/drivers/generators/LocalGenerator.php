@@ -3,18 +3,18 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\drivers\warmers;
+namespace putyourlightson\blitz\drivers\generators;
 
 use Craft;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\CacheWarmerHelper;
+use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process;
 
-class LocalWarmer extends BaseCacheWarmer
+class LocalGenerator extends BaseCacheGenerator
 {
     /**
      * @see _getPhpPath()
@@ -36,38 +36,38 @@ class LocalWarmer extends BaseCacheWarmer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Local Warmer');
+        return Craft::t('blitz', 'Local Generator');
     }
 
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true)
+    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true)
     {
-        $siteUris = $this->beforeWarmCache($siteUris);
+        $siteUris = $this->beforeGenerateCache($siteUris);
 
         if (empty($siteUris)) {
             return;
         }
 
         if ($queue) {
-            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress');
+            CacheGeneratorHelper::addGeneratorJob($siteUris, 'generateUrisWithProgress');
         }
         else {
-            $this->warmUrisWithProgress($siteUris, $setProgressHandler);
+            $this->generateUrisWithProgress($siteUris, $setProgressHandler);
         }
 
-        $this->afterWarmCache($siteUris);
+        $this->afterGenerateCache($siteUris);
     }
 
     /**
-     * Warms site URIs with progress.
+     * Generates site URIs with progress.
      */
-    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $count = 0;
         $total = count($siteUris);
-        $label = 'Warming {count} of {total} pages.';
+        $label = 'Generateing {count} of {total} pages.';
 
         foreach ($siteUris as $siteUri) {
             $count++;
@@ -82,18 +82,18 @@ class LocalWarmer extends BaseCacheWarmer
                 $siteUri = new SiteUriModel($siteUri);
             }
 
-            $success = $this->_warmUri($siteUri);
+            $success = $this->_generateUri($siteUri);
 
             if ($success) {
-                $this->warmed++;
+                $this->generated++;
             }
         }
     }
 
     /**
-     * Warms a site URI.
+     * Generates a site URI.
      */
-    private function _warmUri(SiteUriModel $siteUri): bool
+    private function _generateUri(SiteUriModel $siteUri): bool
     {
         // Only proceed if this is a cacheable site URI
         if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {

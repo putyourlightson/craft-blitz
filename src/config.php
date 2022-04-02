@@ -28,8 +28,8 @@ return [
         // How cache invalidation should be handled.
         // - `0`: Expire the cache only
         // - `1`: Clear the cache only
-        // - `2`: Expire and warm the cache
-        // - `3`: Clear and warm the cache
+        // - `2`: Expire and generate the cache
+        // - `3`: Clear and generate the cache
         //'invalidationMode' => 3,
 
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
@@ -65,16 +65,16 @@ return [
         // The storage type classes to add to the plugin’s default storage types.
         //'cacheStorageTypes' => [],
 
-        // The warmer type to use.
-        //'cacheWarmerType' => 'putyourlightson\blitz\drivers\warmers\GuzzleWarmer',
+        // The generator type to use.
+        //'cacheGeneratorType' => 'putyourlightson\blitz\drivers\generators\GuzzleGenerator',
 
-        // The warmer settings.
-        //'cacheWarmerSettings' => ['concurrency' => 3],
+        // The generator settings.
+        //'cacheGeneratorSettings' => ['concurrency' => 3],
 
-        // The warmer type classes to add to the plugin’s default warmer types.
-        //'cacheWarmerTypes' => [],
+        // The generator type classes to add to the plugin’s default generator types.
+        //'cacheGeneratorTypes' => [],
 
-        // Custom site URIs to warm when either a site or the entire cache is warmed.
+        // Custom site URIs to generate when either a site or the entire cache is generated.
         //'customSiteUris' => [
         //    [
         //        'siteId' => 1,
@@ -127,8 +127,8 @@ return [
         //    'putyourlightson\blitzshell\ShellDeployer',
         //],
 
-        // Whether pages containing query string parameters should be warmed.
-        //'warmPagesWithQueryStringParams' => true,
+        // Whether pages containing query string parameters should be generated.
+        //'generatePagesWithQueryStringParams' => true,
 
         // Whether the cache should automatically be refreshed after a global set is updated.
         //'refreshCacheAutomaticallyForGlobals' => true,
@@ -162,7 +162,7 @@ return [
         //    ],
         //],
 
-        // An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
+        // An API key that can be used via a URL (min. 16 characters).
         //'apiKey' => '',
 
         // A path to the `bin` folder that should be forced.

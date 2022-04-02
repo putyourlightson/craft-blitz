@@ -143,9 +143,9 @@ class CacheController extends Controller
     }
 
     /**
-     * Warms the cache.
+     * Generates the cache.
      */
-    public function actionWarm(): int
+    public function actionGenerate(): int
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
             $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.') . PHP_EOL, BaseConsole::FG_RED);
@@ -153,7 +153,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_warmCache(SiteUriHelper::getAllSiteUris(true));
+        $this->_generateCache(SiteUriHelper::getAllSiteUris(true));
 
         return ExitCode::OK;
     }
@@ -179,7 +179,7 @@ class CacheController extends Controller
      */
     public function actionRefresh(): int
     {
-        // Get warmable site URIs before flushing the cache
+        // Get site URIs to generate before flushing the cache
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(true),
             Blitz::$plugin->settings->customSiteUris,
@@ -190,8 +190,8 @@ class CacheController extends Controller
             $this->_flushCache();
         }
 
-        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            $this->_warmCache($siteUris);
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
+            $this->_generateCache($siteUris);
             $this->_deploy($siteUris);
         }
 
@@ -213,7 +213,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        // Get warmable site URIs before flushing the cache
+        // Get site URIs to generate before flushing the cache
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
 
         foreach (Blitz::$plugin->settings->customSiteUris as $customSiteUri) {
@@ -227,8 +227,8 @@ class CacheController extends Controller
             $this->_flushCache($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            $this->_warmCache($siteUris);
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
+            $this->_generateCache($siteUris);
             $this->_deploy($siteUris);
         }
 
@@ -370,38 +370,32 @@ class CacheController extends Controller
     /**
      * @param SiteUriModel[] $siteUris
      */
-    private function _warmCache(array $siteUris)
+    private function _generateCache(array $siteUris)
     {
-        if (Blitz::$plugin->cacheWarmer->isDummy) {
-            $this->stderr(Craft::t('blitz', 'Cache warming is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
-
-            return;
-        }
-
-        $this->stdout(Craft::t('blitz', 'Warming Blitz cache...') . PHP_EOL, BaseConsole::FG_YELLOW);
+        $this->stdout(Craft::t('blitz', 'Generating Blitz cache...') . PHP_EOL, BaseConsole::FG_YELLOW);
 
         $siteUris = array_merge($siteUris, Blitz::$plugin->settings->customSiteUris);
 
         if ($this->queue) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler']);
+            Blitz::$plugin->cacheGenerator->generateUris($siteUris, [$this, 'setProgressHandler']);
 
-            $this->_output('Blitz cache queued for warming.');
+            $this->_output('Blitz cache queued for generation.');
 
             return;
         }
 
         Console::startProgress(0, count($siteUris), '', 0.8);
-        Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler'], $this->queue);
+        Blitz::$plugin->cacheGenerator->generateUris($siteUris, [$this, 'setProgressHandler'], $this->queue);
         Console::endProgress();
 
-        $warmed = Blitz::$plugin->cacheWarmer->warmed;
+        $generated = Blitz::$plugin->cacheGenerator->generated;
         $total = count($siteUris);
 
-        if ($warmed < $total) {
-            $this->stdout(Craft::t('blitz', 'Warmed {warmed} of {total} pages. To see why pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['warmed' => $warmed, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
+        if ($generated < $total) {
+            $this->stdout(Craft::t('blitz', 'Generated {generated} of {total} pages. To see why pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['generated' => $generated, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
         }
 
-        $this->_output('Blitz cache warming complete.');
+        $this->_output('Blitz cache generation complete.');
     }
 
     /**

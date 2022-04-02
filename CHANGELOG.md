@@ -1,19 +1,20 @@
 # Release Notes for Blitz
 
 ## 4.0.0-beta.2 - Unreleased
-> {warning} The included/excluded query string parameters config setting format has changed, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php).
+> {warning} Cache warmers have been completely replaced by cache generators. The included/excluded query string parameters config setting format has changed, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php).
 
 ### Added
 - Added compatibility with Craft 4.
 - Added a new `Invalidation Mode` setting that allows for controlling how cache invalidation should be handled.
 - Added the ability to revalidate cached pages that have expired when serving cached responses ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
-- Added the ability for the Guzzle and Local warmers to revalidate cached pages during the warming process.
+- Added the concept of cache generation, that completely replaces cache warming.
 - Added the included/excluded query string parameter settings to the "Advanced Settings" tab in the control panel, and added the ability for them to be site-specific.
 
 ### Changed
-- The Guzzle warmer now bypasses origin server and reverse proxy caches.
-- The Local warmer is no longer marked as "experimental".
-- Cache purging now takes place after cache warming.
+- Replaced all `Warmer` drivers and classes with `Generator` drivers and classes.
+- Replaced the `Guzzle Warmer` with the `Guzzle Generator`.
+- Replaced the `Local Warmer` with the `Local Generator`.
+- Cache purging now takes place after cache generation.
 - Changed the included/excluded query string parameters config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php). 
 
 ### Removed

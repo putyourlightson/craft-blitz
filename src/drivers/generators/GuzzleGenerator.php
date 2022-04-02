@@ -3,7 +3,7 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-namespace putyourlightson\blitz\drivers\warmers;
+namespace putyourlightson\blitz\drivers\generators;
 
 use Craft;
 use craft\helpers\UrlHelper;
@@ -12,14 +12,14 @@ use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\CacheWarmerHelper;
+use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\services\CacheRequestService;
 
 /**
  * @property-read null|string $settingsHtml
  */
-class GuzzleWarmer extends BaseCacheWarmer
+class GuzzleGenerator extends BaseCacheGenerator
 {
     /**
      * @var int
@@ -31,36 +31,36 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Guzzle Warmer');
+        return Craft::t('blitz', 'Guzzle Generator');
     }
 
     /**
      * @inheritdoc
      */
-    public function warmUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true)
+    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true)
     {
-        $siteUris = $this->beforeWarmCache($siteUris);
+        $siteUris = $this->beforeGenerateCache($siteUris);
 
         if ($queue) {
-            CacheWarmerHelper::addWarmerJob($siteUris, 'warmUrisWithProgress');
+            CacheGeneratorHelper::addGeneratorJob($siteUris, 'generateUrisWithProgress');
         }
         else {
-            $this->warmUrisWithProgress($siteUris, $setProgressHandler);
+            $this->generateUrisWithProgress($siteUris, $setProgressHandler);
         }
 
-        $this->afterWarmCache($siteUris);
+        $this->afterGenerateCache($siteUris);
     }
 
     /**
-     * Warms site URIs with progress.
+     * Generates site URIs with progress.
      */
-    public function warmUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
         $urls = SiteUriHelper::getUrlsFromSiteUris($siteUris);
 
         $count = 0;
         $total = count($urls);
-        $label = 'Warming {count} of {total} pages.';
+        $label = 'Generating {count} of {total} pages.';
 
         $client = Craft::createGuzzleClient();
 
@@ -69,7 +69,7 @@ class GuzzleWarmer extends BaseCacheWarmer
             'concurrency' => $this->concurrency,
             'fulfilled' => function() use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
-                $this->warmed++;
+                $this->generated++;
 
                 if (is_callable($setProgressHandler)) {
                     $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
@@ -97,8 +97,8 @@ class GuzzleWarmer extends BaseCacheWarmer
      */
     public function getSettingsHtml(): ?string
     {
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/warmers/guzzle/settings', [
-            'warmer' => $this,
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/generators/guzzle/settings', [
+            'generator' => $this,
         ]);
     }
 

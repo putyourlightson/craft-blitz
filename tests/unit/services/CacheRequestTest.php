@@ -251,7 +251,7 @@ class CacheRequestTest extends Unit
         /**
          * Mock the web server request
          *
-         * @see \putyourlightson\blitz\drivers\warmers\LocalWarmer::_warmUri
+         * @see \putyourlightson\blitz\drivers\generators\LocalGenerator::_generateUri()
          */
         $uri = trim(parse_url($url, PHP_URL_PATH), '/');
 

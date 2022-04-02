@@ -9,11 +9,11 @@ use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
+use putyourlightson\blitz\drivers\generators\GuzzleGenerator;
 use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
-use putyourlightson\blitz\drivers\warmers\GuzzleWarmer;
 
 class SettingsModel extends Model
 {
@@ -30,11 +30,12 @@ class SettingsModel extends Model
     /**
      * @const int
      */
-    public const INVALIDATION_MODE_EXPIRE_AND_WARM = 2;
+    public const INVALIDATION_MODE_EXPIRE_AND_GENERATE = 2;
+
     /**
      * @const int
      */
-    public const INVALIDATION_MODE_CLEAR_AND_WARM = 3;
+    public const INVALIDATION_MODE_CLEAR_AND_GENERATE = 3;
 
     /**
      * @const int
@@ -76,10 +77,10 @@ class SettingsModel extends Model
      *
      * - `self::INVALIDATION_MODE_EXPIRE`: Expire the cache only
      * - `self::INVALIDATION_MODE_CLEAR`: Clear the cache only
-     * - `self::INVALIDATION_MODE_EXPIRE_AND_WARM`: Expire and warm the cache
-     * - `self::INVALIDATION_MODE_CLEAR_AND_WARM`: Clear and warm the cache
+     * - `self::INVALIDATION_MODE_EXPIRE_AND_GENERATE`: Expire and generate the cache
+     * - `self::INVALIDATION_MODE_CLEAR_AND_GENERATE`: Clear and generate the cache
      */
-    public int $invalidationMode = self::INVALIDATION_MODE_CLEAR_AND_WARM;
+    public int $invalidationMode = self::INVALIDATION_MODE_CLEAR_AND_GENERATE;
 
     /**
      * @var array The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
@@ -125,22 +126,22 @@ class SettingsModel extends Model
     public array $cacheStorageTypes = [];
 
     /**
-     * @var string The warmer type to use.
+     * @var string The generator type to use.
      */
-    public string $cacheWarmerType = GuzzleWarmer::class;
+    public string $cacheGeneratorType = GuzzleGenerator::class;
 
     /**
-     * @var array The warmer settings.
+     * @var array The generator settings.
      */
-    public array $cacheWarmerSettings = [];
+    public array $cacheGeneratorSettings = [];
 
     /**
-     * @var string[] The warmer type classes to add to the plugin’s default warmer types.
+     * @var string[] The generator type classes to add to the plugin’s default generator types.
      */
-    public array $cacheWarmerTypes = [];
+    public array $cacheGeneratorTypes = [];
 
     /**
-     * @var array Custom site URIs to warm when either a site or the entire cache is warmed.
+     * @var array Custom site URIs to generate when either a site or the entire cache is generated.
      *
      * [
      *     [
@@ -182,9 +183,9 @@ class SettingsModel extends Model
     public array $deployerTypes = [];
 
     /**
-     * @var bool Whether pages containing query string parameters should be warmed.
+     * @var bool Whether pages containing query string parameters should be generated.
      */
-    public bool $warmPagesWithQueryStringParams = true;
+    public bool $generatePagesWithQueryStringParams = true;
 
     /**
      * @var bool Whether the cache should automatically be refreshed after a global set is updated.
@@ -253,7 +254,7 @@ class SettingsModel extends Model
     ];
 
     /**
-     * @var string An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
+     * @var string An API key that can be used via a URL (min. 16 characters).
      */
     public string $apiKey = '';
 
@@ -381,22 +382,22 @@ class SettingsModel extends Model
     public function shouldClearOnRefresh(): bool
     {
         return $this->invalidationMode == self::INVALIDATION_MODE_CLEAR
-            || $this->invalidationMode == self::INVALIDATION_MODE_CLEAR_AND_WARM;
+            || $this->invalidationMode == self::INVALIDATION_MODE_CLEAR_AND_GENERATE;
     }
 
     /**
-     * Returns whether the cache should be warmed on refresh.
+     * Returns whether the cache should be generated on refresh.
      *
      * @since 4.0.0
      */
-    public function shouldWarmOnRefresh(): bool
+    public function shouldGenerateOnRefresh(): bool
     {
         if (!$this->cachingEnabled) {
             return false;
         }
 
-        return $this->invalidationMode == self::INVALIDATION_MODE_EXPIRE_AND_WARM
-            || $this->invalidationMode == self::INVALIDATION_MODE_CLEAR_AND_WARM;
+        return $this->invalidationMode == self::INVALIDATION_MODE_EXPIRE_AND_GENERATE
+            || $this->invalidationMode == self::INVALIDATION_MODE_CLEAR_AND_GENERATE;
     }
 
     /**
@@ -406,7 +407,7 @@ class SettingsModel extends Model
      */
     public function shouldPurgeOnRefresh(): bool
     {
-        return $this->shouldClearOnRefresh() || $this->shouldWarmOnRefresh();
+        return $this->shouldClearOnRefresh() || $this->shouldGenerateOnRefresh();
     }
 
     /**
@@ -428,13 +429,13 @@ class SettingsModel extends Model
     protected function defineRules(): array
     {
         return [
-            [['cacheStorageType', 'cacheWarmerType', 'queryStringCaching'], 'required'],
-            [['cacheStorageType', 'cacheWarmerType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
+            [['cacheStorageType', 'cacheGeneratorType', 'queryStringCaching'], 'required'],
+            [['cacheStorageType', 'cacheGeneratorType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
             [['queryStringCaching'], 'in', 'range' => [
                 self::INVALIDATION_MODE_EXPIRE,
                 self::INVALIDATION_MODE_CLEAR,
-                self::INVALIDATION_MODE_EXPIRE_AND_WARM,
-                self::INVALIDATION_MODE_CLEAR_AND_WARM,
+                self::INVALIDATION_MODE_EXPIRE_AND_GENERATE,
+                self::INVALIDATION_MODE_CLEAR_AND_GENERATE,
             ]],
             [['queryStringCaching'], 'in', 'range' => [
                 self::QUERY_STRINGS_DO_NOT_CACHE_URLS,

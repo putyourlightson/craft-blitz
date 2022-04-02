@@ -16,7 +16,7 @@
 {% set tabs = {
     general: {label: 'General Settings'|t('blitz'), url: '#general'},
     storage: {label: 'Cache Storage'|t('blitz'), url: '#storage'},
-    warming: {label: 'Cache Warming'|t('blitz'), url: '#warming'},
+    generating: {label: 'Cache Generation'|t('blitz'), url: '#generation'},
     purging: {label: 'Reverse Proxy Purging'|t('blitz'), url: '#purging'},
     deployment: {label: 'Remote Deployment'|t('blitz'), url: '#deployment'},
     advanced: {label: 'Advanced Settings'|t('blitz'), url: '#advanced'},
@@ -96,10 +96,10 @@
                     warning: config.invalidationMode is defined ? configWarning('invalidationMode'),
                     name: 'settings[invalidationMode]',
                     options: {
-                        3: "Clear and Warm (high refresh rate, medium availability)"|t('blitz'),
-                        2: "Expire and Warm (medium refresh rate, high availability)"|t('blitz'),
-                        1: "Clear only (high refresh rate, low availability)"|t('blitz'),
-                        0: "Expire only (low refresh rate, high availability)"|t('blitz'),
+                        3: "Clear the cache and regenerate"|t('blitz'),
+                        2: "Expire the cache and regenerate"|t('blitz'),
+                        1: "Clear the cache only"|t('blitz'),
+                        0: "Expire the cache only"|t('blitz'),
                     },
                     value: settings.invalidationMode,
                 }) }}
@@ -192,31 +192,31 @@
         {{ config.cacheStorageSettings is defined ? configFieldWarning('cacheStorageSettings') }}
     </div>
 
-    <div id="warming" class="hidden">
+    <div id="generation" class="hidden">
         {% set info %}
-            <span class="info">{{ 'The warmer determines how the cache is warmed. You can extend Blitz to add your own or third-party cache warmers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'cache-warming'})|raw }}</span>
+            <span class="info">{{ 'The generator determines how the cache is generated. You can extend Blitz to add your own or third-party cache generators. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'cache-generating'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
-            label: "Cache Warmer"|t('blitz'),
-            instructions: "The warmer type to use for warming the cache."|t('blitz') ~ info,
-            warning: (config.cacheWarmerType is defined ? configWarning('cacheWarmerType')),
-            name: 'settings[cacheWarmerType]',
-            options: warmerTypeOptions,
-            value: className(warmerDriver),
+            label: "Cache Generator"|t('blitz'),
+            instructions: "The generator type to use for generating the cache."|t('blitz') ~ info,
+            warning: (config.cacheGeneratorType is defined ? configWarning('cacheGeneratorType')),
+            name: 'settings[cacheGeneratorType]',
+            options: generatorTypeOptions,
+            value: className(generatorDriver),
             required: true,
             toggle: true,
         }) }}
 
-        {% for driver in warmerDrivers %}
-            {% set isCurrent = (className(driver) == className(warmerDriver)) %}
+        {% for driver in generatorDrivers %}
+            {% set isCurrent = (className(driver) == className(generatorDriver)) %}
             <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
-                {% namespace 'cacheWarmerSettings[' ~ className(driver) ~ ']' %}
-                    {{ (isCurrent ? warmerDriver : driver).getSettingsHtml()|raw }}
+                {% namespace 'cacheGeneratorSettings[' ~ className(driver) ~ ']' %}
+                    {{ (isCurrent ? generatorDriver : driver).getSettingsHtml()|raw }}
                 {% endnamespace %}
             </div>
         {% endfor %}
 
-        {{ config.cacheWarmerSettings is defined ? configFieldWarning('cacheWarmerSettings') }}
+        {{ config.cacheGeneratorSettings is defined ? configFieldWarning('cacheGeneratorSettings') }}
 
         {% set cols = {
             siteId: {
@@ -236,11 +236,11 @@
 
         <input type="hidden" name="customSiteUris" value="" />
         {% set info %}
-            <span class="info">{{ 'Add any URIs that Craft doesn’t know about here and they will be warmed when either a site or the entire cache is warmed.'|t('blitz') }}</span>
+            <span class="info">{{ 'Add any URIs that Craft doesn’t know about here and they will be generated when either a site or the entire cache is generated.'|t('blitz') }}</span>
         {% endset %}
         {{ forms.editableTableField({
             label: "Custom Site URIs"|t('blitz'),
-            instructions: "Custom site URIs to include when warming the cache."|t('blitz') ~ info,
+            instructions: "Custom site URIs to include when generating the cache."|t('blitz') ~ info,
             warning: (config.customSiteUris is defined ? configWarning('customSiteUris')),
             name: 'settings[customSiteUris]',
             id: 'customSiteUris',
@@ -282,7 +282,7 @@
 
     <div id="deployment" class="hidden">
         {% set info %}
-            <span class="info">{{ 'A deployer allows you to deploy cached files to a remote location. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been warmed. You can extend Blitz to add your own or third-party deployers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'remote-deployment'})|raw }}</span>
+            <span class="info">{{ 'A deployer allows you to deploy cached files to a remote location. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been generated. You can extend Blitz to add your own or third-party deployers. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'remote-deployment'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
             label: "Remote Deployer"|t('blitz'),
@@ -366,7 +366,7 @@
 
         {{ forms.autosuggestField({
             label: "API Key"|t('blitz'),
-            instructions: "An API key that can be used to clear, flush, purge, warm, deploy and refresh cache through a URL (min. 16 characters)."|t('blitz'),
+            instructions: "An API key that can be used to clear, flush, purge, generate, deploy and refresh cache through a URL (min. 16 characters)."|t('blitz'),
             suggestEnvVars: true,
             name: 'settings[apiKey]',
             value: settings.apiKey,

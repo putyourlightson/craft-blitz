@@ -63,7 +63,7 @@ class SiteUriHelper
         // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
         $siteUriSets = [self::getSiteUrisForSite($primarySite->id, $cacheableOnly)];
 
-        // Loop through all sites to ensure we warm all site element URLs
+        // Loop through all sites to ensure we generate all site element URLs
         $sites = $sitesService->getAllSites();
 
         foreach ($sites as $site) {
@@ -124,7 +124,7 @@ class SiteUriHelper
                     continue;
                 }
 
-                if (!Blitz::$plugin->settings->warmPagesWithQueryStringParams && str_contains($uri, '?')) {
+                if (!Blitz::$plugin->settings->generatePagesWithQueryStringParams && str_contains($uri, '?')) {
                     continue;
                 }
             }

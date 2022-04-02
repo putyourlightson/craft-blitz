@@ -28,9 +28,9 @@ use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
+use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
-use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -54,7 +54,7 @@ use yii\web\Response;
  * @property-read GenerateCacheService $generateCache
  * @property-read RefreshCacheService $refreshCache
  * @property-read BaseCacheStorage $cacheStorage
- * @property-read BaseCacheWarmer $cacheWarmer
+ * @property-read BaseCacheGenerator $cacheGenerator
  * @property-read BaseCachePurger $cachePurger
  * @property-read BaseDeployer $deployer
  * @property-read SettingsModel $settings
@@ -168,9 +168,9 @@ class Blitz extends Plugin
                 ['class' => $this->settings->cacheStorageType],
                 $this->settings->cacheStorageSettings
             ),
-            'cacheWarmer' => array_merge(
-                ['class' => $this->settings->cacheWarmerType],
-                $this->settings->cacheWarmerSettings
+            'cacheGenerator' => array_merge(
+                ['class' => $this->settings->cacheGeneratorType],
+                $this->settings->cacheGeneratorSettings
             ),
             'cachePurger' => array_merge(
                 ['class' => $this->settings->cachePurgerType],
@@ -421,8 +421,8 @@ class Blitz extends Plugin
                         'blitz:purge' => [
                             'label' => Craft::t('blitz', 'Purge cache'),
                         ],
-                        'blitz:warm' => [
-                            'label' => Craft::t('blitz', 'Warm cache'),
+                        'blitz:generate' => [
+                            'label' => Craft::t('blitz', 'Generate cache'),
                         ],
                         'blitz:deploy' => [
                             'label' => Craft::t('blitz', 'Remote deploy'),

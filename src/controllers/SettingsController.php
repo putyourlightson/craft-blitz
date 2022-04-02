@@ -10,13 +10,13 @@ use craft\base\ComponentInterface;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
+use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
-use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\helpers\BaseDriverHelper;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\CacheStorageHelper;
-use putyourlightson\blitz\helpers\CacheWarmerHelper;
+use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use yii\web\Response;
 
@@ -50,16 +50,16 @@ class SettingsController extends Controller
 
         $storageDrivers = CacheStorageHelper::getAllDrivers();
 
-        /** @var BaseCacheWarmer $warmerDriver */
-        $warmerDriver = BaseDriverHelper::createDriver(
-            $settings->cacheWarmerType,
-            $settings->cacheWarmerSettings
+        /** @var BaseCacheGenerator $generatorDriver */
+        $generatorDriver = BaseDriverHelper::createDriver(
+            $settings->cacheGeneratorType,
+            $settings->cacheGeneratorSettings,
         );
 
-        // Validate the warmer so that any errors will be displayed
-        $warmerDriver->validate();
+        // Validate the generator so that any errors will be displayed
+        $generatorDriver->validate();
 
-        $warmerDrivers = CacheWarmerHelper::getAllDrivers();
+        $generatorDrivers = CacheGeneratorHelper::getAllDrivers();
 
         /** @var BaseCachePurger $purgerDriver */
         $purgerDriver = BaseDriverHelper::createDriver(
@@ -92,9 +92,9 @@ class SettingsController extends Controller
             'storageDriver' => $storageDriver,
             'storageDrivers' => $storageDrivers,
             'storageTypeOptions' => array_map([$this, '_getSelectOption'], $storageDrivers),
-            'warmerDriver' => $warmerDriver,
-            'warmerDrivers' => $warmerDrivers,
-            'warmerTypeOptions' => array_map([$this, '_getSelectOption'], $warmerDrivers),
+            'generatorDriver' => $generatorDriver,
+            'generatorDrivers' => $generatorDrivers,
+            'generatorTypeOptions' => array_map([$this, '_getSelectOption'], $generatorDrivers),
             'purgerDriver' => $purgerDriver,
             'purgerDrivers' => $purgerDrivers,
             'purgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgerDrivers),
@@ -115,7 +115,7 @@ class SettingsController extends Controller
 
         $postedSettings = $request->getBodyParam('settings', []);
         $storageSettings = $request->getBodyParam('cacheStorageSettings', []);
-        $warmerSettings = $request->getBodyParam('cacheWarmerSettings', []);
+        $generatorSettings = $request->getBodyParam('cacheGeneratorSettings', []);
         $purgerSettings = $request->getBodyParam('cachePurgerSettings', []);
         $deployerSettings = $request->getBodyParam('deployerSettings', []);
 
@@ -132,14 +132,14 @@ class SettingsController extends Controller
             $settings->cacheStorageSettings
         );
 
-        // Apply warmer settings excluding type
-        $settings->cacheWarmerSettings = $warmerSettings[$settings->cacheWarmerType] ?? [];
+        // Apply generator settings excluding type
+        $settings->cacheGeneratorSettings = $generatorSettings[$settings->cacheGeneratorType] ?? [];
 
-        // Create the warmer driver so that we can validate it
-        /** @var BaseCacheWarmer $warmerDriver */
-        $warmerDriver = BaseDriverHelper::createDriver(
-            $settings->cacheWarmerType,
-            $settings->cacheWarmerSettings
+        // Create the generator driver so that we can validate it
+        /** @var BaseCacheGenerator $generatorDriver */
+        $generatorDriver = BaseDriverHelper::createDriver(
+            $settings->cacheGeneratorType,
+            $settings->cacheGeneratorSettings,
         );
 
         // Apply purger settings excluding type
@@ -165,13 +165,13 @@ class SettingsController extends Controller
         // Validate
         $settings->validate();
         $storageDriver->validate();
-        $warmerDriver->validate();
+        $generatorDriver->validate();
         $purgerDriver->validate();
         $deployerDriver->validate();
 
         if ($settings->hasErrors()
             || $storageDriver->hasErrors()
-            || $warmerDriver->hasErrors()
+            || $generatorDriver->hasErrors()
             || $purgerDriver->hasErrors()
             || $deployerDriver->hasErrors()
         ) {

@@ -4,7 +4,8 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
-use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\generators\GuzzleGenerator;
+use putyourlightson\blitz\drivers\generators\LocalGenerator;
 
 class m220330_120000_update_settings extends Migration
 {
@@ -17,9 +18,17 @@ class m220330_120000_update_settings extends Migration
         $schemaVersion = $projectConfig->get('plugins.blitz.schemaVersion', true);
 
         if (version_compare($schemaVersion, '4.0.0', '<')) {
-            $clearCacheAutomatically = $projectConfig->get('plugins.blitz.settings.clearCacheAutomatically') ?? true;
-            $warmCacheAutomatically = $projectConfig->get('plugins.blitz.settings.warmCacheAutomatically') ?? true;
-            $invalidationMode = $this->_getInvalidationMode($clearCacheAutomatically, $warmCacheAutomatically);
+            $warmerType = $projectConfig->get('plugins.blitz.settings.cacheWarmerType') ?? null;
+            $generatorType = ($warmerType == 'putyourlightson\\blitz\\drivers\\warmers\\LocalWarmer')
+                ? LocalGenerator::class : GuzzleGenerator::class;
+            $projectConfig->set('plugins.blitz.settings.cacheGeneratorType', $generatorType);
+
+            $generatorSettings = $projectConfig->get('plugins.blitz.settings.cacheWarmerSettings') ?? [];
+            $projectConfig->set('plugins.blitz.settings.cacheGeneratorSettings', $generatorSettings);
+
+            $clear = $projectConfig->get('plugins.blitz.settings.clearCacheAutomatically') ?? true;
+            $generate = $projectConfig->get('plugins.blitz.settings.warmCacheAutomatically') ?? true;
+            $invalidationMode = $this->_getInvalidationMode($clear, $generate);
             $projectConfig->set('plugins.blitz.settings.invalidationMode', $invalidationMode);
 
             $includedQueryStringParams = $projectConfig->get('plugins.blitz.settings.includedQueryStringParams');
@@ -44,9 +53,9 @@ class m220330_120000_update_settings extends Migration
         return false;
     }
 
-    private function _getInvalidationMode(bool $clear, bool $warm): int
+    private function _getInvalidationMode(bool $clear, bool $generate): int
     {
-        return $clear ? ($warm ? 3 : 1) : ($warm ? 2 : 0);
+        return $clear ? ($generate ? 3 : 1) : ($generate ? 2 : 0);
     }
 
     private function _updateQueryStringParams(array &$queryStringParams)

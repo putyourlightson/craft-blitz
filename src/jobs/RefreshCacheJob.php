@@ -43,7 +43,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * @var bool
      */
-    public bool $forceWarm = false;
+    public bool $forceGenerate = false;
 
     /**
      * @inheritdoc
@@ -133,7 +133,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
 
-        // Merge in site URIs of element IDs to ensure that uncached elements are also warmed
+        // Merge in site URIs of element IDs to ensure that uncached elements are also generated
         /** @var ElementInterface $elementType */
         foreach ($this->elements as $elementType => $elementData) {
             if ($elementType::hasUris()) {
@@ -143,7 +143,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         $siteUris = array_unique($siteUris, SORT_REGULAR);
 
-        Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $this->forceClear, $this->forceWarm);
+        Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $this->forceClear, $this->forceGenerate);
     }
 
     /**

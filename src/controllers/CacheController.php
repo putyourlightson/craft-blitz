@@ -109,16 +109,16 @@ class CacheController extends Controller
     }
 
     /**
-     * Warms the cache.
+     * Generates the cache.
      */
-    public function actionWarm(): Response
+    public function actionGenerate(): Response
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
             return $this->_getResponse('Blitz caching is disabled.', false);
         }
 
-        Blitz::$plugin->cacheWarmer->warmAll();
-        $message = 'Blitz cache successfully queued for warming.';
+        Blitz::$plugin->cacheGenerator->generateAll();
+        $message = 'Blitz cache successfully queued for generation.';
         Blitz::$plugin->log($message);
 
         return $this->_getResponse($message);
@@ -148,8 +148,8 @@ class CacheController extends Controller
         Blitz::$plugin->refreshCache->refreshAll();
         $message = 'Blitz cache successfully refreshed.';
 
-        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            $message = 'Blitz cache successfully refreshed and queued for warming.';
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
+            $message = 'Blitz cache successfully refreshed and queued for generation.';
         }
 
         Blitz::$plugin->log($message);
@@ -183,8 +183,8 @@ class CacheController extends Controller
         Blitz::$plugin->refreshCache->refreshSite($siteId);
         $message = 'Site successfully refreshed.';
 
-        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            $message = 'Site successfully refreshed and queued for warming.';
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
+            $message = 'Site successfully refreshed and queued for generation.';
         }
 
         Blitz::$plugin->log($message);

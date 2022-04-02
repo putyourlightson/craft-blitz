@@ -396,7 +396,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes the cache.
      */
-    public function refresh(bool $forceClear = false, bool $forceWarm = false)
+    public function refresh(bool $forceClear = false, bool $forceGenerate = false)
     {
         if (empty($this->cacheIds) && empty($this->elements)) {
             return;
@@ -406,7 +406,7 @@ class RefreshCacheService extends Component
             'cacheIds' => $this->cacheIds,
             'elements' => $this->elements,
             'forceClear' => $forceClear,
-            'forceWarm' => $forceWarm,
+            'forceGenerate' => $forceGenerate,
         ]);
 
         $queue = Craft::$app->getQueue();
@@ -429,7 +429,7 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceWarm = false)
+    public function refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false)
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
@@ -440,7 +440,7 @@ class RefreshCacheService extends Component
 
         $siteUris = $event->siteUris;
 
-        $this->_refreshSiteUris($siteUris, $forceClear, $forceWarm);
+        $this->_refreshSiteUris($siteUris, $forceClear, $forceGenerate);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
@@ -481,7 +481,7 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Get warmable site URIs before flushing the cache
+        // Get site URIs to generate before flushing the cache
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(true),
             Blitz::$plugin->settings->customSiteUris
@@ -492,8 +492,8 @@ class RefreshCacheService extends Component
             Blitz::$plugin->flushCache->flushAll();
         }
 
-        if (Blitz::$plugin->settings->shouldWarmOnRefresh()) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris);
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
+            Blitz::$plugin->cacheGenerator->generateUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
@@ -518,7 +518,7 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Get warmable site URIs before flushing the cache
+        // Get site URIs to generate before flushing the cache
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
 
         foreach (Blitz::$plugin->settings->customSiteUris as $customSiteUri) {
@@ -618,18 +618,18 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceWarm = false)
+    private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false)
     {
         if (Blitz::$plugin->settings->shouldClearOnRefresh() || $forceClear) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldWarmOnRefresh() || $forceWarm) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris);
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh() || $forceGenerate) {
+            Blitz::$plugin->cacheGenerator->generateUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldPurgeOnRefresh() || $forceWarm) {
+        if (Blitz::$plugin->settings->shouldPurgeOnRefresh() || $forceGenerate) {
             Blitz::$plugin->cachePurger->purgeUris($siteUris);
         }
     }
