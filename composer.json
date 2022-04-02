@@ -19,7 +19,8 @@
         "php": "^8.0.2",
         "craftcms/cms": "^4.0.0-beta.1",
         "putyourlightson/craft-log-to-file": "^2.0.0-alpha.1",
-        "symplify/git-wrapper": "^10.0.0"
+        "symfony/process": "^5.4|^6.0",
+        "symplify/git-wrapper": "^10.0"
     },
     "require-dev": {
         "codeception/codeception": "^4.1.29",

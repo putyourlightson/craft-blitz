@@ -44,7 +44,7 @@ class CacheRequestService extends Component
     /**
      * @const string
      */
-    public const REVALIDATE_ROUTE = 'blitz/revalidate/revalidate';
+    public const GENERATE_ROUTE = 'blitz/generator/generate';
 
     /**
      * @const int
@@ -54,7 +54,7 @@ class CacheRequestService extends Component
     /**
      * @var bool|null
      */
-    private ?bool $_isRevalidateRequest = null;
+    private ?bool $_isGeneratorRequest = null;
 
     /**
      * @var array|null
@@ -113,7 +113,7 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if ($request->getToken() !== null && !$this->getIsRevalidateRequest()) {
+        if ($request->getToken() !== null && !$this->getIsGeneratorRequest()) {
             Blitz::$plugin->debug('Page not cached because a token request header/parameter was provided.', [], $request->getAbsoluteUrl());
 
             return false;
@@ -196,26 +196,27 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns whether this is a revalidate request.
+     * Returns whether this is a generator request.
      *
      * @since 4.0.0
      */
-    public function getIsRevalidateRequest(): bool
+    public function getIsGeneratorRequest(): bool
     {
-        if ($this->_isRevalidateRequest !== null) {
-            return $this->_isRevalidateRequest;
+        if ($this->_isGeneratorRequest !== null) {
+            return $this->_isGeneratorRequest;
         }
 
         $token = Craft::$app->getRequest()->getToken();
 
         if ($token == null) {
-            $this->_isRevalidateRequest = false;
+            $this->_isGeneratorRequest = false;
         }
         else {
-            $this->_isRevalidateRequest = Craft::$app->getTokens()->getTokenRoute($token) == [self::REVALIDATE_ROUTE];
+            $tokenRoute = Craft::$app->getTokens()->getTokenRoute($token);
+            $this->_isGeneratorRequest = in_array(self::GENERATE_ROUTE, $tokenRoute);
         }
 
-        return $this->_isRevalidateRequest;
+        return $this->_isGeneratorRequest;
     }
 
     /**
@@ -258,7 +259,7 @@ class CacheRequestService extends Component
      */
     public function getCachedResponse(SiteUriModel $siteUri): ?Response
     {
-        if ($this->getIsRevalidateRequest()) {
+        if ($this->getIsGeneratorRequest()) {
             return null;
         }
 

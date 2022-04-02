@@ -114,12 +114,12 @@ class GuzzleWarmer extends BaseCacheWarmer
     }
 
     /**
-     * Returns a generator to return the URL requests in a memory efficient manner
+     * Returns a generator object to return the URL requests in a memory efficient manner
      * https://medium.com/tech-tajawal/use-memory-gently-with-yield-in-php-7e62e2480b8d
      */
     private function _getRequests(array $urls): Generator
     {
-        $token = Craft::$app->getTokens()->createPreviewToken(CacheRequestService::REVALIDATE_ROUTE);
+        $token = Craft::$app->getTokens()->createToken(CacheRequestService::GENERATE_ROUTE);
 
         foreach ($urls as $url) {
             // Ensure URL is an absolute URL starting with http
