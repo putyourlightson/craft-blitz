@@ -1,6 +1,8 @@
 <?php
 /**
  * Blitz web bootstrap file
+ *
+ * @since 4.0.0
  */
 
 use craft\services\Plugins;

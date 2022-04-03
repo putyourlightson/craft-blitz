@@ -216,7 +216,7 @@
             </div>
         {% endfor %}
 
-        {{ config.cacheGeneratorSettings is defined ? configFieldWarning('cacheGeneratorSettings') }}
+        {{ config.cacheGeneratorSettings is defined and config.cacheGeneratorSettings ? configFieldWarning('cacheGeneratorSettings') }}
 
         {% set cols = {
             siteId: {

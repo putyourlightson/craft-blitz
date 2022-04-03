@@ -106,7 +106,7 @@ class LocalGenerator extends BaseCacheGenerator
 
         $command = [
             $this->_getPhpPath(),
-            CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/web/bootstrap.php',
+            CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/bootstrap/web.php',
             '--url=' . $url,
             '--webroot=' . $this->_getWebroot(),
             '--basePath=' . CRAFT_BASE_PATH,

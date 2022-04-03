@@ -12,6 +12,9 @@ use JetBrains\PhpStorm\NoReturn;
 use yii\base\Event;
 use yii\web\Response;
 
+/**
+ * @since 4.0.0
+ */
 class GeneratorController extends Controller
 {
     /**
