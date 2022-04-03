@@ -19,8 +19,7 @@ class m220330_120000_update_settings extends Migration
 
         if (version_compare($schemaVersion, '4.0.0', '<')) {
             $warmerType = $projectConfig->get('plugins.blitz.settings.cacheWarmerType') ?? null;
-            $generatorType = ($warmerType == 'putyourlightson\\blitz\\drivers\\warmers\\LocalWarmer')
-                ? LocalGenerator::class : GuzzleGenerator::class;
+            $generatorType = $this->_getGeneratorType($warmerType);
             $projectConfig->set('plugins.blitz.settings.cacheGeneratorType', $generatorType);
 
             $generatorSettings = $projectConfig->get('plugins.blitz.settings.cacheWarmerSettings') ?? [];
@@ -28,8 +27,8 @@ class m220330_120000_update_settings extends Migration
 
             $clear = $projectConfig->get('plugins.blitz.settings.clearCacheAutomatically') ?? true;
             $generate = $projectConfig->get('plugins.blitz.settings.warmCacheAutomatically') ?? true;
-            $invalidationMode = $this->_getInvalidationMode($clear, $generate);
-            $projectConfig->set('plugins.blitz.settings.invalidationMode', $invalidationMode);
+            $refreshMode = $this->_getRefreshMode($clear, $generate);
+            $projectConfig->set('plugins.blitz.settings.refreshMode', $refreshMode);
 
             $includedQueryStringParams = $projectConfig->get('plugins.blitz.settings.includedQueryStringParams');
             $this->_updateQueryStringParams($includedQueryStringParams);
@@ -53,7 +52,13 @@ class m220330_120000_update_settings extends Migration
         return false;
     }
 
-    private function _getInvalidationMode(bool $clear, bool $generate): int
+    private function _getGeneratorType(string $warmerType): string
+    {
+        return $warmerType == 'putyourlightson\\blitz\\drivers\\warmers\\LocalWarmer'
+            ? LocalGenerator::class : GuzzleGenerator::class;
+    }
+
+    private function _getRefreshMode(bool $clear, bool $generate): int
     {
         return $clear ? ($generate ? 3 : 1) : ($generate ? 2 : 0);
     }

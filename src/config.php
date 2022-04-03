@@ -25,12 +25,12 @@ return [
         // With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 
-        // How cache invalidation should be handled.
-        // - `0`: Expire the cache only
-        // - `1`: Clear the cache only
-        // - `2`: Expire and generate the cache
-        // - `3`: Clear and generate the cache
-        //'invalidationMode' => 3,
+        // How cache refreshing should be handled.
+        // - `0`: Expire the cache, regenerate manually or when visited
+        // - `1`: Clear the cache, regenerate manually or when visited
+        // - `2`: Expire the cache and regenerate in a queue job
+        // - `3`: Clear the cache and regenerate in a queue job
+        //'refreshMode' => 3,
 
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
         //'includedUriPatterns' => [

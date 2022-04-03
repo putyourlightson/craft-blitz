@@ -91,17 +91,17 @@
                     <span class="info">{{ ''|t('blitz') }}</span>
                 {% endset %}
                 {{ forms.selectField({
-                    label: "Invalidation Mode"|t('blitz'),
-                    instructions: "How cache invalidation should be handled."|t('blitz') ~ info,
-                    warning: config.invalidationMode is defined ? configWarning('invalidationMode'),
-                    name: 'settings[invalidationMode]',
+                    label: "Refresh Mode"|t('blitz'),
+                    instructions: "How cache refreshing should be handled."|t('blitz') ~ info,
+                    warning: config.refreshMode is defined ? configWarning('refreshMode'),
+                    name: 'settings[refreshMode]',
                     options: {
-                        3: "Clear the cache and regenerate"|t('blitz'),
-                        2: "Expire the cache and regenerate"|t('blitz'),
-                        1: "Clear the cache only"|t('blitz'),
-                        0: "Expire the cache only"|t('blitz'),
+                        3: "Clear the cache and regenerate in a queue job"|t('blitz'),
+                        2: "Expire the cache and regenerate in a queue job"|t('blitz'),
+                        1: "Clear the cache, regenerate manually or when visited"|t('blitz'),
+                        0: "Expire the cache, regenerate manually or when visited"|t('blitz'),
                     },
-                    value: settings.invalidationMode,
+                    value: settings.refreshMode,
                 }) }}
             </div>
         </div>

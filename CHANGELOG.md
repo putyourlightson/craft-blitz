@@ -5,7 +5,7 @@
 
 ### Added
 - Added compatibility with Craft 4.
-- Added a new `Invalidation Mode` setting that allows for controlling how cache invalidation should be handled.
+- Added a new `Refresh Mode` setting that allows for controlling how cache refreshing should be handled.
 - Added the ability to revalidate cached pages that have expired when serving cached responses ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
 - Added the concept of cache generation, that completely replaces cache warming.
 - Added the included/excluded query string parameter settings to the "Advanced Settings" tab in the control panel, and added the ability for them to be site-specific.

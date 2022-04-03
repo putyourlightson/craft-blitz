@@ -20,22 +20,22 @@ class SettingsModel extends Model
     /**
      * @const int
      */
-    public const INVALIDATION_MODE_EXPIRE = 0;
+    public const REFRESH_MODE_EXPIRE = 0;
 
     /**
      * @const int
      */
-    public const INVALIDATION_MODE_CLEAR = 1;
+    public const REFRESH_MODE_CLEAR = 1;
 
     /**
      * @const int
      */
-    public const INVALIDATION_MODE_EXPIRE_AND_GENERATE = 2;
+    public const REFRESH_MODE_EXPIRE_AND_GENERATE = 2;
 
     /**
      * @const int
      */
-    public const INVALIDATION_MODE_CLEAR_AND_GENERATE = 3;
+    public const REFRESH_MODE_CLEAR_AND_GENERATE = 3;
 
     /**
      * @const int
@@ -75,12 +75,12 @@ class SettingsModel extends Model
     /**
      * @var int How cache invalidation should be handled.
      *
-     * - `self::INVALIDATION_MODE_EXPIRE`: Expire the cache only
-     * - `self::INVALIDATION_MODE_CLEAR`: Clear the cache only
-     * - `self::INVALIDATION_MODE_EXPIRE_AND_GENERATE`: Expire and generate the cache
-     * - `self::INVALIDATION_MODE_CLEAR_AND_GENERATE`: Clear and generate the cache
+     * - `self::REFRESH_MODE_EXPIRE`: Expire the cache only
+     * - `self::REFRESH_MODE_CLEAR`: Clear the cache only
+     * - `self::REFRESH_MODE_EXPIRE_AND_GENERATE`: Expire and generate the cache
+     * - `self::REFRESH_MODE_CLEAR_AND_GENERATE`: Clear and generate the cache
      */
-    public int $invalidationMode = self::INVALIDATION_MODE_CLEAR_AND_GENERATE;
+    public int $refreshMode = self::REFRESH_MODE_CLEAR_AND_GENERATE;
 
     /**
      * @var array The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
@@ -381,8 +381,8 @@ class SettingsModel extends Model
      */
     public function shouldClearOnRefresh(): bool
     {
-        return $this->invalidationMode == self::INVALIDATION_MODE_CLEAR
-            || $this->invalidationMode == self::INVALIDATION_MODE_CLEAR_AND_GENERATE;
+        return $this->refreshMode == self::REFRESH_MODE_CLEAR
+            || $this->refreshMode == self::REFRESH_MODE_CLEAR_AND_GENERATE;
     }
 
     /**
@@ -396,8 +396,8 @@ class SettingsModel extends Model
             return false;
         }
 
-        return $this->invalidationMode == self::INVALIDATION_MODE_EXPIRE_AND_GENERATE
-            || $this->invalidationMode == self::INVALIDATION_MODE_CLEAR_AND_GENERATE;
+        return $this->refreshMode == self::REFRESH_MODE_EXPIRE_AND_GENERATE
+            || $this->refreshMode == self::REFRESH_MODE_CLEAR_AND_GENERATE;
     }
 
     /**
@@ -432,10 +432,10 @@ class SettingsModel extends Model
             [['cacheStorageType', 'cacheGeneratorType', 'queryStringCaching'], 'required'],
             [['cacheStorageType', 'cacheGeneratorType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
             [['queryStringCaching'], 'in', 'range' => [
-                self::INVALIDATION_MODE_EXPIRE,
-                self::INVALIDATION_MODE_CLEAR,
-                self::INVALIDATION_MODE_EXPIRE_AND_GENERATE,
-                self::INVALIDATION_MODE_CLEAR_AND_GENERATE,
+                self::REFRESH_MODE_EXPIRE,
+                self::REFRESH_MODE_CLEAR,
+                self::REFRESH_MODE_EXPIRE_AND_GENERATE,
+                self::REFRESH_MODE_CLEAR_AND_GENERATE,
             ]],
             [['queryStringCaching'], 'in', 'range' => [
                 self::QUERY_STRINGS_DO_NOT_CACHE_URLS,
