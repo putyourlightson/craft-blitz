@@ -14,9 +14,9 @@ use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\helpers\BaseDriverHelper;
+use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\CacheStorageHelper;
-use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
 use yii\web\Response;
 

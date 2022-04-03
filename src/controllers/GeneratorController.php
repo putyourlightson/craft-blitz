@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\controllers;
 use Craft;
 use craft\controllers\PreviewController;
 use craft\web\Controller;
+use JetBrains\PhpStorm\NoReturn;
 use yii\base\Event;
 use yii\web\Response;
 
@@ -32,13 +33,13 @@ class GeneratorController extends Controller
     /**
      * Generates a response and outputs whether it was successful.
      */
-    public function actionGenerate()
+    #[NoReturn] public function actionGenerate()
     {
         $response = $this->_getResponse();
 
         // Suppress the output using a dummy stream
         Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
-            function (Event $event) {
+            function(Event $event) {
                 /** @var Response $response */
                 $response = $event->sender;
                 $response->stream = fn() => ['data' => ''];
@@ -55,7 +56,7 @@ class GeneratorController extends Controller
      *
      * @see PreviewController::actionPreview()
      */
-    private function _getResponse()
+    private function _getResponse(): Response
     {
         // Recheck whether this is an action request, this time ignoring the token
         $this->request->checkIfActionRequest(true, false);

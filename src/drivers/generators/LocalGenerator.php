@@ -67,7 +67,7 @@ class LocalGenerator extends BaseCacheGenerator
     {
         $count = 0;
         $total = count($siteUris);
-        $label = 'Generateing {count} of {total} pages.';
+        $label = 'Generating {count} of {total} pages.';
 
         foreach ($siteUris as $siteUri) {
             $count++;

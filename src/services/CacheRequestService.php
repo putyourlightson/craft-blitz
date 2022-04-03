@@ -20,7 +20,7 @@ use yii\web\Response;
 
 /**
  * @property-read bool $isCacheableRequest
- * @property-read bool $isRevalidateRequest
+ * @property-read bool $isGeneratorRequest
  * @property-read null|SiteUriModel $requestedCacheableSiteUri
  * @property-read string $allowedQueryString
  */
