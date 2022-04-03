@@ -9,9 +9,8 @@ use craft\services\Plugins;
 use craft\web\View;
 use yii\base\Event;
 
-$options = getopt(null, ['url:', 'token:', 'webroot:', 'basePath::']);
+$options = getopt(null, ['url:', 'webroot:', 'basePath::']);
 $url = $options['url'] ?? null;
-$token = $options['token'] ?? null;
 $webroot = $options['webroot'] ?? null;
 $basePath = $options['basePath'] ?? dirname(__DIR__, 4);
 
@@ -20,6 +19,7 @@ if (empty($url)) {
 }
 
 $queryString = parse_url($url, PHP_URL_QUERY);
+parse_str($queryString, $queryStringParams);
 
 /**
  * Mock a web server request
@@ -35,16 +35,11 @@ $_SERVER = array_merge($_SERVER, [
     'QUERY_STRING' => $queryString,
 ]);
 
-$_GET = [
-    'p' => trim(parse_url($url, PHP_URL_PATH), '/'),
-];
-
-foreach (explode('&', $queryString) as $queryStringParam) {
-    $queryStringParam = explode('=', $queryStringParam);
-    if (!empty($queryStringParam)) {
-        $_GET[$queryStringParam[0]] = $queryStringParam[1] ?? '';
-    }
-}
+// Merge the path param onto the query string params
+$pathParam = Craft::$app->getConfig()->getGeneral()->pathParam;
+$_GET = array_merge($queryStringParams, [
+    $pathParam => trim(parse_url($url, PHP_URL_PATH), '/'),
+]);
 
 // Load shared bootstrap
 require $basePath . '/bootstrap.php';
