@@ -11,6 +11,7 @@ use Generator;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
@@ -67,9 +68,12 @@ class GuzzleGenerator extends BaseCacheGenerator
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $this->_getRequests($urls), [
             'concurrency' => $this->concurrency,
-            'fulfilled' => function() use (&$count, $total, $label, $setProgressHandler) {
+            'fulfilled' => function(Response $response) use (&$count, $total, $label, $setProgressHandler) {
                 $count++;
-                $this->generated++;
+
+                if ($response->getBody()->getContents() == 1) {
+                    $this->generated++;
+                }
 
                 if (is_callable($setProgressHandler)) {
                     $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
