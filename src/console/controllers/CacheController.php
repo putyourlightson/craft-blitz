@@ -153,7 +153,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_generateCache(SiteUriHelper::getAllSiteUris(true));
+        $this->_generateCache(SiteUriHelper::getAllSiteUris());
 
         return ExitCode::OK;
     }
@@ -169,7 +169,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_deploy(SiteUriHelper::getAllSiteUris(true));
+        $this->_deploy(SiteUriHelper::getAllSiteUris());
 
         return ExitCode::OK;
     }
@@ -181,7 +181,7 @@ class CacheController extends Controller
     {
         // Get site URIs to generate before flushing the cache
         $siteUris = array_merge(
-            SiteUriHelper::getAllSiteUris(true),
+            SiteUriHelper::getAllSiteUris(),
             Blitz::$plugin->settings->customSiteUris,
         );
 

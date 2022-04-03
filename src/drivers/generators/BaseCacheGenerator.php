@@ -105,7 +105,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         }
 
         $siteUris = array_merge(
-            SiteUriHelper::getAllSiteUris(true),
+            SiteUriHelper::getAllSiteUris(),
             Blitz::$plugin->settings->customSiteUris
         );
 

@@ -53,7 +53,7 @@ class SiteUriHelper
      *
      * @return SiteUriModel[]
      */
-    public static function getAllSiteUris(bool $cacheableOnly = false): array
+    public static function getAllSiteUris(): array
     {
         $sitesService = Craft::$app->getSites();
 
@@ -61,18 +61,16 @@ class SiteUriHelper
         $primarySite = $sitesService->getPrimarySite();
 
         // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
-        $siteUriSets = [self::getSiteUrisForSite($primarySite->id, $cacheableOnly)];
+        $siteUriSets = [self::getSiteUrisForSite($primarySite->id, true)];
 
         // Loop through all sites to ensure we generate all site element URLs
         $sites = $sitesService->getAllSites();
 
         foreach ($sites as $site) {
             // Ignore primary site as we have already added it
-            if ($site->id == $primarySite->id) {
-                continue;
+            if ($site->id != $primarySite->id) {
+                $siteUriSets[] = self::getSiteUrisForSite($site->id, true);
             }
-
-            $siteUriSets[] = self::getSiteUrisForSite($site->id, $cacheableOnly);
         }
 
         return array_merge(...$siteUriSets);

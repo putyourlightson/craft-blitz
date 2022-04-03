@@ -116,6 +116,10 @@ class LocalGenerator extends BaseCacheGenerator
         $process = new Process($command, $cwd);
         $process->run();
 
+        if (!$process->isSuccessful()) {
+            return false;
+        }
+
         return $process->getOutput() == 1;
     }
 
