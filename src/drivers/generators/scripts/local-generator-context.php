@@ -9,7 +9,7 @@ use yii\base\Event;
 
 // Receives a channel that to send data between the parent and child processes
 // https://amphp.org/parallel/processes#child-process-or-thread
-return function (Channel $channel): Generator {
+return function(Channel $channel): Generator {
     $config = yield $channel->receive();
 
     $url = $config['url'];

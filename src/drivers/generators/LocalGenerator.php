@@ -13,6 +13,9 @@ use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use function Amp\Iterator\fromIterable;
 use function Amp\Parallel\Context\create;
 
+/**
+ * @property-read null|string $settingsHtml
+ */
 class LocalGenerator extends BaseCacheGenerator
 {
     /**
@@ -56,7 +59,7 @@ class LocalGenerator extends BaseCacheGenerator
     {
         // Event loop for running parallel processes
         // https://amphp.org/parallel/processes
-        Loop::run(function () use ($siteUris, $setProgressHandler) {
+        Loop::run(function() use ($siteUris, $setProgressHandler) {
             $urls = $this->getUrlsToGenerate($siteUris);
 
             $count = 0;
@@ -72,7 +75,7 @@ class LocalGenerator extends BaseCacheGenerator
             \Amp\Sync\ConcurrentIterator\each(
                 fromIterable($urls),
                 new LocalSemaphore($this->concurrency),
-                function ($url) use ($setProgressHandler, &$count, $total, $config) {
+                function($url) use ($setProgressHandler, &$count, $total, $config) {
                     $count++;
                     $config['url'] = $url;
 
@@ -83,7 +86,7 @@ class LocalGenerator extends BaseCacheGenerator
                     yield $context->send($config);
                     $result = yield $context->receive();
 
-                    if ($result == 1) {
+                    if ($result) {
                         $this->generated++;
                     }
 
