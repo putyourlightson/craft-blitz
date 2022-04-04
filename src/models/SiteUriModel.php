@@ -35,10 +35,10 @@ class SiteUriModel extends Model
     }
 
     /**
-     * Returns a URL.
+     * Returns a URL with optional params.
      */
-    public function getUrl(): string
+    public function getUrl(array $params = []): string
     {
-        return UrlHelper::siteUrl($this->uri, null, null, $this->siteId);
+        return UrlHelper::siteUrl($this->uri, $params, null, $this->siteId);
     }
 }

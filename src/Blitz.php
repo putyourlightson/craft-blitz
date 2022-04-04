@@ -218,8 +218,10 @@ class Blitz extends Plugin
                 }
 
                 if ($cachedResponse = $this->cacheRequest->getCachedResponse($siteUri)) {
-                    // Output the cached response and end the script
-                    Craft::$app->end(0, $cachedResponse);
+                    // Send the cached response and exit early, without allowing
+                    // the full application life cycle to complete.
+                    $cachedResponse->send();
+                    exit();
                 }
 
                 $this->generateCache->registerElementPrepareEvents();

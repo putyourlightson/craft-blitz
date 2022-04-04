@@ -12,7 +12,7 @@
 
 ### Changed
 - Replaced all `Warmer` drivers and classes with `Generator` drivers and classes.
-- Replaced the `Guzzle Warmer` with the `Guzzle Generator`.
+- Replaced the `Guzzle Warmer` with the `HTTP Generator`.
 - Replaced the `Local Warmer` with the `Local Generator`.
 - Cache purging now takes place after cache generation.
 - Changed the included/excluded query string parameters config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php). 

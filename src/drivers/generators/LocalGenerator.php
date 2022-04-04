@@ -14,6 +14,20 @@ use function Amp\Iterator\fromIterable;
 use function Amp\Parallel\Context\create;
 
 /**
+ * This generator runs concurrent PHP child processes or threads to generate
+ * each individual site URI. We do it this way because to handle a web request
+ * properly, the Craft web application must be run. Since this generator may have
+ * been run via a console request (or a CLI based queue runner), and therefore exist
+ * in the context of a Craft console application, the only way to ensure that the
+ * life cycle of a web request is fully performed is to bootstrap a web app and
+ * mock a web request. The bootstrapping and mocking of the web request happen in
+ * the `local-generator-script.php` file.
+ *
+ * The Amp PHP framework is used for running parallel processes and a concurrent
+ * iterator is used to pool and run the processes concurrently.
+ * See https://amphp.org/parallel/processes
+ * and https://amphp.org/sync/concurrent-iterator
+ *
  * @property-read null|string $settingsHtml
  */
 class LocalGenerator extends BaseCacheGenerator
@@ -57,11 +71,11 @@ class LocalGenerator extends BaseCacheGenerator
      */
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
+        $urls = $this->getUrlsToGenerate($siteUris, true);
+
         // Event loop for running parallel processes
         // https://amphp.org/parallel/processes
-        Loop::run(function() use ($siteUris, $setProgressHandler) {
-            $urls = $this->getUrlsToGenerate($siteUris);
-
+        Loop::run(function() use ($urls, $setProgressHandler) {
             $count = 0;
             $total = count($urls);
             $config = [
@@ -75,13 +89,13 @@ class LocalGenerator extends BaseCacheGenerator
             \Amp\Sync\ConcurrentIterator\each(
                 fromIterable($urls),
                 new LocalSemaphore($this->concurrency),
-                function($url) use ($setProgressHandler, &$count, $total, $config) {
+                function(string $url) use ($setProgressHandler, &$count, $total, $config) {
                     $count++;
                     $config['url'] = $url;
 
                     // Create a context that to send data between the parent and child processes
                     // https://amphp.org/parallel/processes#parent-process
-                    $context = create(__DIR__ . '/scripts/local-generator-context.php');
+                    $context = create(__DIR__ . '/local-generator-script.php');
                     yield $context->start();
                     yield $context->send($config);
                     $result = yield $context->receive();

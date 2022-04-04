@@ -9,7 +9,7 @@ use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
-use putyourlightson\blitz\drivers\generators\GuzzleGenerator;
+use putyourlightson\blitz\drivers\generators\HttpGenerator;
 use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
@@ -128,7 +128,7 @@ class SettingsModel extends Model
     /**
      * @var string The generator type to use.
      */
-    public string $cacheGeneratorType = GuzzleGenerator::class;
+    public string $cacheGeneratorType = HttpGenerator::class;
 
     /**
      * @var array The generator settings.
@@ -379,7 +379,7 @@ class SettingsModel extends Model
      *
      * @since 4.0.0
      */
-    public function shouldClearOnRefresh(): bool
+    public function clearOnRefresh(): bool
     {
         return $this->refreshMode == self::REFRESH_MODE_CLEAR
             || $this->refreshMode == self::REFRESH_MODE_CLEAR_AND_GENERATE;
@@ -390,7 +390,7 @@ class SettingsModel extends Model
      *
      * @since 4.0.0
      */
-    public function shouldGenerateOnRefresh(): bool
+    public function generateOnRefresh(): bool
     {
         if (!$this->cachingEnabled) {
             return false;
@@ -405,9 +405,9 @@ class SettingsModel extends Model
      *
      * @since 4.0.0
      */
-    public function shouldPurgeOnRefresh(): bool
+    public function purgeOnRefresh(): bool
     {
-        return $this->shouldClearOnRefresh() || $this->shouldGenerateOnRefresh();
+        return $this->clearOnRefresh() || $this->generateOnRefresh();
     }
 
     /**

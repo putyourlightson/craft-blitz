@@ -7,8 +7,14 @@ use Amp\Parallel\Sync\Channel;
 use craft\services\Plugins;
 use yii\base\Event;
 
-// Receives a channel that to send data between the parent and child processes
-// https://amphp.org/parallel/processes#child-process-or-thread
+/**
+ * This script bootstraps a web app and mocks a web request. It is called by the
+ * Local Generator, which runs in a parent process, receiving a channel that is
+ * used to send data between the parent and child processes.
+ * https://amphp.org/parallel/processes#child-process-or-thread
+ *
+ * @see putyourlightson\blitz\drivers\generators\LocalGenerator::generateUris()
+ */
 return function(Channel $channel): Generator {
     $config = yield $channel->receive();
 
@@ -42,18 +48,19 @@ return function(Channel $channel): Generator {
     // Load shared bootstrap
     require $root . '/bootstrap.php';
 
-    // // Force a web request before plugins are loaded (as early as possible)
+    // Force a web request before plugins are loaded (as early as possible)
     Event::on(Plugins::class, Plugins::EVENT_BEFORE_LOAD_PLUGINS,
         function() {
             Craft::$app->getRequest()->setIsConsoleRequest(false);
         }
     );
 
-    // Load the Craft web application
-    /** @var craft\web\Application $app */
+    /**
+     * Load and run the Craft web application, checking success based on exit code
+     * @see \yii\base\Response::$exitStatus
+     * @var craft\web\Application $app
+     */
     $app = require $root . '/vendor/craftcms/cms/bootstrap/web.php';
-
-    // Run Craft
     $success = $app->run() == 0;
 
     yield $channel->send($success);

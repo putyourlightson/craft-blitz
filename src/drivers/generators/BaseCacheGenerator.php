@@ -7,12 +7,10 @@ namespace putyourlightson\blitz\drivers\generators;
 
 use Craft;
 use craft\base\SavableComponent;
-use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\services\CacheRequestService;
 
 /**
  * @property-read array $siteOptions
@@ -28,11 +26,11 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      *
      * ```php
      * use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
-     * use putyourlightson\blitz\drivers\generators\GuzzleGenerator;
+     * use putyourlightson\blitz\drivers\generators\HttpGenerator;
      * use putyourlightson\blitz\events\RefreshCacheEvent;
      * use yii\base\Event;
      *
-     * Event::on(GuzzleGenerator::class, BaseCacheGenerator::EVENT_BEFORE_GENERATE_CACHE, function(RefreshCacheEvent $e) {
+     * Event::on(HttpGenerator::class, BaseCacheGenerator::EVENT_BEFORE_GENERATE_CACHE, function(RefreshCacheEvent $e) {
      *     foreach ($e->siteUris as $key => $siteUri) {
      *         if (strpos($siteUri->uri, 'leave-me-out-of-this') !== false) {
      *             // Removes a single site URI.
@@ -61,11 +59,11 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      *
      * ```php
      * use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
-     * use putyourlightson\blitz\drivers\generators\GuzzleGenerator;
+     * use putyourlightson\blitz\drivers\generators\HttpGenerator;
      * use putyourlightson\blitz\events\RefreshCacheEvent;
      * use yii\base\Event;
      *
-     * Event::on(GuzzleGenerator::class, BaseCacheGenerator::EVENT_BEFORE_GENERATE_ALL_CACHE, function(RefreshCacheEvent $e) {
+     * Event::on(HttpGenerator::class, BaseCacheGenerator::EVENT_BEFORE_GENERATE_ALL_CACHE, function(RefreshCacheEvent $e) {
      *     return false;
      * });
      * ```
@@ -76,6 +74,11 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      * @event RefreshCacheEvent The event that is triggered after the entire cache is generated.
      */
     public const EVENT_AFTER_GENERATE_ALL_CACHE = 'afterGenerateAllCache';
+
+    /**
+     * @const string
+     */
+    public const GENERATE_ACTION_ROUTE = 'blitz/generator/generate';
 
     /**
      * @inheritdoc
@@ -125,24 +128,23 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     {
         $urls = [];
         $nonCacheableSiteUris = [];
-        $token = Craft::$app->getTokens()->createToken(CacheRequestService::GENERATE_ROUTE);
+        $params = [
+            'token' => Craft::$app->getTokens()->createToken(self::GENERATE_ACTION_ROUTE),
+        ];
 
         foreach ($siteUris as $siteUri) {
-            // Convert to a SiteUriModel if it is an array
+            // Convert to a site URI model if it is an array
             if (is_array($siteUri)) {
                 $siteUri = new SiteUriModel($siteUri);
             }
 
-            // Only proceed if this is a cacheable site URI
-            if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-                $nonCacheableSiteUris[] = $siteUri;
-
-                continue;
+            // Only add if a cacheable site URI
+            if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+                $urls[] = $siteUri->getUrl($params);
             }
-
-            $urls[] = UrlHelper::url($siteUri->getUrl(), [
-                'token' => $token,
-            ]);
+            else {
+                $nonCacheableSiteUris[] = $siteUri;
+            }
         }
 
         // Delete and purge non-cacheable site URIs
@@ -151,12 +153,11 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
             Blitz::$plugin->cachePurger->purgeUris($nonCacheableSiteUris);
         }
 
-        // Return unique URLs only
-        return array_unique($urls);
+        return $urls;
     }
 
     /**
-     * Gets site options.
+     * Returns site options.
      */
     protected function getSiteOptions(): array
     {

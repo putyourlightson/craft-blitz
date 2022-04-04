@@ -487,17 +487,17 @@ class RefreshCacheService extends Component
             Blitz::$plugin->settings->customSiteUris
         );
 
-        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
+        if (Blitz::$plugin->settings->clearOnRefresh()) {
             Blitz::$plugin->clearCache->clearAll();
             Blitz::$plugin->flushCache->flushAll();
         }
 
-        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
+        if (Blitz::$plugin->settings->generateOnRefresh()) {
             Blitz::$plugin->cacheGenerator->generateUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldPurgeOnRefresh()) {
+        if (Blitz::$plugin->settings->purgeOnRefresh()) {
             Blitz::$plugin->cachePurger->purgeUris($siteUris);
         }
 
@@ -620,16 +620,16 @@ class RefreshCacheService extends Component
      */
     private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false)
     {
-        if (Blitz::$plugin->settings->shouldClearOnRefresh() || $forceClear) {
+        if (Blitz::$plugin->settings->clearOnRefresh() || $forceClear) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldGenerateOnRefresh() || $forceGenerate) {
+        if (Blitz::$plugin->settings->generateOnRefresh() || $forceGenerate) {
             Blitz::$plugin->cacheGenerator->generateUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldPurgeOnRefresh() || $forceGenerate) {
+        if (Blitz::$plugin->settings->purgeOnRefresh() || $forceGenerate) {
             Blitz::$plugin->cachePurger->purgeUris($siteUris);
         }
     }

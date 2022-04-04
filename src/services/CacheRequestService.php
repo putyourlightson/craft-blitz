@@ -12,6 +12,7 @@ use craft\events\CancelableEvent;
 use craft\web\Application;
 use craft\web\Request;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
@@ -40,11 +41,6 @@ class CacheRequestService extends Component
      * @const ResponseEvent
      */
     public const EVENT_AFTER_GET_RESPONSE = 'afterGetResponse';
-
-    /**
-     * @const string
-     */
-    public const GENERATE_ROUTE = 'blitz/generator/generate';
 
     /**
      * @const int
@@ -223,7 +219,8 @@ class CacheRequestService extends Component
         }
         else {
             $tokenRoute = Craft::$app->getTokens()->getTokenRoute($token);
-            $this->_isGeneratorRequest = in_array(self::GENERATE_ROUTE, $tokenRoute);
+            $this->_isGeneratorRequest = is_array($tokenRoute)
+                && in_array(BaseCacheGenerator::GENERATE_ACTION_ROUTE, $tokenRoute);
         }
 
         return $this->_isGeneratorRequest;

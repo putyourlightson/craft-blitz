@@ -66,7 +66,7 @@ return [
         //'cacheStorageTypes' => [],
 
         // The generator type to use.
-        //'cacheGeneratorType' => 'putyourlightson\blitz\drivers\generators\GuzzleGenerator',
+        //'cacheGeneratorType' => 'putyourlightson\blitz\drivers\generators\HttpGenerator',
 
         // The generator settings.
         //'cacheGeneratorSettings' => ['concurrency' => 3],

@@ -9,7 +9,7 @@ use Craft;
 use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\drivers\generators\GuzzleGenerator;
+use putyourlightson\blitz\drivers\generators\HttpGenerator;
 use putyourlightson\blitz\drivers\generators\LocalGenerator;
 use yii\base\Event;
 
@@ -28,7 +28,7 @@ class CacheGeneratorHelper extends BaseDriverHelper
     public static function getAllTypes(): array
     {
         $generatorTypes = [
-            GuzzleGenerator::class,
+            HttpGenerator::class,
             LocalGenerator::class,
         ];
 

@@ -9,7 +9,6 @@ use Craft;
 use craft\controllers\PreviewController;
 use craft\web\Application;
 use craft\web\Controller;
-use craft\web\UrlManager;
 use yii\base\Event;
 use yii\web\Response;
 
@@ -35,9 +34,9 @@ class GeneratorController extends Controller
     }
 
     /**
-     * Generates a response and outputs whether it was successful.
+     * Generates and returns a response with the output suppressed.
      */
-    public function actionGenerate()
+    public function actionGenerate(): Response
     {
         $response = $this->_getResponse();
 
@@ -50,8 +49,8 @@ class GeneratorController extends Controller
             }
         );
 
-        // No content will be sent, check the response code instead
-        $response->send();
+        // No content will be returned, the response code should be checked instead
+        return $response;
     }
 
     /**

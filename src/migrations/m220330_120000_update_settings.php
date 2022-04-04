@@ -4,7 +4,7 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
-use putyourlightson\blitz\drivers\generators\GuzzleGenerator;
+use putyourlightson\blitz\drivers\generators\HttpGenerator;
 use putyourlightson\blitz\drivers\generators\LocalGenerator;
 
 class m220330_120000_update_settings extends Migration
@@ -55,7 +55,7 @@ class m220330_120000_update_settings extends Migration
     private function _getGeneratorType(string $warmerType): string
     {
         return $warmerType == 'putyourlightson\\blitz\\drivers\\warmers\\LocalWarmer'
-            ? LocalGenerator::class : GuzzleGenerator::class;
+            ? LocalGenerator::class : HttpGenerator::class;
     }
 
     private function _getRefreshMode(bool $clear, bool $generate): int

@@ -185,17 +185,17 @@ class CacheController extends Controller
             Blitz::$plugin->settings->customSiteUris,
         );
 
-        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
+        if (Blitz::$plugin->settings->clearOnRefresh()) {
             $this->_clearCache();
             $this->_flushCache();
         }
 
-        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
+        if (Blitz::$plugin->settings->generateOnRefresh()) {
             $this->_generateCache($siteUris);
             $this->_deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldPurgeOnRefresh()) {
+        if (Blitz::$plugin->settings->purgeOnRefresh()) {
             $this->_purgeCache();
         }
 
@@ -222,17 +222,17 @@ class CacheController extends Controller
             }
         }
 
-        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
+        if (Blitz::$plugin->settings->clearOnRefresh()) {
             $this->_clearCache($siteUris);
             $this->_flushCache($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
+        if (Blitz::$plugin->settings->generateOnRefresh()) {
             $this->_generateCache($siteUris);
             $this->_deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldPurgeOnRefresh()) {
+        if (Blitz::$plugin->settings->purgeOnRefresh()) {
             $this->_purgeCache($siteUris);
         }
 
