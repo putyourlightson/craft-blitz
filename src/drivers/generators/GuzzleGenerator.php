@@ -53,11 +53,13 @@ class GuzzleGenerator extends BaseCacheGenerator
      */
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
-        $client = Craft::createGuzzleClient();
-        $requests = $this->_getRequestsToGenerate($siteUris);
+        $urls = $this->getUrlsToGenerate($siteUris);
 
         $count = 0;
-        $total = count($requests);
+        $total = count($urls);
+
+        $client = Craft::createGuzzleClient();
+        $requests = $this->_getRequestsToGenerate($urls);
 
         // Create a pool of requests for sending multiple concurrent requests
         $pool = new Pool($client, $requests, [
@@ -112,10 +114,8 @@ class GuzzleGenerator extends BaseCacheGenerator
      * Returns a generator object to return the URL requests in a memory efficient manner
      * https://medium.com/tech-tajawal/use-memory-gently-with-yield-in-php-7e62e2480b8d
      */
-    private function _getRequestsToGenerate(array $siteUris): Generator
+    private function _getRequestsToGenerate(array $urls): Generator
     {
-        $urls = $this->getUrlsToGenerate($siteUris);
-
         foreach ($urls as $url) {
             yield new Request('GET', $url);
         }
