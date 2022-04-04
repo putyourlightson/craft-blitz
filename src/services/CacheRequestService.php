@@ -141,45 +141,48 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
     {
+        $uri = strtolower($siteUri->uri);
+        $url = $siteUri->getUrl();
+
         // Ignore URIs that are CP pages
         $generalConfig = Craft::$app->getConfig()->getGeneral();
 
-        if ($generalConfig->cpTrigger && str_contains($siteUri->uri, $generalConfig->cpTrigger)) {
+        if ($generalConfig->cpTrigger && str_contains($uri, $generalConfig->cpTrigger)) {
             return false;
         }
 
         // Ignore URIs that are resources
         $resourceBaseUri = trim(parse_url(Craft::getAlias($generalConfig->resourceBaseUrl), PHP_URL_PATH), '/');
 
-        if ($resourceBaseUri && str_contains($siteUri->uri, $resourceBaseUri)) {
+        if ($resourceBaseUri && str_contains($uri, $resourceBaseUri)) {
             return false;
         }
 
-        // Ignore URIs that contain index.php
-        if (str_contains($siteUri->uri, 'index.php')) {
-            Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $siteUri->getUrl());
+        // Ignore URIs that contain `index.php`
+        if (str_contains($uri, 'index.php')) {
+            Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $url);
 
             return false;
         }
 
         // Ignore URIs that are longer than the max URI length
-        if (strlen($siteUri->uri) > self::MAX_URI_LENGTH) {
+        if (strlen($uri) > self::MAX_URI_LENGTH) {
             Blitz::$plugin->debug('Page not cached because it exceeds the max URI length of {max} characters.', [
                 'max' => self::MAX_URI_LENGTH,
-            ], $siteUri->getUrl());
+            ], $url);
 
             return false;
         }
 
         // Excluded URI patterns take priority
         if ($this->matchesUriPatterns($siteUri, Blitz::$plugin->settings->excludedUriPatterns)) {
-            Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.', [], $siteUri->getUrl());
+            Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.', [], $url);
 
             return false;
         }
 
         if (!$this->matchesUriPatterns($siteUri, Blitz::$plugin->settings->includedUriPatterns)) {
-            Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.', [], $siteUri->getUrl());
+            Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.', [], $url);
 
             return false;
         }
@@ -187,7 +190,14 @@ class CacheRequestService extends Component
         if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
             && !empty($this->getAllowedQueryString($siteUri->siteId))
         ) {
-            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $siteUri->getUrl());
+            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $url);
+
+            return false;
+        }
+
+        // Ignore URLs that don't start with `http`
+        if (!str_starts_with(strtolower($url), 'http')) {
+            Blitz::$plugin->debug('Page not cached because the URL does not start with `http`.', [], $url);
 
             return false;
         }

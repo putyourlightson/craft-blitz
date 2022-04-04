@@ -1,7 +1,7 @@
 # Release Notes for Blitz
 
 ## 4.0.0-beta.2 - Unreleased
-> {warning} Cache warmers have been completely replaced by cache generators. The included/excluded query string parameters config setting format has changed, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php).
+> {warning} Cache warmers have been completely replaced by cache generators. The included/excluded query string parameters config setting format has changed. See the new formats [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php).
 
 ### Added
 - Added compatibility with Craft 4.
@@ -18,7 +18,7 @@
 - Changed the included/excluded query string parameters config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php). 
 
 ### Removed
-- Removed the `Clear Cache Automatically` and `Warm Cache Automatically` settings (use the `Invalidation Mode` setting instead).
+- Removed the `Clear Cache Automatically` and `Warm Cache Automatically` settings (use the `Refresh Mode` setting instead).
 - Removed the `Warm Cache Delay` setting on cache purgers.
 - Removed the `warmCacheDelay` property from the `CachePurgerTrait` class.
 - Removed the `delay` property from the `DriverJob` class. 

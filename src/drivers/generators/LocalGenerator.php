@@ -8,11 +8,7 @@ namespace putyourlightson\blitz\drivers\generators;
 use Amp\Loop;
 use Amp\Sync\LocalSemaphore;
 use Craft;
-use craft\helpers\UrlHelper;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
-use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\services\CacheRequestService;
 
 use function Amp\Iterator\fromIterable;
 use function Amp\Parallel\Context\create;
@@ -23,11 +19,6 @@ class LocalGenerator extends BaseCacheGenerator
      * @var int
      */
     public int $concurrency = 3;
-
-    /**
-     * @see _getToken()
-     */
-    private string|bool|null $_token = null;
 
     /**
      * @inheritdoc
@@ -66,8 +57,10 @@ class LocalGenerator extends BaseCacheGenerator
         // Event loop for running parallel processes
         // https://amphp.org/parallel/processes
         Loop::run(function () use ($siteUris, $setProgressHandler) {
+            $urls = $this->getUrlsToGenerate($siteUris);
+
             $count = 0;
-            $total = count($siteUris);
+            $total = count($urls);
             $config = [
                 'basePath' => CRAFT_BASE_PATH,
                 'webroot' => Craft::getAlias('@webroot'),
@@ -77,16 +70,10 @@ class LocalGenerator extends BaseCacheGenerator
             // Approach 4: Concurrent Iterator
             // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
             \Amp\Sync\ConcurrentIterator\each(
-                fromIterable($siteUris),
+                fromIterable($urls),
                 new LocalSemaphore($this->concurrency),
-                function ($siteUri) use ($setProgressHandler, &$count, $total, $config) {
+                function ($url) use ($setProgressHandler, &$count, $total, $config) {
                     $count++;
-                    $url = $this->_getUrlToGenerate($siteUri);
-
-                    if ($url === null) {
-                        return;
-                    }
-
                     $config['url'] = $url;
 
                     // Create a context that to send data between the parent and child processes
@@ -110,33 +97,23 @@ class LocalGenerator extends BaseCacheGenerator
     }
 
     /**
-     * Returns a URL to generate, provided the site URI is cacheable.
+     * @inheritdoc
      */
-    private function _getUrlToGenerate(SiteUriModel|array $siteUri): ?string
+    public function getSettingsHtml(): ?string
     {
-        // Convert to a SiteUriModel if it is an array
-        if (is_array($siteUri)) {
-            $siteUri = new SiteUriModel($siteUri);
-        }
-
-        // Only proceed if this is a cacheable site URI
-        if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-            return null;
-        }
-
-        return UrlHelper::url($siteUri->getUrl(), [
-            'token' => $this->_getToken(),
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/generators/local/settings', [
+            'generator' => $this,
         ]);
     }
 
-    private function _getToken(): string|bool
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
     {
-        if ($this->_token !== null) {
-            return $this->_token;
-        }
-
-        $this->_token = Craft::$app->getTokens()->createToken(CacheRequestService::GENERATE_ROUTE);
-
-        return $this->_token;
+        return [
+            [['concurrency'], 'required'],
+            [['concurrency'], 'integer', 'min' => 1, 'max' => 100],
+        ];
     }
 }

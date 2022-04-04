@@ -5,8 +5,12 @@
 
 {% macro configFieldWarning(setting) -%}
     <div class="field">
-        <p class="warning">
-            {{ 'These settings are being overridden by the `{setting}` config setting.'|t('blitz', {setting: setting })|markdown(inlineOnly=true) }}
+        <p class="warning has-icon">
+            <span class="icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Warning: </span>
+            <span>
+                {{ 'These settings are being overridden by the `{setting}` config setting.'|t('blitz', {setting: setting })|markdown(inlineOnly=true) }}
+            </span>
         </p>
     </div>
 {%- endmacro %}

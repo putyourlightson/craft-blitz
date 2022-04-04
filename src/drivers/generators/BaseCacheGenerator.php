@@ -7,10 +7,12 @@ namespace putyourlightson\blitz\drivers\generators;
 
 use Craft;
 use craft\base\SavableComponent;
+use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\services\CacheRequestService;
 
 /**
  * @property-read array $siteOptions
@@ -114,6 +116,42 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         if ($this->hasEventHandlers(self::EVENT_AFTER_GENERATE_ALL_CACHE)) {
             $this->trigger(self::EVENT_AFTER_GENERATE_ALL_CACHE, $event);
         }
+    }
+
+    /**
+     * Returns URLs to generate, deleting and purging any that are not cacheable.
+     */
+    protected function getUrlsToGenerate(array $siteUris): array
+    {
+        $urls = [];
+        $nonCacheableSiteUris = [];
+        $token = Craft::$app->getTokens()->createToken(CacheRequestService::GENERATE_ROUTE);
+
+        foreach ($siteUris as $siteUri) {
+            // Convert to a SiteUriModel if it is an array
+            if (is_array($siteUri)) {
+                $siteUri = new SiteUriModel($siteUri);
+            }
+
+            // Only proceed if this is a cacheable site URI
+            if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+                $nonCacheableSiteUris[] = $siteUri;
+
+                continue;
+            }
+
+            $urls[] = UrlHelper::url($siteUri->getUrl(), [
+                'token' => $token,
+            ]);
+        }
+
+        // Delete and purge non-cacheable site URIs
+        if (!empty($nonCacheableSiteUris)) {
+            Blitz::$plugin->cacheStorage->deleteUris($nonCacheableSiteUris);
+            Blitz::$plugin->cachePurger->purgeUris($nonCacheableSiteUris);
+        }
+
+        return $urls;
     }
 
     /**

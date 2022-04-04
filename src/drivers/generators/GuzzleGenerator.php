@@ -6,16 +6,12 @@
 namespace putyourlightson\blitz\drivers\generators;
 
 use Craft;
-use craft\helpers\UrlHelper;
 use Generator;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
-use GuzzleHttp\Psr7\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
-use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\services\CacheRequestService;
 
 /**
  * @property-read null|string $settingsHtml
@@ -57,34 +53,29 @@ class GuzzleGenerator extends BaseCacheGenerator
      */
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
-        $urls = SiteUriHelper::getUrlsFromSiteUris($siteUris);
+        $client = Craft::createGuzzleClient();
+        $requests = $this->_getRequestsToGenerate($siteUris);
 
         $count = 0;
-        $total = count($urls);
-        $label = 'Generating {count} of {total} pages.';
-
-        $client = Craft::createGuzzleClient();
+        $total = count($requests);
 
         // Create a pool of requests for sending multiple concurrent requests
-        $pool = new Pool($client, $this->_getRequests($urls), [
+        $pool = new Pool($client, $requests, [
             'concurrency' => $this->concurrency,
-            'fulfilled' => function(Response $response) use (&$count, $total, $label, $setProgressHandler) {
+            'fulfilled' => function() use (&$count, $total, $setProgressHandler) {
                 $count++;
-
-                if ($response->getBody()->getContents() == 1) {
-                    $this->generated++;
-                }
+                $this->generated++;
 
                 if (is_callable($setProgressHandler)) {
-                    $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                    $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
                     call_user_func($setProgressHandler, $count, $total, $progressLabel);
                 }
             },
-            'rejected' => function(GuzzleException $reason) use (&$count, $total, $label, $setProgressHandler) {
+            'rejected' => function(GuzzleException $reason) use (&$count, $total, $setProgressHandler) {
                 $count++;
 
                 if (is_callable($setProgressHandler)) {
-                    $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                    $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
                     call_user_func($setProgressHandler, $count, $total, $progressLabel);
                 }
 
@@ -121,21 +112,11 @@ class GuzzleGenerator extends BaseCacheGenerator
      * Returns a generator object to return the URL requests in a memory efficient manner
      * https://medium.com/tech-tajawal/use-memory-gently-with-yield-in-php-7e62e2480b8d
      */
-    private function _getRequests(array $urls): Generator
+    private function _getRequestsToGenerate(array $siteUris): Generator
     {
-        $token = Craft::$app->getTokens()->createToken(CacheRequestService::GENERATE_ROUTE);
+        $urls = $this->getUrlsToGenerate($siteUris);
 
         foreach ($urls as $url) {
-            // Ensure URL is an absolute URL starting with http
-            if (stripos($url, 'http') !== 0) {
-                continue;
-            }
-
-            // Add the token to the URL to help break through reverse proxy CDN caches.
-            $url = UrlHelper::url($url, [
-                'token' => $token,
-            ]);
-
             yield new Request('GET', $url);
         }
     }
