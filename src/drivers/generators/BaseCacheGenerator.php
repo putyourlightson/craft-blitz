@@ -151,7 +151,8 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
             Blitz::$plugin->cachePurger->purgeUris($nonCacheableSiteUris);
         }
 
-        return $urls;
+        // Return unique URLs only
+        return array_unique($urls);
     }
 
     /**
