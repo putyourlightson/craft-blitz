@@ -49,9 +49,8 @@ class GeneratorController extends Controller
             }
         );
 
+        // No content will be sent, check the response code instead
         $response->send();
-
-        exit($response->getIsOk() ? '1' : '0');
     }
 
     /**

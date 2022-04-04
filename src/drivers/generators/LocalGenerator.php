@@ -5,31 +5,29 @@
 
 namespace putyourlightson\blitz\drivers\generators;
 
+use Amp\Loop;
+use Amp\Sync\LocalSemaphore;
 use Craft;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Process\Process;
+
+use function Amp\Iterator\fromIterable;
+use function Amp\Parallel\Context\create;
 
 class LocalGenerator extends BaseCacheGenerator
 {
     /**
-     * @see _getPhpPath()
+     * @var int
      */
-    private string|bool|null $_phpPath = null;
+    public int $concurrency = 3;
 
     /**
      * @see _getToken()
      */
     private string|bool|null $_token = null;
-
-    /**
-     * @see _getWebroot()
-     */
-    private string|bool|null $_webroot = null;
 
     /**
      * @inheritdoc
@@ -65,74 +63,70 @@ class LocalGenerator extends BaseCacheGenerator
      */
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
-        $count = 0;
-        $total = count($siteUris);
-        $label = 'Generating {count} of {total} pages.';
+        // Event loop for running parallel processes
+        // https://amphp.org/parallel/processes
+        Loop::run(function () use ($siteUris, $setProgressHandler) {
+            $count = 0;
+            $total = count($siteUris);
+            $config = [
+                'basePath' => CRAFT_BASE_PATH,
+                'webroot' => Craft::getAlias('@webroot'),
+                'pathParam' => Craft::$app->getConfig()->getGeneral()->pathParam,
+            ];
 
-        foreach ($siteUris as $siteUri) {
-            $count++;
+            // Approach 4: Concurrent Iterator
+            // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
+            \Amp\Sync\ConcurrentIterator\each(
+                fromIterable($siteUris),
+                new LocalSemaphore($this->concurrency),
+                function ($siteUri) use ($setProgressHandler, &$count, $total, $config) {
+                    $count++;
+                    $url = $this->_getUrlToGenerate($siteUri);
 
-            if (is_callable($setProgressHandler)) {
-                $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
-                call_user_func($setProgressHandler, $count, $total, $progressLabel);
-            }
+                    if ($url === null) {
+                        return;
+                    }
 
-            // Convert to a SiteUriModel if it is an array
-            if (is_array($siteUri)) {
-                $siteUri = new SiteUriModel($siteUri);
-            }
+                    $config['url'] = $url;
 
-            $success = $this->_generateUri($siteUri);
+                    // Create a context that to send data between the parent and child processes
+                    // https://amphp.org/parallel/processes#parent-process
+                    $context = create(__DIR__ . '/scripts/local-generator-context.php');
+                    yield $context->start();
+                    yield $context->send($config);
+                    $result = yield $context->receive();
 
-            if ($success) {
-                $this->generated++;
-            }
-        }
+                    if ($result == 1) {
+                        $this->generated++;
+                    }
+
+                    if (is_callable($setProgressHandler)) {
+                        $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
+                        call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                    }
+                }
+            );
+        });
     }
 
     /**
-     * Generates a site URI.
+     * Returns a URL to generate, provided the site URI is cacheable.
      */
-    private function _generateUri(SiteUriModel $siteUri): bool
+    private function _getUrlToGenerate(SiteUriModel|array $siteUri): ?string
     {
+        // Convert to a SiteUriModel if it is an array
+        if (is_array($siteUri)) {
+            $siteUri = new SiteUriModel($siteUri);
+        }
+
         // Only proceed if this is a cacheable site URI
         if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-            return false;
+            return null;
         }
 
-        $url = UrlHelper::url($siteUri->getUrl(), [
+        return UrlHelper::url($siteUri->getUrl(), [
             'token' => $this->_getToken(),
         ]);
-
-        $command = [
-            $this->_getPhpPath(),
-            CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/bootstrap/web.php',
-            '--url=' . $url,
-            '--webroot=' . $this->_getWebroot(),
-            '--basePath=' . CRAFT_BASE_PATH,
-        ];
-        $cwd = realpath(CRAFT_BASE_PATH);
-
-        $process = new Process($command, $cwd);
-        $process->run();
-
-        if (!$process->isSuccessful()) {
-            return false;
-        }
-
-        return $process->getOutput() == 1;
-    }
-
-    private function _getPhpPath(): string|bool
-    {
-        if ($this->_phpPath !== null) {
-            return $this->_phpPath;
-        }
-
-        $phpFinder = new PhpExecutableFinder();
-        $this->_phpPath = $phpFinder->find();
-
-        return $this->_phpPath;
     }
 
     private function _getToken(): string|bool
@@ -141,21 +135,8 @@ class LocalGenerator extends BaseCacheGenerator
             return $this->_token;
         }
 
-        $this->_token = Craft::$app->getTokens()->createToken([CacheRequestService::GENERATE_ROUTE, [
-            'output' => false,
-        ]]);
+        $this->_token = Craft::$app->getTokens()->createToken(CacheRequestService::GENERATE_ROUTE);
 
         return $this->_token;
-    }
-
-    private function _getWebroot(): string|bool
-    {
-        if ($this->_webroot !== null) {
-            return $this->_webroot;
-        }
-
-        $this->_webroot = Craft::getAlias('@webroot');
-
-        return $this->_webroot;
     }
 }
