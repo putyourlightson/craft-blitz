@@ -1,7 +1,7 @@
 includes:
     - %currentWorkingDirectory%/vendor/craftcms/phpstan/phpstan.neon
 parameters:
-    level: 3
+    level: 5
     paths:
         - src
     excludePaths:

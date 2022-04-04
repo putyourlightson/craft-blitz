@@ -13,8 +13,8 @@ return function(Channel $channel): Generator {
     $config = yield $channel->receive();
 
     $url = $config['url'];
+    $root = $config['root'];
     $webroot = $config['webroot'];
-    $basePath = $config['basePath'];
     $pathParam = $config['pathParam'];
 
     $queryString = parse_url($url, PHP_URL_QUERY);
@@ -40,7 +40,7 @@ return function(Channel $channel): Generator {
     ]);
 
     // Load shared bootstrap
-    require $basePath . '/bootstrap.php';
+    require $root . '/bootstrap.php';
 
     // // Force a web request before plugins are loaded (as early as possible)
     Event::on(Plugins::class, Plugins::EVENT_BEFORE_LOAD_PLUGINS,
@@ -51,7 +51,7 @@ return function(Channel $channel): Generator {
 
     // Load the Craft web application
     /** @var craft\web\Application $app */
-    $app = require CRAFT_VENDOR_PATH . '/craftcms/cms/bootstrap/web.php';
+    $app = require $root . '/vendor/craftcms/cms/bootstrap/web.php';
 
     // Run Craft
     $success = $app->run() == 0;

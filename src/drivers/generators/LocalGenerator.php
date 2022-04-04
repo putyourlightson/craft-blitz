@@ -65,7 +65,7 @@ class LocalGenerator extends BaseCacheGenerator
             $count = 0;
             $total = count($urls);
             $config = [
-                'basePath' => CRAFT_BASE_PATH,
+                'root' => Craft::getAlias('@root'),
                 'webroot' => Craft::getAlias('@webroot'),
                 'pathParam' => Craft::$app->getConfig()->getGeneral()->pathParam,
             ];

@@ -7,8 +7,9 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\controllers\PreviewController;
+use craft\web\Application;
 use craft\web\Controller;
-use JetBrains\PhpStorm\NoReturn;
+use craft\web\UrlManager;
 use yii\base\Event;
 use yii\web\Response;
 
@@ -36,7 +37,7 @@ class GeneratorController extends Controller
     /**
      * Generates a response and outputs whether it was successful.
      */
-    #[NoReturn] public function actionGenerate()
+    public function actionGenerate()
     {
         $response = $this->_getResponse();
 
@@ -64,11 +65,13 @@ class GeneratorController extends Controller
         $this->request->checkIfActionRequest(true, false);
 
         // Re-route the request, this time ignoring the token
-        $urlManager = Craft::$app->getUrlManager();
+        /** @var Application $app */
+        $app = Craft::$app;
+        $urlManager = $app->getUrlManager();
         $urlManager->checkToken = false;
         $urlManager->setRouteParams([], false);
         $urlManager->setMatchedElement(null);
 
-        return Craft::$app->handleRequest($this->request, true);
+        return $app->handleRequest($this->request, true);
     }
 }
