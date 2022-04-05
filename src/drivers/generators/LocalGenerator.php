@@ -110,7 +110,7 @@ class LocalGenerator extends BaseCacheGenerator
             }
         );
 
-        // Exceptions are thrown only when the promise is yielded.
+        // Exceptions are thrown only when the promise is resolved.
         try {
             wait($promise);
         }

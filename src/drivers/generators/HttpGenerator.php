@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\drivers\generators;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
-use Amp\Loop;
 use Amp\Sync\LocalSemaphore;
 use Craft;
 use Exception;
@@ -79,7 +78,7 @@ class HttpGenerator extends BaseCacheGenerator
         $promise = \Amp\Sync\ConcurrentIterator\each(
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
-            function (string $url) use ($setProgressHandler, &$count, $total, $client) {
+            function(string $url) use ($setProgressHandler, &$count, $total, $client) {
                 $count++;
 
                 /** @var Response $response */
@@ -99,7 +98,7 @@ class HttpGenerator extends BaseCacheGenerator
             }
         );
 
-        // Exceptions are thrown only when the promise is yielded.
+        // Exceptions are thrown only when the promise is resolved.
         try {
             wait($promise);
         }
