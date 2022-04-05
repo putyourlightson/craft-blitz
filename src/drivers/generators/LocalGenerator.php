@@ -5,13 +5,15 @@
 
 namespace putyourlightson\blitz\drivers\generators;
 
-use Amp\Loop;
 use Amp\Sync\LocalSemaphore;
 use Craft;
+use Exception;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 
 use function Amp\Iterator\fromIterable;
 use function Amp\Parallel\Context\create;
+use function Amp\Promise\wait;
 
 /**
  * This generator runs concurrent PHP child processes or threads to generate
@@ -24,7 +26,7 @@ use function Amp\Parallel\Context\create;
  * the `local-generator-script.php` file.
  *
  * The Amp PHP framework is used for running parallel processes and a concurrent
- * iterator is used to pool and run the processes concurrently.
+ * iterator is used to run the processes concurrently.
  * See https://amphp.org/parallel/processes
  * and https://amphp.org/sync/concurrent-iterator
  *
@@ -71,46 +73,51 @@ class LocalGenerator extends BaseCacheGenerator
      */
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
     {
-        $urls = $this->getUrlsToGenerate($siteUris, true);
+        $urls = $this->getUrlsToGenerate($siteUris);
 
-        // Event loop for running parallel processes
-        // https://amphp.org/parallel/processes
-        Loop::run(function() use ($urls, $setProgressHandler) {
-            $count = 0;
-            $total = count($urls);
-            $config = [
-                'root' => Craft::getAlias('@root'),
-                'webroot' => Craft::getAlias('@webroot'),
-                'pathParam' => Craft::$app->getConfig()->getGeneral()->pathParam,
-            ];
+        $count = 0;
+        $total = count($urls);
+        $config = [
+            'root' => Craft::getAlias('@root'),
+            'webroot' => Craft::getAlias('@webroot'),
+            'pathParam' => Craft::$app->getConfig()->getGeneral()->pathParam,
+        ];
 
-            // Approach 4: Concurrent Iterator
-            // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
-            \Amp\Sync\ConcurrentIterator\each(
-                fromIterable($urls),
-                new LocalSemaphore($this->concurrency),
-                function(string $url) use ($setProgressHandler, &$count, $total, $config) {
-                    $count++;
-                    $config['url'] = $url;
+        // Approach 4: Concurrent Iterator
+        // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
+        $promise = \Amp\Sync\ConcurrentIterator\each(
+            fromIterable($urls),
+            new LocalSemaphore($this->concurrency),
+            function(string $url) use ($setProgressHandler, &$count, $total, $config) {
+                $count++;
+                $config['url'] = $url;
 
-                    // Create a context that to send data between the parent and child processes
-                    // https://amphp.org/parallel/processes#parent-process
-                    $context = create(__DIR__ . '/local-generator-script.php');
-                    yield $context->start();
-                    yield $context->send($config);
-                    $result = yield $context->receive();
+                // Create a context that to send data between the parent and child processes
+                // https://amphp.org/parallel/processes#parent-process
+                $context = create(__DIR__ . '/local-generator-script.php');
+                yield $context->start();
+                yield $context->send($config);
+                $result = yield $context->receive();
 
-                    if ($result) {
-                        $this->generated++;
-                    }
-
-                    if (is_callable($setProgressHandler)) {
-                        $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
-                        call_user_func($setProgressHandler, $count, $total, $progressLabel);
-                    }
+                if ($result) {
+                    $this->generated++;
                 }
-            );
-        });
+
+                if (is_callable($setProgressHandler)) {
+                    $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
+                    call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                }
+            }
+        );
+
+        // Exceptions are thrown only when the promise is yielded.
+        try {
+            wait($promise);
+        }
+        // Catch all possible exceptions to avoid interrupting progress.
+        catch (Exception $exception) {
+            Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
+        }
     }
 
     /**

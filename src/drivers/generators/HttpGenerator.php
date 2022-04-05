@@ -16,15 +16,15 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 
 use function Amp\Iterator\fromIterable;
+use function Amp\Promise\wait;
 
 /**
  * This generator makes concurrent HTTP requests to generate each individual
- * site URI. It adds a token with a generate action route to requests only if
- * we don't clear on refresh, so that pages that are organically cached in the
- * meantime aren't unnecessarily regenerated.
+ * site URI, using a token with a generate action route to break through existing
+ * cache storage and reverse proxy caches.
  *
  * The Amp PHP framework is used for making HTTP requests and a concurrent
- * iterator is used to pool and send the requests concurrently.
+ * iterator is used to send the requests concurrently.
  * See https://amphp.org/http-client/concurrent
  * and https://amphp.org/sync/concurrent-iterator
  *
@@ -69,48 +69,44 @@ class HttpGenerator extends BaseCacheGenerator
     {
         $urls = $this->getUrlsToGenerate($siteUris);
 
-        // Event loop for running concurrent requests
-        // https://amphp.org/http-client/
-        Loop::run(function() use ($urls, $setProgressHandler) {
-            $count = 0;
-            $total = count($urls);
+        $count = 0;
+        $total = count($urls);
 
-            $client = HttpClientBuilder::buildDefault();
+        $client = HttpClientBuilder::buildDefault();
 
-            // Approach 4: Concurrent Iterator
-            // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
-            $promise = \Amp\Sync\ConcurrentIterator\each(
-                fromIterable($urls),
-                new LocalSemaphore($this->concurrency),
-                function (string $url) use ($setProgressHandler, &$count, $total, $client) {
-                    $count++;
+        // Approach 4: Concurrent Iterator
+        // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
+        $promise = \Amp\Sync\ConcurrentIterator\each(
+            fromIterable($urls),
+            new LocalSemaphore($this->concurrency),
+            function (string $url) use ($setProgressHandler, &$count, $total, $client) {
+                $count++;
 
-                    /** @var Response $response */
-                    $response = yield $client->request(new Request($url));
+                /** @var Response $response */
+                $response = yield $client->request(new Request($url));
 
-                    if ($response->getStatus() == 200) {
-                        $this->generated++;
-                    }
-                    else {
-                        Blitz::$plugin->debug('{status} error: {reason}', ['status' => $response->getStatus(), 'reason' => $response->getReason()], $url);
-                    }
-
-                    if (is_callable($setProgressHandler)) {
-                        $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
-                        call_user_func($setProgressHandler, $count, $total, $progressLabel);
-                    }
+                if ($response->getStatus() == 200) {
+                    $this->generated++;
                 }
-            );
+                else {
+                    Blitz::$plugin->debug('{status} error: {reason}', ['status' => $response->getStatus(), 'reason' => $response->getReason()], $url);
+                }
 
-            // Exceptions are thrown only when the promise is yielded. later.
-            try {
-                yield $promise;
+                if (is_callable($setProgressHandler)) {
+                    $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
+                    call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                }
             }
-            // Catch all possible exceptions to avoid interrupting progress.
-            catch (Exception $exception) {
-                Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
-            }
-        });
+        );
+
+        // Exceptions are thrown only when the promise is yielded.
+        try {
+            wait($promise);
+        }
+        // Catch all possible exceptions to avoid interrupting progress.
+        catch (Exception $exception) {
+            Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
+        }
     }
 
     /**
