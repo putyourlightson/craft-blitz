@@ -137,7 +137,12 @@ class CacheRequestTest extends Unit
         $allowedQueryString = 'sort=asc&search=waldo';
         $disallowedQueryString = 'spidy=123';
 
-        Blitz::$plugin->settings->excludedQueryStringParams = ['^(?!sort$|search$).*'];
+        Blitz::$plugin->settings->excludedQueryStringParams = [
+            [
+                'siteId' => '',
+                'queryStringParam' => '^(?!sort$|search$).*',
+            ],
+        ];
 
         // Mock a URL request
         $this->_mockRequest($this->siteUri->getUrl() . '?' . $disallowedQueryString . '&' . $allowedQueryString);
@@ -251,7 +256,7 @@ class CacheRequestTest extends Unit
         /**
          * Mock the web server request
          *
-         * @see \putyourlightson\blitz\drivers\generators\LocalGenerator::_generateUri()
+         * @see \craft\test\Craft::recreateClient()
          */
         $uri = trim(parse_url($url, PHP_URL_PATH), '/');
 
