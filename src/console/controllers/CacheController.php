@@ -175,7 +175,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes the cache.
+     * Refreshes the entire cache, respecting the “Refresh Mode”.
      */
     public function actionRefresh(): int
     {
@@ -188,6 +188,7 @@ class CacheController extends Controller
         if (Blitz::$plugin->settings->clearOnRefresh()) {
             $this->_clearCache();
             $this->_flushCache();
+            $this->_purgeCache();
         }
 
         if (Blitz::$plugin->settings->generateOnRefresh()) {
@@ -195,15 +196,15 @@ class CacheController extends Controller
             $this->_deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeOnRefresh()) {
-            $this->_purgeCache();
+        if (Blitz::$plugin->settings->purgeAfterGenerate()) {
+            $this->_purgeCache($siteUris);
         }
 
         return ExitCode::OK;
     }
 
     /**
-     * Refreshes the cache for a site.
+     * Refreshes the cache for a site, respecting the “Refresh Mode”.
      */
     public function actionRefreshSite(int $siteId = null): int
     {
@@ -225,6 +226,7 @@ class CacheController extends Controller
         if (Blitz::$plugin->settings->clearOnRefresh()) {
             $this->_clearCache($siteUris);
             $this->_flushCache($siteUris);
+            $this->_purgeCache($siteUris);
         }
 
         if (Blitz::$plugin->settings->generateOnRefresh()) {
@@ -232,7 +234,7 @@ class CacheController extends Controller
             $this->_deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeOnRefresh()) {
+        if (Blitz::$plugin->settings->purgeAfterGenerate()) {
             $this->_purgeCache($siteUris);
         }
 
@@ -246,7 +248,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes expired cache.
+     * Refreshes expired cache, clearing it if necessary.
      */
     public function actionRefreshExpired(): int
     {

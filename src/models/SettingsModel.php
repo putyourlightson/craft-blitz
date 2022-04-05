@@ -379,8 +379,12 @@ class SettingsModel extends Model
      *
      * @since 4.0.0
      */
-    public function clearOnRefresh(): bool
+    public function clearOnRefresh(bool $force = false): bool
     {
+        if ($force) {
+            return true;
+        }
+
         return $this->refreshMode == self::REFRESH_MODE_CLEAR
             || $this->refreshMode == self::REFRESH_MODE_CLEAR_AND_GENERATE;
     }
@@ -390,8 +394,12 @@ class SettingsModel extends Model
      *
      * @since 4.0.0
      */
-    public function generateOnRefresh(): bool
+    public function generateOnRefresh(bool $force = false): bool
     {
+        if ($force) {
+            return true;
+        }
+
         if (!$this->cachingEnabled) {
             return false;
         }
@@ -401,13 +409,13 @@ class SettingsModel extends Model
     }
 
     /**
-     * Returns whether the cache should be purged on refresh.
+     * Returns whether the cache should be purged after being generated.
      *
      * @since 4.0.0
      */
-    public function purgeOnRefresh(): bool
+    public function purgeAfterGenerate(bool $forceClear = false, bool $forceGenerate = false): bool
     {
-        return $this->clearOnRefresh() || $this->generateOnRefresh();
+        return !$this->clearOnRefresh($forceClear) && $this->generateOnRefresh($forceGenerate);
     }
 
     /**

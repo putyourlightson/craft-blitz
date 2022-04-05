@@ -71,7 +71,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             $this->cacheIds = array_merge($this->cacheIds, Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds']));
         }
 
-        $clearCache = Blitz::$plugin->settings->clearOnRefresh() || $this->forceClear;
+        $clearCache = Blitz::$plugin->settings->clearOnRefresh($this->forceClear);
 
         // If clear cache is enabled then clear the site URIs early
         if ($clearCache) {
