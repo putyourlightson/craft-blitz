@@ -77,36 +77,38 @@ class HttpGenerator extends BaseCacheGenerator
 
             $client = HttpClientBuilder::buildDefault();
 
-            try {
-                // Approach 4: Concurrent Iterator
-                // Yield the promise so we can later catch exceptions.
-                // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
-                yield \Amp\Sync\ConcurrentIterator\each(
-                    fromIterable($urls),
-                    new LocalSemaphore($this->concurrency),
-                    function (string $url) use ($setProgressHandler, &$count, $total, $client) {
-                        $count++;
+            // Approach 4: Concurrent Iterator
+            // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
+            $promise = \Amp\Sync\ConcurrentIterator\each(
+                fromIterable($urls),
+                new LocalSemaphore($this->concurrency),
+                function (string $url) use ($setProgressHandler, &$count, $total, $client) {
+                    $count++;
 
-                        /** @var Response $response */
-                        $response = yield $client->request(new Request($url));
+                    /** @var Response $response */
+                    $response = yield $client->request(new Request($url));
 
-                        if ($response->getStatus() == 200) {
-                            $this->generated++;
-                        }
-                        else {
-                            Blitz::$plugin->debug('{status} error: {reason}', ['status' => $response->getStatus(), 'reason' => $response->getReason()], $url);
-                        }
-
-                        if (is_callable($setProgressHandler)) {
-                            $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
-                            call_user_func($setProgressHandler, $count, $total, $progressLabel);
-                        }
+                    if ($response->getStatus() == 200) {
+                        $this->generated++;
                     }
-                );
+                    else {
+                        Blitz::$plugin->debug('{status} error: {reason}', ['status' => $response->getStatus(), 'reason' => $response->getReason()], $url);
+                    }
+
+                    if (is_callable($setProgressHandler)) {
+                        $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
+                        call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                    }
+                }
+            );
+
+            // Exceptions are thrown only when the promise is yielded. later.
+            try {
+                yield $promise;
             }
-            // Catch all possible exceptions, thrown only outside the yielded iterator
+            // Catch all possible exceptions to avoid interrupting progress.
             catch (Exception $exception) {
-                Blitz::$plugin->debug($exception->getMessage());
+                Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
             }
         });
     }

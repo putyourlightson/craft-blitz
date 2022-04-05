@@ -5,8 +5,10 @@
 
 namespace putyourlightson\blitz\drivers\generators;
 
+use Amp\MultiReasonException;
 use Craft;
 use craft\base\SavableComponent;
+use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
@@ -154,6 +156,24 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         }
 
         return $urls;
+    }
+
+    /**
+     * Returns all messages for an exception, for easier debugging.
+     */
+    protected function getAllExceptionMessages(Exception $exception): string
+    {
+        $messages = [
+            $exception->getMessage(),
+        ];
+
+        while ($exception = $exception->getPrevious()) {
+            if (!($exception instanceof MultiReasonException)) {
+                $messages[] = $exception->getMessage();
+            }
+        }
+
+        return implode('. ', $messages);
     }
 
     /**
