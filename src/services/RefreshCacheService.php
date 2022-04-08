@@ -466,11 +466,15 @@ class RefreshCacheService extends Component
         }
 
         $this->addCacheIds($cacheIds);
-        $this->refresh(false, true);
+
+        // Force clear the cache if it will not be regenerated.
+        $forceClear = !Blitz::$plugin->settings->generateOnRefresh();
+
+        $this->refresh($forceClear);
     }
 
     /**
-     * Refreshes the entire cache.
+     * Refreshes the entire cache, respecting the “Refresh Mode”.
      */
     public function refreshAll()
     {
@@ -570,12 +574,8 @@ class RefreshCacheService extends Component
             }
         }
 
-        // Ensure we force clear the cache provided it will not be regenerated.
-        $forceClear = false;
-
-        if (!Blitz::$plugin->settings->generateOnRefresh()) {
-            $forceClear = true;
-        }
+        // Force clear the cache if it will not be regenerated.
+        $forceClear = !Blitz::$plugin->settings->generateOnRefresh();
 
         $this->refresh($forceClear);
     }

@@ -141,7 +141,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes the entire cache.
+     * Refreshes the entire cache, respecting the “Refresh Mode”.
      */
     public function actionRefresh(): Response
     {
