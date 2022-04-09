@@ -63,7 +63,7 @@ class m220330_120000_update_settings extends Migration
         return $clear ? ($generate ? 3 : 1) : ($generate ? 2 : 0);
     }
 
-    private function _updateQueryStringParams(array &$queryStringParams)
+    private function _updateQueryStringParams(array &$queryStringParams): void
     {
         // Add keys to query string params
         foreach ($queryStringParams as $key => $queryStringParam) {

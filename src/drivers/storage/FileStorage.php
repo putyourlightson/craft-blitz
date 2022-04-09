@@ -90,7 +90,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function save(string $value, SiteUriModel $siteUri, int $duration = null)
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null): void
     {
         $filePaths = $this->getFilePaths($siteUri);
 
@@ -119,7 +119,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function deleteUris(array $siteUris)
+    public function deleteUris(array $siteUris): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_DELETE_URIS, $event);
@@ -151,7 +151,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function deleteAll()
+    public function deleteAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_DELETE_ALL, $event);

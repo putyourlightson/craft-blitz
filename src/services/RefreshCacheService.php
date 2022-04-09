@@ -111,7 +111,7 @@ class RefreshCacheService extends Component
     /**
      * Resets the component, so it can be used multiple times in the same request.
      */
-    public function reset()
+    public function reset(): void
     {
         $this->cacheIds = [];
         $this->elements = [];
@@ -170,7 +170,7 @@ class RefreshCacheService extends Component
     /**
      * Adds cache IDs to refresh.
      */
-    public function addCacheIds(array $cacheIds)
+    public function addCacheIds(array $cacheIds): void
     {
         $this->cacheIds = array_unique(array_merge($this->cacheIds, $cacheIds));
     }
@@ -178,7 +178,7 @@ class RefreshCacheService extends Component
     /**
      * Adds element IDs to refresh.
      */
-    public function addElementIds(string $elementType, array $elementIds)
+    public function addElementIds(string $elementType, array $elementIds): void
     {
         $this->elements[$elementType] = $this->elements[$elementType] ?? [
             'elementIds' => [],
@@ -191,7 +191,7 @@ class RefreshCacheService extends Component
     /**
      * Adds an element to refresh.
      */
-    public function addElement(ElementInterface $element)
+    public function addElement(ElementInterface $element): void
     {
         // Don't proceed if not an actual element
         if (!($element instanceof Element)) {
@@ -295,7 +295,7 @@ class RefreshCacheService extends Component
     /**
      * Adds expiry dates for a given element.
      */
-    public function addElementExpiryDates(Element $element)
+    public function addElementExpiryDates(Element $element): void
     {
         $expiryDate = null;
         $now = new DateTime();
@@ -315,7 +315,7 @@ class RefreshCacheService extends Component
     /**
      * Adds an expiry date for a given element.
      */
-    public function addElementExpiryDate(Element $element, DateTime $expiryDate)
+    public function addElementExpiryDate(Element $element, DateTime $expiryDate): void
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
@@ -345,7 +345,7 @@ class RefreshCacheService extends Component
      *
      * @param int[] $cacheIds
      */
-    public function expireCacheIds(array $cacheIds, DateTime $expiryDate = null)
+    public function expireCacheIds(array $cacheIds, DateTime $expiryDate = null): void
     {
         if (empty($cacheIds)) {
             return;
@@ -369,7 +369,7 @@ class RefreshCacheService extends Component
     /**
      * Generates element expiry dates.
      */
-    public function generateExpiryDates(string $elementType = null)
+    public function generateExpiryDates(string $elementType = null): void
     {
         if ($elementType === null) {
             $elementType = Entry::class;
@@ -396,7 +396,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes the cache.
      */
-    public function refresh(bool $forceClear = false, bool $forceGenerate = false)
+    public function refresh(bool $forceClear = false, bool $forceGenerate = false): void
     {
         if (empty($this->cacheIds) && empty($this->elements)) {
             return;
@@ -429,7 +429,7 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false)
+    public function refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
@@ -450,7 +450,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes a site URI if it has expired.
      */
-    public function refreshSiteUriIfExpired(SiteUriModel $siteUri)
+    public function refreshSiteUriIfExpired(SiteUriModel $siteUri): void
     {
         $now = Db::prepareDateForDb(new DateTime());
 
@@ -476,7 +476,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes the entire cache, respecting the “Refresh Mode”.
      */
-    public function refreshAll()
+    public function refreshAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_REFRESH_ALL_CACHE, $event);
@@ -514,7 +514,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes a site.
      */
-    public function refreshSite(int $siteId)
+    public function refreshSite(int $siteId): void
     {
         $event = new RefreshSiteCacheEvent(['siteId' => $siteId]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_SITE_CACHE, $event);
@@ -542,7 +542,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes expired cache.
      */
-    public function refreshExpiredCache()
+    public function refreshExpiredCache(): void
     {
         $this->batchMode = true;
         $now = Db::prepareDateForDb(new DateTime());
@@ -585,7 +585,7 @@ class RefreshCacheService extends Component
      *
      * @param string[] $urls
      */
-    public function refreshCachedUrls(array $urls)
+    public function refreshCachedUrls(array $urls): void
     {
         // Get site URIs from URLs
         $siteUris = SiteUriHelper::getSiteUrisFromUrls($urls);
@@ -598,7 +598,7 @@ class RefreshCacheService extends Component
      *
      * @param string[] $tags
      */
-    public function refreshCacheTags(array $tags)
+    public function refreshCacheTags(array $tags): void
     {
         $event = new RefreshCacheTagsEvent(['tags' => $tags]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE_TAGS, $event);
@@ -626,7 +626,7 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false)
+    private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false): void
     {
         if (Blitz::$plugin->settings->clearOnRefresh($forceClear)) {
             Blitz::$plugin->clearCache->clearUris($siteUris);

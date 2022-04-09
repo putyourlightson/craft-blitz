@@ -24,7 +24,7 @@ class FeedMeIntegration extends BaseIntegration
     /**
      * @inheritdoc
      */
-    public static function registerEvents()
+    public static function registerEvents(): void
     {
         Event::on(Process::class, Process::EVENT_BEFORE_PROCESS_FEED,
             function() {

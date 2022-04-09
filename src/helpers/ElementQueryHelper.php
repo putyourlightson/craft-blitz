@@ -95,7 +95,7 @@ class ElementQueryHelper
     /**
      * Returns a normalized element query ID parameter.
      */
-    public static function getNormalizedElementQueryIdParam(mixed $value)
+    public static function getNormalizedElementQueryIdParam(mixed $value): mixed
     {
         if ($value === null || is_int($value)) {
             return $value;
@@ -261,7 +261,7 @@ class ElementQueryHelper
     /**
      * Converts query parameter values to more concise formats recursively.
      */
-    private static function _convertQueryParamsRecursively(mixed &$value)
+    private static function _convertQueryParamsRecursively(mixed &$value): void
     {
         // Convert elements to their ID
         if ($value instanceof ElementInterface) {

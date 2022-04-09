@@ -135,7 +135,7 @@ class Install extends Migration
     /**
      * Creates the indexes needed for the Records used by the plugin.
      */
-    protected function createIndexes()
+    protected function createIndexes(): void
     {
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
         $this->createIndex(null, CacheRecord::tableName(), 'expiryDate');
@@ -151,7 +151,7 @@ class Install extends Migration
     /**
      * Creates the foreign keys needed for the Records used by the plugin.
      */
-    protected function addForeignKeys()
+    protected function addForeignKeys(): void
     {
         $this->addForeignKey(null, CacheRecord::tableName(), 'siteId', Site::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');

@@ -98,7 +98,7 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    public function deployUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
         $count = 0;
         $total = 0;
@@ -203,7 +203,7 @@ class GitDeployer extends BaseDeployer
     /**
      * @inheritDoc
      */
-    public function addError($attribute, $error = '')
+    public function addError($attribute, $error = ''): void
     {
         // Remove value of personal access token to avoid it being output
         $error = str_replace($this->getPersonalAccessToken(), $this->personalAccessToken, $error);
@@ -361,7 +361,7 @@ class GitDeployer extends BaseDeployer
     /**
      * Updates a file by saving the value or deleting the file if empty.
      */
-    private function _updateFile(string $value, string $filePath)
+    private function _updateFile(string $value, string $filePath): void
     {
         if (empty($value)) {
             if (file_exists($filePath)) {
@@ -382,7 +382,7 @@ class GitDeployer extends BaseDeployer
     /**
      * Deploys to the remote repository.
      */
-    private function _deploy(int $siteId)
+    private function _deploy(int $siteId): void
     {
         $event = new CancelableEvent();
         $this->trigger(self::EVENT_BEFORE_COMMIT, $event);
@@ -439,7 +439,7 @@ class GitDeployer extends BaseDeployer
      *
      * @param string[]|string $commands
      */
-    private function _runCommands(array|string $commands)
+    private function _runCommands(array|string $commands): void
     {
         if (empty($commands)) {
             return;

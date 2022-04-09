@@ -13,7 +13,7 @@ class BlitzAsset extends AssetBundle
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         $this->sourcePath = '@putyourlightson/blitz/resources';
 

@@ -38,7 +38,7 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     /**
      * @inheritdoc
      */
-    public function purgeSite(int $siteId)
+    public function purgeSite(int $siteId): void
     {
         $this->purgeUris(SiteUriHelper::getSiteUrisForSite($siteId));
     }
@@ -46,7 +46,7 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     /**
      * @inheritdoc
      */
-    public function purgeAll()
+    public function purgeAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_PURGE_ALL_CACHE, $event);
@@ -97,7 +97,7 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
      *
      * @param SiteUriModel[] $siteUris
      */
-    protected function afterPurgeCache(array $siteUris)
+    protected function afterPurgeCache(array $siteUris): void
     {
         if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_PURGE_CACHE, new RefreshCacheEvent([

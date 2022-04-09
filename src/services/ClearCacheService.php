@@ -38,7 +38,7 @@ class ClearCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function clearUris(array $siteUris)
+    public function clearUris(array $siteUris): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_CLEAR_CACHE, $event);
@@ -57,7 +57,7 @@ class ClearCacheService extends Component
     /**
      * Clears the cache for a given site.
      */
-    public function clearSite(int $siteId)
+    public function clearSite(int $siteId): void
     {
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId);
 
@@ -67,7 +67,7 @@ class ClearCacheService extends Component
     /**
      * Clears the entire cache.
      */
-    public function clearAll()
+    public function clearAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_CLEAR_ALL_CACHE, $event);

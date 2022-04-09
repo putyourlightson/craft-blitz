@@ -85,7 +85,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     /**
      * @inheritdoc
      */
-    public function generateSite(int $siteId, callable $setProgressHandler = null, bool $queue = true)
+    public function generateSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
     {
         // Get custom site URIs for the provided site only
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->customSiteUris);
@@ -102,7 +102,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     /**
      * @inheritdoc
      */
-    public function generateAll(callable $setProgressHandler = null, bool $queue = true)
+    public function generateAll(callable $setProgressHandler = null, bool $queue = true): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_GENERATE_ALL_CACHE, $event);
@@ -213,7 +213,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      *
      * @param SiteUriModel[] $siteUris
      */
-    protected function afterGenerateCache(array $siteUris)
+    protected function afterGenerateCache(array $siteUris): void
     {
         if ($this->hasEventHandlers(self::EVENT_AFTER_GENERATE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_GENERATE_CACHE, new RefreshCacheEvent([

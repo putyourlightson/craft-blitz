@@ -42,7 +42,7 @@ class FlushCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function flushUris(array $siteUris)
+    public function flushUris(array $siteUris): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_FLUSH_CACHE, $event);
@@ -77,7 +77,7 @@ class FlushCacheService extends Component
     /**
      * Flushes the cache for a given site.
      */
-    public function flushSite(int $siteId)
+    public function flushSite(int $siteId): void
     {
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId);
         $this->flushUris($siteUris);
@@ -86,7 +86,7 @@ class FlushCacheService extends Component
     /**
      * Flushes the entire cache.
      */
-    public function flushAll()
+    public function flushAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_FLUSH_ALL_CACHE, $event);
@@ -116,7 +116,7 @@ class FlushCacheService extends Component
     /**
      * Runs garbage collection.
      */
-    public function runGarbageCollection()
+    public function runGarbageCollection(): void
     {
         // Get and delete element query records without an associated element query cache
         $elementQueryRecordIds = ElementQueryRecord::find()
@@ -140,7 +140,7 @@ class FlushCacheService extends Component
     /**
      * Resets auto increment values of the given table.
      */
-    private function _resetAutoIncrement(string $table)
+    private function _resetAutoIncrement(string $table): void
     {
         $db = Craft::$app->getDb();
         $dbDriver = $db->getDriverName();

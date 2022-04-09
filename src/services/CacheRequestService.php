@@ -317,7 +317,7 @@ class CacheRequestService extends Component
      *
      * @since 3.12.0
      */
-    public function saveAndPrepareResponse(Response $response, SiteUriModel $siteUri)
+    public function saveAndPrepareResponse(Response $response, SiteUriModel $siteUri): void
     {
         if (!$response->getIsOk()) {
             return;
@@ -439,7 +439,7 @@ class CacheRequestService extends Component
      * @see Application::handleRequest()
      * @since 3.12.0
      */
-    private function _addCraftHeaders(Response $response)
+    private function _addCraftHeaders(Response $response): void
     {
         $headers = $response->getHeaders();
         $generalConfig = Craft::$app->getConfig()->getGeneral();
@@ -469,7 +469,7 @@ class CacheRequestService extends Component
      *
      * @since 3.12.0
      */
-    private function _prepareResponse(Response $response, string $content, SiteUriModel $siteUri)
+    private function _prepareResponse(Response $response, string $content, SiteUriModel $siteUri): void
     {
         $response->content = $content;
 

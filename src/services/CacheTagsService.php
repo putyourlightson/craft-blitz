@@ -67,7 +67,7 @@ class CacheTagsService extends Component
      *
      * @param string[] $tags
      */
-    public function saveTags(array $tags, int $cacheId)
+    public function saveTags(array $tags, int $cacheId): void
     {
         $values = [];
 

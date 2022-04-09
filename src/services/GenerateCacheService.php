@@ -81,7 +81,7 @@ class GenerateCacheService extends Component
     /**
      * Resets the component, so it can be used multiple times in the same request.
      */
-    public function reset()
+    public function reset(): void
     {
         $this->elementCaches = [];
         $this->elementQueryCaches = [];
@@ -94,7 +94,7 @@ class GenerateCacheService extends Component
     /**
      * Registers element prepare events.
      */
-    public function registerElementPrepareEvents()
+    public function registerElementPrepareEvents(): void
     {
         // Register element populate event
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
@@ -120,7 +120,7 @@ class GenerateCacheService extends Component
     /**
      * Adds an element to be cached.
      */
-    public function addElement(ElementInterface $element)
+    public function addElement(ElementInterface $element): void
     {
         // Don't proceed if element caching is disabled
         if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
@@ -140,7 +140,7 @@ class GenerateCacheService extends Component
     /**
      * Adds an element query to be cached.
      */
-    public function addElementQuery(ElementQuery $elementQuery)
+    public function addElementQuery(ElementQuery $elementQuery): void
     {
         // Don't proceed if element query caching is disabled
         if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
@@ -183,7 +183,7 @@ class GenerateCacheService extends Component
     /**
      * Saves an element query.
      */
-    public function saveElementQuery(ElementQuery $elementQuery)
+    public function saveElementQuery(ElementQuery $elementQuery): void
     {
         $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
 
@@ -239,7 +239,7 @@ class GenerateCacheService extends Component
     /**
      * Saves an element query's sources.
      */
-    public function saveElementQuerySources(ElementQuery $elementQuery, string $queryId)
+    public function saveElementQuerySources(ElementQuery $elementQuery, string $queryId): void
     {
         $db = Craft::$app->getDb();
 
@@ -364,7 +364,7 @@ class GenerateCacheService extends Component
     /**
      * Saves the output for a site URI.
      */
-    public function saveOutput(string $output, SiteUriModel $siteUri, int $duration = null)
+    public function saveOutput(string $output, SiteUriModel $siteUri, int $duration = null): void
     {
         $event = new SaveCacheEvent([
             'output' => $output,
@@ -391,7 +391,7 @@ class GenerateCacheService extends Component
     /**
      * Batch inserts cache values to database.
      */
-    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName)
+    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName): void
     {
         // Get values by selecting only records with existing IDs
         $values = ActiveRecord::find()

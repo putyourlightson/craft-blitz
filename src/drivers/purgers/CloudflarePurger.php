@@ -80,7 +80,7 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function purgeUris(array $siteUris)
+    public function purgeUris(array $siteUris): void
     {
         $siteUris = $this->beforePurgeCache($siteUris);
 
@@ -98,7 +98,7 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function purgeSite(int $siteId)
+    public function purgeSite(int $siteId): void
     {
         $this->_sendRequest('delete', 'purge_cache', $siteId, [
             'purge_everything' => true,

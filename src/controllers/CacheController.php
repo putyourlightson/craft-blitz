@@ -62,7 +62,7 @@ class CacheController extends Controller
     /**
      * @inheritdoc
      */
-    public function afterAction($action, $result)
+    public function afterAction($action, $result): mixed
     {
         // If front-end request, run the queue to ensure action is completed in full
         if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE) {

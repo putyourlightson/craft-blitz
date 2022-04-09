@@ -53,7 +53,7 @@ class BaseDriverHelper
      *
      * @param SiteUriModel[] $siteUris
      */
-    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $priority = null)
+    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $priority = null): void
     {
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
 

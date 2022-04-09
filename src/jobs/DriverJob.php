@@ -73,7 +73,7 @@ class DriverJob extends BaseJob implements RetryableJobInterface
     /**
      * Handles setting the progress.
      */
-    public function setProgressHandler(int $count, int $total, string $label = null)
+    public function setProgressHandler(int $count, int $total, string $label = null): void
     {
         $progress = $total > 0 ? ($count / $total) : 0;
 

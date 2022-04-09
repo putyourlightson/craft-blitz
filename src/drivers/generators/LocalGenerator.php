@@ -50,7 +50,7 @@ class LocalGenerator extends BaseCacheGenerator
     /**
      * @inheritdoc
      */
-    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true)
+    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
     {
         $siteUris = $this->beforeGenerateCache($siteUris);
 
@@ -71,7 +71,7 @@ class LocalGenerator extends BaseCacheGenerator
     /**
      * Generates site URIs with progress.
      */
-    public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null)
+    public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
         $urls = $this->getUrlsToGenerate($siteUris);
 

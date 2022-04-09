@@ -28,7 +28,7 @@ class SeomaticIntegration extends BaseIntegration
     /**
      * @inheritdoc
      */
-    public static function registerEvents()
+    public static function registerEvents(): void
     {
         // Set up invalidate container caches event listeners
         Event::on(MetaContainers::class, MetaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,

@@ -25,21 +25,21 @@ class DummyPurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function purgeUris(array $siteUris)
+    public function purgeUris(array $siteUris): void
     {
     }
 
     /**
      * @inheritdoc
      */
-    public function purgeSite(int $siteId)
+    public function purgeSite(int $siteId): void
     {
     }
 
     /**
      * @inheritdoc
      */
-    public function purgeAll()
+    public function purgeAll(): void
     {
     }
 }

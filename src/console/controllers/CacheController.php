@@ -30,7 +30,7 @@ class CacheController extends Controller
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -322,12 +322,12 @@ class CacheController extends Controller
     /**
      * Handles setting the progress.
      */
-    public function setProgressHandler(int $count, int $total)
+    public function setProgressHandler(int $count, int $total): void
     {
         Console::updateProgress($count, $total);
     }
 
-    private function _clearCache(array $siteUris = null)
+    private function _clearCache(array $siteUris = null): void
     {
         if ($siteUris !== null) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
@@ -339,7 +339,7 @@ class CacheController extends Controller
         $this->_output('Blitz cache successfully cleared.');
     }
 
-    private function _flushCache(array $siteUris = null)
+    private function _flushCache(array $siteUris = null): void
     {
         if ($siteUris !== null) {
             Blitz::$plugin->flushCache->flushUris($siteUris);
@@ -351,7 +351,7 @@ class CacheController extends Controller
         $this->_output('Blitz cache successfully flushed.');
     }
 
-    private function _purgeCache(array $siteUris = null)
+    private function _purgeCache(array $siteUris = null): void
     {
         if (Blitz::$plugin->cachePurger->isDummy) {
             $this->stderr(Craft::t('blitz', 'Cache purging is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
@@ -372,7 +372,7 @@ class CacheController extends Controller
     /**
      * @param SiteUriModel[] $siteUris
      */
-    private function _generateCache(array $siteUris)
+    private function _generateCache(array $siteUris): void
     {
         $this->stdout(Craft::t('blitz', 'Generating Blitz cache...') . PHP_EOL, BaseConsole::FG_YELLOW);
 
@@ -403,7 +403,7 @@ class CacheController extends Controller
     /**
      * @param SiteUriModel[] $siteUris
      */
-    private function _deploy(array $siteUris)
+    private function _deploy(array $siteUris): void
     {
         if (Blitz::$plugin->deployer->isDummy) {
             $this->stderr(Craft::t('blitz', 'Deploying is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
@@ -427,7 +427,7 @@ class CacheController extends Controller
     /**
      * Logs and outputs a message to the console.
      */
-    private function _output(string $message)
+    private function _output(string $message): void
     {
         Blitz::$plugin->log($message);
 

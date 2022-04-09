@@ -58,7 +58,7 @@ class CacheGeneratorHelper extends BaseDriverHelper
     /**
      * Adds a generator job to the queue.
      */
-    public static function addGeneratorJob(array $siteUris, string $driverMethod, int $priority = null)
+    public static function addGeneratorJob(array $siteUris, string $driverMethod, int $priority = null): void
     {
         $description = Craft::t('blitz', 'Generating Blitz cache');
 

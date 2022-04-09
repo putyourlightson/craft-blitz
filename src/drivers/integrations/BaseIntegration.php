@@ -18,7 +18,7 @@ abstract class BaseIntegration implements IntegrationInterface
     /**
      * @inheritdoc
      */
-    public static function registerEvents()
+    public static function registerEvents(): void
     {
     }
 }

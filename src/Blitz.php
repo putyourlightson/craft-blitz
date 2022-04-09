@@ -84,7 +84,7 @@ class Blitz extends Plugin
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -116,7 +116,7 @@ class Blitz extends Plugin
     /**
      * Logs an action
      */
-    public function log(string $message, array $params = [], string $type = 'info')
+    public function log(string $message, array $params = [], string $type = 'info'): void
     {
         $message = Craft::t('blitz', $message, $params);
 
@@ -126,7 +126,7 @@ class Blitz extends Plugin
     /**
      * Logs a debug message if debug mode is enabled
      */
-    public function debug(string $message, array $params = [], string $url = '')
+    public function debug(string $message, array $params = [], string $url = ''): void
     {
         if (!$this->settings->debug || empty($message)) {
             return;
@@ -155,7 +155,7 @@ class Blitz extends Plugin
     /**
      * Registers the components
      */
-    private function _registerComponents()
+    private function _registerComponents(): void
     {
         $this->setComponents([
             'cacheRequest' => CacheRequestService::class,
@@ -186,7 +186,7 @@ class Blitz extends Plugin
     /**
      * Registers variables
      */
-    private function _registerVariables()
+    private function _registerVariables(): void
     {
         Event::on(CraftVariable::class, CraftVariable::EVENT_INIT,
             function(Event $event) {
@@ -200,7 +200,7 @@ class Blitz extends Plugin
     /**
      * Registers cacheable request events
      */
-    private function _registerCacheableRequestEvents()
+    private function _registerCacheableRequestEvents(): void
     {
         // Register application init event
         Event::on(Application::class, Application::EVENT_INIT,
@@ -241,7 +241,7 @@ class Blitz extends Plugin
     /**
      * Registers element events
      */
-    private function _registerElementEvents()
+    private function _registerElementEvents(): void
     {
         // Add cache IDs before hard deleting elements, so we can refresh them
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
@@ -293,7 +293,7 @@ class Blitz extends Plugin
     /**
      * Registers resave elements events
      */
-    private function _registerResaveElementEvents()
+    private function _registerResaveElementEvents(): void
     {
         // Enable batch mode
         $events = [
@@ -329,7 +329,7 @@ class Blitz extends Plugin
     /**
      * Registers integration events
      */
-    private function _registerIntegrationEvents()
+    private function _registerIntegrationEvents(): void
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
             function() {
@@ -343,7 +343,7 @@ class Blitz extends Plugin
     /**
      * Registers clear caches
      */
-    private function _registerClearCaches()
+    private function _registerClearCaches(): void
     {
         Event::on(ClearCaches::class, ClearCaches::EVENT_REGISTER_CACHE_OPTIONS,
             function(RegisterCacheOptionsEvent $event) {
@@ -359,7 +359,7 @@ class Blitz extends Plugin
     /**
      * Registers CP URL rules event
      */
-    private function _registerCpUrlRules()
+    private function _registerCpUrlRules(): void
     {
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
@@ -376,7 +376,7 @@ class Blitz extends Plugin
     /**
      * Registers utilities
      */
-    private function _registerUtilities()
+    private function _registerUtilities(): void
     {
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function(RegisterComponentTypesEvent $event) {
@@ -388,7 +388,7 @@ class Blitz extends Plugin
     /**
      * Registers redirect after install
      */
-    private function _registerRedirectAfterInstall()
+    private function _registerRedirectAfterInstall(): void
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_INSTALL_PLUGIN,
             function(PluginEvent $event) {
@@ -407,7 +407,7 @@ class Blitz extends Plugin
     /**
      * Registers user permissions
      */
-    private function _registerUserPermissions()
+    private function _registerUserPermissions(): void
     {
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {

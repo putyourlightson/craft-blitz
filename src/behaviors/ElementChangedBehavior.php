@@ -40,7 +40,7 @@ class ElementChangedBehavior extends Behavior
     /**
      * @inerhitdoc
      */
-    public function attach($owner)
+    public function attach($owner): void
     {
         parent::attach($owner);
 
