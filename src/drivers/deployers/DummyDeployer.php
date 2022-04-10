@@ -34,7 +34,7 @@ class DummyDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deployUris(array $siteUris, callable $setProgressHandler = null) { }
+    public function deployUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true) { }
 
     /**
      * @inheritdoc
