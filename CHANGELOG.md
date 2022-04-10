@@ -9,6 +9,7 @@
 
 ### Fixed
 - Fixed deployers not being added as queue jobs when running via a console command ([#384](https://github.com/putyourlightson/craft-blitz/issues/384)).
+- Fixed GitWrapper v3 exception handling. 
 
 ## 3.11.2 - 2022-03-03
 ### Fixed

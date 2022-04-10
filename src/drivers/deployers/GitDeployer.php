@@ -11,7 +11,7 @@ use craft\db\Table;
 use craft\events\CancelableEvent;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
-use GitWrapper\GitException;
+use Exception;
 use GitWrapper\GitWorkingCopy;
 use GitWrapper\GitWrapper;
 use putyourlightson\blitz\Blitz;
@@ -222,7 +222,7 @@ class GitDeployer extends BaseDeployer
 
                 $git->fetch();
             }
-            catch (GitException $e) {
+            catch (Exception $e) {
                 $this->addError('gitRepositories',
                     Craft::t('blitz',
                         'Error connecting to repository: {error}',
@@ -464,7 +464,7 @@ class GitDeployer extends BaseDeployer
 
             $git->push();
         }
-        catch (GitException $e) {
+        catch (Exception $e) {
             Blitz::$plugin->log('Remote deploy failed: {error}', [
                 'error' => $e->getMessage(),
             ], 'error');
