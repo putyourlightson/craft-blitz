@@ -7,13 +7,13 @@
 - Added compatibility with Craft 4.
 - Added a new `Refresh Mode` setting that allows for controlling how cache refreshing should be handled.
 - Added the ability to revalidate cached pages that have expired when serving cached responses ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
-- Added the concept of cache generation, that completely replaces cache warming.
-- Added the included/excluded query string parameter settings to the "Advanced Settings" tab in the control panel, and added the ability for them to be site-specific.
+- Added the concept of cache generation, that supersedes cache warming, and is used both for generating, regenerating and in some cases removing cached pages.
+- Added the included/excluded query string parameter settings to the "Advanced Settings" tab in the control panel, as well as the ability for them to be site-specific.
 
 ### Changed
 - Replaced all `Warmer` drivers and classes with `Generator` drivers and classes.
 - Replaced the `Guzzle Warmer` with the `HTTP Generator`.
-- Replaced the `Local Warmer` with the `Local Generator`.
+- Replaced the `Local Warmer` (experimental) with the `Local Generator` (stable).
 - Cache purging now takes place after cache generation.
 - Changed the included/excluded query string parameters config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php). 
 
