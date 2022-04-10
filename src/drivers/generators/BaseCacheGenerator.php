@@ -189,36 +189,4 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
 
         return $siteOptions;
     }
-
-    /**
-     * Triggers the `beforeGenerateCache` event.
-     *
-     * @param SiteUriModel[] $siteUris
-     * @return SiteUriModel[]
-     */
-    protected function beforeGenerateCache(array $siteUris): array
-    {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-        $this->trigger(self::EVENT_BEFORE_GENERATE_CACHE, $event);
-
-        if (!$event->isValid) {
-            return [];
-        }
-
-        return $event->siteUris;
-    }
-
-    /**
-     * Triggers the `afterGenerateCache` event.
-     *
-     * @param SiteUriModel[] $siteUris
-     */
-    protected function afterGenerateCache(array $siteUris): void
-    {
-        if ($this->hasEventHandlers(self::EVENT_AFTER_GENERATE_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_GENERATE_CACHE, new RefreshCacheEvent([
-                'siteUris' => $siteUris,
-            ]));
-        }
-    }
 }

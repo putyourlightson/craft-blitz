@@ -73,36 +73,4 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     {
         return true;
     }
-
-    /**
-     * Triggers the `beforePurgeCache` event.
-     *
-     * @param SiteUriModel[] $siteUris
-     * @return SiteUriModel[]
-     */
-    protected function beforePurgeCache(array $siteUris): array
-    {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-        $this->trigger(self::EVENT_BEFORE_PURGE_CACHE, $event);
-
-        if (!$event->isValid) {
-            return [];
-        }
-
-        return $event->siteUris;
-    }
-
-    /**
-     * Triggers the `afterPurgeCache` event.
-     *
-     * @param SiteUriModel[] $siteUris
-     */
-    protected function afterPurgeCache(array $siteUris): void
-    {
-        if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_PURGE_CACHE, new RefreshCacheEvent([
-                'siteUris' => $siteUris,
-            ]));
-        }
-    }
 }
