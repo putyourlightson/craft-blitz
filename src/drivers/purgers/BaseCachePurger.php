@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\drivers\purgers;
 use Craft;
 use craft\base\SavableComponent;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 
@@ -38,15 +39,39 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     /**
      * @inheritdoc
      */
-    public function purgeSite(int $siteId): void
+    public function purgeUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
     {
-        $this->purgeUris(SiteUriHelper::getSiteUrisForSite($siteId));
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_PURGE_CACHE, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        if ($queue) {
+            CachePurgerHelper::addDriverJob($siteUris, 'deployUrisWithProgress');
+        }
+        else {
+            $this->purgeUrisWithProgress($siteUris, $setProgressHandler);
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_PURGE_CACHE, $event);
+        }
     }
 
     /**
      * @inheritdoc
      */
-    public function purgeAll(): void
+    public function purgeSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
+    {
+        $this->purgeUris(SiteUriHelper::getSiteUrisForSite($siteId), $setProgressHandler, $queue);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function purgeAll(callable $setProgressHandler = null, bool $queue = true): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_PURGE_ALL_CACHE, $event);
@@ -58,12 +83,19 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
         $sites = Craft::$app->getSites()->getAllSites();
 
         foreach ($sites as $site) {
-            $this->purgeSite($site->id);
+            $this->purgeSite($site->id, $setProgressHandler, $queue);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_ALL_CACHE)) {
             $this->trigger(self::EVENT_AFTER_PURGE_ALL_CACHE, $event);
         }
+    }
+
+    /**
+     * Purge site URIs with progress.
+     */
+    public function purgeUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
+    {
     }
 
     /**

@@ -25,21 +25,21 @@ class DummyPurger extends BaseCachePurger
     /**
      * @inheritdoc
      */
-    public function purgeUris(array $siteUris): void
+    public function purgeUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
     {
     }
 
     /**
      * @inheritdoc
      */
-    public function purgeSite(int $siteId): void
+    public function purgeSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
     {
     }
 
     /**
      * @inheritdoc
      */
-    public function purgeAll(): void
+    public function purgeAll(callable $setProgressHandler = null, bool $queue = true): void
     {
     }
 }

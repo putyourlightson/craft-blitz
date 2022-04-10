@@ -359,14 +359,27 @@ class CacheController extends Controller
             return;
         }
 
-        if ($siteUris !== null) {
-            Blitz::$plugin->cachePurger->purgeUris($siteUris);
-        }
-        else {
-            Blitz::$plugin->cachePurger->purgeAll();
+        if ($this->queue) {
+            Blitz::$plugin->cachePurger->purgeUris($siteUris, [$this, 'setProgressHandler']);
+            $this->_output('Blitz cache queued for purging.');
+
+            return;
         }
 
-        $this->_output('Blitz cache successfully purged.');
+        $this->stdout(Craft::t('blitz', 'Purging pages...') . PHP_EOL, BaseConsole::FG_YELLOW);
+
+        Console::startProgress(0, count($siteUris), '', 0.8);
+
+        if ($siteUris !== null) {
+            Blitz::$plugin->cachePurger->purgeUris($siteUris, [$this, 'setProgressHandler'], false);
+        }
+        else {
+            Blitz::$plugin->cachePurger->purgeAll([$this, 'setProgressHandler'], false);
+        }
+
+        Console::endProgress();
+
+        $this->_output('Purging complete.');
     }
 
     /**
