@@ -31,6 +31,9 @@
 ### Changed
 - Cached page responses now include the headers that Craft normally adds ([#385](https://github.com/putyourlightson/craft-blitz/issues/385)).
 
+### Fixed
+- Fixed deployers not being added as queue jobs when running via a console command ([#384](https://github.com/putyourlightson/craft-blitz/issues/384)).
+
 ## 3.11.2 - 2022-03-03
 ### Fixed
 - Fixed URL encoding of query strings which could prevent server rewrites from finding cached URIs ([#365](https://github.com/putyourlightson/craft-blitz/issues/365)). 

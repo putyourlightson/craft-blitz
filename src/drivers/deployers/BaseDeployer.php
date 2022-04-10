@@ -38,7 +38,7 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
     /**
      * @inheritdoc
      */
-    public function deployUris(array $siteUris, callable $setProgressHandler = null): void
+    public function deployUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_DEPLOY, $event);
@@ -47,11 +47,11 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
             return;
         }
 
-        if (Craft::$app->getRequest()->getIsConsoleRequest()) {
-            $this->deployUrisWithProgress($siteUris, $setProgressHandler);
+        if ($queue) {
+            DeployerHelper::addDeployerJob($siteUris, 'deployUrisWithProgress');
         }
         else {
-            DeployerHelper::addDeployerJob($siteUris, 'deployUrisWithProgress');
+            $this->deployUrisWithProgress($siteUris, $setProgressHandler);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY)) {
