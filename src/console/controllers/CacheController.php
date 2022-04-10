@@ -398,17 +398,16 @@ class CacheController extends Controller
             return;
         }
 
-        $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, Console::FG_YELLOW);
-
         $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
 
         if ($this->queue) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler']);
-
             $this->_output('Blitz cache queued for warming.');
 
             return;
         }
+
+        $this->stdout(Craft::t('blitz', 'Warming Blitz cache...').PHP_EOL, Console::FG_YELLOW);
 
         Console::startProgress(0, count($siteUris), '', 0.8);
         Blitz::$plugin->cacheWarmer->warmUris($siteUris, [$this, 'setProgressHandler'], null, false);
@@ -435,14 +434,19 @@ class CacheController extends Controller
             return;
         }
 
-        $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, Console::FG_YELLOW);
-
         $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
 
+        if ($this->queue) {
+            Blitz::$plugin->deployer->deployUris($siteUris, [$this, 'setProgressHandler']);
+            $this->_output('Blitz cache queued for deploying.');
+
+            return;
+        }
+
+        $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, Console::FG_YELLOW);
+
         Console::startProgress(0, count($siteUris), '', 0.8);
-
         Blitz::$plugin->deployer->deployUris($siteUris, [$this, 'setProgressHandler']);
-
         Console::endProgress();
 
         $this->_output('Deploying complete.');

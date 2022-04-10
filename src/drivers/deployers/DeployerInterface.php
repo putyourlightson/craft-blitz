@@ -18,8 +18,9 @@ interface DeployerInterface extends SavableComponentInterface
      *
      * @param SiteUriModel[] $siteUris
      * @param callable|null $setProgressHandler
+     * @param bool $queue
      */
-    public function deployUris(array $siteUris, callable $setProgressHandler = null);
+    public function deployUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true);
 
     /**
      * Deploys the cache for a given site ID.
