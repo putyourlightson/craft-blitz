@@ -27,6 +27,7 @@ interface DeployerInterface extends SavableComponentInterface
      *
      * @param int $siteId
      * @param callable|null $setProgressHandler
+     * @param bool $queue
      */
     public function deploySite(int $siteId, callable $setProgressHandler = null, bool $queue = true);
 

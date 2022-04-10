@@ -44,5 +44,5 @@ class DummyDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deployAll(callable $setProgressHandler = null) { }
+    public function deployAll(callable $setProgressHandler = null, bool $queue = true) { }
 }
