@@ -28,14 +28,14 @@ interface DeployerInterface extends SavableComponentInterface
      * @param int $siteId
      * @param callable|null $setProgressHandler
      */
-    public function deploySite(int $siteId, callable $setProgressHandler = null);
+    public function deploySite(int $siteId, callable $setProgressHandler = null, bool $queue = true);
 
     /**
      * Deploys the entire cache.
      *
      * @param callable|null $setProgressHandler
      */
-    public function deployAll(callable $setProgressHandler = null);
+    public function deployAll(callable $setProgressHandler = null, bool $queue = true);
 
     /**
      * Tests the deployer settings.

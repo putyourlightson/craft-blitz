@@ -71,16 +71,16 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
     /**
      * @inheritdoc
      */
-    public function deploySite(int $siteId, callable $setProgressHandler = null)
+    public function deploySite(int $siteId, callable $setProgressHandler = null, bool $queue = true)
     {
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
-        $this->deployUris($siteUris, $setProgressHandler);
+        $this->deployUris($siteUris, $setProgressHandler, $queue);
     }
 
     /**
      * @inheritdoc
      */
-    public function deployAll(callable $setProgressHandler = null)
+    public function deployAll(callable $setProgressHandler = null, bool $queue = true)
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_DEPLOY_ALL, $event);
@@ -91,7 +91,7 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
 
         $siteUris = SiteUriHelper::getAllSiteUris(true);
 
-        $this->deployUris($siteUris, $setProgressHandler);
+        $this->deployUris($siteUris, $setProgressHandler, $queue);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DEPLOY_ALL)) {
             $this->trigger(self::EVENT_AFTER_DEPLOY_ALL, $event);

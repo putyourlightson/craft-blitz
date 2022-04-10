@@ -446,7 +446,7 @@ class CacheController extends Controller
         $this->stdout(Craft::t('blitz', 'Deploying pages...').PHP_EOL, Console::FG_YELLOW);
 
         Console::startProgress(0, count($siteUris), '', 0.8);
-        Blitz::$plugin->deployer->deployUris($siteUris, [$this, 'setProgressHandler']);
+        Blitz::$plugin->deployer->deployUris($siteUris, [$this, 'setProgressHandler'], false);
         Console::endProgress();
 
         $this->_output('Deploying complete.');

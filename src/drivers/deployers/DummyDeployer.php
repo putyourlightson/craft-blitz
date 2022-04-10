@@ -39,7 +39,7 @@ class DummyDeployer extends BaseDeployer
     /**
      * @inheritdoc
      */
-    public function deploySite(int $siteId, callable $setProgressHandler = null) { }
+    public function deploySite(int $siteId, callable $setProgressHandler = null, bool $queue = true) { }
 
     /**
      * @inheritdoc
