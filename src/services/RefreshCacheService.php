@@ -422,14 +422,12 @@ class RefreshCacheService extends Component
 
         $queue = Craft::$app->getQueue();
 
-        try {
-            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
-                ->push($refreshCacheJob);
+        // Apply a priority if the queue supports them.
+        if (method_exists($queue, 'priority')) {
+            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority);
         }
-        catch (NotSupportedException $exception) {
-            // The queue probably doesn't support custom push priorities. Try again without one.
-            $queue->push($refreshCacheJob);
-        }
+
+        $queue->push($refreshCacheJob);
 
         // Reset values
         $this->cacheIds = [];
