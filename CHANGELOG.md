@@ -25,7 +25,7 @@
 - Removed the `delay` property from the `DriverJob` class. 
 - Removed the `delay` parameter from all methods in the `CacheWarmerInterface` class.  
 
-## 3.12.0 - Unreleased
+## 3.12.0 - 2022-04-11
 ### Added
 - Added `beforeRefreshCacheTags` and `afterRefreshCacheTags` events to the `RefreshCacheService` class ([#386](https://github.com/putyourlightson/craft-blitz/issues/386)).
 
@@ -34,6 +34,7 @@
 
 ### Fixed
 - Fixed deployers not being added as queue jobs when running via a console command ([#384](https://github.com/putyourlightson/craft-blitz/issues/384)).
+- Fixed exception handling in GitWrapper version 3.
 
 ## 3.11.2 - 2022-03-03
 ### Fixed
