@@ -1,8 +1,10 @@
 # Release Notes for Blitz
 
 ## 3.12.1 - 2022-04-14
+> {tip} The cache should be manually refreshed following this update in order to ensure the fix is applied.
+
 ### Fixed
-- Fixed how some responses were being too eagerly cached ([#397](https://github.com/putyourlightson/craft-blitz/issues/397)).
+- Fixed responses being too eagerly cached, resulting in unintentionally cached pages ([#397](https://github.com/putyourlightson/craft-blitz/issues/397)).
 
 ## 3.12.0 - 2022-04-11
 ### Added
