@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.12.1 - 2022-04-14
+### Fixed
+- Fixed the response format not being respected and leading to non-HTML pages being unintentionally cached ([#397](https://github.com/putyourlightson/craft-blitz/issues/397)).
+
 ## 3.12.0 - 2022-04-11
 ### Added
 - Added `beforeRefreshCacheTags` and `afterRefreshCacheTags` events to the `RefreshCacheService` class ([#386](https://github.com/putyourlightson/craft-blitz/issues/386)).

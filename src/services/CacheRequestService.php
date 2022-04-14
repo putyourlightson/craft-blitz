@@ -10,13 +10,12 @@ use craft\base\Component;
 use craft\elements\User;
 use craft\events\CancelableEvent;
 use craft\web\Request;
-use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
-use yii\web\Response as BaseResponse;
+use yii\web\Response;
 
 /**
  *
@@ -260,12 +259,13 @@ class CacheRequestService extends Component
         $this->_addCraftHeaders($response);
         $this->prepareResponse($response, $content, $siteUri);
 
-        $outputComments = Blitz::$plugin->settings->outputComments === true
-            || Blitz::$plugin->settings->outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED;
+        // Append the served by comment if this is an HTML response and if allowed.
+        if ($response->format == Response::FORMAT_HTML && SiteUriHelper::hasHtmlMimeType($siteUri)) {
+            $outputComments = Blitz::$plugin->settings->outputComments;
 
-        // Append served by comment if allowed and has HTML mime type
-        if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
-            $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
+            if ($outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED) {
+                $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
+            }
         }
 
         $response->content = $content;
@@ -305,11 +305,8 @@ class CacheRequestService extends Component
         // Get the mime type from the site URI
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
-        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML) {
-            $response->format = BaseResponse::FORMAT_HTML;
-        }
-        else {
-            $response->format = BaseResponse::FORMAT_RAW;
+        if ($mimeType != SiteUriHelper::MIME_TYPE_HTML) {
+            $response->format = Response::FORMAT_RAW;
             $headers->set('Content-Type', $mimeType);
         }
     }
