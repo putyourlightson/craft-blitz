@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.0.0-beta.2 - Unreleased
+## 4.0.0-beta.2 - 2022-04-14
 > {warning} Cache warmers have been completely replaced by cache generators. The included/excluded query string parameters config setting format has changed. See the new formats [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php).
 
 ### Added
