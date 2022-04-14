@@ -93,19 +93,15 @@ class CloudflarePurger extends BaseCachePurger
     public function purgeUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
         $count = 0;
-        $total = 0;
+        $total = count($siteUris);
         $label = 'Purging {count} of {total} pages.';
-
-        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
-
-        foreach ($groupedSiteUris as $siteUriGroup) {
-            $total += count($siteUriGroup);
-        }
 
         if (is_callable($setProgressHandler)) {
             $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
             call_user_func($setProgressHandler, $count, $total, $progressLabel);
         }
+
+        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
         foreach ($groupedSiteUris as $siteId => $siteUriGroup) {
             $this->_sendRequest('delete', 'purge_cache', $siteId, [

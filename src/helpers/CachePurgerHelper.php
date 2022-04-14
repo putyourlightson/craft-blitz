@@ -5,11 +5,13 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use Craft;
 use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\purgers\CloudflarePurger;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
+use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\Event;
 
 class CachePurgerHelper extends BaseDriverHelper
@@ -52,5 +54,17 @@ class CachePurgerHelper extends BaseDriverHelper
     public static function getAllDrivers(): array
     {
         return self::createDrivers(self::getAllTypes());
+    }
+
+    /**
+     * Adds a purger job to the queue.
+     *
+     * @param SiteUriModel[] $siteUris
+     */
+    public static function addPurgerJob(array $siteUris, string $driverMethod, int $priority = null): void
+    {
+        $description = Craft::t('blitz', 'Purging pages');
+
+        self::addDriverJob($siteUris, 'cachePurger', $driverMethod, $description, $priority);
     }
 }
