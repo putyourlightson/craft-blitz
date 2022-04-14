@@ -203,6 +203,11 @@ class SettingsModel extends Model
     public bool $refreshCacheWhenElementSavedNotLive = false;
 
     /**
+     * @var bool Whether non-HTML responses should be cached.
+     */
+    public bool $cacheNonHtmlResponses = false;
+
+    /**
      * @var int Whether URLs with query strings should be cached and how.
      *
      * - `self::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings

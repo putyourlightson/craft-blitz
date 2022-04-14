@@ -76,7 +76,6 @@
                     warning: config.cachingEnabled is defined ? configWarning('cachingEnabled'),
                     name: 'settings[cachingEnabled]',
                     on: settings.cachingEnabled,
-                    required: true,
                 }) }}
             </div>
         </div>
@@ -310,6 +309,17 @@
     <div id="advanced" class="hidden">
 
         {% set info %}
+            <span class="info">{{ 'By default, Blitz only caches HTML responses. With this setting enabled, Blitz will also cache pages that contain non-HTML formats. If enabled, you should ensure that URIs that should not be caches, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.'|t('blitz') }}</span>
+        {% endset %}
+        {{ forms.lightswitchField({
+            label: "Cache non-HTML Responses"|t('blitz'),
+            instructions: "Whether pages that contain non-HTML should be cached."|t('blitz') ~ info,
+            warning: config.cacheNonHtmlResponses is defined ? configWarning('cacheNonHtmlResponses'),
+            name: 'settings[cacheNonHtmlResponses]',
+            on: settings.cacheNonHtmlResponses,
+        }) }}
+
+        {% set info %}
             <span class="info">{{ 'This setting determines how URLs with query strings will be cached. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: docs ~ 'query-string-caching'})|raw }}</span>
         {% endset %}
         {{ forms.selectField({
@@ -323,7 +333,6 @@
                 2: "Cache URLs with unique query strings as the same page"|t('blitz'),
             },
             value: settings.queryStringCaching,
-            required: true,
         }) }}
 
         {% set cols = siteColumn|merge({

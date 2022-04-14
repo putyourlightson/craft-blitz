@@ -6,9 +6,10 @@
 ### Added
 - Added compatibility with Craft 4.
 - Added a new `Refresh Mode` setting that allows for controlling how cache refreshing should be handled.
-- Added the ability to revalidate cached pages that have expired when serving cached responses ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
 - Added the concept of cache generation, that supersedes cache warming, and is used both for generating, regenerating and in some cases removing cached pages.
-- Added the included/excluded query string parameter settings to the "Advanced Settings" tab in the control panel, as well as the ability for them to be site-specific.
+- Added the ability to revalidate cached pages that have expired when serving cached responses ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
+- Added a new `cacheNonHtmlResponses` setting  to the "Advanced Settings" tab, that allows enabling caching of pages that return non-HTML formats.
+- Added the included/excluded query string parameter settings to the "Advanced Settings" tab, as well as the ability for them to be site-specific.
 - Added the ability for cache purgers to be run in queue jobs.
 
 ### Changed
@@ -24,6 +25,12 @@
 - Removed the `warmCacheDelay` property from the `CachePurgerTrait` class.
 - Removed the `delay` property from the `DriverJob` class. 
 - Removed the `delay` parameter from all methods in the `CacheWarmerInterface` class.  
+
+## 3.12.1 - 2022-04-14
+> {tip} The cache should be manually refreshed following this update in order to ensure the fix is applied.
+
+### Fixed
+- Fixed responses being too eagerly cached, resulting in unintentionally cached pages ([#397](https://github.com/putyourlightson/craft-blitz/issues/397)).
 
 ## 3.12.0 - 2022-04-11
 ### Added
