@@ -8,19 +8,12 @@ namespace putyourlightson\blitztests\unit\controllers;
 use Codeception\Test\Unit;
 use Craft;
 use putyourlightson\blitz\Blitz;
-use yii\base\InvalidRouteException;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     2.3.0
+ * @since 2.3.0
  */
-
 class BaseControllerTest extends Unit
 {
-    // Public methods
-    // =========================================================================
-
     protected function _before()
     {
         parent::_before();
@@ -29,14 +22,7 @@ class BaseControllerTest extends Unit
         Blitz::$plugin->controllerNamespace = str_replace('\\console', '', Blitz::$plugin->controllerNamespace);
     }
 
-    /**
-     * @param string $action
-     * @param array $params
-     *
-     * @return mixed
-     * @throws InvalidRouteException
-     */
-    protected function runActionWithParams(string $action, array $params)
+    protected function runActionWithParams(string $action, array $params): mixed
     {
         Craft::$app->request->setBodyParams($params);
 

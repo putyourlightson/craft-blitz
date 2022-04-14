@@ -9,48 +9,41 @@ use Codeception\Test\Unit;
 use Craft;
 use craft\helpers\App;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\CacheStorageInterface;
 use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     3.6.9
+ * @since 3.6.9
  */
 
 class YiiCacheStorageTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
      * @var YiiCacheStorage
      */
-    private $cacheStorage;
+    private CacheStorageInterface $cacheStorage;
 
     /**
      * @var SiteUriModel
      */
-    private $siteUri;
+    private SiteUriModel $siteUri;
 
     /**
      * @var int
      */
-    private $duration = 60;
+    private int $duration = 60;
 
     /**
      * @var string
      */
-    private $output = 'xyz';
-
-    // Protected methods
-    // =========================================================================
+    private string $output = 'xyz';
 
     protected function _before()
     {
@@ -75,9 +68,6 @@ class YiiCacheStorageTest extends Unit
 
         Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri, $this->duration);
     }
-
-    // Public methods
-    // =========================================================================
 
     public function testSave()
     {

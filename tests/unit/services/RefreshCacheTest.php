@@ -23,51 +23,43 @@ use putyourlightson\blitztests\fixtures\EntriesFixture;
 use UnitTester;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     3.1.0
+ * @since 3.1.0
  */
 
 class RefreshCacheTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
      * @var SiteUriModel
      */
-    private $siteUri;
+    private SiteUriModel $siteUri;
 
     /**
      * @var string
      */
-    private $output = 'xyz';
+    private string $output = 'xyz';
 
     /**
-     * @var Entry
+     * @var Entry|ElementChangedBehavior|null
      */
-    private $entry1;
+    private Entry|ElementChangedBehavior|null $entry1 = null;
 
     /**
-     * @var Entry
+     * @var Entry|null
      */
-    private $entry2;
+    private ?Entry $entry2 = null;
 
     /**
      * @var array
      */
-    private $emptyElements = [
+    private array $emptyElements = [
         'elementIds' => [],
         'sourceIds' => [],
     ];
-
-    // Fixtures
-    // =========================================================================
 
     /**
      * @return array
@@ -80,9 +72,6 @@ class RefreshCacheTest extends Unit
             ],
         ];
     }
-
-    // Protected methods
-    // =========================================================================
 
     protected function _before()
     {
@@ -129,9 +118,6 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->refreshCache->batchMode = true;
     }
 
-    // Public methods
-    // =========================================================================
-
     public function testGetElementCacheIds()
     {
         Blitz::$plugin->generateCache->addElement($this->entry1);
@@ -159,7 +145,7 @@ class RefreshCacheTest extends Unit
                 'index' => 1234567890,
                 'type' => Entry::class,
                 'params' => '[]',
-            ], false)
+            ])
             ->execute();
         $queryId = $db->getLastInsertID();
 
@@ -168,7 +154,7 @@ class RefreshCacheTest extends Unit
             ->insert(ElementQuerySourceRecord::tableName(), [
                 'sourceId' => $this->entry1->sectionId,
                 'queryId' => $queryId,
-            ], false)
+            ])
             ->execute();
 
         $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
@@ -271,6 +257,7 @@ class RefreshCacheTest extends Unit
 
         Blitz::$plugin->refreshCache->addElementExpiryDates($this->entry1);
 
+        /** @var ElementExpiryDateRecord $elementExpiryDateRecord */
         $elementExpiryDateRecord = ElementExpiryDateRecord::find()
             ->where(['elementId' => $this->entry1->id])
             ->one();
@@ -285,6 +272,7 @@ class RefreshCacheTest extends Unit
 
         Blitz::$plugin->refreshCache->addElementExpiryDates($this->entry1);
 
+        /** @var ElementExpiryDateRecord $elementExpiryDateRecord */
         $elementExpiryDateRecord = ElementExpiryDateRecord::find()
             ->where(['elementId' => $this->entry1->id])
             ->one();

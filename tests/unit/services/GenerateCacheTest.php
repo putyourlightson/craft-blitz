@@ -24,33 +24,25 @@ use putyourlightson\campaign\elements\MailingListElement;
 use UnitTester;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     2.3.0
+ * @since 2.3.0
  */
 
 class GenerateCacheTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
      * @var SiteUriModel
      */
-    private $siteUri;
+    private SiteUriModel $siteUri;
 
     /**
      * @var string
      */
-    private $output = 'xyz';
-
-    // Protected methods
-    // =========================================================================
+    private string $output = 'xyz';
 
     protected function _before()
     {
@@ -65,9 +57,6 @@ class GenerateCacheTest extends Unit
             'uri' => 'page',
         ]);
     }
-
-    // Public methods
-    // =========================================================================
 
     public function testSaveCache()
     {
