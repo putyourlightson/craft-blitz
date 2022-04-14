@@ -13,35 +13,28 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
+use yii\web\Response;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     3.0.0
+ * @since 3.0.0
  */
 
 class CacheRequestTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
      * @var SiteUriModel
      */
-    private $siteUri;
+    private SiteUriModel $siteUri;
 
     /**
      * @var array
      */
-    private $uriPattern;
-
-    // Protected methods
-    // =========================================================================
+    private array $uriPattern;
 
     protected function _before()
     {
@@ -57,9 +50,6 @@ class CacheRequestTest extends Unit
             'uriPattern' => $this->siteUri->uri,
         ];
     }
-
-    // Public methods
-    // =========================================================================
 
     public function testGetIsCacheableRequest()
     {
@@ -248,8 +238,18 @@ class CacheRequestTest extends Unit
         $this->assertStringContainsString('Served by Blitz on', $value);
     }
 
-    // Private methods
-    // =========================================================================
+    public function testGetResponseWithMimeType()
+    {
+        // Save a value for the site URI
+        $this->siteUri->uri .= '.json';
+        Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
+
+        Blitz::$plugin->settings->outputComments = true;
+        $response = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri);
+
+        $this->assertEquals(Response::FORMAT_RAW, $response->format);
+        $this->assertStringNotContainsString('Served by Blitz on', $response->content);
+    }
 
     private function _mockRequest(string $url)
     {
