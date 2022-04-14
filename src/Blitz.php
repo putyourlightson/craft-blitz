@@ -19,6 +19,7 @@ use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
+use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Plugins;
@@ -28,6 +29,7 @@ use craft\utilities\ClearCaches;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
+use craft\web\View;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
 use putyourlightson\blitz\drivers\integrations\IntegrationInterface;
@@ -45,8 +47,8 @@ use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\logtofile\LogToFile;
+use yii\base\Controller;
 use yii\base\Event;
-use yii\web\Response;
 
 /**
  *
@@ -254,13 +256,14 @@ class Blitz extends Plugin
                     }
                 );
 
-                // Register after prepare response event
-                Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
-                    function() use ($siteUri) {
+                // Register after render page template event
+                Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
+                    function(TemplateEvent $event) use ($siteUri) {
                         $response = Craft::$app->getResponse();
+
                         if ($response->getIsOk()) {
                             // Save the content and prepare the response
-                            if ($content = $this->generateCache->save($response->content, $siteUri)) {
+                            if ($content = $this->generateCache->save($event->output, $siteUri)) {
                                 $this->cacheRequest->prepareResponse($response, $content, $siteUri);
                             }
                         }
@@ -335,7 +338,7 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
-            [ResaveController::class, ResaveController::EVENT_BEFORE_ACTION],
+            [ResaveController::class, Controller::EVENT_BEFORE_ACTION],
         ];
 
         foreach ($events as $event) {
@@ -350,7 +353,7 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
-            [ResaveController::class, ResaveController::EVENT_AFTER_ACTION],
+            [ResaveController::class, Controller::EVENT_AFTER_ACTION],
         ];
 
         foreach ($events as $event) {

@@ -13,6 +13,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
+use yii\web\Response;
 
 /**
  * @author    PutYourLightsOn
@@ -241,6 +242,19 @@ class CacheRequestTest extends Unit
         Blitz::$plugin->settings->outputComments = SettingsModel::OUTPUT_COMMENTS_SERVED;
         $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
         $this->assertStringContainsString('Served by Blitz on', $value);
+    }
+
+    public function testGetResponseWithMimeType()
+    {
+        // Save a value for the site URI
+        $this->siteUri->uri .= '.json';
+        Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
+
+        Blitz::$plugin->settings->outputComments = true;
+        $response = Blitz::$plugin->cacheRequest->getResponse($this->siteUri);
+
+        $this->assertEquals(Response::FORMAT_RAW, $response->format);
+        $this->assertStringNotContainsString('Served by Blitz on', $response->content);
     }
 
     // Private methods
