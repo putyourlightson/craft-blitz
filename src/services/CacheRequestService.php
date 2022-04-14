@@ -498,8 +498,11 @@ class CacheRequestService extends Component
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
         if ($mimeType != SiteUriHelper::MIME_TYPE_HTML) {
-            $response->format = Response::FORMAT_RAW;
             $headers->set('Content-Type', $mimeType);
+
+            if ($response->format == Response::FORMAT_HTML) {
+                $response->format = Response::FORMAT_RAW;
+            }
         }
     }
 
