@@ -4,6 +4,7 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
+use craft\helpers\ProjectConfig as ProjectConfigHelper;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
 use putyourlightson\blitz\drivers\generators\LocalGenerator;
 
@@ -35,8 +36,10 @@ class m220330_120000_update_settings extends Migration
             $projectConfig->remove('plugins.blitz.settings.warmCacheAutomatically');
 
             $cachePurgerSettings = $projectConfig->get('plugins.blitz.settings.cachePurgerSettings');
+            $cachePurgerSettings = ProjectConfigHelper::unpackAssociativeArray($cachePurgerSettings);
             if (isset($cachePurgerSettings['warmCacheDelay'])) {
                 unset($cachePurgerSettings['warmCacheDelay']);
+                $cachePurgerSettings = ProjectConfigHelper::packAssociativeArray($cachePurgerSettings);
                 $projectConfig->set('plugins.blitz.settings.cachePurgerSettings', $cachePurgerSettings);
             }
 
