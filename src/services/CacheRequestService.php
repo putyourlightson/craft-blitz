@@ -122,6 +122,14 @@ class CacheRequestService extends Component
             return false;
         }
 
+        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
+            && !empty($this->getAllowedQueryString($siteUri->siteId))
+        ) {
+            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $request->getAbsoluteUrl());
+
+            return false;
+        }
+
         $event = new CancelableEvent();
         $this->trigger(self::EVENT_IS_CACHEABLE_REQUEST, $event);
 
@@ -189,14 +197,6 @@ class CacheRequestService extends Component
 
         if (!$this->matchesUriPatterns($siteUri, Blitz::$plugin->settings->includedUriPatterns)) {
             Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.', [], $url);
-
-            return false;
-        }
-
-        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
-            && !empty($this->getAllowedQueryString($siteUri->siteId))
-        ) {
-            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $url);
 
             return false;
         }

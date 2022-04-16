@@ -38,7 +38,7 @@ class GeneratorController extends Controller
      */
     public function actionGenerate(): Response
     {
-        $response = $this->_getResponse();
+        $response = $this->_generateResponse();
 
         // Suppress the output using a dummy stream
         Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
@@ -58,7 +58,7 @@ class GeneratorController extends Controller
      *
      * @see PreviewController::actionPreview()
      */
-    private function _getResponse(): Response
+    private function _generateResponse(): Response
     {
         // Recheck whether this is an action request, this time ignoring the token
         $this->request->checkIfActionRequest(true, false);
