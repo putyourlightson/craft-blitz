@@ -21,14 +21,24 @@ class m220330_120000_update_settings extends Migration
             $warmerType = $projectConfig->get('plugins.blitz.settings.cacheWarmerType') ?? null;
             $generatorType = $this->_getGeneratorType($warmerType);
             $projectConfig->set('plugins.blitz.settings.cacheGeneratorType', $generatorType);
+            $projectConfig->remove('plugins.blitz.settings.cacheWarmerType');
 
             $generatorSettings = $projectConfig->get('plugins.blitz.settings.cacheWarmerSettings') ?? [];
             $projectConfig->set('plugins.blitz.settings.cacheGeneratorSettings', $generatorSettings);
+            $projectConfig->remove('plugins.blitz.settings.cacheWarmerSettings');
 
             $clear = $projectConfig->get('plugins.blitz.settings.clearCacheAutomatically') ?? true;
             $generate = $projectConfig->get('plugins.blitz.settings.warmCacheAutomatically') ?? true;
             $refreshMode = $this->_getRefreshMode($clear, $generate);
             $projectConfig->set('plugins.blitz.settings.refreshMode', $refreshMode);
+            $projectConfig->remove('plugins.blitz.settings.clearCacheAutomatically');
+            $projectConfig->remove('plugins.blitz.settings.warmCacheAutomatically');
+
+            $cachePurgerSettings = $projectConfig->get('plugins.blitz.settings.cachePurgerSettings');
+            if (isset($cachePurgerSettings['warmCacheDelay'])) {
+                unset($cachePurgerSettings['warmCacheDelay']);
+                $projectConfig->set('plugins.blitz.settings.cachePurgerSettings', $cachePurgerSettings);
+            }
 
             $includedQueryStringParams = $projectConfig->get('plugins.blitz.settings.includedQueryStringParams');
             $this->_updateQueryStringParams($includedQueryStringParams);
@@ -37,12 +47,6 @@ class m220330_120000_update_settings extends Migration
             $excludedQueryStringParams = $projectConfig->get('plugins.blitz.settings.excludedQueryStringParams');
             $this->_updateQueryStringParams($excludedQueryStringParams);
             $projectConfig->set('plugins.blitz.settings.excludedQueryStringParams', $excludedQueryStringParams);
-
-            $cachePurgerSettings = $projectConfig->get('plugins.blitz.settings.cachePurgerSettings');
-            if (isset($cachePurgerSettings['warmCacheDelay'])) {
-                unset($cachePurgerSettings['warmCacheDelay']);
-                $projectConfig->set('plugins.blitz.settings.cachePurgerSettings', $cachePurgerSettings);
-            }
         }
 
         return true;
