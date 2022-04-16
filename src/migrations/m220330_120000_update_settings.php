@@ -17,7 +17,7 @@ class m220330_120000_update_settings extends Migration
         $projectConfig = Craft::$app->getProjectConfig();
         $schemaVersion = $projectConfig->get('plugins.blitz.schemaVersion', true);
 
-        if (version_compare($schemaVersion, '4.0.0', '<')) {
+        if (version_compare($schemaVersion, '4.0.0-beta.3', '<')) {
             $warmerType = $projectConfig->get('plugins.blitz.settings.cacheWarmerType') ?? null;
             $generatorType = $this->_getGeneratorType($warmerType);
             $projectConfig->set('plugins.blitz.settings.cacheGeneratorType', $generatorType);
@@ -37,6 +37,12 @@ class m220330_120000_update_settings extends Migration
             $excludedQueryStringParams = $projectConfig->get('plugins.blitz.settings.excludedQueryStringParams');
             $this->_updateQueryStringParams($excludedQueryStringParams);
             $projectConfig->set('plugins.blitz.settings.excludedQueryStringParams', $excludedQueryStringParams);
+
+            $cachePurgerSettings = $projectConfig->get('plugins.blitz.settings.cachePurgerSettings');
+            if (isset($cachePurgerSettings['warmCacheDelay'])) {
+                unset($cachePurgerSettings['warmCacheDelay']);
+                $projectConfig->set('plugins.blitz.settings.cachePurgerSettings', $cachePurgerSettings);
+            }
         }
 
         return true;
