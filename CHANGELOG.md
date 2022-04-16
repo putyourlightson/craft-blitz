@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.0.0-beta.4 - 2022-04-16
+### Fixed
+- Fixed a bug in determining whether a response was cacheable.
+
 ## 4.0.0-beta.3 - 2022-04-16
 ### Fixed
 - Fixed a missing migration to remove the `warmCacheDelay` setting.

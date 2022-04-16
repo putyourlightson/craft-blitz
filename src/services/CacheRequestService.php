@@ -133,6 +133,16 @@ class CacheRequestService extends Component
     }
 
     /**
+     * Returns whether the response is cacheable.
+     */
+    public function getIsCacheableResponse(Response $response): bool
+    {
+        return $response->format == Response::FORMAT_HTML
+            || $response->format == 'template'
+            || Blitz::$plugin->settings->cacheNonHtmlResponses;
+    }
+
+    /**
      * Returns whether the site URI is cacheable.
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
@@ -293,8 +303,8 @@ class CacheRequestService extends Component
         $this->_addCraftHeaders($response);
         $this->_prepareResponse($response, $content, $siteUri);
 
-        // Append the served by comment if this is an HTML response and if allowed.
-        if ($response->format == Response::FORMAT_HTML && SiteUriHelper::hasHtmlMimeType($siteUri)) {
+        // Append the served by comment if this is a cacheable response and if a HTML mime type.
+        if ($this->getIsCacheableResponse($response) && SiteUriHelper::hasHtmlMimeType($siteUri)) {
             $outputComments = Blitz::$plugin->settings->outputComments;
 
             if ($outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED) {
@@ -324,7 +334,7 @@ class CacheRequestService extends Component
             return;
         }
 
-        if ($response->format != Response::FORMAT_HTML && !Blitz::$plugin->settings->cacheNonHtmlResponses) {
+        if (!$this->getIsCacheableResponse($response)) {
             return;
         }
 
