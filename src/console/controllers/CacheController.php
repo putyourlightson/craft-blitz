@@ -366,7 +366,7 @@ class CacheController extends Controller
             return;
         }
 
-        $this->stdout(Craft::t('blitz', 'Purging pages...') . PHP_EOL, BaseConsole::FG_YELLOW);
+        $this->stdout(Craft::t('blitz', 'Purging cache...') . PHP_EOL, BaseConsole::FG_YELLOW);
 
         Console::startProgress(0, count($siteUris), '', 0.8);
 
