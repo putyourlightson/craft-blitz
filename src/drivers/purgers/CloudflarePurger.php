@@ -94,10 +94,10 @@ class CloudflarePurger extends BaseCachePurger
     {
         $count = 0;
         $total = count($siteUris);
-        $label = 'Purging {count} of {total} pages.';
+        $label = 'Purging {total} pages.';
 
         if (is_callable($setProgressHandler)) {
-            $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+            $progressLabel = Craft::t('blitz', $label, ['total' => $total]);
             call_user_func($setProgressHandler, $count, $total, $progressLabel);
         }
 
@@ -111,7 +111,7 @@ class CloudflarePurger extends BaseCachePurger
             $count = $count + count($groupedSiteUris);
 
             if (is_callable($setProgressHandler)) {
-                $progressLabel = Craft::t('blitz', $label, ['count' => $count, 'total' => $total]);
+                $progressLabel = Craft::t('blitz', $label, ['total' => $total]);
                 call_user_func($setProgressHandler, $count, $total, $progressLabel);
             }
         }
