@@ -63,7 +63,7 @@ class CachePurgerHelper extends BaseDriverHelper
      */
     public static function addPurgerJob(array $siteUris, string $driverMethod, int $priority = null): void
     {
-        $description = Craft::t('blitz', 'Purging cache');
+        $description = Craft::t('blitz', 'Purging Blitz cache');
 
         self::addDriverJob($siteUris, 'cachePurger', $driverMethod, $description, $priority);
     }
