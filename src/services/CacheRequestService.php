@@ -84,48 +84,35 @@ class CacheRequestService extends Component
             return false;
         }
 
+        $url = $request->getAbsoluteUrl();
+
         /** @var User|null $user */
         $user = Craft::$app->getUser()->getIdentity();
 
         if ($user !== null) {
             // Ensure that if the site is not live that the user has permission to access it
             if (!Craft::$app->getIsLive() && !$user->can('accessSiteWhenSystemIsOff')) {
-                Blitz::$plugin->debug('Page not cached because the site is not live and the user does not have permission to access it.', [], $request->getAbsoluteUrl());
+                Blitz::$plugin->debug('Page not cached because the site is not live and the user does not have permission to access it.', [], $url);
 
                 return false;
             }
 
             // Ensure that the debug toolbar is not enabled
             if ($user->getPreference('enableDebugToolbarForSite')) {
-                Blitz::$plugin->debug('Page not cached because the debug toolbar is enabled.', [], $request->getAbsoluteUrl());
+                Blitz::$plugin->debug('Page not cached because the debug toolbar is enabled.', [], $url);
 
                 return false;
             }
         }
 
         if (!empty($request->getParam('no-cache'))) {
-            Blitz::$plugin->debug('Page not cached because a `no-cache` request parameter was provided.', [], $request->getAbsoluteUrl());
+            Blitz::$plugin->debug('Page not cached because a `no-cache` request parameter was provided.', [], $url);
 
             return false;
         }
 
         if ($request->getToken() !== null && !$this->getIsGeneratorRequest()) {
-            Blitz::$plugin->debug('Page not cached because a token request header/parameter was provided.', [], $request->getAbsoluteUrl());
-
-            return false;
-        }
-
-        // Check for path param in URL because `$request->getQueryString()` will contain it regardless
-        if (preg_match('/[?&]' . Craft::$app->config->general->pathParam . '=/', $request->getUrl()) === 1) {
-            Blitz::$plugin->debug('Page not cached because a path param was provided in the query string. ', [], $request->getAbsoluteUrl());
-
-            return false;
-        }
-
-        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
-            && !empty($this->getAllowedQueryString($siteUri->siteId))
-        ) {
-            Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $request->getAbsoluteUrl());
+            Blitz::$plugin->debug('Page not cached because a token request header/parameter was provided.', [], $url);
 
             return false;
         }
@@ -201,6 +188,22 @@ class CacheRequestService extends Component
             return false;
         }
 
+        if ($this->_containsPathParam($siteUri->uri)) {
+            Blitz::$plugin->debug('Page not cached because a path param was provided in the query string.', [], $url);
+
+            return false;
+        }
+
+        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
+            $allowedQueryString = $this->getAllowedQueryString($siteUri->siteId, $siteUri->uri);
+
+            if ($allowedQueryString) {
+                Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $url);
+
+                return false;
+            }
+        }
+
         // Ignore URLs that don't start with `http`
         if (!str_starts_with(strtolower($url), 'http')) {
             Blitz::$plugin->debug('Page not cached because the URL does not start with `http`.', [], $url);
@@ -243,6 +246,7 @@ class CacheRequestService extends Component
     {
         $site = Craft::$app->getSites()->getCurrentSite();
         $uri = Craft::$app->getRequest()->getFullUri();
+        $queryString = Craft::$app->getRequest()->getQueryString();
 
         /**
          * Remove the base site path from the full URI
@@ -259,10 +263,12 @@ class CacheRequestService extends Component
         }
 
         // Add the allowed query string if unique query strings should not be cached as the same page
-        if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE
-            && ($allowedQueryString = $this->getAllowedQueryString($site->id))
-        ) {
-            $uri .= '?' . $allowedQueryString;
+        if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE) {
+            $allowedQueryString = $this->getAllowedQueryString($site->id, '?' . $queryString);
+
+            if ($allowedQueryString) {
+                $uri .= '?' . $allowedQueryString;
+            }
         }
 
         return new SiteUriModel([
@@ -406,26 +412,24 @@ class CacheRequestService extends Component
     /**
      * Returns the query string after processing the included and excluded query string params.
      */
-    public function getAllowedQueryString(int $siteId): string
+    public function getAllowedQueryString(int $siteId, string $uri): string
     {
-        if (!empty($this->_allowedQueryStrings[$siteId])) {
-            return $this->_allowedQueryStrings[$siteId];
+        if (!empty($this->_allowedQueryStrings[$siteId][$uri])) {
+            return $this->_allowedQueryStrings[$siteId][$uri];
         }
 
-        $queryString = Craft::$app->getRequest()->getQueryStringWithoutPath();
-        $queryStringParams = explode('&', $queryString);
+        $queryString = parse_url($uri, PHP_URL_QUERY);
+        parse_str($queryString, $queryStringParams);
 
-        foreach ($queryStringParams as $key => $queryStringParam) {
-            $param = explode('=', $queryStringParam);
-
-            if (!$this->getIsAllowedQueryStringParam($siteId, $param[0])) {
+        foreach ($queryStringParams as $key => $value) {
+            if (!$this->getIsAllowedQueryStringParam($siteId, $key)) {
                 unset($queryStringParams[$key]);
             }
         }
 
-        $this->_allowedQueryStrings[$siteId] = implode('&', $queryStringParams);
+        $this->_allowedQueryStrings[$siteId][$uri] = http_build_query($queryStringParams);
 
-        return $this->_allowedQueryStrings[$siteId];
+        return $this->_allowedQueryStrings[$siteId][$uri];
     }
 
     /**
@@ -446,6 +450,18 @@ class CacheRequestService extends Component
         }
 
         return false;
+    }
+
+    /**
+     * Returns whether the provided URI contains the path param.
+     */
+    private function _containsPathParam(string $uri): bool
+    {
+        $queryString = parse_url($uri, PHP_URL_QUERY);
+        parse_str($queryString, $queryStringParams);
+        $pathParam = Craft::$app->config->general->pathParam;
+
+        return isset($queryStringParams[$pathParam]);
     }
 
     /**

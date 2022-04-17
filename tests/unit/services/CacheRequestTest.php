@@ -69,23 +69,6 @@ class CacheRequestTest extends Unit
         $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableRequest());
     }
 
-    public function testGetIsCacheableRequestWithPathParam()
-    {
-        // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl() . '?' . Craft::$app->config->general->pathParam . '=search');
-
-        // Enable caching and add an included URI pattern
-        Blitz::$plugin->settings->cachingEnabled = true;
-        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
-        Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
-
-        // Hide the fact that this is a console request
-        Craft::$app->getRequest()->isConsoleRequest = false;
-
-        // Assert that the request is not cacheable
-        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableRequest());
-    }
-
     public function testGetRequestedCacheableSiteUri()
     {
         $allowedQueryString = 'x=1&y=1';
@@ -155,8 +138,18 @@ class CacheRequestTest extends Unit
         Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
         $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
 
-        // Exclude the excluded URI pattern works
+        // Exclude the excluded URI pattern
         Blitz::$plugin->settings->excludedUriPatterns = [$this->uriPattern];
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+    }
+
+    public function testGetIsCacheableSiteUriWithPathParam()
+    {
+        // Include the URI pattern
+        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+
+        $this->siteUri->uri .= '?' . Craft::$app->config->general->pathParam . '=search';
         $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
     }
 
@@ -195,10 +188,9 @@ class CacheRequestTest extends Unit
 
     public function testGetAllowedQueryString()
     {
-        // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl() . '?gclid=1&fbclid=2&page=3');
+        $uri = $this->siteUri->uri . '?gclid=1&fbclid=2&page=3';
 
-        $this->assertEquals('page=3', Blitz::$plugin->cacheRequest->getAllowedQueryString($this->siteUri->siteId));
+        $this->assertEquals('page=3', Blitz::$plugin->cacheRequest->getAllowedQueryString($this->siteUri->siteId, $uri));
     }
 
     public function testGetResponse()
