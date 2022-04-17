@@ -69,6 +69,9 @@ class GeneratorController extends Controller
             $this->request->setQueryParams($queryParams);
         }
 
+        // Unset the token
+        $this->request->setToken(null);
+
         // Recheck whether this is an action request, this time ignoring the token
         $this->request->checkIfActionRequest(true, false);
 
