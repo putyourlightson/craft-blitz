@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.0.0-beta.4 - Unreleased
+## 4.0.0-beta.4 - 2022-04-17
 ### Fixed
 - Fixed a bug in determining whether responses were cacheable.
 
