@@ -97,7 +97,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh',
             'label' => Craft::t('blitz', 'Refresh Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshes (clears, flushes, generates) all of the pages.'),
+            'instructions' => Craft::t('blitz', 'Refreshes all of the pages according to the “Refresh Mode”.'),
         ];
 
         $actions[] = [
