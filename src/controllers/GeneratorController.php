@@ -7,8 +7,10 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\controllers\PreviewController;
+use craft\helpers\UrlHelper;
 use craft\web\Application;
 use craft\web\Controller;
+use craft\web\twig\variables\Paginate;
 use yii\base\Event;
 use yii\web\Response;
 
@@ -60,7 +62,7 @@ class GeneratorController extends Controller
      */
     private function _generateResponse(): Response
     {
-        // Remove the token query param
+        // Remove the token query param.
         $tokenParam = Craft::$app->config->general->tokenParam;
         $queryParams = $this->request->getQueryParams();
 
@@ -69,7 +71,16 @@ class GeneratorController extends Controller
             $this->request->setQueryParams($queryParams);
         }
 
-        // Unset the token
+        /**
+         * Update the query string to avoid the token being added to URLs.
+         * @see Paginate::getPageUrl()
+         */
+        $_SERVER['QUERY_STRING'] = http_build_query($queryParams);
+
+        /**
+         * Unset the token to avoid it being added to URLs.
+         * @see UrlHelper::_createUrl()
+         */
         $this->request->setToken(null);
 
         // Recheck whether this is an action request, this time ignoring the token
