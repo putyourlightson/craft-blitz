@@ -73,12 +73,12 @@ class SettingsModel extends Model
     public bool $cachingEnabled = false;
 
     /**
-     * @var int How cache invalidation should be handled.
+     * @var int Determines when and how the cache should be refreshed.
      *
-     * - `self::REFRESH_MODE_EXPIRE`: Expire the cache only
-     * - `self::REFRESH_MODE_CLEAR`: Clear the cache only
-     * - `self::REFRESH_MODE_EXPIRE_AND_GENERATE`: Expire and generate the cache
-     * - `self::REFRESH_MODE_CLEAR_AND_GENERATE`: Clear and generate the cache
+     * - `self::REFRESH_MODE_EXPIRE`: Expire the cache, regenerate manually or organically
+     * - `self::REFRESH_MODE_CLEAR`: Clear the cache, regenerate manually or organically
+     * - `self::REFRESH_MODE_EXPIRE_AND_GENERATE`: Expire the cache and regenerate in a queue job
+     * - `self::REFRESH_MODE_CLEAR_AND_GENERATE`: Clear the cache and regenerate in a queue job
      */
     public int $refreshMode = self::REFRESH_MODE_CLEAR_AND_GENERATE;
 

@@ -25,9 +25,9 @@ return [
         // With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 
-        // How cache refreshing should be handled.
-        // - `0`: Expire the cache, regenerate manually or when visited
-        // - `1`: Clear the cache, regenerate manually or when visited
+        // Determines when and how the cache should be refreshed.
+        // - `0`: Expire the cache, regenerate manually or organically
+        // - `1`: Clear the cache, regenerate manually or organically
         // - `2`: Expire the cache and regenerate in a queue job
         // - `3`: Clear the cache and regenerate in a queue job
         //'refreshMode' => 3,
