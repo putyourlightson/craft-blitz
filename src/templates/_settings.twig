@@ -310,11 +310,11 @@
     <div id="advanced" class="hidden">
 
         {% set info %}
-            <span class="info">{{ 'By default, Blitz only caches HTML responses. With this setting enabled, Blitz will also cache pages that contain non-HTML formats. If enabled, you should ensure that URIs that should not be caches, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.'|t('blitz') }}</span>
+            <span class="info">{{ 'By default, Blitz only caches HTML responses. With this setting enabled, Blitz will also cache pages that return non-HTML responses. If enabled, you should ensure that URIs that should not be caches, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.'|t('blitz') }}</span>
         {% endset %}
         {{ forms.lightswitchField({
             label: "Cache non-HTML Responses"|t('blitz'),
-            instructions: "Whether pages that contain non-HTML should be cached."|t('blitz') ~ info,
+            instructions: "Whether pages that return non-HTML responses should be cached."|t('blitz') ~ info,
             warning: config.cacheNonHtmlResponses is defined ? configWarning('cacheNonHtmlResponses'),
             name: 'settings[cacheNonHtmlResponses]',
             on: settings.cacheNonHtmlResponses,

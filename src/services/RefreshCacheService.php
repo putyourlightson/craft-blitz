@@ -29,7 +29,6 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
 
 /**
@@ -126,7 +125,6 @@ class RefreshCacheService extends Component
     public function getElementCacheIds(array $elementIds): array
     {
         /** @var int[] $ids */
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $ids = ElementCacheRecord::find()
             ->select('cacheId')
             ->where(['elementId' => $elementIds])
@@ -148,7 +146,6 @@ class RefreshCacheService extends Component
     {
         // Get element query records without eager loading
         /** @var ElementQueryRecord[] $records */
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $records = ElementQueryRecord::find()
             ->where(['type' => $elementType])
             ->innerJoinWith([

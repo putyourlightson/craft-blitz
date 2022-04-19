@@ -98,7 +98,7 @@ return [
 
         // The purger type classes to add to the plugin’s default purger types.
         //'cachePurgerTypes' => [
-        //    'putyourlightson\blitzshell\ShellDeployer',
+        //    'putyourlightson\blitzcloudfront\CloudFrontPurger',
         //],
 
         // The deployer type to use.
