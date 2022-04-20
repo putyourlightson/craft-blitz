@@ -133,6 +133,9 @@ return [
         // Whether the cache should automatically be refreshed after a global set is updated.
         //'refreshCacheAutomaticallyForGlobals' => true,
 
+        // Whether the cache should be refreshed when an element is moved within a structure.
+        //'refreshCacheWhenElementMovedInStructure' => true,
+
         // Whether the cache should be refreshed when an element is saved but unchanged.
         //'refreshCacheWhenElementSavedUnchanged' => false,
 

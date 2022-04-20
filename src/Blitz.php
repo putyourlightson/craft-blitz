@@ -12,6 +12,7 @@ use craft\console\controllers\ResaveController;
 use craft\events\BatchElementActionEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
+use craft\events\MoveElementEvent;
 use craft\events\PluginEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -20,6 +21,7 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
 use craft\services\Plugins;
+use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
@@ -99,6 +101,7 @@ class Blitz extends Plugin
         $this->_registerCacheableRequestEvents();
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
+        $this->_registerStructureEvents();
         $this->_registerIntegrationEvents();
         $this->_registerClearCaches();
 
@@ -292,7 +295,7 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers resave elements events
+     * Registers resave element events
      */
     private function _registerResaveElementEvents(): void
     {
@@ -322,6 +325,20 @@ class Blitz extends Plugin
             Event::on($event[0], $event[1],
                 function() {
                     $this->refreshCache->refresh();
+                }
+            );
+        }
+    }
+
+    /**
+     * Registers structure events
+     */
+    private function _registerStructureEvents(): void
+    {
+        if ($this->settings->refreshCacheWhenElementMovedInStructure) {
+            Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
+                function (MoveElementEvent $event) {
+                    $this->refreshCache->addElement($event->element);
                 }
             );
         }
