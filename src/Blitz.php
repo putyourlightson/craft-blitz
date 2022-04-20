@@ -18,6 +18,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
+use craft\log\MonologTarget;
 use craft\services\Elements;
 use craft\services\Plugins;
 use craft\services\UserPermissions;
@@ -26,6 +27,7 @@ use craft\utilities\ClearCaches;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
+use Psr\Log\LogLevel;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
 use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
@@ -41,9 +43,9 @@ use putyourlightson\blitz\services\GenerateCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
-use putyourlightson\logtofile\LogToFile;
 use yii\base\Controller;
 use yii\base\Event;
+use yii\log\Logger;
 use yii\web\Response;
 
 /**
@@ -95,6 +97,9 @@ class Blitz extends Plugin
         $this->_registerComponents();
         $this->_registerVariables();
 
+        // Register a custom log target
+        $this->_registerLogTarget();
+
         // Register events
         $this->_registerCacheableRequestEvents();
         $this->_registerElementEvents();
@@ -117,11 +122,11 @@ class Blitz extends Plugin
     /**
      * Logs an action
      */
-    public function log(string $message, array $params = [], string $type = 'info'): void
+    public function log(string $message, array $params = [], string $type = Logger::LEVEL_INFO): void
     {
         $message = Craft::t('blitz', $message, $params);
 
-        LogToFile::log($message, 'blitz', $type);
+        Craft::getLogger()->log($message, $type, 'blitz');
     }
 
     /**
@@ -142,7 +147,7 @@ class Blitz extends Plugin
             $message .= ' [' . $url . ']';
         }
 
-        LogToFile::log($message, 'blitz', 'debug');
+        Craft::getLogger()->log($message, Logger::LEVEL_INFO, 'blitz');
     }
 
     /**
@@ -196,6 +201,23 @@ class Blitz extends Plugin
                 $variable->set('blitz', BlitzVariable::class);
             }
         );
+    }
+
+    /**
+     * Registers a custom log target
+     */
+    private function _registerLogTarget(): void
+    {
+        // Create a new log target and add it to the dispatcher.
+        $logTarget = new MonologTarget([
+            'name' => 'blitz',
+            'categories' => ['blitz'],
+            'logContext' => false,
+            'allowLineBreaks' => false,
+            'level' => LogLevel::INFO,
+        ]);
+
+        Craft::getLogger()->dispatcher->targets[] = $logTarget;
     }
 
     /**

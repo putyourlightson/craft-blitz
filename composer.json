@@ -20,7 +20,6 @@
         "amphp/http-client": "^4.0",
         "amphp/parallel": "^1.0",
         "craftcms/cms": "^4.0.0-beta.1",
-        "putyourlightson/craft-log-to-file": "^2.0.0-alpha.1",
         "symplify/git-wrapper": "^10.0"
     },
     "require-dev": {

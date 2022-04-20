@@ -16,6 +16,7 @@
 - Replaced all `Warmer` drivers and classes with `Generator` drivers and classes.
 - Replaced the `Guzzle Warmer` with the `HTTP Generator`.
 - Replaced the `Local Warmer` (experimental) with the `Local Generator` (stable).
+- Replaced the `Log To File` helper package with a custom Monolog log target.
 - Changed the included/excluded query string parameters config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php). 
 
 ### Removed
