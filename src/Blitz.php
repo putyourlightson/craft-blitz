@@ -18,6 +18,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
+use craft\log\Dispatcher;
 use craft\log\MonologTarget;
 use craft\services\Elements;
 use craft\services\Plugins;
@@ -27,6 +28,7 @@ use craft\utilities\ClearCaches;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
+use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
@@ -208,14 +210,33 @@ class Blitz extends Plugin
      */
     private function _registerLogTarget(): void
     {
-        // Create a new log target and add it to the dispatcher.
-        Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
+        /**
+         * Create a new log target and add it to the dispatcher.
+         * @see Dispatcher::getTargets()
+         */
+        $logTarget = new MonologTarget([
             'name' => 'blitz',
             'categories' => ['blitz'],
             'logContext' => false,
             'allowLineBreaks' => false,
             'level' => LogLevel::INFO,
+            /**
+             * Give the log target a custom line formatter.
+             * @see MonologTarget::init()
+             */
+            'formatter' => new LineFormatter(
+                /**
+                 * Keep the format simple, loveable and complete.
+                 * @see LineFormatter::SIMPLE_FORMAT
+                 */
+                format: "[%datetime%] %channel%.%level_name%: %message%\n",
+                dateFormat: 'Y-m-d H:i:s',
+                allowInlineLineBreaks: false,
+                ignoreEmptyContextAndExtra: true,
+            ),
         ]);
+
+        Craft::getLogger()->dispatcher->targets[] = $logTarget;
     }
 
     /**
