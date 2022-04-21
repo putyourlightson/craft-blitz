@@ -18,8 +18,6 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
-use craft\log\Dispatcher;
-use craft\log\MonologTarget;
 use craft\services\Elements;
 use craft\services\Plugins;
 use craft\services\UserPermissions;
@@ -28,7 +26,6 @@ use craft\utilities\ClearCaches;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
-use Monolog\Formatter\LineFormatter;
 use Psr\Log\LogLevel;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
@@ -48,7 +45,6 @@ use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Controller;
 use yii\base\Event;
-use yii\log\Logger;
 use yii\web\Response;
 
 /**
@@ -93,7 +89,6 @@ class Blitz extends Plugin
     public function init(): void
     {
         parent::init();
-
         self::$plugin = $this;
 
         // Register services and variables before processing the request
@@ -125,7 +120,7 @@ class Blitz extends Plugin
     /**
      * Logs an action
      */
-    public function log(string $message, array $params = [], string $type = Logger::LEVEL_INFO): void
+    public function log(string $message, array $params = [], string $type = LogLevel::INFO): void
     {
         $message = Craft::t('blitz', $message, $params);
 
@@ -150,7 +145,7 @@ class Blitz extends Plugin
             $message .= ' [' . $url . ']';
         }
 
-        Craft::getLogger()->log($message, Logger::LEVEL_INFO, 'blitz');
+        Craft::getLogger()->log($message, LogLevel::INFO, 'blitz');
     }
 
     /**

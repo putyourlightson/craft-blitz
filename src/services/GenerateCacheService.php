@@ -15,6 +15,7 @@ use craft\events\PopulateElementEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
+use Psr\Log\LogLevel;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -224,8 +225,8 @@ class GenerateCacheService extends Component
 
                 $this->saveElementQuerySources($elementQuery, $queryId);
             }
-            catch (Exception $e) {
-                Blitz::$plugin->log($e->getMessage(), [], 'error');
+            catch (Exception $exception) {
+                Blitz::$plugin->log($exception->getMessage(), [], LogLevel::ERROR);
             }
         }
 

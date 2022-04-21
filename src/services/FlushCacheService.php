@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use Psr\Log\LogLevel;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
@@ -157,8 +158,8 @@ class FlushCacheService extends Component
             try {
                 $db->createCommand($sql)->execute();
             }
-            catch (Exception $e) {
-                Blitz::$plugin->log('Failed to reset auto increment: ' . $e->getMessage(), [], 'error');
+            catch (Exception $exception) {
+                Blitz::$plugin->log('Failed to reset auto increment: ' . $exception->getMessage(), [], LogLevel::ERROR);
             }
         }
     }

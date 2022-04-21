@@ -34,7 +34,7 @@ class LogTarget extends MonologTarget
         $this->categories = [$this->name];
 
         /**
-         * Keep the format simple, loveable and complete.
+         * Make the format as simple as possible.
          * @see LineFormatter::SIMPLE_FORMAT
          */
         $this->formatter = new LineFormatter(

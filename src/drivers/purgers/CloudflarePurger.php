@@ -14,6 +14,7 @@ use craft\helpers\Db;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
+use Psr\Log\LogLevel;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 
@@ -127,8 +128,8 @@ class CloudflarePurger extends BaseCachePurger
                 try {
                     $site = Craft::$app->getSites()->getSiteByUid($siteUid);
                 }
-                catch (SiteNotFoundException $e) {
-                    Blitz::$plugin->log($e->getMessage(), [], 'error');
+                catch (SiteNotFoundException $exception) {
+                    Blitz::$plugin->log($exception->getMessage(), [], LogLevel::ERROR);
 
                     continue;
                 }
@@ -251,7 +252,7 @@ class CloudflarePurger extends BaseCachePurger
                     preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
 
                     if (!empty($matches[1])) {
-                        Blitz::$plugin->log(trim($matches[1], ':'), [], 'error');
+                        Blitz::$plugin->log(trim($matches[1], ':'), [], LogLevel::ERROR);
                     }
                 }
             },

@@ -12,6 +12,7 @@ use craft\events\CancelableEvent;
 use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
+use Psr\Log\LogLevel;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use Symfony\Component\Process\Process;
@@ -187,11 +188,11 @@ class GitDeployer extends BaseDeployer
 
                 $git->fetch();
             }
-            catch (GitException $e) {
+            catch (GitException $exception) {
                 $this->addError('gitRepositories',
                     Craft::t('blitz',
                         'Error connecting to repository: {error}',
-                        ['error' => $e->getMessage()]
+                        ['error' => $exception->getMessage()]
                     )
                 );
             }
@@ -375,7 +376,7 @@ class GitDeployer extends BaseDeployer
             FileHelper::writeToFile($filePath, $value);
         }
         catch (ErrorException|InvalidArgumentException $exception) {
-            Blitz::$plugin->log($exception->getMessage(), [], 'error');
+            Blitz::$plugin->log($exception->getMessage(), [], LogLevel::ERROR);
         }
     }
 
@@ -419,10 +420,10 @@ class GitDeployer extends BaseDeployer
 
             $git->push();
         }
-        catch (GitException $e) {
+        catch (GitException $exception) {
             Blitz::$plugin->log('Remote deploy failed: {error}', [
-                'error' => $e->getMessage(),
-            ], 'error');
+                'error' => $exception->getMessage(),
+            ], LogLevel::ERROR);
 
             throw $e;
         }
