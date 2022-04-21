@@ -36,6 +36,7 @@ use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\helpers\IntegrationHelper;
+use putyourlightson\blitz\log\LogTarget;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\services\CacheTagsService;
@@ -210,33 +211,9 @@ class Blitz extends Plugin
      */
     private function _registerLogTarget(): void
     {
-        /**
-         * Create a new log target and add it to the dispatcher.
-         * @see Dispatcher::getTargets()
-         */
-        $logTarget = new MonologTarget([
-            'name' => 'blitz',
-            'categories' => ['blitz'],
-            'logContext' => false,
-            'allowLineBreaks' => false,
-            'level' => LogLevel::INFO,
-            /**
-             * Give the log target a custom line formatter.
-             * @see MonologTarget::init()
-             */
-            'formatter' => new LineFormatter(
-                /**
-                 * Keep the format simple, loveable and complete.
-                 * @see LineFormatter::SIMPLE_FORMAT
-                 */
-                format: "[%datetime%] %channel%.%level_name%: %message%\n",
-                dateFormat: 'Y-m-d H:i:s',
-                allowInlineLineBreaks: false,
-                ignoreEmptyContextAndExtra: true,
-            ),
+        Craft::getLogger()->dispatcher->targets[] = new LogTarget([
+            'name' => 'blitz'
         ]);
-
-        Craft::getLogger()->dispatcher->targets[] = $logTarget;
     }
 
     /**
