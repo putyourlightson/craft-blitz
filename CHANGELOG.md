@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.0.0-beta.6 - Unreleased
+### Changed
+- Replaced the `Log To File` helper package with a custom Monolog log target.
+
 ## 4.0.0-beta.5 - 2022-04-18
 ### Changed
 - Improved instruction text in the plugin settings.
