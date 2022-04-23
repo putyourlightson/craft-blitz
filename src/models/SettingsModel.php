@@ -193,6 +193,11 @@ class SettingsModel extends Model
     public bool $refreshCacheAutomaticallyForGlobals = true;
 
     /**
+     * @var bool Whether the cache should be refreshed when an element is moved within a structure.
+     */
+    public bool $refreshCacheWhenElementMovedInStructure = true;
+
+    /**
      * @var bool Whether the cache should be refreshed when an element is saved but unchanged.
      */
     public bool $refreshCacheWhenElementSavedUnchanged = false;
