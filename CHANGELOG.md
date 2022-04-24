@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
 ## 4.0.0-beta.6 - Unreleased
+### Added
+- Added a new `refreshCacheWhenElementMovedInStructure` setting, defaulting to `true`, that controls whether the cache should be refreshed when an element is moved within a structure ([#289](https://github.com/putyourlightson/craft-blitz/issues/289)).
+
 ### Changed
 - Replaced the `Log To File` helper package with a custom Monolog log target.
 
