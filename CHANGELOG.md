@@ -6,6 +6,7 @@
 
 ### Changed
 - Replaced the `Log To File` helper package with a custom Monolog log target.
+- Improved instruction text for `Query String Caching` settings.
 
 ## 4.0.0-beta.5 - 2022-04-18
 ### Changed

@@ -1,6 +1,7 @@
 {% extends '_layouts/cp' %}
 
 {% import '_includes/forms' as forms %}
+{% from 'blitz/_macros' import instructions %}
 {% from 'blitz/_macros' import configWarning %}
 {% from 'blitz/_macros' import configFieldWarning %}
 
@@ -68,11 +69,11 @@
 
             <div class="flex-grow field">
                 {% set info %}
-                    <span class="info">{{ 'With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disabling this setting will prevent Blitz from caching any new pages.'|t('blitz') }}</span>
+                    {{ 'With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disabling this setting will prevent Blitz from caching any new pages.'|t('blitz') }}
                 {% endset %}
                 {{ forms.lightswitchField({
                     label: "Caching Enabled"|t('blitz'),
-                    instructions: "Whether caching should be enabled."|t('blitz') ~ info,
+                    instructions: instructions("Whether caching should be enabled."|t('blitz'), info),
                     warning: config.cachingEnabled is defined ? configWarning('cachingEnabled'),
                     name: 'settings[cachingEnabled]',
                     on: settings.cachingEnabled,
@@ -86,37 +87,32 @@
             <div class="flex-grow">
                 {# This empty span ensures that the field is not the first element, which throws off vertical margin. #}
                 <span></span>
-                {% set instructions -%}
-                    <div>
-                        {{ "Determines when and how the cache should be refreshed."|t('blitz') }}
-                        <div class="info">
-                            <p>
-                                <strong>Clear the cache and regenerate in a queue job</strong>
-                                <br>
-                                Select this if updated content should be applied as soon as possible and if cached pages should be automatically regenerated.
-                            </p>
-                            <p>
-                                <strong>Expire the cache and regenerate in a queue job</strong>
-                                <br>
-                                Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are automatically regenerated.
-                            </p>
-                            <p>
-                                <strong>Clear the cache, regenerate manually or organically</strong>
-                                <br>
-                                Select this if updated content should be applied as soon as possible but if cached pages should be regenerated manually (via a cron job) or organically (when pages are visited).
-                            </p>
-                            <p>
-                                <strong>Expire the cache, regenerate manually or organically</strong>
-                                <br>
-                                Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are regenerated manually (via a cron job).
-                            </p>
-                            <a href="{{ docs ~ 'refresh-mode' }}" class="go" target="_blank">Learn more</a>
-                        </div>
-                    </div>
-                {%- endset %}
+                {% set info %}
+                    <p>
+                        <strong>Clear the cache and regenerate in a queue job</strong>
+                        <br>
+                        Select this if updated content should be applied as soon as possible and if cached pages should be automatically regenerated.
+                    </p>
+                    <p>
+                        <strong>Expire the cache and regenerate in a queue job</strong>
+                        <br>
+                        Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are automatically regenerated.
+                    </p>
+                    <p>
+                        <strong>Clear the cache, regenerate manually or organically</strong>
+                        <br>
+                        Select this if updated content should be applied as soon as possible but if cached pages should be regenerated manually (via a cron job) or organically (when pages are visited).
+                    </p>
+                    <p>
+                        <strong>Expire the cache, regenerate manually or organically</strong>
+                        <br>
+                        Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are regenerated manually (via a cron job).
+                    </p>
+                    <a href="{{ docs ~ 'refresh-mode' }}" class="go" target="_blank">Learn more</a>
+                {% endset %}
                 {{ forms.selectField({
                     label: "Refresh Mode"|t('blitz'),
-                    instructions: instructions,
+                    instructions: instructions("Determines when and how the cache should be refreshed."|t('blitz'), info),
                     warning: config.refreshMode is defined ? configWarning('refreshMode'),
                     name: 'settings[refreshMode]',
                     options: {
@@ -150,11 +146,11 @@
 
                 <input type="hidden" name="includedUriPatterns" value="" />
                 {% set info %}
-                    <span class="info">{{ 'Only URIs that match one or more included URI patterns will be cached.'|t('blitz') }}</span>
+                    {{ 'Only URIs that match one or more included URI patterns will be cached.'|t('blitz') }}
                 {% endset %}
                 {{ forms.editableTableField({
                     label: "Included URI Patterns"|t('blitz'),
-                    instructions: "The URI patterns to include in caching."|t('blitz') ~ info,
+                    instructions: instructions("The URI patterns to include in caching."|t('blitz'), info),
                     warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
                     name: 'settings[includedUriPatterns]',
                     id: 'includedUriPatterns',
@@ -168,11 +164,11 @@
 
                 <input type="hidden" name="excludedUriPatterns" value="" />
                 {% set info %}
-                    <span class="info">{{ 'URIs that match one or more excluded URI patterns will not be cached. Excluded URI patterns will override any matching included URI patterns.'|t('blitz') }}</span>
+                    {{ 'URIs that match one or more excluded URI patterns will not be cached. Excluded URI patterns will override any matching included URI patterns.'|t('blitz') }}
                 {% endset %}
                 {{ forms.editableTableField({
                     label: "Exclude URI Patterns"|t('blitz'),
-                    instructions: "The URI patterns to exclude from caching."|t('blitz') ~ info,
+                    instructions: instructions("The URI patterns to exclude from caching."|t('blitz'), info),
                     warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
                     name: 'settings[excludedUriPatterns]',
                     id: 'excludedUriPatterns',
@@ -191,11 +187,11 @@
 
     <div id="storage" class="hidden">
         {% set info %}
-            <span class="info">{{ 'The storage type determines how and where cached pages are stored. You can extend Blitz to add your own or third-party cache storage types.'|t('blitz') }} <a href="{{ docs ~ 'cache-storage' }}" class="go" target="_blank">Learn more</a></span>
+            {{ 'The storage type determines how and where cached pages are stored. You can extend Blitz to add your own or third-party cache storage types.'|t('blitz') }} <a href="{{ docs ~ 'cache-storage' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Storage"|t('blitz'),
-            instructions: "The storage type to use for storing cached pages."|t('blitz') ~ info,
+            instructions: instructions("The storage type to use for storing cached pages."|t('blitz'), info),
             warning: (config.cacheStorageType is defined ? configWarning('cacheStorageType')),
             name: 'settings[cacheStorageType]',
             options: storageTypeOptions,
@@ -217,11 +213,11 @@
 
     <div id="generation" class="hidden">
         {% set info %}
-            <span class="info">{{ 'The generator determines how the cache is generated. You can extend Blitz to add your own or third-party cache generators.'|t('blitz') }} <a href="{{ docs ~ 'cache-generation' }}" class="go" target="_blank">Learn more</a></span>
+            {{ 'The generator determines how the cache is generated. You can extend Blitz to add your own or third-party cache generators.'|t('blitz') }} <a href="{{ docs ~ 'cache-generation' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Generator"|t('blitz'),
-            instructions: "The generator type to use for generating the cache."|t('blitz') ~ info,
+            instructions: instructions("The generator type to use for generating the cache."|t('blitz'), info),
             warning: (config.cacheGeneratorType is defined ? configWarning('cacheGeneratorType')),
             name: 'settings[cacheGeneratorType]',
             options: generatorTypeOptions,
@@ -258,11 +254,11 @@
 
         <input type="hidden" name="customSiteUris" value="" />
         {% set info %}
-            <span class="info">{{ 'Add any URIs that Craft doesn’t know about here and they will be generated when either a site or the entire cache is generated.'|t('blitz') }}</span>
+            {{ 'Add any URIs that Craft doesn’t know about here and they will be generated when either a site or the entire cache is generated.'|t('blitz') }}
         {% endset %}
         {{ forms.editableTableField({
             label: "Custom Site URIs"|t('blitz'),
-            instructions: "Custom site URIs to include when generating the cache."|t('blitz') ~ info,
+            instructions: instructions("Custom site URIs to include when generating the cache."|t('blitz'), info),
             warning: (config.customSiteUris is defined ? configWarning('customSiteUris')),
             name: 'settings[customSiteUris]',
             id: 'customSiteUris',
@@ -277,11 +273,11 @@
 
     <div id="purging" class="hidden">
         {% set info %}
-            <span class="info">{{ 'A purger allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated. You can extend Blitz to add your own or third-party reverse proxy purgers.'|t('blitz') }} <a href="{{ docs ~ 'reverse-proxy-purging' }}" class="go" target="_blank">Learn more</a></span>
+            {{ 'A purger allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated. You can extend Blitz to add your own or third-party reverse proxy purgers.'|t('blitz') }} <a href="{{ docs ~ 'reverse-proxy-purging' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Reverse Proxy Purger"|t('blitz'),
-            instructions: "A purger to use for clearing cache in a reverse proxy."|t('blitz') ~ info,
+            instructions: instructions("A purger to use for clearing cache in a reverse proxy."|t('blitz'), info),
             warning: (config.cachePurgerType is defined ? configWarning('cachePurgerType')),
             name: 'settings[cachePurgerType]',
             options: purgerTypeOptions,
@@ -303,11 +299,11 @@
 
     <div id="deployment" class="hidden">
         {% set info %}
-            <span class="info">{{ 'A deployer allows you to deploy cached files to a remote location. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been generated. You can extend Blitz to add your own or third-party deployers.'|t('blitz') }} <a href="{{ docs ~ 'remote-deployment' }}" class="go" target="_blank">Learn more</a></span>
+            {{ 'A deployer allows you to deploy cached files to a remote location. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been generated. You can extend Blitz to add your own or third-party deployers.'|t('blitz') }} <a href="{{ docs ~ 'remote-deployment' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Remote Deployer"|t('blitz'),
-            instructions: "A deployer to use for remotely deploying cached files."|t('blitz') ~ info,
+            instructions: instructions("A deployer to use for remotely deploying cached files."|t('blitz'), info),
             warning: (config.deployerType is defined ? configWarning('deployerType')),
             name: 'settings[deployerType]',
             options: deployerTypeOptions,
@@ -330,22 +326,37 @@
     <div id="advanced" class="hidden">
 
         {% set info %}
-            <span class="info">{{ 'By default, Blitz only caches HTML responses. With this setting enabled, Blitz will also cache pages that return non-HTML responses. If enabled, you should ensure that URIs that should not be caches, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.'|t('blitz') }}</span>
+            {{ 'By default, Blitz only caches HTML responses. With this setting enabled, Blitz will also cache pages that return non-HTML responses. If enabled, you should ensure that URIs that should not be caches, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.'|t('blitz') }}
         {% endset %}
         {{ forms.lightswitchField({
             label: "Cache non-HTML Responses"|t('blitz'),
-            instructions: "Whether pages that return non-HTML responses should be cached."|t('blitz') ~ info,
+            instructions: instructions("Whether pages that return non-HTML responses should be cached."|t('blitz'), info),
             warning: config.cacheNonHtmlResponses is defined ? configWarning('cacheNonHtmlResponses'),
             name: 'settings[cacheNonHtmlResponses]',
             on: settings.cacheNonHtmlResponses,
         }) }}
 
         {% set info %}
-            <span class="info">{{ 'This setting determines how URLs with query strings will be cached.'|t('blitz') }} <a href="{{ docs ~ 'query-string-caching' }}" class="go" target="_blank">Learn more</a></span>
+            <p>
+                <strong>Do not cache URLs with query strings</strong>
+                <br>
+                URLs with query strings (anything following a <code>?</code> in a URL) will not be cached.
+            </p>
+            <p>
+                <strong>Cache URLs with query strings as unique pages</strong>
+                <br>
+                URLs with query strings will be cached as unique pages, so <code>domain.com/about</code>, <code>domain.com/about?utm_source=twitter</code> and <code>domain.com/about?utm_source=facebook</code> will be cached separately.
+            </p>
+            <p>
+                <strong>Cache URLs with query strings as the same page</strong>
+                <br>
+                URLs with query strings will be cached as the same page, so <code>domain.com/about</code>, <code>domain.com/about?utm_source=twitter</code> and <code>domain.com/about?utm_source=facebook</code> will all be cached with the same output.
+            </p>
+            <a href="{{ docs ~ 'query-string-caching' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Query String Caching"|t('blitz'),
-            instructions: "Whether URLs with query strings should cached and how."|t('blitz') ~ info,
+            instructions: instructions("Whether URLs with query strings should cached and how."|t('blitz'), info),
             warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
             name: 'settings[queryStringCaching]',
             options: {
