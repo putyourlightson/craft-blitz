@@ -183,36 +183,6 @@ class SettingsModel extends Model
     public array $deployerTypes = [];
 
     /**
-     * @var bool Whether pages containing query string parameters should be generated.
-     */
-    public bool $generatePagesWithQueryStringParams = true;
-
-    /**
-     * @var bool Whether the cache should automatically be refreshed after a global set is updated.
-     */
-    public bool $refreshCacheAutomaticallyForGlobals = true;
-
-    /**
-     * @var bool Whether the cache should be refreshed when an element is moved within a structure.
-     */
-    public bool $refreshCacheWhenElementMovedInStructure = true;
-
-    /**
-     * @var bool Whether the cache should be refreshed when an element is saved but unchanged.
-     */
-    public bool $refreshCacheWhenElementSavedUnchanged = false;
-
-    /**
-     * @var bool Whether the cache should be refreshed when an element is saved but not live.
-     */
-    public bool $refreshCacheWhenElementSavedNotLive = false;
-
-    /**
-     * @var bool Whether non-HTML responses should be cached.
-     */
-    public bool $cacheNonHtmlResponses = false;
-
-    /**
      * @var int Whether URLs with query strings should be cached and how.
      *
      * - `self::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
@@ -267,6 +237,36 @@ class SettingsModel extends Model
      * @var string An API key that can be used via a URL (min. 16 characters).
      */
     public string $apiKey = '';
+
+    /**
+     * @var bool Whether pages containing query string parameters should be generated.
+     */
+    public bool $generatePagesWithQueryStringParams = true;
+
+    /**
+     * @var bool Whether the cache should automatically be refreshed after a global set is updated.
+     */
+    public bool $refreshCacheAutomaticallyForGlobals = true;
+
+    /**
+     * @var bool Whether the cache should be refreshed when an element is moved within a structure.
+     */
+    public bool $refreshCacheWhenElementMovedInStructure = true;
+
+    /**
+     * @var bool Whether the cache should be refreshed when an element is saved but unchanged.
+     */
+    public bool $refreshCacheWhenElementSavedUnchanged = false;
+
+    /**
+     * @var bool Whether the cache should be refreshed when an element is saved but not live.
+     */
+    public bool $refreshCacheWhenElementSavedNotLive = false;
+
+    /**
+     * @var bool Whether non-HTML responses should be cached.
+     */
+    public bool $cacheNonHtmlResponses = false;
 
     /**
      * @var bool Whether elements should be cached in the database.
@@ -449,7 +449,7 @@ class SettingsModel extends Model
         return [
             [['cacheStorageType', 'cacheGeneratorType', 'queryStringCaching'], 'required'],
             [['cacheStorageType', 'cacheGeneratorType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
-            [['queryStringCaching'], 'in', 'range' => [
+            [['refreshMode'], 'in', 'range' => [
                 self::REFRESH_MODE_EXPIRE,
                 self::REFRESH_MODE_CLEAR,
                 self::REFRESH_MODE_EXPIRE_AND_GENERATE,

@@ -8,10 +8,10 @@
 - Added a new `Refresh Mode` setting that determines when and how the cache should be refreshed.
 - Added the concept of cache generation, that supersedes cache warming, and is used both for generating, regenerating and in some cases removing cached pages.
 - Added the ability to revalidate cached pages that have expired when serving cached responses ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
-- Added a new `cacheNonHtmlResponses` setting to the Advanced Settings tab, defaulting to `false`, that allows enabling caching of pages that return non-HTML responses.
-- Added a new `refreshCacheWhenElementMovedInStructure` setting, defaulting to `true`, that controls whether the cache should be refreshed when an element is moved within a structure ([#289](https://github.com/putyourlightson/craft-blitz/issues/289)).
 - Added the included/excluded query string parameter settings to the Advanced Settings tab and added the ability for them to be site-specific.
 - Added the ability for cache purgers to be run in queue jobs.
+- Added a new `refreshCacheWhenElementMovedInStructure` config setting, defaulting to `true`, that controls whether the cache should be refreshed when an element is moved within a structure ([#289](https://github.com/putyourlightson/craft-blitz/issues/289)).
+- Added a new `cacheNonHtmlResponses` config setting, defaulting to `false`, that allows enabling caching of pages that return non-HTML responses.
 
 ### Changed
 - Replaced all `Warmer` drivers and classes with `Generator` drivers and classes.

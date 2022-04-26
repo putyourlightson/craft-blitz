@@ -127,24 +127,6 @@ return [
         //    'putyourlightson\blitzshell\ShellDeployer',
         //],
 
-        // Whether pages containing query string parameters should be generated.
-        //'generatePagesWithQueryStringParams' => true,
-
-        // Whether the cache should automatically be refreshed after a global set is updated.
-        //'refreshCacheAutomaticallyForGlobals' => true,
-
-        // Whether the cache should be refreshed when an element is moved within a structure.
-        //'refreshCacheWhenElementMovedInStructure' => true,
-
-        // Whether the cache should be refreshed when an element is saved but unchanged.
-        //'refreshCacheWhenElementSavedUnchanged' => false,
-
-        // Whether the cache should be refreshed when an element is saved but not live.
-        //'refreshCacheWhenElementSavedNotLive' => false,
-
-        // Whether non-HTML responses should be cached.
-        //'cacheNonHtmlResponses' => false,
-
         // Whether URLs with query strings should be cached and how.
         // - `0`: Do not cache URLs with query strings
         // - `1`: Cache URLs with query strings as unique pages
@@ -171,8 +153,23 @@ return [
         // An API key that can be used via a URL (min. 16 characters).
         //'apiKey' => '',
 
-        // A path to the `bin` folder that should be forced.
-        //'binPath' => '',
+        // Whether pages containing query string parameters should be generated.
+        //'generatePagesWithQueryStringParams' => true,
+
+        // Whether the cache should automatically be refreshed after a global set is updated.
+        //'refreshCacheAutomaticallyForGlobals' => true,
+
+        // Whether the cache should be refreshed when an element is moved within a structure.
+        //'refreshCacheWhenElementMovedInStructure' => true,
+
+        // Whether the cache should be refreshed when an element is saved but unchanged.
+        //'refreshCacheWhenElementSavedUnchanged' => false,
+
+        // Whether the cache should be refreshed when an element is saved but not live.
+        //'refreshCacheWhenElementSavedNotLive' => false,
+
+        // Whether non-HTML responses should be cached. With this setting enabled, Blitz will also cache pages that return non-HTML responses. If enabled, you should ensure that URIs that should not be caches, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.
+        //'cacheNonHtmlResponses' => false,
 
         // Whether elements should be cached in the database.
         //'cacheElements' => true,
