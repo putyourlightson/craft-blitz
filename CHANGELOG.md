@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.12.2 - 2022-04-26
+### Fixed
+- Fixed a bug in which the `permissionsPolicyHeader` and `disallowRobots` general config settings were being accessed without ensuring that they exist first, since they were added in Craft 3.x ([#398](https://github.com/putyourlightson/craft-blitz/issues/398)).
+
 ## 3.12.1 - 2022-04-14
 > {tip} The cache should be manually refreshed following this update in order to ensure the fix is applied.
 

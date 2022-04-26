@@ -437,12 +437,18 @@ class CacheRequestService extends Component
         $headers = $response->getHeaders();
         $generalConfig = Craft::$app->getConfig()->getGeneral();
 
-        if ($generalConfig->permissionsPolicyHeader) {
-            $headers->set('Permissions-Policy', $generalConfig->permissionsPolicyHeader);
+        // TODO: Remove in Blitz 4, since the setting was only added in Craft 3.6.14
+        $permissionsPolicyHeader = $generalConfig->permissionsPolicyHeader ?? null;
+
+        if ($permissionsPolicyHeader) {
+            $headers->set('Permissions-Policy', $permissionsPolicyHeader);
         }
 
+        // TODO: Remove in Blitz 4, since the setting was only added in Craft 3.5.10
+        $disallowRobots = $generalConfig->disallowRobots ?? null;
+
         // Tell bots not to index/follow CP and tokenized pages
-        if ($generalConfig->disallowRobots) {
+        if ($disallowRobots) {
             $headers->set('X-Robots-Tag', 'none');
         }
 
