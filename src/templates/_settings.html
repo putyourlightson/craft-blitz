@@ -64,7 +64,6 @@
                     warning: config.cachingEnabled is defined ? configWarning('cachingEnabled'),
                     name: 'settings[cachingEnabled]',
                     on: settings.cachingEnabled,
-                    required: true,
                 }) }}
             </div>
         </div>
@@ -147,7 +146,6 @@
             name: 'settings[cacheStorageType]',
             options: storageTypeOptions,
             value: className(storageDriver),
-            required: true,
             toggle: true,
         }) }}
 
@@ -174,7 +172,6 @@
             name: 'settings[cacheWarmerType]',
             options: warmerTypeOptions,
             value: className(warmerDriver),
-            required: true,
             toggle: true,
         }) }}
 
@@ -232,7 +229,6 @@
             name: 'settings[cachePurgerType]',
             options: purgerTypeOptions,
             value: className(purgerDriver),
-            required: true,
             toggle: true,
         }) }}
 
@@ -259,7 +255,6 @@
             name: 'settings[deployerType]',
             options: deployerTypeOptions,
             value: className(deployerDriver),
-            required: true,
             toggle: true,
         }) }}
 
@@ -285,7 +280,6 @@
             warning: (config.clearCacheAutomatically is defined ? configWarning('clearCacheAutomatically')),
             name: 'settings[clearCacheAutomatically]',
             on: settings.clearCacheAutomatically,
-            required: true,
         }) }}
 
         {% set info %}
@@ -297,7 +291,6 @@
             warning: (config.warmCacheAutomatically is defined ? configWarning('warmCacheAutomatically')),
             name: 'settings[warmCacheAutomatically]',
             on: settings.warmCacheAutomatically,
-            required: true,
         }) }}
 
         {% set info %}
@@ -314,7 +307,6 @@
                 2: "Cache URLs with unique query strings as the same page"|t('blitz'),
             },
             value: settings.queryStringCaching,
-            required: true,
         }) }}
 
         {{ forms.autosuggestField({
