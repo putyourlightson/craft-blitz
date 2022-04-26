@@ -2,7 +2,7 @@
 
 ## 3.12.2 - 2022-04-26
 ### Changed
-- Cleaned up settings page elements.
+- Improved instruction text for `Query String Caching` setting and cleaned up settings elements.
 
 ### Fixed
 - Fixed a bug in which the `permissionsPolicyHeader` and `disallowRobots` general config settings were being accessed without ensuring that they exist first, since they were added in Craft 3.x ([#398](https://github.com/putyourlightson/craft-blitz/issues/398)).
