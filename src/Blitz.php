@@ -48,6 +48,7 @@ use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\base\Controller;
 use yii\base\Event;
+use yii\log\Logger;
 use yii\web\Response;
 
 /**
@@ -122,9 +123,9 @@ class Blitz extends Plugin
     }
 
     /**
-     * Logs an action
+     * Logs a message
      */
-    public function log(string $message, array $params = [], string $type = LogLevel::INFO): void
+    public function log(string $message, array $params = [], int $type = Logger::LEVEL_INFO): void
     {
         $message = Craft::t('blitz', $message, $params);
 
@@ -149,7 +150,7 @@ class Blitz extends Plugin
             $message .= ' [' . $url . ']';
         }
 
-        Craft::getLogger()->log($message, LogLevel::INFO, 'blitz');
+        Craft::getLogger()->log($message, Logger::LEVEL_INFO, 'blitz');
     }
 
     /**
@@ -359,7 +360,7 @@ class Blitz extends Plugin
     {
         if ($this->settings->refreshCacheWhenElementMovedInStructure) {
             Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
-                function (MoveElementEvent $event) {
+                function(MoveElementEvent $event) {
                     $this->refreshCache->addElement($event->element);
                 }
             );

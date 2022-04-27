@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.0.0-beta.7 - Unreleased
+### Fixed
+- Fixed a bug in the custom log and debug methods.
+
 ## 4.0.0-beta.6 - 2022-04-26
 ### Added
 - Added a new `refreshCacheWhenElementMovedInStructure` setting, defaulting to `true`, that controls whether the cache should be refreshed when an element is moved within a structure ([#289](https://github.com/putyourlightson/craft-blitz/issues/289)).
@@ -46,6 +50,13 @@
 - Removed the `warmCacheDelay` property from the `CachePurgerTrait` class.
 - Removed the `delay` property from the `DriverJob` class. 
 - Removed the `delay` parameter from all methods in the `CacheWarmerInterface` class.  
+
+## 3.12.2 - 2022-04-26
+### Changed
+- Improved instruction text for `Query String Caching` setting and cleaned up settings elements.
+
+### Fixed
+- Fixed a bug in which the `permissionsPolicyHeader` and `disallowRobots` general config settings were being accessed without ensuring that they exist first, since they were added in Craft 3.x ([#398](https://github.com/putyourlightson/craft-blitz/issues/398)).
 
 ## 3.12.1 - 2022-04-14
 > {tip} The cache should be manually refreshed following this update in order to ensure the fix is applied.

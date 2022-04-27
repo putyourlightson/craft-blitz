@@ -14,9 +14,9 @@ use craft\helpers\Db;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Request;
-use Psr\Log\LogLevel;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use yii\log\Logger;
 
 /**
  * @property-read null|string $settingsHtml
@@ -129,7 +129,7 @@ class CloudflarePurger extends BaseCachePurger
                     $site = Craft::$app->getSites()->getSiteByUid($siteUid);
                 }
                 catch (SiteNotFoundException $exception) {
-                    Blitz::$plugin->log($exception->getMessage(), [], LogLevel::ERROR);
+                    Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
 
                     continue;
                 }
@@ -252,7 +252,7 @@ class CloudflarePurger extends BaseCachePurger
                     preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
 
                     if (!empty($matches[1])) {
-                        Blitz::$plugin->log(trim($matches[1], ':'), [], LogLevel::ERROR);
+                        Blitz::$plugin->log(trim($matches[1], ':'), [], Logger::LEVEL_ERROR);
                     }
                 }
             },

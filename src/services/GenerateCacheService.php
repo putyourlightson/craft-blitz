@@ -15,7 +15,6 @@ use craft\events\PopulateElementEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
-use Psr\Log\LogLevel;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -31,6 +30,7 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use yii\base\Event;
 use yii\db\Exception;
+use yii\log\Logger;
 
 class GenerateCacheService extends Component
 {
@@ -226,7 +226,7 @@ class GenerateCacheService extends Component
                 $this->saveElementQuerySources($elementQuery, $queryId);
             }
             catch (Exception $exception) {
-                Blitz::$plugin->log($exception->getMessage(), [], LogLevel::ERROR);
+                Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
             }
         }
 

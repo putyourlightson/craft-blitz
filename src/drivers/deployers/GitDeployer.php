@@ -12,7 +12,6 @@ use craft\events\CancelableEvent;
 use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
-use Psr\Log\LogLevel;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use Symfony\Component\Process\Process;
@@ -22,6 +21,7 @@ use Symplify\GitWrapper\GitWrapper;
 use yii\base\ErrorException;
 use yii\base\Event;
 use yii\base\InvalidArgumentException;
+use yii\log\Logger;
 
 /**
  * @property-read null|string $settingsHtml
@@ -376,7 +376,7 @@ class GitDeployer extends BaseDeployer
             FileHelper::writeToFile($filePath, $value);
         }
         catch (ErrorException|InvalidArgumentException $exception) {
-            Blitz::$plugin->log($exception->getMessage(), [], LogLevel::ERROR);
+            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }
 
@@ -423,9 +423,9 @@ class GitDeployer extends BaseDeployer
         catch (GitException $exception) {
             Blitz::$plugin->log('Remote deploy failed: {error}', [
                 'error' => $exception->getMessage(),
-            ], LogLevel::ERROR);
+            ], Logger::LEVEL_ERROR);
 
-            throw $e;
+            throw $exception;
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_COMMIT)) {
