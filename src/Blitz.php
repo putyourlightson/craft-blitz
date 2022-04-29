@@ -178,32 +178,33 @@ class Blitz extends Plugin
     /**
      * Registers the components that should be defined via settings, providing
      * they have not already been set in `$pluginConfigs`.
+     *
      * @see Plugins::$pluginConfigs
      */
     private function _registerComponents(): void
     {
-        if ($this->get('cacheStorage') === null) {
+        if (!$this->has('cacheStorage')) {
             $this->set('cacheStorage', array_merge(
                 ['class' => $this->settings->cacheStorageType],
                 $this->settings->cacheStorageSettings,
             ));
         }
 
-        if ($this->get('cacheGenerator') === null) {
+        if (!$this->has('cacheGenerator')) {
             $this->set('cacheGenerator', array_merge(
                 ['class' => $this->settings->cacheGeneratorType],
                 $this->settings->cacheGeneratorSettings,
             ));
         }
 
-        if ($this->get('cachePurger') === null) {
+        if (!$this->has('cachePurger')) {
             $this->set('cachePurger', array_merge(
                 ['class' => $this->settings->cachePurgerType],
                 $this->settings->cachePurgerSettings,
             ));
         }
 
-        if ($this->get('deployer') === null) {
+        if (!$this->has('deployer')) {
             $this->set('deployer', array_merge(
                 ['class' => $this->settings->deployerType],
                 $this->settings->deployerSettings,
