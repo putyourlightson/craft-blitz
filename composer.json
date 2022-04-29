@@ -19,7 +19,7 @@
         "php": "^8.0.2",
         "amphp/http-client": "^4.0",
         "amphp/parallel": "^1.0",
-        "craftcms/cms": "^4.0.0-beta.1",
+        "craftcms/cms": "^4.0.0-RC2",
         "symplify/git-wrapper": "^10.0"
     },
     "require-dev": {

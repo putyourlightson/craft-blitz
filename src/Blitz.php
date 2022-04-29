@@ -73,6 +73,23 @@ class Blitz extends Plugin
     public static Blitz $plugin;
 
     /**
+     * @inerhitdoc
+     */
+    public static function config(): array
+    {
+        return [
+            'components' => [
+                'cacheRequest' => ['class' => CacheRequestService::class],
+                'cacheTags' => ['class' => CacheTagsService::class],
+                'clearCache' => ['class' => ClearCacheService::class],
+                'flushCache' => ['class' => FlushCacheService::class],
+                'generateCache' => ['class' => GenerateCacheService::class],
+                'refreshCache' => ['class' => RefreshCacheService::class],
+            ],
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public bool $hasCpSettings = true;
@@ -95,11 +112,8 @@ class Blitz extends Plugin
         parent::init();
         self::$plugin = $this;
 
-        // Register services and variables before processing the request
         $this->_registerComponents();
         $this->_registerVariables();
-
-        // Register a custom log target
         $this->_registerLogTarget();
 
         // Register events
@@ -162,34 +176,37 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers the components
+     * Registers the components that should be defined via settings
      */
     private function _registerComponents(): void
     {
-        $this->setComponents([
-            'cacheRequest' => CacheRequestService::class,
-            'cacheTags' => CacheTagsService::class,
-            'clearCache' => ClearCacheService::class,
-            'flushCache' => FlushCacheService::class,
-            'generateCache' => GenerateCacheService::class,
-            'refreshCache' => RefreshCacheService::class,
-            'cacheStorage' => array_merge(
+        if (!isset($this->cacheStorage)) {
+            $this->set('cacheStorage', array_merge(
                 ['class' => $this->settings->cacheStorageType],
-                $this->settings->cacheStorageSettings
-            ),
-            'cacheGenerator' => array_merge(
+                $this->settings->cacheStorageSettings,
+            ));
+        }
+
+        if (!isset($this->cacheGenerator)) {
+            $this->set('cacheGenerator', array_merge(
                 ['class' => $this->settings->cacheGeneratorType],
-                $this->settings->cacheGeneratorSettings
-            ),
-            'cachePurger' => array_merge(
+                $this->settings->cacheGeneratorSettings,
+            ));
+        }
+
+        if (!isset($this->cachePurger)) {
+            $this->set('cachePurger', array_merge(
                 ['class' => $this->settings->cachePurgerType],
-                $this->settings->cachePurgerSettings
-            ),
-            'deployer' => array_merge(
+                $this->settings->cachePurgerSettings,
+            ));
+        }
+
+        if (!isset($this->deployer)) {
+            $this->set('deployer', array_merge(
                 ['class' => $this->settings->deployerType],
-                $this->settings->deployerSettings
-            ),
-        ]);
+                $this->settings->deployerSettings,
+            ));
+        }
     }
 
     /**
