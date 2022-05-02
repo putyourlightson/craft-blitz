@@ -65,15 +65,19 @@ class m220330_120000_update_settings extends Migration
         return false;
     }
 
-    private function _getGeneratorType(string $warmerType): string
+    private function _getGeneratorType(?string $warmerType): string
     {
-        return $warmerType == 'putyourlightson\\blitz\\drivers\\warmers\\LocalWarmer'
+        return $warmerType === 'putyourlightson\\blitz\\drivers\\warmers\\LocalWarmer'
             ? LocalGenerator::class : HttpGenerator::class;
     }
 
     private function _getRefreshMode(bool $clear, bool $generate): int
     {
-        return $clear ? ($generate ? 3 : 1) : ($generate ? 2 : 0);
+        if ($clear) {
+            return $generate ? 3 : 1;
+        }
+
+        return $generate ? 2 : 0;
     }
 
     private function _updateQueryStringParams(array &$queryStringParams): void
