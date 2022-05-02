@@ -51,6 +51,10 @@
 - Removed the `delay` property from the `DriverJob` class. 
 - Removed the `delay` parameter from all methods in the `CacheWarmerInterface` class.  
 
+## 3.12.3 - Unreleased
+### Fixed
+- Fixed a bug in which queue drivers that do not support priorities were throwing an exception ([#400](https://github.com/putyourlightson/craft-blitz/issues/400)).
+
 ## 3.12.2 - 2022-04-26
 ### Changed
 - Improved instruction text for `Query String Caching` setting and cleaned up settings elements.
