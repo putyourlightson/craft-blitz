@@ -422,12 +422,20 @@ class RefreshCacheService extends Component
 
         $queue = Craft::$app->getQueue();
 
-        // Apply a priority if the queue supports them.
-        if (method_exists($queue, 'priority')) {
-            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority);
+        /**
+         * Some queue drivers, for example Redis, don't support custom push priorities,
+         * but it's not enough to check whether the `priority()` method exists,
+         * since it exists on the abstract Queue class. So instead we use a try/catch
+         * clause, falling back to a regular push without setting the priority.
+         * See https://github.com/putyourlightson/craft-blitz/issues/400
+         */
+        try {
+            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
+                ->push($refreshCacheJob);
         }
-
-        $queue->push($refreshCacheJob);
+        catch (NotSupportedException) {
+            $queue->push($refreshCacheJob);
+        }
 
         // Reset values
         $this->cacheIds = [];
