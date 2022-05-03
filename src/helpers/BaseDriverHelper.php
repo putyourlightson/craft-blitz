@@ -8,10 +8,11 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\SavableComponent;
 use craft\helpers\Component;
-use craft\queue\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\services\RefreshCacheService;
+use yii\base\NotSupportedException;
 
 class BaseDriverHelper
 {
@@ -39,11 +40,10 @@ class BaseDriverHelper
     public static function createDriver(string $type, array $settings = []): SavableComponent
     {
         /** @var SavableComponent $driver */
-        /** @noinspection PhpUnnecessaryLocalVariableInspection */
         $driver = Component::createComponent([
             'type' => $type,
             'settings' => $settings,
-        ],                                   SavableComponent::class);
+        ], SavableComponent::class);
 
         return $driver;
     }
@@ -71,15 +71,16 @@ class BaseDriverHelper
             'description' => $description,
         ]);
 
-        // Add job to queue with a priority
-        /** @var Queue $queue */
         $queue = Craft::$app->getQueue();
 
-        // Some queues don't support custom push priorities.
-        if (method_exists($queue, 'priority')) {
+        /**
+         * @see RefreshCacheService::refresh()
+         */
+        try {
             $queue->priority($priority)->push($job);
         }
-        else {
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (NotSupportedException) {
             $queue->push($job);
         }
     }

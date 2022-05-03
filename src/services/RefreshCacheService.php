@@ -31,7 +31,6 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
-use yii\queue\redis\Queue;
 
 /**
  * This class is responsible for keeping the cache fresh.
@@ -421,6 +420,7 @@ class RefreshCacheService extends Component
             $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
                 ->push($refreshCacheJob);
         }
+        /** @noinspection PhpRedundantCatchClauseInspection */
         catch (NotSupportedException) {
             $queue->push($refreshCacheJob);
         }
