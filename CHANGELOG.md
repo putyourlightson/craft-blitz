@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.12.4 - 2022-05-03
+### Fixed
+- Fixed a bug introduced in 3.12.3 when running PHP version 7.
+
 ## 3.12.3 - 2022-05-03
 ### Fixed
 - Fixed a bug in which queue drivers that do not support priorities were throwing an exception ([#400](https://github.com/putyourlightson/craft-blitz/issues/400)).

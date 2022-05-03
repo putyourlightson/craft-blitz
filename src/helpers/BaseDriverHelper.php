@@ -98,6 +98,7 @@ class BaseDriverHelper
         try {
             $queue->priority($priority)->push($job);
         }
+        /** @noinspection PhpRedundantCatchClauseInspection */
         catch (NotSupportedException $e) {
             // The queue probably doesn't support custom push priorities. Try again without one.
             $queue->push($job);

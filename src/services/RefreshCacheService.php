@@ -433,7 +433,8 @@ class RefreshCacheService extends Component
             $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
                 ->push($refreshCacheJob);
         }
-        catch (NotSupportedException) {
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (NotSupportedException $e) {
             $queue->push($refreshCacheJob);
         }
 
