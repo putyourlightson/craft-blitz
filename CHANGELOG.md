@@ -2,7 +2,7 @@
 
 ## 3.12.4 - 2022-05-03
 ### Fixed
-- Fixed a bug introduced in 3.12.3 when running PHP version 7.
+- Fixed a bug introduced in 3.12.3 when running PHP version 7 ([#401](https://github.com/putyourlightson/craft-blitz/issues/401)).
 
 ## 3.12.3 - 2022-05-03
 ### Fixed
