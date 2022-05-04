@@ -176,7 +176,7 @@ class SiteUriHelper
         if (str_starts_with($pageTrigger, '?')) {
             $pageTrigger = trim($pageTrigger, '?=');
 
-            return (bool)preg_match('/\?(.*\&)?' . $pageTrigger . '=/', $uri);
+            return (bool)preg_match('/\?(.*&)?' . $pageTrigger . '=/', $uri);
         }
         else {
             $pageTrigger = preg_quote($pageTrigger, '/');

@@ -1,47 +1,23 @@
 # Release Notes for Blitz
 
-## 4.0.0-beta.7 - Unreleased
-### Fixed
-- Fixed a bug in the custom log and debug methods.
-
-## 4.0.0-beta.6 - 2022-04-26
-### Added
-- Added a new `refreshCacheWhenElementMovedInStructure` setting, defaulting to `true`, that controls whether the cache should be refreshed when an element is moved within a structure ([#289](https://github.com/putyourlightson/craft-blitz/issues/289)).
-
-### Changed
-- Replaced the `Log To File` helper package with a custom Monolog log target.
-- Improved instruction text for `Query String Caching` setting.
-- Moved the `cacheNonHtmlResponses` setting out of the "Advanced Settings" tab, modify it via config settings.
-
-## 4.0.0-beta.5 - 2022-04-18
-### Changed
-- Improved instruction text in the plugin settings.
-
-## 4.0.0-beta.4 - 2022-04-17
-### Fixed
-- Fixed a bug in determining whether responses were cacheable.
-
-## 4.0.0-beta.3 - 2022-04-16
-### Fixed
-- Fixed a missing migration to remove the `warmCacheDelay` setting.
-
-## 4.0.0-beta.2 - 2022-04-14
+## 4.0.0 - 2022-05-04
 > {warning} Cache warmers have been completely replaced by cache generators. The included/excluded query string parameters config setting format has changed. See the new formats [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php).
 
 ### Added
 - Added compatibility with Craft 4.
-- Added a new `Refresh Mode` setting that allows for controlling how cache refreshing should be handled.
+- Added a new `Refresh Mode` setting that determines when and how the cache should be refreshed.
 - Added the concept of cache generation, that supersedes cache warming, and is used both for generating, regenerating and in some cases removing cached pages.
 - Added the ability to revalidate cached pages that have expired when serving cached responses ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
-- Added a new `cacheNonHtmlResponses` setting  to the "Advanced Settings" tab, that allows enabling caching of pages that return non-HTML formats.
-- Added the included/excluded query string parameter settings to the "Advanced Settings" tab, as well as the ability for them to be site-specific.
+- Added the included/excluded query string parameter settings to the Advanced Settings tab and added the ability for them to be site-specific.
 - Added the ability for cache purgers to be run in queue jobs.
+- Added a new `refreshCacheWhenElementMovedInStructure` config setting, defaulting to `true`, that controls whether the cache should be refreshed when an element is moved within a structure ([#289](https://github.com/putyourlightson/craft-blitz/issues/289)).
+- Added a new `cacheNonHtmlResponses` config setting, defaulting to `false`, that allows enabling caching of pages that return non-HTML responses.
 
 ### Changed
 - Replaced all `Warmer` drivers and classes with `Generator` drivers and classes.
 - Replaced the `Guzzle Warmer` with the `HTTP Generator`.
 - Replaced the `Local Warmer` (experimental) with the `Local Generator` (stable).
-- Cache purging now takes place after cache generation.
+- Replaced the `Log To File` helper package with a custom Monolog log target.
 - Changed the included/excluded query string parameters config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php). 
 
 ### Removed
@@ -51,7 +27,11 @@
 - Removed the `delay` property from the `DriverJob` class. 
 - Removed the `delay` parameter from all methods in the `CacheWarmerInterface` class.  
 
-## 3.12.3 - Unreleased
+## 3.12.4 - 2022-05-03
+### Fixed
+- Fixed a bug introduced in 3.12.3 when running PHP version 7 ([#401](https://github.com/putyourlightson/craft-blitz/issues/401)).
+
+## 3.12.3 - 2022-05-03
 ### Fixed
 - Fixed a bug in which queue drivers that do not support priorities were throwing an exception ([#400](https://github.com/putyourlightson/craft-blitz/issues/400)).
 
