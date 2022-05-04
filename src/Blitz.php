@@ -97,7 +97,7 @@ class Blitz extends Plugin
     /**
      * @inheritdoc
      */
-    public string $schemaVersion = '4.0.0-beta.3';
+    public string $schemaVersion = '4.0.0';
 
     /**
      * @inheritdoc
