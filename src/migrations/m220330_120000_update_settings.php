@@ -36,11 +36,13 @@ class m220330_120000_update_settings extends Migration
             $projectConfig->remove('plugins.blitz.settings.warmCacheAutomatically');
 
             $cachePurgerSettings = $projectConfig->get('plugins.blitz.settings.cachePurgerSettings');
-            $cachePurgerSettings = ProjectConfigHelper::unpackAssociativeArray($cachePurgerSettings);
-            if (isset($cachePurgerSettings['warmCacheDelay'])) {
-                unset($cachePurgerSettings['warmCacheDelay']);
-                $cachePurgerSettings = ProjectConfigHelper::packAssociativeArray($cachePurgerSettings);
-                $projectConfig->set('plugins.blitz.settings.cachePurgerSettings', $cachePurgerSettings);
+            if ($cachePurgerSettings !== null) {
+                $cachePurgerSettings = ProjectConfigHelper::unpackAssociativeArray($cachePurgerSettings);
+                if (isset($cachePurgerSettings['warmCacheDelay'])) {
+                    unset($cachePurgerSettings['warmCacheDelay']);
+                    $cachePurgerSettings = ProjectConfigHelper::packAssociativeArray($cachePurgerSettings);
+                    $projectConfig->set('plugins.blitz.settings.cachePurgerSettings', $cachePurgerSettings);
+                }
             }
 
             $includedQueryStringParams = $projectConfig->get('plugins.blitz.settings.includedQueryStringParams');
