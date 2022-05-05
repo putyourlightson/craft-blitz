@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 4.0.1 - 2022-05-05
+### Fixed
+- Fixed a bug in the `purge` console command.
+- Fixed a bug in the custom log target.
+
 ## 4.0.0 - 2022-05-04
 > {warning} Cache warmers have been completely replaced by cache generators. The included/excluded query string parameters config setting format has changed. See the new formats [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php).
 

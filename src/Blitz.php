@@ -237,6 +237,7 @@ class Blitz extends Plugin
             'name' => 'blitz',
             'categories' => ['blitz'],
             'level' => LogLevel::INFO,
+            'allowLineBreaks' => false,
             'formatter' => new LineFormatter(
                 format: "[%datetime%] %message%\n",
                 dateFormat: 'Y-m-d H:i:s',

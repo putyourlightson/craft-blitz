@@ -266,7 +266,7 @@ class CacheController extends Controller
     /**
      * Refreshes cached URLs.
      */
-    public function actionRefreshUrls(array $urls = null): int
+    public function actionRefreshUrls(array $urls = []): int
     {
         if (empty($urls)) {
             $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
@@ -288,7 +288,7 @@ class CacheController extends Controller
     /**
      * Refreshes tagged cached pages.
      */
-    public function actionRefreshTagged(array $tags = null): int
+    public function actionRefreshTagged(array $tags = []): int
     {
         if (empty($tags)) {
             $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
@@ -360,7 +360,13 @@ class CacheController extends Controller
         }
 
         if ($this->queue) {
-            Blitz::$plugin->cachePurger->purgeUris($siteUris, [$this, 'setProgressHandler']);
+            if ($siteUris !== null) {
+                Blitz::$plugin->cachePurger->purgeUris($siteUris, [$this, 'setProgressHandler']);
+            }
+            else {
+                Blitz::$plugin->cachePurger->purgeAll([$this, 'setProgressHandler']);
+            }
+
             $this->_output('Blitz cache queued for purging.');
 
             return;
