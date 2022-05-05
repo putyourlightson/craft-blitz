@@ -10,22 +10,18 @@ use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
 use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
-use Throwable;
 
 class Install extends Migration
 {
-    // Public Methods
-    // =========================================================================
-
     /**
-     * @return bool
+     * @inheritdoc
      */
     public function safeUp(): bool
     {
@@ -41,8 +37,7 @@ class Install extends Migration
     }
 
     /**
-     * @return bool
-     * @throws Throwable
+     * @inheritdoc
      */
     public function safeDown(): bool
     {
@@ -58,13 +53,8 @@ class Install extends Migration
         return true;
     }
 
-    // Protected Methods
-    // =========================================================================
-
     /**
-     * Creates the tables needed for the Records used by the plugin
-     *
-     * @return bool
+     * Creates the tables needed for the Records used by the plugin.
      */
     protected function createTables(): bool
     {
@@ -143,29 +133,25 @@ class Install extends Migration
     }
 
     /**
-     * Creates the indexes needed for the Records used by the plugin
-     *
-     * @return void
+     * Creates the indexes needed for the Records used by the plugin.
      */
-    protected function createIndexes()
+    protected function createIndexes(): void
     {
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
-        $this->createIndex(null, CacheRecord::tableName(), 'expiryDate', false);
+        $this->createIndex(null, CacheRecord::tableName(), 'expiryDate');
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'elementId', true);
-        $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate', false);
+        $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate');
         $this->createIndex(null, ElementQueryCacheRecord::tableName(), ['cacheId', 'queryId'], true);
         $this->createIndex(null, ElementQuerySourceRecord::tableName(), ['sourceId', 'queryId'], true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
-        $this->createIndex(null, ElementQueryRecord::tableName(), 'type', false);
-        $this->createIndex(null, CacheTagRecord::tableName(), 'tag', false);
+        $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
+        $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
     }
 
     /**
-     * Creates the foreign keys needed for the Records used by the plugin
-     *
-     * @return void
+     * Creates the foreign keys needed for the Records used by the plugin.
      */
-    protected function addForeignKeys()
+    protected function addForeignKeys(): void
     {
         $this->addForeignKey(null, CacheRecord::tableName(), 'siteId', Site::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');

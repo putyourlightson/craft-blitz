@@ -8,28 +8,21 @@ namespace putyourlightson\blitz\variables;
 use Craft;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
-use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
+use yii\web\View;
 
 class BlitzVariable
 {
     /**
      * @var int
      */
-    private $_injected = 0;
-
-    // Public Methods
-    // =========================================================================
+    private int $_injected = 0;
 
     /**
      * Returns script to get the output of a URI.
-     *
-     * @param string $uri
-     * @param array $params
-     * @return Markup
      */
     public function getUri(string $uri, array $params = []): Markup
     {
@@ -40,16 +33,12 @@ class BlitzVariable
 
     /**
      * Returns script to get the output of a template.
-     *
-     * @param string $template
-     * @param array $params
-     * @return Markup
      */
     public function getTemplate(string $template, array $params = []): Markup
     {
         // Ensure template exists
         if (!Craft::$app->getView()->resolveTemplate($template)) {
-            throw new NotFoundHttpException('Template not found: '.$template);
+            throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
         $uri = $this->_getActionUrl('blitz/templates/get');
@@ -69,8 +58,6 @@ class BlitzVariable
 
     /**
      * Returns a script to get a CSRF input field.
-     *
-     * @return Markup
      */
     public function csrfInput(): Markup
     {
@@ -79,8 +66,6 @@ class BlitzVariable
 
     /**
      * Returns a script to get the CSRF param.
-     *
-     * @return Markup
      */
     public function csrfParam(): Markup
     {
@@ -89,8 +74,6 @@ class BlitzVariable
 
     /**
      * Returns a script to get a CSRF token.
-     *
-     * @return Markup
      */
     public function csrfToken(): Markup
     {
@@ -99,10 +82,6 @@ class BlitzVariable
 
     /**
      * Returns options for the current page cache, first setting any parameters provided.
-     *
-     * @param array $params
-     *
-     * @return CacheOptionsModel
      */
     public function options(array $params = []): CacheOptionsModel
     {
@@ -123,15 +102,13 @@ class BlitzVariable
 
     /**
      * Returns whether the `@web` alias is used in any site's base URL.
-     *
-     * @return bool
      */
     public static function getWebAliasExists(): bool
     {
         $sites = Craft::$app->getSites()->getAllSites();
 
         foreach ($sites as $site) {
-            if (strpos($site->baseUrl, '@web') !== false) {
+            if (str_contains($site->baseUrl, '@web')) {
                 return true;
             }
         }
@@ -139,14 +116,8 @@ class BlitzVariable
         return false;
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Returns an absolute action URL for a URI.
-     *
-     * @param string $uri
-     * @return string
      */
     private function _getActionUrl(string $uri): string
     {
@@ -155,9 +126,6 @@ class BlitzVariable
 
     /**
      * Returns a script to inject the output of a CSRF property.
-     *
-     * @param string $property
-     * @return Markup
      */
     private function _getCsrfScript(string $property): Markup
     {
@@ -168,11 +136,6 @@ class BlitzVariable
 
     /**
      * Returns a script to inject the output of a URI.
-     *
-     * @param string $uri
-     * @param array $params
-     * @param string|null $property
-     * @return Markup
      */
     private function _getScript(string $uri, array $params = [], string $property = null): Markup
     {
@@ -190,7 +153,7 @@ class BlitzVariable
 
         // Create polyfills using https://polyfill.io/v3/url-builder/.
         $polyfills = ['fetch', 'Promise', 'CustomEvent'];
-        $polyfillUrl = 'https://polyfill.io/v3/polyfill.min.js?features='.implode('%2C', $polyfills);
+        $polyfillUrl = 'https://polyfill.io/v3/polyfill.min.js?features=' . implode('%2C', $polyfills);
 
         // Register polyfills for IE11 only, using the `module/nomodule` pattern.
         // https://3perf.com/blog/polyfills/#modulenomodule
@@ -208,10 +171,10 @@ class BlitzVariable
         ];
 
         foreach ($data as $key => &$value) {
-            $value = 'data-blitz-'.$key.'="'.$value.'"';
+            $value = 'data-blitz-' . $key . '="' . $value . '"';
         }
 
-        $output = '<span class="blitz-inject" id="blitz-inject-'.$id.'" '.implode(' ', $data).'></span>';
+        $output = '<span class="blitz-inject" id="blitz-inject-' . $id . '" ' . implode(' ', $data) . '></span>';
 
         return Template::raw($output);
     }

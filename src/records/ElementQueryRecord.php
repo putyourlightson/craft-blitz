@@ -18,13 +18,8 @@ use yii\db\ActiveQueryInterface;
  */
 class ElementQueryRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
-     *
-     * @return string
      */
     public static function tableName(): string
     {
@@ -33,8 +28,6 @@ class ElementQueryRecord extends ActiveRecord
 
     /**
      * Returns the associated element query caches
-     *
-     * @return ActiveQueryInterface
      */
     public function getElementQueryCaches(): ActiveQueryInterface
     {
@@ -43,8 +36,6 @@ class ElementQueryRecord extends ActiveRecord
 
     /**
      * Returns the associated element query sources
-     *
-     * @return ActiveQueryInterface
      */
     public function getElementQuerySources(): ActiveQueryInterface
     {

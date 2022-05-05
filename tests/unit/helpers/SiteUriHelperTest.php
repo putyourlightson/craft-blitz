@@ -13,28 +13,20 @@ use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     3.9.0
+ * @since 3.9.0
  */
 
 class SiteUriHelperTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
-     * @var Site
+     * @var Site|null
      */
-    private $secondarySite;
-
-    // Protected methods
-    // =========================================================================
+    private ?Site $secondarySite = null;
 
     protected function _before()
     {
@@ -47,15 +39,12 @@ class SiteUriHelperTest extends Unit
                 'name' => 'Secondary',
                 'handle' => 'secondary',
                 'language' => $primarySite->language,
-                'baseUrl' => trim($primarySite->baseUrl, '/').'/secondary/',
+                'baseUrl' => trim($primarySite->baseUrl, '/') . '/secondary/',
             ]);
 
             Craft::$app->sites->saveSite($this->secondarySite);
         }
     }
-
-    // Public methods
-    // =========================================================================
 
     public function testGetMimeType()
     {
@@ -65,27 +54,27 @@ class SiteUriHelperTest extends Unit
         $this->assertEquals('text/plain', SiteUriHelper::getMimeType($siteUri));
 
         $siteUri->uri = 'xyz?test.txt';
-        $this->assertEquals(SiteUriHelper::MIME_TYPE_HTML, SiteUriHelper::getMimeType($siteUri));
+        $this->assertTrue(SiteUriHelper::hasHtmlMimeType($siteUri));
     }
 
     public function testGetSiteUriFromUrl()
     {
-        $siteUri = SiteUriHelper::getSiteUriFromUrl($this->secondarySite->getBaseUrl().'page');
+        $siteUri = SiteUriHelper::getSiteUriFromUrl($this->secondarySite->getBaseUrl() . 'page');
         $siteId = Craft::$app->sites->getSiteByHandle('secondary')->id;
         $this->assertEquals($siteId, $siteUri->siteId);
     }
 
     public function testIsPaginatedUri()
     {
-        $this->assertEquals(SiteUriHelper::isPaginatedUri('xyz'), false);
+        $this->assertFalse(SiteUriHelper::isPaginatedUri('xyz'));
 
         Craft::$app->config->general->pageTrigger = 'page';
-        $this->assertEquals(SiteUriHelper::isPaginatedUri('xyz/page4'), true);
+        $this->assertTrue(SiteUriHelper::isPaginatedUri('xyz/page4'));
 
         Craft::$app->config->general->pageTrigger = 'page/';
-        $this->assertEquals(SiteUriHelper::isPaginatedUri('xyz/page/4'), true);
+        $this->assertTrue(SiteUriHelper::isPaginatedUri('xyz/page/4'));
 
         Craft::$app->config->general->pageTrigger = '?page=';
-        $this->assertEquals(SiteUriHelper::isPaginatedUri('xyz?t=1&page=4'), true);
+        $this->assertTrue(SiteUriHelper::isPaginatedUri('xyz?t=1&page=4'));
     }
 }

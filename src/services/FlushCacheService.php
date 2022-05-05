@@ -14,41 +14,36 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\Exception;
+use yii\log\Logger;
 
 class FlushCacheService extends Component
 {
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent
+     */
+    public const EVENT_BEFORE_FLUSH_CACHE = 'beforeFlushCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_FLUSH_CACHE = 'beforeFlushCache';
+    public const EVENT_AFTER_FLUSH_CACHE = 'afterFlushCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_AFTER_FLUSH_CACHE = 'afterFlushCache';
+    public const EVENT_BEFORE_FLUSH_ALL_CACHE = 'beforeFlushAllCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_FLUSH_ALL_CACHE = 'beforeFlushAllCache';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_FLUSH_ALL_CACHE = 'afterFlushAllCache';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_AFTER_FLUSH_ALL_CACHE = 'afterFlushAllCache';
 
     /**
      * Flushes cache records given an array of site URIs.
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function flushUris(array $siteUris)
+    public function flushUris(array $siteUris): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_FLUSH_CACHE, $event);
@@ -82,10 +77,8 @@ class FlushCacheService extends Component
 
     /**
      * Flushes the cache for a given site.
-     *
-     * @param int $siteId
      */
-    public function flushSite(int $siteId)
+    public function flushSite(int $siteId): void
     {
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId);
         $this->flushUris($siteUris);
@@ -94,7 +87,7 @@ class FlushCacheService extends Component
     /**
      * Flushes the entire cache.
      */
-    public function flushAll()
+    public function flushAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_FLUSH_ALL_CACHE, $event);
@@ -124,7 +117,7 @@ class FlushCacheService extends Component
     /**
      * Runs garbage collection.
      */
-    public function runGarbageCollection()
+    public function runGarbageCollection(): void
     {
         // Get and delete element query records without an associated element query cache
         $elementQueryRecordIds = ElementQueryRecord::find()
@@ -145,33 +138,28 @@ class FlushCacheService extends Component
         }
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Resets auto increment values of the given table.
-     *
-     * @param string $table
      */
-    private function _resetAutoIncrement(string $table)
+    private function _resetAutoIncrement(string $table): void
     {
         $db = Craft::$app->getDb();
         $dbDriver = $db->getDriverName();
         $sql = '';
 
         if ($dbDriver == 'mysql') {
-            $sql = 'ALTER TABLE '.$table.' AUTO_INCREMENT = 1';
+            $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT = 1';
         }
         elseif ($dbDriver == 'postgres') {
-            $sql = 'ALTER SEQUENCE '.$table.'_id_seq RESTART WITH 1';
+            $sql = 'ALTER SEQUENCE ' . $table . '_id_seq RESTART WITH 1';
         }
 
         if ($sql) {
             try {
                 $db->createCommand($sql)->execute();
             }
-            catch (Exception $e) {
-                Blitz::$plugin->log('Failed to reset auto increment: '.$e->getMessage(), [], 'error');
+            catch (Exception $exception) {
+                Blitz::$plugin->log('Failed to reset auto increment: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
             }
         }
     }

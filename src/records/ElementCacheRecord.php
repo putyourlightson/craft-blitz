@@ -15,13 +15,8 @@ use yii\db\ActiveQueryInterface;
  */
 class ElementCacheRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
-     *
-     * @return string
      */
     public static function tableName(): string
     {
@@ -30,8 +25,6 @@ class ElementCacheRecord extends ActiveRecord
 
     /**
      * Returns the associated cache
-     *
-     * @return ActiveQueryInterface
      */
     public function getCache(): ActiveQueryInterface
     {

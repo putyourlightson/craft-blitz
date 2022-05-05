@@ -13,38 +13,32 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 class ClearCacheService extends Component
 {
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent
+     */
+    public const EVENT_BEFORE_CLEAR_CACHE = 'beforeClearCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_CLEAR_CACHE = 'beforeClearCache';
+    public const EVENT_AFTER_CLEAR_CACHE = 'afterClearCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_AFTER_CLEAR_CACHE = 'afterClearCache';
+    public const EVENT_BEFORE_CLEAR_ALL_CACHE = 'beforeClearAllCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_CLEAR_ALL_CACHE = 'beforeClearAllCache';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_CLEAR_ALL_CACHE = 'afterClearAllCache';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_AFTER_CLEAR_ALL_CACHE = 'afterClearAllCache';
 
     /**
      * Clears the cache given an array of site URIs.
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function clearUris(array $siteUris)
+    public function clearUris(array $siteUris): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_CLEAR_CACHE, $event);
@@ -55,8 +49,6 @@ class ClearCacheService extends Component
 
         Blitz::$plugin->cacheStorage->deleteUris($event->siteUris);
 
-        Blitz::$plugin->cachePurger->purgeUris($event->siteUris);
-
         if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
             $this->trigger(self::EVENT_AFTER_CLEAR_CACHE, $event);
         }
@@ -64,10 +56,8 @@ class ClearCacheService extends Component
 
     /**
      * Clears the cache for a given site.
-     *
-     * @param int $siteId
      */
-    public function clearSite(int $siteId)
+    public function clearSite(int $siteId): void
     {
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId);
 
@@ -77,7 +67,7 @@ class ClearCacheService extends Component
     /**
      * Clears the entire cache.
      */
-    public function clearAll()
+    public function clearAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_CLEAR_ALL_CACHE, $event);
@@ -87,8 +77,6 @@ class ClearCacheService extends Component
         }
 
         Blitz::$plugin->cacheStorage->deleteAll();
-
-        Blitz::$plugin->cachePurger->purgeAll();
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_ALL_CACHE)) {
             $this->trigger(self::EVENT_AFTER_CLEAR_ALL_CACHE, $event);

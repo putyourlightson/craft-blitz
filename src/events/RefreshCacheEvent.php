@@ -10,11 +10,8 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 class RefreshCacheEvent extends CancelableEvent
 {
-    // Properties
-    // =========================================================================
-
     /**
-     * @var SiteUriModel[]|null
+     * @var SiteUriModel[]
      */
-    public $siteUris;
+    public array $siteUris = [];
 }

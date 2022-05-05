@@ -17,36 +17,25 @@ use yii\queue\RetryableJobInterface;
  */
 class DriverJob extends BaseJob implements RetryableJobInterface
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var SiteUriModel[]
      */
-    public $siteUris;
+    public array $siteUris;
 
     /**
      * @var string
      */
-    public $driverId;
+    public string $driverId;
 
     /**
      * @var string
      */
-    public $driverMethod;
-
-    /**
-     * @var int|null
-     */
-    public $delay;
+    public string $driverMethod;
 
     /**
      * @var Queue
      */
-    private $_queue;
-
-    // Public Methods
-    // =========================================================================
+    private Queue $_queue;
 
     /**
      * @inheritdoc
@@ -67,7 +56,7 @@ class DriverJob extends BaseJob implements RetryableJobInterface
     /**
      * @inheritdoc
      */
-    public function execute($queue)
+    public function execute($queue): void
     {
         App::maxPowerCaptain();
 
@@ -77,18 +66,14 @@ class DriverJob extends BaseJob implements RetryableJobInterface
         $driver = Blitz::$plugin->get($this->driverId);
 
         if ($driver !== null && is_callable([$driver, $this->driverMethod])) {
-            call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler'], $this->delay);
+            call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler']);
         }
     }
 
     /**
      * Handles setting the progress.
-     *
-     * @param int $count
-     * @param int $total
-     * @param string|null $label
      */
-    public function setProgressHandler(int $count, int $total, string $label = null)
+    public function setProgressHandler(int $count, int $total, string $label = null): void
     {
         $progress = $total > 0 ? ($count / $total) : 0;
 

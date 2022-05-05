@@ -1,0 +1,18 @@
+{% import "_includes/forms" as forms %}
+
+
+{% set info %}
+    <span class="info">{{ "The higher the number, the faster the cache will be generated but the more server processing will be required. A value between 1 and 5 is recommended."|t('blitz') }}</span>
+{% endset %}
+{{ forms.textField({
+    type: 'number',
+    unit: "concurrent processes"|t('blitz'),
+    label: "Concurrency"|t('blitz'),
+    instructions: "The max number of concurrent PHP processes to use when generating the cache."|t('blitz') ~ info,
+    name: 'concurrency',
+    min: 1,
+    max: 100,
+    value: generator.concurrency,
+    errors: generator.getErrors('concurrency'),
+    required: true,
+}) }}

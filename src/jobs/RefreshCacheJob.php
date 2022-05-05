@@ -12,13 +12,11 @@ use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
-use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use Throwable;
 use yii\db\Exception as DbException;
 use yii\queue\RetryableJobInterface;
 
@@ -27,26 +25,25 @@ use yii\queue\RetryableJobInterface;
  */
 class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var int[]
      */
-    public $cacheIds = [];
+    public array $cacheIds = [];
 
     /**
      * @var array
      */
-    public $elements = [];
+    public array $elements = [];
 
     /**
      * @var bool
      */
-    public $clearCache = false;
+    public bool $forceClear = false;
 
-    // Public Methods
-    // =========================================================================
+    /**
+     * @var bool
+     */
+    public bool $forceGenerate = false;
 
     /**
      * @inheritdoc
@@ -66,26 +63,19 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
     /**
      * @inheritdoc
-     *
-     * @throws Exception
-     * @throws Throwable
      */
-    public function execute($queue)
+    public function execute($queue): void
     {
-        // Set progress label
-        $this->setProgress($queue, 0,
-            Craft::t('blitz', 'Clearing cached pages.')
-        );
-
         // Merge in element cache IDs
         foreach ($this->elements as $elementData) {
             $this->cacheIds = array_merge($this->cacheIds, Blitz::$plugin->refreshCache->getElementCacheIds($elementData['elementIds']));
         }
 
-        // If clear cache is enabled then clear the site URIs early
-        if ($this->clearCache) {
-            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
+        $clearCache = Blitz::$plugin->settings->clearOnRefresh($this->forceClear);
 
+        // If clear cache is enabled then clear the site URIs early
+        if ($clearCache) {
+            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
@@ -136,32 +126,25 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             }
         }
 
-        // If clear cache is enabled
-        if ($this->clearCache) {
-            // Set progress label
-            $this->setProgress($queue, 1,
-                Craft::t('blitz', 'Clearing cached pages.')
-            );
-
-            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
-
-            // Merge in site URIs of element IDs to ensure that uncached elements are also warmed
-            /** @var ElementInterface $elementType */
-            foreach ($this->elements as $elementType => $elementData) {
-                if ($elementType::hasUris()) {
-                    $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementData['elementIds']));
-                }
-            }
-
-            Blitz::$plugin->refreshCache->refreshSiteUris(array_unique($siteUris, SORT_REGULAR));
-        }
-        else {
+        // If clear cache is disabled then expire the cache IDs.
+        if (!$clearCache) {
             Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
         }
-    }
 
-    // Protected Methods
-    // =========================================================================
+        $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
+
+        // Merge in site URIs of element IDs to ensure that uncached elements are also generated
+        /** @var ElementInterface $elementType */
+        foreach ($this->elements as $elementType => $elementData) {
+            if ($elementType::hasUris()) {
+                $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementData['elementIds']));
+            }
+        }
+
+        $siteUris = array_unique($siteUris, SORT_REGULAR);
+
+        Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $this->forceClear, $this->forceGenerate);
+    }
 
     /**
      * @inheritdoc
@@ -171,24 +154,19 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         return Craft::t('blitz', 'Refreshing Blitz cache');
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
-     * Returns cache IDs that match any special source tags
+     * Returns cache IDs that match any special source tags.
      *
-     * @param string $elementType
-     * @param array $sourceIds
      * @return int[]
      */
     private function _getSourceTagCacheIds(string $elementType, array $sourceIds): array
     {
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
 
-        $tags = [$sourceIdAttribute.':*'];
+        $tags = [$sourceIdAttribute . ':*'];
 
         foreach ($sourceIds as $sourceId) {
-            $tags[] = $sourceIdAttribute.':'.$sourceId;
+            $tags[] = $sourceIdAttribute . ':' . $sourceId;
         }
 
         return Blitz::$plugin->cacheTags->getCacheIds($tags);
@@ -197,10 +175,6 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * Returns cache IDs from a given entry query that contains the provided element IDs,
      * ignoring the provided cache IDs.
-     *
-     * @param ElementQueryRecord $elementQueryRecord
-     * @param array $elementIds
-     * @param array $ignoreCacheIds
      *
      * @return int[]
      */
@@ -246,7 +220,9 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         try {
             $elementQueryIds = $elementQuery->ids();
         }
-        catch (DbException $exception) {}
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (DbException) {
+        }
 
         // If one or more of the element IDs are in the element query's IDs
         if (!empty(array_intersect($elementIds, $elementQueryIds))) {
@@ -264,5 +240,4 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         return $cacheIds;
     }
-
 }

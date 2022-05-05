@@ -11,23 +11,20 @@ use yii\base\Event;
 
 class FeedMeIntegration extends BaseIntegration
 {
-    // Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
     public static function getRequiredPlugins(): array
     {
         return [
-            ['handle' => 'feed-me', 'version' => '4.0.0']
+            ['handle' => 'feed-me', 'version' => '4.0.0'],
         ];
     }
 
     /**
      * @inheritdoc
      */
-    public static function registerEvents()
+    public static function registerEvents(): void
     {
         Event::on(Process::class, Process::EVENT_BEFORE_PROCESS_FEED,
             function() {

@@ -11,9 +11,6 @@ use putyourlightson\blitz\Blitz;
 
 class CacheUtility extends Utility
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -33,7 +30,7 @@ class CacheUtility extends Utility
     /**
      * @inheritdoc
      */
-    public static function iconPath()
+    public static function iconPath(): ?string
     {
         $iconPath = Craft::getAlias('@vendor/putyourlightson/craft-blitz/src/icon-mask.svg');
 
@@ -58,10 +55,6 @@ class CacheUtility extends Utility
 
     /**
      * Returns available actions.
-     *
-     * @param bool $showAll
-     *
-     * @return array
      */
     public static function getActions(bool $showAll = false): array
     {
@@ -79,19 +72,17 @@ class CacheUtility extends Utility
             'instructions' => Craft::t('blitz', 'Deletes all cache records from the database.'),
         ];
 
+        $actions[] = [
+            'id' => 'generate',
+            'label' => Craft::t('blitz', 'Generate Cache'),
+            'instructions' => Craft::t('blitz', 'Generates all of the cacheable pages.'),
+        ];
+
         if ($showAll || !Blitz::$plugin->cachePurger->isDummy) {
             $actions[] = [
                 'id' => 'purge',
                 'label' => Craft::t('blitz', 'Purge Cache'),
                 'instructions' => Craft::t('blitz', 'Deletes all cached pages in the reverse proxy.'),
-            ];
-        }
-
-        if ($showAll || !Blitz::$plugin->cacheWarmer->isDummy) {
-            $actions[] = [
-                'id' => 'warm',
-                'label' => Craft::t('blitz', 'Warm Cache'),
-                'instructions' => Craft::t('blitz', 'Warms all of the cacheable pages.'),
             ];
         }
 
@@ -106,7 +97,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh',
             'label' => Craft::t('blitz', 'Refresh Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshes (clears, purges, flushes, warms, deploys) all of the pages.'),
+            'instructions' => Craft::t('blitz', 'Refreshes all of the pages according to the “Refresh Mode”.'),
         ];
 
         $actions[] = [
@@ -148,8 +139,6 @@ class CacheUtility extends Utility
 
     /**
      * Returns tag suggestions.
-     *
-     * @return array
      */
     public static function getTagSuggestions(): array
     {
@@ -169,4 +158,3 @@ class CacheUtility extends Utility
         ]];
     }
 }
-

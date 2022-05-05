@@ -16,16 +16,10 @@ use yii\base\Event;
 
 class DeployerHelper extends BaseDriverHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_DEPLOYER_TYPES = 'registerDeployerTypes';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_REGISTER_DEPLOYER_TYPES = 'registerDeployerTypes';
 
     /**
      * Returns all deployer types.
@@ -63,15 +57,14 @@ class DeployerHelper extends BaseDriverHelper
     }
 
     /**
+     * Adds a deploy job to the queue.
+     *
      * @param SiteUriModel[] $siteUris
-     * @param string $driverMethod
-     * @param int|null $delay
-     * @param int|null $priority
      */
-    public static function addDeployerJob(array $siteUris, string $driverMethod, int $delay = null, int $priority = null)
+    public static function addDeployerJob(array $siteUris, string $driverMethod, int $priority = null): void
     {
         $description = Craft::t('blitz', 'Deploying files');
 
-        self::addDriverJob($siteUris, 'deployer', $driverMethod, $description, $delay, $priority);
+        self::addDriverJob($siteUris, 'deployer', $driverMethod, $description, $priority);
     }
 }

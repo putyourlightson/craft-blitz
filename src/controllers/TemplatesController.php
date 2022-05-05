@@ -12,21 +12,13 @@ use yii\web\Response;
 
 class TemplatesController extends Controller
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = true;
-
-    // Public Methods
-    // =========================================================================
+    protected int|bool|array $allowAnonymous = true;
 
     /**
      * Returns a rendered template.
-     *
-     * @return Response
      */
     public function actionGet(): Response
     {
@@ -46,7 +38,6 @@ class TemplatesController extends Controller
         }
 
         $params = Craft::$app->getRequest()->getParam('params', []);
-
         $output = Craft::$app->getView()->renderPageTemplate($template, $params);
 
         return $this->asRaw($output);

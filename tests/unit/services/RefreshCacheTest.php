@@ -23,51 +23,43 @@ use putyourlightson\blitztests\fixtures\EntriesFixture;
 use UnitTester;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     3.1.0
+ * @since 3.1.0
  */
 
 class RefreshCacheTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
      * @var SiteUriModel
      */
-    private $siteUri;
+    private SiteUriModel $siteUri;
 
     /**
      * @var string
      */
-    private $output = 'xyz';
+    private string $output = 'xyz';
 
     /**
-     * @var Entry
+     * @var Entry|ElementChangedBehavior|null
      */
-    private $entry1;
+    private Entry|ElementChangedBehavior|null $entry1 = null;
 
     /**
-     * @var Entry
+     * @var Entry|null
      */
-    private $entry2;
+    private ?Entry $entry2 = null;
 
     /**
      * @var array
      */
-    private $emptyElements = [
+    private array $emptyElements = [
         'elementIds' => [],
         'sourceIds' => [],
     ];
-
-    // Fixtures
-    // =========================================================================
 
     /**
      * @return array
@@ -76,13 +68,10 @@ class RefreshCacheTest extends Unit
     {
         return [
             'entries' => [
-                'class' => EntriesFixture::class
+                'class' => EntriesFixture::class,
             ],
         ];
     }
-
-    // Protected methods
-    // =========================================================================
 
     protected function _before()
     {
@@ -125,12 +114,9 @@ class RefreshCacheTest extends Unit
 
         $this->entry1->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
-        Blitz::$plugin->refreshCache->elements = [];
+        Blitz::$plugin->refreshCache->reset();
         Blitz::$plugin->refreshCache->batchMode = true;
     }
-
-    // Public methods
-    // =========================================================================
 
     public function testGetElementCacheIds()
     {
@@ -159,7 +145,7 @@ class RefreshCacheTest extends Unit
                 'index' => 1234567890,
                 'type' => Entry::class,
                 'params' => '[]',
-            ], false)
+            ])
             ->execute();
         $queryId = $db->getLastInsertID();
 
@@ -168,7 +154,7 @@ class RefreshCacheTest extends Unit
             ->insert(ElementQuerySourceRecord::tableName(), [
                 'sourceId' => $this->entry1->sectionId,
                 'queryId' => $queryId,
-            ], false)
+            ])
             ->execute();
 
         $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
@@ -271,6 +257,7 @@ class RefreshCacheTest extends Unit
 
         Blitz::$plugin->refreshCache->addElementExpiryDates($this->entry1);
 
+        /** @var ElementExpiryDateRecord $elementExpiryDateRecord */
         $elementExpiryDateRecord = ElementExpiryDateRecord::find()
             ->where(['elementId' => $this->entry1->id])
             ->one();
@@ -285,6 +272,7 @@ class RefreshCacheTest extends Unit
 
         Blitz::$plugin->refreshCache->addElementExpiryDates($this->entry1);
 
+        /** @var ElementExpiryDateRecord $elementExpiryDateRecord */
         $elementExpiryDateRecord = ElementExpiryDateRecord::find()
             ->where(['elementId' => $this->entry1->id])
             ->one();
@@ -326,7 +314,7 @@ class RefreshCacheTest extends Unit
                     'sourceIds' => [$this->entry1->sectionId],
                 ],
             ],
-            'clearCache' => true,
+            'forceClear' => true,
         ]);
         $refreshCacheJob->execute(Craft::$app->getQueue());
 
@@ -340,7 +328,7 @@ class RefreshCacheTest extends Unit
     public function testRefreshSourceTag()
     {
         // Add source tag and save
-        Blitz::$plugin->generateCache->options->tags('sectionId:'.$this->entry1->sectionId);
+        Blitz::$plugin->generateCache->options->tags('sectionId:' . $this->entry1->sectionId);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         // Assert that the output (which may also contain a timestamp) contains the cached value
@@ -354,7 +342,7 @@ class RefreshCacheTest extends Unit
                     'sourceIds' => [$this->entry1->sectionId],
                 ],
             ],
-            'clearCache' => true,
+            'forceClear' => true,
         ]);
         $refreshCacheJob->execute(Craft::$app->getQueue());
 
@@ -387,7 +375,7 @@ class RefreshCacheTest extends Unit
         // Assert that the output (which may also contain a timestamp) contains the cached value
         $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
 
-        $url = substr($this->siteUri->url, 0, -1).'*';
+        $url = substr($this->siteUri->url, 0, -1) . '*';
         Blitz::$plugin->refreshCache->refreshCachedUrls([$url]);
 
         Craft::$app->runAction('queue/run');

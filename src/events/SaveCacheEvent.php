@@ -10,21 +10,18 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 class SaveCacheEvent extends CancelableEvent
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var string
      */
-    public $output;
+    public string $output;
 
     /**
      * @var SiteUriModel
      */
-    public $siteUri;
+    public SiteUriModel $siteUri;
 
     /**
      * @var int|null
      */
-    public $duration;
+    public ?int $duration;
 }

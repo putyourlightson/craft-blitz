@@ -9,11 +9,8 @@ use yii\base\Event;
 
 class RegisterNonCacheableElementTypesEvent extends Event
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var string[]
      */
-    public $elementTypes = [];
+    public array $elementTypes = [];
 }

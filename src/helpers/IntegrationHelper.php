@@ -13,16 +13,10 @@ use yii\base\Event;
 
 class IntegrationHelper
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @event RegisterComponentTypesEvent
      */
-    const EVENT_REGISTER_INTEGRATIONS = 'registerIntegrations';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_REGISTER_INTEGRATIONS = 'registerIntegrations';
 
     /**
      * Returns all integrations.
@@ -38,15 +32,13 @@ class IntegrationHelper
         ]);
         Event::trigger(static::class, self::EVENT_REGISTER_INTEGRATIONS, $event);
 
-        $integrations = $event->types;
-
-        return $integrations;
+        return $event->types;
     }
 
     /**
      * Returns active integrations.
      *
-     * @return string[]
+     * @return IntegrationInterface[]
      */
     public static function getActiveIntegrations(): array
     {

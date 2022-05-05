@@ -9,30 +9,24 @@ use craft\base\Model;
 use craft\helpers\UrlHelper;
 
 /**
- * @property string $url
+ * @property-read string $url
  */
 class SiteUriModel extends Model
 {
-    // Public Properties
-    // =========================================================================
-
     /**
-     * @var int|string
+     * @var string|int|null
      */
-    public $siteId;
+    public string|int|null $siteId = null;
 
     /**
      * @var string
      */
-    public $uri;
-
-    // Public Methods
-    // =========================================================================
+    public string $uri = '';
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -41,10 +35,10 @@ class SiteUriModel extends Model
     }
 
     /**
-     * Returns a URL.
+     * Returns a URL with optional params.
      */
-    public function getUrl(): string
+    public function getUrl(array $params = []): string
     {
-        return UrlHelper::siteUrl($this->uri, null, null, $this->siteId);
+        return UrlHelper::siteUrl($this->uri, $params, null, $this->siteId);
     }
 }

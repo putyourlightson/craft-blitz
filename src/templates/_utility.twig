@@ -1,0 +1,91 @@
+{% import "_includes/forms" as forms %}
+
+
+{{ driverHtml|raw }}
+
+
+<h1>{{ 'Blitz Actions'|t('blitz') }}</h1>
+
+{% set cols = {
+    form: {
+        type: 'html',
+        heading: 'Action'|t('blitz'),
+    },
+} %}
+
+{% set rows = [] %}
+{% for action in actions %}
+    {% if currentUser.can('blitz:' ~ action.id) %}
+        {% set form %}
+            <div style="margin: 10px 0;">
+                <form class="utility" method="post" accept-charset="UTF-8">
+                    <input type="hidden" name="action" value="blitz/cache/{{ action.id }}">
+                    <input type="hidden" name="utility" value="1">
+
+                    {{ redirectInput('utilities/blitz-cache') }}
+                    {{ csrfInput() }}
+
+                    <p class="light">{{ action.instructions|t('blitz') }}</p>
+
+                    {% if action.id == 'refresh-site' %}
+                        {{ forms.selectField({
+                            name: 'siteId',
+                            id: 'siteId',
+                            options: action.options,
+                            first: true,
+                        }) }}
+                    {% elseif action.id == 'refresh-urls' %}
+                        {{ forms.editableTableField({
+                            name: 'urls',
+                            id: 'urls',
+                            cols: [{
+                                type: 'singleline',
+                                heading: 'URLs'|t('blitz'),
+                                placeholder: siteUrl('page'),
+                                code: true,
+                            }],
+                            addRowLabel: "Add a URL"|t('blitz'),
+                            allowAdd: true,
+                            allowDelete: true,
+                            allowReorder: true,
+                            first: true,
+                        }) }}
+                    {% elseif action.id == 'refresh-tagged' %}
+                        {{ forms.editableTableField({
+                            name: 'tags',
+                            id: 'tags',
+                            cols: [{
+                                type: 'singleline',
+                                heading: 'Tags'|t('blitz'),
+                                placeholder: 'tag-name',
+                                suggestions: tagSuggestions,
+                                code: true,
+                            }],
+                            addRowLabel: "Add a Tag"|t('blitz'),
+                            allowAdd: true,
+                            allowDelete: true,
+                            allowReorder: true,
+                            first: true,
+                        }) }}
+                    {% endif %}
+
+                    <input type="submit" class="btn submit" value="{{ action.label|t('blitz') }}">
+                </form>
+            </div>
+        {% endset %}
+
+        {% set rows = rows|merge([{
+            form: form,
+        }]) %}
+    {% endif %}
+{% endfor %}
+
+{% if rows|length %}
+    {{ forms.editableTableField({
+        name: 'actions',
+        id: 'actions',
+        cols: cols,
+        rows: rows,
+        staticRows: true,
+    }) }}
+{% endif %}

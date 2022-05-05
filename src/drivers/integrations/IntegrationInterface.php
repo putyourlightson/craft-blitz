@@ -7,9 +7,6 @@ namespace putyourlightson\blitz\drivers\integrations;
 
 interface IntegrationInterface
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Returns the required plugins.
      *
@@ -18,8 +15,6 @@ interface IntegrationInterface
      *
      * - ['feed-me', 'seomatic']
      * - [['handle' => 'feed-me', 'version' => '4.0.0'], 'seomatic']
-     *
-     * @return array
      */
     public static function getRequiredPlugins(): array;
 

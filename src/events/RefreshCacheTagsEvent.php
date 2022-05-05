@@ -8,15 +8,12 @@ namespace putyourlightson\blitz\events;
 use craft\events\CancelableEvent;
 
 /**
- * @since 3.11.3
+ * @since 3.12.0
  */
 class RefreshCacheTagsEvent extends CancelableEvent
 {
-    // Properties
-    // =========================================================================
-
     /**
-     * @var string[]|null
+     * @var string[]
      */
-    public $tags;
+    public array $tags = [];
 }

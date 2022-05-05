@@ -7,11 +7,8 @@ namespace putyourlightson\blitz\drivers\deployers;
 
 trait DeployerTrait
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var bool
      */
-    public $isDummy = false;
+    public bool $isDummy = false;
 }

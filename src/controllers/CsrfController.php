@@ -6,40 +6,30 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\helpers\Html;
 use craft\web\Controller;
 use yii\web\Response;
 
 class CsrfController extends Controller
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = true;
-
-    // Public Methods
-    // =========================================================================
+    protected int|bool|array $allowAnonymous = true;
 
     /**
      * Returns a CSRF input field.
-     *
-     * @return Response
      */
     public function actionInput(): Response
     {
         $request = Craft::$app->getRequest();
-
-        $input = '<input type="hidden" name="'.$request->csrfParam.'" value="'.$request->getCsrfToken().'">';
+        $input = Html::hiddenInput($request->csrfParam, $request->getCsrfToken());
 
         return $this->asRaw($input);
     }
 
     /**
      * Returns the CSRF param.
-     *
-     * @return Response
      */
     public function actionParam(): Response
     {
@@ -48,8 +38,6 @@ class CsrfController extends Controller
 
     /**
      * Returns a CSRF token.
-     *
-     * @return Response
      */
     public function actionToken(): Response
     {
@@ -58,8 +46,6 @@ class CsrfController extends Controller
 
     /**
      * Returns all CSRF options in a single JSON response.
-     *
-     * @return Response
      */
     public function actionJson(): Response
     {

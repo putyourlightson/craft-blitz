@@ -11,16 +11,13 @@ use putyourlightson\blitz\models\SiteUriModel;
 
 class ResponseEvent extends CancelableEvent
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var SiteUriModel
      */
-    public $siteUri;
+    public SiteUriModel $siteUri;
 
     /**
      * @var Response
      */
-    public $response;
+    public Response $response;
 }

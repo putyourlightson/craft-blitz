@@ -12,34 +12,24 @@ use yii\caching\CacheInterface;
 use yii\db\Exception;
 
 /**
- *
- * @property mixed $settingsHtml
+ * @property-read null|string $settingsHtml
  */
 class YiiCacheStorage extends BaseCacheStorage
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @const string
      */
-    const KEY_PREFIX = 'blitz';
-
-    // Properties
-    // =========================================================================
+    public const KEY_PREFIX = 'blitz';
 
     /**
      * @var string
      */
-    public $cacheComponent = 'cache';
+    public string $cacheComponent = 'cache';
 
     /**
      * @var CacheInterface|null
      */
-    private $_cache;
-
-    // Static
-    // =========================================================================
+    private ?CacheInterface $_cache;
 
     /**
      * @inheritdoc
@@ -49,13 +39,10 @@ class YiiCacheStorage extends BaseCacheStorage
         return Craft::t('blitz', 'Yii Cache Storage');
     }
 
-    // Public Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -73,15 +60,17 @@ class YiiCacheStorage extends BaseCacheStorage
 
         $value = '';
 
-        // Redis cache throws an exception if the connection is broken, so we catch it here
+        // Redis cache can throw an exception if the connection is broken
         try {
             // Cast the site ID to an integer to avoid an incorrect key
             // https://github.com/putyourlightson/craft-blitz/issues/257
             $value = $this->_cache->get([
-                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
+                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
             ]);
         }
-        catch (Exception $e) {}
+        /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (Exception) {
+        }
 
         return $value ?: '';
     }
@@ -89,7 +78,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function save(string $value, SiteUriModel $siteUri, int $duration = null)
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null): void
     {
         if ($this->_cache === null) {
             return;
@@ -98,14 +87,14 @@ class YiiCacheStorage extends BaseCacheStorage
         // Cast the site ID to an integer to avoid an incorrect key
         // https://github.com/putyourlightson/craft-blitz/issues/257
         $this->_cache->set([
-            self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
+            self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
         ], $value, $duration);
     }
 
     /**
      * @inheritdoc
      */
-    public function deleteUris(array $siteUris)
+    public function deleteUris(array $siteUris): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_DELETE_URIS, $event);
@@ -122,7 +111,7 @@ class YiiCacheStorage extends BaseCacheStorage
             // Cast the site ID to an integer to avoid an incorrect key
             // https://github.com/putyourlightson/craft-blitz/issues/257
             $this->_cache->delete([
-                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri
+                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
             ]);
         }
 
@@ -134,7 +123,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function deleteAll()
+    public function deleteAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_DELETE_ALL, $event);
@@ -165,7 +154,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function getSettingsHtml()
+    public function getSettingsHtml(): ?string
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/yii-cache/settings', [
             'driver' => $this,

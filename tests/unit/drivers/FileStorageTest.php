@@ -8,43 +8,36 @@ namespace putyourlightson\blitztests\unit\drivers;
 use Codeception\Test\Unit;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\CacheStorageInterface;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     3.6.9
+ * @since 3.6.9
  */
 
 class FileStorageTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
      * @var FileStorage
      */
-    private $cacheStorage;
+    private CacheStorageInterface $cacheStorage;
 
     /**
      * @var SiteUriModel
      */
-    private $siteUri;
+    private SiteUriModel $siteUri;
 
     /**
      * @var string
      */
-    private $output = 'xyz';
-
-    // Protected methods
-    // =========================================================================
+    private string $output = 'xyz';
 
     protected function _before()
     {
@@ -66,9 +59,6 @@ class FileStorageTest extends Unit
 
         Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri);
     }
-
-    // Public methods
-    // =========================================================================
 
     public function testSave()
     {
@@ -106,7 +96,7 @@ class FileStorageTest extends Unit
         $total = 10;
 
         for ($i = 0; $i < $total; $i++) {
-            FileHelper::writeToFile($path.'/test-'.$i.'/index.html', 'test');
+            FileHelper::writeToFile($path . '/test-' . $i . '/index.html', 'test');
         }
 
         $this->assertEquals($total, $this->cacheStorage->getCachedFileCount($path));

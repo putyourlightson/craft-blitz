@@ -24,39 +24,31 @@ use putyourlightson\campaign\elements\MailingListElement;
 use UnitTester;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     2.3.0
+ * @since 2.3.0
  */
 
 class GenerateCacheTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
      * @var SiteUriModel
      */
-    private $siteUri;
+    private SiteUriModel $siteUri;
 
     /**
      * @var string
      */
-    private $output = 'xyz';
-
-    // Protected methods
-    // =========================================================================
+    private string $output = 'xyz';
 
     protected function _before()
     {
         parent::_before();
 
-        Blitz::$plugin->generateCache->options->cachingEnabled = true;
+        Blitz::$plugin->settings->cachingEnabled = true;
         Blitz::$plugin->cacheStorage->deleteAll();
         Blitz::$plugin->flushCache->flushAll();
 
@@ -65,9 +57,6 @@ class GenerateCacheTest extends Unit
             'uri' => 'page',
         ]);
     }
-
-    // Public methods
-    // =========================================================================
 
     public function testSaveCache()
     {
@@ -85,42 +74,35 @@ class GenerateCacheTest extends Unit
     public function testSaveCacheWithOutputComments()
     {
         Blitz::$plugin->generateCache->options->outputComments = false;
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
-        $this->assertStringNotContainsString('Cached by Blitz on', $value);
+        $value = Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        $this->assertEquals($this->output, $value);
 
         Blitz::$plugin->generateCache->options->outputComments = true;
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
-        $this->assertStringContainsString('Cached by Blitz on', $value);
-
-        Blitz::$plugin->generateCache->options->outputComments = SettingsModel::OUTPUT_COMMENTS_CACHED;
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
+        $value = Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
         $this->assertStringContainsString('Cached by Blitz on', $value);
 
         Blitz::$plugin->generateCache->options->outputComments = SettingsModel::OUTPUT_COMMENTS_SERVED;
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        $value = Blitz::$plugin->cacheStorage->get($this->siteUri);
-        $this->assertStringNotContainsString('Cached by Blitz on', $value);
+        $value = Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        $this->assertEquals($this->output, $value);
+
+        Blitz::$plugin->generateCache->options->outputComments = SettingsModel::OUTPUT_COMMENTS_CACHED;
+        $value = Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        $this->assertStringContainsString('Cached by Blitz on', $value);
     }
 
     public function testSaveCacheWithFileExtension()
     {
         $siteUri = new SiteUriModel(['siteId' => $this->siteUri->siteId]);
+        $siteUri->uri = $this->siteUri->uri . '.html';
 
-        $siteUri->uri = $this->siteUri->uri.'.html';
-
-        Blitz::$plugin->generateCache->save($this->output, $siteUri);
-        $value = Blitz::$plugin->cacheStorage->get($siteUri);
+        $value = Blitz::$plugin->generateCache->save($this->output, $siteUri);
 
         // Assert that the output contains a timestamp
         $this->assertStringContainsString('Cached by Blitz on', $value);
 
-        $siteUri->uri = $this->siteUri->uri.'.json';
+        $siteUri->uri = $this->siteUri->uri . '.json';
 
-        Blitz::$plugin->generateCache->save($this->output, $siteUri);
-        $value = Blitz::$plugin->cacheStorage->get($siteUri);
+        $value = Blitz::$plugin->generateCache->save($this->output, $siteUri);
 
         // Assert that the output does not contain a timestamp
         $this->assertStringNotContainsString('Cached by Blitz on', $value);
@@ -229,11 +211,15 @@ class GenerateCacheTest extends Unit
     public function testSaveElementQueryCacheRecords()
     {
         $elementQuery = Entry::find();
+
         Blitz::$plugin->generateCache->addElementQuery($elementQuery);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        $newSiteUri = new SiteUriModel(['siteId' => 1, 'uri' => 'new']);
-        Blitz::$plugin->generateCache->save($this->output, $newSiteUri);
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        Blitz::$plugin->generateCache->save($this->output, new SiteUriModel([
+            'siteId' => 1,
+            'uri' => 'new',
+        ]));
 
         $count = ElementQueryCacheRecord::find()->count();
 

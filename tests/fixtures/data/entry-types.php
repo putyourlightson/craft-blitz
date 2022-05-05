@@ -9,7 +9,7 @@ return [
         'handle' => 'entryType1',
         'titleFormat' => null,
         'sortOrder' => '1',
-        'uid' => 'entry-type-1------------------uid'
+        'uid' => 'entry-type-1------------------uid',
     ],
     [
         'id' => '2',
@@ -19,6 +19,6 @@ return [
         'handle' => 'entryType2',
         'titleFormat' => null,
         'sortOrder' => '2',
-        'uid' => 'entry-type-2------------------uid'
+        'uid' => 'entry-type-2------------------uid',
     ],
 ];

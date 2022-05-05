@@ -10,6 +10,8 @@ use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
+use craft\events\CancelableEvent;
+use craft\events\PopulateElementEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
@@ -26,62 +28,64 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use yii\base\Event;
 use yii\db\Exception;
+use yii\log\Logger;
 
 class GenerateCacheService extends Component
 {
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent
+     */
+    public const EVENT_BEFORE_SAVE_CACHE = 'beforeSaveCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_SAVE_CACHE = 'beforeSaveCache';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_SAVE_CACHE = 'afterSaveCache';
+    public const EVENT_AFTER_SAVE_CACHE = 'afterSaveCache';
 
     /**
      * @const string
      */
-    const MUTEX_LOCK_NAME_CACHE_RECORDS = 'blitz:cacheRecords';
+    public const MUTEX_LOCK_NAME_CACHE_RECORDS = 'blitz:cacheRecords';
 
     /**
      * @const string
      */
-    const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
-
-
-    // Properties
-    // =========================================================================
+    public const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
 
     /**
      * @var CacheOptionsModel
      */
-    public $options;
+    public CacheOptionsModel $options;
 
     /**
      * @var int[]
      */
-    public $elementCaches = [];
+    public array $elementCaches = [];
 
     /**
      * @var int[]
      */
-    public $elementQueryCaches = [];
-
-    // Public Methods
-    // =========================================================================
+    public array $elementQueryCaches = [];
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
+        $this->reset();
+    }
+
+    /**
+     * Resets the component, so it can be used multiple times in the same request.
+     */
+    public function reset(): void
+    {
+        $this->elementCaches = [];
+        $this->elementQueryCaches = [];
         $this->options = new CacheOptionsModel();
 
         // Set default attributes from the plugin settings
@@ -89,11 +93,35 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Adds an element to be cached.
-     *
-     * @param ElementInterface $element
+     * Registers element prepare events.
      */
-    public function addElement(ElementInterface $element)
+    public function registerElementPrepareEvents(): void
+    {
+        // Register element populate event
+        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
+            function(PopulateElementEvent $event) {
+                if (Craft::$app->getResponse()->getIsOk()) {
+                    $this->addElement($event->element);
+                }
+            }
+        );
+
+        // Register element query prepare event
+        Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
+            function(CancelableEvent $event) {
+                if (Craft::$app->getResponse()->getIsOk()) {
+                    /** @var ElementQuery $elementQuery */
+                    $elementQuery = $event->sender;
+                    $this->addElementQuery($elementQuery);
+                }
+            }
+        );
+    }
+
+    /**
+     * Adds an element to be cached.
+     */
+    public function addElement(ElementInterface $element): void
     {
         // Don't proceed if element caching is disabled
         if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
@@ -112,10 +140,8 @@ class GenerateCacheService extends Component
 
     /**
      * Adds an element query to be cached.
-     *
-     * @param ElementQuery $elementQuery
      */
-    public function addElementQuery(ElementQuery $elementQuery)
+    public function addElementQuery(ElementQuery $elementQuery): void
     {
         // Don't proceed if element query caching is disabled
         if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
@@ -157,25 +183,23 @@ class GenerateCacheService extends Component
 
     /**
      * Saves an element query.
-     *
-     * @param ElementQuery $elementQuery
      */
-    public function saveElementQuery(ElementQuery $elementQuery)
+    public function saveElementQuery(ElementQuery $elementQuery): void
     {
         $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
 
         // Create a unique index from the element type and parameters for quicker indexing and less storage
-        $index = sprintf('%u', crc32($elementQuery->elementType.$params));
+        $index = sprintf('%u', crc32($elementQuery->elementType . $params));
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
-        $lockName = self::MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS.':'.$index;
+        $lockName = self::MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS . ':' . $index;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
         }
 
-        // Use DB connection so we can exclude audit columns when inserting
+        // Use DB connection, so we can exclude audit columns when inserting
         $db = Craft::$app->getDb();
 
         // Get element query record from index or create one if it does not exist
@@ -187,19 +211,22 @@ class GenerateCacheService extends Component
         if (!$queryId) {
             try {
                 $db->createCommand()
-                    ->insert(ElementQueryRecord::tableName(), [
-                        'index' => $index,
-                        'type' => $elementQuery->elementType,
-                        'params' => $params,
-                    ], false)
+                    ->insert(
+                        ElementQueryRecord::tableName(),
+                        [
+                            'index' => $index,
+                            'type' => $elementQuery->elementType,
+                            'params' => $params,
+                        ],
+                    )
                     ->execute();
 
                 $queryId = $db->getLastInsertID();
 
                 $this->saveElementQuerySources($elementQuery, $queryId);
             }
-            catch (Exception $e) {
-                Blitz::$plugin->log($e->getMessage(), [], 'error');
+            catch (Exception $exception) {
+                Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
             }
         }
 
@@ -212,18 +239,13 @@ class GenerateCacheService extends Component
 
     /**
      * Saves an element query's sources.
-     *
-     * @param ElementQuery $elementQuery
-     * @param string $queryId
-     *
-     * @throws Exception
      */
-    public function saveElementQuerySources(ElementQuery $elementQuery, string $queryId)
+    public function saveElementQuerySources(ElementQuery $elementQuery, string $queryId): void
     {
         $db = Craft::$app->getDb();
 
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-        $sourceIds = $sourceIdAttribute ? $elementQuery->$sourceIdAttribute : null;
+        $sourceIds = $sourceIdAttribute ? $elementQuery->{$sourceIdAttribute} : null;
 
         // Normalize source IDs
         $sourceIds = ElementQueryHelper::getNormalizedElementQueryIdParam($sourceIds);
@@ -240,22 +262,21 @@ class GenerateCacheService extends Component
             }
 
             $db->createCommand()
-                ->insert(ElementQuerySourceRecord::tableName(), [
-                    'sourceId' => $sourceId,
-                    'queryId' => $queryId,
-                ], false)
+                ->insert(
+                    ElementQuerySourceRecord::tableName(),
+                    [
+                        'sourceId' => $sourceId,
+                        'queryId' => $queryId,
+                    ],
+                )
                 ->execute();
         }
     }
 
     /**
      * Saves the content for a site URI to the cache.
-     *
-     * @param string $content
-     * @param SiteUriModel $siteUri
-     * @return string|null
      */
-    public function save(string $content, SiteUriModel $siteUri)
+    public function save(string $content, SiteUriModel $siteUri): ?string
     {
         if (!$this->options->cachingEnabled) {
             return null;
@@ -296,7 +317,7 @@ class GenerateCacheService extends Component
         ]);
 
         $db->createCommand()
-            ->insert(CacheRecord::tableName(), $cacheValue, false)
+            ->insert(CacheRecord::tableName(), $cacheValue)
             ->execute();
 
         $cacheId = (int)$db->getLastInsertID();
@@ -324,18 +345,17 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        // Get the mime type from the URI
-        $mimeType = SiteUriHelper::getMimeType($siteUri);
-
         $outputComments = $this->options->outputComments === true
             || $this->options->outputComments == SettingsModel::OUTPUT_COMMENTS_CACHED;
 
-        // Append timestamp comment only if html mime type and allowed
-        if ($mimeType == SiteUriHelper::MIME_TYPE_HTML && $outputComments) {
-            $content .= '<!-- Cached by Blitz on '.date('c').' -->';
+        // Append cached by comment if allowed and has HTML mime type
+        if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
+            $content .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
         }
 
         $this->saveOutput($content, $siteUri, $this->options->getCacheDuration());
+
+        $this->reset();
 
         $mutex->release($lockName);
 
@@ -344,12 +364,8 @@ class GenerateCacheService extends Component
 
     /**
      * Saves the output for a site URI.
-     *
-     * @param string $output
-     * @param SiteUriModel $siteUri
-     * @param int|null $duration
      */
-    public function saveOutput(string $output, SiteUriModel $siteUri, int $duration = null)
+    public function saveOutput(string $output, SiteUriModel $siteUri, int $duration = null): void
     {
         $event = new SaveCacheEvent([
             'output' => $output,
@@ -374,13 +390,9 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * @param int $cacheId
-     * @param array $ids
-     * @param string $checkTable
-     * @param string $insertTable
-     * @param string $columnName
+     * Batch inserts cache values to database.
      */
-    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName)
+    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName): void
     {
         // Get values by selecting only records with existing IDs
         $values = ActiveRecord::find()
@@ -393,12 +405,12 @@ class GenerateCacheService extends Component
             $values[$key] = [$cacheId, $value];
         }
 
-        // Batch insert cache values to database
         Craft::$app->getDb()->createCommand()
-            ->batchInsert($insertTable,
+            ->batchInsert(
+                $insertTable,
                 ['cacheId', $columnName],
                 $values,
-                false)
+            )
             ->execute();
     }
 }

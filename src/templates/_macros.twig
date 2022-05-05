@@ -1,0 +1,24 @@
+{% macro instructions(instructionText, infoText) -%}
+    <div>
+        {{ instructionText }}
+        <div class="info">
+            {{ infoText }}
+        </div>
+    </div>
+{%- endmacro %}
+
+{% macro configWarning(setting) -%}
+    {{ 'This is being overridden by the `{setting}` config setting.'|t('blitz', {setting: setting })|markdown(inlineOnly=true) }}
+{%- endmacro %}
+
+{% macro configFieldWarning(setting) -%}
+    <div class="field">
+        <p class="warning has-icon">
+            <span class="icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Warning: </span>
+            <span>
+                {{ 'These settings are being overridden by the `{setting}` config setting.'|t('blitz', {setting: setting })|markdown(inlineOnly=true) }}
+            </span>
+        </p>
+    </div>
+{%- endmacro %}

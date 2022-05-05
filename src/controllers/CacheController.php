@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\View;
@@ -15,9 +16,6 @@ use yii\web\Response;
 
 class CacheController extends Controller
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -26,20 +24,15 @@ class CacheController extends Controller
     /**
      * @var bool Disable Snaptcha validation
      */
-    public $enableSnaptchaValidation = false;
+    public bool $enableSnaptchaValidation = false;
 
     /**
      * @inheritdoc
      */
-    protected $allowAnonymous = true;
-
-    // Public Methods
-    // =========================================================================
+    protected array|bool|int $allowAnonymous = true;
 
     /**
      * @inheritdoc
-     *
-     * @throws ForbiddenHttpException
      */
     public function beforeAction($action): bool
     {
@@ -51,12 +44,12 @@ class CacheController extends Controller
 
         // Require permission if posted from utility
         if ($request->getIsPost() && $request->getParam('utility')) {
-            $this->requirePermission('blitz:'.$action->id);
+            $this->requirePermission('blitz:' . $action->id);
         }
         else {
             // Verify API key
             $key = $request->getParam('key');
-            $apiKey = Craft::parseEnv(Blitz::$plugin->settings->apiKey);
+            $apiKey = App::parseEnv(Blitz::$plugin->settings->apiKey);
 
             if (empty($key) || empty($apiKey) || $key != $apiKey) {
                 throw new ForbiddenHttpException('Unauthorised access.');
@@ -66,7 +59,10 @@ class CacheController extends Controller
         return true;
     }
 
-    public function afterAction($action, $result)
+    /**
+     * @inheritdoc
+     */
+    public function afterAction($action, $result): mixed
     {
         // If front-end request, run the queue to ensure action is completed in full
         if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE) {
@@ -78,13 +74,10 @@ class CacheController extends Controller
 
     /**
      * Clears the cache.
-     *
-     * @return Response
      */
     public function actionClear(): Response
     {
         Blitz::$plugin->clearCache->clearAll();
-
         $message = 'Blitz cache successfully cleared.';
         Blitz::$plugin->log($message);
 
@@ -93,13 +86,10 @@ class CacheController extends Controller
 
     /**
      * Flushes the cache.
-     *
-     * @return Response
      */
     public function actionFlush(): Response
     {
         Blitz::$plugin->flushCache->flushAll();
-
         $message = 'Blitz cache successfully flushed.';
         Blitz::$plugin->log($message);
 
@@ -108,13 +98,10 @@ class CacheController extends Controller
 
     /**
      * Purges the cache.
-     *
-     * @return Response
      */
     public function actionPurge(): Response
     {
         Blitz::$plugin->cachePurger->purgeAll();
-
         $message = 'Blitz cache successfully purged.';
         Blitz::$plugin->log($message);
 
@@ -122,19 +109,16 @@ class CacheController extends Controller
     }
 
     /**
-     * Warms the cache.
-     *
-     * @return Response
+     * Generates the cache.
      */
-    public function actionWarm(): Response
+    public function actionGenerate(): Response
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
             return $this->_getResponse('Blitz caching is disabled.', false);
         }
 
-        Blitz::$plugin->cacheWarmer->warmAll();
-
-        $message = 'Blitz cache successfully queued for warming.';
+        Blitz::$plugin->cacheGenerator->generateAll();
+        $message = 'Blitz cache successfully queued for generation.';
         Blitz::$plugin->log($message);
 
         return $this->_getResponse($message);
@@ -142,8 +126,6 @@ class CacheController extends Controller
 
     /**
      * Deploys the cache.
-     *
-     * @return Response
      */
     public function actionDeploy(): Response
     {
@@ -152,7 +134,6 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->deployer->deployAll();
-
         $message = 'Blitz cache successfully queued for deployment.';
         Blitz::$plugin->log($message);
 
@@ -160,18 +141,15 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes the entire cache.
-     *
-     * @return Response
+     * Refreshes the entire cache, respecting the “Refresh Mode”.
      */
     public function actionRefresh(): Response
     {
         Blitz::$plugin->refreshCache->refreshAll();
-
         $message = 'Blitz cache successfully refreshed.';
 
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            $message = 'Blitz cache successfully refreshed and queued for warming.';
+        if (Blitz::$plugin->settings->generateOnRefresh()) {
+            $message = 'Blitz cache successfully refreshed and queued for generation.';
         }
 
         Blitz::$plugin->log($message);
@@ -181,13 +159,10 @@ class CacheController extends Controller
 
     /**
      * Refreshes expired cache.
-     *
-     * @return Response
      */
     public function actionRefreshExpired(): Response
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
-
         $message = 'Expired cache successfully refreshed.';
         Blitz::$plugin->log($message);
 
@@ -196,8 +171,6 @@ class CacheController extends Controller
 
     /**
      * Refreshes site cache.
-     *
-     * @return Response
      */
     public function actionRefreshSite(): Response
     {
@@ -208,11 +181,10 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->refreshCache->refreshSite($siteId);
-
         $message = 'Site successfully refreshed.';
 
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            $message = 'Site successfully refreshed and queued for warming.';
+        if (Blitz::$plugin->settings->generateOnRefresh()) {
+            $message = 'Site successfully refreshed and queued for generation.';
         }
 
         Blitz::$plugin->log($message);
@@ -222,13 +194,10 @@ class CacheController extends Controller
 
     /**
      * Refreshes cached URLs.
-     *
-     * @return Response
      */
     public function actionRefreshUrls(): Response
     {
         $urls = Craft::$app->getRequest()->getParam('urls');
-
         $urls = $this->_normalizeArguments($urls);
 
         if (empty($urls)) {
@@ -236,7 +205,6 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
-
         $message = 'Cached URLs successfully refreshed.';
         Blitz::$plugin->log($message);
 
@@ -245,13 +213,10 @@ class CacheController extends Controller
 
     /**
      * Refreshes tagged cache.
-     *
-     * @return Response
      */
     public function actionRefreshTagged(): Response
     {
         $tags = Craft::$app->getRequest()->getParam('tags');
-
         $tags = $this->_normalizeArguments($tags);
 
         if (empty($tags)) {
@@ -259,23 +224,14 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
-
         $message = 'Tagged cache successfully refreshed.';
         Blitz::$plugin->log($message);
 
         return $this->_getResponse($message);
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Returns a response.
-     *
-     * @param string $message
-     * @param bool $success
-     *
-     * @return Response
      */
     private function _getResponse(string $message, bool $success = true): Response
     {
@@ -302,11 +258,9 @@ class CacheController extends Controller
     /**
      * Normalizes values as an array of arguments.
      *
-     * @param string|array|null $values
-     *
      * @return string[]
      */
-    private function _normalizeArguments($values): array
+    private function _normalizeArguments(array|string|null $values): array
     {
         if (is_string($values)) {
             $values = StringHelper::split($values);
@@ -321,9 +275,7 @@ class CacheController extends Controller
             });
 
             // Remove empty values
-            $values = array_filter($values);
-
-            return $values;
+            return array_filter($values);
         }
 
         return [];

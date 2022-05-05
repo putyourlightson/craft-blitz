@@ -14,23 +14,13 @@ use yii\db\Expression;
 
 class ElementQueryHelper
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var array
      */
-    private static $_defaultElementQueryParams = [];
-
-    // Public Methods
-    // =========================================================================
+    private static array $_defaultElementQueryParams = [];
 
     /**
      * Returns the element query's unique parameters.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return array
      */
     public static function getUniqueElementQueryParams(ElementQuery $elementQuery): array
     {
@@ -58,7 +48,7 @@ class ElementQueryHelper
 
         // Convert ID parameters to arrays
         foreach ($params as $key => $value) {
-            if ($key == 'id' || substr($key, -2) == 'Id') {
+            if ($key == 'id' || str_ends_with($key, 'Id')) {
                 $params[$key] = self::getNormalizedElementQueryIdParam($value);
             }
         }
@@ -71,10 +61,6 @@ class ElementQueryHelper
 
     /**
      * Returns an element query's default parameters for a given element type.
-     *
-     * @param string|null $elementType
-     *
-     * @return array
      */
     public static function getDefaultElementQueryParams(string $elementType = null): array
     {
@@ -108,12 +94,8 @@ class ElementQueryHelper
 
     /**
      * Returns a normalized element query ID parameter.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
-    public static function getNormalizedElementQueryIdParam($value)
+    public static function getNormalizedElementQueryIdParam(mixed $value): mixed
     {
         if ($value === null || is_int($value)) {
             return $value;
@@ -161,10 +143,6 @@ class ElementQueryHelper
 
     /**
      * Returns whether the element query has fixed IDs.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return bool
      */
     public static function hasFixedIdsOrSlugs(ElementQuery $elementQuery): bool
     {
@@ -201,10 +179,6 @@ class ElementQueryHelper
 
     /**
      * Returns whether the element query contains an expression on any of its criteria.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return bool
      */
     public static function containsExpressionCriteria(ElementQuery $elementQuery): bool
     {
@@ -227,10 +201,6 @@ class ElementQueryHelper
 
     /**
      * Returns whether the element query is randomly ordered.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return bool
      */
     public static function isOrderByRandom(ElementQuery $elementQuery): bool
     {
@@ -251,10 +221,6 @@ class ElementQueryHelper
 
     /**
      * Returns whether the element query is a draft or revision query.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return bool
      */
     public static function isDraftOrRevisionQuery(ElementQuery $elementQuery): bool
     {
@@ -267,10 +233,6 @@ class ElementQueryHelper
 
     /**
      * Returns whether the element query is a relation query.
-     *
-     * @param ElementQuery $elementQuery
-     *
-     * @return bool
      */
     public static function isRelationQuery(ElementQuery $elementQuery): bool
     {
@@ -296,15 +258,10 @@ class ElementQueryHelper
         return false;
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
      * Converts query parameter values to more concise formats recursively.
-     *
-     * @param mixed $value
      */
-    private static function _convertQueryParamsRecursively(&$value)
+    private static function _convertQueryParamsRecursively(mixed &$value): void
     {
         // Convert elements to their ID
         if ($value instanceof ElementInterface) {
@@ -321,7 +278,6 @@ class ElementQueryHelper
         // Convert DateTime objects to Unix timestamp
         if ($value instanceof DateTime) {
             $value = $value->getTimestamp();
-            return;
         }
     }
 }

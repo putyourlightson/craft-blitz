@@ -10,16 +10,11 @@ use craft\web\Response;
 use yii\web\BadRequestHttpException;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     2.3.0
+ * @since 2.3.0
  */
 
 class TemplatesControllerTest extends BaseControllerTest
 {
-    // Public methods
-    // =========================================================================
-
     public function testGetSuccess()
     {
         Craft::$app->getView()->setTemplateMode('site');

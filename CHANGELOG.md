@@ -1,5 +1,32 @@
 # Release Notes for Blitz
 
+## 4.0.0 - 2022-05-04
+> {warning} Cache warmers have been completely replaced by cache generators. The included/excluded query string parameters config setting format has changed. See the new formats [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php).
+
+### Added
+- Added compatibility with Craft 4.
+- Added a new `Refresh Mode` setting that determines when and how the cache should be refreshed.
+- Added the concept of cache generation, that supersedes cache warming, and is used both for generating, regenerating and in some cases removing cached pages.
+- Added the ability to revalidate cached pages that have expired when serving cached responses ([#381](https://github.com/putyourlightson/craft-blitz/issues/381)).
+- Added the included/excluded query string parameter settings to the Advanced Settings tab and added the ability for them to be site-specific.
+- Added the ability for cache purgers to be run in queue jobs.
+- Added a new `refreshCacheWhenElementMovedInStructure` config setting, defaulting to `true`, that controls whether the cache should be refreshed when an element is moved within a structure ([#289](https://github.com/putyourlightson/craft-blitz/issues/289)).
+- Added a new `cacheNonHtmlResponses` config setting, defaulting to `false`, that allows enabling caching of pages that return non-HTML responses.
+
+### Changed
+- Replaced all `Warmer` drivers and classes with `Generator` drivers and classes.
+- Replaced the `Guzzle Warmer` with the `HTTP Generator`.
+- Replaced the `Local Warmer` (experimental) with the `Local Generator` (stable).
+- Replaced the `Log To File` helper package with a custom Monolog log target.
+- Changed the included/excluded query string parameters config setting format, see the new format [here](https://github.com/putyourlightson/craft-blitz/blob/v4/src/config.php). 
+
+### Removed
+- Removed the `Clear Cache Automatically` and `Warm Cache Automatically` settings (use the `Refresh Mode` setting instead).
+- Removed the `Warm Cache Delay` setting on cache purgers.
+- Removed the `warmCacheDelay` property from the `CachePurgerTrait` class.
+- Removed the `delay` property from the `DriverJob` class. 
+- Removed the `delay` parameter from all methods in the `CacheWarmerInterface` class.  
+
 ## 3.12.4 - 2022-05-03
 ### Fixed
 - Fixed a bug introduced in 3.12.3 when running PHP version 7 ([#401](https://github.com/putyourlightson/craft-blitz/issues/401)).
@@ -30,7 +57,7 @@
 
 ### Fixed
 - Fixed deployers not being added as queue jobs when running via a console command ([#384](https://github.com/putyourlightson/craft-blitz/issues/384)).
-- Fixed exception handling in GitWrapper version 3. 
+- Fixed exception handling in GitWrapper version 3.
 
 ## 3.11.2 - 2022-03-03
 ### Fixed

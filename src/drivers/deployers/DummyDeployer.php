@@ -9,9 +9,6 @@ use Craft;
 
 class DummyDeployer extends BaseDeployer
 {
-    // Static
-    // =========================================================================
-
     /**
      * @inheritdoc
      */
@@ -20,29 +17,29 @@ class DummyDeployer extends BaseDeployer
         return Craft::t('blitz', 'None');
     }
 
-    // Properties
-    // =========================================================================
-
     /**
      * @var bool
      */
-    public $isDummy = true;
-
-    // Public Methods
-    // =========================================================================
+    public bool $isDummy = true;
 
     /**
      * @inheritdoc
      */
-    public function deployUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true) { }
+    public function deployUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
+    {
+    }
 
     /**
      * @inheritdoc
      */
-    public function deploySite(int $siteId, callable $setProgressHandler = null, bool $queue = true) { }
+    public function deploySite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
+    {
+    }
 
     /**
      * @inheritdoc
      */
-    public function deployAll(callable $setProgressHandler = null, bool $queue = true) { }
+    public function deployAll(callable $setProgressHandler = null, bool $queue = true): void
+    {
+    }
 }

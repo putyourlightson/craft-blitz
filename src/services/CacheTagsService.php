@@ -11,13 +11,10 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheTagRecord;
 
 /**
- * @property string[] $allTags
+ * @property-read string[] $allTags
  */
 class CacheTagsService extends Component
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Returns all unique tags.
      *
@@ -33,8 +30,6 @@ class CacheTagsService extends Component
 
     /**
      * Returns tags for the given site URI.
-     *
-     * @param SiteUriModel $siteUri
      *
      * @return string[]
      */
@@ -52,7 +47,6 @@ class CacheTagsService extends Component
      * Returns cache IDs for the given tags.
      *
      * @param string[] $tags
-     *
      * @return int[]
      */
     public function getCacheIds(array $tags): array
@@ -72,9 +66,8 @@ class CacheTagsService extends Component
      * Saves one or more tags given a cache ID.
      *
      * @param string[] $tags
-     * @param int $cacheId
      */
-    public function saveTags(array $tags, int $cacheId)
+    public function saveTags(array $tags, int $cacheId): void
     {
         $values = [];
 
@@ -83,10 +76,11 @@ class CacheTagsService extends Component
         }
 
         Craft::$app->getDb()->createCommand()
-            ->batchInsert(CacheTagRecord::tableName(),
+            ->batchInsert(
+                CacheTagRecord::tableName(),
                 ['cacheId', 'tag'],
                 $values,
-                false)
+            )
             ->execute();
     }
 }

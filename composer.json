@@ -1,7 +1,7 @@
 {
     "name": "putyourlightson/craft-blitz",
     "description": "Intelligent static page caching for creating lightning-fast sites.",
-    "version": "3.12.4",
+    "version": "4.0.0",
     "type": "craft-plugin",
     "homepage": "https://putyourlightson.com/plugins/blitz",
     "license": "proprietary",
@@ -16,15 +16,20 @@
         "speed"
     ],
     "require": {
-        "craftcms/cms": "^3.2.1",
-        "putyourlightson/craft-log-to-file": "^1.2.3",
-        "cpliakas/git-wrapper": "^1.7.0 || ^2.2.0 || ^3.0.0"
+        "php": "^8.0.2",
+        "amphp/http-client": "^4.0",
+        "amphp/parallel": "^1.0",
+        "craftcms/cms": "^4.0.0",
+        "symplify/git-wrapper": "^10.0"
     },
     "require-dev": {
-        "codeception/codeception": "^4.0.0",
-        "vlucas/phpdotenv": "^3.0",
-        "codeception/module-yii2": "^1.0.0",
-        "codeception/module-asserts": "^1.0.0"
+        "codeception/codeception": "^4.1.29",
+        "codeception/module-asserts": "^1.3.1",
+        "codeception/module-yii2": "^1.1.5",
+        "craftcms/ecs": "dev-main",
+        "craftcms/phpstan": "dev-main",
+        "yiisoft/yii2-redis": "^2.0",
+        "vlucas/phpdotenv": "^5.4.1"
     },
     "autoload": {
         "psr-4": {
@@ -43,9 +48,7 @@
         "developer": "PutYourLightsOn",
         "developerUrl": "https://putyourlightson.com/",
         "documentationUrl": "https://putyourlightson.com/plugins/blitz",
-        "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v3/CHANGELOG.md",
-        "class": "putyourlightson\\blitz\\Blitz",
-        "schemaVersion": "3.10.0",
-        "hasCpSettings": true
+        "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v4/CHANGELOG.md",
+        "class": "putyourlightson\\blitz\\Blitz"
     }
 }

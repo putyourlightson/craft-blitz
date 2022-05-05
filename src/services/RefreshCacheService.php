@@ -36,149 +36,147 @@ use yii\db\ActiveQuery;
  * This class is responsible for keeping the cache fresh.
  * When one or more cacheable element are updated, they are added to the `$elements` array.
  * If `$batchMode` is false then the `refresh()` method is called immediately,
- * otherwise it is triggered by a resave elements event.
+ * otherwise it is triggered by a resave event.
  * The `refresh()` method creates a `RefreshCacheJob` so that refreshing happens asynchronously.
  *
  * @property SiteUriModel[] $allSiteUris
  */
 class RefreshCacheService extends Component
 {
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshElementEvent
+     */
+    public const EVENT_BEFORE_ADD_ELEMENT = 'beforeAddElement';
 
     /**
      * @event RefreshElementEvent
      */
-    const EVENT_BEFORE_ADD_ELEMENT = 'beforeAddElement';
-
-    /**
-     * @event RefreshElementEvent
-     */
-    const EVENT_AFTER_ADD_ELEMENT = 'afterAddElement';
+    public const EVENT_AFTER_ADD_ELEMENT = 'afterAddElement';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_REFRESH_CACHE = 'beforeRefreshCache';
+    public const EVENT_BEFORE_REFRESH_CACHE = 'beforeRefreshCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
+    public const EVENT_AFTER_REFRESH_CACHE = 'afterRefreshCache';
 
     /**
      * @event RefreshCacheTagsEvent
      */
-    const EVENT_BEFORE_REFRESH_CACHE_TAGS = 'beforeRefreshCacheTags';
+    public const EVENT_BEFORE_REFRESH_CACHE_TAGS = 'beforeRefreshCacheTags';
 
     /**
      * @event RefreshCacheTagsEvent
      */
-    const EVENT_AFTER_REFRESH_CACHE_TAGS = 'afterRefreshCacheTags';
+    public const EVENT_AFTER_REFRESH_CACHE_TAGS = 'afterRefreshCacheTags';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_BEFORE_REFRESH_ALL_CACHE = 'beforeRefreshAllCache';
+    public const EVENT_BEFORE_REFRESH_ALL_CACHE = 'beforeRefreshAllCache';
 
     /**
      * @event RefreshCacheEvent
      */
-    const EVENT_AFTER_REFRESH_ALL_CACHE = 'afterRefreshAllCache';
+    public const EVENT_AFTER_REFRESH_ALL_CACHE = 'afterRefreshAllCache';
 
     /**
      * @event RefreshSiteCacheEvent
      */
-    const EVENT_BEFORE_REFRESH_SITE_CACHE = 'beforeRefreshSiteCache';
+    public const EVENT_BEFORE_REFRESH_SITE_CACHE = 'beforeRefreshSiteCache';
 
     /**
      * @event RefreshSiteCacheEvent
      */
-    const EVENT_AFTER_REFRESH_SITE_CACHE = 'afterRefreshSiteCache';
-
-    // Properties
-    // =========================================================================
+    public const EVENT_AFTER_REFRESH_SITE_CACHE = 'afterRefreshSiteCache';
 
     /**
      * @var bool
      */
-    public $batchMode = false;
+    public bool $batchMode = false;
 
     /**
      * @var int[]
      */
-    public $cacheIds = [];
+    public array $cacheIds = [];
 
     /**
      * @var array
      */
-    public $elements = [];
+    public array $elements = [];
 
-    // Public Methods
-    // =========================================================================
+    /**
+     * Resets the component, so it can be used multiple times in the same request.
+     */
+    public function reset(): void
+    {
+        $this->cacheIds = [];
+        $this->elements = [];
+    }
 
     /**
      * Returns cache IDs given an array of element IDs.
      *
      * @param int[] $elementIds
-     *
      * @return int[]
      */
     public function getElementCacheIds(array $elementIds): array
     {
-        return ElementCacheRecord::find()
+        /** @var int[] $ids */
+        $ids = ElementCacheRecord::find()
             ->select('cacheId')
             ->where(['elementId' => $elementIds])
             ->groupBy('cacheId')
             ->column();
+
+        return $ids;
     }
 
     /**
      * Returns element queries of the provided element type that can be joined
      * with the provided source IDs, ignoring the provided cache IDs.
      *
-     * @param string $elementType
      * @param int[] $sourceIds
      * @param int[] $ignoreCacheIds
-     *
      * @return ElementQueryRecord[]
      */
     public function getElementTypeQueries(string $elementType, array $sourceIds, array $ignoreCacheIds): array
     {
         // Get element query records without eager loading
-        return ElementQueryRecord::find()
+        /** @var ElementQueryRecord[] $records */
+        $records = ElementQueryRecord::find()
             ->where(['type' => $elementType])
             ->innerJoinWith([
                 'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
                     $query->where(['sourceId' => $sourceIds])
                         ->orWhere(['sourceId' => null]);
-                }
+                },
             ], false)
             ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
                     $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
-                }
+                },
             ], false)
             ->all();
+
+        return $records;
     }
 
     /**
      * Adds cache IDs to refresh.
-     *
-     * @param array $cacheIds
      */
-    public function addCacheIds(array $cacheIds)
+    public function addCacheIds(array $cacheIds): void
     {
         $this->cacheIds = array_unique(array_merge($this->cacheIds, $cacheIds));
     }
 
     /**
      * Adds element IDs to refresh.
-     *
-     * @param string $elementType
-     * @param array $elementIds
      */
-    public function addElementIds(string $elementType, array $elementIds)
+    public function addElementIds(string $elementType, array $elementIds): void
     {
         $this->elements[$elementType] = $this->elements[$elementType] ?? [
             'elementIds' => [],
@@ -190,10 +188,8 @@ class RefreshCacheService extends Component
 
     /**
      * Adds an element to refresh.
-     *
-     * @param ElementInterface $element
      */
-    public function addElement(ElementInterface $element)
+    public function addElement(ElementInterface $element): void
     {
         // Don't proceed if not an actual element
         if (!($element instanceof Element)) {
@@ -274,7 +270,7 @@ class RefreshCacheService extends Component
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
 
         if ($sourceIdAttribute !== null) {
-            $sourceId = $element->$sourceIdAttribute;
+            $sourceId = $element->{$sourceIdAttribute};
 
             if (!in_array($sourceId, $this->elements[$elementType]['sourceIds'])) {
                 $this->elements[$elementType]['sourceIds'][] = $sourceId;
@@ -296,10 +292,8 @@ class RefreshCacheService extends Component
 
     /**
      * Adds expiry dates for a given element.
-     *
-     * @param Element $element
      */
-    public function addElementExpiryDates(Element $element)
+    public function addElementExpiryDates(Element $element): void
     {
         $expiryDate = null;
         $now = new DateTime();
@@ -318,11 +312,8 @@ class RefreshCacheService extends Component
 
     /**
      * Adds an expiry date for a given element.
-     *
-     * @param Element $element
-     * @param DateTime $expiryDate
      */
-    public function addElementExpiryDate(Element $element, DateTime $expiryDate)
+    public function addElementExpiryDate(Element $element, DateTime $expiryDate): void
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
@@ -351,9 +342,8 @@ class RefreshCacheService extends Component
      * Adds an expiry date for the given cache IDs.
      *
      * @param int[] $cacheIds
-     * @param DateTime|null $expiryDate
      */
-    public function expireCacheIds(array $cacheIds, DateTime $expiryDate = null)
+    public function expireCacheIds(array $cacheIds, DateTime $expiryDate = null): void
     {
         if (empty($cacheIds)) {
             return;
@@ -376,10 +366,8 @@ class RefreshCacheService extends Component
 
     /**
      * Generates element expiry dates.
-     *
-     * @param string|null $elementType
      */
-    public function generateExpiryDates(string $elementType = null)
+    public function generateExpiryDates(string $elementType = null): void
     {
         if ($elementType === null) {
             $elementType = Entry::class;
@@ -395,7 +383,7 @@ class RefreshCacheService extends Component
                 ['>', 'postDate', $now],
                 ['>', 'expiryDate', $now],
             ])
-            ->anyStatus()
+            ->status(null)
             ->all();
 
         foreach ($elements as $element) {
@@ -405,10 +393,8 @@ class RefreshCacheService extends Component
 
     /**
      * Refreshes the cache.
-     *
-     * @param bool $forceClear
      */
-    public function refresh(bool $forceClear = false)
+    public function refresh(bool $forceClear = false, bool $forceGenerate = false): void
     {
         if (empty($this->cacheIds) && empty($this->elements)) {
             return;
@@ -417,7 +403,8 @@ class RefreshCacheService extends Component
         $refreshCacheJob = new RefreshCacheJob([
             'cacheIds' => $this->cacheIds,
             'elements' => $this->elements,
-            'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
+            'forceClear' => $forceClear,
+            'forceGenerate' => $forceGenerate,
         ]);
 
         $queue = Craft::$app->getQueue();
@@ -434,13 +421,11 @@ class RefreshCacheService extends Component
                 ->push($refreshCacheJob);
         }
         /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (NotSupportedException $e) {
+        catch (NotSupportedException) {
             $queue->push($refreshCacheJob);
         }
 
-        // Reset values
-        $this->cacheIds = [];
-        $this->elements = [];
+        $this->reset();
     }
 
     /**
@@ -448,7 +433,7 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function refreshSiteUris(array $siteUris)
+    public function refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
@@ -459,14 +444,7 @@ class RefreshCacheService extends Component
 
         $siteUris = $event->siteUris;
 
-        Blitz::$plugin->clearCache->clearUris($siteUris);
-
-        // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
-
-            Blitz::$plugin->deployer->deployUris($siteUris);
-        }
+        $this->_refreshSiteUris($siteUris, $forceClear, $forceGenerate);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
@@ -474,9 +452,35 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes the entire cache.
+     * Refreshes a site URI if it has expired.
      */
-    public function refreshAll()
+    public function refreshSiteUriIfExpired(SiteUriModel $siteUri): void
+    {
+        $now = Db::prepareDateForDb(new DateTime());
+
+        // Get the cache IDs of expired site URIs
+        $cacheIds = CacheRecord::find()
+            ->select('id')
+            ->where($siteUri->toArray())
+            ->andWhere(['<', 'expiryDate', $now])
+            ->column();
+
+        if (empty($cacheIds)) {
+            return;
+        }
+
+        $this->addCacheIds($cacheIds);
+
+        // Force clear the cache if it will not be regenerated.
+        $forceClear = !Blitz::$plugin->settings->generateOnRefresh();
+
+        $this->refresh($forceClear);
+    }
+
+    /**
+     * Refreshes the entire cache, respecting the “Refresh Mode”.
+     */
+    public function refreshAll(): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_REFRESH_ALL_CACHE, $event);
@@ -485,20 +489,25 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Get warmable site URIs before flushing the cache
+        // Get site URIs to generate before flushing the cache
         $siteUris = array_merge(
-            SiteUriHelper::getAllSiteUris(true),
-            Blitz::$plugin->settings->getCustomSiteUris()
+            SiteUriHelper::getAllSiteUris(),
+            Blitz::$plugin->settings->customSiteUris
         );
 
-        Blitz::$plugin->flushCache->flushAll();
-        Blitz::$plugin->clearCache->clearAll();
+        if (Blitz::$plugin->settings->clearOnRefresh()) {
+            Blitz::$plugin->clearCache->clearAll();
+            Blitz::$plugin->flushCache->flushAll();
+            Blitz::$plugin->cachePurger->purgeAll();
+        }
 
-        // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
-
+        if (Blitz::$plugin->settings->generateOnRefresh()) {
+            Blitz::$plugin->cacheGenerator->generateUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
+        }
+
+        if (Blitz::$plugin->settings->purgeAfterGenerate()) {
+            Blitz::$plugin->cachePurger->purgeUris($siteUris);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_ALL_CACHE)) {
@@ -508,10 +517,8 @@ class RefreshCacheService extends Component
 
     /**
      * Refreshes a site.
-     *
-     * @param int $siteId
      */
-    public function refreshSite(int $siteId)
+    public function refreshSite(int $siteId): void
     {
         $event = new RefreshSiteCacheEvent(['siteId' => $siteId]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_SITE_CACHE, $event);
@@ -520,24 +527,16 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Get warmable site URIs before flushing the cache
+        // Get site URIs to generate before flushing the cache
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
 
-        foreach (Blitz::$plugin->settings->getCustomSiteUris() as $customSiteUri) {
+        foreach (Blitz::$plugin->settings->customSiteUris as $customSiteUri) {
             if ($customSiteUri['siteId'] == $siteId) {
                 $siteUris[] = $customSiteUri;
             }
         }
 
-        Blitz::$plugin->flushCache->flushUris($siteUris);
-        Blitz::$plugin->clearCache->clearUris($siteUris);
-
-        // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
-            Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
-
-            Blitz::$plugin->deployer->deployUris($siteUris);
-        }
+        $this->_refreshSiteUris($siteUris);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_SITE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_SITE_CACHE, $event);
@@ -547,7 +546,7 @@ class RefreshCacheService extends Component
     /**
      * Refreshes expired cache.
      */
-    public function refreshExpiredCache()
+    public function refreshExpiredCache(): void
     {
         $this->batchMode = true;
         $now = Db::prepareDateForDb(new DateTime());
@@ -561,6 +560,7 @@ class RefreshCacheService extends Component
         $this->addCacheIds($cacheIds);
 
         // Check for expired elements to invalidate
+        /** @var ElementExpiryDateRecord[] $elementExpiryDates */
         $elementExpiryDates = ElementExpiryDateRecord::find()
             ->where(['<', 'expiryDate', $now])
             ->all();
@@ -568,33 +568,20 @@ class RefreshCacheService extends Component
         $elementsService = Craft::$app->getElements();
 
         foreach ($elementExpiryDates as $elementExpiryDate) {
-            /** @var ElementExpiryDateRecord $elementExpiryDate */
-            $elementId = $elementExpiryDate->elementId;
+            $element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
 
             // This should happen before invalidating the element so that other expiry dates will be saved
             $elementExpiryDate->delete();
 
-            // TODO: simplify using the following technique in 4.0.0
-            // https://github.com/craftcms/cms/pull/5861
-            //$element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
-
-            $elementType = $elementsService->getElementTypeById($elementId);
-
-            if ($elementType !== null) {
-                /** @var ElementInterface $elementType */
-                $element = $elementType::find()
-                    ->id($elementId)
-                    ->site('*')
-                    ->status(null)
-                    ->one();
-
-                if ($element !== null) {
-                    $this->addElement($element);
-                }
+            if ($element !== null) {
+                $this->addElement($element);
             }
         }
 
-        $this->refresh(true);
+        // Force clear the cache if it will not be regenerated.
+        $forceClear = !Blitz::$plugin->settings->generateOnRefresh();
+
+        $this->refresh($forceClear);
     }
 
     /**
@@ -602,7 +589,7 @@ class RefreshCacheService extends Component
      *
      * @param string[] $urls
      */
-    public function refreshCachedUrls(array $urls)
+    public function refreshCachedUrls(array $urls): void
     {
         // Get site URIs from URLs
         $siteUris = SiteUriHelper::getSiteUrisFromUrls($urls);
@@ -615,7 +602,7 @@ class RefreshCacheService extends Component
      *
      * @param string[] $tags
      */
-    public function refreshCacheTags(array $tags)
+    public function refreshCacheTags(array $tags): void
     {
         $event = new RefreshCacheTagsEvent(['tags' => $tags]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE_TAGS, $event);
@@ -635,6 +622,28 @@ class RefreshCacheService extends Component
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE_TAGS)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE_TAGS, $event);
+        }
+    }
+
+    /**
+     * Refreshes site URIs.
+     *
+     * @param SiteUriModel[] $siteUris
+     */
+    private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false): void
+    {
+        if (Blitz::$plugin->settings->clearOnRefresh($forceClear)) {
+            Blitz::$plugin->clearCache->clearUris($siteUris);
+            Blitz::$plugin->cachePurger->purgeUris($siteUris);
+        }
+
+        if (Blitz::$plugin->settings->generateOnRefresh($forceGenerate)) {
+            Blitz::$plugin->cacheGenerator->generateUris($siteUris);
+            Blitz::$plugin->deployer->deployUris($siteUris);
+        }
+
+        if (Blitz::$plugin->settings->purgeAfterGenerate($forceClear, $forceGenerate)) {
+            Blitz::$plugin->cachePurger->purgeUris($siteUris);
         }
     }
 }

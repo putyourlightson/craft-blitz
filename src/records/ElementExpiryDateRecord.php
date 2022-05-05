@@ -14,13 +14,8 @@ use DateTime;
  */
 class ElementExpiryDateRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
-     *
-     * @return string
      */
     public static function tableName(): string
     {

@@ -1,0 +1,15 @@
+{% if craft.app.request.getParam('welcome') %}
+
+    <div class="blitz-welcome bottom readable">
+        <p>
+            {{ 'Save the settings and your site pages will automatically be cached when visited.'|t('blitz') }}
+            <br>
+            {{ 'If you like, you can generate the entire cache using the <a href="{url}" class="go" target="_blank">Blitz Cache Utility</a>'|t('blitz', {url: cpUrl('utilities/blitz-cache')})|raw }}
+        </p>
+        <p>
+            📖
+            {{ 'More in the <a href="{url}" class="go" target="_blank">Getting Started Guide</a>'|t('blitz', {url: docs ~ 'getting-started'})|raw }}
+        </p>
+    </div>
+
+{% endif %}

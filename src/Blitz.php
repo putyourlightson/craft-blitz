@@ -6,96 +6,121 @@
 namespace putyourlightson\blitz;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
-use craft\elements\db\ElementQuery;
 use craft\events\BatchElementActionEvent;
-use craft\events\CancelableEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
+use craft\events\MoveElementEvent;
 use craft\events\PluginEvent;
-use craft\events\PopulateElementEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
-use craft\events\TemplateEvent;
 use craft\helpers\UrlHelper;
+use craft\log\MonologTarget;
 use craft\services\Elements;
 use craft\services\Plugins;
+use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
 use craft\web\Application;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
-use craft\web\View;
+use Monolog\Formatter\LineFormatter;
+use Psr\Log\LogLevel;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
-use putyourlightson\blitz\drivers\integrations\IntegrationInterface;
+use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
-use putyourlightson\blitz\drivers\warmers\BaseCacheWarmer;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\services\CacheTagsService;
+use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
-use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
-use putyourlightson\logtofile\LogToFile;
 use yii\base\Controller;
 use yii\base\Event;
+use yii\log\Logger;
+use yii\web\Response;
 
 /**
+ * @property-read CacheRequestService $cacheRequest
+ * @property-read CacheTagsService $cacheTags
+ * @property-read ClearCacheService $clearCache
+ * @property-read FlushCacheService $flushCache
+ * @property-read GenerateCacheService $generateCache
+ * @property-read RefreshCacheService $refreshCache
+ * @property-read BaseCacheStorage $cacheStorage
+ * @property-read BaseCacheGenerator $cacheGenerator
+ * @property-read BaseCachePurger $cachePurger
+ * @property-read BaseDeployer $deployer
  *
- * @property CacheRequestService $cacheRequest
- * @property CacheTagsService $cacheTags
- * @property ClearCacheService $clearCache
- * @property FlushCacheService $flushCache
- * @property GenerateCacheService $generateCache
- * @property RefreshCacheService $refreshCache
- * @property BaseCacheStorage $cacheStorage
- * @property BaseCacheWarmer $cacheWarmer
- * @property BaseCachePurger $cachePurger
- * @property BaseDeployer $deployer
- * @property SettingsModel $settings
- * @property mixed $settingsResponse
- * @property array $cpRoutes
+ * @property-read SettingsModel $settings
  */
 class Blitz extends Plugin
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var Blitz
      */
-    public static $plugin;
+    public static Blitz $plugin;
 
-    // Public Methods
-    // =========================================================================
+    /**
+     * @inerhitdoc
+     */
+    public static function config(): array
+    {
+        return [
+            'components' => [
+                'cacheRequest' => ['class' => CacheRequestService::class],
+                'cacheTags' => ['class' => CacheTagsService::class],
+                'clearCache' => ['class' => ClearCacheService::class],
+                'flushCache' => ['class' => FlushCacheService::class],
+                'generateCache' => ['class' => GenerateCacheService::class],
+                'refreshCache' => ['class' => RefreshCacheService::class],
+            ],
+        ];
+    }
 
     /**
      * @inheritdoc
      */
-    public function init()
+    public bool $hasCpSettings = true;
+
+    /**
+     * @inheritdoc
+     */
+    public string $schemaVersion = '4.0.0';
+
+    /**
+     * @inheritdoc
+     */
+    public string $minVersionRequired = '3.10.0';
+
+    /**
+     * @inheritdoc
+     */
+    public function init(): void
     {
         parent::init();
-
         self::$plugin = $this;
 
-        // Register services and variables before processing the request
         $this->_registerComponents();
         $this->_registerVariables();
+        $this->_registerLogTarget();
 
         // Register events
         $this->_registerCacheableRequestEvents();
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
+        $this->_registerStructureEvents();
         $this->_registerIntegrationEvents();
         $this->_registerClearCaches();
 
@@ -112,27 +137,19 @@ class Blitz extends Plugin
     }
 
     /**
-     * Logs an action
-     *
-     * @param string $message
-     * @param array $params
-     * @param string $type
+     * Logs a message
      */
-    public function log(string $message, array $params = [], string $type = 'info')
+    public function log(string $message, array $params = [], int $type = Logger::LEVEL_INFO): void
     {
         $message = Craft::t('blitz', $message, $params);
 
-        LogToFile::log($message, 'blitz', $type);
+        Craft::getLogger()->log($message, $type, 'blitz');
     }
 
     /**
      * Logs a debug message if debug mode is enabled
-     *
-     * @param string $message
-     * @param array $params
-     * @param string $url
      */
-    public function debug(string $message, array $params = [], string $url = '')
+    public function debug(string $message, array $params = [], string $url = ''): void
     {
         if (!$this->settings->debug || empty($message)) {
             return;
@@ -144,14 +161,11 @@ class Blitz extends Plugin
         $message = Craft::t('blitz', $message, $params);
 
         if ($url) {
-            $message .= ' ['.$url.']';
+            $message .= ' [' . $url . ']';
         }
 
-        LogToFile::log($message, 'blitz', 'debug');
+        Craft::getLogger()->log($message, Logger::LEVEL_INFO, 'blitz');
     }
-
-    // Protected Methods
-    // =========================================================================
 
     /**
      * @inheritdoc
@@ -161,44 +175,47 @@ class Blitz extends Plugin
         return new SettingsModel();
     }
 
-    // Private Methods
-    // =========================================================================
-
     /**
-     * Registers the components
+     * Registers the components that should be defined via settings, providing
+     * they have not already been set in `$pluginConfigs`.
+     *
+     * @see Plugins::$pluginConfigs
      */
-    private function _registerComponents()
+    private function _registerComponents(): void
     {
-        $this->setComponents([
-            'cacheRequest' => CacheRequestService::class,
-            'cacheTags' => CacheTagsService::class,
-            'clearCache' => ClearCacheService::class,
-            'flushCache' => FlushCacheService::class,
-            'generateCache' => GenerateCacheService::class,
-            'refreshCache' => RefreshCacheService::class,
-            'cacheStorage' => array_merge(
+        if (!$this->has('cacheStorage')) {
+            $this->set('cacheStorage', array_merge(
                 ['class' => $this->settings->cacheStorageType],
-                $this->settings->cacheStorageSettings
-            ),
-            'cacheWarmer' => array_merge(
-                ['class' => $this->settings->cacheWarmerType],
-                $this->settings->cacheWarmerSettings
-            ),
-            'cachePurger' => array_merge(
+                $this->settings->cacheStorageSettings,
+            ));
+        }
+
+        if (!$this->has('cacheGenerator')) {
+            $this->set('cacheGenerator', array_merge(
+                ['class' => $this->settings->cacheGeneratorType],
+                $this->settings->cacheGeneratorSettings,
+            ));
+        }
+
+        if (!$this->has('cachePurger')) {
+            $this->set('cachePurger', array_merge(
                 ['class' => $this->settings->cachePurgerType],
-                $this->settings->cachePurgerSettings
-            ),
-            'deployer' => array_merge(
+                $this->settings->cachePurgerSettings,
+            ));
+        }
+
+        if (!$this->has('deployer')) {
+            $this->set('deployer', array_merge(
                 ['class' => $this->settings->deployerType],
-                $this->settings->deployerSettings
-            ),
-        ]);
+                $this->settings->deployerSettings,
+            ));
+        }
     }
 
     /**
      * Registers variables
      */
-    private function _registerVariables()
+    private function _registerVariables(): void
     {
         Event::on(CraftVariable::class, CraftVariable::EVENT_INIT,
             function(Event $event) {
@@ -210,9 +227,27 @@ class Blitz extends Plugin
     }
 
     /**
+     * Registers a custom log target, keeping the format as simple as possible.
+     *
+     * @see LineFormatter::SIMPLE_FORMAT
+     */
+    private function _registerLogTarget(): void
+    {
+        Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
+            'name' => 'blitz',
+            'categories' => ['blitz'],
+            'level' => LogLevel::INFO,
+            'formatter' => new LineFormatter(
+                format: "[%datetime%] %message%\n",
+                dateFormat: 'Y-m-d H:i:s',
+            ),
+        ]);
+    }
+
+    /**
      * Registers cacheable request events
      */
-    private function _registerCacheableRequestEvents()
+    private function _registerCacheableRequestEvents(): void
     {
         // Register application init event
         Event::on(Application::class, Application::EVENT_INIT,
@@ -229,44 +264,21 @@ class Blitz extends Plugin
                     return;
                 }
 
-                if ($response = $this->cacheRequest->getResponse($siteUri)) {
+                if ($cachedResponse = $this->cacheRequest->getCachedResponse($siteUri)) {
                     // Send the cached response and exit early, without allowing
                     // the full application life cycle to complete.
-                    $response->send();
+                    $cachedResponse->send();
                     exit();
                 }
 
-                // Register element populate event
-                Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-                    function(PopulateElementEvent $event) {
-                        if (Craft::$app->getResponse()->getIsOk() && $event->element !== null) {
-                            $this->generateCache->addElement($event->element);
-                        }
-                    }
-                );
+                $this->generateCache->registerElementPrepareEvents();
 
-                // Register element query prepare event
-                Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
-                    function(CancelableEvent $event) {
-                        if (Craft::$app->getResponse()->getIsOk()) {
-                            /** @var ElementQuery $elementQuery */
-                            $elementQuery = $event->sender;
-                            $this->generateCache->addElementQuery($elementQuery);
-                        }
-                    }
-                );
-
-                // Register after render page template event
-                Event::on(View::class, View::EVENT_AFTER_RENDER_PAGE_TEMPLATE,
-                    function(TemplateEvent $event) use ($siteUri) {
-                        $response = Craft::$app->getResponse();
-
-                        if ($response->getIsOk()) {
-                            // Save the content and prepare the response
-                            if ($content = $this->generateCache->save($event->output, $siteUri)) {
-                                $this->cacheRequest->prepareResponse($response, $content, $siteUri);
-                            }
-                        }
+                // Register after prepare response event
+                Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
+                    function(Event $event) use ($siteUri) {
+                        /** @var Response $response */
+                        $response = $event->sender;
+                        $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
                     }
                 );
             }
@@ -276,12 +288,12 @@ class Blitz extends Plugin
     /**
      * Registers element events
      */
-    private function _registerElementEvents()
+    private function _registerElementEvents(): void
     {
-        // Add cache IDs before hard deleting elements so we can refresh them
+        // Add cache IDs before hard deleting elements, so we can refresh them
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(DeleteElementEvent $event) {
-                if ($event->hardDelete && $event->element !== null) {
+                if ($event->hardDelete) {
                     $cacheIds = $this->refreshCache->getElementCacheIds([$event->element->getId()]);
                     $this->refreshCache->addCacheIds($cacheIds);
                 }
@@ -299,11 +311,10 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on(Elements::class, $event,
-                /** @var ElementEvent|BatchElementActionEvent $event */
-                function($event) {
-                    if ($event->element !== null) {
-                        $event->element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
-                    }
+                function(ElementEvent|BatchElementActionEvent $event) {
+                    /** @var Element $element */
+                    $element = $event->element;
+                    $element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
                 }
             );
         }
@@ -319,20 +330,17 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on(Elements::class, $event,
-                /** @var ElementEvent|BatchElementActionEvent $event */
-                function($event) {
-                    if ($event->element !== null) {
-                        $this->refreshCache->addElement($event->element);
-                    }
+                function(ElementEvent|BatchElementActionEvent $event) {
+                    $this->refreshCache->addElement($event->element);
                 }
             );
         }
     }
 
     /**
-     * Registers resave elements events
+     * Registers resave element events
      */
-    private function _registerResaveElementEvents()
+    private function _registerResaveElementEvents(): void
     {
         // Enable batch mode
         $events = [
@@ -366,13 +374,26 @@ class Blitz extends Plugin
     }
 
     /**
+     * Registers structure events
+     */
+    private function _registerStructureEvents(): void
+    {
+        if ($this->settings->refreshCacheWhenElementMovedInStructure) {
+            Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
+                function(MoveElementEvent $event) {
+                    $this->refreshCache->addElement($event->element);
+                }
+            );
+        }
+    }
+
+    /**
      * Registers integration events
      */
-    private function _registerIntegrationEvents()
+    private function _registerIntegrationEvents(): void
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_LOAD_PLUGINS,
             function() {
-                /** @var IntegrationInterface $integration */
                 foreach (IntegrationHelper::getActiveIntegrations() as $integration) {
                     $integration::registerEvents();
                 }
@@ -383,7 +404,7 @@ class Blitz extends Plugin
     /**
      * Registers clear caches
      */
-    private function _registerClearCaches()
+    private function _registerClearCaches(): void
     {
         Event::on(ClearCaches::class, ClearCaches::EVENT_REGISTER_CACHE_OPTIONS,
             function(RegisterCacheOptionsEvent $event) {
@@ -399,7 +420,7 @@ class Blitz extends Plugin
     /**
      * Registers CP URL rules event
      */
-    private function _registerCpUrlRules()
+    private function _registerCpUrlRules(): void
     {
         Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
@@ -416,7 +437,7 @@ class Blitz extends Plugin
     /**
      * Registers utilities
      */
-    private function _registerUtilities()
+    private function _registerUtilities(): void
     {
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function(RegisterComponentTypesEvent $event) {
@@ -428,7 +449,7 @@ class Blitz extends Plugin
     /**
      * Registers redirect after install
      */
-    private function _registerRedirectAfterInstall()
+    private function _registerRedirectAfterInstall(): void
     {
         Event::on(Plugins::class, Plugins::EVENT_AFTER_INSTALL_PLUGIN,
             function(PluginEvent $event) {
@@ -436,7 +457,7 @@ class Blitz extends Plugin
                     // Redirect to settings page with welcome
                     Craft::$app->getResponse()->redirect(
                         UrlHelper::cpUrl('settings/plugins/blitz', [
-                            'welcome' => 1
+                            'welcome' => 1,
                         ])
                     )->send();
                 }
@@ -447,40 +468,43 @@ class Blitz extends Plugin
     /**
      * Registers user permissions
      */
-    private function _registerUserPermissions()
+    private function _registerUserPermissions(): void
     {
         Event::on(UserPermissions::class, UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {
-                $event->permissions['Blitz'] = [
-                    'blitz:clear' => [
-                        'label' => Craft::t('blitz', 'Clear cache')
-                    ],
-                    'blitz:flush' => [
-                        'label' => Craft::t('blitz', 'Flush cache')
-                    ],
-                    'blitz:purge' => [
-                        'label' => Craft::t('blitz', 'Purge cache')
-                    ],
-                    'blitz:warm' => [
-                        'label' => Craft::t('blitz', 'Warm cache')
-                    ],
-                    'blitz:deploy' => [
-                        'label' => Craft::t('blitz', 'Remote deploy')
-                    ],
-                    'blitz:refresh' => [
-                        'label' => Craft::t('blitz', 'Refresh cache')
-                    ],
-                    'blitz:refresh-expired' => [
-                        'label' => Craft::t('blitz', 'Refresh expired cache')
-                    ],
-                    'blitz:refresh-site' => [
-                        'label' => Craft::t('blitz', 'Refresh site cache')
-                    ],
-                    'blitz:refresh-urls' => [
-                        'label' => Craft::t('blitz', 'Refresh cached URLs')
-                    ],
-                    'blitz:refresh-tagged' => [
-                        'label' => Craft::t('blitz', 'Refresh tagged cache')
+                $event->permissions[] = [
+                    'heading' => 'Blitz',
+                    'permissions' => [
+                        'blitz:clear' => [
+                            'label' => Craft::t('blitz', 'Clear cache'),
+                        ],
+                        'blitz:flush' => [
+                            'label' => Craft::t('blitz', 'Flush cache'),
+                        ],
+                        'blitz:purge' => [
+                            'label' => Craft::t('blitz', 'Purge cache'),
+                        ],
+                        'blitz:generate' => [
+                            'label' => Craft::t('blitz', 'Generate cache'),
+                        ],
+                        'blitz:deploy' => [
+                            'label' => Craft::t('blitz', 'Remote deploy'),
+                        ],
+                        'blitz:refresh' => [
+                            'label' => Craft::t('blitz', 'Refresh cache'),
+                        ],
+                        'blitz:refresh-expired' => [
+                            'label' => Craft::t('blitz', 'Refresh expired cache'),
+                        ],
+                        'blitz:refresh-site' => [
+                            'label' => Craft::t('blitz', 'Refresh site cache'),
+                        ],
+                        'blitz:refresh-urls' => [
+                            'label' => Craft::t('blitz', 'Refresh cached URLs'),
+                        ],
+                        'blitz:refresh-tagged' => [
+                            'label' => Craft::t('blitz', 'Refresh tagged cache'),
+                        ],
                     ],
                 ];
             }

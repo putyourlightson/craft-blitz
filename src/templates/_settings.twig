@@ -1,0 +1,415 @@
+{% extends '_layouts/cp' %}
+
+{% import '_includes/forms' as forms %}
+{% from 'blitz/_macros' import instructions %}
+{% from 'blitz/_macros' import configWarning %}
+{% from 'blitz/_macros' import configFieldWarning %}
+
+{% do view.registerAssetBundle('putyourlightson\\blitz\\assets\\BlitzAsset') %}
+
+{% set crumbs = [
+    { label: 'Settings'|t('app'), url: url('settings') },
+    { label: 'Plugins'|t('app'), url: url('settings/plugins') }
+] %}
+
+{% set title = 'Blitz' %}
+
+{% set tabs = {
+    general: {label: 'General Settings'|t('blitz'), url: '#general'},
+    storage: {label: 'Cache Storage'|t('blitz'), url: '#storage'},
+    generating: {label: 'Cache Generation'|t('blitz'), url: '#generation'},
+    purging: {label: 'Reverse Proxy Purging'|t('blitz'), url: '#purging'},
+    deployment: {label: 'Remote Deployment'|t('blitz'), url: '#deployment'},
+    advanced: {label: 'Advanced Settings'|t('blitz'), url: '#advanced'},
+} %}
+
+{% set fullPageForm = true %}
+{% set welcome = craft.app.request.getParam('welcome') %}
+{% set docs = 'https://putyourlightson.com/plugins/blitz#' %}
+
+{% set siteColumn = [] %}
+{% if craft.app.getIsMultiSite() %}
+    {% set allSiteOptions = [{value: '', label: 'All Sites'|t('blitz')}]|merge(siteOptions) %}
+    {% set siteColumn = {
+        siteId: {
+            type: 'select',
+            heading: 'Site'|t('blitz'),
+            options: allSiteOptions,
+            thin: true,
+        }
+    } %}
+{% endif %}
+
+{% block actionButton %}
+
+    <input type="submit" class="btn submit" value="{{ 'Save'|t('app') }}">
+
+{% endblock %}
+
+
+{% block content %}
+
+    <input type="hidden" name="action" value="blitz/settings/save">
+    <input type="hidden" name="pluginHandle" value="blitz">
+
+    <div id="general">
+
+        {{ include('blitz/_includes/welcome/top') }}
+
+        {% if craft.blitz.getWebAliasExists() %}
+            <div class="field">
+                <p class="warning">
+                    {{ "One or more sites use `@web` in their base URL. The `@web` alias is not recommended if it is determined automatically."|t('blitz')|md(inlineOnly=true) }}
+                </p>
+            </div>
+        {% endif %}
+
+        <div class="flex">
+            {{ include('blitz/_includes/welcome/step', { step: 1, text: 'Enable caching' }) }}
+
+            <div class="flex-grow field">
+                {% set info %}
+                    {{ 'With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disabling this setting will prevent Blitz from caching any new pages.'|t('blitz') }}
+                {% endset %}
+                {{ forms.lightswitchField({
+                    label: "Caching Enabled"|t('blitz'),
+                    instructions: instructions("Whether caching should be enabled."|t('blitz'), info),
+                    warning: config.cachingEnabled is defined ? configWarning('cachingEnabled'),
+                    name: 'settings[cachingEnabled]',
+                    on: settings.cachingEnabled,
+                }) }}
+            </div>
+        </div>
+
+        <div class="flex">
+            {{ include('blitz/_includes/welcome/step', { step: 2, text: 'Select an invalidation mode' }) }}
+
+            <div class="flex-grow">
+                {# This empty span ensures that the field is not the first element, which throws off vertical margin. #}
+                <span></span>
+                {% set info %}
+                    <p>
+                        <strong>Clear the cache and regenerate in a queue job</strong>
+                        <br>
+                        Select this if updated content should be applied as soon as possible and if cached pages should be automatically regenerated.
+                    </p>
+                    <p>
+                        <strong>Expire the cache and regenerate in a queue job</strong>
+                        <br>
+                        Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are automatically regenerated.
+                    </p>
+                    <p>
+                        <strong>Clear the cache, regenerate manually or organically</strong>
+                        <br>
+                        Select this if updated content should be applied as soon as possible but if cached pages should be regenerated manually (via a cron job) or organically (when pages are visited).
+                    </p>
+                    <p>
+                        <strong>Expire the cache, regenerate manually or organically</strong>
+                        <br>
+                        Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are regenerated manually (via a cron job).
+                    </p>
+                    <a href="{{ docs ~ 'refresh-mode' }}" class="go" target="_blank">Learn more</a>
+                {% endset %}
+                {{ forms.selectField({
+                    label: "Refresh Mode"|t('blitz'),
+                    instructions: instructions("Determines when and how the cache should be refreshed."|t('blitz'), info),
+                    warning: config.refreshMode is defined ? configWarning('refreshMode'),
+                    name: 'settings[refreshMode]',
+                    options: {
+                        3: "Clear the cache and regenerate in a queue job"|t('blitz'),
+                        2: "Expire the cache and regenerate in a queue job"|t('blitz'),
+                        1: "Clear the cache, regenerate manually or organically"|t('blitz'),
+                        0: "Expire the cache, regenerate manually or organically"|t('blitz'),
+                    },
+                    value: settings.refreshMode,
+                }) }}
+            </div>
+        </div>
+
+        <div class="flex">
+            {{ include('blitz/_includes/welcome/step', { step: 3, text: 'Add at least one included URI pattern' }) }}
+
+            <div class="flex-grow">
+
+                {% set info -%}
+                    {{ include('blitz/_includes/uri-pattern-info', { docs: docs }) }}
+                {%- endset %}
+                {% set cols = siteColumn|merge({
+                    uriPattern: {
+                        type: 'singleline',
+                        heading: 'URI Pattern'|t('blitz'),
+                        placeholder: "Leave blank to match the homepage"|t('blitz'),
+                        code: true,
+                        info: info,
+                    }
+                }) %}
+
+                <input type="hidden" name="includedUriPatterns" value="" />
+                {% set info %}
+                    {{ 'Only URIs that match one or more included URI patterns will be cached.'|t('blitz') }}
+                {% endset %}
+                {{ forms.editableTableField({
+                    label: "Included URI Patterns"|t('blitz'),
+                    instructions: instructions("The URI patterns to include in caching."|t('blitz'), info),
+                    warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
+                    name: 'settings[includedUriPatterns]',
+                    id: 'includedUriPatterns',
+                    cols: cols,
+                    rows: settings.includedUriPatterns,
+                    addRowLabel: "Add a URI pattern"|t('blitz'),
+                    allowAdd: true,
+                    allowDelete: true,
+                    allowReorder: true,
+                }) }}
+
+                <input type="hidden" name="excludedUriPatterns" value="" />
+                {% set info %}
+                    {{ 'URIs that match one or more excluded URI patterns will not be cached. Excluded URI patterns will override any matching included URI patterns.'|t('blitz') }}
+                {% endset %}
+                {{ forms.editableTableField({
+                    label: "Exclude URI Patterns"|t('blitz'),
+                    instructions: instructions("The URI patterns to exclude from caching."|t('blitz'), info),
+                    warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
+                    name: 'settings[excludedUriPatterns]',
+                    id: 'excludedUriPatterns',
+                    cols: cols,
+                    rows: settings.excludedUriPatterns,
+                    allowAdd: true,
+                    allowDelete: true,
+                    allowReorder: true,
+                    addRowLabel: "Add a URI pattern"|t('blitz'),
+                }) }}
+            </div>
+        </div>
+
+        {{ include('blitz/_includes/welcome/bottom', { docs: docs }) }}
+    </div>
+
+    <div id="storage" class="hidden">
+        {% set info %}
+            {{ 'The storage type determines how and where cached pages are stored. You can extend Blitz to add your own or third-party cache storage types.'|t('blitz') }} <a href="{{ docs ~ 'cache-storage' }}" class="go" target="_blank">Learn more</a>
+        {% endset %}
+        {{ forms.selectField({
+            label: "Cache Storage"|t('blitz'),
+            instructions: instructions("The storage type to use for storing cached pages."|t('blitz'), info),
+            warning: (config.cacheStorageType is defined ? configWarning('cacheStorageType')),
+            name: 'settings[cacheStorageType]',
+            options: storageTypeOptions,
+            value: className(storageDriver),
+            toggle: true,
+        }) }}
+
+        {% for driver in storageDrivers %}
+            {% set isCurrent = (className(driver) == className(storageDriver)) %}
+            <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
+                {% namespace 'cacheStorageSettings[' ~ className(driver) ~ ']' %}
+                    {{ (isCurrent ? storageDriver : driver).getSettingsHtml()|raw }}
+                {% endnamespace %}
+            </div>
+        {% endfor %}
+
+        {{ config.cacheStorageSettings is defined ? configFieldWarning('cacheStorageSettings') }}
+    </div>
+
+    <div id="generation" class="hidden">
+        {% set info %}
+            {{ 'The generator determines how the cache is generated. You can extend Blitz to add your own or third-party cache generators.'|t('blitz') }} <a href="{{ docs ~ 'cache-generation' }}" class="go" target="_blank">Learn more</a>
+        {% endset %}
+        {{ forms.selectField({
+            label: "Cache Generator"|t('blitz'),
+            instructions: instructions("The generator type to use for generating the cache."|t('blitz'), info),
+            warning: (config.cacheGeneratorType is defined ? configWarning('cacheGeneratorType')),
+            name: 'settings[cacheGeneratorType]',
+            options: generatorTypeOptions,
+            value: className(generatorDriver),
+            toggle: true,
+        }) }}
+
+        {% for driver in generatorDrivers %}
+            {% set isCurrent = (className(driver) == className(generatorDriver)) %}
+            <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
+                {% namespace 'cacheGeneratorSettings[' ~ className(driver) ~ ']' %}
+                    {{ (isCurrent ? generatorDriver : driver).getSettingsHtml()|raw }}
+                {% endnamespace %}
+            </div>
+        {% endfor %}
+
+        {{ config.cacheGeneratorSettings is defined and config.cacheGeneratorSettings ? configFieldWarning('cacheGeneratorSettings') }}
+
+        {% set cols = {
+            siteId: {
+                type: 'select',
+                heading: 'Site'|t('blitz'),
+                options: siteOptions,
+                thin: true,
+            },
+            uri: {
+                type: 'singleline',
+                heading: 'URI'|t('blitz'),
+                placeholder: "relative/uri",
+                code: true,
+                info: 'A relative URI that belongs to the specified site.'|t('blitz'),
+            }
+        } %}
+
+        <input type="hidden" name="customSiteUris" value="" />
+        {% set info %}
+            {{ 'Add any URIs that Craft doesn’t know about here and they will be generated when either a site or the entire cache is generated.'|t('blitz') }}
+        {% endset %}
+        {{ forms.editableTableField({
+            label: "Custom Site URIs"|t('blitz'),
+            instructions: instructions("Custom site URIs to include when generating the cache."|t('blitz'), info),
+            warning: (config.customSiteUris is defined ? configWarning('customSiteUris')),
+            name: 'settings[customSiteUris]',
+            id: 'customSiteUris',
+            cols: cols,
+            rows: settings.customSiteUris,
+            allowAdd: true,
+            allowDelete: true,
+            allowReorder: true,
+            addRowLabel: "Add a custom site URI"|t('blitz'),
+        }) }}
+    </div>
+
+    <div id="purging" class="hidden">
+        {% set info %}
+            {{ 'A purger allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated. You can extend Blitz to add your own or third-party reverse proxy purgers.'|t('blitz') }} <a href="{{ docs ~ 'reverse-proxy-purging' }}" class="go" target="_blank">Learn more</a>
+        {% endset %}
+        {{ forms.selectField({
+            label: "Reverse Proxy Purger"|t('blitz'),
+            instructions: instructions("A purger to use for clearing cache in a reverse proxy."|t('blitz'), info),
+            warning: (config.cachePurgerType is defined ? configWarning('cachePurgerType')),
+            name: 'settings[cachePurgerType]',
+            options: purgerTypeOptions,
+            value: className(purgerDriver),
+            toggle: true,
+        }) }}
+
+        {% for driver in purgerDrivers %}
+            {% set isCurrent = (className(driver) == className(purgerDriver)) %}
+            <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
+                {% namespace 'cachePurgerSettings[' ~ className(driver) ~ ']' %}
+                    {{ (isCurrent ? purgerDriver : driver).getSettingsHtml()|raw }}
+                {% endnamespace %}
+            </div>
+        {% endfor %}
+
+        {{ config.cachePurgerSettings is defined ? configFieldWarning('cachePurgerSettings') }}
+    </div>
+
+    <div id="deployment" class="hidden">
+        {% set info %}
+            {{ 'A deployer allows you to deploy cached files to a remote location. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been generated. You can extend Blitz to add your own or third-party deployers.'|t('blitz') }} <a href="{{ docs ~ 'remote-deployment' }}" class="go" target="_blank">Learn more</a>
+        {% endset %}
+        {{ forms.selectField({
+            label: "Remote Deployer"|t('blitz'),
+            instructions: instructions("A deployer to use for remotely deploying cached files."|t('blitz'), info),
+            warning: (config.deployerType is defined ? configWarning('deployerType')),
+            name: 'settings[deployerType]',
+            options: deployerTypeOptions,
+            value: className(deployerDriver),
+            toggle: true,
+        }) }}
+
+        {% for driver in deployerDrivers %}
+            {% set isCurrent = (className(driver) == className(deployerDriver)) %}
+            <div id="{{ className(driver)|id }}" {{ not isCurrent ? 'class="hidden"' }}>
+                {% namespace 'deployerSettings[' ~ className(driver) ~ ']' %}
+                    {{ (isCurrent ? deployerDriver : driver).getSettingsHtml()|raw }}
+                {% endnamespace %}
+            </div>
+        {% endfor %}
+
+        {{ config.deployerSettings is defined ? configFieldWarning('deployerSettings') }}
+    </div>
+
+    <div id="advanced" class="hidden">
+
+        {% set info %}
+            <p>
+                <strong>Do not cache URLs with query strings</strong>
+                <br>
+                URLs with query strings (anything following a <code>?</code> in a URL) will not be cached.
+            </p>
+            <p>
+                <strong>Cache URLs with query strings as unique pages</strong>
+                <br>
+                URLs with query strings will be cached as unique pages, so <code>domain.com/about</code>, <code>domain.com/about?utm_source=twitter</code> and <code>domain.com/about?utm_source=facebook</code> will be cached separately.
+            </p>
+            <p>
+                <strong>Cache URLs with query strings as the same page</strong>
+                <br>
+                URLs with query strings will be cached as the same page, so <code>domain.com/about</code>, <code>domain.com/about?utm_source=twitter</code> and <code>domain.com/about?utm_source=facebook</code> will all be cached with the same output.
+            </p>
+            <a href="{{ docs ~ 'query-string-caching' }}" class="go" target="_blank">Learn more</a>
+        {% endset %}
+        {{ forms.selectField({
+            label: "Query String Caching"|t('blitz'),
+            instructions: instructions("Whether URLs with query strings should cached and how."|t('blitz'), info),
+            warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
+            name: 'settings[queryStringCaching]',
+            options: {
+                0: "Do not cache URLs with query strings"|t('blitz'),
+                1: "Cache URLs with unique query strings as unique pages"|t('blitz'),
+                2: "Cache URLs with unique query strings as the same page"|t('blitz'),
+            },
+            value: settings.queryStringCaching,
+        }) }}
+
+        {% set cols = siteColumn|merge({
+            queryStringParam: {
+                type: 'singleline',
+                heading: 'Query String Parameter'|t('blitz'),
+                code: true,
+            }
+        }) %}
+
+        <input type="hidden" name="includedQueryStringParams" value="" />
+        {{ forms.editableTableField({
+            label: "Included Query String Parameters"|t('blitz'),
+            instructions: "The query string parameters to include when determining if and how a page should be cached (regular expressions may be used)."|t('blitz'),
+            warning: (config.includedQueryStringParams is defined ? configWarning('includedQueryStringParams')),
+            name: 'settings[includedQueryStringParams]',
+            id: 'includedQueryStringParams',
+            cols: cols,
+            rows: settings.includedQueryStringParams,
+            addRowLabel: "Add a query string parameter"|t('blitz'),
+            allowAdd: true,
+            allowDelete: true,
+            allowReorder: true,
+        }) }}
+
+        <input type="hidden" name="excludedQueryStringParams" value="" />
+        {{ forms.editableTableField({
+            label: "Excluded Query String Parameters"|t('blitz'),
+            instructions: "The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used)."|t('blitz'),
+            warning: (config.excludedQueryStringParams is defined ? configWarning('excludedQueryStringParams')),
+            name: 'settings[excludedQueryStringParams]',
+            id: 'excludedQueryStringParams',
+            cols: cols,
+            rows: settings.excludedQueryStringParams,
+            addRowLabel: "Add a query string parameter"|t('blitz'),
+            allowAdd: true,
+            allowDelete: true,
+            allowReorder: true,
+        }) }}
+
+        {{ forms.autosuggestField({
+            label: "API Key"|t('blitz'),
+            instructions: "An API key that can be used to clear, flush, purge, generate, deploy and refresh cache through a URL (min. 16 characters)."|t('blitz'),
+            suggestEnvVars: true,
+            name: 'settings[apiKey]',
+            value: settings.apiKey,
+            errors: settings.getErrors('apiKey'),
+        }) }}
+
+        {% if settings.apiKey and not settings.getErrors('apiKey') %}
+            {{ include('blitz/_includes/api-urls', { docs: docs }) }}
+        {% endif %}
+
+        <p class="light">
+            {{ 'More advanced settings are available using config settings.'|t('blitz') }} <a href="{{ docs ~ 'config-settings' }}" class="go" target="_blank">Learn more</a>
+        </p>
+    </div>
+
+{% endblock %}

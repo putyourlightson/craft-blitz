@@ -7,11 +7,8 @@ namespace putyourlightson\blitz\events;
 
 class RefreshSiteCacheEvent extends RefreshCacheEvent
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var int|null
      */
-    public $siteId;
+    public ?int $siteId;
 }

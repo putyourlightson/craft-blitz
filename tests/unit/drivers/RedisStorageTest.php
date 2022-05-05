@@ -8,6 +8,7 @@ namespace putyourlightson\blitztests\unit\drivers;
 use Codeception\Test\Unit;
 use Craft;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\CacheStorageInterface;
 use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
@@ -15,38 +16,30 @@ use yii\redis\Cache;
 use yii\redis\Connection;
 
 /**
- * @author    PutYourLightsOn
- * @package   Blitz
- * @since     3.6.9
+ * @since 3.6.9
  */
 
 class RedisStorageTest extends Unit
 {
-    // Properties
-    // =========================================================================
-
     /**
      * @var UnitTester
      */
-    protected $tester;
+    protected UnitTester $tester;
 
     /**
      * @var YiiCacheStorage
      */
-    private $cacheStorage;
+    private CacheStorageInterface $cacheStorage;
 
     /**
      * @var SiteUriModel
      */
-    private $siteUri;
+    private SiteUriModel $siteUri;
 
     /**
      * @var string
      */
-    private $output = 'xyz';
-
-    // Protected methods
-    // =========================================================================
+    private string $output = 'xyz';
 
     protected function _before()
     {
@@ -55,7 +48,7 @@ class RedisStorageTest extends Unit
         // Set cache component to Redis
         Craft::$app->set('redis', [
             'class' => Connection::class,
-            'hostname' => 'redis.service.nitro',
+            'hostname' => 'redis',
             'port' => 6379,
         ]);
         Craft::$app->set('cache', [
@@ -80,9 +73,6 @@ class RedisStorageTest extends Unit
 
         Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri);
     }
-
-    // Public methods
-    // =========================================================================
 
     public function testSave()
     {

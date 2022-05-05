@@ -8,21 +8,16 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\SavableComponent;
 use craft\helpers\Component;
-use craft\queue\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\services\RefreshCacheService;
 use yii\base\NotSupportedException;
 
 class BaseDriverHelper
 {
-    // Public Methods
-    // =========================================================================
-
     /**
      * Creates drivers of the provided types.
-     *
-     * @param array $types
      *
      * @return SavableComponent[]
      */
@@ -32,11 +27,7 @@ class BaseDriverHelper
 
         foreach ($types as $type) {
             if ($type::isSelectable()) {
-                $driver = self::createDriver($type);
-
-                if ($driver !== null) {
-                    $drivers[] = $driver;
-                }
+                $drivers[] = self::createDriver($type);
             }
         }
 
@@ -45,11 +36,6 @@ class BaseDriverHelper
 
     /**
      * Creates a driver of the provided type with the optional settings.
-     *
-     * @param string $type
-     * @param array $settings
-     *
-     * @return SavableComponent
      */
     public static function createDriver(string $type, array $settings = []): SavableComponent
     {
@@ -66,13 +52,8 @@ class BaseDriverHelper
      * Adds a driver job to the queue.
      *
      * @param SiteUriModel[] $siteUris
-     * @param string $driverId
-     * @param string $driverMethod
-     * @param string|null $description
-     * @param int|null $delay
-     * @param int|null $priority
      */
-    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $delay = null, int $priority = null)
+    public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $priority = null): void
     {
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
 
@@ -88,19 +69,18 @@ class BaseDriverHelper
             'driverId' => $driverId,
             'driverMethod' => $driverMethod,
             'description' => $description,
-            'delay' => $delay,
         ]);
 
-        // Add job to queue with a priority
-        /** @var Queue $queue */
         $queue = Craft::$app->getQueue();
 
+        /**
+         * @see RefreshCacheService::refresh()
+         */
         try {
             $queue->priority($priority)->push($job);
         }
         /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (NotSupportedException $e) {
-            // The queue probably doesn't support custom push priorities. Try again without one.
+        catch (NotSupportedException) {
             $queue->push($job);
         }
     }

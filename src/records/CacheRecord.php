@@ -15,17 +15,12 @@ use yii\db\ActiveQueryInterface;
  * @property string $uri
  * @property int|null $paginate
  * @property DateTime|null $expiryDate
- * @property ActiveQueryInterface $elements
+ * @property-read ActiveQueryInterface $elements
  */
 class CacheRecord extends ActiveRecord
 {
-    // Public Static Methods
-    // =========================================================================
-
     /**
      * @inheritdoc
-     *
-     * @return string
      */
     public static function tableName(): string
     {
@@ -34,8 +29,6 @@ class CacheRecord extends ActiveRecord
 
     /**
      * Returns the associated elements
-     *
-     * @return ActiveQueryInterface
      */
     public function getElements(): ActiveQueryInterface
     {

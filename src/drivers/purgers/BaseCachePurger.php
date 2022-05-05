@@ -8,54 +8,69 @@ namespace putyourlightson\blitz\drivers\purgers;
 use Craft;
 use craft\base\SavableComponent;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\models\SiteUriModel;
 
 abstract class BaseCachePurger extends SavableComponent implements CachePurgerInterface
 {
-    // Traits
-    // =========================================================================
-
     use CachePurgerTrait;
 
-    // Constants
-    // =========================================================================
+    /**
+     * @event RefreshCacheEvent The event that is triggered before the cache is purged.
+     */
+    public const EVENT_BEFORE_PURGE_CACHE = 'beforePurgeCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered after the cache is purged.
      */
-    const EVENT_BEFORE_PURGE_CACHE = 'beforePurgeCache';
+    public const EVENT_AFTER_PURGE_CACHE = 'afterPurgeCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered before all cache is purged.
      */
-    const EVENT_AFTER_PURGE_CACHE = 'afterPurgeCache';
+    public const EVENT_BEFORE_PURGE_ALL_CACHE = 'beforePurgeAllCache';
 
     /**
-     * @event RefreshCacheEvent
+     * @event RefreshCacheEvent The event that is triggered after all cache is purged.
      */
-    const EVENT_BEFORE_PURGE_ALL_CACHE = 'beforePurgeAllCache';
-
-    /**
-     * @event RefreshCacheEvent
-     */
-    const EVENT_AFTER_PURGE_ALL_CACHE = 'afterPurgeAllCache';
-
-    // Public Methods
-    // =========================================================================
+    public const EVENT_AFTER_PURGE_ALL_CACHE = 'afterPurgeAllCache';
 
     /**
      * @inheritdoc
      */
-    public function purgeSite(int $siteId)
+    public function purgeUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
     {
-        $this->purgeUris(SiteUriHelper::getSiteUrisForSite($siteId));
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_PURGE_CACHE, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        if ($queue) {
+            CachePurgerHelper::addPurgerJob($siteUris, 'purgeUrisWithProgress');
+        }
+        else {
+            $this->purgeUrisWithProgress($siteUris, $setProgressHandler);
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_PURGE_CACHE, $event);
+        }
     }
 
     /**
      * @inheritdoc
      */
-    public function purgeAll()
+    public function purgeSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
+    {
+        $this->purgeUris(SiteUriHelper::getSiteUrisForSite($siteId), $setProgressHandler, $queue);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function purgeAll(callable $setProgressHandler = null, bool $queue = true): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_PURGE_ALL_CACHE, $event);
@@ -67,7 +82,7 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
         $sites = Craft::$app->getSites()->getAllSites();
 
         foreach ($sites as $site) {
-            $this->purgeSite($site->id);
+            $this->purgeSite($site->id, $setProgressHandler, $queue);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_ALL_CACHE)) {
@@ -76,43 +91,17 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     }
 
     /**
+     * Purge site URIs with progress.
+     */
+    public function purgeUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
+    {
+    }
+
+    /**
      * @inheritdoc
      */
     public function test(): bool
     {
         return true;
-    }
-
-    /**
-     * Triggers the `beforePurgeCache` event.
-     *
-     * @param SiteUriModel[] $siteUris
-     *
-     * @return SiteUriModel[]
-     */
-    protected function beforePurgeCache(array $siteUris): array
-    {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-        $this->trigger(self::EVENT_BEFORE_PURGE_CACHE, $event);
-
-        if (!$event->isValid) {
-            return [];
-        }
-
-        return $event->siteUris;
-    }
-
-    /**
-     * Triggers the `afterPurgeCache` event.
-     *
-     * @param SiteUriModel[] $siteUris
-     */
-    protected function afterPurgeCache(array $siteUris)
-    {
-        if ($this->hasEventHandlers(self::EVENT_AFTER_PURGE_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_PURGE_CACHE, new RefreshCacheEvent([
-                'siteUris' => $siteUris
-            ]));
-        }
     }
 }

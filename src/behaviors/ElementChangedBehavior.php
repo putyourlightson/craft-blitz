@@ -11,7 +11,7 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
 
 /**
- * This class attaches behavior to detect whether an element has changed.
+ * This behavior detects whether an element has changed.
  *
  * @since 3.6.0
  *
@@ -22,34 +22,25 @@ use yii\base\Behavior;
  */
 class ElementChangedBehavior extends Behavior
 {
-    // Constants
-    // =========================================================================
-
     /**
      * @const string
      */
-    const BEHAVIOR_NAME = 'elementChanged';
-
-    // Properties
-    // =========================================================================
+    public const BEHAVIOR_NAME = 'elementChanged';
 
     /**
-     * @var string|null
+     * @var string|null The previous status of the element.
      */
-    public $previousStatus;
+    public ?string $previousStatus = null;
 
     /**
-     * @var bool
+     * @var bool Whether the element was deleted.
      */
-    public $isDeleted = false;
-
-    // Public Methods
-    // =========================================================================
+    public bool $isDeleted = false;
 
     /**
-     * @inheritdoc
+     * @inerhitdoc
      */
-    public function attach($owner)
+    public function attach($owner): void
     {
         parent::attach($owner);
 
@@ -74,67 +65,30 @@ class ElementChangedBehavior extends Behavior
 
     /**
      * Returns whether the element's fields, attributes or status have changed.
-     *
-     * @return bool
      */
     public function getHasChanged(): bool
     {
         $element = $this->owner;
-        $version = Craft::$app->getVersion();
-
-        /**
-         * Detection of changes are not possible before Craft 3.4, therefore
-         * we always assume true.
-         * TODO: remove in 4.0.0
-         */
-        if (version_compare($version, '3.4', '<')) {
-            return true;
-        }
-
-        /**
-         * Before Craft 3.7, it is sufficient to check whether the element being saved
-         * has any dirty attributes or fields.
-         * TODO: remove in 4.0.0
-         */
-        if (version_compare($version, '3.7', '<')) {
-            if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
-                return true;
-            }
-        }
-
-        /**
-         * Detection of first save is not possible before Craft 3.7.5, therefore
-         * we always assume true.
-         * TODO: remove in 4.0.0
-         */
-        if (version_compare($version, '3.7.0', '>=')
-            && version_compare($version, '3.7.5', '<')
-        ) {
-            return true;
-        }
 
         /**
          * Craft 3.7.5 introduced detection of first save. Craft 3.7 can save
          * canonical entries by duplicating a draft or revision, so we need to
          * additionally check whether the original element has any modified
          * attributes or fields.
-         * TODO: remove in 4.0.0
          */
-        if (version_compare($version, '3.7.5', '>=')) {
-            if ($element->firstSave) {
+        if ($element->firstSave) {
+            return true;
+        }
+
+        if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
+            return true;
+        }
+
+        $original = $element->duplicateOf;
+
+        if ($original !== null) {
+            if (!empty($original->getModifiedAttributes()) || !empty($original->getModifiedFields())) {
                 return true;
-            }
-
-            if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
-                return true;
-            }
-
-            $original = $element->duplicateOf;
-
-            if ($original !== null) {
-                if (!empty($original->getModifiedAttributes()) || !empty($original->getModifiedFields())) {
-                    return true;
-                }
             }
         }
 
@@ -151,8 +105,6 @@ class ElementChangedBehavior extends Behavior
 
     /**
      * Returns whether the element's status has changed.
-     *
-     * @return bool
      */
     public function getHasStatusChanged(): bool
     {
@@ -161,8 +113,6 @@ class ElementChangedBehavior extends Behavior
 
     /**
      * Returns whether the element has a live or expired status.
-     *
-     * @return bool
      */
     public function getHasLiveOrExpiredStatus(): bool
     {

@@ -25,6 +25,13 @@ return [
         // With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 
+        // Determines when and how the cache should be refreshed.
+        // - `0`: Expire the cache, regenerate manually or organically
+        // - `1`: Clear the cache, regenerate manually or organically
+        // - `2`: Expire the cache and regenerate in a queue job
+        // - `3`: Clear the cache and regenerate in a queue job
+        //'refreshMode' => 3,
+
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
         //'includedUriPatterns' => [
         //    [
@@ -58,16 +65,16 @@ return [
         // The storage type classes to add to the plugin’s default storage types.
         //'cacheStorageTypes' => [],
 
-        // The warmer type to use.
-        //'cacheWarmerType' => 'putyourlightson\blitz\drivers\warmers\GuzzleWarmer',
+        // The generator type to use.
+        //'cacheGeneratorType' => 'putyourlightson\blitz\drivers\generators\HttpGenerator',
 
-        // The warmer settings.
-        //'cacheWarmerSettings' => ['concurrency' => 3],
+        // The generator settings.
+        //'cacheGeneratorSettings' => ['concurrency' => 3],
 
-        // The warmer type classes to add to the plugin’s default warmer types.
-        //'cacheWarmerTypes' => [],
+        // The generator type classes to add to the plugin’s default generator types.
+        //'cacheGeneratorTypes' => [],
 
-        // Custom site URIs to warm when either a site or the entire cache is warmed.
+        // Custom site URIs to generate when either a site or the entire cache is generated.
         //'customSiteUris' => [
         //    [
         //        'siteId' => 1,
@@ -87,12 +94,11 @@ return [
         //    ],
         //    'email' => '',
         //    'apiKey' => '',
-        //    'warmCacheDelay' => '5',
         //],
 
         // The purger type classes to add to the plugin’s default purger types.
         //'cachePurgerTypes' => [
-        //    'putyourlightson\blitzshell\ShellDeployer',
+        //    'putyourlightson\blitzcloudfront\CloudFrontPurger',
         //],
 
         // The deployer type to use.
@@ -121,17 +127,40 @@ return [
         //    'putyourlightson\blitzshell\ShellDeployer',
         //],
 
-        // Whether the cache should automatically be cleared when elements are updated.
-        //'clearCacheAutomatically' => true,
+        // Whether URLs with query strings should be cached and how.
+        // - `0`: Do not cache URLs with query strings
+        // - `1`: Cache URLs with query strings as unique pages
+        // - `2`: Cache URLs with query strings as the same page
+        //'queryStringCaching' => 0,
 
-        // Whether the cache should automatically be warmed after clearing.
-        //'warmCacheAutomatically' => true,
+        // The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
+        //'includedQueryStringParams' => [
+        //    [
+        //        'queryStringParam' => '.*',
+        //    ],
+        //],
 
-        // Whether pages containing query string parameters should be warmed.
-        //'warmPagesWithQueryStringParams' => true,
+        // The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
+        //'excludedQueryStringParams' => [
+        //    [
+        //        'queryStringParam' => 'gclid',
+        //    ],
+        //    [
+        //        'queryStringParam' => 'fbclid',
+        //    ],
+        //],
+
+        // An API key that can be used via a URL (min. 16 characters).
+        //'apiKey' => '',
+
+        // Whether pages containing query string parameters should be generated.
+        //'generatePagesWithQueryStringParams' => true,
 
         // Whether the cache should automatically be refreshed after a global set is updated.
         //'refreshCacheAutomaticallyForGlobals' => true,
+
+        // Whether the cache should be refreshed when an element is moved within a structure.
+        //'refreshCacheWhenElementMovedInStructure' => true,
 
         // Whether the cache should be refreshed when an element is saved but unchanged.
         //'refreshCacheWhenElementSavedUnchanged' => false,
@@ -139,23 +168,8 @@ return [
         // Whether the cache should be refreshed when an element is saved but not live.
         //'refreshCacheWhenElementSavedNotLive' => false,
 
-        // Whether URLs with query strings should cached and how.
-        // - `0`: Do not cache URLs with query strings
-        // - `1`: Cache URLs with query strings as unique pages
-        // - `2`: Cache URLs with query strings as the same page
-        //'queryStringCaching' => 0,
-
-        // The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
-        //'includedQueryStringParams' => ['.*'],
-
-        // The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
-        //'excludedQueryStringParams' => ['gclid', 'fbclid'],
-
-        // An API key that can be used to clear, flush, warm, or refresh expired cache through a URL (min. 16 characters).
-        //'apiKey' => '',
-
-        // A path to the `bin` folder that should be forced.
-        //'binPath' => '',
+        // Whether non-HTML responses should be cached. With this setting enabled, Blitz will also cache pages that return non-HTML responses. If enabled, you should ensure that URIs that should not be caches, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.
+        //'cacheNonHtmlResponses' => false,
 
         // Whether elements should be cached in the database.
         //'cacheElements' => true,
@@ -217,5 +231,5 @@ return [
 
         // The name of the JavaScript event that will trigger a script inject.
         //'injectScriptEvent' => 'DOMContentLoaded',
-    ]
+    ],
 ];
