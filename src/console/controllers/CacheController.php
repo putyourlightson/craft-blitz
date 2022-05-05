@@ -374,16 +374,14 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Purging cache...') . PHP_EOL, BaseConsole::FG_YELLOW);
 
-        Console::startProgress(0, count($siteUris), '', 0.8);
-
         if ($siteUris !== null) {
+            Console::startProgress(0, count($siteUris), '', 0.8);
             Blitz::$plugin->cachePurger->purgeUris($siteUris, [$this, 'setProgressHandler'], false);
+            Console::endProgress();
         }
         else {
             Blitz::$plugin->cachePurger->purgeAll([$this, 'setProgressHandler'], false);
         }
-
-        Console::endProgress();
 
         $this->_output('Purging complete.');
     }
