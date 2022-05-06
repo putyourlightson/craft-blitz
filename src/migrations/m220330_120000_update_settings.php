@@ -46,12 +46,16 @@ class m220330_120000_update_settings extends Migration
             }
 
             $includedQueryStringParams = $projectConfig->get('plugins.blitz.settings.includedQueryStringParams');
-            $this->_updateQueryStringParams($includedQueryStringParams);
-            $projectConfig->set('plugins.blitz.settings.includedQueryStringParams', $includedQueryStringParams);
+            if ($includedQueryStringParams !== null) {
+                $this->_updateQueryStringParams($includedQueryStringParams);
+                $projectConfig->set('plugins.blitz.settings.includedQueryStringParams', $includedQueryStringParams);
+            }
 
             $excludedQueryStringParams = $projectConfig->get('plugins.blitz.settings.excludedQueryStringParams');
-            $this->_updateQueryStringParams($excludedQueryStringParams);
-            $projectConfig->set('plugins.blitz.settings.excludedQueryStringParams', $excludedQueryStringParams);
+            if ($excludedQueryStringParams !== null) {
+                $this->_updateQueryStringParams($excludedQueryStringParams);
+                $projectConfig->set('plugins.blitz.settings.excludedQueryStringParams', $excludedQueryStringParams);
+            }
         }
 
         return true;

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.0.3 - 2022-05-06
+### Fixed
+- Fixed a bug in a migration when no cache purger settings existed ([#402](https://github.com/putyourlightson/craft-blitz/issues/402)).
+
 ## 4.0.2 - 2022-05-05
 ### Fixed
 - Fixed a bug in a migration when no cache purger settings existed ([#402](https://github.com/putyourlightson/craft-blitz/issues/402)).
