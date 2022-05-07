@@ -7,23 +7,8 @@ assignees: ''
 
 ---
 
-### Describe the bug
-A clear and concise description of what the bug is.
-Please check the common-issues section of the docs to see if they can help you solve your issue:
-https://putyourlightson.com/plugins/blitz#common-issues
-
-### To reproduce
-Steps to reproduce the behaviour:
-1. Go to "..."
-2. Click on "..."
-3. See error message "..."
-
-### Expected behaviour
-A clear and concise description of what you expected to happen.
-
-### Screenshots
-If applicable, add screenshots to help explain your problem.
-
-### Versions
-- Plugin version:
-- Craft version:
+Please provide a clear and concise description of what the bug is, including:
+- Steps to reproduce the issue.
+- A clear and concise description of what you expected to happen.
+- If applicable, add screenshots to help explain your problem.
+- The plugin and Craft version numbers.

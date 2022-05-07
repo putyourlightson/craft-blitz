@@ -7,8 +7,4 @@ assignees: ''
 
 ---
 
-### Question
-A question about the plugin or how it works. We are diligent about documentation so please check the plugin docs before submitting your question.
-
-### Additional context
-Add any other context or screenshots about the support request here.
+Please provide a clear and concise question. We are diligent about documentation, so please check whether your question is answered by the plugin docs before submitting.
