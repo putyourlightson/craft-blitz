@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.1.0 - Unreleased
+### Added
+- Added a utility that provides recommendations for eager-loading elements, powered by the [Blitz Recommendations](https://github.com/putyourlightson/craft-blitz-recommendations-core) package.
+
 ## 4.0.3 - 2022-05-06
 ### Fixed
 - Fixed a bug in a migration when no cache purger settings existed ([#402](https://github.com/putyourlightson/craft-blitz/issues/402)).
