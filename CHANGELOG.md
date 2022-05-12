@@ -2,7 +2,7 @@
 
 ## 4.1.0 - Unreleased
 ### Added
-- Added a utility that provides recommendations for eager-loading elements, powered by the [Blitz Tips](https://github.com/putyourlightson/craft-blitz-hints-utility) package.
+- Added a utility that provides template performance hints, powered by the [Blitz Hints Module](https://github.com/putyourlightson/craft-blitz-hints-module).
 
 ## 4.0.3 - 2022-05-06
 ### Fixed
