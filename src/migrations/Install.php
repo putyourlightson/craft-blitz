@@ -17,6 +17,7 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use putyourlightson\blitzhints\migrations\Install as HintsInstall;
 
 class Install extends Migration
 {
@@ -28,6 +29,8 @@ class Install extends Migration
         if ($this->createTables()) {
             $this->createIndexes();
             $this->addForeignKeys();
+
+            (new HintsInstall())->safeUp();
 
             // Refresh the db schema caches
             Craft::$app->db->schema->refresh();
@@ -49,6 +52,8 @@ class Install extends Migration
         $this->dropTableIfExists(ElementExpiryDateRecord::tableName());
         $this->dropTableIfExists(CacheTagRecord::tableName());
         $this->dropTableIfExists(CacheRecord::tableName());
+
+        (new HintsInstall())->safeDown();
 
         return true;
     }

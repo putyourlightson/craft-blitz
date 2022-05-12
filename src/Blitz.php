@@ -46,7 +46,7 @@ use putyourlightson\blitz\services\GenerateCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
-use putyourlightson\blitzrecommendations\BlitzRecommendations;
+use putyourlightson\blitzhints\BlitzHints;
 use yii\base\Controller;
 use yii\base\Event;
 use yii\log\Logger;
@@ -136,7 +136,7 @@ class Blitz extends Plugin
             }
         }
 
-        BlitzRecommendations::bootstrap();
+        BlitzHints::bootstrap();
     }
 
     /**

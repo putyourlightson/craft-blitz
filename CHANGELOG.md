@@ -2,7 +2,7 @@
 
 ## 4.1.0 - Unreleased
 ### Added
-- Added a utility that provides recommendations for eager-loading elements, powered by the [Blitz Recommendations](https://github.com/putyourlightson/craft-blitz-recommendations-core) package.
+- Added a utility that provides recommendations for eager-loading elements, powered by the [Blitz Tips](https://github.com/putyourlightson/craft-blitz-hints-utility) package.
 
 ## 4.0.3 - 2022-05-06
 ### Fixed
