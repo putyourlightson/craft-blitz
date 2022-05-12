@@ -116,6 +116,7 @@ class Blitz extends Plugin
         $this->_registerComponents();
         $this->_registerVariables();
         $this->_registerLogTarget();
+        $this->_registerHints();
 
         // Register events
         $this->_registerCacheableRequestEvents();
@@ -135,8 +136,6 @@ class Blitz extends Plugin
                 $this->_registerUserPermissions();
             }
         }
-
-        BlitzHints::bootstrap();
     }
 
     /**
@@ -247,6 +246,18 @@ class Blitz extends Plugin
                 dateFormat: 'Y-m-d H:i:s',
             ),
         ]);
+    }
+
+    /**
+     * Registers the Blitz hints module.
+     */
+    private function _registerHints(): void
+    {
+        if (!$this->settings->hintsEnabled) {
+            return;
+        }
+
+        BlitzHints::bootstrap();
     }
 
     /**
