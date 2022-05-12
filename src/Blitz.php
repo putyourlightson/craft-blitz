@@ -116,7 +116,6 @@ class Blitz extends Plugin
         $this->_registerComponents();
         $this->_registerVariables();
         $this->_registerLogTarget();
-        $this->_registerHints();
 
         // Register events
         $this->_registerCacheableRequestEvents();
@@ -136,6 +135,9 @@ class Blitz extends Plugin
                 $this->_registerUserPermissions();
             }
         }
+
+        // Register hints after utilities
+        $this->_registerHints();
     }
 
     /**
