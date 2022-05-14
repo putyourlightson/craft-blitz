@@ -332,7 +332,9 @@ class RefreshCacheService extends Component
                     'elementId' => $element->id,
                     'expiryDate' => $expiryDate,
                 ],
-                ['expiryDate' => $expiryDate],
+                [
+                    'expiryDate' => $expiryDate,
+                ],
                 [],
                 false)
             ->execute();

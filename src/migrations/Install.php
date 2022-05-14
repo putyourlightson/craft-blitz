@@ -53,9 +53,12 @@ class Install extends Migration
         $this->dropTableIfExists(CacheTagRecord::tableName());
         $this->dropTableIfExists(CacheRecord::tableName());
 
-        (new HintsInstall())->safeDown();
+        // Don't remove table if Blitz Recommendations is installed.
+        if (Craft::$app->getPlugins()->isPluginInstalled('blitz-recommendations')) {
+            return true;
+        }
 
-        return true;
+        return (new HintsInstall())->safeDown();
     }
 
     /**
