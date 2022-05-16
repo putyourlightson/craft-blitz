@@ -1,4 +1,5 @@
 <?php
+
 /** @noinspection PhpIncludeInspection */
 /** @noinspection PhpParamsInspection */
 
@@ -8,7 +9,9 @@
 
 use Amp\Parallel\Sync\Channel;
 use craft\services\Plugins;
+use putyourlightson\blitz\Blitz;
 use yii\base\Event;
+use yii\log\Logger;
 
 /**
  * This script bootstraps a web app and mocks a web request. It is called by the
@@ -48,34 +51,8 @@ return function(Channel $channel): Generator {
         $pathParam => trim(parse_url($url, PHP_URL_PATH), '/'),
     ]);
 
-    // Bootstrap the request
-    bootstrap($root);
-
-    // Force a web request before plugins are loaded (as early as possible)
-    Event::on(Plugins::class, Plugins::EVENT_BEFORE_LOAD_PLUGINS,
-        function() {
-            Craft::$app->getRequest()->setIsConsoleRequest(false);
-        }
-    );
-
-    /**
-     * Load and run the Craft web application, checking success based on exit code
-     * @see \yii\base\Response::$exitStatus
-     * @var craft\web\Application $app
-     */
-    $app = require $root . '/vendor/craftcms/cms/bootstrap/web.php';
-    $success = $app->run() == 0;
-
-    yield $channel->send($success);
-};
-
-/**
- * Loads the shared bootstrap, rather than depending on the file existing in the project.
- * https://github.com/putyourlightson/craft-blitz/issues/404
- */
-function bootstrap(string $root): void
-{
-    // Define path constants
+    // Bootstrap the request manually, rather than depending on the file existing.
+    // https://github.com/putyourlightson/craft-blitz/issues/404
     define('CRAFT_BASE_PATH', $root);
     define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
 
@@ -100,4 +77,28 @@ function bootstrap(string $root): void
             (new Dotenv\Dotenv(CRAFT_BASE_PATH))->load();
         }
     }
-}
+
+    // Force a web request before plugins are loaded (as early as possible)
+    Event::on(Plugins::class, Plugins::EVENT_BEFORE_LOAD_PLUGINS,
+        function() {
+            Craft::$app->getRequest()->setIsConsoleRequest(false);
+        }
+    );
+
+    /**
+     * Load and run the Craft web application, checking success based on exit code
+     * @see \yii\base\Response::$exitStatus
+     * @var craft\web\Application $app
+     */
+    $app = require $root . '/vendor/craftcms/cms/bootstrap/web.php';
+
+    try {
+        $success = $app->run() == 0;
+    }
+    catch (Exception $exception) {
+        Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
+        $success = 1;
+    }
+
+    yield $channel->send($success);
+};
