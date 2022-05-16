@@ -1,4 +1,7 @@
 <?php
+/** @noinspection PhpIncludeInspection */
+/** @noinspection PhpParamsInspection */
+
 /**
  * @copyright Copyright (c) PutYourLightsOn
  */
@@ -81,14 +84,20 @@ function bootstrap(string $root): void
 
     // Load dotenv, depending on the available method and version.
     // https://github.com/vlucas/phpdotenv/blob/master/UPGRADING.md
-    if (class_exists(Dotenv\Dotenv::class)) {
+    if (class_exists(Dotenv\Dotenv::class) && file_exists(CRAFT_BASE_PATH . '/.env')) {
+        // Dotenv v5
         if (method_exists('Dotenv\Dotenv', 'createUnsafeMutable')) {
             // By default, this will allow .env file values to override environment variables
             // with matching names. Use `createUnsafeImmutable` to disable this.
             Dotenv\Dotenv::createUnsafeMutable(CRAFT_BASE_PATH)->safeLoad();
         }
-        elseif (file_exists(CRAFT_BASE_PATH.'/.env')) {
+        // Dotenv v3
+        elseif (method_exists('Dotenv\Dotenv', 'create')) {
             Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();
+        }
+        // Dotenv v2
+        else {
+            (new Dotenv\Dotenv(CRAFT_BASE_PATH))->load();
         }
     }
 }
