@@ -45,8 +45,8 @@ return function(Channel $channel): Generator {
         $pathParam => trim(parse_url($url, PHP_URL_PATH), '/'),
     ]);
 
-    // Load shared bootstrap
-    require $root . '/bootstrap.php';
+    // Bootstrap the request
+    bootstrap($root);
 
     // Force a web request before plugins are loaded (as early as possible)
     Event::on(Plugins::class, Plugins::EVENT_BEFORE_LOAD_PLUGINS,
@@ -65,3 +65,30 @@ return function(Channel $channel): Generator {
 
     yield $channel->send($success);
 };
+
+/**
+ * Loads the shared bootstrap, rather than depending on the file existing in the project.
+ * https://github.com/putyourlightson/craft-blitz/issues/404
+ */
+function bootstrap(string $root): void
+{
+    // Define path constants
+    define('CRAFT_BASE_PATH', $root);
+    define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
+
+    // Load Composer's autoloader
+    require_once CRAFT_VENDOR_PATH . '/autoload.php';
+
+    // Load dotenv, depending on the available method and version.
+    // https://github.com/vlucas/phpdotenv/blob/master/UPGRADING.md
+    if (class_exists(Dotenv\Dotenv::class)) {
+        if (method_exists('Dotenv\Dotenv', 'createUnsafeMutable')) {
+            // By default, this will allow .env file values to override environment variables
+            // with matching names. Use `createUnsafeImmutable` to disable this.
+            Dotenv\Dotenv::createUnsafeMutable(CRAFT_BASE_PATH)->safeLoad();
+        }
+        elseif (file_exists(CRAFT_BASE_PATH.'/.env')) {
+            Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();
+        }
+    }
+}

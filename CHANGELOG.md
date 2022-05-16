@@ -4,6 +4,9 @@
 ### Added
 - Added a utility that provides template performance hints, powered by the [Blitz Hints Module](https://github.com/putyourlightson/craft-blitz-hints-module).
 
+### Fixed
+- Fixed the Local Generator bootstrap process for older Craft installations ([#404](https://github.com/putyourlightson/craft-blitz/issues/404)).
+
 ## 4.0.3 - 2022-05-06
 ### Fixed
 - Fixed a bug in a migration when no cache purger settings existed ([#402](https://github.com/putyourlightson/craft-blitz/issues/402)).
