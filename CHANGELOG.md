@@ -1,8 +1,8 @@
 # Release Notes for Blitz
 
-## 4.1.0 - Unreleased
+## 4.1.0 - 2022-05-16
 ### Added
-- Added a utility that provides template performance hints, powered by the [Blitz Hints Module](https://github.com/putyourlightson/craft-blitz-hints-module).
+- Added a utility that provides template performance hints, powered by the [Blitz Hints](https://github.com/putyourlightson/craft-blitz-hints) package, [read the announcement](https://putyourlightson.com/articles/ballroom-blitz).
 
 ### Fixed
 - Fixed the Local Generator bootstrap process for older Craft installations ([#404](https://github.com/putyourlightson/craft-blitz/issues/404)).
