@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.1.1 - 2022-05-16
+### Changed
+- Bumped the required version of the Blitz Hints package.
+
 ## 4.1.0 - 2022-05-16
 ### Added
 - Added a utility that provides template performance hints, powered by the [Blitz Hints](https://github.com/putyourlightson/craft-blitz-hints) package, [read the announcement](https://putyourlightson.com/articles/ballroom-blitz).
