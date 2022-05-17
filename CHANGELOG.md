@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.1.2 - 2022-05-17
+### Added
+- Added the Blitz Hints announcement to the dashboard.
+
 ## 4.1.1 - 2022-05-16
 ### Changed
 - Bumped the required version of the Blitz Hints package.
