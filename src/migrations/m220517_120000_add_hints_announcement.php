@@ -15,7 +15,7 @@ class m220517_120000_add_hints_announcement extends Migration
     {
         Craft::$app->announcements->push(
             Translation::prep('blitz', 'New Hints Utility'),
-            Translation::prep('blitz', 'The new Blitz Hints utility displays templating performance hints for eager-loading elements in your Twig templates. [Read the announcement →]({url})', [
+            Translation::prep('blitz', 'The new Blitz Hints utility displays templating performance hints for eager-loading elements in your Twig templates ([read the announcement]({url})).', [
                 'url' => 'https://putyourlightson.com/articles/ballroom-blitz',
             ]),
             'blitz',
