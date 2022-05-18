@@ -139,6 +139,7 @@ return [
         // The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
         //'includedQueryStringParams' => [
         //    [
+        //        'siteId' => '',
         //        'queryStringParam' => '.*',
         //    ],
         //],
@@ -146,9 +147,11 @@ return [
         // The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
         //'excludedQueryStringParams' => [
         //    [
+        //        'siteId' => '',
         //        'queryStringParam' => 'gclid',
         //    ],
         //    [
+        //        'siteId' => '',
         //        'queryStringParam' => 'fbclid',
         //    ],
         //],
