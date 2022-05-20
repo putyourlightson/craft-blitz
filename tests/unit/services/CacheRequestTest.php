@@ -71,11 +71,14 @@ class CacheRequestTest extends Unit
 
     public function testGetRequestedCacheableSiteUri()
     {
+        $pathParam = 'p=segment';
         $allowedQueryString = 'x=1&y=1';
         $disallowedQueryString = 'gclid=123';
 
         // Mock a URL request
-        $this->_mockRequest($this->siteUri->getUrl() . '?' . $disallowedQueryString . '&' . $allowedQueryString);
+        $this->_mockRequest($this->siteUri->getUrl() . '?' .
+            implode('&', [$pathParam, $disallowedQueryString, $allowedQueryString])
+        );
 
         // Enable caching and add an included URI pattern
         Blitz::$plugin->settings->cachingEnabled = true;
@@ -143,14 +146,18 @@ class CacheRequestTest extends Unit
         $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
     }
 
-    public function testGetIsCacheableSiteUriWithPathParam()
+    public function testGetIsCacheableSiteUriWithIndex()
     {
-        // Include the URI pattern
-        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
-        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+        Blitz::$plugin->settings->includedUriPatterns = [[
+            'siteId' => '',
+            'uriPattern' => '.*',
+        ]];
+        $siteUri = new SiteUriModel([
+            'siteId' => 1,
+            'uri' => 'index.php',
+        ]);
 
-        $this->siteUri->uri .= '?' . Craft::$app->config->general->pathParam . '=search';
-        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri));
     }
 
     public function testMatchesUriPatterns()
