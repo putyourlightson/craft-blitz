@@ -431,7 +431,8 @@ class CacheRequestService extends Component
      */
     public function getIsAllowedQueryStringParam(int $siteId, string $param): bool
     {
-        if ($param == Craft::$app->config->general->pathParam || $param == Craft::$app->config->general->tokenParam) {
+        $generalConfig = Craft::$app->getConfig()->getGeneral();
+        if ($param == $generalConfig->pathParam || $param == $generalConfig->tokenParam) {
             return false;
         }
 
