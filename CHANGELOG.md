@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.1.3 - 2022-05-20
+## 4.1.3 - 2022-05-23
 ### Fixed
 - Fixed issues with Apache server rewrites that could prevent pages from being cached ([#411](https://github.com/putyourlightson/craft-blitz/issues/411)).
 
