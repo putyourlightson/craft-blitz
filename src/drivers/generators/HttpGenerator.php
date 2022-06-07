@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\generators;
 
 use Amp\Http\Client\HttpClientBuilder;
+use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
 use Amp\Http\Client\Response;
 use Amp\Sync\LocalSemaphore;
@@ -14,6 +15,7 @@ use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
+use yii\log\Logger;
 
 use function Amp\Iterator\fromIterable;
 use function Amp\Promise\wait;
@@ -93,19 +95,24 @@ class HttpGenerator extends BaseCacheGenerator
             function(string $url) use ($setProgressHandler, &$count, $total, $client) {
                 $count++;
 
-                /** @var Response $response */
-                $response = yield $client->request(new Request($url));
+                try {
+                    /** @var Response $response */
+                    $response = yield $client->request(new Request($url));
 
-                if ($response->getStatus() == 200) {
-                    $this->generated++;
-                }
-                else {
-                    Blitz::$plugin->debug('{status} error: {reason}', ['status' => $response->getStatus(), 'reason' => $response->getReason()], $url);
-                }
+                    if ($response->getStatus() == 200) {
+                        $this->generated++;
+                    }
+                    else {
+                        Blitz::$plugin->debug('{status} error: {reason}', ['status' => $response->getStatus(), 'reason' => $response->getReason()], $url);
+                    }
 
-                if (is_callable($setProgressHandler)) {
-                    $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
-                    call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                    if (is_callable($setProgressHandler)) {
+                        $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
+                        call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                    }
+                }
+                catch (HttpException $exception) {
+                    Blitz::$plugin->log($exception->getMessage() . ' [' . $url . ']', [], Logger::LEVEL_ERROR);
                 }
             }
         );
