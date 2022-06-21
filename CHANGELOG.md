@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
-## 4.1.4 - Unreleased
+## 4.1.4 - 2022-06-21
 ### Changed
 - Exceptions are caught and logged, rather than being thrown, during cache generation using the HTTP Generator ([#418](https://github.com/putyourlightson/craft-blitz/issues/418)).
+
+### Fixed
+- Fixed an issue in which expiry dates were not being added or updated for pending entries ([#422](https://github.com/putyourlightson/craft-blitz/issues/422)).
 
 ## 4.1.3 - 2022-05-23
 ### Fixed
