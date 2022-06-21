@@ -20,7 +20,6 @@ async function injectElements()
     const promises = [];
 
     elements.forEach(element => {
-        const priority = element.getAttribute('data-blitz-priority');
         const injectElement: InjectElement = {
             element: element,
             id: element.getAttribute('data-blitz-id'),

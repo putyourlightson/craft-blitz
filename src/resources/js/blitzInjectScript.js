@@ -49,7 +49,6 @@ function injectElements() {
                     promises = [];
                     elements.forEach(function (element) {
                         var _a;
-                        var priority = element.getAttribute('data-blitz-priority');
                         var injectElement = {
                             element: element,
                             id: element.getAttribute('data-blitz-id'),

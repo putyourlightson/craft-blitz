@@ -70,10 +70,12 @@ return function(Channel $channel): Generator {
         }
         // Dotenv v3
         elseif (method_exists('Dotenv\Dotenv', 'create')) {
+            /** @phpstan-ignore-next-line */
             Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();
         }
         // Dotenv v2
         else {
+            /** @phpstan-ignore-next-line */
             (new Dotenv\Dotenv(CRAFT_BASE_PATH))->load();
         }
     }
