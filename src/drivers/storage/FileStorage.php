@@ -103,7 +103,7 @@ class FileStorage extends BaseCacheStorage
             foreach ($filePaths as $filePath) {
                 FileHelper::writeToFile($filePath, $value);
 
-                if ($this->createGzipFiles) {
+                if ($this->createGzipFiles && function_exists('gzencode')) {
                     FileHelper::writeToFile($filePath . '.gz', gzencode($value));
                 }
 
