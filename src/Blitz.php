@@ -76,6 +76,7 @@ class Blitz extends Plugin
      */
     public static $plugin;
 
+
     // Public Methods
     // =========================================================================
 

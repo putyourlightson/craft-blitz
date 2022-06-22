@@ -251,10 +251,10 @@ class RefreshCacheService extends Component
                 return;
             }
 
-            // Don't proceed if element status has not changed and is not live or expired (and the config setting allows). Refreshing expired elements is necessary to clear cached pages (https://github.com/putyourlightson/craft-blitz/issues/267).
+            // Don't proceed if the element status has not changed and is not refreshable (and the config setting allows). Refreshing pending (https://github.com/putyourlightson/craft-blitz/issues/422) and expired (https://github.com/putyourlightson/craft-blitz/issues/267) elements is necessary to clear cached pages.
             if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive
                 && !$elementChanged->getHasStatusChanged()
-                && !$elementChanged->getHasLiveOrExpiredStatus()
+                && !$elementChanged->getHasRefreshableStatus()
             ) {
                 return;
             }
@@ -325,15 +325,6 @@ class RefreshCacheService extends Component
     public function addElementExpiryDate(Element $element, DateTime $expiryDate)
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
-
-        /** @var ElementExpiryDateRecord|null $elementExpiryDateRecord */
-        $elementExpiryDateRecord = ElementExpiryDateRecord::find()
-            ->where(['elementId' => $element->id])
-            ->one();
-
-        if ($elementExpiryDateRecord !== null && $elementExpiryDateRecord->expiryDate < $expiryDate) {
-            $expiryDate = $elementExpiryDateRecord->expiryDate;
-        }
 
         /** @noinspection MissedFieldInspection */
         Craft::$app->getDb()->createCommand()

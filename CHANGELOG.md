@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.12.5 - 2022-06-22
+### Fixed
+- Fixed an issue in which expiry dates were not being added or updated for pending entries ([#422](https://github.com/putyourlightson/craft-blitz/issues/422)).
+
 ## 3.12.4 - 2022-05-03
 ### Fixed
 - Fixed a bug introduced in 3.12.3 when running PHP version 7 ([#401](https://github.com/putyourlightson/craft-blitz/issues/401)).
