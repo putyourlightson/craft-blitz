@@ -10,6 +10,7 @@ use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
+use putyourlightson\blitz\drivers\integrations\CommerceIntegration;
 use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
@@ -308,6 +309,7 @@ class SettingsModel extends Model
      * @var string[] The integrations to initialise.
      */
     public array $integrations = [
+        CommerceIntegration::class,
         FeedMeIntegration::class,
         SeomaticIntegration::class,
     ];
