@@ -4,6 +4,9 @@
 ### Added
 - Added a Commerce plugin integration that refreshes variants on order completion so that their stock is updated ([#432](https://github.com/putyourlightson/craft-blitz/issues/432)).
 
+### Changed
+- The cache is now refreshed when an asset's focal point is changed ([#431](https://github.com/putyourlightson/craft-blitz/issues/431)).
+
 ## 4.1.4 - 2022-06-21
 ### Changed
 - Exceptions are caught and logged, rather than being thrown, during cache generation using the HTTP Generator ([#418](https://github.com/putyourlightson/craft-blitz/issues/418)).

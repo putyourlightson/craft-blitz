@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\behaviors;
 
 use Craft;
 use craft\base\Element;
+use craft\elements\Asset;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
 
@@ -17,7 +18,8 @@ use yii\base\Behavior;
  *
  * @property-read bool $hasChanged
  * @property-read bool $hasStatusChanged
- * @property-read bool $hasLiveOrExpiredStatus
+ * @property-read bool $hasFocalPointChanged
+ * @property-read bool $hasRefreshableStatus
  * @property Element $owner
  */
 class ElementChangedBehavior extends Behavior
@@ -31,6 +33,11 @@ class ElementChangedBehavior extends Behavior
      * @var string|null The previous status of the element.
      */
     public ?string $previousStatus = null;
+
+    /**
+     * @var array|null The previous focal point of the element, if an asset.
+     */
+    public ?array $previousFocalPoint = null;
 
     /**
      * @var bool Whether the element was deleted.
@@ -51,11 +58,11 @@ class ElementChangedBehavior extends Behavior
             return;
         }
 
-        /** @var Element|null $originalElement */
         $originalElement = Craft::$app->getElements()->getElementById($element->id, get_class($element), $element->siteId);
+        $this->previousStatus = $originalElement->getStatus();
 
-        if ($originalElement !== null) {
-            $this->previousStatus = $originalElement->getStatus();
+        if ($originalElement instanceof Asset) {
+            $this->previousFocalPoint = $originalElement->focalPoint;
         }
 
         $element->on(Element::EVENT_AFTER_DELETE, function() {
@@ -100,6 +107,10 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
+        if ($this->getHasFocalPointChanged()) {
+            return true;
+        }
+
         return false;
     }
 
@@ -109,6 +120,31 @@ class ElementChangedBehavior extends Behavior
     public function getHasStatusChanged(): bool
     {
         return $this->previousStatus === null || $this->previousStatus != $this->owner->getStatus();
+    }
+
+    /**
+     * Returns whether the element's focal point has changed, if an asset, which takes
+     * image cropping and rotation into account too.
+     */
+    public function getHasFocalPointChanged(): bool
+    {
+        if ($this->previousFocalPoint === null || !($this->owner instanceof Asset)) {
+            return false;
+        }
+
+        // Comparing floats is problematic, so we convert to a fixed precision first.
+        // https://www.php.net/manual/en/language.types.float.php
+        $precision = 5;
+        $previousFocalPoint = [
+            number_format($this->previousFocalPoint['x'], $precision),
+            number_format($this->previousFocalPoint['y'], $precision),
+        ];
+        $focalPoint = [
+            number_format($this->owner->focalPoint['x'], $precision),
+            number_format($this->owner->focalPoint['y'], $precision),
+        ];
+
+        return $previousFocalPoint != $focalPoint;
     }
 
     /**
