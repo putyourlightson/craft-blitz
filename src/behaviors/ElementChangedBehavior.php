@@ -59,10 +59,13 @@ class ElementChangedBehavior extends Behavior
         }
 
         $originalElement = Craft::$app->getElements()->getElementById($element->id, get_class($element), $element->siteId);
-        $this->previousStatus = $originalElement->getStatus();
 
-        if ($originalElement instanceof Asset) {
-            $this->previousFocalPoint = $originalElement->focalPoint;
+        if ($originalElement !== null) {
+            $this->previousStatus = $originalElement->getStatus();
+
+            if ($originalElement instanceof Asset) {
+                $this->previousFocalPoint = $originalElement->focalPoint;
+            }
         }
 
         $element->on(Element::EVENT_AFTER_DELETE, function() {
