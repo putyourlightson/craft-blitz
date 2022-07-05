@@ -1,11 +1,11 @@
 # Release Notes for Blitz
 
-## 4.2.0 - Unreleased
+## 4.2.0 - 2022-07-05
 ### Added
 - Added a Commerce plugin integration that refreshes variants on order completion so that their stock is updated ([#432](https://github.com/putyourlightson/craft-blitz/issues/432)).
 
 ### Changed
-- The cache is now refreshed when an asset's focal point is changed ([#431](https://github.com/putyourlightson/craft-blitz/issues/431)).
+- The cache is now refreshed when the focal point of an asset is changed ([#431](https://github.com/putyourlightson/craft-blitz/issues/431)).
 
 ## 4.1.4 - 2022-06-21
 ### Changed

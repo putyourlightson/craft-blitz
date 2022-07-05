@@ -10,6 +10,9 @@ use craft\commerce\elements\Variant;
 use putyourlightson\blitz\Blitz;
 use yii\base\Event;
 
+/**
+ * @since 4.2.0
+ */
 class CommerceIntegration extends BaseIntegration
 {
     /**

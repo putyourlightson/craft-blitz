@@ -25,7 +25,6 @@ use UnitTester;
 /**
  * @since 3.1.0
  */
-
 class RefreshCacheTest extends Unit
 {
     /**
