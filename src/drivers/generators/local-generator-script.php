@@ -9,6 +9,7 @@
 
 use Amp\Parallel\Sync\Channel;
 use craft\services\Plugins;
+use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use yii\base\Event;
 use yii\log\Logger;
@@ -84,6 +85,10 @@ return function(Channel $channel): Generator {
     Event::on(Plugins::class, Plugins::EVENT_BEFORE_LOAD_PLUGINS,
         function() {
             Craft::$app->getRequest()->setIsConsoleRequest(false);
+
+            // Force the template mode too
+            // https://github.com/putyourlightson/craft-blitz/issues/437
+            Craft::$app->getView()->setTemplateMode(View::TEMPLATE_MODE_SITE);
         }
     );
 

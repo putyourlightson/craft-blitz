@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.2.1 - Unreleased
+### Fixed
+- Fixed an issue with the Local Generator when Twig extensions were being registered via a module ([#437](https://github.com/putyourlightson/craft-blitz/issues/437)).
+
 ## 4.2.0 - 2022-07-05
 ### Added
 - Added a Commerce plugin integration that refreshes variants on order completion so that their stock is updated ([#432](https://github.com/putyourlightson/craft-blitz/issues/432)).
