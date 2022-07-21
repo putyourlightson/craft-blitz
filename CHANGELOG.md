@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.2.1 - Unreleased
+## 4.2.1 - 2022-07-21
 ### Fixed
 - Fixed an issue with the Local Generator when Twig extensions were being registered via a module ([#437](https://github.com/putyourlightson/craft-blitz/issues/437)).
 
