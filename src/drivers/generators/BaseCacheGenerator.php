@@ -34,12 +34,12 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      *
      * Event::on(HttpGenerator::class, BaseCacheGenerator::EVENT_BEFORE_GENERATE_CACHE, function(RefreshCacheEvent $event) {
      *     foreach ($event->siteUris as $key => $siteUri) {
-     *         if (strpos($siteUri->uri, 'leave-me-out-of-this') !== false) {
+     *         if (str_contains($siteUri->uri, 'leave-me-out-of-this')) {
      *             // Removes a single site URI.
      *             unset($event->siteUris[$key]);
      *         }
      *
-     *         if (strpos($siteUri->uri, 'leave-us-all-out-of-this') !== false) {
+     *         if (str_contains($siteUri->uri, 'leave-us-all-out-of-this')) {
      *             // Prevents the cache from being generated.
      *             return false;
      *         }
