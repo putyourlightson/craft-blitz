@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.12.6 - 2022-08-22
+### Changed
+- The cache is now purged at most once per cache refresh.
+
 ## 3.12.5 - 2022-06-22
 ### Fixed
 - Fixed an issue in which expiry dates were not being added or updated for pending entries ([#422](https://github.com/putyourlightson/craft-blitz/issues/422)).

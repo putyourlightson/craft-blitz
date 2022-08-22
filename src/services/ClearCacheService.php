@@ -55,8 +55,6 @@ class ClearCacheService extends Component
 
         Blitz::$plugin->cacheStorage->deleteUris($event->siteUris);
 
-        Blitz::$plugin->cachePurger->purgeUris($event->siteUris);
-
         if ($this->hasEventHandlers(self::EVENT_AFTER_CLEAR_CACHE)) {
             $this->trigger(self::EVENT_AFTER_CLEAR_CACHE, $event);
         }
