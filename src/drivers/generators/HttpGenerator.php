@@ -8,13 +8,10 @@ namespace putyourlightson\blitz\drivers\generators;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
-use Amp\Http\Client\Response;
 use Amp\Sync\LocalSemaphore;
 use Craft;
 use Exception;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\events\RefreshCacheEvent;
-use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use yii\log\Logger;
 
 use function Amp\Iterator\fromIterable;
@@ -48,34 +45,6 @@ class HttpGenerator extends BaseCacheGenerator
     }
 
     /**
-     * @inheritdoc
-     */
-    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
-    {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-        $this->trigger(self::EVENT_BEFORE_GENERATE_CACHE, $event);
-
-        if (!$event->isValid) {
-            return;
-        }
-
-        $siteUris = $event->siteUris;
-
-        if ($queue) {
-            CacheGeneratorHelper::addGeneratorJob($siteUris, 'generateUrisWithProgress');
-        }
-        else {
-            $this->generateUrisWithProgress($siteUris, $setProgressHandler);
-        }
-
-        if ($this->hasEventHandlers(self::EVENT_AFTER_GENERATE_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_GENERATE_CACHE, new RefreshCacheEvent([
-                'siteUris' => $siteUris,
-            ]));
-        }
-    }
-
-    /**
      * Generates site URIs with progress.
      */
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
@@ -96,7 +65,6 @@ class HttpGenerator extends BaseCacheGenerator
                 $count++;
 
                 try {
-                    /** @var Response $response */
                     $response = yield $client->request(new Request($url));
 
                     if ($response->getStatus() == 200) {

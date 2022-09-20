@@ -11,6 +11,7 @@ use craft\base\SavableComponent;
 use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 
@@ -81,6 +82,41 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      * @const string
      */
     public const GENERATE_ACTION_ROUTE = 'blitz/generator/generate';
+
+    /**
+     * @inheritdoc
+     */
+    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
+    {
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $this->trigger(self::EVENT_BEFORE_GENERATE_CACHE, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        $siteUris = $event->siteUris;
+
+        if ($queue) {
+            CacheGeneratorHelper::addGeneratorJob($siteUris, 'generateUrisWithProgress');
+        }
+        else {
+            $this->generateUrisWithProgress($siteUris, $setProgressHandler);
+        }
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_GENERATE_CACHE)) {
+            $this->trigger(self::EVENT_AFTER_GENERATE_CACHE, new RefreshCacheEvent([
+                'siteUris' => $siteUris,
+            ]));
+        }
+    }
+
+    /**
+     * Generates URIs with a callable progress handler and should be overridden by subclasses.
+     */
+    public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
+    {
+    }
 
     /**
      * @inheritdoc

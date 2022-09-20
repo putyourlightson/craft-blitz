@@ -9,8 +9,6 @@ use Amp\Sync\LocalSemaphore;
 use Craft;
 use Exception;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\events\RefreshCacheEvent;
-use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 
 use function Amp\Iterator\fromIterable;
 use function Amp\Parallel\Context\create;
@@ -46,34 +44,6 @@ class LocalGenerator extends BaseCacheGenerator
     public static function displayName(): string
     {
         return Craft::t('blitz', 'Local Generator');
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
-    {
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
-        $this->trigger(self::EVENT_BEFORE_GENERATE_CACHE, $event);
-
-        if (!$event->isValid) {
-            return;
-        }
-
-        $siteUris = $event->siteUris;
-
-        if ($queue) {
-            CacheGeneratorHelper::addGeneratorJob($siteUris, 'generateUrisWithProgress');
-        }
-        else {
-            $this->generateUrisWithProgress($siteUris, $setProgressHandler);
-        }
-
-        if ($this->hasEventHandlers(self::EVENT_AFTER_GENERATE_CACHE)) {
-            $this->trigger(self::EVENT_AFTER_GENERATE_CACHE, new RefreshCacheEvent([
-                'siteUris' => $siteUris,
-            ]));
-        }
     }
 
     /**
