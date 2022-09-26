@@ -45,7 +45,7 @@ class SiteUriHelper
      */
     public static function hasHtmlMimeType(SiteUriModel $siteUri): bool
     {
-        return self::getMimeType($siteUri) == self::MIME_TYPE_HTML;
+        return self::getMimeType($siteUri) === self::MIME_TYPE_HTML;
     }
 
     /**

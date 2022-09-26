@@ -1,8 +1,9 @@
 # Release Notes for Blitz
 
-## 4.2.2 - Unreleased
+## 4.2.2 - 2022-09-26
 ### Changed
-- The Local Generator continues generating pages, rather than failing, even when Twig template errors are encountered ([#444](https://github.com/putyourlightson/craft-blitz/issues/444)).
+- The Local Generator now continues generating pages, rather than failing, even when Twig template errors are encountered ([#444](https://github.com/putyourlightson/craft-blitz/issues/444)).
+- The Git Deployer now only appends `/index.html` to site URIs with HTML mime types ([#443](https://github.com/putyourlightson/craft-blitz/issues/443)).
 
 ## 4.2.1 - 2022-07-21
 ### Fixed

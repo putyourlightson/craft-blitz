@@ -135,9 +135,14 @@ class GitDeployer extends BaseDeployer
                     call_user_func($setProgressHandler, $count, $total, $progressLabel);
                 }
 
-                $filePath = FileHelper::normalizePath($repository['repositoryPath'] . '/' . $siteUri->uri . '/index.html');
-
                 $value = Blitz::$plugin->cacheStorage->get($siteUri);
+                $filePath = FileHelper::normalizePath($repository['repositoryPath'] . '/' . $siteUri->uri);
+
+                // If the site URI has an HTML mime type, append `index.html`.
+                // https://github.com/putyourlightson/craft-blitz/issues/443
+                if (SiteUriHelper::hasHtmlMimeType($siteUri)) {
+                    $filePath .= '/index.html';
+                }
 
                 $this->_updateFile($value, $filePath);
             }
