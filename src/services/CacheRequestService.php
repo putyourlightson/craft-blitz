@@ -7,8 +7,11 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use craft\db\Query;
+use craft\db\Table;
 use craft\elements\User;
 use craft\events\CancelableEvent;
+use craft\helpers\Json;
 use craft\web\Application;
 use craft\web\Request;
 use putyourlightson\blitz\Blitz;
@@ -225,9 +228,15 @@ class CacheRequestService extends Component
             $this->_isGeneratorRequest = false;
         }
         else {
-            $tokenRoute = Craft::$app->getTokens()->getTokenRoute($token);
-            $this->_isGeneratorRequest = is_array($tokenRoute)
-                && in_array(BaseCacheGenerator::GENERATE_ACTION_ROUTE, $tokenRoute);
+            // Don't use Tokens::getTokenRoute, as that can result in the token being deleted.
+            // https://github.com/putyourlightson/craft-blitz/issues/448
+            $route = (new Query())
+                ->select('route')
+                ->from(Table::TOKENS)
+                ->where(['token' => $token])
+                ->column();
+            $route = (array)Json::decodeIfJson($route);
+            $this->_isGeneratorRequest = in_array(BaseCacheGenerator::GENERATE_ACTION_ROUTE, $route);
         }
 
         return $this->_isGeneratorRequest;
