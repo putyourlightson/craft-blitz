@@ -74,6 +74,11 @@ class SettingsModel extends Model
     public bool $hintsEnabled = true;
 
     /**
+     * @var bool With this setting enabled, Blitz will include templates using Server Side Includes (SSI), which must be enabled on the server.
+     */
+    public bool $ssiEnabled = false;
+
+    /**
      * @var bool With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
      */
     public bool $cachingEnabled = false;

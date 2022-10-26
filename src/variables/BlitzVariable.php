@@ -10,6 +10,7 @@ use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
+use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
 use yii\web\View;
@@ -17,9 +18,55 @@ use yii\web\View;
 class BlitzVariable
 {
     /**
+     * @const string
+     */
+    public const STATIC_INCLUDE_ACTION = 'blitz/templates/static-include';
+
+    /**
+     * @const string
+     */
+    public const DYNAMIC_INCLUDE_ACTION = 'blitz/templates/dynamic-include';
+
+    /**
      * @var int
      */
     private int $_injected = 0;
+
+    /**
+     * Returns a statically included rendered template.
+     *
+     * @since 4.3.0
+     */
+    public function staticInclude(string $template, array $params = []): Markup
+    {
+        $uri = '/' . CacheRequestService::STATIC_INCLUDES_FOLDER;
+        $action = self::STATIC_INCLUDE_ACTION;
+
+        return $this->_includeTemplate($template, $uri, $action, $params);
+    }
+
+    public function dynamicInclude(string $template, array $params = []): Markup
+    {
+        $uri = '/';
+        $action = self::DYNAMIC_INCLUDE_ACTION;
+
+        return $this->_includeTemplate($template, $uri, $action, $params);
+    }
+
+    /**
+     * Returns script to get the output of a template.
+     *
+     * @deprecated in 4.3.0. Use [[staticInclude()]] or [[dynamicInclude()]] instead.
+     */
+    public function getTemplate(string $template, array $params = []): Markup
+    {
+        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.staticInclude()` or `craft.blitz.dynamicInclude()` instead.');
+
+        $uri = '/';
+        $action = 'blitz/templates/get';
+
+        return $this->_includeTemplate($template, $uri, $action, $params);
+    }
 
     /**
      * Returns script to get the output of a URI.
@@ -27,31 +74,6 @@ class BlitzVariable
     public function getUri(string $uri, array $params = []): Markup
     {
         $params['no-cache'] = 1;
-
-        return $this->_getScript($uri, $params);
-    }
-
-    /**
-     * Returns script to get the output of a template.
-     */
-    public function getTemplate(string $template, array $params = []): Markup
-    {
-        // Ensure template exists
-        if (!Craft::$app->getView()->resolveTemplate($template)) {
-            throw new NotFoundHttpException('Template not found: ' . $template);
-        }
-
-        $uri = $this->_getActionUrl('blitz/templates/get');
-
-        // Hash the template
-        $template = Craft::$app->getSecurity()->hashData($template);
-
-        // Add template and passed in params to the params
-        $params = [
-            'template' => $template,
-            'params' => $params,
-            'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
-        ];
 
         return $this->_getScript($uri, $params);
     }
@@ -117,21 +139,45 @@ class BlitzVariable
     }
 
     /**
-     * Returns an absolute action URL for a URI.
+     * Returns an SSI tag to inject the output of a URI.
      */
-    private function _getActionUrl(string $uri): string
+    private function _includeTemplate(string $template, string $uri, string $action, array $params = []): Markup
     {
-        return UrlHelper::actionUrl($uri, null, null, false);
+        if (!Craft::$app->getView()->resolveTemplate($template)) {
+            throw new NotFoundHttpException('Template not found: ' . $template);
+        }
+
+        $params = [
+            'action' => $action,
+            'template' => $this->_getHashedTemplate($template),
+            'params' => $params,
+            'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
+        ];
+
+        if (Blitz::$plugin->settings->ssiEnabled) {
+            return $this->_getSsiTag($uri, $params);
+        }
+
+        return $this->_getScript($uri, $params);
+    }
+
+    private function _getHashedTemplate(string $template): string
+    {
+        if (!Craft::$app->getView()->resolveTemplate($template)) {
+            throw new NotFoundHttpException('Template not found: ' . $template);
+        }
+
+        return Craft::$app->getSecurity()->hashData($template);
     }
 
     /**
-     * Returns a script to inject the output of a CSRF property.
+     * Returns an SSI tag to inject the output of a URI.
      */
-    private function _getCsrfScript(string $property): Markup
+    private function _getSsiTag(string $uri, array $params = []): Markup
     {
-        $uri = $this->_getActionUrl('blitz/csrf/json');
+        $uri = $uri . '?' . http_build_query($params);
 
-        return $this->_getScript($uri, [], $property);
+        return Template::raw('<!--#include virtual="' . $uri . '" -->');
     }
 
     /**
@@ -177,5 +223,23 @@ class BlitzVariable
         $output = '<span class="blitz-inject" id="blitz-inject-' . $id . '" ' . implode(' ', $data) . '></span>';
 
         return Template::raw($output);
+    }
+
+    /**
+     * Returns an absolute action URL for a URI.
+     */
+    private function _getActionUrl(string $uri): string
+    {
+        return UrlHelper::actionUrl($uri, null, null, false);
+    }
+
+    /**
+     * Returns a script to inject the output of a CSRF property.
+     */
+    private function _getCsrfScript(string $property): Markup
+    {
+        $uri = $this->_getActionUrl('blitz/csrf/json');
+
+        return $this->_getScript($uri, [], $property);
     }
 }

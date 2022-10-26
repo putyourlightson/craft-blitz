@@ -345,12 +345,14 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        $outputComments = $this->options->outputComments === true
-            || $this->options->outputComments === SettingsModel::OUTPUT_COMMENTS_CACHED;
+        if (!Blitz::$plugin->cacheRequest->getIsStaticInclude()) {
+            $outputComments = $this->options->outputComments === true
+                || $this->options->outputComments === SettingsModel::OUTPUT_COMMENTS_CACHED;
 
-        // Append cached by comment if allowed and has HTML mime type
-        if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
-            $content .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
+            // Append cached by comment if allowed and has HTML mime type
+            if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
+                $content .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
+            }
         }
 
         $this->saveOutput($content, $siteUri, $this->options->getCacheDuration());

@@ -241,11 +241,7 @@ class FileStorage extends BaseCacheStorage
             return [];
         }
 
-        // Replace ? with / in URI
-        $uri = str_replace('?', '/', $siteUri->uri);
-
-        // Create normalized file path
-        $filePath = FileHelper::normalizePath($sitePath . '/' . $uri . '/index.html');
+        $filePath = $this->_getNormalizedFilePath($sitePath, $siteUri->uri);
 
         // Ensure that file path is a sub path of the site path
         if (!str_contains($filePath, $sitePath)) {
@@ -266,8 +262,9 @@ class FileStorage extends BaseCacheStorage
          * Similar issue: https://www.drupal.org/project/boost/issues/1398578
          * Solution: https://www.drupal.org/files/issues/boost-n1398578-19.patch
          */
-        if (rawurldecode($filePath) != $filePath) {
-            $filePaths[] = rawurldecode($filePath);
+        $decodedUri = rawurldecode($siteUri->uri);
+        if ($decodedUri != $siteUri->uri) {
+            $filePaths[] = $this->_getNormalizedFilePath($sitePath, $decodedUri);
         }
 
         return $filePaths;
@@ -320,6 +317,19 @@ class FileStorage extends BaseCacheStorage
         return [
             [['folderPath'], 'required'],
         ];
+    }
+
+    private function _getNormalizedFilePath(string $sitePath, string $uri): string
+    {
+        $uriParts = explode('?', $uri);
+        $queryString = $uriParts[1] ?? '';
+
+        // Encode forward slashes in query string
+        $queryString = str_replace('/', '%2F', $queryString);
+
+        $uri = $uriParts[0] . '/' . $queryString;
+
+        return FileHelper::normalizePath($sitePath . '/' . $uri . '/index.html');
     }
 
     private function _hasInvalidQueryString(string $uri): bool

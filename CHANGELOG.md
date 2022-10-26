@@ -1,5 +1,15 @@
 # Release Notes for Blitz
 
+## 4.3.0 - Unreleased
+### Added
+- Added a new `ssiEnabled` config setting, that determines whether Blitz will include templates using Server Side Includes (SSI), which must be enabled on the server.
+- Added the `craft.blitz.staticInclude()` and `craft.blitz.dynamicInclude()` template variables, which includes a template using SSI if enabled, otherwise via an AJAX request. The `staticInclude()` method returns a cached result (if one exists), whereas the `dynamicInclude()` method always returns a freshly rendered template.
+- Added the `blitz/templates/static-include` and `blitz/templates/dynamic-include` controller actions.
+
+### Deprecated
+- Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.staticInclude()` or `craft.blitz.dynamicInclude()` instead.
+- Deprecated the `blitz/templates/get` controller action. Use `blitz/templates/static-include` or `blitz/templates/dynamic-include` instead.
+
 ## 4.2.3 - 2022-10-19
 ### Fixed
 - Fixed a bug in which one-time use tokens would not work with Blitz enabled ([#448](https://github.com/putyourlightson/craft-blitz/issues/448)).

@@ -20,6 +20,7 @@ use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\variables\BlitzVariable;
 use yii\web\Response;
 
 /**
@@ -46,6 +47,11 @@ class CacheRequestService extends Component
     public const EVENT_AFTER_GET_RESPONSE = 'afterGetResponse';
 
     /**
+     * @const string
+     */
+    public const STATIC_INCLUDES_FOLDER = '_staticIncludes';
+
+    /**
      * @const int
      */
     public const MAX_URI_LENGTH = 255;
@@ -65,9 +71,8 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableRequest(): bool
     {
-        // Ensure caching is enabled
-        if (!Blitz::$plugin->settings->cachingEnabled) {
-            return false;
+        if ($this->getIsStaticInclude()) {
+            return true;
         }
 
         $request = Craft::$app->getRequest();
@@ -135,6 +140,10 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableResponse(Response $response): bool
     {
+        if ($this->getIsStaticInclude()) {
+            return true;
+        }
+
         return $response->format == Response::FORMAT_HTML
             || $response->format == 'template'
             || Blitz::$plugin->settings->cacheNonHtmlResponses;
@@ -145,6 +154,10 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
     {
+        if ($this->getIsStaticInclude($siteUri->uri)) {
+            return true;
+        }
+
         $uri = strtolower($siteUri->uri);
         $url = $siteUri->getUrl();
 
@@ -212,6 +225,28 @@ class CacheRequestService extends Component
     }
 
     /**
+     * Returns whether this is a static include.
+     * Doesn't memoize the result, which would disrupt the local cache generator.
+     *
+     * @since 4.3.0
+     */
+    public function getIsStaticInclude(?string $uri = null): bool
+    {
+        // Static includes based on the URI takes preference
+        if ($uri !== null) {
+            return str_starts_with($uri, self::STATIC_INCLUDES_FOLDER);
+        }
+
+        if (Craft::$app->getRequest()->getIsActionRequest()) {
+            $action = implode('/', Craft::$app->getRequest()->getActionSegments());
+
+            return $action == BlitzVariable::STATIC_INCLUDE_ACTION;
+        }
+
+        return false;
+    }
+
+    /**
      * Returns whether this is a generator request.
      *
      * @since 4.0.0
@@ -247,6 +282,15 @@ class CacheRequestService extends Component
      */
     public function getRequestedCacheableSiteUri(): ?SiteUriModel
     {
+        $request = Craft::$app->getRequest();
+
+        if ($this->getIsStaticInclude()) {
+            return new SiteUriModel([
+                'siteId' => $request->getParam('siteId'),
+                'uri' => self::STATIC_INCLUDES_FOLDER . '?' . http_build_query($request->getQueryParams()),
+            ]);
+        }
+
         $site = Craft::$app->getSites()->getCurrentSite();
         $uri = Craft::$app->getRequest()->getFullUri();
         $queryString = Craft::$app->getRequest()->getQueryString();
@@ -309,15 +353,18 @@ class CacheRequestService extends Component
         }
 
         $response = $event->response;
+
         $this->_addCraftHeaders($response);
         $this->_prepareResponse($response, $content, $siteUri);
 
-        // Append the served by comment if this is a cacheable response and if a HTML mime type.
-        if ($this->getIsCacheableResponse($response) && SiteUriHelper::hasHtmlMimeType($siteUri)) {
-            $outputComments = Blitz::$plugin->settings->outputComments;
+        if (!$this->getIsStaticInclude()) {
+            // Append the served by comment if this is a cacheable response and if a HTML mime type.
+            if ($this->getIsCacheableResponse($response) && SiteUriHelper::hasHtmlMimeType($siteUri)) {
+                $outputComments = Blitz::$plugin->settings->outputComments;
 
-            if ($outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED) {
-                $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
+                if ($outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED) {
+                    $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
+                }
             }
         }
 
