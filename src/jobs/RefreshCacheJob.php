@@ -99,8 +99,9 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
                 if ($total = count($elementQueryRecords)) {
                     $count = 0;
 
-                    // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
-                    $elementQueryCacheIdSets = [[]];
+                    // Use sets and the splat operator rather than array_merge for performance
+                    // https://github.com/kalessil/phpinspectionsea/blob/master/docs/performance.md#slow-array-function-used-in-loop
+                    $elementQueryCacheIdSets = [];
 
                     foreach ($elementQueryRecords as $elementQueryRecord) {
                         // Merge in element query cache IDs
