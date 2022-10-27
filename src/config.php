@@ -98,8 +98,9 @@ return [
         //            'zoneId' => '',
         //        ],
         //    ],
-        //    'email' => '',
+        //    'authenticationMethod' => 'apiKey',
         //    'apiKey' => '',
+        //    'email' => '',
         //],
 
         // The purger type classes to add to the plugin’s default purger types.
