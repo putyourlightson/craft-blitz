@@ -318,17 +318,18 @@ class RefreshCacheService extends Component
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
         /** @noinspection MissedFieldInspection */
-        Craft::$app->getDb()->createCommand()
-            ->upsert(ElementExpiryDateRecord::tableName(), [
-                    'elementId' => $element->id,
-                    'expiryDate' => $expiryDate,
-                ],
-                [
-                    'expiryDate' => $expiryDate,
-                ],
-                [],
-                false)
-            ->execute();
+        Craft::$app->getDb()->createCommand()->upsert(
+            ElementExpiryDateRecord::tableName(),
+            [
+                'elementId' => $element->id,
+                'expiryDate' => $expiryDate,
+            ],
+            [
+                'expiryDate' => $expiryDate,
+            ],
+            [],
+            false)
+        ->execute();
     }
 
     /**

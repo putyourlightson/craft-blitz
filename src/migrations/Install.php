@@ -17,6 +17,7 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use putyourlightson\blitz\records\RelatedCacheRecord;
 use putyourlightson\blitzhints\migrations\Install as HintsInstall;
 
 class Install extends Migration
@@ -137,6 +138,14 @@ class Install extends Migration
             ]);
         }
 
+        if (!$this->db->tableExists(RelatedCacheRecord::tableName())) {
+            $this->createTable(RelatedCacheRecord::tableName(), [
+                'cacheId' => $this->integer()->notNull(),
+                'relatedCacheId' => $this->integer()->notNull(),
+                'PRIMARY KEY([[cacheId]], [[relatedCacheId]])',
+            ]);
+        }
+
         return true;
     }
 
@@ -154,6 +163,7 @@ class Install extends Migration
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
+        $this->createIndex(null, RelatedCacheRecord::tableName(), 'cacheId');
     }
 
     /**
@@ -169,5 +179,7 @@ class Install extends Migration
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQuerySourceRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, CacheTagRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, RelatedCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, RelatedCacheRecord::tableName(), 'relatedCacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
     }
 }

@@ -28,6 +28,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use putyourlightson\blitz\records\RelatedCacheRecord;
 use yii\base\Event;
 use yii\db\Exception;
 use yii\log\Logger;
@@ -68,6 +69,11 @@ class GenerateCacheService extends Component
      * @var int[]
      */
     public array $elementQueryCaches = [];
+
+    /**
+     * @var string|null
+     */
+    public ?string $relatedUri = null;
 
     /**
      * @inheritdoc
@@ -340,6 +346,10 @@ class GenerateCacheService extends Component
             );
         }
 
+        if ($this->relatedUri !== null) {
+            $this->_insertRelatedCache($cacheId, $this->relatedUri);
+        }
+
         // Save cache tags
         if (!empty($this->options->tags)) {
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
@@ -392,7 +402,7 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Batch inserts cache values to database.
+     * Batch inserts cache values into the database.
      */
     private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName): void
     {
@@ -407,12 +417,29 @@ class GenerateCacheService extends Component
             $values[$key] = [$cacheId, $value];
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->batchInsert(
-                $insertTable,
-                ['cacheId', $columnName],
-                $values,
-            )
-            ->execute();
+        Craft::$app->getDb()->createCommand()->batchInsert(
+            $insertTable,
+            ['cacheId', $columnName],
+            $values,
+        )
+        ->execute();
+    }
+
+    /**
+     * Inserts a related cache ID into the database.
+     */
+    private function _insertRelatedCache(int $cacheId, string $uri): void
+    {
+        $relatedCacheId = CacheRecord::find()
+            ->select('id')
+            ->where(['uri' => $uri])
+            ->scalar();
+
+        if ($relatedCacheId) {
+            $relatedCacheRecord = new RelatedCacheRecord();
+            $relatedCacheRecord->cacheId = $cacheId;
+            $relatedCacheRecord->relatedCacheId = $relatedCacheId;
+            $relatedCacheRecord->save();
+        }
     }
 }

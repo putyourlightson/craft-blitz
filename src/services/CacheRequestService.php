@@ -285,6 +285,9 @@ class CacheRequestService extends Component
         $request = Craft::$app->getRequest();
 
         if ($this->getIsStaticInclude()) {
+            // Record the related cache, so we can purge it whenever necessary
+            Blitz::$plugin->generateCache->relatedUri = substr(Craft::$app->getRequest()->url, 1);
+
             return new SiteUriModel([
                 'siteId' => $request->getParam('siteId'),
                 'uri' => self::STATIC_INCLUDES_FOLDER . '?' . http_build_query($request->getQueryParams()),
