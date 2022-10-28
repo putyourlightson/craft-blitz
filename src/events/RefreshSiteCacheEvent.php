@@ -10,5 +10,5 @@ class RefreshSiteCacheEvent extends RefreshCacheEvent
     /**
      * @var int|null
      */
-    public ?int $siteId;
+    public ?int $siteId = null;
 }

@@ -23,5 +23,5 @@ class SaveCacheEvent extends CancelableEvent
     /**
      * @var int|null
      */
-    public ?int $duration;
+    public ?int $duration = null;
 }

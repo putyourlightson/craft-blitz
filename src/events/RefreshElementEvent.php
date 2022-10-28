@@ -13,5 +13,5 @@ class RefreshElementEvent extends CancelableEvent
     /**
      * @var ElementInterface|null
      */
-    public ?ElementInterface $element;
+    public ?ElementInterface $element = null;
 }
