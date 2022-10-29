@@ -33,24 +33,23 @@ class BlitzVariable
     private int $_injected = 0;
 
     /**
-     * Returns a statically included rendered template.
+     * Returns a statically (cached) included rendered template.
      *
      * @since 4.3.0
      */
-    public function staticInclude(string $template, array $params = []): Markup
+    public function staticInclude(string $template, array $params = [], $useAjax = false): Markup
     {
-        $uri = '/' . CacheRequestService::STATIC_INCLUDES_FOLDER;
-        $action = self::STATIC_INCLUDE_ACTION;
-
-        return $this->_includeTemplate($template, $uri, $action, $params);
+        return $this->_includeTemplate($template, CacheRequestService::STATIC_INCLUDES_FOLDER, self::STATIC_INCLUDE_ACTION, $params, $useAjax);
     }
 
-    public function dynamicInclude(string $template, array $params = []): Markup
+    /**
+     * Returns a dynamically (rendered) included rendered template.
+     *
+     * @since 4.3.0
+     */
+    public function dynamicInclude(string $template, array $params = [], $useAjax = true): Markup
     {
-        $uri = '/';
-        $action = self::DYNAMIC_INCLUDE_ACTION;
-
-        return $this->_includeTemplate($template, $uri, $action, $params);
+        return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params, $useAjax);
     }
 
     /**
@@ -62,10 +61,7 @@ class BlitzVariable
     {
         Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.staticInclude()` or `craft.blitz.dynamicInclude()` instead.');
 
-        $uri = '/';
-        $action = 'blitz/templates/get';
-
-        return $this->_includeTemplate($template, $uri, $action, $params);
+        return $this->_includeTemplate($template, '', 'blitz/templates/get', $params, true);
     }
 
     /**
@@ -139,13 +135,15 @@ class BlitzVariable
     }
 
     /**
-     * Returns an SSI tag to inject the output of a URI.
+     * Returns the code to inject the output of a template.
      */
-    private function _includeTemplate(string $template, string $uri, string $action, array $params = []): Markup
+    private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params = [], bool $useAjax = false): Markup
     {
         if (!Craft::$app->getView()->resolveTemplate($template)) {
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
+
+        $url = UrlHelper::siteUrl($uriPrefix);
 
         $params = [
             'action' => $action,
@@ -154,11 +152,11 @@ class BlitzVariable
             'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
         ];
 
-        if (Blitz::$plugin->settings->ssiEnabled) {
-            return $this->_getSsiTag($uri, $params);
+        if ($useAjax === false && Blitz::$plugin->settings->ssiEnabled) {
+            return $this->_getSsiTag($url, $params);
         }
 
-        return $this->_getScript($uri, $params);
+        return $this->_getScript($url, $params);
     }
 
     private function _getHashedTemplate(string $template): string
@@ -171,17 +169,17 @@ class BlitzVariable
     }
 
     /**
-     * Returns an SSI tag to inject the output of a URI.
+     * Returns an SSI tag to inject the output of a URL.
      */
-    private function _getSsiTag(string $uri, array $params = []): Markup
+    private function _getSsiTag(string $url, array $params = []): Markup
     {
-        $uri = $uri . '?' . http_build_query($params);
+        $url = $url . '?' . http_build_query($params);
 
-        return Template::raw('<!--#include virtual="' . $uri . '" -->');
+        return Template::raw('<!--#include virtual="' . $url . '" -->');
     }
 
     /**
-     * Returns a script to inject the output of a URI.
+     * Returns a script to inject the output of a URL.
      */
     private function _getScript(string $uri, array $params = [], string $property = null): Markup
     {
