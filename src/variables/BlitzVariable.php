@@ -143,7 +143,8 @@ class BlitzVariable
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
-        $url = UrlHelper::siteUrl($uriPrefix);
+        // Create a URI relative to the root domain, to account for subfolders
+        $uri = parse_url(UrlHelper::siteUrl($uriPrefix), PHP_URL_PATH);
 
         $params = [
             'action' => $action,
@@ -153,10 +154,10 @@ class BlitzVariable
         ];
 
         if ($useAjax === false && Blitz::$plugin->settings->ssiEnabled) {
-            return $this->_getSsiTag($url, $params);
+            return $this->_getSsiTag($uri, $params);
         }
 
-        return $this->_getScript($url, $params);
+        return $this->_getScript($uri, $params);
     }
 
     private function _getHashedTemplate(string $template): string
@@ -169,17 +170,17 @@ class BlitzVariable
     }
 
     /**
-     * Returns an SSI tag to inject the output of a URL.
+     * Returns an SSI tag to inject the output of a URI.
      */
-    private function _getSsiTag(string $url, array $params = []): Markup
+    private function _getSsiTag(string $uri, array $params = []): Markup
     {
-        $url = $url . '?' . http_build_query($params);
+        $uri = $uri . '?' . http_build_query($params);
 
-        return Template::raw('<!--#include virtual="' . $url . '" -->');
+        return Template::raw('<!--#include virtual="' . $uri . '" -->');
     }
 
     /**
-     * Returns a script to inject the output of a URL.
+     * Returns a script to inject the output of a URI.
      */
     private function _getScript(string $uri, array $params = [], string $property = null): Markup
     {
