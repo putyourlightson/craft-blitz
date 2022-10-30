@@ -53,6 +53,16 @@ class BlitzVariable
     }
 
     /**
+     * Returns script to fetch the output of a URI.
+     *
+     * @since 4.3.0
+     */
+    public function fetchUri(string $uri, array $params = []): Markup
+    {
+        return $this->_getScript($uri, $params);
+    }
+
+    /**
      * Returns script to get the output of a template.
      *
      * @deprecated in 4.3.0. Use [[staticInclude()]] or [[dynamicInclude()]] instead.
@@ -66,9 +76,13 @@ class BlitzVariable
 
     /**
      * Returns script to get the output of a URI.
+     *
+     * @deprecated in 4.3.0. Use [[fetchUri()]] instead.
      */
     public function getUri(string $uri, array $params = []): Markup
     {
+        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getUri()` has been deprecated. Use `craft.blitz.fetchUri()` instead.');
+
         $params['no-cache'] = 1;
 
         return $this->_getScript($uri, $params);
@@ -153,8 +167,13 @@ class BlitzVariable
             'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
         ];
 
-        if ($useAjax === false && Blitz::$plugin->settings->ssiEnabled) {
-            return $this->_getSsiTag($uri, $params);
+        if ($useAjax === false) {
+            if (Blitz::$plugin->settings->ssiEnabled) {
+                return $this->_getSsiTag($uri, $params);
+            }
+            if (Blitz::$plugin->settings->esiEnabled) {
+                return $this->_getEsiTag($uri, $params);
+            }
         }
 
         return $this->_getScript($uri, $params);
@@ -174,9 +193,24 @@ class BlitzVariable
      */
     private function _getSsiTag(string $uri, array $params = []): Markup
     {
-        $uri = $uri . '?' . http_build_query($params);
+        $uri = $this->_getUriWithParams($uri, $params);
 
         return Template::raw('<!--#include virtual="' . $uri . '" -->');
+    }
+
+    /**
+     * Returns an ESI tag to inject the output of a URI.
+     */
+    private function _getEsiTag(string $uri, array $params = []): Markup
+    {
+        $uri = $this->_getUriWithParams($uri, $params);
+
+        return Template::raw('<esi:include src="' . $uri . '" />');
+    }
+
+    private function _getUriWithParams(string $uri, array $params): string
+    {
+        return $uri . '?' . http_build_query($params);
     }
 
     /**
