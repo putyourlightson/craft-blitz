@@ -11,7 +11,6 @@ use yii\db\ActiveQueryInterface;
 /**
  * @property int $cacheId
  * @property int $relatedCacheId
- * @property-read ActiveQueryInterface $relatedCaches
  */
 class RelatedCacheRecord extends ActiveRecord
 {
@@ -21,13 +20,5 @@ class RelatedCacheRecord extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%blitz_relatedcaches}}';
-    }
-
-    /**
-     * Returns the associated related caches
-     */
-    public function getRelatedCaches(): ActiveQueryInterface
-    {
-        return $this->hasMany(CacheRecord::class, ['relatedCacheId' => 'id']);
     }
 }

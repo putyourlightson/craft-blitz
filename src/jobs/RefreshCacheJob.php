@@ -15,8 +15,10 @@ use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\RelatedCacheRecord;
 use yii\db\Exception as DbException;
 use yii\queue\RetryableJobInterface;
 
@@ -87,7 +89,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             ));
         }
 
-        // Merge in cache IDs match element query results
+        // Merge in cache IDs that match element query results
         /** @var ElementInterface|string $elementType */
         foreach ($this->elements as $elementType => $elementData) {
             // If we have element IDs then loop through element queries to check for matches
@@ -145,6 +147,14 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         $siteUris = array_unique($siteUris, SORT_REGULAR);
 
         Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $this->forceClear, $this->forceGenerate);
+
+        // If SSI is enabled, purge related cache IDs.
+        if (Blitz::$plugin->settings->ssiEnabled && Blitz::$plugin->settings->purgeAfterGenerate($this->forceClear, $this->forceGenerate)) {
+            $siteUris = $this->_getRelatedSiteUris($this->cacheIds);
+            if (!empty($siteUris)) {
+                Blitz::$plugin->cachePurger->purgeUris($siteUris);
+            }
+        }
     }
 
     /**
@@ -240,5 +250,20 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         }
 
         return $cacheIds;
+    }
+
+    /**
+     * Returns site URIs related to the provided cache IDs.
+     *
+     * @return SiteUriModel[]
+     */
+    private function _getRelatedSiteUris(array $cacheIds): array
+    {
+        $relatedCacheIds = RelatedCacheRecord::find()
+            ->select('relatedCacheId')
+            ->where(['cacheId' => $cacheIds])
+            ->column();
+
+        return SiteUriHelper::getCachedSiteUris($relatedCacheIds);
     }
 }
