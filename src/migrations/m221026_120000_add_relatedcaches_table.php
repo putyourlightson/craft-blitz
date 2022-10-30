@@ -5,7 +5,6 @@ namespace putyourlightson\blitz\migrations;
 use craft\db\Migration;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\RelatedCacheRecord;
-use putyourlightson\blitzhints\migrations\Install as HintsInstall;
 
 class m221026_120000_add_relatedcaches_table extends Migration
 {
