@@ -325,7 +325,7 @@ class FileStorage extends BaseCacheStorage
         $queryString = $uriParts[1] ?? '';
 
         // Encode forward slashes and square brackets in query string
-        $queryString = str_replace(['/'. '[', ']'], ['%2F', '%5B', '%5D'], $queryString);
+        $queryString = str_replace(['/', '[', ']'], ['%2F', '%5B', '%5D'], $queryString);
 
         $uri = $uriParts[0] . '/' . $queryString;
 
