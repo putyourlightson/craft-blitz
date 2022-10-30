@@ -19,12 +19,11 @@ class TemplatesController extends Controller
     protected int|bool|array $allowAnonymous = true;
 
     /**
-     * Returns a rendered template using the static include action.
-     * This is necessary for detecting SSI requests.
+     * Returns a rendered template using the static include action (necessary for detecting SSI requests).
      */
     public function actionStaticInclude(): Response
     {
-        return $this->_getTemplate();
+        return $this->_getRenderedTemplate();
     }
 
     /**
@@ -32,7 +31,7 @@ class TemplatesController extends Controller
      */
     public function actionDynamicInclude(): Response
     {
-        return $this->_getTemplate();
+        return $this->_getRenderedTemplate();
     }
 
     /**
@@ -44,10 +43,13 @@ class TemplatesController extends Controller
     {
         Craft::$app->getDeprecator()->log(__METHOD__, '`blitz/templates/get` has been deprecated. Use `blitz/templates/static-include` or `blitz/templates/dynamic-include` instead.');
 
-        return $this->_getTemplate();
+        return $this->_getRenderedTemplate();
     }
 
-    private function _getTemplate(): Response
+    /**
+     * Returns a rendered template.
+     */
+    private function _getRenderedTemplate(): Response
     {
         $template = Craft::$app->getRequest()->getRequiredParam('template');
 

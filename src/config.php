@@ -28,6 +28,9 @@ return [
         // With this setting enabled, Blitz will include templates using Server Side Includes (SSI), which must be enabled on the server.
         //'ssiEnabled' => false,
 
+        // With this setting enabled, Blitz will include templates using Edge Side Includes (ESI), which must be enabled on the server.
+        //'esiEnabled' => false,
+
         // With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 

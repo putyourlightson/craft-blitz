@@ -362,7 +362,7 @@ class CacheRequestService extends Component
         $this->_addCraftHeaders($response);
         $this->_prepareResponse($response, $content, $siteUri);
 
-        if (!$this->getIsStaticInclude()) {
+        if ($this->getIsStaticInclude() === false) {
             // Append the served by comment if this is a cacheable response and if a HTML mime type.
             if ($this->getIsCacheableResponse($response) && SiteUriHelper::hasHtmlMimeType($siteUri)) {
                 $outputComments = Blitz::$plugin->settings->outputComments;
@@ -562,6 +562,11 @@ class CacheRequestService extends Component
         if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
             $tagsHeader = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
             $headers->set(Blitz::$plugin->cachePurger->tagHeaderName, $tagsHeader);
+        }
+
+        // Add headers for static includes with ESI enabled
+        if ($this->getIsStaticInclude() && Blitz::$plugin->settings->esiEnabled) {
+            $headers->set('Surrogate-Control', 'content="ESI/1.0"');
         }
 
         // Get the mime type from the site URI
