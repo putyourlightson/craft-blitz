@@ -20,7 +20,7 @@ class BlitzVariable
     /**
      * @const string
      */
-    public const STATIC_INCLUDE_ACTION = 'blitz/templates/static-include';
+    public const INCLUDE_ACTION = 'blitz/templates/include';
 
     /**
      * @const string
@@ -33,13 +33,13 @@ class BlitzVariable
     private int $_injected = 0;
 
     /**
-     * Returns a statically (cached) included rendered template.
+     * Returns a (cached) included rendered template.
      *
      * @since 4.3.0
      */
-    public function staticInclude(string $template, array $params = [], $useAjax = false): Markup
+    public function include(string $template, array $params = [], $useAjax = false): Markup
     {
-        return $this->_includeTemplate($template, CacheRequestService::STATIC_INCLUDES_FOLDER, self::STATIC_INCLUDE_ACTION, $params, $useAjax);
+        return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::INCLUDE_ACTION, $params, $useAjax);
     }
 
     /**
@@ -65,11 +65,11 @@ class BlitzVariable
     /**
      * Returns script to get the output of a template.
      *
-     * @deprecated in 4.3.0. Use [[staticInclude()]] or [[dynamicInclude()]] instead.
+     * @deprecated in 4.3.0. Use [[include()]] or [[dynamicInclude()]] instead.
      */
     public function getTemplate(string $template, array $params = []): Markup
     {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.staticInclude()` or `craft.blitz.dynamicInclude()` instead.');
+        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.include()` or `craft.blitz.dynamicInclude()` instead.');
 
         return $this->_includeTemplate($template, '', 'blitz/templates/get', $params, true);
     }
