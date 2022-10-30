@@ -29,6 +29,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\RelatedCacheRecord;
 use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
 
@@ -125,14 +126,11 @@ class RefreshCacheService extends Component
      */
     public function getElementCacheIds(array $elementIds): array
     {
-        /** @var int[] $ids */
-        $ids = ElementCacheRecord::find()
+        return ElementCacheRecord::find()
             ->select('cacheId')
             ->where(['elementId' => $elementIds])
             ->groupBy('cacheId')
             ->column();
-
-        return $ids;
     }
 
     /**
@@ -163,6 +161,21 @@ class RefreshCacheService extends Component
             ->all();
 
         return $records;
+    }
+
+    /**
+     * Returns cache IDs related to the provided cache IDs.
+     *
+     * @param int[] $cacheIds
+     * @return int[]
+     */
+    public function getRelatedCacheIds(array $cacheIds): array
+    {
+        return RelatedCacheRecord::find()
+            ->select('relatedCacheId')
+            ->where(['cacheId' => $cacheIds])
+            ->groupBy('relatedCacheId')
+            ->column();
     }
 
     /**
@@ -317,7 +330,6 @@ class RefreshCacheService extends Component
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
-        /** @noinspection MissedFieldInspection */
         Craft::$app->getDb()->createCommand()->upsert(
             ElementExpiryDateRecord::tableName(),
             [

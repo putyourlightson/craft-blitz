@@ -363,7 +363,7 @@ class CacheRequestService extends Component
         $this->_prepareResponse($response, $content, $siteUri);
 
         if ($this->getIsInclude() === false) {
-            // Append the served by comment if this is a cacheable response and if a HTML mime type.
+            // Append the served by comment if this is a cacheable response and if an HTML mime type.
             if ($this->getIsCacheableResponse($response) && SiteUriHelper::hasHtmlMimeType($siteUri)) {
                 $outputComments = Blitz::$plugin->settings->outputComments;
 

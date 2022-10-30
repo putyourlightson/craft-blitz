@@ -15,10 +15,8 @@ use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use putyourlightson\blitz\records\RelatedCacheRecord;
 use yii\db\Exception as DbException;
 use yii\queue\RetryableJobInterface;
 
@@ -150,7 +148,8 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         // If SSI is enabled, purge related cache IDs.
         if (Blitz::$plugin->settings->ssiEnabled && Blitz::$plugin->settings->purgeAfterGenerate($this->forceClear, $this->forceGenerate)) {
-            $siteUris = $this->_getRelatedSiteUris($this->cacheIds);
+            $relatedCacheIds = Blitz::$plugin->refreshCache->getRelatedCacheIds($this->cacheIds);
+            $siteUris = SiteUriHelper::getCachedSiteUris($relatedCacheIds);
             if (!empty($siteUris)) {
                 Blitz::$plugin->cachePurger->purgeUris($siteUris);
             }
@@ -250,20 +249,5 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         }
 
         return $cacheIds;
-    }
-
-    /**
-     * Returns site URIs related to the provided cache IDs.
-     *
-     * @return SiteUriModel[]
-     */
-    private function _getRelatedSiteUris(array $cacheIds): array
-    {
-        $relatedCacheIds = RelatedCacheRecord::find()
-            ->select('relatedCacheId')
-            ->where(['cacheId' => $cacheIds])
-            ->column();
-
-        return SiteUriHelper::getCachedSiteUris($relatedCacheIds);
     }
 }
