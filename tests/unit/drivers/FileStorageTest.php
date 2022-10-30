@@ -93,10 +93,15 @@ class FileStorageTest extends Unit
         $this->cacheStorage->deleteAll();
 
         $path = $this->cacheStorage->getSitePath(1);
-        $total = 10;
+        $total = 3;
+        $siteUri = new SiteUriModel([
+            'siteId' => 1,
+            'uri' => $path . '/test-with-äöü-',
+        ]);
 
         for ($i = 0; $i < $total; $i++) {
-            FileHelper::writeToFile($path . '/test-' . $i . '/index.html', 'test');
+            $siteUri->uri .= $i;
+            $this->cacheStorage->save('test', $siteUri);
         }
 
         $this->assertEquals($total, $this->cacheStorage->getCachedFileCount($path));
