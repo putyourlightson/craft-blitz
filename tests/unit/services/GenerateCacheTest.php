@@ -19,6 +19,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use putyourlightson\blitz\records\RelatedCacheRecord;
 use putyourlightson\campaign\elements\CampaignElement;
 use putyourlightson\campaign\elements\MailingListElement;
 use UnitTester;
@@ -275,5 +276,20 @@ class GenerateCacheTest extends Unit
 
         // Assert that one cache ID was found
         $this->assertCount(1, $cacheIds);
+    }
+
+    public function testSaveRelatedCaches()
+    {
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+        Blitz::$plugin->generateCache->relatedUri = $this->siteUri->uri;
+        Blitz::$plugin->generateCache->save('test', new SiteUriModel([
+            'siteId' => 1,
+            'uri' => '_includes/test',
+        ]));
+
+        $count = RelatedCacheRecord::find()->count();
+
+        // Assert that the record was saved
+        $this->assertEquals(1, $count);
     }
 }

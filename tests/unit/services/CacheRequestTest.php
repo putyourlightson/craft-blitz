@@ -8,6 +8,7 @@ namespace putyourlightson\blitztests\unit\services;
 use Codeception\Test\Unit;
 use Craft;
 use craft\helpers\App;
+use craft\helpers\UrlHelper;
 use craft\web\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
@@ -69,9 +70,28 @@ class CacheRequestTest extends Unit
         $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableRequest());
     }
 
+    public function testGetIsInclude()
+    {
+        // Mock a URL request
+        $this->_mockRequest($this->siteUri->getUrl());
+
+        // Assert that the request is not an include request
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsInclude());
+
+        $this->_mockRequest(UrlHelper::siteUrl('_includes', ['action' => 'blitz/templates/include']));
+
+        // Assert that the request is an include request
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsInclude());
+    }
+
+    public function testGetIsIncludeWithUri()
+    {
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsInclude('_includes/'));
+    }
+
     public function testGetRequestedCacheableSiteUri()
     {
-        $pathParam = 'p=segment';
+        $pathParam = 'p=page';
         $allowedQueryString = 'x=1&y=1';
         $disallowedQueryString = 'gclid=123';
 
@@ -258,16 +278,19 @@ class CacheRequestTest extends Unit
          * @see \craft\test\Craft::recreateClient()
          */
         $uri = trim(parse_url($url, PHP_URL_PATH), '/');
+        $queryString = parse_url($url, PHP_URL_QUERY);
 
         $_SERVER = array_merge($_SERVER, [
             'HTTP_HOST' => parse_url($url, PHP_URL_HOST),
             'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
             'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https',
             'REQUEST_METHOD' => 'GET',
-            'REQUEST_URI' => '/' . $uri . '?' . parse_url($url, PHP_URL_QUERY),
-            'QUERY_STRING' => parse_url($url, PHP_URL_QUERY),
+            'REQUEST_URI' => '/' . $uri . '?' . $queryString,
+            'QUERY_STRING' => $queryString,
             'SCRIPT_NAME' => '/index.php',
         ]);
+        parse_str($queryString, $queryStringParams);
+        $_GET = $queryStringParams;
         $_POST = [];
         $_REQUEST = [];
 
