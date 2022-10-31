@@ -17,7 +17,6 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
-use putyourlightson\blitz\records\IncludedCacheRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use putyourlightson\blitz\records\SsiIncludeRecord;
 use putyourlightson\blitzhints\migrations\Install as HintsInstall;
