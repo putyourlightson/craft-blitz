@@ -2,8 +2,8 @@
 
 ## 4.3.0 - Unreleased
 ### Added
-- Added the `ssiEnabled` config setting that enables Blitz to include templates using Server Side Includes (SSI), which must be enabled on the server.
-- Added the `esiEnabled` config setting that enables Blitz to include templates using Edge Side Includes (ESI), which must be enabled on the server or CDN.
+- Added the `ssiEnabled` config setting that enables Blitz to include templates using Server Side Includes (SSI), which must be enabled on the web server.
+- Added the `esiEnabled` config setting that enables Blitz to include templates using Edge Side Includes (ESI), which must be enabled on the web server or reverse proxy (CDN).
 - Added the `craft.blitz.include()` template variable, that includes a template using SSI if enabled, otherwise via an AJAX request. The `include()` method returns a cached result (if one exists).
 - Added the `craft.blitz.dynamicInclude()` template variable, that includes a template via an AJAX request. The `dynamicInclude()` method always returns a freshly rendered template.
 - Added the `craft.blitz.fetch()` template variable, that fetches a URI via an AJAX request. Whether the URI response is cached or not is determined by the URI patterns in the plugin settings.
