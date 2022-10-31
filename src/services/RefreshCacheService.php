@@ -164,16 +164,16 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Returns SSI include cache IDs related to the provided cache IDs.
+     * Returns site URIs from SSI includes related to the provided site URIs.
      *
      * @param SiteUriModel[] $siteUris
-     * @return int[]
+     * @return SiteUriModel[]
      */
-    public function getSsiIncludeCacheIds(array $siteUris): array
+    public function getSsiIncludeSiteUris(array $siteUris): array
     {
         $uris = array_map(fn($siteUri) => $siteUri->uri, $siteUris);
 
-        return SsiIncludeCacheRecord::find()
+        $cacheIds = SsiIncludeCacheRecord::find()
             ->select('cacheId')
             ->innerJoinWith([
                 'ssiInclude' => function(ActiveQuery $query) use ($uris) {
@@ -181,6 +181,8 @@ class RefreshCacheService extends Component
                 },
             ], false)
             ->column();
+
+        return SiteUriHelper::getCachedSiteUris($cacheIds);
     }
 
     /**
@@ -643,9 +645,16 @@ class RefreshCacheService extends Component
      */
     private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false): void
     {
+        $purgeableSiteUris = $siteUris;
+
+        // If SSI is enabled, merge site URIs from SSI includes into purgeable site URIs.
+        if (Blitz::$plugin->settings->ssiEnabled) {
+            $purgeableSiteUris = array_unique(array_merge($siteUris, $this->getSsiIncludeSiteUris($siteUris)));
+        }
+
         if (Blitz::$plugin->settings->clearOnRefresh($forceClear)) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
-            Blitz::$plugin->cachePurger->purgeUris($siteUris);
+            Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
         }
 
         if (Blitz::$plugin->settings->generateOnRefresh($forceGenerate)) {
@@ -654,7 +663,7 @@ class RefreshCacheService extends Component
         }
 
         if (Blitz::$plugin->settings->purgeAfterGenerate($forceClear, $forceGenerate)) {
-            Blitz::$plugin->cachePurger->purgeUris($siteUris);
+            Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
         }
     }
 }
