@@ -9,6 +9,9 @@
 - Added the `craft.blitz.fetch()` template variable, that fetches a URI via an AJAX request. Whether the URI response is cached or not is determined by the URI patterns in the plugin settings.
 - Added the `blitz/templates/include` and `blitz/templates/dynamic-include` controller actions.
 
+### Changed
+- Improved the detection of when elements should be refreshed based on changes.
+
 ### Deprecated
 - Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.include()` or `craft.blitz.dynamicInclude()` instead.
 - Deprecated the `craft.blitz.getUri()` template variable. Use `craft.blitz.fetch()` instead.

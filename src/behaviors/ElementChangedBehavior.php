@@ -90,7 +90,7 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
+        if (!empty($element->getDirtyAttributes())) {
             return true;
         }
 
