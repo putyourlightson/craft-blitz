@@ -154,11 +154,12 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
     {
-        if ($this->getIsInclude($siteUri)) {
+        $uri = strtolower($siteUri->uri);
+
+        if ($this->getIsInclude($uri)) {
             return true;
         }
 
-        $uri = strtolower($siteUri->uri);
         $url = $siteUri->getUrl();
 
         // Ignore URIs that are CP pages
@@ -230,11 +231,12 @@ class CacheRequestService extends Component
      *
      * @since 4.3.0
      */
-    public function getIsInclude(?SiteUriModel $siteUri = null): bool
+    public function getIsInclude(?string $uri = null): bool
     {
-        // Static includes based on the site URI takes preference
-        if ($siteUri !== null) {
-            return str_starts_with($siteUri->uri, self::INCLUDES_FOLDER);
+        // Includes based on the URI takes preference
+        if ($uri !== null) {
+            $uri = trim($uri, '/');
+            return str_starts_with($uri, self::INCLUDES_FOLDER);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
@@ -559,7 +561,7 @@ class CacheRequestService extends Component
             $headers->set(Blitz::$plugin->cachePurger->tagHeaderName, $tagsHeader);
         }
 
-        // Add headers for static includes with ESI enabled
+        // Add headers for includes with ESI enabled
         if ($this->getIsInclude() && Blitz::$plugin->settings->esiEnabled) {
             $headers->set('Surrogate-Control', 'content="ESI/1.0"');
         }

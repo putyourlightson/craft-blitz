@@ -84,13 +84,9 @@ class CacheRequestTest extends Unit
         $this->assertTrue(Blitz::$plugin->cacheRequest->getIsInclude());
     }
 
-    public function testGetIsIncludeWithSiteUri()
+    public function testGetIsIncludeWithUri()
     {
-        $siteUri = new SiteUriModel([
-            'siteId' => 1,
-            'uri' => '_includes/test',
-        ]);
-        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsInclude($siteUri));
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsInclude('/_includes?action='));
     }
 
     public function testGetRequestedCacheableSiteUri()

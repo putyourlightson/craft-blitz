@@ -196,8 +196,10 @@ class BlitzVariable
     {
         $uri = $this->_getUriWithParams($uri, $params);
 
-        // Record the SSI include, so we can purge it whenever necessary
-        Blitz::$plugin->generateCache->addSsiInclude($uri);
+        // Add an SSI include, so we can purge it whenever necessary
+        if (Blitz::$plugin->cacheRequest->getIsInclude($uri)) {
+            Blitz::$plugin->generateCache->addSsiInclude($uri);
+        }
 
         return Template::raw('<!--#include virtual="' . $uri . '" -->');
     }
