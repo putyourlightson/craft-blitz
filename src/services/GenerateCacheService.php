@@ -28,7 +28,8 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
-use putyourlightson\blitz\records\RelatedCacheRecord;
+use putyourlightson\blitz\records\SsiIncludeCacheRecord;
+use putyourlightson\blitz\records\SsiIncludeRecord;
 use yii\base\Event;
 use yii\db\Exception;
 use yii\log\Logger;
@@ -56,6 +57,11 @@ class GenerateCacheService extends Component
     public const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
 
     /**
+     * @const string
+     */
+    public const MUTEX_LOCK_NAME_SSI_INCLUDE_RECORDS = 'blitz:ssiIncludeRecords';
+
+    /**
      * @var CacheOptionsModel
      */
     public CacheOptionsModel $options;
@@ -71,9 +77,9 @@ class GenerateCacheService extends Component
     public array $elementQueryCaches = [];
 
     /**
-     * @var string|null
+     * @var int[]
      */
-    public ?string $relatedUri = null;
+    public array $ssiIncludeCaches = [];
 
     /**
      * @inheritdoc
@@ -92,6 +98,7 @@ class GenerateCacheService extends Component
     {
         $this->elementCaches = [];
         $this->elementQueryCaches = [];
+        $this->ssiIncludeCaches = [];
         $this->options = new CacheOptionsModel();
 
         // Set default attributes from the plugin settings
@@ -188,6 +195,14 @@ class GenerateCacheService extends Component
     }
 
     /**
+     * Adds an SSI include.
+     */
+    public function addSsiInclude(string $uri): void
+    {
+        $this->saveSsiInclude(trim($uri, '/'));
+    }
+
+    /**
      * Saves an element query.
      */
     public function saveElementQuery(ElementQuery $elementQuery): void
@@ -280,6 +295,43 @@ class GenerateCacheService extends Component
     }
 
     /**
+     * Saves an SSI include.
+     */
+    public function saveSsiInclude(string $uri): void
+    {
+        // Require a mutex to avoid doing the same operation multiple times
+        $mutex = Craft::$app->getMutex();
+        $lockName = self::MUTEX_LOCK_NAME_SSI_INCLUDE_RECORDS;
+
+        if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
+            return;
+        }
+
+        // Use DB connection, so we can exclude audit columns when inserting
+        $db = Craft::$app->getDb();
+
+        // Get record or create one if it does not exist
+        $ssiIncludeId = SsiIncludeRecord::find()
+            ->select('id')
+            ->where(['uri' => $uri])
+            ->scalar();
+
+        if (!$ssiIncludeId) {
+            $db->createCommand()
+                ->insert(SsiIncludeRecord::tableName(), ['uri' => $uri])
+                ->execute();
+
+            $ssiIncludeId = $db->getLastInsertID();
+        }
+
+        if ($ssiIncludeId && !in_array($ssiIncludeId, $this->ssiIncludeCaches)) {
+            $this->ssiIncludeCaches[] = $ssiIncludeId;
+        }
+
+        $mutex->release($lockName);
+    }
+
+    /**
      * Saves the content for a site URI to the cache.
      */
     public function save(string $content, SiteUriModel $siteUri): ?string
@@ -329,7 +381,8 @@ class GenerateCacheService extends Component
         $cacheId = (int)$db->getLastInsertID();
 
         if (!empty($this->elementCaches)) {
-            $this->_batchInsertCaches($cacheId,
+            $this->_batchInsertCaches(
+                $cacheId,
                 $this->elementCaches,
                 Element::tableName(),
                 ElementCacheRecord::tableName(),
@@ -338,7 +391,8 @@ class GenerateCacheService extends Component
         }
 
         if (!empty($this->elementQueryCaches)) {
-            $this->_batchInsertCaches($cacheId,
+            $this->_batchInsertCaches(
+                $cacheId,
                 $this->elementQueryCaches,
                 ElementQueryRecord::tableName(),
                 ElementQueryCacheRecord::tableName(),
@@ -346,8 +400,14 @@ class GenerateCacheService extends Component
             );
         }
 
-        if ($this->relatedUri !== null) {
-            $this->_insertRelatedCache($cacheId, $this->relatedUri);
+        if (!empty($this->ssiIncludeCaches)) {
+            $this->_batchInsertCaches(
+                $cacheId,
+                $this->ssiIncludeCaches,
+                SsiIncludeRecord::tableName(),
+                SsiIncludeCacheRecord::tableName(),
+                'ssiIncludeId'
+            );
         }
 
         // Save cache tags
@@ -423,23 +483,5 @@ class GenerateCacheService extends Component
             $values,
         )
         ->execute();
-    }
-
-    /**
-     * Inserts a related cache ID into the database.
-     */
-    private function _insertRelatedCache(int $cacheId, string $uri): void
-    {
-        $relatedCacheId = CacheRecord::find()
-            ->select('id')
-            ->where(['uri' => $uri])
-            ->scalar();
-
-        if ($relatedCacheId) {
-            $relatedCacheRecord = new RelatedCacheRecord();
-            $relatedCacheRecord->cacheId = $cacheId;
-            $relatedCacheRecord->relatedCacheId = $relatedCacheId;
-            $relatedCacheRecord->save();
-        }
     }
 }

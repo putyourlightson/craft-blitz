@@ -146,10 +146,10 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $this->forceClear, $this->forceGenerate);
 
-        // If SSI is enabled, purge related cache IDs.
-        if (Blitz::$plugin->settings->ssiEnabled && Blitz::$plugin->settings->purgeAfterGenerate($this->forceClear, $this->forceGenerate)) {
-            $relatedCacheIds = Blitz::$plugin->refreshCache->getRelatedCacheIds($this->cacheIds);
-            $siteUris = SiteUriHelper::getCachedSiteUris($relatedCacheIds);
+        // If SSI is enabled, purge SSI include cache IDs.
+        if (Blitz::$plugin->settings->ssiEnabled) {
+            $ssiIncludeCacheIds = Blitz::$plugin->refreshCache->getSsiIncludeCacheIds($siteUris);
+            $siteUris = SiteUriHelper::getCachedSiteUris($ssiIncludeCacheIds);
             if (!empty($siteUris)) {
                 Blitz::$plugin->cachePurger->purgeUris($siteUris);
             }

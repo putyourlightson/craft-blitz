@@ -154,7 +154,7 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
     {
-        if ($this->getIsInclude($siteUri->uri)) {
+        if ($this->getIsInclude($siteUri)) {
             return true;
         }
 
@@ -230,11 +230,11 @@ class CacheRequestService extends Component
      *
      * @since 4.3.0
      */
-    public function getIsInclude(?string $uri = null): bool
+    public function getIsInclude(?SiteUriModel $siteUri = null): bool
     {
-        // Static includes based on the URI takes preference
-        if ($uri !== null) {
-            return str_starts_with($uri, self::INCLUDES_FOLDER);
+        // Static includes based on the site URI takes preference
+        if ($siteUri !== null) {
+            return str_starts_with($siteUri->uri, self::INCLUDES_FOLDER);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
@@ -285,11 +285,6 @@ class CacheRequestService extends Component
         $request = Craft::$app->getRequest();
 
         if ($this->getIsInclude()) {
-            if (Blitz::$plugin->settings->ssiEnabled) {
-                // Record the related cache, so we can purge it whenever necessary
-                Blitz::$plugin->generateCache->relatedUri = substr(Craft::$app->getRequest()->url, 1);
-            }
-
             return new SiteUriModel([
                 'siteId' => $request->getParam('siteId'),
                 'uri' => self::INCLUDES_FOLDER . '?' . http_build_query($request->getQueryParams()),

@@ -10,6 +10,7 @@ use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
@@ -194,6 +195,9 @@ class BlitzVariable
     private function _getSsiTag(string $uri, array $params = []): Markup
     {
         $uri = $this->_getUriWithParams($uri, $params);
+
+        // Record the SSI include, so we can purge it whenever necessary
+        Blitz::$plugin->generateCache->addSsiInclude($uri);
 
         return Template::raw('<!--#include virtual="' . $uri . '" -->');
     }

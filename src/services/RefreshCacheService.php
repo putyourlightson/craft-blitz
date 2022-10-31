@@ -29,7 +29,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use putyourlightson\blitz\records\RelatedCacheRecord;
+use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
 
@@ -164,17 +164,22 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Returns cache IDs related to the provided cache IDs.
+     * Returns SSI include cache IDs related to the provided cache IDs.
      *
-     * @param int[] $cacheIds
+     * @param SiteUriModel[] $siteUris
      * @return int[]
      */
-    public function getRelatedCacheIds(array $cacheIds): array
+    public function getSsiIncludeCacheIds(array $siteUris): array
     {
-        return RelatedCacheRecord::find()
-            ->select('relatedCacheId')
-            ->where(['cacheId' => $cacheIds])
-            ->groupBy('relatedCacheId')
+        $uris = array_map(fn($siteUri) => $siteUri->uri, $siteUris);
+
+        return SsiIncludeCacheRecord::find()
+            ->select('cacheId')
+            ->innerJoinWith([
+                'ssiInclude' => function(ActiveQuery $query) use ($uris) {
+                    $query->where(['uri' => $uris]);
+                },
+            ], false)
             ->column();
     }
 

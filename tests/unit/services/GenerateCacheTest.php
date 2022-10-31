@@ -20,6 +20,7 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\RelatedCacheRecord;
+use putyourlightson\blitz\records\SsiIncludeRecord;
 use putyourlightson\campaign\elements\CampaignElement;
 use putyourlightson\campaign\elements\MailingListElement;
 use UnitTester;
@@ -278,16 +279,16 @@ class GenerateCacheTest extends Unit
         $this->assertCount(1, $cacheIds);
     }
 
-    public function testSaveRelatedCaches()
+    public function testSaveSsiInclude()
     {
-        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
-        Blitz::$plugin->generateCache->relatedUri = $this->siteUri->uri;
-        Blitz::$plugin->generateCache->save('test', new SiteUriModel([
+        $siteUri = new SiteUriModel([
             'siteId' => 1,
             'uri' => '_includes/test',
-        ]));
+        ]);
+        Blitz::$plugin->generateCache->addSsiInclude($siteUri->uri);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        $count = RelatedCacheRecord::find()->count();
+        $count = SsiIncludeRecord::find()->count();
 
         // Assert that the record was saved
         $this->assertEquals(1, $count);
