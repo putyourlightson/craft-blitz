@@ -53,7 +53,7 @@ class BlitzVariable
     }
 
     /**
-     * Returns script to fetch the output of a URI.
+     * Returns a script to fetch the output of a URI.
      *
      * @since 4.3.0
      */
@@ -63,7 +63,7 @@ class BlitzVariable
     }
 
     /**
-     * Returns script to get the output of a template.
+     * Returns a script to get the output of a template.
      *
      * @deprecated in 4.3.0. Use [[include()]] or [[dynamicInclude()]] instead.
      */
@@ -75,7 +75,7 @@ class BlitzVariable
     }
 
     /**
-     * Returns script to get the output of a URI.
+     * Returns a script to get the output of a URI.
      *
      * @deprecated in 4.3.0. Use [[fetch()]] instead.
      */
