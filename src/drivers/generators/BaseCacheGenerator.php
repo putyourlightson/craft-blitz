@@ -124,7 +124,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     public function generateSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
     {
         // Get custom site URIs for the provided site only
-        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->customSiteUris);
+        $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->getCustomSiteUris());
         $customSiteUris = $groupedSiteUris[$siteId] ?? [];
 
         $siteUris = array_merge(
@@ -149,7 +149,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
 
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(),
-            Blitz::$plugin->settings->customSiteUris
+            Blitz::$plugin->settings->getCustomSiteUris()
         );
 
         $this->generateUris($siteUris, $setProgressHandler, $queue);

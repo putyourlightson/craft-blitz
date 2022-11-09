@@ -165,6 +165,8 @@ class SettingsModel extends Model
      *         'uri' => 'pages/custom',
      *     ],
      * ]
+     *
+     * @used-by getCustomSiteUris()
      */
     public array $customSiteUris = [];
 
@@ -443,6 +445,23 @@ class SettingsModel extends Model
     public function purgeAfterGenerate(bool $forceClear = false, bool $forceGenerate = false): bool
     {
         return !$this->clearOnRefresh($forceClear) && $this->generateOnRefresh($forceGenerate);
+    }
+
+    /**
+     * Returns the custom site URIs as site URI models.
+     *
+     * @return SiteUriModel[]
+     * @since 4.3.0
+     */
+    public function getCustomSiteUris(): array
+    {
+        $customSiteUris = [];
+
+        foreach ($this->customSiteUris as $customSiteUri) {
+            $customSiteUris[] = new SiteUriModel($customSiteUri);
+        }
+
+        return $customSiteUris;
     }
 
     /**

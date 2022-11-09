@@ -505,7 +505,7 @@ class RefreshCacheService extends Component
         // Get site URIs to generate before flushing the cache
         $siteUris = array_merge(
             SiteUriHelper::getAllSiteUris(),
-            Blitz::$plugin->settings->customSiteUris
+            Blitz::$plugin->settings->getCustomSiteUris()
         );
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
@@ -543,7 +543,7 @@ class RefreshCacheService extends Component
         // Get site URIs to generate before flushing the cache
         $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
 
-        foreach (Blitz::$plugin->settings->customSiteUris as $customSiteUri) {
+        foreach (Blitz::$plugin->settings->getCustomSiteUris() as $customSiteUri) {
             if ($customSiteUri['siteId'] == $siteId) {
                 $siteUris[] = $customSiteUri;
             }

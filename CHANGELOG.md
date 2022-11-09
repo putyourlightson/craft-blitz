@@ -12,6 +12,9 @@
 ### Changed
 - Improved the detection of when elements should be refreshed based on changes.
 
+### Fixed
+- Fixed a bug in which the CloudFront Purger could throw errors when using custom site URIs.
+
 ### Deprecated
 - Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.include()` or `craft.blitz.dynamicInclude()` instead.
 - Deprecated the `craft.blitz.getUri()` template variable. Use `craft.blitz.fetch()` instead.
