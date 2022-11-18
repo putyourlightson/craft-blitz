@@ -18,7 +18,7 @@ use yii\queue\RetryableJobInterface;
 class DriverJob extends BaseJob implements RetryableJobInterface
 {
     /**
-     * @var SiteUriModel[]
+     * @var array[]
      */
     public array $siteUris;
 

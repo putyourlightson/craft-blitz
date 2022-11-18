@@ -10,6 +10,7 @@ use craft\base\SavableComponent;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 
 abstract class BaseCachePurger extends SavableComponent implements CachePurgerInterface
 {
@@ -92,6 +93,9 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
 
     /**
      * Purge site URIs with progress.
+     *
+     * @param SiteUriModel[]|array[] $siteUris
+     * @param callable|null $setProgressHandler
      */
     public function purgeUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
