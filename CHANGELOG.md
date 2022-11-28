@@ -11,6 +11,7 @@
 
 ### Changed
 - Improved the detection of when elements should be refreshed based on changes.
+- Improved the performance of refresh job requests when cache generation is disabled ([#456](https://github.com/putyourlightson/craft-blitz/issues/456)).
 
 ### Deprecated
 - Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.include()` or `craft.blitz.dynamicInclude()` instead.
