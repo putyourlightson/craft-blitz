@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.12.7 - 2022-11-28
+### Changed
+- Improved the performance of refresh job requests when cache generation is disabled ([#456](https://github.com/putyourlightson/craft-blitz/issues/456)).
+
 ## 3.12.6 - 2022-08-22
 ### Changed
 - The cache is now purged at most once per cache refresh.
