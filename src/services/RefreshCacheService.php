@@ -476,18 +476,22 @@ class RefreshCacheService extends Component
         if (!$event->isValid) {
             return;
         }
+        
+        $warmCacheAutomatically = Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically;
 
         // Get warmable site URIs before flushing the cache
-        $siteUris = array_merge(
-            SiteUriHelper::getAllSiteUris(true),
-            Blitz::$plugin->settings->getCustomSiteUris()
-        );
+        if ($warmCacheAutomatically) {
+            $siteUris = array_merge(
+                SiteUriHelper::getAllSiteUris(true),
+                Blitz::$plugin->settings->getCustomSiteUris()
+            );
+        }
 
         Blitz::$plugin->flushCache->flushAll();
         Blitz::$plugin->clearCache->clearAll();
 
         // Warm and deploy if enabled
-        if (Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically) {
+        if ($warmCacheAutomatically) {
             Blitz::$plugin->cacheWarmer->warmUris($siteUris, null, Blitz::$plugin->cachePurger->warmCacheDelay);
 
             Blitz::$plugin->deployer->deployUris($siteUris);
