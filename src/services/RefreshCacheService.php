@@ -14,6 +14,7 @@ use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\helpers\Db;
 use craft\helpers\ElementHelper;
+use craft\helpers\Queue;
 use DateTime;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
@@ -30,7 +31,6 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
-use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
 
 /**
@@ -413,30 +413,13 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $refreshCacheJob = new RefreshCacheJob([
+        $job = new RefreshCacheJob([
             'cacheIds' => $this->cacheIds,
             'elements' => $this->elements,
             'forceClear' => $forceClear,
             'forceGenerate' => $forceGenerate,
         ]);
-
-        $queue = Craft::$app->getQueue();
-
-        /**
-         * Some queue drivers, for example Redis, don't support custom push priorities,
-         * but it's not enough to check whether the `priority()` method exists,
-         * since it exists on the abstract Queue class. So instead we use a try/catch
-         * clause, falling back to a regular push without setting the priority.
-         * See https://github.com/putyourlightson/craft-blitz/issues/400
-         */
-        try {
-            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
-                ->push($refreshCacheJob);
-        }
-        /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (NotSupportedException) {
-            $queue->push($refreshCacheJob);
-        }
+        Queue::push($job, Blitz::$plugin->settings->refreshCacheJobPriority);
 
         $this->reset();
     }

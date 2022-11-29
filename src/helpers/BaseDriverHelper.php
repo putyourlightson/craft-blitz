@@ -5,14 +5,12 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use Craft;
 use craft\base\SavableComponent;
 use craft\helpers\Component;
+use craft\helpers\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\services\RefreshCacheService;
-use yii\base\NotSupportedException;
 
 class BaseDriverHelper
 {
@@ -70,18 +68,6 @@ class BaseDriverHelper
             'driverMethod' => $driverMethod,
             'description' => $description,
         ]);
-
-        $queue = Craft::$app->getQueue();
-
-        /**
-         * @see RefreshCacheService::refresh()
-         */
-        try {
-            $queue->priority($priority)->push($job);
-        }
-        /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (NotSupportedException) {
-            $queue->push($job);
-        }
+        Queue::push($job, $priority);
     }
 }
