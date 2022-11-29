@@ -179,11 +179,15 @@ class CacheController extends Controller
      */
     public function actionRefresh(): int
     {
+        $generateOnRefresh = Blitz::$plugin->settings->generateOnRefresh();
+
         // Get site URIs to generate before flushing the cache
-        $siteUris = array_merge(
-            SiteUriHelper::getAllSiteUris(),
-            Blitz::$plugin->settings->getCustomSiteUris(),
-        );
+        if ($generateOnRefresh) {
+            $siteUris = array_merge(
+                SiteUriHelper::getAllSiteUris(),
+                Blitz::$plugin->settings->getCustomSiteUris(),
+            );
+        }
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
             $this->_clearCache();
@@ -191,13 +195,13 @@ class CacheController extends Controller
             $this->_purgeCache();
         }
 
-        if (Blitz::$plugin->settings->generateOnRefresh()) {
+        if ($generateOnRefresh) {
             $this->_generateCache($siteUris);
             $this->_deploy($siteUris);
-        }
 
-        if (Blitz::$plugin->settings->purgeAfterGenerate()) {
-            $this->_purgeCache($siteUris);
+            if (Blitz::$plugin->settings->purgeAfterGenerate()) {
+                $this->_purgeCache($siteUris);
+            }
         }
 
         return ExitCode::OK;
