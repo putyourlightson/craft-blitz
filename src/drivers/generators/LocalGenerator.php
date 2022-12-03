@@ -52,9 +52,9 @@ class LocalGenerator extends BaseCacheGenerator
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
         $urls = $this->getUrlsToGenerate($siteUris);
-
+        $pages = $this->getPageCount($siteUris);
         $count = 0;
-        $total = count($urls);
+
         $config = [
             'root' => Craft::getAlias('@root'),
             'webroot' => Craft::getAlias('@webroot'),
@@ -66,8 +66,11 @@ class LocalGenerator extends BaseCacheGenerator
         $promise = \Amp\Sync\ConcurrentIterator\each(
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
-            function(string $url) use ($setProgressHandler, &$count, $total, $config) {
-                $count++;
+            function(string $url) use ($setProgressHandler, &$count, $pages, $config) {
+                if ($this->isPageUrl($url)) {
+                    $count++;
+                }
+
                 $config['url'] = $url;
 
                 // Create a context that to send data between the parent and child processes
@@ -82,8 +85,7 @@ class LocalGenerator extends BaseCacheGenerator
                 }
 
                 if (is_callable($setProgressHandler)) {
-                    $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages.', ['count' => $count, 'total' => $total]);
-                    call_user_func($setProgressHandler, $count, $total, $progressLabel);
+                    $this->callProgressHandler($setProgressHandler, $count, $pages);
                 }
             }
         );

@@ -160,7 +160,23 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     }
 
     /**
+     * Calls the provided progress handles.
+     */
+    protected function callProgressHandler(callable $setProgressHandler, int $count, int $pages): void
+    {
+        $progressLabel = Craft::t('blitz', 'Generating {count} of {pages} pages.', [
+            'count' => $count,
+            'pages' => $pages,
+        ]);
+
+        call_user_func($setProgressHandler, $count, $pages, $progressLabel);
+    }
+
+    /**
      * Returns URLs to generate, deleting and purging any that are not cacheable.
+     *
+     * @param SiteUriModel[]|array[] $siteUris
+     * @return array
      */
     protected function getUrlsToGenerate(array $siteUris): array
     {
@@ -224,5 +240,33 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         }
 
         return $siteOptions;
+    }
+
+    /**
+     * Returns the number of pages (not includes) in the provided site URIs.
+     *
+     * @param SiteUriModel[]|array[] $siteUris
+     * @return int
+     */
+    protected function getPageCount(array $siteUris): int
+    {
+        $count = 0;
+
+        foreach ($siteUris as $siteUri) {
+            $uri = is_array($siteUri) ? $siteUri['uri'] : $siteUri->uri;
+            if (!str_starts_with($uri, '_includes')) {
+                $count++;
+            }
+        }
+
+        return $count;
+    }
+
+    /**
+     * Returns whether the provided URL is a page (not an include).
+     */
+    protected function isPageUrl(string $url): bool
+    {
+        return !str_contains($url, '_includes?action=blitz');
     }
 }

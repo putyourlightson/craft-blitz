@@ -44,7 +44,7 @@ class FileStorage extends BaseCacheStorage
     public bool $createBrotliFiles = false;
 
     /**
-     * @var bool
+     * @var bool Whether cached files may be counted (can be disabled via a plugin/module)
      */
     public bool $countCachedFiles = true;
 
@@ -192,19 +192,20 @@ class FileStorage extends BaseCacheStorage
             $sites[$site->id] = [
                 'name' => $site->name,
                 'path' => $sitePath,
-                'count' => $this->getCachedFileCount($sitePath),
+                'pageCount' => $this->getCachedPageCount($sitePath),
+                'includeCount' => $this->getCachedIncludeCount($sitePath),
             ];
         }
 
         foreach ($sites as $siteId => &$site) {
-            // Check if other site counts should be reduced from this site
+            // Check if other site page counts should be reduced from this site
             foreach ($sites as $otherSiteId => $otherSite) {
                 if ($otherSiteId == $siteId) {
                     continue;
                 }
 
                 if (str_starts_with($otherSite['path'], $site['path'] . '/')) {
-                    $site['count'] -= is_dir($otherSite['path']) ? $otherSite['count'] : 0;
+                    $site['pageCount'] -= is_dir($otherSite['path']) ? $otherSite['pageCount'] : 0;
                 }
             }
         }
@@ -298,15 +299,42 @@ class FileStorage extends BaseCacheStorage
     }
 
     /**
-     * Returns the number of cached files in the provided path.
+     * Returns the number of cached pages in the provided path.
      */
-    public function getCachedFileCount(string $path): int|string
+    public function getCachedPageCount(string $path): int|string
     {
         if (!$this->countCachedFiles) {
             return '-';
         }
 
-        return is_dir($path) ? count(FileHelper::findFiles($path, ['only' => ['index.html']])) : 0;
+        if (!is_dir($path)) {
+            return 0;
+        }
+
+        return count(FileHelper::findFiles($path, [
+            'except' => ['_includes/'],
+            'only' => ['index.html'],
+        ]));
+    }
+
+    /**
+     * Returns the number of cached includes in the provided path.
+     */
+    public function getCachedIncludeCount(string $path): int|string
+    {
+        if (!$this->countCachedFiles) {
+            return '-';
+        }
+
+        $path = rtrim($path, '/') . '/_includes';
+
+        if (!is_dir($path)) {
+            return 0;
+        }
+
+        return count(FileHelper::findFiles($path, [
+            'only' => ['index.html'],
+        ]));
     }
 
     /**

@@ -414,7 +414,7 @@ class CacheController extends Controller
         $total = count($siteUris);
 
         if ($generated < $total) {
-            $this->stdout(Craft::t('blitz', 'Generated {generated} of {total} total possible pages. To see why some pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['generated' => $generated, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
+            $this->stdout(Craft::t('blitz', 'Generated {generated} of {total} total possible pages and includes. To see why some pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['generated' => $generated, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
         }
 
         $this->_output('Blitz cache generation complete.');
