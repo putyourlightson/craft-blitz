@@ -144,7 +144,8 @@ class Install extends Migration
         if (!$this->db->tableExists(SsiIncludeRecord::tableName())) {
             $this->createTable(SsiIncludeRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'uri' => $this->string()->notNull(),
+                'index' => $this->bigInteger()->notNull(),
+                'uri' => $this->text()->notNull(),
             ]);
         }
 
@@ -173,7 +174,7 @@ class Install extends Migration
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
-        $this->createIndex(null, SsiIncludeRecord::tableName(), 'uri');
+        $this->createIndex(null, SsiIncludeRecord::tableName(), 'index');
     }
 
     /**

@@ -17,10 +17,11 @@ class m221026_120000_add_ssiinclude_tables extends Migration
         if (!$this->db->tableExists(SsiIncludeRecord::tableName())) {
             $this->createTable(SsiIncludeRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'uri' => $this->string()->notNull(),
+                'index' => $this->bigInteger()->notNull(),
+                'uri' => $this->text()->notNull(),
             ]);
 
-            $this->createIndex(null, SsiIncludeRecord::tableName(), 'uri');
+            $this->createIndex(null, SsiIncludeRecord::tableName(), 'index');
         }
 
         if (!$this->db->tableExists(SsiIncludeCacheRecord::tableName())) {

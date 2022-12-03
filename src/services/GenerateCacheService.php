@@ -208,9 +208,7 @@ class GenerateCacheService extends Component
     public function saveElementQuery(ElementQuery $elementQuery): void
     {
         $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
-
-        // Create a unique index from the element type and parameters for quicker indexing and less storage
-        $index = sprintf('%u', crc32($elementQuery->elementType . $params));
+        $index = $this->_getUniqueIndex($elementQuery->elementType . $params);
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
@@ -220,9 +218,6 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Use DB connection, so we can exclude audit columns when inserting
-        $db = Craft::$app->getDb();
-
         // Get element query record from index or create one if it does not exist
         $queryId = ElementQueryRecord::find()
             ->select('id')
@@ -231,6 +226,9 @@ class GenerateCacheService extends Component
 
         if (!$queryId) {
             try {
+                // Use DB connection, so we can exclude audit columns when inserting
+                $db = Craft::$app->getDb();
+
                 $db->createCommand()
                     ->insert(
                         ElementQueryRecord::tableName(),
@@ -299,26 +297,34 @@ class GenerateCacheService extends Component
      */
     public function saveSsiInclude(string $uri): void
     {
+        $index = $this->_getUniqueIndex($uri);
+
         // Require a mutex to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
-        $lockName = self::MUTEX_LOCK_NAME_SSI_INCLUDE_RECORDS;
+        $lockName = self::MUTEX_LOCK_NAME_SSI_INCLUDE_RECORDS . ':' . $index;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
             return;
         }
 
-        // Use DB connection, so we can exclude audit columns when inserting
-        $db = Craft::$app->getDb();
-
         // Get record or create one if it does not exist
         $ssiIncludeId = SsiIncludeRecord::find()
             ->select('id')
-            ->where(['uri' => $uri])
+            ->where(['index' => $index])
             ->scalar();
 
         if (!$ssiIncludeId) {
+            // Use DB connection, so we can exclude audit columns when inserting
+            $db = Craft::$app->getDb();
+
             $db->createCommand()
-                ->insert(SsiIncludeRecord::tableName(), ['uri' => $uri])
+                ->insert(
+                    SsiIncludeRecord::tableName(),
+                    [
+                        'index' => $index,
+                        'uri' => $uri,
+                    ]
+                )
                 ->execute();
 
             $ssiIncludeId = $db->getLastInsertID();
@@ -483,5 +489,13 @@ class GenerateCacheService extends Component
             $values,
         )
         ->execute();
+    }
+
+    /**
+     * Creates a unique index from the element type and parameters for quicker indexing and less storage.
+     */
+    private function _getUniqueIndex(string $value): int
+    {
+        return sprintf('%u', crc32($value));
     }
 }

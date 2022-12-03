@@ -10,6 +10,7 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
+ * @property string $index
  * @property string $uri
  * @property SsiIncludeCacheRecord[] $ssiIncludeCaches
  */
