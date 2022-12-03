@@ -16,6 +16,11 @@ use yii\base\Event;
 class CacheGeneratorHelper extends BaseDriverHelper
 {
     /**
+     * const string
+     */
+    public const DRIVER_ID = 'cacheGenerator';
+
+    /**
      * @event RegisterComponentTypesEvent
      */
     public const EVENT_REGISTER_GENERATOR_TYPES = 'registerGeneratorTypes';
@@ -62,6 +67,14 @@ class CacheGeneratorHelper extends BaseDriverHelper
     {
         $description = Craft::t('blitz', 'Generating Blitz cache');
 
-        self::addDriverJob($siteUris, 'cacheGenerator', $driverMethod, $description, $priority);
+        self::addDriverJob($siteUris, self::DRIVER_ID, $driverMethod, $description, $priority);
+    }
+
+    /**
+     * Releases generator jobs from the queue.
+     */
+    public static function releaseGeneratorJobs(): void
+    {
+        self::releaseDriverJobs(self::DRIVER_ID);
     }
 }

@@ -190,6 +190,9 @@ class CacheController extends Controller
         }
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
+            // Release jobs, since we're anyway clearing the cache
+            Blitz::$plugin->refreshCache->releaseJobs();
+
             $this->_clearCache();
             $this->_flushCache();
             $this->_purgeCache();

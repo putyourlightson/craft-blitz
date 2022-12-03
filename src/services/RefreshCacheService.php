@@ -22,6 +22,9 @@ use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\events\RefreshCacheTagsEvent;
 use putyourlightson\blitz\events\RefreshElementEvent;
 use putyourlightson\blitz\events\RefreshSiteCacheEvent;
+use putyourlightson\blitz\helpers\CacheGeneratorHelper;
+use putyourlightson\blitz\helpers\CachePurgerHelper;
+use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
@@ -496,6 +499,9 @@ class RefreshCacheService extends Component
         }
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
+            // Release jobs, since we're anyway clearing the cache
+            $this->releaseJobs();
+
             Blitz::$plugin->clearCache->clearAll();
             Blitz::$plugin->flushCache->flushAll();
             Blitz::$plugin->cachePurger->purgeAll();
@@ -623,6 +629,16 @@ class RefreshCacheService extends Component
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE_TAGS)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE_TAGS, $event);
         }
+    }
+
+    /**
+     * Releases generator, deployer and purger jobs.
+     */
+    public function releaseJobs(): void
+    {
+        CacheGeneratorHelper::releaseGeneratorJobs();
+        DeployerHelper::releaseDeployerJobs();
+        CachePurgerHelper::releasePurgerJobs();
     }
 
     /**

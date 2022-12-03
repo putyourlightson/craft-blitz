@@ -5,7 +5,9 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use Craft;
 use craft\base\SavableComponent;
+use craft\db\Query;
 use craft\helpers\Component;
 use craft\helpers\Queue;
 use putyourlightson\blitz\Blitz;
@@ -48,8 +50,6 @@ class BaseDriverHelper
 
     /**
      * Adds a driver job to the queue.
-     *
-     * @param SiteUriModel[] $siteUris
      */
     public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $priority = null): void
     {
@@ -69,5 +69,25 @@ class BaseDriverHelper
             'description' => $description,
         ]);
         Queue::push($job, $priority);
+    }
+
+    /**
+     * Releases driver jobs from the queue.
+     */
+    public static function releaseDriverJobs(string $driverId): void
+    {
+        /** @var \craft\queue\Queue $queue */
+        $queue = Craft::$app->getQueue();
+
+        $jobIds = (new Query())
+            ->select('id')
+            ->from($queue->tableName)
+            ->where(['like', 'job', '"putyourlightson\blitz\jobs\DriverJob"'])
+            ->andWhere(['like', 'job', '"' . $driverId . '"'])
+            ->column();
+
+        foreach ($jobIds as $jobId) {
+            $queue->release($jobId);
+        }
     }
 }

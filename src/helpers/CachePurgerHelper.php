@@ -17,6 +17,11 @@ use yii\base\Event;
 class CachePurgerHelper extends BaseDriverHelper
 {
     /**
+     * const string
+     */
+    public const DRIVER_ID = 'cachePurger';
+
+    /**
      * @event RegisterComponentTypesEvent
      */
     public const EVENT_REGISTER_PURGER_TYPES = 'registerPurgerTypes';
@@ -65,6 +70,14 @@ class CachePurgerHelper extends BaseDriverHelper
     {
         $description = Craft::t('blitz', 'Purging Blitz cache');
 
-        self::addDriverJob($siteUris, 'cachePurger', $driverMethod, $description, $priority);
+        self::addDriverJob($siteUris, self::DRIVER_ID, $driverMethod, $description, $priority);
+    }
+
+    /**
+     * Releases purger jobs from the queue.
+     */
+    public static function releasePurgerJobs(): void
+    {
+        self::releaseDriverJobs(self::DRIVER_ID);
     }
 }
