@@ -103,7 +103,7 @@ class FileStorageTest extends Unit
             $this->cacheStorage->save('test', $siteUri);
         }
 
-        $this->assertEquals($total, $this->cacheStorage->getCachedFileCount($path));
+        $this->assertEquals($total, $this->cacheStorage->getCachedPageCount($path));
     }
 
     public function testGetFilePathsWithQueryStrings()

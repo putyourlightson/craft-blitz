@@ -3,7 +3,7 @@
 {% do view.registerAssetBundle("putyourlightson\\blitz\\assets\\BlitzAsset") %}
 
 
-<h1>{{ "Cached Pages"|t('blitz') }}</h1>
+<h1>{{ "Cached Files"|t('blitz') }}</h1>
 
 
 {% set cols = {
@@ -16,9 +16,13 @@
         heading: "Cache Folder Path"|t('blitz'),
         class: 'code',
     },
-    cachedPages: {
+    pages: {
         type: 'html',
-        heading: "Cached Pages"|t('blitz'),
+        heading: "Pages"|t('blitz'),
+    },
+    includes: {
+        type: 'html',
+        heading: "Includes"|t('blitz'),
     },
 } %}
 
@@ -27,7 +31,8 @@
     {% set rows = rows|merge([{
         heading: site.name,
         cacheFolderPath: site.path,
-        cachedPages: site.count,
+        pages: site.pageCount,
+        includes: site.includeCount,
     }]) %}
 {% endfor %}
 
