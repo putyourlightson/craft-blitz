@@ -14,14 +14,17 @@ class m221026_120000_add_ssiinclude_tables extends Migration
      */
     public function safeUp(): bool
     {
+        if ($this->db->tableExists(CacheRecord::tableName())) {
+            $this->alterColumn(CacheRecord::tableName(), 'uri', $this->string(1000)->notNull());
+        }
+
         if (!$this->db->tableExists(SsiIncludeRecord::tableName())) {
             $this->createTable(SsiIncludeRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'index' => $this->bigInteger()->notNull(),
-                'uri' => $this->text()->notNull(),
+                'uri' => $this->string(1000)->notNull(),
             ]);
 
-            $this->createIndex(null, SsiIncludeRecord::tableName(), 'index');
+            $this->createIndex(null, SsiIncludeRecord::tableName(), 'uri');
         }
 
         if (!$this->db->tableExists(SsiIncludeCacheRecord::tableName())) {

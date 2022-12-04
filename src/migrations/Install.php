@@ -74,7 +74,7 @@ class Install extends Migration
             $this->createTable(CacheRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string()->notNull(),
+                'uri' => $this->string(1000)->notNull(),
                 'paginate' => $this->integer(),
                 'expiryDate' => $this->dateTime(),
             ]);
@@ -144,8 +144,7 @@ class Install extends Migration
         if (!$this->db->tableExists(SsiIncludeRecord::tableName())) {
             $this->createTable(SsiIncludeRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'index' => $this->bigInteger()->notNull(),
-                'uri' => $this->text()->notNull(),
+                'uri' => $this->string(1000)->notNull(),
             ]);
         }
 
