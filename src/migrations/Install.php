@@ -19,6 +19,7 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use putyourlightson\blitz\records\SsiIncludeRecord;
+use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitzhints\migrations\Install as HintsInstall;
 
 class Install extends Migration
@@ -70,11 +71,13 @@ class Install extends Migration
      */
     protected function createTables(): bool
     {
+        $maxUriLength = CacheRequestService::MAX_URI_LENGTH;
+
         if (!$this->db->tableExists(CacheRecord::tableName())) {
             $this->createTable(CacheRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string(1000)->notNull(),
+                'uri' => $this->string($maxUriLength)->notNull(),
                 'paginate' => $this->integer(),
                 'expiryDate' => $this->dateTime(),
             ]);
@@ -144,7 +147,7 @@ class Install extends Migration
         if (!$this->db->tableExists(SsiIncludeRecord::tableName())) {
             $this->createTable(SsiIncludeRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'uri' => $this->string(1000)->notNull(),
+                'uri' => $this->string($maxUriLength)->notNull(),
             ]);
         }
 

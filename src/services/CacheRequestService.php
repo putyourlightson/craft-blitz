@@ -54,7 +54,7 @@ class CacheRequestService extends Component
     /**
      * @const int
      */
-    public const MAX_URI_LENGTH = 255;
+    public const MAX_URI_LENGTH = 1000;
 
     /**
      * @var bool|null

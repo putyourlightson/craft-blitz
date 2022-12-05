@@ -6,6 +6,7 @@ use craft\db\Migration;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use putyourlightson\blitz\records\SsiIncludeRecord;
+use putyourlightson\blitz\services\CacheRequestService;
 
 class m221026_120000_add_ssiinclude_tables extends Migration
 {
@@ -14,14 +15,16 @@ class m221026_120000_add_ssiinclude_tables extends Migration
      */
     public function safeUp(): bool
     {
+        $maxUriLength = CacheRequestService::MAX_URI_LENGTH;
+
         if ($this->db->tableExists(CacheRecord::tableName())) {
-            $this->alterColumn(CacheRecord::tableName(), 'uri', $this->string(1000)->notNull());
+            $this->alterColumn(CacheRecord::tableName(), 'uri', $this->string($maxUriLength)->notNull());
         }
 
         if (!$this->db->tableExists(SsiIncludeRecord::tableName())) {
             $this->createTable(SsiIncludeRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'uri' => $this->string(1000)->notNull(),
+                'uri' => $this->string($maxUriLength)->notNull(),
             ]);
 
             $this->createIndex(null, SsiIncludeRecord::tableName(), 'uri');
