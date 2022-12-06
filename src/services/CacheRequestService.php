@@ -21,6 +21,7 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\variables\BlitzVariable;
+use yii\log\Logger;
 use yii\web\Response;
 
 /**
@@ -185,9 +186,14 @@ class CacheRequestService extends Component
 
         // Ignore URIs that are longer than the max URI length
         if (strlen($uri) > self::MAX_URI_LENGTH) {
-            Blitz::$plugin->debug('Page not cached because it exceeds the max URI length of {max} characters.', [
-                'max' => self::MAX_URI_LENGTH,
-            ], $url);
+            Blitz::$plugin->log(
+                'Page not cached because it exceeds the max URI length of {max} characters. [{uri}]',
+                [
+                    'max' => CacheRequestService::MAX_URI_LENGTH,
+                    'uri' => $uri,
+                ],
+                Logger::LEVEL_WARNING,
+            );
 
             return false;
         }
