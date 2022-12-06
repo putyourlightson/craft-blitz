@@ -391,6 +391,11 @@ class SettingsModel extends Model
     public string $injectScriptEvent = 'DOMContentLoaded';
 
     /**
+     * @var int Tha maximum length of URIs that may be cached. Increasing this value requires manually updating the limit in the `uri` column of the `blitz_caches` and `blitz_ssiincludes` database tables as well.
+     */
+    public int $maxUriLength = 1000;
+
+    /**
      * @inheritdoc
      */
     public function attributeLabels(): array

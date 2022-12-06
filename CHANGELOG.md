@@ -9,6 +9,7 @@
 - Added the `craft.blitz.dynamicInclude()` template variable, that includes a template via an AJAX request. The `dynamicInclude()` method always returns a freshly rendered template.
 - Added the `craft.blitz.fetch()` template variable, that fetches a URI via an AJAX request. Whether the URI response is cached or not is determined by the URI patterns in the plugin settings.
 - Added the `blitz/templates/include` and `blitz/templates/dynamic-include` controller actions.
+- Added the `maxUriLength` config setting.
 
 ### Changed
 - Improved the detection of when elements should be refreshed based on changes.

@@ -3,10 +3,10 @@
 namespace putyourlightson\blitz\migrations;
 
 use craft\db\Migration;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use putyourlightson\blitz\records\SsiIncludeRecord;
-use putyourlightson\blitz\services\CacheRequestService;
 
 class m221026_120000_add_ssiinclude_tables extends Migration
 {
@@ -15,7 +15,7 @@ class m221026_120000_add_ssiinclude_tables extends Migration
      */
     public function safeUp(): bool
     {
-        $maxUriLength = CacheRequestService::MAX_URI_LENGTH;
+        $maxUriLength = Blitz::$plugin->settings->maxUriLength;
 
         if ($this->db->tableExists(CacheRecord::tableName())) {
             $this->alterColumn(CacheRecord::tableName(), 'uri', $this->string($maxUriLength)->notNull());

@@ -21,7 +21,6 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\variables\BlitzVariable;
-use yii\log\Logger;
 use yii\web\Response;
 
 /**
@@ -51,11 +50,6 @@ class CacheRequestService extends Component
      * @const string
      */
     public const INCLUDES_FOLDER = '_includes';
-
-    /**
-     * @const int
-     */
-    public const MAX_URI_LENGTH = 1000;
 
     /**
      * @var bool|null
@@ -157,6 +151,13 @@ class CacheRequestService extends Component
     {
         $uri = strtolower($siteUri->uri);
 
+        // Ignore URIs that are longer than the max URI length
+        $validUriLength = SiteUriHelper::validateUriLength($uri, 'Page not cached because it exceeds the max URI length of {max} characters. Consider shortening it by passing in fewer ');
+
+        if ($validUriLength === false) {
+            return false;
+        }
+
         if ($this->getIsInclude($uri)) {
             return true;
         }
@@ -180,20 +181,6 @@ class CacheRequestService extends Component
         // Ignore URIs that contain `index.php`
         if (str_contains($uri, 'index.php')) {
             Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $url);
-
-            return false;
-        }
-
-        // Ignore URIs that are longer than the max URI length
-        if (strlen($uri) > self::MAX_URI_LENGTH) {
-            Blitz::$plugin->log(
-                'Page not cached because it exceeds the max URI length of {max} characters. [{uri}]',
-                [
-                    'max' => CacheRequestService::MAX_URI_LENGTH,
-                    'uri' => $uri,
-                ],
-                Logger::LEVEL_WARNING,
-            );
 
             return false;
         }
@@ -237,7 +224,7 @@ class CacheRequestService extends Component
      *
      * @since 4.3.0
      */
-    public function getIsInclude(?string $uri = null): bool
+    public function getIsInclude(string $uri = null): bool
     {
         // Includes based on the URI takes preference
         if ($uri !== null) {
@@ -403,7 +390,9 @@ class CacheRequestService extends Component
         }
 
         // Save the content and prepare the response
-        if ($content = Blitz::$plugin->generateCache->save($response->content, $siteUri)) {
+        $content = Blitz::$plugin->generateCache->save($response->content, $siteUri);
+
+        if ($content) {
             $this->_prepareResponse($response, $content, $siteUri);
         }
     }

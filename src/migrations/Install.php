@@ -9,6 +9,7 @@ use Craft;
 use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
@@ -19,7 +20,6 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use putyourlightson\blitz\records\SsiIncludeRecord;
-use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitzhints\migrations\Install as HintsInstall;
 
 class Install extends Migration
@@ -71,7 +71,7 @@ class Install extends Migration
      */
     protected function createTables(): bool
     {
-        $maxUriLength = CacheRequestService::MAX_URI_LENGTH;
+        $maxUriLength = Blitz::$plugin->settings->maxUriLength;
 
         if (!$this->db->tableExists(CacheRecord::tableName())) {
             $this->createTable(CacheRecord::tableName(), [

@@ -200,16 +200,9 @@ class GenerateCacheService extends Component
     public function addSsiInclude(string $uri): void
     {
         // Ensure URI is not longer than the max URI length
-        if (strlen($uri) > CacheRequestService::MAX_URI_LENGTH) {
-            Blitz::$plugin->log(
-                'SSI include not saved because it exceeds the max URI length of {max} characters. [{uri}]',
-                [
-                    'max' => CacheRequestService::MAX_URI_LENGTH,
-                    'uri' => $uri,
-                ],
-                Logger::LEVEL_WARNING,
-            );
+        $validUriLength = SiteUriHelper::validateUriLength($uri);
 
+        if ($validUriLength === false) {
             return;
         }
 
