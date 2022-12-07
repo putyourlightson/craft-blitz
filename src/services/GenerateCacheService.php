@@ -199,6 +199,11 @@ class GenerateCacheService extends Component
      */
     public function addSsiInclude(string $uri): void
     {
+        // Don't proceed if element query caching is disabled
+        if (Blitz::$plugin->settings->cachingEnabled === false) {
+            return;
+        }
+
         // Ensure URI is not longer than the max URI length
         $validUriLength = SiteUriHelper::validateUriLength($uri);
 
