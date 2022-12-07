@@ -23,6 +23,16 @@ use yii\web\Response;
 class SettingsController extends Controller
 {
     /**
+     * @inerhitdoc
+     */
+    public function beforeAction($action): bool
+    {
+        $this->requireAdmin();
+
+        return parent::beforeAction($action);
+    }
+
+    /**
      * Edit the plugin settings.
      */
     public function actionEdit(): ?Response
