@@ -29,6 +29,7 @@ use putyourlightson\blitz\variables\BlitzVariable;
  * blitzRewrite(false);
  * ```
  *
+ * @since 4.3.0
  * @param bool $withQueryString Whether the query string should be included.
  * @param string|null $cacheFolderPath The cache folder path, if different to the default.
  */
@@ -38,9 +39,8 @@ function blitzRewrite(bool $withQueryString = true, string $cacheFolderPath = nu
         return;
     }
 
-    /** @var GeneralConfig $generalConfig */
-    $generalConfig = require CRAFT_BASE_PATH . '/config/general.php';
-    $tokenParam = $generalConfig->tokenParam ?? 'token';
+    $config = require CRAFT_BASE_PATH . '/config/general.php';
+    $tokenParam = $config instanceof GeneralConfig ? $config->tokenParam : ($config['tokenParam'] ?? 'token');
     if (!empty($_GET[$tokenParam])) {
         return;
     }
