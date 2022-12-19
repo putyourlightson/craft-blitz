@@ -3,6 +3,10 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
+use craft\config\GeneralConfig;
+use putyourlightson\blitz\services\CacheRequestService;
+use putyourlightson\blitz\variables\BlitzVariable;
+
 /**
  * Blitz rewrite.php
  *
@@ -10,53 +14,64 @@
  * It is useful only in situations where a server rewrite is not possible.
  *
  * Use it by requiring the file and then calling the method, inside the
- * `web/index.php` file, directly after the `bootstrap.php` is required.
+ * `web/index.php` file, directly after `bootstrap.php` is required.
  *
  * ```php
  * require CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/rewrite.php';
  * blitzRewrite();
  * ```
  *
- * @param array{
- *              withQueryString: bool,
- *              cacheFolderPath: string,
- *              tokenParam: string,
- *              actionParam: string,
- *          } $config An array of optional configuration options.
+ * If the `Query String Caching` setting is set to `Cache URLs with query strings
+ * as the same page` then pass in `false` as the first parameter.
+ *
+ * ```php
+ * require CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/rewrite.php';
+ * blitzRewrite(false);
+ * ```
+ *
+ * @param bool $withQueryString Whether the query string should be included.
+ * @param string|null $cacheFolderPath The cache folder path, if different to the default.
  */
-function blitzRewrite(array $config): void
+function blitzRewrite(bool $withQueryString = true, string $cacheFolderPath = null): void
 {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
         return;
     }
 
-    $tokenParam = $config['tokenParam'] ?? 'token';
+    /** @var GeneralConfig $generalConfig */
+    $generalConfig = require CRAFT_BASE_PATH . '/config/general.php';
+    $tokenParam = $generalConfig->tokenParam ?? 'token';
     if (!empty($_GET[$tokenParam])) {
-        return;
-    }
-
-    $actionParam = $config['actionParam'] ?? 'action';
-    if (!empty($_GET[$actionParam])) {
         return;
     }
 
     $host = str_replace(':', '', $_SERVER['HTTP_HOST']);
 
     $uri = $_SERVER['REQUEST_URI'];
-    $withQueryString = $config['withQueryString'] ?? true;
     if ($withQueryString) {
         $uri = str_replace('?', '/', $uri);
     }
     else {
-        $uri = explode('?', $uri)[0];
+        $uri = strtok($uri, '?');
     }
 
-    $cacheFolderPath = $config['cacheFolderPath'] ?? CRAFT_BASE_PATH . '/web/cache/blitz';
-    $path = $cacheFolderPath . '/' . $host . $uri . '/index.html';
-    $path = str_replace('//', '/', $path);
-    $path = str_replace('..', '', $path);
+    /**
+     * Modify the URI for include action requests.
+     * @see CacheRequestService::getRequestedCacheableSiteUri()
+     */
+    $action = $_GET['action'] ?? null;
+    if ($action === BlitzVariable::INCLUDE_ACTION) {
+        $uri = CacheRequestService::INCLUDES_FOLDER . '?' . http_build_query($_GET);
+    }
+    elseif ($action === BlitzVariable::DYNAMIC_INCLUDE_ACTION) {
+        $uri = http_build_query($_GET);
+    }
 
-    if (!file_exists($path)) {
+    $cacheFolderPath = $cacheFolderPath ?? CRAFT_BASE_PATH . '/web/cache/blitz';
+    $path = $cacheFolderPath . '/' . $host . $uri . '/index.html';
+    $path = str_replace(['//', '..'], ['/', ''], $path);
+
+    if (!is_file($path)) {
         return;
     }
 
