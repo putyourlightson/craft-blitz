@@ -45,8 +45,7 @@ class CacheController extends Controller
         // Require permission if posted from utility
         if ($request->getIsPost() && $request->getParam('utility')) {
             $this->requirePermission('blitz:' . $action->id);
-        }
-        else {
+        } else {
             // Verify API key
             $key = $request->getParam('key');
             $apiKey = App::parseEnv(Blitz::$plugin->settings->apiKey);
@@ -247,8 +246,7 @@ class CacheController extends Controller
 
         if ($success) {
             Craft::$app->getSession()->setNotice(Craft::t('blitz', $message));
-        }
-        else {
+        } else {
             Craft::$app->getSession()->setError(Craft::t('blitz', $message));
         }
 

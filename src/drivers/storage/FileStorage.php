@@ -111,8 +111,7 @@ class FileStorage extends BaseCacheStorage
                     FileHelper::writeToFile($filePath . '.br', brotli_compress($value));
                 }
             }
-        }
-        catch (ErrorException|InvalidArgumentException $exception) {
+        } catch (ErrorException|InvalidArgumentException $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }
@@ -167,8 +166,7 @@ class FileStorage extends BaseCacheStorage
 
         try {
             FileHelper::removeDirectory($this->_cacheFolderPath);
-        }
-        catch (ErrorException $exception) {
+        } catch (ErrorException $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
 

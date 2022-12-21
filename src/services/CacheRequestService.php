@@ -256,8 +256,7 @@ class CacheRequestService extends Component
 
         if ($token == null) {
             $this->_isGeneratorRequest = false;
-        }
-        else {
+        } else {
             // Don't use Tokens::getTokenRoute, as that can result in the token being deleted.
             // https://github.com/putyourlightson/craft-blitz/issues/448
             $route = (new Query())
@@ -524,8 +523,7 @@ class CacheRequestService extends Component
         if ($generalConfig->sendPoweredByHeader) {
             $original = $headers->get('X-Powered-By');
             $headers->set('X-Powered-By', $original . ($original ? ',' : '') . Craft::$app->name);
-        }
-        else {
+        } else {
             // In case PHP is already setting one
             header_remove('X-Powered-By');
         }

@@ -50,8 +50,7 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
 
         if ($queue) {
             CachePurgerHelper::addPurgerJob($siteUris, 'purgeUrisWithProgress');
-        }
-        else {
+        } else {
             $this->purgeUrisWithProgress($siteUris, $setProgressHandler);
         }
 

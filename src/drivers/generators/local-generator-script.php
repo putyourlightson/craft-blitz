@@ -100,8 +100,7 @@ return function(Channel $channel): Generator {
 
     try {
         $success = $app->run() == 0;
-    }
-    catch (Throwable $exception) {
+    } catch (Throwable $exception) {
         Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         $success = 1;
     }

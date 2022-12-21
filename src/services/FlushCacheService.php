@@ -161,16 +161,14 @@ class FlushCacheService extends Component
 
         if ($dbDriver == 'mysql') {
             $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT = 1';
-        }
-        elseif ($dbDriver == 'postgres') {
+        } elseif ($dbDriver == 'postgres') {
             $sql = 'ALTER SEQUENCE ' . $table . '_id_seq RESTART WITH 1';
         }
 
         if ($sql) {
             try {
                 $db->createCommand($sql)->execute();
-            }
-            catch (Exception $exception) {
+            } catch (Exception $exception) {
                 Blitz::$plugin->log('Failed to reset auto increment: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
             }
         }

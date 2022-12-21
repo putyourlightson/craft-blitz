@@ -48,8 +48,7 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
 
         if ($queue) {
             DeployerHelper::addDeployerJob($siteUris, 'deployUrisWithProgress');
-        }
-        else {
+        } else {
             $this->deployUrisWithProgress($siteUris, $setProgressHandler);
         }
 

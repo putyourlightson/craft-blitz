@@ -99,8 +99,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
 
         if ($queue) {
             CacheGeneratorHelper::addGeneratorJob($siteUris, 'generateUrisWithProgress');
-        }
-        else {
+        } else {
             $this->generateUrisWithProgress($siteUris, $setProgressHandler);
         }
 
@@ -195,8 +194,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
             // Only add if a cacheable site URI
             if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
                 $urls[] = $siteUri->getUrl($params);
-            }
-            else {
+            } else {
                 $nonCacheableSiteUris[] = $siteUri;
             }
         }

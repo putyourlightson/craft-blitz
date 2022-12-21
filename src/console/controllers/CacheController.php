@@ -338,8 +338,7 @@ class CacheController extends Controller
     {
         if ($siteUris !== null) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
-        }
-        else {
+        } else {
             Blitz::$plugin->clearCache->clearAll();
         }
 
@@ -350,8 +349,7 @@ class CacheController extends Controller
     {
         if ($siteUris !== null) {
             Blitz::$plugin->flushCache->flushUris($siteUris);
-        }
-        else {
+        } else {
             Blitz::$plugin->flushCache->flushAll();
         }
 
@@ -369,8 +367,7 @@ class CacheController extends Controller
         if ($this->queue) {
             if ($siteUris !== null) {
                 Blitz::$plugin->cachePurger->purgeUris($siteUris, [$this, 'setProgressHandler']);
-            }
-            else {
+            } else {
                 Blitz::$plugin->cachePurger->purgeAll([$this, 'setProgressHandler']);
             }
 
@@ -385,8 +382,7 @@ class CacheController extends Controller
             Console::startProgress(0, count($siteUris), '', 0.8);
             Blitz::$plugin->cachePurger->purgeUris($siteUris, [$this, 'setProgressHandler'], false);
             Console::endProgress();
-        }
-        else {
+        } else {
             Blitz::$plugin->cachePurger->purgeAll([$this, 'setProgressHandler'], false);
         }
 

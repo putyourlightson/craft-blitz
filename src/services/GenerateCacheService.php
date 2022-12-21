@@ -257,8 +257,7 @@ class GenerateCacheService extends Component
                 $queryId = $db->getLastInsertID();
 
                 $this->saveElementQuerySources($elementQuery, $queryId);
-            }
-            catch (Exception $exception) {
+            } catch (Exception $exception) {
                 Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
             }
         }

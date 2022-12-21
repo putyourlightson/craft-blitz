@@ -50,8 +50,7 @@ function blitzRewrite(bool $withQueryString = true, string $cacheFolderPath = nu
     $uri = $_SERVER['REQUEST_URI'];
     if ($withQueryString) {
         $uri = str_replace('?', '/', $uri);
-    }
-    else {
+    } else {
         $uri = strtok($uri, '?');
     }
 
@@ -62,8 +61,7 @@ function blitzRewrite(bool $withQueryString = true, string $cacheFolderPath = nu
     $action = $_GET['action'] ?? null;
     if ($action === BlitzVariable::INCLUDE_ACTION) {
         $uri = CacheRequestService::INCLUDES_FOLDER . '?' . http_build_query($_GET);
-    }
-    elseif ($action === BlitzVariable::DYNAMIC_INCLUDE_ACTION) {
+    } elseif ($action === BlitzVariable::DYNAMIC_INCLUDE_ACTION) {
         $uri = http_build_query($_GET);
     }
 

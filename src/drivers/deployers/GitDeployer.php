@@ -192,8 +192,7 @@ class GitDeployer extends BaseDeployer
                 $git = $this->_getGitWorkingCopy($repository['repositoryPath'], $repository['remote']);
 
                 $git->fetch();
-            }
-            catch (GitException $exception) {
+            } catch (GitException $exception) {
                 $this->addError('gitRepositories',
                     Craft::t('blitz',
                         'Error connecting to repository: {error}',
@@ -379,8 +378,7 @@ class GitDeployer extends BaseDeployer
 
         try {
             FileHelper::writeToFile($filePath, $value);
-        }
-        catch (ErrorException|InvalidArgumentException $exception) {
+        } catch (ErrorException|InvalidArgumentException $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }
@@ -424,8 +422,7 @@ class GitDeployer extends BaseDeployer
             }
 
             $git->push();
-        }
-        catch (GitException $exception) {
+        } catch (GitException $exception) {
             Blitz::$plugin->log('Remote deploy failed: {error}', [
                 'error' => $exception->getMessage(),
             ], Logger::LEVEL_ERROR);
