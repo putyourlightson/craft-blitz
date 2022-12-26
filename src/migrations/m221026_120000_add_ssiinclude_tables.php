@@ -27,7 +27,7 @@ class m221026_120000_add_ssiinclude_tables extends Migration
                 'uri' => $this->string($maxUriLength)->notNull(),
             ]);
 
-            $this->createIndex(null, SsiIncludeRecord::tableName(), 'uri');
+            $this->createIndex(null, SsiIncludeRecord::tableName(), 'uri', true);
         }
 
         if (!$this->db->tableExists(SsiIncludeCacheRecord::tableName())) {
