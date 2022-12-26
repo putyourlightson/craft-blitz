@@ -12,12 +12,12 @@ use craft\events\CancelableEvent;
 use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
+use Exception;
+use GitElephant\Command\MainCommand;
+use GitElephant\Repository;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use Symfony\Component\Process\Process;
-use Symplify\GitWrapper\Exception\GitException;
-use Symplify\GitWrapper\GitWorkingCopy;
-use Symplify\GitWrapper\GitWrapper;
 use yii\base\ErrorException;
 use yii\base\Event;
 use yii\base\InvalidArgumentException;
@@ -189,10 +189,9 @@ class GitDeployer extends BaseDeployer
             }
 
             try {
-                $git = $this->_getGitWorkingCopy($repository['repositoryPath'], $repository['remote']);
-
-                $git->fetch();
-            } catch (GitException $exception) {
+                $gitRepo = $this->_getGitRepository($repository['repositoryPath'], $repository['remote']);
+                $gitRepo->fetch();
+            } catch (Exception $exception) {
                 $this->addError('gitRepositories',
                     Craft::t('blitz',
                         'Error connecting to repository: {error}',
@@ -317,40 +316,19 @@ class GitDeployer extends BaseDeployer
     }
 
     /**
-     * Returns a git working copy.
+     * Returns a git repository.
      */
-    private function _getGitWorkingCopy(string $repositoryPath, string $remote): GitWorkingCopy
+    private function _getGitRepository(string $repositoryPath, string $remote): Repository
     {
         $gitCommand = Blitz::$plugin->settings->commands['git'] ?? null;
-
-        if ($gitCommand === null) {
-            // Find the git binary (important because `ExecutableFinder` doesn't always find it!)
-            $commands = [
-                ['type', '-p', 'git'],
-                ['which', 'git'],
-            ];
-
-            foreach ($commands as $command) {
-                $process = new Process($command);
-                $process->run();
-                $gitCommand = trim($process->getOutput()) ?: null;
-
-                if ($gitCommand !== null) {
-                    break;
-                }
-            }
-        }
-
-        $gitWrapper = new GitWrapper($gitCommand);
-
-        // Get working copy
-        $git = $gitWrapper->workingCopy($repositoryPath);
+        $gitRepo = new Repository($repositoryPath, $gitCommand);
 
         // Set user in config
-        $git->config('user.name', $this->name);
-        $git->config('user.email', $this->email);
+        $gitRepo->addGlobalConfig('user.name', $this->name);
+        $gitRepo->addGlobalConfig('user.email', $this->email);
 
-        $remoteUrl = $git->getRemote($remote)['push'];
+        $remote = $gitRepo->getRemote($remote);
+        $remoteUrl = $remote->getPushURL();
 
         // Break the URL into parts and reconstruct with personal access token
         $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https') . '://'
@@ -358,9 +336,9 @@ class GitDeployer extends BaseDeployer
             . parse_url($remoteUrl, PHP_URL_HOST)
             . parse_url($remoteUrl, PHP_URL_PATH);
 
-        $git->remote('set-url', $remote, $remoteUrl);
+        $remote->setPushURL($remoteUrl);
 
-        return $git;
+        return $gitRepo;
     }
 
     /**
@@ -404,25 +382,25 @@ class GitDeployer extends BaseDeployer
         }
 
         try {
-            $git = $this->_getGitWorkingCopy($repository['repositoryPath'], $repository['remote']);
+            $gitRepo = $this->_getGitRepository($repository['repositoryPath'], $repository['remote']);
 
             // Pull down any remote commits
-            $git->pull();
+            $gitRepo->pull();
 
             // Add all files to branch and check it out
-            $git->add('*');
-            $git->checkout($repository['branch']);
+            $gitRepo->stage();
+            $gitRepo->checkout($repository['branch']);
 
-            // Check for changes first to avoid an exception being thrown
-            if ($git->hasChanges()) {
+            // Check for changes to avoid an exception being thrown
+            if ($gitRepo->getStatus()->all()->isEmpty() === false) {
                 // Parse twig tags in the commit message
                 $commitMessage = Craft::$app->getView()->renderString($this->commitMessage);
 
-                $git->commit(addslashes($commitMessage));
+                $gitRepo->commit(addslashes($commitMessage));
             }
 
-            $git->push();
-        } catch (GitException $exception) {
+            $gitRepo->push();
+        } catch (Exception $exception) {
             Blitz::$plugin->log('Remote deploy failed: {error}', [
                 'error' => $exception->getMessage(),
             ], Logger::LEVEL_ERROR);
