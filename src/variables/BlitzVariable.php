@@ -33,23 +33,23 @@ class BlitzVariable
     private int $_injected = 0;
 
     /**
-     * Returns a (cached) included rendered template.
+     * Returns the markup to include a static rendered template.
      *
      * @since 4.3.0
      */
-    public function include(string $template, array $params = [], $useAjax = false): Markup
+    public function include(string $template, array $params = []): Markup
     {
-        return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::INCLUDE_ACTION, $params, $useAjax);
+        return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::INCLUDE_ACTION, $params);
     }
 
     /**
-     * Returns a dynamically (rendered) included rendered template.
+     * Returns the markup to include a dynamically rendered template.
      *
      * @since 4.3.0
      */
-    public function dynamicInclude(string $template, array $params = [], $useAjax = true): Markup
+    public function dynamicInclude(string $template, array $params = []): Markup
     {
-        return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params, $useAjax);
+        return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params);
     }
 
     /**
@@ -71,7 +71,7 @@ class BlitzVariable
     {
         Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.include()` or `craft.blitz.dynamicInclude()` instead.');
 
-        return $this->_includeTemplate($template, '', 'blitz/templates/get', $params, true);
+        return $this->_includeTemplate($template, '', 'blitz/templates/get', $params);
     }
 
     /**
@@ -151,13 +151,13 @@ class BlitzVariable
     /**
      * Returns the code to inject the output of a template.
      */
-    private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params = [], bool $useAjax = false): Markup
+    private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params = []): Markup
     {
         if (!Craft::$app->getView()->resolveTemplate($template)) {
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
-        // Create a URI relative to the root domain, to account for subfolders
+        // Create a URI relative to the root domain, to account for sub-folders
         $uri = parse_url(UrlHelper::siteUrl($uriPrefix), PHP_URL_PATH);
 
         $params = [
@@ -167,7 +167,8 @@ class BlitzVariable
             'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
         ];
 
-        if ($useAjax === false) {
+        // Use SSI or ESI only if an include action
+        if ($action === self::INCLUDE_ACTION) {
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->_getSsiTag($uri, $params);
             }
