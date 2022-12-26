@@ -176,7 +176,7 @@ class Install extends Migration
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
-        $this->createIndex(null, SsiIncludeRecord::tableName(), 'index');
+        $this->createIndex(null, SsiIncludeRecord::tableName(), 'uri');
     }
 
     /**
