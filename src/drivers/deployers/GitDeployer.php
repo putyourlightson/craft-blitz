@@ -384,8 +384,8 @@ class GitDeployer extends BaseDeployer
         try {
             $gitRepo = $this->_getGitRepository($repository['repositoryPath'], $repository['remote']);
 
-            // Pull down any remote commits
-            $gitRepo->pull();
+            // Pull down any remote commits without rebasing
+            $gitRepo->pull(null, null, false);
 
             // Add all files to branch and check it out
             $gitRepo->stage();
