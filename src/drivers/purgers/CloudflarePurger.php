@@ -36,7 +36,7 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * @var string The API authentication method.
      */
-    public string $authenticationMethod = 'apiKey';
+    public string $authenticationMethod = 'apiToken';
 
     /**
      * @var string|null The API token.

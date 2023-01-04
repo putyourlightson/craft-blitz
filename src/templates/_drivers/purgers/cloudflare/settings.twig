@@ -57,7 +57,7 @@
 <div id="apiToken" class="hidden">
     {{ forms.autosuggestField({
         label: "API Token"|t('blitz'),
-        instructions: "The API token for your Cloudflare account (API tokens can be created [here]({url}))."|t('blitz', {url: 'https://dash.cloudflare.com/profile/api-tokens'}),
+        instructions: "The API token for your Cloudflare account (API tokens can be created [here]({url})). The token must have the permission `Cache Purge → Purge` for at least the zone(s) above."|t('blitz', {url: 'https://dash.cloudflare.com/profile/api-tokens'}),
         suggestEnvVars: true,
         name: 'apiToken',
         value: purger.apiToken,
