@@ -35,4 +35,9 @@ interface CacheStorageInterface
      * Returns the utility HTML.
      */
     public function getUtilityHtml(): string;
+
+    /**
+     * Returns the widget HTML.
+     */
+    public function getWidgetHtml(): string;
 }

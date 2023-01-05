@@ -180,36 +180,18 @@ class FileStorage extends BaseCacheStorage
      */
     public function getUtilityHtml(): string
     {
-        $sites = [];
-
-        $allSites = Craft::$app->getSites()->getAllSites();
-
-        foreach ($allSites as $site) {
-            $sitePath = $this->getSitePath($site->id);
-
-            $sites[$site->id] = [
-                'name' => $site->name,
-                'path' => $sitePath,
-                'pageCount' => $this->getCachedPageCount($sitePath),
-                'includeCount' => $this->getCachedIncludeCount($sitePath),
-            ];
-        }
-
-        foreach ($sites as $siteId => &$site) {
-            // Check if other site page counts should be reduced from this site
-            foreach ($sites as $otherSiteId => $otherSite) {
-                if ($otherSiteId == $siteId) {
-                    continue;
-                }
-
-                if (str_starts_with($otherSite['path'], $site['path'] . '/')) {
-                    $site['pageCount'] -= is_dir($otherSite['path']) ? $otherSite['pageCount'] : 0;
-                }
-            }
-        }
-
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/utility', [
-            'sites' => $sites,
+            'sites' => $this->_getSitePageCount(),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getWidgetHtml(): string
+    {
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/widget', [
+            'sites' => $this->_getSitePageCount(),
         ]);
     }
 
@@ -343,6 +325,39 @@ class FileStorage extends BaseCacheStorage
         return [
             [['folderPath'], 'required'],
         ];
+    }
+
+    private function _getSitePageCount(): array
+    {
+        $sites = [];
+
+        $allSites = Craft::$app->getSites()->getAllSites();
+
+        foreach ($allSites as $site) {
+            $sitePath = $this->getSitePath($site->id);
+
+            $sites[$site->id] = [
+                'name' => $site->name,
+                'path' => $sitePath,
+                'pageCount' => $this->getCachedPageCount($sitePath),
+                'includeCount' => $this->getCachedIncludeCount($sitePath),
+            ];
+        }
+
+        foreach ($sites as $siteId => &$site) {
+            // Check if other site page counts should be reduced from this site
+            foreach ($sites as $otherSiteId => $otherSite) {
+                if ($otherSiteId == $siteId) {
+                    continue;
+                }
+
+                if (str_starts_with($otherSite['path'], $site['path'] . '/')) {
+                    $site['pageCount'] -= is_dir($otherSite['path']) ? $otherSite['pageCount'] : 0;
+                }
+            }
+        }
+
+        return $sites;
     }
 
     private function _getNormalizedFilePath(string $sitePath, string $uri): string

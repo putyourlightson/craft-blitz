@@ -39,4 +39,12 @@ abstract class BaseCacheStorage extends SavableComponent implements CacheStorage
     {
         return '';
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getWidgetHtml(): string
+    {
+        return '';
+    }
 }

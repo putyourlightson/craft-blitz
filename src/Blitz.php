@@ -20,6 +20,7 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\log\MonologTarget;
+use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\services\Plugins;
 use craft\services\Structures;
@@ -46,6 +47,7 @@ use putyourlightson\blitz\services\GenerateCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
+use putyourlightson\blitz\widgets\CacheWidget;
 use putyourlightson\blitzhints\BlitzHints;
 use yii\base\Controller;
 use yii\base\Event;
@@ -129,6 +131,7 @@ class Blitz extends Plugin
         if (Craft::$app->getRequest()->getIsCpRequest()) {
             $this->_registerCpUrlRules();
             $this->_registerUtilities();
+            $this->_registerWidgets();
             $this->_registerRedirectAfterInstall();
 
             if (Craft::$app->getEdition() === Craft::Pro) {
@@ -463,6 +466,18 @@ class Blitz extends Plugin
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = CacheUtility::class;
+            }
+        );
+    }
+
+    /**
+     * Registers widgets
+     */
+    private function _registerWidgets(): void
+    {
+        Event::on(Dashboard::class, Dashboard::EVENT_REGISTER_WIDGET_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = CacheWidget::class;
             }
         );
     }

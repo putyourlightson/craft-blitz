@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\utilities;
 
 use Craft;
 use craft\base\Utility;
+use putyourlightson\blitz\assets\BlitzAsset;
 use putyourlightson\blitz\Blitz;
 
 class CacheUtility extends Utility
@@ -46,6 +47,8 @@ class CacheUtility extends Utility
      */
     public static function contentHtml(): string
     {
+        Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
+
         return Craft::$app->getView()->renderTemplate('blitz/_utility', [
             'driverHtml' => Blitz::$plugin->cacheStorage->getUtilityHtml(),
             'actions' => self::getActions(),
@@ -62,7 +65,7 @@ class CacheUtility extends Utility
 
         $actions[] = [
             'id' => 'clear',
-            'label' => Craft::t('blitz', Craft::t('blitz', 'Clear Cache')),
+            'label' => Craft::t('blitz', 'Clear Cache'),
             'instructions' => Craft::t('blitz', 'Deletes all cached pages.'),
         ];
 
@@ -78,7 +81,7 @@ class CacheUtility extends Utility
             'instructions' => Craft::t('blitz', 'Generates all of the cacheable pages.'),
         ];
 
-        if ($showAll || !Blitz::$plugin->cachePurger->isDummy) {
+        if ($showAll || Blitz::$plugin->cachePurger->isDummy === false) {
             $actions[] = [
                 'id' => 'purge',
                 'label' => Craft::t('blitz', 'Purge Cache'),
@@ -86,7 +89,7 @@ class CacheUtility extends Utility
             ];
         }
 
-        if ($showAll || !Blitz::$plugin->deployer->isDummy) {
+        if ($showAll || Blitz::$plugin->deployer->isDummy === false) {
             $actions[] = [
                 'id' => 'deploy',
                 'label' => Craft::t('blitz', 'Deploy to Remote'),

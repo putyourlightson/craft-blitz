@@ -89,3 +89,39 @@ table.editable th.code {
     font-family: inherit;
     font-size: inherit !important;
 }
+
+.putyourlightson\\blitz\\widgets\\cachewidget .front .pane {
+    padding: 0;
+}
+
+.putyourlightson\\blitz\\widgets\\cachewidget h2 {
+    padding: 24px 24px 6px 24px;
+}
+
+.putyourlightson\\blitz\\widgets\\cachewidget .padded {
+    padding: 20px 24px;
+}
+
+.putyourlightson\\blitz\\widgets\\cachewidget .action {
+    cursor: pointer;
+    border-top: 1px solid #e3e5e8;
+}
+
+.putyourlightson\\blitz\\widgets\\cachewidget .action:hover {
+    background: #fafafa;
+}
+
+.putyourlightson\\blitz\\widgets\\cachewidget .action .form {
+    border-top: 1px dotted #e3e5e8;
+}
+
+.putyourlightson\\blitz\\widgets\\cachewidget .action .icon {
+    float: left;
+    width: 20px;
+    margin-right: 8px;
+    color: var(--ui-control-color);
+}
+
+.putyourlightson\\blitz\\widgets\\cachewidget .action:hover .icon {
+    color: inherit;
+}
