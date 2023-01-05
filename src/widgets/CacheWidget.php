@@ -41,6 +41,14 @@ class CacheWidget extends Widget
         return Craft::getAlias('@vendor/putyourlightson/craft-blitz/src/icon-mask.svg');
     }
 
+    /**
+     * @inerhitdoc
+     */
+    public static function maxColspan(): ?int
+    {
+        return 1;
+    }
+
     public static function getActions(): array
     {
         $actions = [];
