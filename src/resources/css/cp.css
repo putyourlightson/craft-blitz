@@ -119,13 +119,13 @@ table.editable th.code {
     padding: 20px 24px;
 }
 
-.putyourlightson\\blitz\\widgets\\cachewidget .action .icon {
+.putyourlightson\\blitz\\widgets\\cachewidget .action .heading .icon {
     float: left;
     width: 20px;
     margin-right: 8px;
     color: var(--ui-control-color);
 }
 
-.putyourlightson\\blitz\\widgets\\cachewidget .action:hover .icon {
+.putyourlightson\\blitz\\widgets\\cachewidget .action:hover .heading .icon {
     color: inherit;
 }
