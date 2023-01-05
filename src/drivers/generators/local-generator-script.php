@@ -19,7 +19,7 @@ use yii\log\Logger;
  * used to send data between the parent and child processes.
  * https://amphp.org/parallel/processes#child-process-or-thread
  *
- * @see putyourlightson\blitz\drivers\generators\LocalGenerator::generateUris()
+ * @see putyourlightson\blitz\drivers\generators\LocalGenerator::generateUrisWithProgress()
  */
 return function(Channel $channel): Generator {
     $config = yield $channel->receive();
