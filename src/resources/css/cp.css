@@ -99,11 +99,11 @@ table.editable th.code {
 }
 
 .putyourlightson\\blitz\\widgets\\cachewidget .action {
-    border-top: 1px solid #e3e5e8;
+    border-top: 1px solid var(--hairline-color);
 }
 
 .putyourlightson\\blitz\\widgets\\cachewidget .action:hover {
-    background: #fafafa;
+    background: var(--gray-050);;
 }
 
 .putyourlightson\\blitz\\widgets\\cachewidget .action .heading {
@@ -111,7 +111,7 @@ table.editable th.code {
 }
 
 .putyourlightson\\blitz\\widgets\\cachewidget .action .form {
-    border-top: 1px dotted #e3e5e8;
+    border-top: 1px dotted var(--hairline-color);
 }
 
 .putyourlightson\\blitz\\widgets\\cachewidget .action .heading,
