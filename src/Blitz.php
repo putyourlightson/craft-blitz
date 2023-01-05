@@ -475,6 +475,10 @@ class Blitz extends Plugin
      */
     private function _registerWidgets(): void
     {
+        if (empty(CacheWidget::getActions())) {
+            return;
+        }
+
         Event::on(Dashboard::class, Dashboard::EVENT_REGISTER_WIDGET_TYPES,
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = CacheWidget::class;

@@ -98,12 +98,7 @@ table.editable th.code {
     padding: 24px 24px 6px 24px;
 }
 
-.putyourlightson\\blitz\\widgets\\cachewidget .padded {
-    padding: 20px 24px;
-}
-
 .putyourlightson\\blitz\\widgets\\cachewidget .action {
-    cursor: pointer;
     border-top: 1px solid #e3e5e8;
 }
 
@@ -111,8 +106,17 @@ table.editable th.code {
     background: #fafafa;
 }
 
+.putyourlightson\\blitz\\widgets\\cachewidget .action .heading {
+    cursor: pointer;
+}
+
 .putyourlightson\\blitz\\widgets\\cachewidget .action .form {
     border-top: 1px dotted #e3e5e8;
+}
+
+.putyourlightson\\blitz\\widgets\\cachewidget .action .heading,
+.putyourlightson\\blitz\\widgets\\cachewidget .action .form {
+    padding: 20px 24px;
 }
 
 .putyourlightson\\blitz\\widgets\\cachewidget .action .icon {

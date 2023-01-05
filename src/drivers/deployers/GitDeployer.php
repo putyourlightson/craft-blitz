@@ -13,7 +13,6 @@ use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use Exception;
-use GitElephant\Command\MainCommand;
 use GitElephant\Repository;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;

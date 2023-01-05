@@ -2,6 +2,7 @@
 
 ## 4.3.0 - Unreleased
 ### Added
+- Added a new Blitz Cache widget with actions to refresh pages, sites or the entire cache.
 - Added the `ssiEnabled` config setting that enables Blitz to include templates using Server Side Includes (SSI), which must be enabled on the web server.
 - Added the `esiEnabled` config setting that enables Blitz to include templates using Edge Side Includes (ESI), which must be enabled on the web server or reverse proxy (CDN).
 - Added the `craft.blitz.include()` template variable, that includes a template using SSI if enabled, otherwise via an AJAX request. The `include()` method returns a cached result (if one exists).
