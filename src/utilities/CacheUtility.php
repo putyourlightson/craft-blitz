@@ -33,7 +33,7 @@ class CacheUtility extends Utility
      */
     public static function iconPath(): ?string
     {
-        $iconPath = Craft::getAlias('@vendor/putyourlightson/craft-blitz/src/icon-mask.svg');
+        $iconPath = Craft::getAlias('@putyourlightson/blitz/icon-mask.svg');
 
         if (!is_string($iconPath)) {
             return null;

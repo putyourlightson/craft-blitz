@@ -38,7 +38,7 @@ class CacheWidget extends Widget
      */
     public static function icon(): string
     {
-        return Craft::getAlias('@vendor/putyourlightson/craft-blitz/src/icon-mask.svg');
+        return Craft::getAlias('@putyourlightson/blitz/icon-mask.svg');
     }
 
     /**
