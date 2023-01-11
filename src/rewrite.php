@@ -17,6 +17,7 @@ use putyourlightson\blitz\variables\BlitzVariable;
  * `web/index.php` file, directly after `bootstrap.php` is required.
  *
  * ```php
+ * // Load Blitz rewrite
  * require CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/rewrite.php';
  * blitzRewrite();
  * ```
@@ -25,6 +26,7 @@ use putyourlightson\blitz\variables\BlitzVariable;
  * as the same page` then pass in `false` as the first parameter.
  *
  * ```php
+ * // Load Blitz rewrite
  * require CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/rewrite.php';
  * blitzRewrite(false);
  * ```
