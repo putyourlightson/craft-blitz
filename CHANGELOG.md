@@ -2,9 +2,9 @@
 
 ## 4.3.0 - Unreleased
 ### Added
-- Added a new Blitz Cache widget with actions to refresh pages, sites or the entire cache.
+- Added a Blitz Cache dashboard widget with actions to refresh specific pages, sites or the entire cache.
 - Added a `rewrite.php` file that can be used in situations where a server rewrite is not possible.
-- Added the `craft.blitz.include()` template variable, that includes a template using SSI if enabled, otherwise via an AJAX request. The `include()` method returns a cached result (if one exists).
+- Added the `craft.blitz.include()` template variable, that includes a template using SSI or ESI if enabled, otherwise via an AJAX request. The `include()` method returns a cached result (if one exists).
 - Added the `craft.blitz.dynamicInclude()` template variable, that includes a template via an AJAX request. The `dynamicInclude()` method always returns a freshly rendered template.
 - Added the `craft.blitz.fetch()` template variable, that fetches a URI via an AJAX request. Whether the URI response is cached or not is determined by the URI patterns in the plugin settings.
 - Added the `blitz/templates/include` and `blitz/templates/dynamic-include` controller actions.

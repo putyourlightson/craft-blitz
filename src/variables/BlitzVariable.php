@@ -57,7 +57,7 @@ class BlitzVariable
     }
 
     /**
-     * Returns a script to fetch the output of a URI.
+     * Returns the markup to fetch the output of a URI.
      *
      * @since 4.3.0
      */

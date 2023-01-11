@@ -21,14 +21,14 @@ use putyourlightson\blitz\variables\BlitzVariable;
  * require CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/rewrite.php';
  * ```
  *
- * You can configure the rewrite by defining one or more of the available constants.
- * For example, if the `Query String Caching` setting is set to `Cache URLs with query
- * strings as the same page`, then set `BLITZ_UNIQUE_QUERY_STRINGS` to `false`.
+ * You can configure the rewrite by defining one or more constants. For example,
+ * if the `Query String Caching` setting is set to `Cache URLs with query strings
+ * as the same page`, then set `BLITZ_INCLUDE_QUERY_STRING` to `false`.
  *
  * ```php
  * // Load Blitz rewrite
- * define('BLITZ_UNIQUE_QUERY_STRINGS', true);
- * define('BLITZ_CACHE_FOLDER_PATH', 'cache/blitz');
+ * define('BLITZ_INCLUDE_QUERY_STRING', false);
+ * define('BLITZ_CACHE_FOLDER_PATH', 'path/to/cache');
  * require CRAFT_VENDOR_PATH . '/putyourlightson/craft-blitz/src/rewrite.php';
  * ```
  *
@@ -59,8 +59,8 @@ $host = str_replace(':', '', $_SERVER['HTTP_HOST']);
 $uri = $_SERVER['REQUEST_URI'];
 
 /** @noinspection PhpTernaryExpressionCanBeReplacedWithConditionInspection */
-$withQueryString = defined('BLITZ_UNIQUE_QUERY_STRINGS') ? BLITZ_UNIQUE_QUERY_STRINGS : true;
-if ($withQueryString) {
+$includeQueryString = defined('BLITZ_INCLUDE_QUERY_STRING') ? BLITZ_INCLUDE_QUERY_STRING : true;
+if ($includeQueryString) {
     $uri = str_replace('?', '/', $uri);
 } else {
     $uri = strtok($uri, '?');
