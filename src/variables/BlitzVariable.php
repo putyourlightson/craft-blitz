@@ -37,9 +37,11 @@ class BlitzVariable
      *
      * @since 4.3.0
      */
-    public function include(string $template, array $params = []): Markup
+    public function include(string $template, array $params = [], array $config = []): Markup
     {
-        return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::INCLUDE_ACTION, $params);
+        $config = array_merge(['useAjax' => false], $config);
+
+        return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::INCLUDE_ACTION, $params, $config);
     }
 
     /**
@@ -47,9 +49,11 @@ class BlitzVariable
      *
      * @since 4.3.0
      */
-    public function dynamicInclude(string $template, array $params = []): Markup
+    public function dynamicInclude(string $template, array $params = [], array $config = []): Markup
     {
-        return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params);
+        $config = array_merge(['useAjax' => true], $config);
+
+        return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params, $config);
     }
 
     /**
@@ -150,8 +154,15 @@ class BlitzVariable
 
     /**
      * Returns the code to inject the output of a template.
+     *
+     * @param string $template
+     * @param string $uriPrefix
+     * @param string $action
+     * @param array $params
+     * @param array{useAjax: bool} $config
+     * @return Markup
      */
-    private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params = []): Markup
+    private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params = [], array $config = []): Markup
     {
         if (!Craft::$app->getView()->resolveTemplate($template)) {
             throw new NotFoundHttpException('Template not found: ' . $template);
@@ -167,8 +178,8 @@ class BlitzVariable
             'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
         ];
 
-        // Use SSI or ESI only if an include action
-        if ($action === self::INCLUDE_ACTION) {
+        $useAjax = $config['useAjax'] ?? false;
+        if ($useAjax === false) {
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->_getSsiTag($uri, $params);
             }
