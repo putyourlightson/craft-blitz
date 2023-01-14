@@ -82,6 +82,16 @@ class GenerateCacheService extends Component
     {
         parent::init();
 
+        $this->reset();
+    }
+
+    /**
+     * Resets the component, so it can be used multiple times in the same request.
+     */
+    public function reset()
+    {
+        $this->elementCaches = [];
+        $this->elementQueryCaches = [];
         $this->options = new CacheOptionsModel();
 
         // Set default attributes from the plugin settings

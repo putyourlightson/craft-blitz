@@ -261,7 +261,7 @@ class CacheRequestService extends Component
 
         // Append the served by comment if this is an HTML response and if allowed.
         if ($response->format == Response::FORMAT_HTML && SiteUriHelper::hasHtmlMimeType($siteUri)) {
-            $outputComments = Blitz::$plugin->settings->outputComments;
+            $outputComments = Blitz::$plugin->generateCache->options->outputComments;
 
             if ($outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED) {
                 $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';

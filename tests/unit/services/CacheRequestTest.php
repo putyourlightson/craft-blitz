@@ -228,18 +228,28 @@ class CacheRequestTest extends Unit
         Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
 
         Blitz::$plugin->settings->outputComments = false;
+        Blitz::$plugin->generateCache->reset();
         $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
         $this->assertStringNotContainsString('Served by Blitz on', $value);
 
         Blitz::$plugin->settings->outputComments = true;
+        Blitz::$plugin->generateCache->reset();
         $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
         $this->assertStringContainsString('Served by Blitz on', $value);
 
         Blitz::$plugin->settings->outputComments = SettingsModel::OUTPUT_COMMENTS_CACHED;
+        Blitz::$plugin->generateCache->reset();
         $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
         $this->assertStringNotContainsString('Served by Blitz on', $value);
 
         Blitz::$plugin->settings->outputComments = SettingsModel::OUTPUT_COMMENTS_SERVED;
+        Blitz::$plugin->generateCache->reset();
+        $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
+        $this->assertStringContainsString('Served by Blitz on', $value);
+
+        Blitz::$plugin->settings->outputComments = false;
+        Blitz::$plugin->generateCache->reset();
+        Blitz::$plugin->generateCache->options->outputComments(true);
         $value = Blitz::$plugin->cacheRequest->getResponse($this->siteUri)->content;
         $this->assertStringContainsString('Served by Blitz on', $value);
     }

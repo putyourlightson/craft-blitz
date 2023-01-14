@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 3.12.8 - 2023-01-13
+### Fixed
+- Fixed a bug in which the "Served by Blitz" comment was not respecting the page specific options in the first request ([#459](https://github.com/putyourlightson/craft-blitz/issues/459)).
+
 ## 3.12.7 - 2022-11-28
 ### Changed
 - Improved the performance of refresh job requests when cache generation is disabled ([#456](https://github.com/putyourlightson/craft-blitz/issues/456)).
