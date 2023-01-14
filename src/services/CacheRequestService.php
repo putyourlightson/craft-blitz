@@ -354,7 +354,7 @@ class CacheRequestService extends Component
         if ($this->getIsInclude() === false) {
             // Append the served by comment if this is a cacheable response and if an HTML mime type.
             if ($this->getIsCacheableResponse($response) && SiteUriHelper::hasHtmlMimeType($siteUri)) {
-                $outputComments = Blitz::$plugin->settings->outputComments;
+                $outputComments = Blitz::$plugin->generateCache->options->outputComments;
 
                 if ($outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED) {
                     $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';

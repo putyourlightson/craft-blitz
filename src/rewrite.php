@@ -42,8 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
 $config = require CRAFT_BASE_PATH . '/config/general.php';
 if ($config instanceof GeneralConfig) {
     $tokenParam = $config->tokenParam;
-}
-else {
+} else {
     $tokenParam = $config['tokenParam'] ?? $config[CRAFT_ENVIRONMENT]['tokenParam'] ?? $config['*']['tokenParam'] ?? 'token';
 }
 if (!empty($_GET[$tokenParam])) {

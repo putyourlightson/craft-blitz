@@ -20,6 +20,9 @@
 - Changed the default authentication method for the Cloudflare purger to “API token” and improved the field instruction text.
 - Replaced the abandoned `symplify/git-wrapper` package with `cypresslab/gitelephant`.
 
+### Fixed
+- Fixed a bug in which the "Served by Blitz" comment was not respecting the page specific options in the first request ([#459](https://github.com/putyourlightson/craft-blitz/issues/459)).
+
 ### Deprecated
 - Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.include()` or `craft.blitz.dynamicInclude()` instead.
 - Deprecated the `craft.blitz.getUri()` template variable. Use `craft.blitz.fetch()` instead.

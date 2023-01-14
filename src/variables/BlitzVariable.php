@@ -159,7 +159,7 @@ class BlitzVariable
      * @param string $uriPrefix
      * @param string $action
      * @param array $params
-     * @param array{useAjax: bool} $config
+     * @param array $config
      * @return Markup
      */
     private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params = [], array $config = []): Markup
