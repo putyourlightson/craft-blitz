@@ -74,12 +74,12 @@ class SettingsModel extends Model
     public bool $hintsEnabled = true;
 
     /**
-     * @var bool With this setting enabled, Blitz will include templates using Server Side Includes (SSI), which must be enabled on the server.
+     * @var bool With this setting enabled, Blitz will include templates using Server-Side Includes (SSI), which must be enabled on the server.
      */
     public bool $ssiEnabled = false;
 
     /**
-     * @var bool With this setting enabled, Blitz will include templates using Edge Side Includes (ESI), which must be enabled on the server.
+     * @var bool With this setting enabled, Blitz will include templates using Edge-Side Includes (ESI), which must be enabled on the server.
      */
     public bool $esiEnabled = false;
 
