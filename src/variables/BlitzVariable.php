@@ -39,7 +39,8 @@ class BlitzVariable
      */
     public function include(string $template, array $params = [], array $config = []): Markup
     {
-        $config = array_merge(['useAjax' => false], $config);
+        $defaultConfig = ['useAjax' => false];
+        $config = array_merge($defaultConfig, $config);
 
         return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::INCLUDE_ACTION, $params, $config);
     }
@@ -51,7 +52,8 @@ class BlitzVariable
      */
     public function dynamicInclude(string $template, array $params = [], array $config = []): Markup
     {
-        $config = array_merge(['useAjax' => true], $config);
+        $defaultConfig = ['useAjax' => true];
+        $config = array_merge($defaultConfig, $config);
 
         return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params, $config);
     }
