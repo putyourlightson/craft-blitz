@@ -20,7 +20,7 @@ class BlitzVariable
     /**
      * @const string
      */
-    public const INCLUDE_ACTION = 'blitz/templates/include';
+    public const STATIC_INCLUDE_ACTION = 'blitz/templates/static-include';
 
     /**
      * @const string
@@ -33,20 +33,20 @@ class BlitzVariable
     private int $_injected = 0;
 
     /**
-     * Returns the markup to include a static rendered template.
+     * Returns the markup to statically include a template.
      *
      * @since 4.3.0
      */
-    public function include(string $template, array $params = [], array $config = []): Markup
+    public function staticInclude(string $template, array $params = [], array $config = []): Markup
     {
         $defaultConfig = ['useAjax' => false];
         $config = array_merge($defaultConfig, $config);
 
-        return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::INCLUDE_ACTION, $params, $config);
+        return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::STATIC_INCLUDE_ACTION, $params, $config);
     }
 
     /**
-     * Returns the markup to include a dynamically rendered template.
+     * Returns the markup to dynamically include a template.
      *
      * @since 4.3.0
      */
@@ -71,7 +71,7 @@ class BlitzVariable
     /**
      * Returns a script to get the output of a template.
      *
-     * @deprecated in 4.3.0. Use [[include()]] or [[dynamicInclude()]] instead.
+     * @deprecated in 4.3.0. Use [[staticInclude()]] or [[dynamicInclude()]] instead.
      */
     public function getTemplate(string $template, array $params = []): Markup
     {
@@ -210,7 +210,7 @@ class BlitzVariable
         $uri = $this->_getUriWithParams($uri, $params);
 
         // Add an SSI include, so we can purge it whenever necessary
-        if (Blitz::$plugin->cacheRequest->getIsInclude($uri)) {
+        if (Blitz::$plugin->cacheRequest->getIsStaticInclude($uri)) {
             Blitz::$plugin->generateCache->addSsiInclude($uri);
         }
 

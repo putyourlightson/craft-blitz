@@ -9,6 +9,7 @@ use craft\base\SavableComponent;
 
 /**
  * @property-read string $utilityHtml
+ * @property-read string $widgetHtml
  */
 abstract class BaseCacheStorage extends SavableComponent implements CacheStorageInterface
 {

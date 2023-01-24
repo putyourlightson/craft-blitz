@@ -429,7 +429,7 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        if (!Blitz::$plugin->cacheRequest->getIsInclude()) {
+        if (!Blitz::$plugin->cacheRequest->getIsStaticInclude()) {
             $outputComments = $this->options->outputComments === true
                 || $this->options->outputComments === SettingsModel::OUTPUT_COMMENTS_CACHED;
 
