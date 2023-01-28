@@ -192,8 +192,7 @@ class BlitzVariable
             'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
         ];
 
-        $requestType = $config['requestType'] ?? null;
-        if ($requestType === self::INCLUDE_REQUEST_TYPE) {
+        if ($config->requestType === self::INCLUDE_REQUEST_TYPE) {
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->_getSsiTag($uri, $params);
             }
