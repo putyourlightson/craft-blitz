@@ -12,6 +12,7 @@ use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
@@ -33,12 +34,12 @@ class BlitzVariable
     /**
      * @const string
      */
-    public const INCLUDE_REQUEST_TYPE = 'include';
+    public const AJAX_REQUEST_TYPE = 'ajax';
 
     /**
      * @const string
      */
-    public const AJAX_REQUEST_TYPE = 'ajax';
+    public const INCLUDE_REQUEST_TYPE = 'include';
 
     /**
      * @var int
@@ -52,7 +53,9 @@ class BlitzVariable
      */
     public function staticInclude(string $template, array $params = [], array $options = []): Markup
     {
-        $config = new VariableConfigModel(['requestType' => self::INCLUDE_REQUEST_TYPE]);
+        $config = new VariableConfigModel([
+            'requestType' => self::INCLUDE_REQUEST_TYPE,
+        ]);
         $config->setAttributes($options);
 
         return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::STATIC_INCLUDE_ACTION, $params, $config);
@@ -65,7 +68,9 @@ class BlitzVariable
      */
     public function dynamicInclude(string $template, array $params = [], array $options = []): Markup
     {
-        $config = new VariableConfigModel(['requestType' => self::AJAX_REQUEST_TYPE]);
+        $config = new VariableConfigModel([
+            'requestType' => self::AJAX_REQUEST_TYPE,
+        ]);
         $config->setAttributes($options);
 
         return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params, $config);
@@ -196,8 +201,14 @@ class BlitzVariable
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->_getSsiTag($uri, $params);
             }
+
             if (Blitz::$plugin->settings->esiEnabled) {
                 return $this->_getEsiTag($uri, $params);
+            }
+
+            $content = $this->_getCachedInclude($uri, $params);
+            if ($content) {
+                return $content;
             }
         }
 
@@ -260,6 +271,22 @@ class BlitzVariable
     }
 
     /**
+     * Returns the content of a cached include.
+     */
+    private function _getCachedInclude(string $uri, array $params): ?Markup
+    {
+        $uri = $this->_getUriWithParams($uri, $params);
+        $siteUri = new SiteUriModel([
+            'siteId' => $params['siteId'],
+            'uri' => $uri,
+        ]);
+
+        $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
+
+        return $response ? Template::raw($response->content) : null;
+    }
+
+    /**
      * Returns a script to inject the output of a URI.
      */
     private function _getScript(string $uri, array $params, VariableConfigModel $config): Markup
@@ -298,7 +325,7 @@ class BlitzVariable
         $output = Html::tag($config->wrapperElement, $config->placeholder, [
             'class' => 'blitz-inject',
             'id' => 'blitz-inject-' . $id,
-            'data' => $data
+            'data' => $data,
         ]);
 
         return Template::raw($output);
