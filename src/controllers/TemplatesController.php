@@ -19,7 +19,9 @@ class TemplatesController extends Controller
     protected int|bool|array $allowAnonymous = true;
 
     /**
-     * Returns a rendered template using the static include action (necessary for detecting SSI requests).
+     * Returns a rendered template using the static include action.
+     * This is necessary for detecting SSI requests and will only be hit when
+     * no cached include exists.
      */
     public function actionStaticInclude(): Response
     {

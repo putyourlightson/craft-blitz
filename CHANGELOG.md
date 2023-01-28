@@ -4,14 +4,14 @@
 ### Added
 - Added a Blitz Cache dashboard widget with actions to refresh specific pages, sites or the entire cache.
 - Added a `rewrite.php` file that can be used in situations where a server rewrite is not possible.
-- Added the `craft.blitz.staticInclude()` template variable, that includes a template using SSI or ESI if enabled, otherwise via an AJAX request. The `staticInclude()` method returns a cached result (if one exists).
-- Added the `craft.blitz.dynamicInclude()` template variable, that includes a template via an AJAX request. The `dynamicInclude()` method always returns a freshly rendered template.
-- Added the `craft.blitz.fetch()` template variable, that fetches a URI via an AJAX request. Whether the URI response is cached or not is determined by the URI patterns in the plugin settings.
+- Added the `craft.blitz.staticInclude()` template variable, that includes a statically cached template using SSI or ESI if enabled, otherwise via an AJAX request.
+- Added the `craft.blitz.dynamicInclude()` template variable, that includes a dynamically rendered template via an AJAX request.
+- Added the `craft.blitz.fetchUri()` template variable, that fetches a URI via an AJAX request. Whether the URI response is cached or not is determined by the URI patterns in the plugin settings.
 - Added the `blitz/templates/static-include` and `blitz/templates/dynamic-include` controller actions.
 - Added the `ssiEnabled` config setting that enables Blitz to include templates using Server-Side Includes (SSI), which must be enabled on the web server.
 - Added the `esiEnabled` config setting that enables Blitz to include templates using Edge-Side Includes (ESI), which must be enabled on the web server or reverse proxy (CDN).
 - Added the `maxUriLength` config setting.
-- Added a cached includes column to the Blitz cache utility for the File Cache Storage driver. 
+- Added a “Cached Includes” column to the Blitz cache utility for the File Cache Storage driver. 
 
 ### Changed
 - Improved the detection of when elements should be refreshed based on changes.
@@ -21,11 +21,11 @@
 - Replaced the abandoned `symplify/git-wrapper` package with `cypresslab/gitelephant`.
 
 ### Fixed
-- Fixed a bug in which the "Served by Blitz" comment was not respecting the page specific options in the first request ([#459](https://github.com/putyourlightson/craft-blitz/issues/459)).
+- Fixed a bug in which the “Served by Blitz” comment was not respecting the page specific options in the first request ([#459](https://github.com/putyourlightson/craft-blitz/issues/459)).
 
 ### Deprecated
-- Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.include()` or `craft.blitz.dynamicInclude()` instead.
-- Deprecated the `craft.blitz.getUri()` template variable. Use `craft.blitz.fetch()` instead.
+- Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.staticInclude()` or `craft.blitz.dynamicInclude()` instead.
+- Deprecated the `craft.blitz.getUri()` template variable. Use `craft.blitz.fetchUri()` instead.
 - Deprecated the `blitz/templates/get` controller action. Use `blitz/templates/static-include` or `blitz/templates/dynamic-include` instead.
 
 ## 4.2.3 - 2022-10-19

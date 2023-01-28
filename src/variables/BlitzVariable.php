@@ -6,10 +6,12 @@
 namespace putyourlightson\blitz\variables;
 
 use Craft;
+use craft\helpers\Html;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
+use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
@@ -28,6 +30,16 @@ class BlitzVariable
     public const DYNAMIC_INCLUDE_ACTION = 'blitz/templates/dynamic-include';
 
     /**
+     * @const string
+     */
+    public const INCLUDE_REQUEST_TYPE = 'include';
+
+    /**
+     * @const string
+     */
+    public const AJAX_REQUEST_TYPE = 'ajax';
+
+    /**
      * @var int
      */
     private int $_injected = 0;
@@ -37,10 +49,10 @@ class BlitzVariable
      *
      * @since 4.3.0
      */
-    public function staticInclude(string $template, array $params = [], array $config = []): Markup
+    public function staticInclude(string $template, array $params = [], array $options = []): Markup
     {
-        $defaultConfig = ['useAjax' => false];
-        $config = array_merge($defaultConfig, $config);
+        $config = new VariableConfigModel(['requestType' => self::INCLUDE_REQUEST_TYPE]);
+        $config->setAttributes($options);
 
         return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::STATIC_INCLUDE_ACTION, $params, $config);
     }
@@ -50,10 +62,10 @@ class BlitzVariable
      *
      * @since 4.3.0
      */
-    public function dynamicInclude(string $template, array $params = [], array $config = []): Markup
+    public function dynamicInclude(string $template, array $params = [], array $options = []): Markup
     {
-        $defaultConfig = ['useAjax' => true];
-        $config = array_merge($defaultConfig, $config);
+        $config = new VariableConfigModel(['requestType' => self::AJAX_REQUEST_TYPE]);
+        $config->setAttributes($options);
 
         return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params, $config);
     }
@@ -63,9 +75,12 @@ class BlitzVariable
      *
      * @since 4.3.0
      */
-    public function fetch(string $uri, array $params = []): Markup
+    public function fetchUri(string $uri, array $params = [], array $options = []): Markup
     {
-        return $this->_getScript($uri, $params);
+        $config = new VariableConfigModel();
+        $config->setAttributes($options);
+
+        return $this->_getScript($uri, $params, $config);
     }
 
     /**
@@ -75,23 +90,26 @@ class BlitzVariable
      */
     public function getTemplate(string $template, array $params = []): Markup
     {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.include()` or `craft.blitz.dynamicInclude()` instead.');
+        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.staticInclude()` or `craft.blitz.dynamicInclude()` instead.');
 
-        return $this->_includeTemplate($template, '', 'blitz/templates/get', $params);
+        $config = new VariableConfigModel();
+
+        return $this->_includeTemplate($template, '', 'blitz/templates/get', $params, $config);
     }
 
     /**
      * Returns a script to get the output of a URI.
      *
-     * @deprecated in 4.3.0. Use [[fetch()]] instead.
+     * @deprecated in 4.3.0. Use [[fetchUri()]] instead.
      */
     public function getUri(string $uri, array $params = []): Markup
     {
         Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getUri()` has been deprecated. Use `craft.blitz.fetch()` instead.');
 
         $params['no-cache'] = 1;
+        $config = new VariableConfigModel();
 
-        return $this->_getScript($uri, $params);
+        return $this->_getScript($uri, $params, $config);
     }
 
     /**
@@ -156,15 +174,8 @@ class BlitzVariable
 
     /**
      * Returns the code to inject the output of a template.
-     *
-     * @param string $template
-     * @param string $uriPrefix
-     * @param string $action
-     * @param array $params
-     * @param array $config
-     * @return Markup
      */
-    private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params = [], array $config = []): Markup
+    private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params, VariableConfigModel $config): Markup
     {
         if (!Craft::$app->getView()->resolveTemplate($template)) {
             throw new NotFoundHttpException('Template not found: ' . $template);
@@ -180,8 +191,8 @@ class BlitzVariable
             'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
         ];
 
-        $useAjax = $config['useAjax'] ?? false;
-        if ($useAjax === false) {
+        $requestType = $config['requestType'] ?? null;
+        if ($requestType === self::INCLUDE_REQUEST_TYPE) {
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->_getSsiTag($uri, $params);
             }
@@ -190,7 +201,7 @@ class BlitzVariable
             }
         }
 
-        return $this->_getScript($uri, $params);
+        return $this->_getScript($uri, $params, $config);
     }
 
     private function _getHashedTemplate(string $template): string
@@ -235,7 +246,7 @@ class BlitzVariable
     /**
      * Returns a script to inject the output of a URI.
      */
-    private function _getScript(string $uri, array $params = [], string $property = null): Markup
+    private function _getScript(string $uri, array $params, VariableConfigModel $config): Markup
     {
         $view = Craft::$app->getView();
         $js = '';
@@ -262,17 +273,17 @@ class BlitzVariable
         $id = $this->_injected;
 
         $data = [
-            'id' => $id,
-            'uri' => $uri,
-            'params' => http_build_query($params),
-            'property' => $property,
+            'blitz-id' => $id,
+            'blitz-uri' => $uri,
+            'blitz-params' => http_build_query($params),
+            'blitz-property' => $config->property,
         ];
 
-        foreach ($data as $key => &$value) {
-            $value = 'data-blitz-' . $key . '="' . $value . '"';
-        }
-
-        $output = '<span class="blitz-inject" id="blitz-inject-' . $id . '" ' . implode(' ', $data) . '></span>';
+        $output = Html::tag($config->wrapperElement, $config->placeholder, [
+            'class' => 'blitz-inject',
+            'id' => 'blitz-inject-' . $id,
+            'data' => $data
+        ]);
 
         return Template::raw($output);
     }
@@ -283,7 +294,8 @@ class BlitzVariable
     private function _getCsrfScript(string $property): Markup
     {
         $uri = UrlHelper::actionUrl('blitz/csrf/json');
+        $config = new VariableConfigModel(['property' => $property]);
 
-        return $this->_getScript($uri, [], $property);
+        return $this->_getScript($uri, [], $config);
     }
 }
