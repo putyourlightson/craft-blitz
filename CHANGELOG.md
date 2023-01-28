@@ -22,6 +22,7 @@
 
 ### Fixed
 - Fixed a bug in which the “Served by Blitz” comment was not respecting the page specific options in the first request ([#459](https://github.com/putyourlightson/craft-blitz/issues/459)).
+- Fixed a bug in which the Blitz Cache utility could throw an error if the `cacheStorageSettings['countCachedFiles']` config setting was disabled.
 
 ### Deprecated
 - Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.staticInclude()` or `craft.blitz.dynamicInclude()` instead.

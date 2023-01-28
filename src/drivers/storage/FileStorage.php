@@ -45,7 +45,7 @@ class FileStorage extends BaseCacheStorage
     public bool $createBrotliFiles = false;
 
     /**
-     * @var bool Whether cached files may be counted (can be disabled via a plugin/module)
+     * @var bool Whether cached files may be counted.
      */
     public bool $countCachedFiles = true;
 
@@ -109,6 +109,7 @@ class FileStorage extends BaseCacheStorage
                 }
 
                 if ($this->createBrotliFiles && function_exists('brotli_compress')) {
+                    /** @noinspection PhpUndefinedFunctionInspection */
                     FileHelper::writeToFile($filePath . '.br', brotli_compress($value));
                 }
             }
@@ -181,6 +182,10 @@ class FileStorage extends BaseCacheStorage
      */
     public function getUtilityHtml(): string
     {
+        if ($this->countCachedFiles === false) {
+            return '';
+        }
+
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/utility', [
             'sites' => $this->_getSitePageCount(),
         ]);
@@ -191,6 +196,10 @@ class FileStorage extends BaseCacheStorage
      */
     public function getWidgetHtml(): string
     {
+        if ($this->countCachedFiles === false) {
+            return '';
+        }
+
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/widget', [
             'sites' => $this->_getSitePageCount(),
         ]);
@@ -282,10 +291,10 @@ class FileStorage extends BaseCacheStorage
     /**
      * Returns the number of cached pages in the provided path.
      */
-    public function getCachedPageCount(string $path): int|string
+    public function getCachedPageCount(string $path): int
     {
         if (!$this->countCachedFiles) {
-            return '-';
+            return 0;
         }
 
         if (!is_dir($path)) {
@@ -301,10 +310,10 @@ class FileStorage extends BaseCacheStorage
     /**
      * Returns the number of cached includes in the provided path.
      */
-    public function getCachedIncludeCount(string $path): int|string
+    public function getCachedIncludeCount(string $path): int
     {
         if (!$this->countCachedFiles) {
-            return '-';
+            return 0;
         }
 
         $path = rtrim($path, '/') . '/_includes';
