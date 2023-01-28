@@ -285,7 +285,8 @@ class Blitz extends Plugin
                     return;
                 }
 
-                if ($cachedResponse = $this->cacheRequest->getCachedResponse($siteUri)) {
+                $cachedResponse = $this->cacheRequest->getCachedResponse($siteUri);
+                if ($cachedResponse) {
                     // Send the cached response and exit early, without allowing the full application life cycle to complete.
                     $cachedResponse->send();
                     exit();

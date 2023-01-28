@@ -246,7 +246,7 @@ return [
         // The name of the JavaScript event that will trigger a script inject.
         //'injectScriptEvent' => 'DOMContentLoaded',
 
-        // Tha maximum length of URIs that may be cached. Increasing this value requires manually updating the limit in the `uri` column of the `blitz_caches` and `blitz_ssiincludes` database tables as well.
-        //'maxUriLength' => 1000,
+        // Tha maximum length of URIs that may be cached. Increasing this value is not recommended.
+        //'maxUriLength' => 255,
     ],
 ];

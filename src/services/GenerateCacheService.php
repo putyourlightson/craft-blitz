@@ -204,13 +204,6 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Ensure URI is not longer than the max URI length
-        $validUriLength = SiteUriHelper::validateUriLength($uri);
-
-        if ($validUriLength === false) {
-            return;
-        }
-
         $this->saveSsiInclude(trim($uri, '/'));
     }
 

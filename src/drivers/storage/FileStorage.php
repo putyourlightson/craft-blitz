@@ -12,6 +12,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\base\ErrorException;
+use yii\base\Exception;
 use yii\base\InvalidArgumentException;
 use yii\log\Logger;
 
@@ -111,7 +112,7 @@ class FileStorage extends BaseCacheStorage
                     FileHelper::writeToFile($filePath . '.br', brotli_compress($value));
                 }
             }
-        } catch (ErrorException|InvalidArgumentException $exception) {
+        } catch (Exception|ErrorException|InvalidArgumentException $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }

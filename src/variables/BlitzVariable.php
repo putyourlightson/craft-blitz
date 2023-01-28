@@ -10,6 +10,7 @@ use craft\helpers\Html;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -220,6 +221,14 @@ class BlitzVariable
     {
         $uri = $this->_getUriWithParams($uri, $params);
 
+        // Ignore URIs that are longer than the max URI length
+        // https://nginx.org/en/docs/http/ngx_http_ssi_module.html#ssi_value_length
+        $validUriLength = SiteUriHelper::validateUriLength($uri, 'SSI tag not generated because it exceeds the max URI length of {max} bytes. Consider shortening it by passing in fewer parameters.');
+
+        if ($validUriLength === false) {
+            return Template::raw('');
+        }
+
         // Add an SSI include, so we can purge it whenever necessary
         if (Blitz::$plugin->cacheRequest->getIsStaticInclude($uri)) {
             Blitz::$plugin->generateCache->addSsiInclude($uri);
@@ -234,6 +243,14 @@ class BlitzVariable
     private function _getEsiTag(string $uri, array $params = []): Markup
     {
         $uri = $this->_getUriWithParams($uri, $params);
+
+        // Ignore URIs that are longer than the max URI length
+        // https://nginx.org/en/docs/http/ngx_http_ssi_module.html#ssi_value_length
+        $validUriLength = SiteUriHelper::validateUriLength($uri, 'ESI tag not generated because it exceeds the max URI length of {max} bytes. Consider shortening it by passing in fewer parameters.');
+
+        if ($validUriLength === false) {
+            return Template::raw('');
+        }
 
         return Template::raw('<esi:include src="' . $uri . '" />');
     }

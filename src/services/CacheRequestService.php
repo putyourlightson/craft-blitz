@@ -152,7 +152,7 @@ class CacheRequestService extends Component
         $uri = strtolower($siteUri->uri);
 
         // Ignore URIs that are longer than the max URI length
-        $validUriLength = SiteUriHelper::validateUriLength($uri, 'Page not cached because it exceeds the max URI length of {max} characters. Consider shortening it by passing in fewer ');
+        $validUriLength = SiteUriHelper::validateUriLength($uri, 'Page not cached because it exceeds the max URI length of {max} bytes. Consider shortening it by passing in fewer parameters.');
 
         if ($validUriLength === false) {
             return false;
