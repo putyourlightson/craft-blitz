@@ -32,16 +32,6 @@ class BlitzVariable
     public const DYNAMIC_INCLUDE_ACTION = 'blitz/templates/dynamic-include';
 
     /**
-     * @const string
-     */
-    public const AJAX_REQUEST_TYPE = 'ajax';
-
-    /**
-     * @const string
-     */
-    public const INCLUDE_REQUEST_TYPE = 'include';
-
-    /**
      * @var int
      */
     private int $_injected = 0;
@@ -54,7 +44,7 @@ class BlitzVariable
     public function staticInclude(string $template, array $params = [], array $options = []): Markup
     {
         $config = new VariableConfigModel([
-            'requestType' => self::INCLUDE_REQUEST_TYPE,
+            'requestType' => VariableConfigModel::INCLUDE_REQUEST_TYPE,
         ]);
         $config->setAttributes($options);
 
@@ -69,7 +59,7 @@ class BlitzVariable
     public function dynamicInclude(string $template, array $params = [], array $options = []): Markup
     {
         $config = new VariableConfigModel([
-            'requestType' => self::AJAX_REQUEST_TYPE,
+            'requestType' => VariableConfigModel::AJAX_REQUEST_TYPE,
         ]);
         $config->setAttributes($options);
 
@@ -197,7 +187,7 @@ class BlitzVariable
             'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
         ];
 
-        if ($config->requestType === self::INCLUDE_REQUEST_TYPE) {
+        if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->_getSsiTag($uri, $params);
             }
@@ -205,8 +195,10 @@ class BlitzVariable
             if (Blitz::$plugin->settings->esiEnabled) {
                 return $this->_getEsiTag($uri, $params);
             }
+        }
 
-            $content = $this->_getCachedInclude($uri, $params);
+        if ($config->requestType === VariableConfigModel::INLINE_REQUEST_TYPE) {
+            $content = $this->_getCachedContent($uri, $params);
             if ($content) {
                 return $content;
             }
@@ -271,9 +263,9 @@ class BlitzVariable
     }
 
     /**
-     * Returns the content of a cached include.
+     * Returns the cached content of a URI, or null if it doesn't exist.
      */
-    private function _getCachedInclude(string $uri, array $params): ?Markup
+    private function _getCachedContent(string $uri, array $params): ?Markup
     {
         $uri = $this->_getUriWithParams($uri, $params);
         $siteUri = new SiteUriModel([

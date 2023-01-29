@@ -10,22 +10,37 @@ use craft\base\Model;
 class VariableConfigModel extends Model
 {
     /**
-     * @var string
+     * @const string Specifies that the request should be AJAX.
+     */
+    public const AJAX_REQUEST_TYPE = 'ajax';
+
+    /**
+     * @const string Specifies that the request should be a Server-Side or Edge-Side Include.
+     */
+    public const INCLUDE_REQUEST_TYPE = 'include';
+
+    /**
+     * @const string Specifies that the request should output cached content inline.
+     */
+    public const INLINE_REQUEST_TYPE = 'inline';
+
+    /**
+     * @var string Specifies the request type to use.
      */
     public string $requestType = 'ajax';
 
     /**
-     * @var string
+     * @var string Specifies the wrapper element type to use.
      */
     public string $wrapperElement = 'span';
 
     /**
-     * @var string
+     * @var string Specifies the placeholder content.
      */
     public string $placeholder = '';
 
     /**
-     * @var string
+     * @var string Specifies the property to place on the wrapper element.
      */
     public string $property = '';
 
@@ -36,7 +51,11 @@ class VariableConfigModel extends Model
     {
         return [
             [['requestType', 'wrapperElement', 'placeholder', 'property'], 'string'],
-            [['requestType'], 'in', 'range' => ['ajax', 'include']],
+            [['requestType'], 'in', 'range' => [
+                self::AJAX_REQUEST_TYPE,
+                self::INCLUDE_REQUEST_TYPE,
+                self::INLINE_REQUEST_TYPE,
+            ]],
         ];
     }
 }
