@@ -51,11 +51,7 @@ class VariableConfigModel extends Model
     {
         return [
             [['requestType', 'wrapperElement', 'placeholder', 'property'], 'string'],
-            [['requestType'], 'in', 'range' => [
-                self::AJAX_REQUEST_TYPE,
-                self::INCLUDE_REQUEST_TYPE,
-                self::INLINE_REQUEST_TYPE,
-            ]],
+            [['requestType'], 'in', 'range' => [self::AJAX_REQUEST_TYPE, self::INCLUDE_REQUEST_TYPE]],
         ];
     }
 }

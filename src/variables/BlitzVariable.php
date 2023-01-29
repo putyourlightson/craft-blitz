@@ -12,7 +12,6 @@ use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
-use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
@@ -197,13 +196,6 @@ class BlitzVariable
             }
         }
 
-        if ($config->requestType === VariableConfigModel::INLINE_REQUEST_TYPE) {
-            $content = $this->_getCachedContent($uri, $params);
-            if ($content) {
-                return $content;
-            }
-        }
-
         return $this->_getScript($uri, $params, $config);
     }
 
@@ -260,22 +252,6 @@ class BlitzVariable
     private function _getUriWithParams(string $uri, array $params): string
     {
         return $uri . '?' . http_build_query($params);
-    }
-
-    /**
-     * Returns the cached content of a URI, or null if it doesn't exist.
-     */
-    private function _getCachedContent(string $uri, array $params): ?Markup
-    {
-        $uri = $this->_getUriWithParams($uri, $params);
-        $siteUri = new SiteUriModel([
-            'siteId' => $params['siteId'],
-            'uri' => $uri,
-        ]);
-
-        $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
-
-        return $response ? Template::raw($response->content) : null;
     }
 
     /**
