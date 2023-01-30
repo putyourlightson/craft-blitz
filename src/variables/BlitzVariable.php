@@ -247,10 +247,7 @@ class BlitzVariable
         }
 
         // Add surrogate control header
-        $headers = Craft::$app->getResponse()->getHeaders();
-        if (!$headers->has('Surrogate-Control')) {
-            $headers->add('Surrogate-Control', 'content="ESI/1.0"');
-        }
+        Craft::$app->getResponse()->getHeaders()->add('Surrogate-Control', 'content="ESI/1.0"');
 
         return Template::raw('<esi:include src="' . $uri . '" />');
     }
