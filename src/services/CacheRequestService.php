@@ -556,7 +556,9 @@ class CacheRequestService extends Component
 
         // Add headers if ESI is enabled for pages only
         if (Blitz::$plugin->settings->esiEnabled && $this->getIsStaticInclude() === false) {
-            $headers->set('Surrogate-Control', 'content="ESI/1.0"');
+            if ($headers->has('Surrogate-Control') === false) {
+                $headers->add('Surrogate-Control', 'content="ESI/1.0"');
+            }
         }
 
         // Get the mime type from the site URI
