@@ -25,12 +25,6 @@ return [
         // With this setting enabled, Blitz will provide template performance hints in a utility.
         //'hintsEnabled' => true,
 
-        // With this setting enabled, Blitz will statically include templates using Server-Side Includes (SSI), which must be enabled on the web server.
-        //'ssiEnabled' => false,
-
-        // With this setting enabled, Blitz will statically include templates using Edge-Side Includes (ESI), which must be enabled on the web server or CDN.
-        //'esiEnabled' => false,
-
         // With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 
@@ -136,6 +130,12 @@ return [
         //'deployerTypes' => [
         //    'putyourlightson\blitzshell\ShellDeployer',
         //],
+
+        // With this setting enabled, Blitz will statically include templates using Server-Side Includes (SSI), which must be enabled on the web server.
+        //'ssiEnabled' => false,
+
+        // With this setting enabled, Blitz will statically include templates using Edge-Side Includes (ESI), which must be enabled on the web server or CDN.
+        //'esiEnabled' => false,
 
         // Whether URLs with query strings should be cached and how.
         // - `0`: Do not cache URLs with query strings

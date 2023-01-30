@@ -323,7 +323,31 @@
         {{ config.deployerSettings is defined ? configFieldWarning('deployerSettings') }}
     </div>
 
-    <div id="advanced" class="hidden">
+    <div id="advanced" class="flex-fields hidden">
+
+        {% set info %}
+            {{ 'With this setting enabled, Blitz will include templates using Server-Side Includes (SSI), which must be enabled on the server.'|t('blitz') }}
+        {% endset %}
+        {{ forms.lightswitchField({
+            label: "SSI Enabled"|t('blitz'),
+            instructions: instructions("Whether SSI is enabled on the server."|t('blitz'), info),
+            warning: config.ssiEnabled is defined ? configWarning('ssiEnabled'),
+            name: 'settings[ssiEnabled]',
+            on: settings.ssiEnabled,
+            fieldClass: 'width-50',
+        }) }}
+
+        {% set info %}
+            {{ 'With this setting enabled, Blitz will include templates using Edge-Side Includes (ESI), which must be enabled on the server.'|t('blitz') }}
+        {% endset %}
+        {{ forms.lightswitchField({
+            label: "ESI Enabled"|t('blitz'),
+            instructions: instructions("Whether ESI is enabled on the server."|t('blitz'), info),
+            warning: config.esiEnabled is defined ? configWarning('esiEnabled'),
+            name: 'settings[esiEnabled]',
+            on: settings.esiEnabled,
+            fieldClass: 'width-50',
+        }) }}
 
         {% set info %}
             <p>
