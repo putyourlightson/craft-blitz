@@ -11,7 +11,8 @@ use putyourlightson\blitz\variables\BlitzVariable;
  * Blitz rewrite.php
  *
  * Rewrites a request to a cached file, if it exists, based on the URI.
- * It is useful only in situations where a server rewrite is not possible.
+ * This is useful only in situations where a server rewrite is not possible.
+ * Works with the Blitz File Storage driver only!
  *
  * Use it by requiring the file and then calling the method, inside the
  * `web/index.php` file, directly after `bootstrap.php` is required.
