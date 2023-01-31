@@ -12,12 +12,13 @@ use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
+use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use yii\db\Exception as DbException;
+use yii\log\Logger;
 use yii\queue\RetryableJobInterface;
 
 /**
@@ -220,9 +221,8 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         // Execute the element query, ignoring any exceptions.
         try {
             $elementQueryIds = $elementQuery->ids();
-        }
-        /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (DbException) {
+        } catch (Exception $exception) {
+            Blitz::$plugin->log('Element query with ID `' . $elementQueryRecord->id . '` could not be executed: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
 
         // If one or more of the element IDs are in the element query's IDs
