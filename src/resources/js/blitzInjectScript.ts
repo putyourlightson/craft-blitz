@@ -10,13 +10,11 @@ interface InjectElement {
 }
 
 async function injectElements() {
-    const shouldInjectAll: boolean = document.dispatchEvent(
+    if (!document.dispatchEvent(
         new CustomEvent('beforeBlitzInjectAll', {
             cancelable: true,
         })
-    );
-
-    if (shouldInjectAll === false) {
+    )) {
         return;
     }
 
@@ -33,15 +31,12 @@ async function injectElements() {
             property: element.getAttribute('data-blitz-property'),
         };
 
-
-        const shouldInject: boolean = document.dispatchEvent(
+        if (document.dispatchEvent(
             new CustomEvent('beforeBlitzInject', {
                 cancelable: true,
                 detail: injectElement,
             })
-        );
-
-        if (shouldInject === true) {
+        )) {
             const url = injectElement.uri + (injectElement.params && '?' + injectElement.params);
             injectElements[url] = injectElements[url] ?? [];
             injectElements[url].push(injectElement);

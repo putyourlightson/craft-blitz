@@ -1,12 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ES6",
     "removeComments": true,
     "lib": [
-      "dom",
-      "es5",
-      "scripthost",
-      "es2015.promise"
+      "ES6",
+      "DOM"
     ]
   },
   "include": [
