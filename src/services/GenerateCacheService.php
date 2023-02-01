@@ -28,8 +28,8 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
-use putyourlightson\blitz\records\SsiIncludeRecord;
 use yii\base\Event;
 use yii\db\Exception;
 use yii\log\Logger;
@@ -55,6 +55,11 @@ class GenerateCacheService extends Component
      * @const string
      */
     public const MUTEX_LOCK_NAME_ELEMENT_QUERY_RECORDS = 'blitz:elementQueryRecords';
+
+    /**
+     * @const string
+     */
+    public const MUTEX_LOCK_NAME_INCLUDE_RECORDS = 'blitz:includeRecords';
 
     /**
      * @const string
@@ -197,14 +202,14 @@ class GenerateCacheService extends Component
     /**
      * Adds an SSI include.
      */
-    public function addSsiInclude(string $uri): void
+    public function addSsiInclude(int $includeId): void
     {
         // Don't proceed if element query caching is disabled
         if (Blitz::$plugin->settings->cachingEnabled === false) {
             return;
         }
 
-        $this->saveSsiInclude(trim($uri, '/'));
+        $this->saveSsiInclude($includeId);
     }
 
     /**
@@ -213,9 +218,7 @@ class GenerateCacheService extends Component
     public function saveElementQuery(ElementQuery $elementQuery): void
     {
         $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
-
-        // Create a unique index from the element type and parameters for quicker indexing and less storage
-        $index = sprintf('%u', crc32($elementQuery->elementType . $params));
+        $index = $this->_createUniqueIndex($elementQuery->elementType . $params);
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
@@ -299,43 +302,63 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves an SSI include.
+     * Saves an include.
      */
-    public function saveSsiInclude(string $uri): void
+    public function saveInclude(int $siteId, string $template, array $params): ?int
     {
+        $params = json_encode($params);
+        $index = $this->_createUniqueIndex($siteId . $template . $params);
+
         // Require a mutex to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
-        $lockName = self::MUTEX_LOCK_NAME_SSI_INCLUDE_RECORDS . ':' . $uri;
+        $lockName = self::MUTEX_LOCK_NAME_INCLUDE_RECORDS . ':' . $index;
 
         if (!$mutex->acquire($lockName, Blitz::$plugin->settings->mutexTimeout)) {
-            return;
+            return null;
         }
 
         // Get record or create one if it does not exist
-        $ssiIncludeId = SsiIncludeRecord::find()
+        $includeId = IncludeRecord::find()
             ->select('id')
-            ->where(['uri' => $uri])
+            ->where(['index' => $index])
             ->scalar();
 
-        if (!$ssiIncludeId) {
-            // Use DB connection, so we can exclude audit columns when inserting
-            $db = Craft::$app->getDb();
+        if (!$includeId) {
+            try {
+                // Use DB connection, so we can exclude audit columns when inserting
+                $db = Craft::$app->getDb();
 
-            $db->createCommand()
-                ->insert(
-                    SsiIncludeRecord::tableName(),
-                    ['uri' => $uri]
-                )
-                ->execute();
+                $db->createCommand()
+                    ->insert(
+                        IncludeRecord::tableName(),
+                        [
+                            'index' => $index,
+                            'siteId' => $siteId,
+                            'template' => $template,
+                            'params' => $params,
+                        ],
+                    )
+                    ->execute();
 
-            $ssiIncludeId = $db->getLastInsertID();
-        }
-
-        if ($ssiIncludeId && !in_array($ssiIncludeId, $this->ssiIncludeCaches)) {
-            $this->ssiIncludeCaches[] = $ssiIncludeId;
+                $includeId = $db->getLastInsertID();
+            } catch (Exception $exception) {
+                Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
+            }
         }
 
         $mutex->release($lockName);
+
+        return $includeId ?: null;
+    }
+
+    /**
+     * Saves an SSI include.
+     */
+    public function saveSsiInclude(int $includeId): void
+    {
+        if (!in_array($includeId, $this->ssiIncludeCaches)) {
+            $this->ssiIncludeCaches[] = $includeId;
+        }
     }
 
     /**
@@ -411,9 +434,9 @@ class GenerateCacheService extends Component
             $this->_batchInsertCaches(
                 $cacheId,
                 $this->ssiIncludeCaches,
-                SsiIncludeRecord::tableName(),
+                IncludeRecord::tableName(),
                 SsiIncludeCacheRecord::tableName(),
-                'ssiIncludeId'
+                'includeId'
             );
         }
 
@@ -422,7 +445,7 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        if (!Blitz::$plugin->cacheRequest->getIsStaticInclude()) {
+        if (!Blitz::$plugin->cacheRequest->getIsCachedInclude()) {
             $outputComments = $this->options->outputComments === true
                 || $this->options->outputComments === SettingsModel::OUTPUT_COMMENTS_CACHED;
 
@@ -490,5 +513,13 @@ class GenerateCacheService extends Component
             $values,
         )
         ->execute();
+    }
+
+    /**
+     * Creates a unique index for quicker indexing and less storage.
+     */
+    private function _createUniqueIndex(string $value): string
+    {
+        return sprintf('%u', crc32($value));
     }
 }

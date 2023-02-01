@@ -15,7 +15,6 @@ use craft\web\twig\variables\Paginate;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
-use yii\log\Logger;
 
 class SiteUriHelper
 {
@@ -355,32 +354,5 @@ class SiteUriHelper
         }
 
         return $groupedSiteUris;
-    }
-
-    /**
-     * Returns whether the URI is within the max URI length.
-     *
-     * @since 4.3.0
-     */
-    public static function validateUriLength(string $uri, string $message = null): bool
-    {
-        $maxUriLength = Blitz::$plugin->settings->maxUriLength;
-
-        if (strlen($uri) > $maxUriLength) {
-            if ($message !== null) {
-                Blitz::$plugin->log(
-                    $message . ' [{uri}]',
-                    [
-                        'max' => $maxUriLength,
-                        'uri' => $uri,
-                    ],
-                    Logger::LEVEL_WARNING,
-                );
-            }
-
-            return false;
-        }
-
-        return true;
     }
 }

@@ -71,8 +71,8 @@ if ($includeQueryString) {
  * @see CacheRequestService::getRequestedCacheableSiteUri()
  */
 $action = $_GET['action'] ?? null;
-if ($action === BlitzVariable::STATIC_INCLUDE_ACTION) {
-    $uri = CacheRequestService::INCLUDES_FOLDER . '?' . http_build_query($_GET);
+if ($action === BlitzVariable::CACHED_INCLUDE_ACTION) {
+    $uri = CacheRequestService::CACHED_INCLUDE_PATH . '?' . http_build_query($_GET);
 } elseif ($action === BlitzVariable::DYNAMIC_INCLUDE_ACTION) {
     $uri = http_build_query($_GET);
 }

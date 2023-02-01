@@ -9,7 +9,6 @@ use Craft;
 use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
@@ -18,8 +17,8 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
-use putyourlightson\blitz\records\SsiIncludeRecord;
 use putyourlightson\blitzhints\migrations\Install as HintsInstall;
 
 class Install extends Migration
@@ -55,7 +54,7 @@ class Install extends Migration
         $this->dropTableIfExists(ElementExpiryDateRecord::tableName());
         $this->dropTableIfExists(CacheTagRecord::tableName());
         $this->dropTableIfExists(SsiIncludeCacheRecord::tableName());
-        $this->dropTableIfExists(SsiIncludeRecord::tableName());
+        $this->dropTableIfExists(IncludeRecord::tableName());
         $this->dropTableIfExists(CacheRecord::tableName());
 
         // Don't remove table if Blitz Recommendations is installed.
@@ -71,13 +70,11 @@ class Install extends Migration
      */
     protected function createTables(): bool
     {
-        $maxUriLength = Blitz::$plugin->settings->maxUriLength;
-
         if (!$this->db->tableExists(CacheRecord::tableName())) {
             $this->createTable(CacheRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string($maxUriLength)->notNull(),
+                'uri' => $this->string()->notNull(),
                 'paginate' => $this->integer(),
                 'expiryDate' => $this->dateTime(),
             ]);
@@ -144,18 +141,21 @@ class Install extends Migration
             ]);
         }
 
-        if (!$this->db->tableExists(SsiIncludeRecord::tableName())) {
-            $this->createTable(SsiIncludeRecord::tableName(), [
+        if (!$this->db->tableExists(IncludeRecord::tableName())) {
+            $this->createTable(IncludeRecord::tableName(), [
                 'id' => $this->primaryKey(),
-                'uri' => $this->string($maxUriLength)->notNull(),
+                'index' => $this->bigInteger()->notNull(),
+                'siteId' => $this->integer()->notNull(),
+                'template' => $this->string()->notNull(),
+                'params' => $this->text()->notNull(),
             ]);
         }
 
         if (!$this->db->tableExists(SsiIncludeCacheRecord::tableName())) {
             $this->createTable(SsiIncludeCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
-                'ssiIncludeId' => $this->integer()->notNull(),
-                'PRIMARY KEY([[cacheId]], [[ssiIncludeId]])',
+                'includeId' => $this->integer()->notNull(),
+                'PRIMARY KEY([[cacheId]], [[includeId]])',
             ]);
         }
 
@@ -176,7 +176,7 @@ class Install extends Migration
         $this->createIndex(null, ElementQueryRecord::tableName(), 'index', true);
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
-        $this->createIndex(null, SsiIncludeRecord::tableName(), 'uri', true);
+        $this->createIndex(null, IncludeRecord::tableName(), 'index', true);
     }
 
     /**
@@ -193,6 +193,6 @@ class Install extends Migration
         $this->addForeignKey(null, ElementQuerySourceRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, CacheTagRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, SsiIncludeCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
-        $this->addForeignKey(null, SsiIncludeCacheRecord::tableName(), 'ssiIncludeId', SsiIncludeRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, SsiIncludeCacheRecord::tableName(), 'includeId', IncludeRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
     }
 }

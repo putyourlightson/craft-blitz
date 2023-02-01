@@ -245,8 +245,5 @@ return [
 
         // The name of the JavaScript event that will trigger a script inject.
         //'injectScriptEvent' => 'DOMContentLoaded',
-
-        // Tha maximum length of URIs that may be cached. Increasing this value is not recommended.
-        //'maxUriLength' => 255,
     ],
 ];

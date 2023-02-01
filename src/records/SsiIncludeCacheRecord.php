@@ -10,8 +10,8 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $cacheId
- * @property int $ssiIncludeId
- * @property SsiIncludeRecord[] $ssiInclude
+ * @property int $includeId
+ * @property IncludeRecord[] $include
  */
 class SsiIncludeCacheRecord extends ActiveRecord
 {
@@ -24,10 +24,10 @@ class SsiIncludeCacheRecord extends ActiveRecord
     }
 
     /**
-     * Returns the associated SSI include
+     * Returns the associated include
      */
-    public function getSsiInclude(): ActiveQueryInterface
+    public function getInclude(): ActiveQueryInterface
     {
-        return $this->hasOne(SsiIncludeRecord::class, ['id' => 'ssiIncludeId']);
+        return $this->hasOne(IncludeRecord::class, ['id' => 'includeId']);
     }
 }

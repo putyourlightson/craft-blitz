@@ -20,6 +20,7 @@ use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\variables\BlitzVariable;
 use yii\web\Response;
 
@@ -49,7 +50,7 @@ class CacheRequestService extends Component
     /**
      * @const string
      */
-    public const INCLUDES_FOLDER = '_includes';
+    public const CACHED_INCLUDE_PATH = '_includes';
 
     /**
      * @var bool|null
@@ -66,7 +67,7 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableRequest(): bool
     {
-        if ($this->getIsStaticInclude()) {
+        if ($this->getIsCachedInclude()) {
             return true;
         }
 
@@ -135,7 +136,7 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableResponse(Response $response): bool
     {
-        if ($this->getIsStaticInclude()) {
+        if ($this->getIsCachedInclude()) {
             return true;
         }
 
@@ -151,14 +152,7 @@ class CacheRequestService extends Component
     {
         $uri = strtolower($siteUri->uri);
 
-        // Ignore URIs that are longer than the max URI length
-        $validUriLength = SiteUriHelper::validateUriLength($uri, 'Page not cached because it exceeds the max URI length of {max} bytes. Consider shortening it by passing in fewer parameters.');
-
-        if ($validUriLength === false) {
-            return false;
-        }
-
-        if ($this->getIsStaticInclude($uri)) {
+        if ($this->getIsCachedInclude($uri)) {
             return true;
         }
 
@@ -219,23 +213,23 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns whether this is a static include.
+     * Returns whether this is a cached include.
      * Doesn't memoize the result, which would disrupt the local cache generator.
      *
      * @since 4.3.0
      */
-    public function getIsStaticInclude(string $uri = null): bool
+    public function getIsCachedInclude(string $uri = null): bool
     {
         // Includes based on the URI takes preference
         if ($uri !== null) {
             $uri = trim($uri, '/');
-            return str_starts_with($uri, self::INCLUDES_FOLDER);
+            return str_starts_with($uri, self::CACHED_INCLUDE_PATH);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             $action = implode('/', Craft::$app->getRequest()->getActionSegments());
 
-            return $action == BlitzVariable::STATIC_INCLUDE_ACTION;
+            return $action == BlitzVariable::CACHED_INCLUDE_ACTION;
         }
 
         return false;
@@ -278,11 +272,16 @@ class CacheRequestService extends Component
     {
         $request = Craft::$app->getRequest();
 
-        if ($this->getIsStaticInclude()) {
-            return new SiteUriModel([
-                'siteId' => $request->getParam('siteId'),
-                'uri' => self::INCLUDES_FOLDER . '?' . http_build_query($request->getQueryParams()),
-            ]);
+        if ($this->getIsCachedInclude()) {
+            $includeId = $request->getParam('includeId');
+            $include = IncludeRecord::findOne($includeId);
+
+            if ($include !== null) {
+                return new SiteUriModel([
+                    'siteId' => $include->siteId,
+                    'uri' => self::CACHED_INCLUDE_PATH . '?' . http_build_query($request->getQueryParams()),
+                ]);
+            }
         }
 
         $site = Craft::$app->getSites()->getCurrentSite();
@@ -351,7 +350,7 @@ class CacheRequestService extends Component
         $this->_addCraftHeaders($response);
         $this->_prepareResponse($response, $content, $siteUri);
 
-        if ($this->getIsStaticInclude() === false) {
+        if ($this->getIsCachedInclude() === false) {
             // Append the served by comment if this is a cacheable response and if an HTML mime type.
             if ($this->getIsCacheableResponse($response) && SiteUriHelper::hasHtmlMimeType($siteUri)) {
                 $outputComments = Blitz::$plugin->generateCache->options->outputComments;
@@ -555,7 +554,7 @@ class CacheRequestService extends Component
         }
 
         // Add headers if ESI is enabled for pages only
-        if (Blitz::$plugin->settings->esiEnabled && $this->getIsStaticInclude() === false) {
+        if (Blitz::$plugin->settings->esiEnabled && $this->getIsCachedInclude() === false) {
             $headers->add('Surrogate-Control', 'content="ESI/1.0"');
         }
 

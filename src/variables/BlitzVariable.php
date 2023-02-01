@@ -10,7 +10,6 @@ use craft\helpers\Html;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -23,12 +22,13 @@ class BlitzVariable
     /**
      * @const string
      */
-    public const STATIC_INCLUDE_ACTION = 'blitz/templates/static-include';
+    public const CACHED_INCLUDE_ACTION = 'blitz/include/cached';
 
     /**
      * @const string
      */
-    public const DYNAMIC_INCLUDE_ACTION = 'blitz/templates/dynamic-include';
+    public const DYNAMIC_INCLUDE_ACTION = 'blitz/include/dynamic';
+
 
     /**
      * @var int
@@ -36,26 +36,26 @@ class BlitzVariable
     private int $_injected = 0;
 
     /**
-     * Returns the markup to statically include a template.
+     * Returns the markup to include a cached template.
      *
      * @since 4.3.0
      */
-    public function staticInclude(string $template, array $params = [], array $options = []): Markup
+    public function includeCached(string $template, array $params = [], array $options = []): Markup
     {
         $config = new VariableConfigModel([
             'requestType' => VariableConfigModel::INCLUDE_REQUEST_TYPE,
         ]);
         $config->setAttributes($options);
 
-        return $this->_includeTemplate($template, CacheRequestService::INCLUDES_FOLDER, self::STATIC_INCLUDE_ACTION, $params, $config);
+        return $this->_includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PATH, self::CACHED_INCLUDE_ACTION, $params, $config);
     }
 
     /**
-     * Returns the markup to dynamically include a template.
+     * Returns the markup to include a dynamically rendered template.
      *
      * @since 4.3.0
      */
-    public function dynamicInclude(string $template, array $params = [], array $options = []): Markup
+    public function includeDynamic(string $template, array $params = [], array $options = []): Markup
     {
         $config = new VariableConfigModel([
             'requestType' => VariableConfigModel::AJAX_REQUEST_TYPE,
@@ -81,15 +81,13 @@ class BlitzVariable
     /**
      * Returns a script to get the output of a template.
      *
-     * @deprecated in 4.3.0. Use [[staticInclude()]] or [[dynamicInclude()]] instead.
+     * @deprecated in 4.3.0. Use [[includeCached()]] or [[includeDynamic()]] instead.
      */
     public function getTemplate(string $template, array $params = []): Markup
     {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.staticInclude()` or `craft.blitz.dynamicInclude()` instead.');
+        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.includeCached()` or `craft.blitz.includeDynamic()` instead.');
 
-        $config = new VariableConfigModel();
-
-        return $this->_includeTemplate($template, '', 'blitz/templates/get', $params, $config);
+        return $this->includeDynamic($template, $params);
     }
 
     /**
@@ -102,9 +100,8 @@ class BlitzVariable
         Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getUri()` has been deprecated. Use `craft.blitz.fetch()` instead.');
 
         $params['no-cache'] = 1;
-        $config = new VariableConfigModel();
 
-        return $this->_getScript($uri, $params, $config);
+        return $this->fetchUri($uri, $params);
     }
 
     /**
@@ -176,19 +173,21 @@ class BlitzVariable
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
+        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+
+        $includeId = Blitz::$plugin->generateCache->saveInclude($siteId, $template, $params);
+
         // Create a URI relative to the root domain, to account for sub-folders
         $uri = parse_url(UrlHelper::siteUrl($uriPrefix), PHP_URL_PATH);
 
         $params = [
             'action' => $action,
-            'template' => $this->_getHashedTemplate($template),
-            'params' => $params,
-            'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
+            'includeId' => $includeId,
         ];
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
             if (Blitz::$plugin->settings->ssiEnabled) {
-                return $this->_getSsiTag($uri, $params);
+                return $this->_getSsiTag($uri, $params, $includeId);
             }
 
             if (Blitz::$plugin->settings->esiEnabled) {
@@ -199,34 +198,15 @@ class BlitzVariable
         return $this->_getScript($uri, $params, $config);
     }
 
-    private function _getHashedTemplate(string $template): string
-    {
-        if (!Craft::$app->getView()->resolveTemplate($template)) {
-            throw new NotFoundHttpException('Template not found: ' . $template);
-        }
-
-        return Craft::$app->getSecurity()->hashData($template);
-    }
-
     /**
      * Returns an SSI tag to inject the output of a URI.
      */
-    private function _getSsiTag(string $uri, array $params = []): Markup
+    private function _getSsiTag(string $uri, array $params, int $includeId): Markup
     {
         $uri = $this->_getUriWithParams($uri, $params);
 
-        // Ignore URIs that are longer than the max URI length
-        // https://nginx.org/en/docs/http/ngx_http_ssi_module.html#ssi_value_length
-        $validUriLength = SiteUriHelper::validateUriLength($uri, 'SSI tag not generated because it exceeds the max URI length of {max} bytes. Consider shortening it by passing in fewer parameters.');
-
-        if ($validUriLength === false) {
-            return Template::raw('');
-        }
-
         // Add an SSI include, so we can purge it whenever necessary
-        if (Blitz::$plugin->cacheRequest->getIsStaticInclude($uri)) {
-            Blitz::$plugin->generateCache->addSsiInclude($uri);
-        }
+        Blitz::$plugin->generateCache->addSsiInclude($includeId);
 
         return Template::raw('<!--#include virtual="' . $uri . '" -->');
     }
@@ -234,17 +214,9 @@ class BlitzVariable
     /**
      * Returns an ESI tag to inject the output of a URI.
      */
-    private function _getEsiTag(string $uri, array $params = []): Markup
+    private function _getEsiTag(string $uri, array $params): Markup
     {
         $uri = $this->_getUriWithParams($uri, $params);
-
-        // Ignore URIs that are longer than the max URI length
-        // https://nginx.org/en/docs/http/ngx_http_ssi_module.html#ssi_value_length
-        $validUriLength = SiteUriHelper::validateUriLength($uri, 'ESI tag not generated because it exceeds the max URI length of {max} bytes. Consider shortening it by passing in fewer parameters.');
-
-        if ($validUriLength === false) {
-            return Template::raw('');
-        }
 
         // Add surrogate control header
         Craft::$app->getResponse()->getHeaders()->add('Surrogate-Control', 'content="ESI/1.0"');

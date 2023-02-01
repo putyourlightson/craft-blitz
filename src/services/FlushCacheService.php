@@ -13,7 +13,7 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use putyourlightson\blitz\records\SsiIncludeRecord;
+use putyourlightson\blitz\records\IncludeRecord;
 use yii\db\Exception;
 use yii\log\Logger;
 
@@ -129,15 +129,6 @@ class FlushCacheService extends Component
 
         ElementQueryRecord::deleteAll(['id' => $elementQueryRecordIds]);
 
-        // Get and delete SSI include records without an associated SSI include cache
-        $ssiIncludeRecordIds = SsiIncludeRecord::find()
-            ->select('id')
-            ->joinWith('ssiIncludeCaches')
-            ->where(['cacheId' => null])
-            ->column();
-
-        SsiIncludeRecord::deleteAll(['id' => $ssiIncludeRecordIds]);
-
         // Check if auto increment values should be reset
         if (CacheRecord::find()->count() == 0) {
             $this->_resetAutoIncrement(CacheRecord::tableName());
@@ -145,8 +136,8 @@ class FlushCacheService extends Component
         if (ElementQueryRecord::find()->count() == 0) {
             $this->_resetAutoIncrement(ElementQueryRecord::tableName());
         }
-        if (SsiIncludeRecord::find()->count() == 0) {
-            $this->_resetAutoIncrement(SsiIncludeRecord::tableName());
+        if (IncludeRecord::find()->count() == 0) {
+            $this->_resetAutoIncrement(IncludeRecord::tableName());
         }
     }
 

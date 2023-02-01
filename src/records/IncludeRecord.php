@@ -10,17 +10,19 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
- * @property string $uri
+ * @property int $siteId
+ * @property string $template
+ * @property string $params
  * @property SsiIncludeCacheRecord[] $ssiIncludeCaches
  */
-class SsiIncludeRecord extends ActiveRecord
+class IncludeRecord extends ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName(): string
     {
-        return '{{%blitz_ssiincludes}}';
+        return '{{%blitz_includes}}';
     }
 
     /**
@@ -28,6 +30,6 @@ class SsiIncludeRecord extends ActiveRecord
      */
     public function getSsiIncludeCaches(): ActiveQueryInterface
     {
-        return $this->hasMany(SsiIncludeCacheRecord::class, ['ssiIncludeId' => 'id']);
+        return $this->hasMany(SsiIncludeCacheRecord::class, ['includeId' => 'id']);
     }
 }

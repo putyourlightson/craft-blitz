@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\web\Controller;
+use putyourlightson\blitz\records\IncludeRecord;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -19,40 +20,14 @@ class TemplatesController extends Controller
     protected int|bool|array $allowAnonymous = true;
 
     /**
-     * Returns a rendered template using the static include action.
-     * This is necessary for detecting SSI requests and will only be hit when
-     * no cached include exists.
-     */
-    public function actionStaticInclude(): Response
-    {
-        return $this->_getRenderedTemplate();
-    }
-
-    /**
-     * Returns a dynamically rendered template.
-     */
-    public function actionDynamicInclude(): Response
-    {
-        return $this->_getRenderedTemplate();
-    }
-
-    /**
      * Returns a rendered template.
      *
-     * @deprecated in 4.3.0. Use [[blitz/templates/static-include]] or [[blitz/templates/dynamic-include] instead.
+     * @deprecated in 4.3.0.
      */
     public function actionGet(): Response
     {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`blitz/templates/get` has been deprecated. Use `blitz/templates/static-include` or `blitz/templates/dynamic-include` instead.');
+        Craft::$app->getDeprecator()->log(__METHOD__, '`blitz/templates/get` has been deprecated.');
 
-        return $this->_getRenderedTemplate();
-    }
-
-    /**
-     * Returns a rendered template.
-     */
-    private function _getRenderedTemplate(): Response
-    {
         $template = Craft::$app->getRequest()->getRequiredParam('template');
 
         // Verify the template hash
@@ -60,10 +35,6 @@ class TemplatesController extends Controller
 
         if ($template === false) {
             throw new BadRequestHttpException('Request contained an invalid param.');
-        }
-
-        if (!Craft::$app->getView()->resolveTemplate($template)) {
-            throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
         $siteId = Craft::$app->getRequest()->getParam('siteId');

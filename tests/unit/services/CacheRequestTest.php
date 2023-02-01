@@ -75,18 +75,18 @@ class CacheRequestTest extends Unit
         // Mock a URL request
         $this->_mockRequest($this->siteUri->getUrl());
 
-        // Assert that the request is not a static include request
-        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsStaticInclude());
+        // Assert that the request is not a cached include request
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCachedInclude());
 
-        $this->_mockRequest(UrlHelper::siteUrl('_includes', ['action' => 'blitz/templates/static-include']));
+        $this->_mockRequest(UrlHelper::siteUrl('_includes', ['action' => 'blitz/include/cached']));
 
-        // Assert that the request is a static include request
-        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsStaticInclude());
+        // Assert that the request is a cached include request
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCachedInclude());
     }
 
     public function testGetIsIncludeWithUri()
     {
-        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsStaticInclude('/_includes?action='));
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCachedInclude('/_includes?action='));
     }
 
     public function testGetRequestedCacheableSiteUri()

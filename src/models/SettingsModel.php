@@ -391,11 +391,6 @@ class SettingsModel extends Model
     public string $injectScriptEvent = 'DOMContentLoaded';
 
     /**
-     * @var int Tha maximum length of URIs that may be cached. Increasing this value is not recommended.
-     */
-    public int $maxUriLength = 255;
-
-    /**
      * @inheritdoc
      */
     public function attributeLabels(): array
