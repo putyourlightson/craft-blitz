@@ -87,7 +87,26 @@ class BlitzVariable
     {
         Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.includeCached()` or `craft.blitz.includeDynamic()` instead.');
 
-        return $this->includeDynamic($template, $params);
+        // Ensure template exists
+        if (!Craft::$app->getView()->resolveTemplate($template)) {
+            throw new NotFoundHttpException('Template not found: ' . $template);
+        }
+
+        $uri = $this->_getActionUrl('blitz/templates/get');
+
+        // Hash the template
+        $template = Craft::$app->getSecurity()->hashData($template);
+
+        // Add template and passed in params to the params
+        $params = [
+            'template' => $template,
+            'params' => $params,
+            'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
+        ];
+
+        $config = new VariableConfigModel();
+
+        return $this->_getScript($uri, $params, $config);
     }
 
     /**
@@ -275,11 +294,19 @@ class BlitzVariable
     }
 
     /**
+     * Returns an absolute action URL for a URI.
+     */
+    private function _getActionUrl(string $uri): string
+    {
+        return UrlHelper::actionUrl($uri, null, null, false);
+    }
+
+    /**
      * Returns a script to inject the output of a CSRF property.
      */
     private function _getCsrfScript(string $property): Markup
     {
-        $uri = UrlHelper::actionUrl('blitz/csrf/json');
+        $uri = $this->_getActionUrl('blitz/csrf/json');
         $config = new VariableConfigModel(['property' => $property]);
 
         return $this->_getScript($uri, [], $config);
