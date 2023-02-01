@@ -72,13 +72,13 @@ if ($includeQueryString) {
  */
 $action = $_GET['action'] ?? null;
 if ($action === BlitzVariable::CACHED_INCLUDE_ACTION) {
-    $uri = CacheRequestService::CACHED_INCLUDE_PATH . '?' . http_build_query($_GET);
+    $uri = CacheRequestService::CACHED_INCLUDE_PATH . '/' . http_build_query($_GET);
 } elseif ($action === BlitzVariable::DYNAMIC_INCLUDE_ACTION) {
     $uri = http_build_query($_GET);
 }
 
 $cacheFolderPath = defined('BLITZ_CACHE_FOLDER_PATH') ? BLITZ_CACHE_FOLDER_PATH : CRAFT_BASE_PATH . '/web/cache/blitz';
-$path = $cacheFolderPath . '/' . $host . $uri . '/index.html';
+$path = $cacheFolderPath . '/' . $host . '/' . $uri . '/index.html';
 $path = str_replace(['//', '..'], ['/', ''], $path);
 
 if (!is_file($path)) {
