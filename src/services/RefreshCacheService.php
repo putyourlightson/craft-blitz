@@ -174,13 +174,22 @@ class RefreshCacheService extends Component
      */
     public function getSsiIncludeSiteUris(array $siteUris): array
     {
-        $uris = array_map(fn($siteUri) => $siteUri->uri, $siteUris);
+        $indexes = [];
+        foreach ($siteUris as $siteUri) {
+            $queryString = parse_url($siteUri->uri, PHP_URL_QUERY);
+            parse_str($queryString, $queryStringParams);
+            $index = $queryStringParams['index'] ?? null;
+
+            if ($index !== null) {
+                $indexes[] = $index;
+            }
+        }
 
         $cacheIds = SsiIncludeCacheRecord::find()
             ->select('cacheId')
             ->innerJoinWith([
-                'ssiInclude' => function(ActiveQuery $query) use ($uris) {
-                    $query->where(['uri' => $uris]);
+                'include' => function(ActiveQuery $query) use ($indexes) {
+                    $query->where(['index' => $indexes]);
                 },
             ], false)
             ->column();

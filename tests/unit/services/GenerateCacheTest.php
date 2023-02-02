@@ -291,7 +291,7 @@ class GenerateCacheTest extends Unit
 
     public function testSaveSsiInclude()
     {
-        $includeId = Blitz::$plugin->generateCache->saveInclude(1, 't', []);
+        [$includeId] = Blitz::$plugin->generateCache->saveInclude(1, 't', []);
         Blitz::$plugin->generateCache->saveSsiInclude($includeId);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 

@@ -266,6 +266,25 @@ class CacheRequestService extends Component
     }
 
     /**
+     * Returns an include record by index.
+     *
+     * @since 4.3.0
+     */
+    public function getIncludeByIndex(?int $index): ?IncludeRecord
+    {
+        if ($index === null) {
+            return null;
+        }
+
+        /** @var IncludeRecord|null $include */
+        $include = IncludeRecord::find()
+            ->where(['index' => $index])
+            ->one();
+
+        return $include;
+    }
+
+    /**
      * Returns the cacheable requested site URI taking the query string into account.
      */
     public function getRequestedCacheableSiteUri(): ?SiteUriModel
@@ -273,15 +292,17 @@ class CacheRequestService extends Component
         $request = Craft::$app->getRequest();
 
         if ($this->getIsCachedInclude()) {
-            $includeId = $request->getParam('includeId');
-            $include = IncludeRecord::findOne($includeId);
+            $index = $request->getParam('index');
+            $include = $this->getIncludeByIndex($index);
 
-            if ($include !== null) {
-                return new SiteUriModel([
-                    'siteId' => $include->siteId,
-                    'uri' => self::CACHED_INCLUDE_PATH . '?' . http_build_query($request->getQueryParams()),
-                ]);
+            if ($include === null) {
+                return null;
             }
+
+            return new SiteUriModel([
+                'siteId' => $include->siteId,
+                'uri' => self::CACHED_INCLUDE_PATH . '?' . http_build_query($request->getQueryParams()),
+            ]);
         }
 
         $site = Craft::$app->getSites()->getCurrentSite();

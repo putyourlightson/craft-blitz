@@ -7,9 +7,7 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\web\Controller;
-use putyourlightson\blitz\records\IncludeRecord;
 use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class TemplatesController extends Controller

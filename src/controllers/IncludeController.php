@@ -7,7 +7,7 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\web\Controller;
-use putyourlightson\blitz\records\IncludeRecord;
+use putyourlightson\blitz\Blitz;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
@@ -42,8 +42,8 @@ class IncludeController extends Controller
      */
     public function _getRenderedTemplate(): Response
     {
-        $includeId = Craft::$app->getRequest()->getRequiredParam('includeId');
-        $include = IncludeRecord::findOne($includeId);
+        $index = Craft::$app->getRequest()->getRequiredParam('index');
+        $include = Blitz::$plugin->cacheRequest->getIncludeByIndex($index);
 
         if ($include === null) {
             throw new BadRequestHttpException('Request contained an invalid param.');

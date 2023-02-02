@@ -304,7 +304,7 @@ class GenerateCacheService extends Component
     /**
      * Saves an include.
      */
-    public function saveInclude(int $siteId, string $template, array $params): ?int
+    public function saveInclude(int $siteId, string $template, array $params): ?array
     {
         $params = json_encode($params);
         $index = $this->_createUniqueIndex($siteId . $template . $params);
@@ -348,7 +348,7 @@ class GenerateCacheService extends Component
 
         $mutex->release($lockName);
 
-        return $includeId ?: null;
+        return $includeId ? [$includeId, $index] : null;
     }
 
     /**

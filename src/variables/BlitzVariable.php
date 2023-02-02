@@ -194,14 +194,14 @@ class BlitzVariable
 
         $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 
-        $includeId = Blitz::$plugin->generateCache->saveInclude($siteId, $template, $params);
+        [$includeId, $index] = Blitz::$plugin->generateCache->saveInclude($siteId, $template, $params);
 
         // Create a URI relative to the root domain, to account for sub-folders
         $uri = parse_url(UrlHelper::siteUrl($uriPrefix), PHP_URL_PATH);
 
         $params = [
             'action' => $action,
-            'includeId' => $includeId,
+            'index' => $index,
         ];
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
