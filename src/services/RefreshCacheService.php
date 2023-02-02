@@ -511,7 +511,7 @@ class RefreshCacheService extends Component
             $this->releaseJobs();
 
             Blitz::$plugin->clearCache->clearAll();
-            Blitz::$plugin->flushCache->flushAll();
+            Blitz::$plugin->flushCache->flushAll(true);
             Blitz::$plugin->cachePurger->purgeAll();
         }
 

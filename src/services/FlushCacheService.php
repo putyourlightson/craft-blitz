@@ -88,7 +88,7 @@ class FlushCacheService extends Component
     /**
      * Flushes the entire cache.
      */
-    public function flushAll(): void
+    public function flushAll(bool $afterClear): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_FLUSH_ALL_CACHE, $event);
@@ -106,7 +106,7 @@ class FlushCacheService extends Component
 
         CacheRecord::deleteAll();
 
-        $this->runGarbageCollection();
+        $this->runGarbageCollection($afterClear);
 
         $mutex->release($lockName);
 
@@ -118,7 +118,7 @@ class FlushCacheService extends Component
     /**
      * Runs garbage collection.
      */
-    public function runGarbageCollection(): void
+    public function runGarbageCollection(bool $afterClear = false): void
     {
         // Get and delete element query records without an associated element query cache
         $elementQueryRecordIds = ElementQueryRecord::find()
@@ -128,6 +128,11 @@ class FlushCacheService extends Component
             ->column();
 
         ElementQueryRecord::deleteAll(['id' => $elementQueryRecordIds]);
+
+        // Delete includes only after a cache clear
+        if ($afterClear === true) {
+            IncludeRecord::deleteAll();
+        }
 
         // Check if auto increment values should be reset
         if (CacheRecord::find()->count() == 0) {
