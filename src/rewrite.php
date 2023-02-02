@@ -58,8 +58,7 @@ if (!empty($_GET[$tokenParam])) {
 $host = str_replace(':', '', $_SERVER['HTTP_HOST']);
 $uri = $_SERVER['REQUEST_URI'];
 
-/** @noinspection PhpTernaryExpressionCanBeReplacedWithConditionInspection */
-$includeQueryString = defined('BLITZ_INCLUDE_QUERY_STRING') ? BLITZ_INCLUDE_QUERY_STRING : true;
+$includeQueryString = !defined('BLITZ_INCLUDE_QUERY_STRING') || BLITZ_INCLUDE_QUERY_STRING;
 if ($includeQueryString) {
     $uri = str_replace('?', '/', $uri);
 } else {
