@@ -88,7 +88,7 @@ class FlushCacheService extends Component
     /**
      * Flushes the entire cache.
      */
-    public function flushAll(bool $afterClear): void
+    public function flushAll(bool $afterClear = false): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_FLUSH_ALL_CACHE, $event);

@@ -83,7 +83,10 @@ class HttpGenerator extends BaseCacheGenerator
                     if ($response->getStatus() == 200) {
                         $this->generated++;
                     } else {
-                        Blitz::$plugin->debug('{status} error: {reason}', ['status' => $response->getStatus(), 'reason' => $response->getReason()], $url);
+                        Blitz::$plugin->debug('{status} error: {reason}', [
+                            'status' => $response->getStatus(),
+                            'reason' => $response->getReason(),
+                        ], $url);
                     }
 
                     if (is_callable($setProgressHandler)) {
