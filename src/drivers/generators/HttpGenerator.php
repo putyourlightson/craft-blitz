@@ -32,9 +32,14 @@ use function Amp\Promise\wait;
 class HttpGenerator extends BaseCacheGenerator
 {
     /**
-     * @var int
+     * @var int The max number of concurrent requests.
      */
     public int $concurrency = 3;
+
+    /**
+     * @var int The timeout for requests in milliseconds.
+     */
+    public int $timeout = 10000;
 
     /**
      * @inheritdoc
@@ -66,7 +71,14 @@ class HttpGenerator extends BaseCacheGenerator
                 }
 
                 try {
-                    $response = yield $client->request(new Request($url));
+                    $request = new Request($url);
+
+                    // Set timeout types, since both have been reported:
+                    // https://github.com/putyourlightson/craft-blitz/issues/467#issuecomment-1410308809
+                    $request->setInactivityTimeout($this->timeout);
+                    $request->setTransferTimeout($this->timeout);
+
+                    $response = yield $client->request($request);
 
                     if ($response->getStatus() == 200) {
                         $this->generated++;
