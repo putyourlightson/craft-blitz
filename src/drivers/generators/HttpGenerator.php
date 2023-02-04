@@ -39,7 +39,7 @@ class HttpGenerator extends BaseCacheGenerator
     /**
      * @var int The timeout for requests in milliseconds.
      */
-    public int $timeout = 10000;
+    public int $timeout = 120000;
 
     /**
      * @inheritdoc
@@ -71,13 +71,7 @@ class HttpGenerator extends BaseCacheGenerator
                 }
 
                 try {
-                    $request = new Request($url);
-
-                    // Set timeout types, since both have been reported:
-                    // https://github.com/putyourlightson/craft-blitz/issues/467#issuecomment-1410308809
-                    $request->setInactivityTimeout($this->timeout);
-                    $request->setTransferTimeout($this->timeout);
-
+                    $request = $this->_createRequest($url);
                     $response = yield $client->request($request);
 
                     if ($response->getStatus() == 200) {
@@ -127,5 +121,19 @@ class HttpGenerator extends BaseCacheGenerator
             [['concurrency'], 'required'],
             [['concurrency'], 'integer', 'min' => 1, 'max' => 100],
         ];
+    }
+
+    private function _createRequest(string $url): Request
+    {
+        $request = new Request($url);
+
+        // Set all timeout types, since at least two have been reported:
+        // https://github.com/putyourlightson/craft-blitz/issues/467#issuecomment-1410308809
+        $request->setTcpConnectTimeout($this->timeout);
+        $request->setTlsHandshakeTimeout($this->timeout);
+        $request->setTransferTimeout($this->timeout);
+        $request->setInactivityTimeout($this->timeout);
+
+        return $request;
     }
 }
