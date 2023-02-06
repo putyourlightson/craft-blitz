@@ -34,9 +34,15 @@ use function Amp\Promise\wait;
 class LocalGenerator extends BaseCacheGenerator
 {
     /**
-     * @var int
+     * @var int The max number of concurrent requests.
      */
     public int $concurrency = 3;
+
+    /**
+     * @var int The timeout for requests in milliseconds. This has no effect
+     * except to prevent errors when the cache generator config setting exists.
+     */
+    public int $timeout = 0;
 
     /**
      * @inheritdoc
@@ -73,7 +79,7 @@ class LocalGenerator extends BaseCacheGenerator
 
                 $config['url'] = $url;
 
-                // Create a context that to send data between the parent and child processes
+                // Create a context to send data between the parent and child processes
                 // https://amphp.org/parallel/processes#parent-process
                 $context = create(__DIR__ . '/local-generator-script.php');
                 yield $context->start();
