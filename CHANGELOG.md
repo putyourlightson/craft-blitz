@@ -11,7 +11,7 @@
 - Added the `ssiEnabled` config setting that enables Blitz to include templates using Server-Side Includes (SSI), which must be enabled on the web server.
 - Added the `esiEnabled` config setting that enables Blitz to include templates using Edge-Side Includes (ESI), which must be enabled on the web server or reverse proxy (CDN).
 - Added a “Cached Includes” column to the Blitz cache utility for the File Cache Storage driver. 
-- Added a `timeout` config setting to the HTTP Generator ([#456](https://github.com/putyourlightson/craft-blitz/issues/467)).
+- Added a `timeout` config setting to the HTTP Generator ([#467](https://github.com/putyourlightson/craft-blitz/issues/467)).
 
 ### Changed
 - Improved the detection of when elements should be refreshed based on changes.
