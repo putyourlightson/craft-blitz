@@ -29,10 +29,14 @@ class ElementQueryHelper
         $defaultParams = self::getDefaultElementQueryParams($elementQuery->elementType);
 
         foreach ($defaultParams as $key => $default) {
-            $value = $elementQuery->{$key};
+            // Ensure the property exists (has not been unset):
+            // https://github.com/putyourlightson/craft-blitz/issues/471
+            if (isset($elementQuery->{$key})) {
+                $value = $elementQuery->{$key};
 
-            if ($value !== $default) {
-                $params[$key] = $value;
+                if ($value !== $default) {
+                    $params[$key] = $value;
+                }
             }
         }
 

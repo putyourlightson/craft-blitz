@@ -23,6 +23,7 @@
 ### Fixed
 - Fixed a bug in which the “Served by Blitz” comment was not respecting the page specific options in the first request ([#459](https://github.com/putyourlightson/craft-blitz/issues/459)).
 - Fixed a bug in which the Blitz Cache utility could throw an error if the `cacheStorageSettings['countCachedFiles']` config setting was disabled.
+- Fixed a bug in which calling `hasSales()` on a Commerce variant query could throw an error ([#471](https://github.com/putyourlightson/craft-blitz/issues/471)).
 
 ### Deprecated
 - Deprecated the `craft.blitz.getTemplate()` template variable. Use `craft.blitz.includeCached()` or `craft.blitz.includeDynamic()` instead.
