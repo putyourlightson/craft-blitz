@@ -26,9 +26,9 @@ class ElementQueryHelper
     {
         $params = [];
 
-        $defaultParams = self::getDefaultElementQueryParams($elementQuery->elementType);
+        $defaultValues = self::getDefaultElementQueryValues($elementQuery->elementType);
 
-        foreach ($defaultParams as $key => $default) {
+        foreach ($defaultValues as $key => $default) {
             // Ensure the property exists (has not been unset):
             // https://github.com/putyourlightson/craft-blitz/issues/471
             if (isset($elementQuery->{$key})) {
@@ -64,9 +64,9 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns an element query's default parameters for a given element type.
+     * Returns an element query's default values.
      */
-    public static function getDefaultElementQueryParams(string $elementType = null): array
+    public static function getDefaultElementQueryValues(string $elementType = null): array
     {
         if ($elementType === null) {
             return [];
@@ -77,21 +77,23 @@ class ElementQueryHelper
         }
 
         /** @var ElementInterface|string $elementType */
-        self::$_defaultElementQueryParams[$elementType] = get_object_vars($elementType::find());
+        $elementQuery = $elementType::find();
 
-        $ignoreParams = [
+        $ignoreKeys = [
             'select',
             'with',
-            'query',
-            'subQuery',
-            'customFields',
             'withStructure',
             'descendantDist',
         ];
 
-        foreach ($ignoreParams as $key) {
-            unset(self::$_defaultElementQueryParams[$elementType][$key]);
+        $keys = array_diff($elementQuery->criteriaAttributes(), $ignoreKeys);
+
+        $values = [];
+        foreach ($keys as $key) {
+            $values[$key] = $elementQuery->{$key};
         }
+
+        self::$_defaultElementQueryParams[$elementType] = $values;
 
         return self::$_defaultElementQueryParams[$elementType];
     }
