@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.3.0 - Unreleased
+## 4.3.0 - 2023-02-07
 ### Added
 - Added a Blitz Cache dashboard widget with actions to refresh specific pages, sites or the entire cache.
 - Added a `rewrite.php` file that can be used in situations where a server rewrite is not possible.
