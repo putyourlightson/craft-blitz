@@ -326,7 +326,7 @@
     <div id="advanced" class="flex-fields hidden">
 
         {% set info %}
-            {{ 'With this setting enabled, Blitz will include cached templates using Server-Side Includes (SSI), which must be enabled on the server.'|t('blitz') }}
+            {{ 'With this setting enabled, Blitz will fetch cached includes using Server-Side Includes (SSI), which must be enabled on the server.'|t('blitz') }}
         {% endset %}
         {{ forms.lightswitchField({
             label: "SSI Enabled"|t('blitz'),
@@ -338,7 +338,7 @@
         }) }}
 
         {% set info %}
-            {{ 'With this setting enabled, Blitz will include cached templates using Edge-Side Includes (ESI), which must be enabled on the server.'|t('blitz') }}
+            {{ 'With this setting enabled, Blitz will fetch cached includes using Edge-Side Includes (ESI), which must be enabled on the server.'|t('blitz') }}
         {% endset %}
         {{ forms.lightswitchField({
             label: "ESI Enabled"|t('blitz'),
