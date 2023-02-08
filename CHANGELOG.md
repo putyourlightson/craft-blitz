@@ -7,7 +7,6 @@
 - Added the `craft.blitz.includeCached()` template variable, that includes a cached template using SSI or ESI if enabled, otherwise via an AJAX request.
 - Added the `craft.blitz.includeDynamic()` template variable, that includes a dynamically rendered template via an AJAX request.
 - Added the `craft.blitz.fetchUri()` template variable, that fetches a URI via an AJAX request. Whether the URI response is cached or not is determined by the URI patterns in the plugin settings.
-- Added the `blitz/templates/include-cached` and `blitz/templates/include-dynamic` controller actions.
 - Added the `ssiEnabled` config setting that enables Blitz to include templates using Server-Side Includes (SSI), which must be enabled on the web server.
 - Added the `esiEnabled` config setting that enables Blitz to include templates using Edge-Side Includes (ESI), which must be enabled on the web server or reverse proxy (CDN).
 - Added a “Cached Includes” column to the Blitz cache utility for the File Cache Storage driver. 
