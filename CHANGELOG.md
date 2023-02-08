@@ -18,6 +18,7 @@
 - Generator, deployer and purger jobs are now released before refreshing the entire cache, provided cache clearing is enabled ([#454](https://github.com/putyourlightson/craft-blitz/issues/454)). 
 - Changed the default authentication method for the Cloudflare purger to “API token” and improved the field instruction text.
 - Replaced the abandoned `symplify/git-wrapper` package with `cypresslab/gitelephant`.
+- Increased the default timeout of HTTP Generator requests to 120 seconds ([#467](https://github.com/putyourlightson/craft-blitz/issues/467)).
 
 ### Fixed
 - Fixed a bug in which the “Served by Blitz” comment was not respecting the page specific options in the first request ([#459](https://github.com/putyourlightson/craft-blitz/issues/459)).
