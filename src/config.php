@@ -29,7 +29,7 @@ return [
         //'cachingEnabled' => false,
 
         // Determines when and how the cache should be refreshed.
-        // - `0`: Expire the cache, regenerate manually or organically
+        // - `0`: Expire the cache, regenerate manually
         // - `1`: Clear the cache, regenerate manually or organically
         // - `2`: Expire the cache and regenerate in a queue job
         // - `3`: Clear the cache and regenerate in a queue job

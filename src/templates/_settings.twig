@@ -104,7 +104,7 @@
                         Select this if updated content should be applied as soon as possible but if cached pages should be regenerated manually (via a cron job) or organically (when pages are visited).
                     </p>
                     <p>
-                        <strong>Expire the cache, regenerate manually or organically</strong>
+                        <strong>Expire the cache, regenerate manually</strong>
                         <br>
                         Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are regenerated manually (via a cron job).
                     </p>
@@ -119,7 +119,7 @@
                         3: "Clear the cache and regenerate in a queue job"|t('blitz'),
                         2: "Expire the cache and regenerate in a queue job"|t('blitz'),
                         1: "Clear the cache, regenerate manually or organically"|t('blitz'),
-                        0: "Expire the cache, regenerate manually or organically"|t('blitz'),
+                        0: "Expire the cache, regenerate manually"|t('blitz'),
                     },
                     value: settings.refreshMode,
                 }) }}
