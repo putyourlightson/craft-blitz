@@ -96,7 +96,11 @@ class ElementChangedBehavior extends Behavior
 
         $original = $element->duplicateOf;
 
-        if ($original !== null) {
+        if ($original === null) {
+            if (!empty($element->getDirtyFields())) {
+                return true;
+            }
+        } else {
             if (!empty($original->getModifiedAttributes()) || !empty($original->getModifiedFields())) {
                 return true;
             }

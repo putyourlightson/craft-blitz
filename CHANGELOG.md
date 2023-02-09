@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.3.1 - Unreleased
+### Fixed
+- Fixed a bug in which saving elements that do not auto-save drafts were not triggering cache refreshes ([#474](https://github.com/putyourlightson/craft-blitz/issues/474)).
+
 ## 4.3.0 - 2023-02-07
 ### Added
 - Added a Blitz Cache dashboard widget with actions to refresh specific pages, sites or the entire cache.
