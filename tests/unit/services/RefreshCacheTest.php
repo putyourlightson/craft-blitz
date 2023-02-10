@@ -19,7 +19,7 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
-use putyourlightson\blitztests\fixtures\EntriesFixture;
+use putyourlightson\blitztests\fixtures\EntryFixture;
 use UnitTester;
 
 /**
@@ -67,7 +67,7 @@ class RefreshCacheTest extends Unit
     {
         return [
             'entries' => [
-                'class' => EntriesFixture::class,
+                'class' => EntryFixture::class,
             ],
         ];
     }
@@ -171,13 +171,32 @@ class RefreshCacheTest extends Unit
         $this->assertEquals(1, count($elementTypeQueries));
     }
 
-    public function testAddElementWhenChanged()
+    public function testAddElementWhenUnhanged()
     {
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the elements are empty
         $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[Entry::class]);
+    }
 
+    public function testAddElementWhenAttributeChanged()
+    {
+        // Update the title
+        $this->entry1->title .= ' X';
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        // Assert that the element and source IDs are correct
+        $this->assertEquals(
+            [
+                'elementIds' => [$this->entry1->id],
+                'sourceIds' => [$this->entry1->sectionId],
+            ],
+            Blitz::$plugin->refreshCache->elements[Entry::class]
+        );
+    }
+
+    public function testAddElementWhenFieldChanged()
+    {
         // Update the title
         $this->entry1->title .= ' X';
         Blitz::$plugin->refreshCache->addElement($this->entry1);

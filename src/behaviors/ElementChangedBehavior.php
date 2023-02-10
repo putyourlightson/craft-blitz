@@ -17,9 +17,12 @@ use yii\base\Behavior;
  * @since 3.6.0
  *
  * @property-read bool $hasChanged
+ * @property-read bool $hasBeenDeleted
  * @property-read bool $hasStatusChanged
  * @property-read bool $hasFocalPointChanged
  * @property-read bool $hasRefreshableStatus
+ * @property-read bool $haveAttributesChanged
+ * @property-read bool $haveFieldsChanged
  * @property Element $owner
  */
 class ElementChangedBehavior extends Behavior
@@ -30,19 +33,9 @@ class ElementChangedBehavior extends Behavior
     public const BEHAVIOR_NAME = 'elementChanged';
 
     /**
-     * @var string|null The previous status of the element.
+     * @var Element|null The original element.
      */
-    public ?string $previousStatus = null;
-
-    /**
-     * @var array|null The previous focal point of the element, if an asset.
-     */
-    public ?array $previousFocalPoint = null;
-
-    /**
-     * @var bool Whether the element was deleted.
-     */
-    public bool $isDeleted = false;
+    public ?Element $originalElement = null;
 
     /**
      * @inerhitdoc
@@ -58,55 +51,21 @@ class ElementChangedBehavior extends Behavior
             return;
         }
 
-        $originalElement = Craft::$app->getElements()->getElementById($element->id, get_class($element), $element->siteId);
-
-        if ($originalElement !== null) {
-            $this->previousStatus = $originalElement->getStatus();
-
-            if ($originalElement instanceof Asset) {
-                $this->previousFocalPoint = $originalElement->focalPoint;
-            }
-        }
-
-        $element->on(Element::EVENT_AFTER_DELETE, function() {
-            $this->isDeleted = true;
-        });
+        $this->originalElement = Craft::$app->getElements()->getElementById($element->id, get_class($element), $element->siteId);
     }
 
     /**
-     * Returns whether the element's fields, attributes or status have changed.
+     * Returns whether the element has changed.
      */
-    public function getHasChanged(): bool
+    public function getHasChanged(bool $includeCustomFields = true): bool
     {
         $element = $this->owner;
 
-        /**
-         * Craft 3.7.5 introduced detection of first save. Craft 3.7 can save
-         * canonical entries by duplicating a draft or revision, so we need to
-         * additionally check whether the original element has any modified
-         * attributes or fields.
-         */
         if ($element->firstSave) {
             return true;
         }
 
-        if (!empty($element->getDirtyAttributes())) {
-            return true;
-        }
-
-        $original = $element->duplicateOf;
-
-        if ($original === null) {
-            if (!empty($element->getDirtyFields())) {
-                return true;
-            }
-        } else {
-            if (!empty($original->getModifiedAttributes()) || !empty($original->getModifiedFields())) {
-                return true;
-            }
-        }
-
-        if ($this->isDeleted) {
+        if ($this->getHasBeenDeleted()) {
             return true;
         }
 
@@ -118,7 +77,27 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
+        if ($this->getHaveAttributesChanged()) {
+            return true;
+        }
+
+        if ($includeCustomFields && $this->getHaveFieldsChanged()) {
+            return true;
+        }
+
         return false;
+    }
+
+    /**
+     * Returns whether the element has been deleted.
+     */
+    public function getHasBeenDeleted(): bool
+    {
+        if ($this->originalElement === null) {
+            return false;
+        }
+
+        return $this->originalElement->dateDeleted !== null;
     }
 
     /**
@@ -126,7 +105,13 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasStatusChanged(): bool
     {
-        return $this->previousStatus === null || $this->previousStatus != $this->owner->getStatus();
+        $element = $this->owner;
+
+        if ($this->originalElement === null) {
+            return false;
+        }
+
+        return $element->getStatus() != $this->originalElement->getStatus();
     }
 
     /**
@@ -135,23 +120,25 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasFocalPointChanged(): bool
     {
-        if ($this->previousFocalPoint === null || !($this->owner instanceof Asset)) {
+        $element = $this->owner;
+
+        if (!($element instanceof Asset) || !($this->originalElement instanceof Asset)) {
             return false;
         }
 
         // Comparing floats is problematic, so we convert to a fixed precision first.
         // https://www.php.net/manual/en/language.types.float.php
         $precision = 5;
-        $previousFocalPoint = [
-            number_format($this->previousFocalPoint['x'], $precision),
-            number_format($this->previousFocalPoint['y'], $precision),
+        $originalFocalPoint = [
+            number_format($this->originalElement->focalPoint['x'], $precision),
+            number_format($this->originalElement->focalPoint['y'], $precision),
         ];
         $focalPoint = [
-            number_format($this->owner->focalPoint['x'], $precision),
-            number_format($this->owner->focalPoint['y'], $precision),
+            number_format($element->focalPoint['x'], $precision),
+            number_format($element->focalPoint['y'], $precision),
         ];
 
-        return $previousFocalPoint != $focalPoint;
+        return $focalPoint != $originalFocalPoint;
     }
 
     /**
@@ -159,8 +146,9 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasRefreshableStatus(): bool
     {
-        $elementStatus = $this->owner->getStatus();
-        $liveStatus = ElementTypeHelper::getLiveStatus(get_class($this->owner));
+        $element = $this->owner;
+        $elementStatus = $element->getStatus();
+        $liveStatus = ElementTypeHelper::getLiveStatus(get_class($element));
         $refreshableStatuses = [
             $liveStatus,
             'pending',
@@ -168,5 +156,52 @@ class ElementChangedBehavior extends Behavior
         ];
 
         return in_array($elementStatus, $refreshableStatuses);
+    }
+
+    /**
+     * Returns whether any of the element’s attributes have changed.
+     */
+    public function getHaveAttributesChanged(): bool
+    {
+        $element = $this->owner;
+
+        /**
+         * The duplicate is `null` if the element doesn’t support drafts/revisions
+         * or is saved before a draft/revision can be auto-created.
+         */
+        $duplicateOf = $element->duplicateOf;
+
+        if ($duplicateOf === null) {
+            return !empty($element->getDirtyAttributes());
+        }
+
+        return !empty($duplicateOf->getModifiedAttributes());
+    }
+
+    /**
+     * Returns whether any of the element’s custom fields have changed.
+     */
+    public function getHaveFieldsChanged(): bool
+    {
+        $element = $this->owner;
+
+        /**
+         * The duplicate is `null` if the element doesn’t support drafts/revisions
+         * or is saved before a draft/revision can be auto-created.
+         */
+        $duplicateOf = $element->duplicateOf;
+
+        if ($duplicateOf === null) {
+            // If the element has revisions, we can check for dirty fields
+            if ($element->hasRevisions()) {
+                return !empty($element->getDirtyFields());
+            }
+
+            // Otherwise we have to assume that fields have changed, as comparing
+            // field values isn’t practical with block field types.
+            return true;
+        }
+
+        return !empty($duplicateOf->getModifiedFields());
     }
 }

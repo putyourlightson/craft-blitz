@@ -5,9 +5,7 @@
 
 namespace putyourlightson\blitztests\fixtures;
 
-use craft\test\fixtures\elements\EntryFixture;
-
-class EntriesFixture extends EntryFixture
+class EntryFixture extends \craft\test\fixtures\elements\EntryFixture
 {
     /**
      * @inheritdoc
