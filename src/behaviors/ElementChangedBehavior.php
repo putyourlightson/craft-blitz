@@ -163,17 +163,11 @@ class ElementChangedBehavior extends Behavior
     {
         $element = $this->owner;
 
-        /**
-         * The duplicate is `null` if the element doesn’t support drafts/revisions
-         * or is saved before a draft/revision can be auto-created.
-         */
-        $duplicateOf = $element->duplicateOf;
-
-        if ($duplicateOf === null) {
-            return !empty($element->getDirtyAttributes());
+        if ($element->duplicateOf !== null) {
+            return !empty($element->duplicateOf->getModifiedAttributes());
         }
 
-        return !empty($duplicateOf->getModifiedAttributes());
+        return !empty($element->getDirtyAttributes());
     }
 
     /**
@@ -183,17 +177,12 @@ class ElementChangedBehavior extends Behavior
     {
         $element = $this->owner;
 
-        // The duplicate is `null` if the element doesn’t support drafts or is
-        // saved before a draft can be auto-created.
-        $duplicateOf = $element->duplicateOf;
-
-        if ($duplicateOf !== null) {
-            return !empty($duplicateOf->getModifiedFields());
+        if ($element->duplicateOf !== null) {
+            return !empty($element->duplicateOf->getModifiedFields());
         }
 
-        // This only works for elements that save via edit forms in the CP
-        // using the `ElementsController::saveElement()` method. Otherwise,
-        // this always return `true`.
+        // This only works for elements that are saved from a duplicate.
+        // It always returns `true` for elements that don’t support drafts.
         return !empty($element->getDirtyFields());
     }
 }
