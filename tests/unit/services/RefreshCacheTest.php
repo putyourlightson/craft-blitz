@@ -48,9 +48,14 @@ class RefreshCacheTest extends Unit
     private Entry|ElementChangedBehavior|null $entry1 = null;
 
     /**
-     * @var Entry|null
+     * @var Entry|ElementChangedBehavior|null
      */
-    private ?Entry $entry2 = null;
+    private Entry|ElementChangedBehavior|null $entry2 = null;
+
+    /**
+     * @var User|ElementChangedBehavior|null
+     */
+    private User|ElementChangedBehavior|null $user = null;
 
     /**
      * @var array
@@ -86,33 +91,13 @@ class RefreshCacheTest extends Unit
             'uri' => 'page',
         ]);
 
-        $this->entry1 = Entry::find()->slug('entry-1')->one();
-        $this->entry2 = Entry::find()->slug('entry-2')->one();
-
-        if ($this->entry1 === null) {
-            $this->entry1 = new Entry([
-                'authorId' => '1',
-                'sectionId' => '1',
-                'typeId' => '1',
-                'title' => 'Entry 1',
-                'slug' => 'entry-1',
-                'text' => 'abc',
-            ]);
-            Craft::$app->getElements()->saveElement($this->entry1);
-        }
-
-        if ($this->entry2 === null) {
-            $this->entry2 = new Entry([
-                'authorId' => '1',
-                'sectionId' => '2',
-                'typeId' => '2',
-                'title' => 'Entry 2',
-                'slug' => 'entry-2',
-            ]);
-            Craft::$app->getElements()->saveElement($this->entry2);
-        }
+        $this->entry1 = Entry::find()->sectionId(1)->one();
+        $this->entry2 = Entry::find()->sectionId(2)->one();
+        $this->user = User::find()->one();
 
         $this->entry1->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+        $this->entry2->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+        $this->user->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
         Blitz::$plugin->refreshCache->reset();
         Blitz::$plugin->refreshCache->batchMode = true;
@@ -174,16 +159,7 @@ class RefreshCacheTest extends Unit
 
     public function testAddElementWhenUnchanged()
     {
-        $user = User::find()->one();
-        $user->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
-        Blitz::$plugin->refreshCache->addElement($user);
-        $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[User::class]);
-
         Blitz::$plugin->refreshCache->addElement($this->entry1);
-
-        $this->assertFalse($this->entry1->getHasStatusChanged());
-        $this->assertFalse($this->entry1->getHaveAttributesChanged());
-        $this->assertEmpty($this->entry1->hasRevisions());
 
         // Assert that the elements are empty
         $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[Entry::class]);
@@ -304,6 +280,29 @@ class RefreshCacheTest extends Unit
         $this->assertEquals(
             Db::prepareDateForDb($this->entry1->postDate),
             $elementExpiryDateRecord->expiryDate
+        );
+    }
+
+    public function testAddUserWhenUnchanged()
+    {
+        Blitz::$plugin->refreshCache->addElement($this->user);
+
+        // Assert that the elements are empty
+        $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[User::class]);
+    }
+
+    public function testAddUserWhenFieldChanged()
+    {
+        $this->user->setFieldValue('shortBio', '123');
+        Blitz::$plugin->refreshCache->addElement($this->user);
+
+        // Assert that the element and source IDs are correct
+        $this->assertEquals(
+            [
+                'elementIds' => [$this->user->id],
+                'sourceIds' => [],
+            ],
+            Blitz::$plugin->refreshCache->elements[User::class]
         );
     }
 

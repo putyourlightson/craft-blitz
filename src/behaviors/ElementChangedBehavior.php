@@ -57,7 +57,7 @@ class ElementChangedBehavior extends Behavior
     /**
      * Returns whether the element has changed.
      */
-    public function getHasChanged(bool $includeCustomFields = true): bool
+    public function getHasChanged(bool $ignoreCustomFields = false): bool
     {
         $element = $this->owner;
 
@@ -81,7 +81,7 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        if ($includeCustomFields && $this->getHaveFieldsChanged()) {
+        if ($ignoreCustomFields === false && $this->getHaveFieldsChanged()) {
             return true;
         }
 
@@ -93,11 +93,9 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasBeenDeleted(): bool
     {
-        if ($this->originalElement === null) {
-            return false;
-        }
+        $element = $this->owner;
 
-        return $this->originalElement->dateDeleted !== null;
+        return $element->dateDeleted !== null;
     }
 
     /**
@@ -185,23 +183,17 @@ class ElementChangedBehavior extends Behavior
     {
         $element = $this->owner;
 
-        /**
-         * The duplicate is `null` if the element doesn’t support drafts/revisions
-         * or is saved before a draft/revision can be auto-created.
-         */
+        // The duplicate is `null` if the element doesn’t support drafts or is
+        // saved before a draft can be auto-created.
         $duplicateOf = $element->duplicateOf;
 
-        if ($duplicateOf === null) {
-            // If the element has revisions, we can check for dirty fields
-            if ($element->hasRevisions()) {
-                return !empty($element->getDirtyFields());
-            }
-
-            // Otherwise we have to assume that fields have changed, as comparing
-            // field values isn’t practical with block field types.
-            return true;
+        if ($duplicateOf !== null) {
+            return !empty($duplicateOf->getModifiedFields());
         }
 
-        return !empty($duplicateOf->getModifiedFields());
+        // This only works for elements that save via edit forms in the CP
+        // using the `ElementsController::saveElement()` method. Otherwise,
+        // this always return `true`.
+        return !empty($element->getDirtyFields());
     }
 }

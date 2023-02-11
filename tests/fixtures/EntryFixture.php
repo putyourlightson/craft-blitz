@@ -15,5 +15,5 @@ class EntryFixture extends \craft\test\fixtures\elements\EntryFixture
     /**
      * @inheritdoc
      */
-    public $depends = [SectionsFixture::class, EntryTypeFixture::class];
+    public $depends = [FieldLayoutFixture::class, SectionsFixture::class, EntryTypeFixture::class];
 }

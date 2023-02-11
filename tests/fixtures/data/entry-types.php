@@ -9,6 +9,7 @@ return [
         'handle' => 'entryType1',
         'titleFormat' => null,
         'sortOrder' => '1',
+        'fieldLayoutType' => 'craft\test\Craft',
         'uid' => 'entry-type-1------------------uid',
     ],
     [
@@ -19,6 +20,7 @@ return [
         'handle' => 'entryType2',
         'titleFormat' => null,
         'sortOrder' => '2',
+        'fieldLayoutType' => 'craft\test\Craft',
         'uid' => 'entry-type-2------------------uid',
     ],
 ];
