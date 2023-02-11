@@ -157,7 +157,7 @@ class RefreshCacheTest extends Unit
 
         // Assert that the elements are empty
         $this->assertEquals(
-            RefreshCacheService::DEFAULT_TRACKED_ELEMENTS, Blitz::$plugin->refreshCache->elements[Entry::class]
+            RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE, Blitz::$plugin->refreshCache->elements[Entry::class]
         );
     }
 
@@ -185,6 +185,19 @@ class RefreshCacheTest extends Unit
         );
     }
 
+    public function testAddElementWhenAttributeAndFieldChanged()
+    {
+        $this->entry1->title .= ' X';
+        $this->entry1->setFieldValue('text', '123');
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        // Assert that the element and source IDs are correct
+        $this->assertEquals(
+            $this->_getTrackedElements($this->entry1),
+            Blitz::$plugin->refreshCache->elements[Entry::class]
+        );
+    }
+
     public function testAddElementWhenStatusChanged()
     {
         $this->entry1->title .= ' X';
@@ -195,7 +208,7 @@ class RefreshCacheTest extends Unit
 
         // Assert that the elements are empty
         $this->assertEquals(
-            RefreshCacheService::DEFAULT_TRACKED_ELEMENTS, Blitz::$plugin->refreshCache->elements[Entry::class]
+            RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE, Blitz::$plugin->refreshCache->elements[Entry::class]
         );
 
         $this->entry1->originalElement->enabled = true;
@@ -272,7 +285,7 @@ class RefreshCacheTest extends Unit
 
         // Assert that the elements are empty
         $this->assertEquals(
-            RefreshCacheService::DEFAULT_TRACKED_ELEMENTS, Blitz::$plugin->refreshCache->elements[User::class]
+            RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE, Blitz::$plugin->refreshCache->elements[User::class]
         );
     }
 
@@ -291,7 +304,7 @@ class RefreshCacheTest extends Unit
     public function testRefreshReset()
     {
         Blitz::$plugin->refreshCache->cacheIds = [1];
-        Blitz::$plugin->refreshCache->elements = [Entry::class => RefreshCacheService::DEFAULT_TRACKED_ELEMENTS];
+        Blitz::$plugin->refreshCache->elements = [Entry::class => RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE];
 
         Blitz::$plugin->refreshCache->refresh();
 
@@ -313,10 +326,13 @@ class RefreshCacheTest extends Unit
         $refreshCacheJob = new RefreshCacheJob([
             'cacheIds' => [],
             'elements' => [
-                Entry::class => [
-                    'elementIds' => [$this->entry1->id],
-                    'sourceIds' => [$this->entry1->sectionId],
-                ],
+                Entry::class => array_merge(
+                    RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE,
+                    [
+                        'elementIds' => [$this->entry1->id],
+                        'sourceIds' => [$this->entry1->sectionId],
+                    ],
+                ),
             ],
             'forceClear' => true,
         ]);
@@ -341,10 +357,13 @@ class RefreshCacheTest extends Unit
         $refreshCacheJob = new RefreshCacheJob([
             'cacheIds' => [],
             'elements' => [
-                Entry::class => [
-                    'elementIds' => [],
-                    'sourceIds' => [$this->entry1->sectionId],
-                ],
+                Entry::class => array_merge(
+                    RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE,
+                    [
+                        'elementIds' => [],
+                        'sourceIds' => [$this->entry1->sectionId],
+                    ],
+                ),
             ],
             'forceClear' => true,
         ]);
@@ -408,10 +427,11 @@ class RefreshCacheTest extends Unit
 
     private function _getTrackedElements(Element $element, array $changedFields = []): array
     {
-        return array_merge(RefreshCacheService::DEFAULT_TRACKED_ELEMENTS, [
+        return [
             'elementIds' => [$element->id],
+            'elementOnlyFieldsChanged' => [$element->id => !empty($changedFields)],
+            'elementChangedFields' => [$element->id => $changedFields],
             'sourceIds' => !empty($element->sectionId) ? [$element->sectionId] : [],
-            'changedFields' => [$element->id => $changedFields]
-        ]);
+        ];
     }
 }

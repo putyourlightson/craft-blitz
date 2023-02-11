@@ -100,10 +100,11 @@ class RefreshCacheService extends Component
     /**
      * @const array
      */
-    public const DEFAULT_TRACKED_ELEMENTS = [
+    public const DEFAULT_TRACKED_ELEMENT_TYPE = [
         'elementIds' => [],
+        'elementOnlyFieldsChanged' => [],
+        'elementChangedFields' => [],
         'sourceIds' => [],
-        'changedFields' => [],
     ];
 
     /**
@@ -131,16 +132,36 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Returns cache IDs given an array of element IDs.
+     * Returns cache IDs given an array of element IDs and changed fields.
      *
      * @param int[] $elementIds
      * @return int[]
      */
-    public function getElementCacheIds(array $elementIds): array
+    public function getElementCacheIds(array $elementIds, array $elementOnlyFieldsChanged = [], array $elementChangedFields = []): array
     {
+        $condition = ['or'];
+
+        foreach ($elementIds as $elementId) {
+            $elementCondition = ['elementId' => $elementId];
+            $onlyFieldsChanged = $elementOnlyFieldsChanged[$elementId] ?? false;
+
+            if ($onlyFieldsChanged) {
+                $changedFields = $elementChangedFields[$elementId] ?? [];
+                $changedFieldCondition = ['or'];
+
+                foreach ($changedFields as $changedField) {
+                    $changedFieldCondition[] = ['in', 'trackFields', $changedField];
+                }
+
+                $elementCondition[] = $changedFieldCondition;
+            }
+
+            $condition[] = $elementCondition;
+        }
+
         return ElementCacheRecord::find()
             ->select('cacheId')
-            ->where(['elementId' => $elementIds])
+            ->where($condition)
             ->groupBy('cacheId')
             ->column();
     }
@@ -219,9 +240,11 @@ class RefreshCacheService extends Component
      */
     public function addElementIds(string $elementType, array $elementIds): void
     {
-        $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENTS;
+        $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENT_TYPE;
 
-        $this->elements[$elementType]['elementIds'] = array_unique(array_merge($this->elements[$elementType]['elementIds'], $elementIds));
+        foreach ($elementIds as $elementId) {
+            $this->elements[$elementType]['elements'][$elementId] = [];
+        }
     }
 
     /**
@@ -265,12 +288,17 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENTS;
+        $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENT_TYPE;
 
-        // Don't proceed if element has already been added
-        if (in_array($element->getId(), $this->elements[$elementType]['elementIds'])) {
+        // Don't proceed if element has already been added and not only fields were changed
+        if (in_array($element->getId(), $this->elements[$elementType]['elementIds'])
+            && $this->elements[$elementType]['elementOnlyFieldsChanged'][$element->id] === false
+        ) {
             return;
         }
+
+        $onlyFieldsChanged = false;
+        $changedFields = $this->elements[$elementType]['elementChangedFields'][$element->id] ?? [];
 
         // If the element has the element changed behavior
         /** @var ElementChangedBehavior|null $elementChanged */
@@ -289,6 +317,16 @@ class RefreshCacheService extends Component
             ) {
                 return;
             }
+
+            if ($elementChanged->onlyFieldsChanged) {
+                $onlyFieldsChanged = true;
+                $changedFields = array_unique(
+                    array_merge($changedFields, $elementChanged->getChangedFields())
+                );
+            } else {
+                // Don’t track changed fields for no reason
+                $changedFields = [];
+            }
         }
 
         $event = new RefreshElementEvent(['element' => $element]);
@@ -300,8 +338,10 @@ class RefreshCacheService extends Component
 
         // Add element
         $this->elements[$elementType]['elementIds'][] = $element->id;
+        $this->elements[$elementType]['elementOnlyFieldsChanged'][$element->id] = $onlyFieldsChanged;
+        $this->elements[$elementType]['elementChangedFields'][$element->id] = $changedFields;
 
-        // Add source ID
+        // Add source
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
         if ($sourceIdAttribute !== null) {
             $sourceId = $element->{$sourceIdAttribute};
@@ -309,13 +349,6 @@ class RefreshCacheService extends Component
                 $this->elements[$elementType]['sourceIds'][] = $sourceId;
             }
         }
-
-        // Add changed fields
-        $changedFields = $this->elements[$elementType]['changedFields'][$element->id] ?? [];
-        if ($elementChanged !== null) {
-            $changedFields = array_unique(array_merge($changedFields, $elementChanged->getChangedFields()));
-        }
-        $this->elements[$elementType]['changedFields'][$element->id] = $changedFields;
 
         // Add element expiry dates
         $this->addElementExpiryDates($element);

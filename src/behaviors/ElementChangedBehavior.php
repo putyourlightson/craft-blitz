@@ -23,6 +23,7 @@ use yii\base\Behavior;
  * @property-read bool $hasRefreshableStatus
  * @property-read bool $haveAttributesChanged
  * @property-read bool $haveFieldsChanged
+ * @property-read string[] $changedFields
  * @property Element $owner
  */
 class ElementChangedBehavior extends Behavior
@@ -36,6 +37,11 @@ class ElementChangedBehavior extends Behavior
      * @var Element|null The original element.
      */
     public ?Element $originalElement = null;
+
+    /**
+     * @var bool Whether only fields have changed on the element.
+     */
+    public bool $onlyFieldsChanged = false;
 
     /**
      * @inerhitdoc
@@ -57,7 +63,7 @@ class ElementChangedBehavior extends Behavior
     /**
      * Returns whether the element has changed.
      */
-    public function getHasChanged(bool $ignoreCustomFields = false): bool
+    public function getHasChanged(): bool
     {
         $element = $this->owner;
 
@@ -82,6 +88,8 @@ class ElementChangedBehavior extends Behavior
         }
 
         if ($this->getHaveFieldsChanged()) {
+            $this->onlyFieldsChanged = true;
+
             return true;
         }
 
