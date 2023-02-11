@@ -81,7 +81,7 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        if ($ignoreCustomFields === false && $this->getHaveFieldsChanged()) {
+        if ($this->getHaveFieldsChanged()) {
             return true;
         }
 
@@ -175,14 +175,24 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHaveFieldsChanged(): bool
     {
+        return !empty($this->getChangedFields());
+    }
+
+    /**
+     * Returns the handles of the custom fields that have changed.
+     *
+     * @return string[]
+     */
+    public function getChangedFields(): array
+    {
         $element = $this->owner;
 
         if ($element->duplicateOf !== null) {
-            return !empty($element->duplicateOf->getModifiedFields());
+            return $element->duplicateOf->getModifiedFields();
         }
 
         // This only works for elements that are saved from a duplicate.
         // It always returns `true` for elements that don’t support drafts.
-        return !empty($element->getDirtyFields());
+        return $element->getDirtyFields();
     }
 }

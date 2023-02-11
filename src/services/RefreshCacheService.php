@@ -98,6 +98,15 @@ class RefreshCacheService extends Component
     public const EVENT_AFTER_REFRESH_SITE_CACHE = 'afterRefreshSiteCache';
 
     /**
+     * @const array
+     */
+    public const DEFAULT_TRACKED_ELEMENTS = [
+        'elementIds' => [],
+        'sourceIds' => [],
+        'changedFields' => [],
+    ];
+
+    /**
      * @var bool
      */
     public bool $batchMode = false;
@@ -210,10 +219,7 @@ class RefreshCacheService extends Component
      */
     public function addElementIds(string $elementType, array $elementIds): void
     {
-        $this->elements[$elementType] = $this->elements[$elementType] ?? [
-            'elementIds' => [],
-            'sourceIds' => [],
-        ];
+        $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENTS;
 
         $this->elements[$elementType]['elementIds'] = array_unique(array_merge($this->elements[$elementType]['elementIds'], $elementIds));
     }
@@ -259,10 +265,7 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $this->elements[$elementType] = $this->elements[$elementType] ?? [
-            'elementIds' => [],
-            'sourceIds' => [],
-        ];
+        $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENTS;
 
         // Don't proceed if element has already been added
         if (in_array($element->getId(), $this->elements[$elementType]['elementIds'])) {
@@ -300,14 +303,19 @@ class RefreshCacheService extends Component
 
         // Add source ID
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
-
         if ($sourceIdAttribute !== null) {
             $sourceId = $element->{$sourceIdAttribute};
-
             if (!in_array($sourceId, $this->elements[$elementType]['sourceIds'])) {
                 $this->elements[$elementType]['sourceIds'][] = $sourceId;
             }
         }
+
+        // Add changed fields
+        $changedFields = $this->elements[$elementType]['changedFields'][$element->id] ?? [];
+        if ($elementChanged !== null) {
+            $changedFields = array_unique(array_merge($changedFields, $elementChanged->getChangedFields()));
+        }
+        $this->elements[$elementType]['changedFields'][$element->id] = $changedFields;
 
         // Add element expiry dates
         $this->addElementExpiryDates($element);
