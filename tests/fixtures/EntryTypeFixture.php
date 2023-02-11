@@ -23,5 +23,5 @@ class EntryTypeFixture extends ActiveFixture
     /**
      * @inheritdoc
      */
-    public $depends = [SectionsFixture::class, FieldLayoutFixture::class];
+    public $depends = [FieldLayoutFixture::class, SectionsFixture::class];
 }

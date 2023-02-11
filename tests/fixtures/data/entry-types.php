@@ -4,7 +4,7 @@ return [
     [
         'id' => '1',
         'sectionId' => '1',
-        'fieldLayoutId' => 1,
+        'fieldLayoutId' => null,
         'name' => 'Entry Type 1',
         'handle' => 'entryType1',
         'titleFormat' => null,
@@ -14,7 +14,7 @@ return [
     [
         'id' => '2',
         'sectionId' => '2',
-        'fieldLayoutId' => 1,
+        'fieldLayoutId' => null,
         'name' => 'Entry Type 2',
         'handle' => 'entryType2',
         'titleFormat' => null,

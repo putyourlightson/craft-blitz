@@ -7,8 +7,8 @@ namespace putyourlightson\blitztests\unit\services;
 
 use Codeception\Test\Unit;
 use Craft;
-use craft\base\Element;
 use craft\elements\Entry;
+use craft\elements\User;
 use craft\helpers\Db;
 use DateInterval;
 use DateTime;
@@ -96,6 +96,7 @@ class RefreshCacheTest extends Unit
                 'typeId' => '1',
                 'title' => 'Entry 1',
                 'slug' => 'entry-1',
+                'text' => 'abc',
             ]);
             Craft::$app->getElements()->saveElement($this->entry1);
         }
@@ -125,7 +126,7 @@ class RefreshCacheTest extends Unit
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds([$this->entry1->id]);
 
         // Assert that one cache ID was returned
-        $this->assertEquals(1, count($cacheIds));
+        $this->assertCount(1, $cacheIds);
     }
 
     public function testGetElementTypeQueries()
@@ -161,19 +162,28 @@ class RefreshCacheTest extends Unit
         );
 
         // Assert that two element type queries were returned
-        $this->assertEquals(2, count($elementTypeQueries));
+        $this->assertCount(2, $elementTypeQueries);
 
         $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
             Entry::class, [$this->entry2->sectionId], []
         );
 
         // Assert that one element type query was returned
-        $this->assertEquals(1, count($elementTypeQueries));
+        $this->assertCount(1, $elementTypeQueries);
     }
 
-    public function testAddElementWhenUnhanged()
+    public function testAddElementWhenUnchanged()
     {
+        $user = User::find()->one();
+        $user->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+        Blitz::$plugin->refreshCache->addElement($user);
+        $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[User::class]);
+
         Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        $this->assertFalse($this->entry1->getHasStatusChanged());
+        $this->assertFalse($this->entry1->getHaveAttributesChanged());
+        $this->assertEmpty($this->entry1->hasRevisions());
 
         // Assert that the elements are empty
         $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[Entry::class]);
@@ -181,7 +191,6 @@ class RefreshCacheTest extends Unit
 
     public function testAddElementWhenAttributeChanged()
     {
-        // Update the title
         $this->entry1->title .= ' X';
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
@@ -197,8 +206,7 @@ class RefreshCacheTest extends Unit
 
     public function testAddElementWhenFieldChanged()
     {
-        // Update the title
-        $this->entry1->title .= ' X';
+        $this->entry1->setFieldValue('text', '123');
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the element and source IDs are correct
@@ -213,19 +221,16 @@ class RefreshCacheTest extends Unit
 
     public function testAddElementWhenStatusChanged()
     {
-        // Update the title
         $this->entry1->title .= ' X';
 
-        // Change the statuses to disabled
-        $this->entry1->previousStatus = Element::STATUS_DISABLED;
+        $this->entry1->originalElement->enabled = false;
         $this->entry1->enabled = false;
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the elements are empty
         $this->assertEquals($this->emptyElements, Blitz::$plugin->refreshCache->elements[Entry::class]);
 
-        // Change the previous status to live
-        $this->entry1->previousStatus = Entry::STATUS_LIVE;
+        $this->entry1->originalElement->enabled = true;
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the element and source IDs are correct
