@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Component;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheTagRecord;
+use putyourlightson\campaign\helpers\StringHelper;
 
 /**
  * @property-read string[] $allTags
@@ -65,11 +66,12 @@ class CacheTagsService extends Component
     /**
      * Saves one or more tags given a cache ID.
      *
-     * @param string[] $tags
+     * @param string[]|string $tags
      */
-    public function saveTags(array $tags, int $cacheId): void
+    public function saveTags(array|string $tags, int $cacheId): void
     {
         $values = [];
+        $tags = is_string($tags) ? StringHelper::split($tags) : $tags;
 
         foreach ($tags as $tag) {
             $values[] = [$cacheId, $tag];

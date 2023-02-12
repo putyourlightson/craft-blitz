@@ -84,6 +84,7 @@ class Install extends Migration
             $this->createTable(ElementCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
+                'trackCustomFields' => $this->string()->defaultValue(null),
                 'PRIMARY KEY([[cacheId]], [[elementId]])',
             ]);
         }

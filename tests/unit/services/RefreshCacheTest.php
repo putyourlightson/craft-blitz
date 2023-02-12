@@ -108,6 +108,44 @@ class RefreshCacheTest extends Unit
         $this->assertCount(1, $cacheIds);
     }
 
+    public function testGetElementCacheIdsWithCustomFields()
+    {
+        Blitz::$plugin->generateCache->options->trackCustomFields(['text']);
+        Blitz::$plugin->generateCache->addElement($this->entry1);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
+            [$this->entry1->id],
+            [$this->entry1->id => true],
+            [$this->entry1->id => ['text']],
+        );
+
+        $this->assertCount(1, $cacheIds);
+    }
+
+    public function testGetElementCacheIdsWithoutCustomFields()
+    {
+        Blitz::$plugin->generateCache->options->trackCustomFields(false);
+        Blitz::$plugin->generateCache->addElement($this->entry1);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
+            [$this->entry1->id],
+            [$this->entry1->id => true],
+            [$this->entry1->id => ['text']],
+        );
+
+        $this->assertCount(0, $cacheIds);
+
+        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
+            [$this->entry1->id],
+            [$this->entry1->id => false],
+            [$this->entry1->id => []],
+        );
+
+        $this->assertCount(1, $cacheIds);
+    }
+
     public function testGetElementTypeQueries()
     {
         // Add element queries and save

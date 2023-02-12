@@ -142,15 +142,15 @@ class RefreshCacheService extends Component
         $condition = ['or'];
 
         foreach ($elementIds as $elementId) {
-            $elementCondition = ['elementId' => $elementId];
+            $elementCondition = ['and', ['elementId' => $elementId]];
             $onlyFieldsChanged = $elementOnlyFieldsChanged[$elementId] ?? false;
 
             if ($onlyFieldsChanged) {
                 $changedFields = $elementChangedFields[$elementId] ?? [];
-                $changedFieldCondition = ['or'];
+                $changedFieldCondition = ['or', ['trackCustomFields' => null]];
 
                 foreach ($changedFields as $changedField) {
-                    $changedFieldCondition[] = ['in', 'trackFields', $changedField];
+                    $changedFieldCondition[] = ['in', 'trackCustomFields', $changedField];
                 }
 
                 $elementCondition[] = $changedFieldCondition;

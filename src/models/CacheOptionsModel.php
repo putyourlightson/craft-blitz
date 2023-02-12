@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\models;
 
 use craft\base\Model;
 use craft\helpers\ConfigHelper;
-use craft\helpers\StringHelper;
 use craft\validators\DateTimeValidator;
 use DateTime;
 
@@ -37,9 +36,14 @@ class CacheOptionsModel extends Model
     public int|bool $outputComments = true;
 
     /**
-     * @var string[]
+     * @var string[]|string|bool
      */
-    public array $tags = [];
+    public array|string|bool $trackCustomFields = true;
+
+    /**
+     * @var string[]|string
+     */
+    public array|string $tags = [];
 
     /**
      * @var int|null
@@ -152,11 +156,21 @@ class CacheOptionsModel extends Model
     }
 
     /**
+     * Sets the track custom fields option.
+     */
+    public function trackCustomFields(array|string|bool $value = true): self
+    {
+        $this->trackCustomFields = $value;
+
+        return $this;
+    }
+
+    /**
      * Sets the tags option.
      */
     public function tags(array|string|null $value): self
     {
-        $this->tags = is_string($value) ? StringHelper::split($value) : $value;
+        $this->tags = $value;
 
         return $this;
     }

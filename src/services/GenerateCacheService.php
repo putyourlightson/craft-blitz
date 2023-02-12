@@ -77,6 +77,11 @@ class GenerateCacheService extends Component
     public array $elementCaches = [];
 
     /**
+     * @var string[][]|string[]|null[]
+     */
+    public array $elementCachesTrackCustomFields = [];
+
+    /**
      * @var int[]
      */
     public array $elementQueryCaches = [];
@@ -154,6 +159,8 @@ class GenerateCacheService extends Component
         if (!in_array($element->getId(), $this->elementCaches)) {
             $this->elementCaches[] = $element->getId();
         }
+
+        $this->_addElementTrackCustomFields($element->getId());
     }
 
     /**
@@ -416,7 +423,9 @@ class GenerateCacheService extends Component
                 $this->elementCaches,
                 Element::tableName(),
                 ElementCacheRecord::tableName(),
-                'elementId'
+                'elementId',
+                $this->elementCachesTrackCustomFields,
+                'trackCustomFields',
             );
         }
 
@@ -426,7 +435,7 @@ class GenerateCacheService extends Component
                 $this->elementQueryCaches,
                 ElementQueryRecord::tableName(),
                 ElementQueryCacheRecord::tableName(),
-                'queryId'
+                'queryId',
             );
         }
 
@@ -436,7 +445,7 @@ class GenerateCacheService extends Component
                 $this->ssiIncludeCaches,
                 IncludeRecord::tableName(),
                 SsiIncludeCacheRecord::tableName(),
-                'includeId'
+                'includeId',
             );
         }
 
@@ -492,9 +501,34 @@ class GenerateCacheService extends Component
     }
 
     /**
+     * Adds the custom fields to track for an element ID.
+     */
+    private function _addElementTrackCustomFields(int $elementId): void
+    {
+        if ($this->options->trackCustomFields === true) {
+            $this->elementCachesTrackCustomFields[$elementId] = null;
+
+            return;
+        }
+
+        if ($this->options->trackCustomFields === false) {
+            $trackCustomFields = [];
+        } elseif (is_string($this->options->trackCustomFields)) {
+            $trackCustomFields = StringHelper::split($this->options->trackCustomFields);
+        } else {
+            $trackCustomFields = $this->options->trackCustomFields;
+        }
+
+        $this->elementCachesTrackCustomFields[$elementId] = array_unique(array_merge(
+            $this->elementCachesTrackCustomFields[$elementId] ?? [],
+            $trackCustomFields,
+        ));
+    }
+
+    /**
      * Batch inserts cache values into the database.
      */
-    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName): void
+    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraValues = [], string $extraColumnName = null): void
     {
         // Get values by selecting only records with existing IDs
         $values = ActiveRecord::find()
@@ -505,11 +539,20 @@ class GenerateCacheService extends Component
 
         foreach ($values as $key => $value) {
             $values[$key] = [$cacheId, $value];
+
+            if (!empty($extraValues)) {
+                $values[$key][] = is_array($extraValues[$value]) ? implode(',', $extraValues[$value]) : $extraValues[$value];
+            }
+        }
+
+        $columns = ['cacheId', $columnName];
+        if ($extraColumnName) {
+            $columns[] = $extraColumnName;
         }
 
         Craft::$app->getDb()->createCommand()->batchInsert(
             $insertTable,
-            ['cacheId', $columnName],
+            $columns,
             $values,
         )
         ->execute();
