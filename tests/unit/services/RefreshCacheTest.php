@@ -116,7 +116,6 @@ class RefreshCacheTest extends Unit
 
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
             [$this->entry1->id],
-            [$this->entry1->id => true],
             [$this->entry1->id => ['text']],
         );
 
@@ -131,7 +130,6 @@ class RefreshCacheTest extends Unit
 
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
             [$this->entry1->id],
-            [$this->entry1->id => true],
             [$this->entry1->id => ['text']],
         );
 
@@ -139,8 +137,7 @@ class RefreshCacheTest extends Unit
 
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
             [$this->entry1->id],
-            [$this->entry1->id => false],
-            [$this->entry1->id => []],
+            [$this->entry1->id => null],
         );
 
         $this->assertCount(1, $cacheIds);
@@ -368,6 +365,7 @@ class RefreshCacheTest extends Unit
                     RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE,
                     [
                         'elementIds' => [$this->entry1->id],
+                        'elementOnlyFieldsChanged' => [$this->entry1->id => null],
                         'sourceIds' => [$this->entry1->sectionId],
                     ],
                 ),
@@ -463,12 +461,11 @@ class RefreshCacheTest extends Unit
         $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
     }
 
-    private function _getTrackedElements(Element $element, array $changedFields = []): array
+    private function _getTrackedElements(Element $element, ?array $onlyFieldsChanged = null): array
     {
         return [
             'elementIds' => [$element->id],
-            'elementOnlyFieldsChanged' => [$element->id => !empty($changedFields)],
-            'elementChangedFields' => [$element->id => $changedFields],
+            'elementOnlyFieldsChanged' => [$element->id => $onlyFieldsChanged],
             'sourceIds' => !empty($element->sectionId) ? [$element->sectionId] : [],
         ];
     }

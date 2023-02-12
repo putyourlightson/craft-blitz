@@ -39,9 +39,10 @@ class ElementChangedBehavior extends Behavior
     public ?Element $originalElement = null;
 
     /**
-     * @var bool Whether only fields have changed on the element.
+     * @var array|null The fields that have changed on the element, only if
+     * nothing else has changed.
      */
-    public bool $onlyFieldsChanged = false;
+    public array|null $onlyFieldsChanged = null;
 
     /**
      * @inerhitdoc
@@ -87,8 +88,9 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        if ($this->getHaveFieldsChanged()) {
-            $this->onlyFieldsChanged = true;
+        $changedFields = $this->getChangedFields();
+        if (!empty($changedFields)) {
+            $this->onlyFieldsChanged = $changedFields;
 
             return true;
         }
@@ -176,14 +178,6 @@ class ElementChangedBehavior extends Behavior
         }
 
         return !empty($element->getDirtyAttributes());
-    }
-
-    /**
-     * Returns whether any of the element’s custom fields have changed.
-     */
-    public function getHaveFieldsChanged(): bool
-    {
-        return !empty($this->getChangedFields());
     }
 
     /**

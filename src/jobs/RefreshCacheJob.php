@@ -68,11 +68,10 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     public function execute($queue): void
     {
         // Merge in element cache IDs
-        foreach ($this->elements as $elementData) {
+        foreach ($this->elements as $element) {
             $elementCacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-                $elementData['elementIds'],
-                $elementData['elementOnlyFieldsChanged'],
-                $elementData['elementChangedFields'],
+                $element['elementIds'],
+                $element['elementOnlyFieldsChanged'],
             );
             $this->cacheIds = array_merge($this->cacheIds, $elementCacheIds);
         }
