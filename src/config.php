@@ -184,11 +184,11 @@ return [
         // Whether non-HTML responses should be cached. With this setting enabled, Blitz will also cache pages that return non-HTML responses. If enabled, you should ensure that URIs that should not be caches, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.
         //'cacheNonHtmlResponses' => false,
 
-        // Whether elements should be cached in the database.
-        //'cacheElements' => true,
+        // Whether elements should be tracked in the database.
+        //'trackElements' => true,
 
-        // Whether element queries should be cached in the database.
-        //'cacheElementQueries' => true,
+        // Whether element queries should be tracked in the database.
+        //'trackElementQueries' => true,
 
         // The amount of time after which the cache should expire (if not 0). See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
         //'cacheDuration' => 0,

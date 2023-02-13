@@ -15,7 +15,6 @@ use craft\events\PopulateElementEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
-use craft\records\Field;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -149,12 +148,17 @@ class GenerateCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
-        // Don't proceed if element caching is disabled
+        // Don’t proceed if element tracking is disabled
+        if (!Blitz::$plugin->settings->trackElements || !$this->options->trackElements) {
+            return;
+        }
+
+        // Check deprecated values in case they’re still being used.
         if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
             return;
         }
 
-        // Don't proceed if not a cacheable element type
+        // Don’t proceed if not a cacheable element type
         if (!ElementTypeHelper::getIsCacheableElementType(get_class($element))) {
             return;
         }
@@ -171,37 +175,42 @@ class GenerateCacheService extends Component
      */
     public function addElementQuery(ElementQuery $elementQuery): void
     {
-        // Don't proceed if element query caching is disabled
+        // Don’t proceed if element query tracking is disabled
+        if (!Blitz::$plugin->settings->trackElementQueries || !$this->options->trackElementQueries) {
+            return;
+        }
+
+        // Check deprecated values in case they’re still being used.
         if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
             return;
         }
 
-        // Don't proceed if not a cacheable element type
+        // Don’t proceed if not a cacheable element type
         if (!ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)) {
             return;
         }
 
-        // Don't proceed if the query has fixed IDs or slugs
+        // Don’t proceed if the query has fixed IDs or slugs
         if (ElementQueryHelper::hasFixedIdsOrSlugs($elementQuery)) {
             return;
         }
 
-        // Don't proceed if the query contains an expression criteria
+        // Don’t proceed if the query contains an expression criteria
         if (ElementQueryHelper::containsExpressionCriteria($elementQuery)) {
             return;
         }
 
-        // Don't proceed if the order is random
+        // Don’t proceed if the order is random
         if (ElementQueryHelper::isOrderByRandom($elementQuery)) {
             return;
         }
 
-        // Don't proceed if this is a draft or revision query
+        // Don’t proceed if this is a draft or revision query
         if (ElementQueryHelper::isDraftOrRevisionQuery($elementQuery)) {
             return;
         }
 
-        // Don't proceed if this is a relation query
+        // Don’t proceed if this is a relation query
         if (ElementQueryHelper::isRelationQuery($elementQuery)) {
             return;
         }
@@ -214,7 +223,7 @@ class GenerateCacheService extends Component
      */
     public function addSsiInclude(int $includeId): void
     {
-        // Don't proceed if element query caching is disabled
+        // Don’t proceed if element query caching is disabled
         if (Blitz::$plugin->settings->cachingEnabled === false) {
             return;
         }
@@ -380,7 +389,7 @@ class GenerateCacheService extends Component
             return null;
         }
 
-        // Don't cache if the output contains any transform generation URLs
+        // Don’t cache if the output contains any transform generation URLs
         // https://github.com/putyourlightson/craft-blitz/issues/125
         if (StringHelper::contains(stripslashes($content), 'assets/generate-transform')) {
             Blitz::$plugin->debug('Page not cached because it contains transform generation URLs. Consider setting the `generateTransformsBeforePageLoad` general config setting to `true` to fix this.', [], $siteUri->getUrl());
@@ -406,7 +415,7 @@ class GenerateCacheService extends Component
         // Delete cache records so we get a fresh cache.
         CacheRecord::deleteAll($cacheValue);
 
-        // Don't paginate URIs that are already paginated.
+        // Don’t paginate URIs that are already paginated.
         $paginate = SiteUriHelper::isPaginatedUri($siteUri->uri) ? null : $this->options->paginate;
 
         $cacheValue = array_merge($cacheValue, [

@@ -1,5 +1,19 @@
 # Release Notes for Blitz
 
+## 4.4.0 - Unreleased
+### Added
+- Added the `trackCustomFields` page specific option property and function that allows you to specify which custom fields should be tracked.
+
+### Changed
+- Renamed the `cacheElements` page specific option property and function to `trackElements`.
+- Renamed the `cacheElementQueries` page specific option property and function to `trackElementQueries`.
+
+### Deprecated
+- Deprecated the `craft.blitz.options({cacheElements})` property. Use `craft.blitz.options({trackElements})` instead.
+- Deprecated the `craft.blitz.options({cacheElementQueries})` property. Use `craft.blitz.options({trackElementQueries})` instead.
+- Deprecated the `craft.blitz.options.cacheElements()` function. Use `craft.blitz.options.trackElements()` instead.
+- Deprecated the `craft.blitz.options.cacheElementQueries()` function. Use `craft.blitz.options.trackElementQueries()` instead.
+
 ## 4.3.1 - 2023-02-10
 ### Fixed
 - Fixed a bug in which saving elements without going through a draft were not triggering cache refreshes ([#474](https://github.com/putyourlightson/craft-blitz/issues/474)).

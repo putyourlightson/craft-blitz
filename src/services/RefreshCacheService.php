@@ -301,7 +301,7 @@ class RefreshCacheService extends Component
 
         // Don’t proceed if element has already been added and something other
         // than fields were changed.
-        if (!empty($this->elements[$elementType]['elements'][$element->id])) {
+        if (isset($this->elements[$elementType]['elements'][$element->id])) {
             $changedByFields = $this->elements[$elementType]['elements'][$element->id];
 
             if (empty($changedByFields)) {

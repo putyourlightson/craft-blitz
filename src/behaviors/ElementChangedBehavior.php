@@ -184,7 +184,7 @@ class ElementChangedBehavior extends Behavior
      *
      * @return int[]|bool
      */
-    private function _getChangedFields(): array|string
+    private function _getChangedFields(): array|bool
     {
         $element = $this->owner;
 
