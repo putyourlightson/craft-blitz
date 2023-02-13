@@ -32,7 +32,10 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     public array $cacheIds = [];
 
     /**
-     * @var array
+     * @var array<string, array{
+     *          elements: array<int, int[]|bool>,
+     *          sourceIds: int[],
+     *      }>
      */
     public array $elements = [];
 
@@ -69,10 +72,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     {
         // Merge in element cache IDs
         foreach ($this->elements as $element) {
-            $elementCacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-                $element['elementIds'],
-                $element['elementOnlyFieldsChanged'],
-            );
+            $elementCacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($element['elements']);
             $this->cacheIds = array_merge($this->cacheIds, $elementCacheIds);
         }
 
@@ -85,20 +85,22 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         }
 
         // Merge in cache IDs that match any source tags
-        foreach ($this->elements as $elementType => $elementData) {
+        foreach ($this->elements as $elementType => $element) {
             $this->cacheIds = array_unique(array_merge(
                 $this->cacheIds,
-                $this->_getSourceTagCacheIds($elementType, $elementData['sourceIds'])
+                $this->_getSourceTagCacheIds($elementType, $element['sourceIds'])
             ));
         }
 
         // Merge in cache IDs that match element query results
         /** @var ElementInterface|string $elementType */
-        foreach ($this->elements as $elementType => $elementData) {
+        foreach ($this->elements as $elementType => $element) {
+            $elementIds = array_keys($element['elements']);
+
             // If we have element IDs then loop through element queries to check for matches
-            if (count($elementData['elementIds'])) {
+            if (count($elementIds)) {
                 $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
-                    $elementType, $elementData['sourceIds'], $this->cacheIds
+                    $elementType, $element['sourceIds'], $this->cacheIds
                 );
 
                 if ($total = count($elementQueryRecords)) {
@@ -111,7 +113,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
                     foreach ($elementQueryRecords as $elementQueryRecord) {
                         // Merge in element query cache IDs
                         $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
-                            $elementQueryRecord, $elementData['elementIds'], $this->cacheIds
+                            $elementQueryRecord, $elementIds, $this->cacheIds
                         );
 
                         $count++;
@@ -141,9 +143,10 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         // Merge in site URIs of element IDs to ensure that uncached elements are also generated
         /** @var ElementInterface $elementType */
-        foreach ($this->elements as $elementType => $elementData) {
+        foreach ($this->elements as $elementType => $element) {
             if ($elementType::hasUris()) {
-                $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementData['elementIds']));
+                $elementIds = array_keys($element['elements']);
+                $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementIds));
             }
         }
 

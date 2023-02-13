@@ -11,8 +11,9 @@ use yii\db\ActiveQueryInterface;
 /**
  * @property int $cacheId
  * @property int $elementId
- * @property string $trackCustomFields
+ * @property string $trackAllCustomFields
  * @property CacheRecord $cache
+ * @property ElementFieldCacheRecord[] $elementFieldCaches
  */
 class ElementCacheRecord extends ActiveRecord
 {
@@ -30,5 +31,16 @@ class ElementCacheRecord extends ActiveRecord
     public function getCache(): ActiveQueryInterface
     {
         return $this->hasOne(CacheRecord::class, ['id' => 'cacheId']);
+    }
+
+    /**
+     * Returns the associated element field cache records
+     */
+    public function getElementFieldCaches(): ActiveQueryInterface
+    {
+        return $this->hasMany(ElementFieldCacheRecord::class, [
+            'cacheId' => 'cacheId',
+            'elementId' => 'elementId',
+        ]);
     }
 }

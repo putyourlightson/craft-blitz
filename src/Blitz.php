@@ -319,7 +319,8 @@ class Blitz extends Plugin
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(DeleteElementEvent $event) {
                 if ($event->hardDelete) {
-                    $cacheIds = $this->refreshCache->getElementCacheIds([$event->element->getId()]);
+                    $elements = [$event->element->getId() => []];
+                    $cacheIds = $this->refreshCache->getElementCacheIds($elements);
                     $this->refreshCache->addCacheIds($cacheIds);
                 }
             }

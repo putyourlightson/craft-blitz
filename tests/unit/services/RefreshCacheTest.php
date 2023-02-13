@@ -9,7 +9,6 @@ use Codeception\Test\Unit;
 use Craft;
 use craft\base\Element;
 use craft\elements\Entry;
-use craft\elements\User;
 use craft\helpers\Db;
 use DateInterval;
 use DateTime;
@@ -55,11 +54,6 @@ class RefreshCacheTest extends Unit
     private Entry|ElementChangedBehavior|null $entry2 = null;
 
     /**
-     * @var User|ElementChangedBehavior|null
-     */
-    private User|ElementChangedBehavior|null $user = null;
-
-    /**
      * @return array
      */
     public function _fixtures(): array
@@ -87,11 +81,9 @@ class RefreshCacheTest extends Unit
 
         $this->entry1 = Entry::find()->sectionId(1)->one();
         $this->entry2 = Entry::find()->sectionId(2)->one();
-        $this->user = User::find()->one();
 
         $this->entry1->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
         $this->entry2->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
-        $this->user->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
         Blitz::$plugin->refreshCache->reset();
         Blitz::$plugin->refreshCache->batchMode = true;
@@ -102,7 +94,9 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds([$this->entry1->id]);
+        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
+            [$this->entry1->id => []],
+        );
 
         // Assert that one cache ID was returned
         $this->assertCount(1, $cacheIds);
@@ -114,9 +108,9 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
+        $fieldIds = Blitz::$plugin->generateCache->getFieldIdsFromHandles($this->entry1, ['text']);
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id],
-            [$this->entry1->id => ['text']],
+            [$this->entry1->id => $fieldIds],
         );
 
         $this->assertCount(1, $cacheIds);
@@ -128,16 +122,15 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
+        $fieldIds = Blitz::$plugin->generateCache->getFieldIdsFromHandles($this->entry1, ['text']);
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id],
-            [$this->entry1->id => ['text']],
+            [$this->entry1->id => $fieldIds],
         );
 
         $this->assertCount(0, $cacheIds);
 
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id],
-            [$this->entry1->id => null],
+            [$this->entry1->id => []],
         );
 
         $this->assertCount(1, $cacheIds);
@@ -201,11 +194,8 @@ class RefreshCacheTest extends Unit
         $this->entry1->title .= ' X';
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the element and source IDs are correct
-        $this->assertEquals(
-            $this->_getTrackedElements($this->entry1),
-            Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1);
     }
 
     public function testAddElementWhenFieldChanged()
@@ -213,11 +203,51 @@ class RefreshCacheTest extends Unit
         $this->entry1->setFieldValue('text', '123');
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the element and source IDs are correct
-        $this->assertEquals(
-            $this->_getTrackedElements($this->entry1, ['text']),
-            Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        $fieldIds = Blitz::$plugin->generateCache->getFieldIdsFromHandles($this->entry1, ['text', '123']);
+
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1, $fieldIds);
+    }
+
+    public function testAddElementMultipleTimesWhenAttributesChanged()
+    {
+        $this->entry1->title .= ' X';
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        $this->entry1->setFieldValue('text', '123');
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1);
+    }
+
+    public function testAddElementMultipleTimesWhenFieldsChanged()
+    {
+        $this->entry1->setFieldValue('text', '123');
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        $this->entry1->setFieldValue('moreText', '123');
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        $fieldIds = Blitz::$plugin->generateCache->getFieldIdsFromHandles($this->entry1, ['text', 'moreText']);
+
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1, $fieldIds);
+    }
+
+    public function testAddElementMultipleTimesWhenAllFieldsChanged()
+    {
+        $this->entry1->setFieldValue('text', '123');
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        $this->entry1->setFieldValue('moreText', '123');
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        $this->entry1->setFieldValue('evenMoreText', '123');
+        Blitz::$plugin->refreshCache->addElement($this->entry1);
+
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1, true);
     }
 
     public function testAddElementWhenAttributeAndFieldChanged()
@@ -226,11 +256,8 @@ class RefreshCacheTest extends Unit
         $this->entry1->setFieldValue('text', '123');
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the element and source IDs are correct
-        $this->assertEquals(
-            $this->_getTrackedElements($this->entry1),
-            Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1);
     }
 
     public function testAddElementWhenStatusChanged()
@@ -249,11 +276,8 @@ class RefreshCacheTest extends Unit
         $this->entry1->originalElement->enabled = true;
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the element and source IDs are correct
-        $this->assertEquals(
-            $this->_getTrackedElements($this->entry1),
-            Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1);
     }
 
     public function testAddElementWhenExpired()
@@ -262,11 +286,8 @@ class RefreshCacheTest extends Unit
         $this->entry1->expiryDate = new DateTime('20010101');
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the element and source IDs are correct
-        $this->assertEquals(
-            $this->_getTrackedElements($this->entry1),
-            Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1);
     }
 
     public function testAddElementWhenDeleted()
@@ -274,11 +295,8 @@ class RefreshCacheTest extends Unit
         // Delete the element
         Craft::$app->getElements()->deleteElement($this->entry1);
 
-        // Assert that the element and source IDs are correct
-        $this->assertEquals(
-            $this->_getTrackedElements($this->entry1),
-            Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->entry1);
     }
 
     public function testAddElementExpiryDates()
@@ -314,28 +332,6 @@ class RefreshCacheTest extends Unit
         );
     }
 
-    public function testAddUserWhenUnchanged()
-    {
-        Blitz::$plugin->refreshCache->addElement($this->user);
-
-        // Assert that the elements are empty
-        $this->assertEquals(
-            RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE, Blitz::$plugin->refreshCache->elements[User::class]
-        );
-    }
-
-    public function testAddUserWhenFieldChanged()
-    {
-        $this->user->setFieldValue('shortBio', '123');
-        Blitz::$plugin->refreshCache->addElement($this->user);
-
-        // Assert that the element and source IDs are correct
-        $this->assertEquals(
-            $this->_getTrackedElements($this->user, ['shortBio']),
-            Blitz::$plugin->refreshCache->elements[User::class]
-        );
-    }
-
     public function testRefreshReset()
     {
         Blitz::$plugin->refreshCache->cacheIds = [1];
@@ -361,14 +357,10 @@ class RefreshCacheTest extends Unit
         $refreshCacheJob = new RefreshCacheJob([
             'cacheIds' => [],
             'elements' => [
-                Entry::class => array_merge(
-                    RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE,
-                    [
-                        'elementIds' => [$this->entry1->id],
-                        'elementOnlyFieldsChanged' => [$this->entry1->id => null],
-                        'sourceIds' => [$this->entry1->sectionId],
-                    ],
-                ),
+                Entry::class => [
+                    'elements' => [$this->entry1->id => []],
+                    'sourceIds' => [$this->entry1->sectionId],
+                ],
             ],
             'forceClear' => true,
         ]);
@@ -393,13 +385,10 @@ class RefreshCacheTest extends Unit
         $refreshCacheJob = new RefreshCacheJob([
             'cacheIds' => [],
             'elements' => [
-                Entry::class => array_merge(
-                    RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE,
-                    [
-                        'elementIds' => [],
-                        'sourceIds' => [$this->entry1->sectionId],
-                    ],
-                ),
+                Entry::class => [
+                    'elements' => [],
+                    'sourceIds' => [$this->entry1->sectionId],
+                ],
             ],
             'forceClear' => true,
         ]);
@@ -461,12 +450,15 @@ class RefreshCacheTest extends Unit
         $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
     }
 
-    private function _getTrackedElements(Element $element, ?array $onlyFieldsChanged = null): array
+    private function _assertTrackedElement(Element|ElementChangedBehavior $element, array|bool $changedByFields = [])
     {
-        return [
-            'elementIds' => [$element->id],
-            'elementOnlyFieldsChanged' => [$element->id => $onlyFieldsChanged],
+        $trackedElements = [
+            'elements' => [$element->id => $changedByFields],
             'sourceIds' => !empty($element->sectionId) ? [$element->sectionId] : [],
         ];
+
+        $refreshCacheElements = Blitz::$plugin->refreshCache->elements[$element::class];
+
+        $this->assertEquals($trackedElements, $refreshCacheElements);
     }
 }

@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\behaviors;
 use Craft;
 use craft\base\Element;
 use craft\elements\Asset;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
 
@@ -39,10 +40,10 @@ class ElementChangedBehavior extends Behavior
     public ?Element $originalElement = null;
 
     /**
-     * @var array|null The fields that have changed on the element, only if
-     * nothing else has changed.
+     * @var int[]|bool The field IDs that caused the element to change, only set
+     * if nothing else has changed, or `true` if all fields changed.
      */
-    public array|null $onlyFieldsChanged = null;
+    public array|bool $changedByFields = [];
 
     /**
      * @inerhitdoc
@@ -88,10 +89,8 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        $changedFields = $this->getChangedFields();
-        if (!empty($changedFields)) {
-            $this->onlyFieldsChanged = $changedFields;
-
+        $this->changedByFields = $this->_getChangedFields();
+        if (!empty($this->changedByFields)) {
             return true;
         }
 
@@ -181,20 +180,31 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns the handles of the custom fields that have changed.
+     * Returns the IDs of the custom fields that have changed, or `true` if all have.
      *
-     * @return string[]
+     * @return int[]|bool
      */
-    public function getChangedFields(): array
+    private function _getChangedFields(): array|string
     {
         $element = $this->owner;
 
-        if ($element->duplicateOf !== null) {
-            return $element->duplicateOf->getModifiedFields();
+        if ($element->duplicateOf == null) {
+            // Only elements that support drafts can track changed fields:
+            // https://github.com/craftcms/cms/discussions/12667
+            $changedFieldHandles = $element->getDirtyFields();
+
+            // Check if all custom fields are dirty
+            $fieldLayout = $element->getFieldLayout();
+            $customFields = $fieldLayout->getCustomFields();
+            $customFieldHandles = array_map(fn($field) => $field->handle, $customFields);
+
+            if (empty(array_diff($customFieldHandles, $changedFieldHandles))) {
+                return true;
+            }
+        } else {
+            $changedFieldHandles = $element->duplicateOf->getModifiedFields();
         }
 
-        // This only works for elements that are saved from a duplicate.
-        // It always returns `true` for elements that don’t support drafts.
-        return $element->getDirtyFields();
+        return Blitz::$plugin->generateCache->getFieldIdsFromHandles($element, $changedFieldHandles);
     }
 }

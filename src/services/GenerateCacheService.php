@@ -15,6 +15,7 @@ use craft\events\PopulateElementEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
+use craft\records\Field;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -25,6 +26,7 @@ use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
+use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
@@ -77,9 +79,9 @@ class GenerateCacheService extends Component
     public array $elementCaches = [];
 
     /**
-     * @var string[][]|string[]|null[]
+     * @var int[]|bool[]
      */
-    public array $elementCachesTrackCustomFields = [];
+    public array $elementCachesTrackFields = [];
 
     /**
      * @var int[]
@@ -107,6 +109,7 @@ class GenerateCacheService extends Component
     public function reset(): void
     {
         $this->elementCaches = [];
+        $this->elementCachesTrackFields = [];
         $this->elementQueryCaches = [];
         $this->ssiIncludeCaches = [];
         $this->options = new CacheOptionsModel();
@@ -160,7 +163,7 @@ class GenerateCacheService extends Component
             $this->elementCaches[] = $element->getId();
         }
 
-        $this->_addElementTrackCustomFields($element->getId());
+        $this->_addElementTrackCustomFields($element);
     }
 
     /**
@@ -418,15 +421,7 @@ class GenerateCacheService extends Component
         $cacheId = (int)$db->getLastInsertID();
 
         if (!empty($this->elementCaches)) {
-            $this->_batchInsertCaches(
-                $cacheId,
-                $this->elementCaches,
-                Element::tableName(),
-                ElementCacheRecord::tableName(),
-                'elementId',
-                $this->elementCachesTrackCustomFields,
-                'trackCustomFields',
-            );
+            $this->_batchInsertElementCaches($cacheId);
         }
 
         if (!empty($this->elementQueryCaches)) {
@@ -501,17 +496,37 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Adds the custom fields to track for an element ID.
+     * Returns an element’s field IDs of the provided field handles.
+     *
+     * @param string[] $handles
+     * @return int[]
      */
-    private function _addElementTrackCustomFields(int $elementId): void
+    public function getFieldIdsFromHandles(ElementInterface $element, array $handles): array
     {
-        if ($this->options->trackCustomFields === true) {
-            $this->elementCachesTrackCustomFields[$elementId] = null;
+        $fieldIds = [];
 
-            return;
+        // Get fields from the layout, as field handles are not unique.
+        $fieldLayout = $element->getFieldLayout();
+
+        foreach ($handles as $handle) {
+            $field = $fieldLayout->getFieldByHandle($handle);
+
+            if ($field !== null) {
+                $fieldIds[] = $field->id;
+            }
         }
 
-        if ($this->options->trackCustomFields === false) {
+        return $fieldIds;
+    }
+
+    /**
+     * Adds the custom fields to track for an element ID.
+     */
+    private function _addElementTrackCustomFields(ElementInterface $element): void
+    {
+        if ($this->options->trackCustomFields === true) {
+            $trackCustomFields = true;
+        } elseif ($this->options->trackCustomFields === false) {
             $trackCustomFields = [];
         } elseif (is_string($this->options->trackCustomFields)) {
             $trackCustomFields = StringHelper::split($this->options->trackCustomFields);
@@ -519,34 +534,76 @@ class GenerateCacheService extends Component
             $trackCustomFields = $this->options->trackCustomFields;
         }
 
-        $this->elementCachesTrackCustomFields[$elementId] = array_unique(array_merge(
-            $this->elementCachesTrackCustomFields[$elementId] ?? [],
-            $trackCustomFields,
-        ));
+        if (is_array($trackCustomFields)) {
+            $trackCustomFields = $this->getFieldIdsFromHandles($element, $trackCustomFields);
+        }
+
+        $this->elementCachesTrackFields[$element->id] = $trackCustomFields;
+    }
+
+    /**
+     * Batch inserts element caches into the database.
+     */
+    private function _batchInsertElementCaches(int $cacheId): void
+    {
+        $trackAllFields = [];
+        $trackFields = [];
+
+        foreach ($this->elementCachesTrackFields as $elementId => $elementCacheTrackFields) {
+            $trackAllFields[$elementId] = $elementCacheTrackFields === true;
+
+            if (is_array($elementCacheTrackFields) && !empty($elementCacheTrackFields)) {
+                $trackFields[$elementId] = $elementCacheTrackFields;
+            }
+        }
+
+        $this->_batchInsertCaches(
+            $cacheId,
+            $this->elementCaches,
+            Element::tableName(),
+            ElementCacheRecord::tableName(),
+            'elementId',
+            $trackAllFields,
+            'trackAllFields',
+        );
+
+        if (!empty($trackFields)) {
+            $this->_batchInsertCaches(
+                $cacheId,
+                $this->elementCaches,
+                Element::tableName(),
+                ElementFieldCacheRecord::tableName(),
+                'elementId',
+                $trackFields,
+                'fieldId',
+            );
+        }
     }
 
     /**
      * Batch inserts cache values into the database.
      */
-    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraValues = [], string $extraColumnName = null): void
+    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraValues = null, string $extraColumnName = null): void
     {
-        // Get values by selecting only records with existing IDs
-        $values = ActiveRecord::find()
+        // Get valid IDs by selecting only records with existing IDs
+        $validIds = ActiveRecord::find()
             ->select('id')
             ->from($checkTable)
             ->where(['id' => $ids])
             ->column();
 
-        foreach ($values as $key => $value) {
-            $values[$key] = [$cacheId, $value];
-
-            if (!empty($extraValues)) {
-                $values[$key][] = is_array($extraValues[$value]) ? implode(',', $extraValues[$value]) : $extraValues[$value];
+        $values = [];
+        foreach ($validIds as $id) {
+            if ($extraValues === null) {
+                $values[] = [$cacheId, $id];
+            } elseif (isset($extraValues[$id])) {
+                $extraValue = is_array($extraValues[$id]) ? implode(',', $extraValues[$id]) : $extraValues[$id];
+                $values[] = [$cacheId, $id, $extraValue];
             }
         }
 
         $columns = ['cacheId', $columnName];
-        if ($extraColumnName) {
+        if ($extraColumnName !== null) {
             $columns[] = $extraColumnName;
         }
 

@@ -101,8 +101,7 @@ class RefreshCacheService extends Component
      * @const array
      */
     public const DEFAULT_TRACKED_ELEMENT_TYPE = [
-        'elementIds' => [],
-        'elementOnlyFieldsChanged' => [],
+        'elements' => [],
         'sourceIds' => [],
     ];
 
@@ -117,7 +116,10 @@ class RefreshCacheService extends Component
     public array $cacheIds = [];
 
     /**
-     * @var array
+     * @var array<string, array{
+     *          elements: array<int, int[]|bool>,
+     *          sourceIds: int[],
+     *      }>
      */
     public array $elements = [];
 
@@ -133,32 +135,41 @@ class RefreshCacheService extends Component
     /**
      * Returns cache IDs given an array of element IDs and changed fields.
      *
-     * @param int[] $elementIds
-     * @param string[][]|null[] $elementOnlyFieldsChanged
+     * @param array<int, int[]|bool> $elements
      * @return int[]
      */
-    public function getElementCacheIds(array $elementIds, array $elementOnlyFieldsChanged = []): array
+    public function getElementCacheIds(array $elements): array
     {
         $condition = ['or'];
 
-        foreach ($elementIds as $elementId) {
-            $elementCondition = ['and', ['elementId' => $elementId]];
-            $onlyFieldsChanged = $elementOnlyFieldsChanged[$elementId] ?? null;
+        foreach ($elements as $elementId => $changedByFields) {
+            $elementCondition = [
+                'and',
+                [ElementCacheRecord::tableName() . '.elementId' => $elementId],
+            ];
 
-            if ($onlyFieldsChanged !== null) {
-                $elementCondition[] = array_merge(
-                    ['or', ['trackCustomFields' => null]],
-                    array_map(fn($field) => ['in', 'trackCustomFields', $field], $onlyFieldsChanged)
-                );
+            if (!empty($changedByFields)) {
+                if ($changedByFields === true) {
+                    $fieldCondition = ['not', ['fieldId' => null]];
+                } else {
+                    $fieldCondition = ['fieldId' => $changedByFields];
+                }
+
+                $elementCondition[] = [
+                    'or',
+                    ['trackAllFields' => true],
+                    $fieldCondition,
+                ];
             }
 
             $condition[] = $elementCondition;
         }
 
         return ElementCacheRecord::find()
-            ->select('cacheId')
+            ->select(ElementCacheRecord::tableName() . '.cacheId')
             ->where($condition)
-            ->groupBy('cacheId')
+            ->joinWith('elementFieldCaches')
+            ->groupBy(ElementCacheRecord::tableName() . '.cacheId')
             ->column();
     }
 
@@ -286,14 +297,14 @@ class RefreshCacheService extends Component
 
         $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENT_TYPE;
 
-        $onlyFieldsChanged = [];
+        $changedByFields = [];
 
         // Don’t proceed if element has already been added and something other
         // than fields were changed.
-        if (in_array($element->getId(), $this->elements[$elementType]['elementIds'])) {
-            $onlyFieldsChanged = $this->elements[$elementType]['elementOnlyFieldsChanged'][$element->id] ?? null;
+        if (!empty($this->elements[$elementType]['elements'][$element->id])) {
+            $changedByFields = $this->elements[$elementType]['elements'][$element->id];
 
-            if ($onlyFieldsChanged === null) {
+            if (empty($changedByFields)) {
                 return;
             }
         }
@@ -316,12 +327,13 @@ class RefreshCacheService extends Component
                 return;
             }
 
-            if ($elementChanged->onlyFieldsChanged === null) {
-                $onlyFieldsChanged = null;
+            if ($changedByFields === true || $elementChanged->changedByFields === true) {
+                $changedByFields = true;
             } else {
-                $onlyFieldsChanged = array_unique(
-                    array_merge($onlyFieldsChanged, $elementChanged->onlyFieldsChanged)
-                );
+                // Get unique values and reset keys (to help with testing).
+                $changedByFields = array_values(array_unique(
+                    array_merge($changedByFields, $elementChanged->changedByFields)
+                ));
             }
         }
 
@@ -333,8 +345,7 @@ class RefreshCacheService extends Component
         }
 
         // Add element
-        $this->elements[$elementType]['elementIds'][] = $element->id;
-        $this->elements[$elementType]['elementOnlyFieldsChanged'][$element->id] = $onlyFieldsChanged;
+        $this->elements[$elementType]['elements'][$element->id] = $changedByFields;
 
         // Add source
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
