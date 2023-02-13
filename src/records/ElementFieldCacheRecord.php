@@ -10,7 +10,7 @@ use craft\db\ActiveRecord;
 /**
  * @property int $cacheId
  * @property int $elementId
- * @property string $trackCustomFields
+ * @property int $fieldId
  */
 class ElementFieldCacheRecord extends ActiveRecord
 {

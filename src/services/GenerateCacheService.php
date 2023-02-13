@@ -79,7 +79,7 @@ class GenerateCacheService extends Component
     public array $elementCaches = [];
 
     /**
-     * @var int[]|bool[]
+     * @var int[][]|bool[]
      */
     public array $elementCachesTrackFields = [];
 
@@ -163,7 +163,7 @@ class GenerateCacheService extends Component
             $this->elementCaches[] = $element->getId();
         }
 
-        $this->_addElementTrackCustomFields($element);
+        $this->_addElementTrackFields($element);
     }
 
     /**
@@ -522,23 +522,23 @@ class GenerateCacheService extends Component
     /**
      * Adds the custom fields to track for an element ID.
      */
-    private function _addElementTrackCustomFields(ElementInterface $element): void
+    private function _addElementTrackFields(ElementInterface $element): void
     {
         if ($this->options->trackCustomFields === true) {
-            $trackCustomFields = true;
+            $trackFields = true;
         } elseif ($this->options->trackCustomFields === false) {
-            $trackCustomFields = [];
+            $trackFields = [];
         } elseif (is_string($this->options->trackCustomFields)) {
-            $trackCustomFields = StringHelper::split($this->options->trackCustomFields);
+            $trackFields = StringHelper::split($this->options->trackCustomFields);
         } else {
-            $trackCustomFields = $this->options->trackCustomFields;
+            $trackFields = $this->options->trackCustomFields;
         }
 
-        if (is_array($trackCustomFields)) {
-            $trackCustomFields = $this->getFieldIdsFromHandles($element, $trackCustomFields);
+        if (is_array($trackFields)) {
+            $trackFields = $this->getFieldIdsFromHandles($element, $trackFields);
         }
 
-        $this->elementCachesTrackFields[$element->id] = $trackCustomFields;
+        $this->elementCachesTrackFields[$element->id] = $trackFields;
     }
 
     /**
@@ -597,8 +597,13 @@ class GenerateCacheService extends Component
             if ($extraValues === null) {
                 $values[] = [$cacheId, $id];
             } elseif (isset($extraValues[$id])) {
-                $extraValue = is_array($extraValues[$id]) ? implode(',', $extraValues[$id]) : $extraValues[$id];
-                $values[] = [$cacheId, $id, $extraValue];
+                if (is_array($extraValues[$id])) {
+                    foreach ($extraValues[$id] as $extraValue) {
+                        $values[] = [$cacheId, $id, $extraValue];
+                    }
+                } else {
+                    $values[] = [$cacheId, $id, $extraValues[$id]];
+                }
             }
         }
 
