@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\base\ComponentInterface;
+use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\BaseDeployer;
@@ -95,6 +96,9 @@ class SettingsController extends Controller
 
         $deployerDrivers = DeployerHelper::getAllDrivers();
 
+        // SSI URLs only work with an `action` parameter.
+        $detectSsiUrl = UrlHelper::siteUrl('', ['action' => 'blitz/settings/detect-ssi']);
+
         return $this->renderTemplate('blitz/_settings', [
             'settings' => $settings,
             'config' => Craft::$app->getConfig()->getConfigFromFile('blitz'),
@@ -111,6 +115,7 @@ class SettingsController extends Controller
             'deployerDriver' => $deployerDriver,
             'deployerDrivers' => $deployerDrivers,
             'deployerTypeOptions' => array_map([$this, '_getSelectOption'], $deployerDrivers),
+            'detectSsiUrl' => $detectSsiUrl,
         ]);
     }
 
@@ -212,6 +217,14 @@ class SettingsController extends Controller
         Craft::$app->getSession()->setNotice($notice);
 
         return $this->redirectToPostedUrl();
+    }
+
+    /**
+     * Returns an SSI detected message.
+     */
+    public function actionDetectSsi(): string
+    {
+        return Craft::t('blitz', 'SSI detected on web server.');
     }
 
     /**

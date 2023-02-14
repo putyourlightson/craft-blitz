@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.3.2 - 2023-02-13
+### Added
+- Added a tip to the `SSI Enabled` setting that appears if Server-Side Includes (SSI) are enabled on the web server.
+
 ## 4.3.1 - 2023-02-10
 ### Fixed
 - Fixed a bug in which saving elements without going through a draft were not triggering cache refreshes ([#474](https://github.com/putyourlightson/craft-blitz/issues/474)).
@@ -11,8 +15,8 @@
 - Added the `craft.blitz.includeCached()` template variable, that includes a cached template using SSI or ESI if enabled, otherwise via an AJAX request.
 - Added the `craft.blitz.includeDynamic()` template variable, that includes a dynamically rendered template via an AJAX request.
 - Added the `craft.blitz.fetchUri()` template variable, that fetches a URI via an AJAX request. Whether the URI response is cached or not is determined by the URI patterns in the plugin settings.
-- Added the `ssiEnabled` config setting that enables Blitz to include templates using Server-Side Includes (SSI), which must be enabled on the web server.
-- Added the `esiEnabled` config setting that enables Blitz to include templates using Edge-Side Includes (ESI), which must be enabled on the web server or reverse proxy (CDN).
+- Added a `SSI Enabled` setting that enables Blitz to include templates using Server-Side Includes (SSI), which must be enabled on the web server.
+- Added a `ESI Enabled` setting that enables Blitz to include templates using Edge-Side Includes (ESI), which must be enabled on the web server or reverse proxy (CDN).
 - Added a “Cached Includes” column to the Blitz cache utility for the File Cache Storage driver. 
 - Added a `timeout` config setting to the HTTP Generator ([#467](https://github.com/putyourlightson/craft-blitz/issues/467)).
 
