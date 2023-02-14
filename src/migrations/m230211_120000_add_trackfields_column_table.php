@@ -20,7 +20,7 @@ class m230211_120000_add_trackfields_column_table extends Migration
             $this->addColumn(
                 ElementCacheRecord::tableName(),
                 'trackAllFields',
-                $this->boolean()->defaultValue(1)->after('elementId'),
+                $this->boolean()->notNull()->defaultValue(1)->after('elementId'),
             );
         }
 
