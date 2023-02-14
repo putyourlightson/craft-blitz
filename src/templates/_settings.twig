@@ -332,6 +332,7 @@
             label: "SSI Enabled"|t('blitz'),
             instructions: instructions("Whether SSI is enabled on the server."|t('blitz'), info),
             warning: config.ssiEnabled is defined ? configWarning('ssiEnabled'),
+            tip: '<!--#include virtual="' ~ detectSsiUrl ~ '" -->',
             name: 'settings[ssiEnabled]',
             on: settings.ssiEnabled,
             fieldClass: 'width-50',
