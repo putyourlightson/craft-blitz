@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.3.3 - 2023-02-14
+### Changed
+- The `SSI Enabled` tip now also displays whether Server-Side Includes (SSI) are not enabled on the web server.
+
 ## 4.3.2 - 2023-02-13
 ### Added
 - Added a tip to the `SSI Enabled` setting that appears if Server-Side Includes (SSI) are enabled on the web server.

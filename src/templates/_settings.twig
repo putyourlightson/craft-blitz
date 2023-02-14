@@ -329,14 +329,20 @@
             {{ 'With this setting enabled, Blitz will fetch cached includes using Server-Side Includes (SSI), which must be enabled on the server.'|t('blitz') }}
         {% endset %}
         {{ forms.lightswitchField({
+            id: 'ssiEnabled',
             label: "SSI Enabled"|t('blitz'),
             instructions: instructions("Whether SSI is enabled on the server."|t('blitz'), info),
+            tip: '...',
             warning: config.ssiEnabled is defined ? configWarning('ssiEnabled'),
-            tip: '<!--#include virtual="' ~ detectSsiUrl ~ '" -->',
             name: 'settings[ssiEnabled]',
             on: settings.ssiEnabled,
             fieldClass: 'width-50',
         }) }}
+
+        <!--#include virtual="{{ detectSsiActionUrl }}" -->
+        <script>
+            document.getElementById('ssiEnabled-tip').lastElementChild.innerHTML = ssiDetected !== undefined ? '{{ 'SSI detected on web server.'|t('blitz') }}' : '{{ 'SSI not detected on web server.'|t('blitz') }}';
+        </script>
 
         {% set info %}
             {{ 'With this setting enabled, Blitz will fetch cached includes using Edge-Side Includes (ESI), which must be enabled on the server.'|t('blitz') }}

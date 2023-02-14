@@ -97,7 +97,7 @@ class SettingsController extends Controller
         $deployerDrivers = DeployerHelper::getAllDrivers();
 
         // SSI URLs only work with an `action` parameter.
-        $detectSsiUrl = UrlHelper::siteUrl('', ['action' => 'blitz/settings/detect-ssi']);
+        $detectSsiActionUrl = UrlHelper::siteUrl('', ['action' => 'blitz/settings/detect-ssi']);
 
         return $this->renderTemplate('blitz/_settings', [
             'settings' => $settings,
@@ -115,7 +115,7 @@ class SettingsController extends Controller
             'deployerDriver' => $deployerDriver,
             'deployerDrivers' => $deployerDrivers,
             'deployerTypeOptions' => array_map([$this, '_getSelectOption'], $deployerDrivers),
-            'detectSsiUrl' => $detectSsiUrl,
+            'detectSsiActionUrl' => $detectSsiActionUrl,
         ]);
     }
 
@@ -224,7 +224,7 @@ class SettingsController extends Controller
      */
     public function actionDetectSsi(): string
     {
-        return Craft::t('blitz', 'SSI detected on web server.');
+        return '<script>const ssiDetected = true;</script>';
     }
 
     /**
