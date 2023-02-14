@@ -13,8 +13,10 @@ use yii\db\ActiveQueryInterface;
  * @property int $index
  * @property string $type
  * @property string $params
- * @property ElementQueryCacheRecord[] $elementQueryCaches
- * @property ElementQuerySourceRecord[] $elementQuerySources
+ * @property int[]|string|null $fieldIds
+ *
+ * @property-read ElementQueryCacheRecord[] $elementQueryCaches
+ * @property-read ElementQuerySourceRecord[] $elementQuerySources
  */
 class ElementQueryRecord extends ActiveRecord
 {

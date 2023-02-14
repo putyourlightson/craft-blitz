@@ -131,6 +131,7 @@ class Install extends Migration
                 'index' => $this->bigInteger()->notNull(),
                 'type' => $this->string()->notNull(),
                 'params' => $this->text(),
+                'fieldIds' => $this->string(),
             ]);
         }
 

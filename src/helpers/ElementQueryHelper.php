@@ -64,6 +64,15 @@ class ElementQueryHelper
     }
 
     /**
+     * Returns the field IDs that the element query depends on.
+     */
+    public static function getFieldsElementQueryDependsOn(ElementQuery $elementQuery): array
+    {
+        //$elementQuery->criteriaAttributes();
+        return [];
+    }
+
+    /**
      * Returns an element query's default values.
      */
     public static function getDefaultElementQueryValues(string $elementType = null): array

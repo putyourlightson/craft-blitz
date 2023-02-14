@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\helpers\Json;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
 use yii\web\BadRequestHttpException;
@@ -56,7 +57,7 @@ class IncludeController extends Controller
         }
 
         Craft::$app->getSites()->setCurrentSite($include->siteId);
-        $params = json_decode($include->params, true);
+        $params = Json::decodeIfJson($include->params);
         $output = Craft::$app->getView()->renderPageTemplate($template, $params);
 
         return $this->asRaw($output);

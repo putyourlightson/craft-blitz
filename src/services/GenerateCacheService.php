@@ -88,6 +88,11 @@ class GenerateCacheService extends Component
     public array $elementQueryCaches = [];
 
     /**
+     * @var int[][]|bool[]
+     */
+    public array $elementQueryCachesTrackFields = [];
+
+    /**
      * @var int[]
      */
     public array $ssiIncludeCaches = [];
@@ -237,7 +242,9 @@ class GenerateCacheService extends Component
     public function saveElementQuery(ElementQuery $elementQuery): void
     {
         $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
-        $index = $this->_createUniqueIndex($elementQuery->elementType . $params);
+        $dependsOnFieldIds = ElementQueryHelper::getFieldsElementQueryDependsOn($elementQuery);
+        $dependsOnFieldIds = !empty($dependsOnFieldIds) ? json_encode($dependsOnFieldIds) : null;
+        $index = $this->_createUniqueIndex($elementQuery->elementType . $params . ($dependsOnFieldIds ?? ''));
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
@@ -265,6 +272,7 @@ class GenerateCacheService extends Component
                             'index' => $index,
                             'type' => $elementQuery->elementType,
                             'params' => $params,
+                            'dependsOnFieldIds' => $dependsOnFieldIds,
                         ],
                     )
                     ->execute();

@@ -94,16 +94,16 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         // Merge in cache IDs that match element query results
         /** @var ElementInterface|string $elementType */
-        foreach ($this->elements as $elementType => $element) {
-            $elementIds = array_keys($element['elements']);
-
-            // If we have element IDs then loop through element queries to check for matches
-            if (count($elementIds)) {
+        foreach ($this->elements as $elementType => $elements) {
+            // If we have elements then loop through element queries to check for matches
+            if (count($elements)) {
                 $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
-                    $elementType, $element['sourceIds'], $this->cacheIds
+                    $elementType, $elements['sourceIds'], $this->cacheIds
                 );
 
-                if ($total = count($elementQueryRecords)) {
+                $total = count($elementQueryRecords);
+
+                if ($total > 0) {
                     $count = 0;
 
                     // Use sets and the splat operator rather than array_merge for performance
@@ -113,7 +113,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
                     foreach ($elementQueryRecords as $elementQueryRecord) {
                         // Merge in element query cache IDs
                         $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
-                            $elementQueryRecord, $elementIds, $this->cacheIds
+                            $elementQueryRecord, $elements, $this->cacheIds
                         );
 
                         $count++;
@@ -182,12 +182,14 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     }
 
     /**
-     * Returns cache IDs from a given entry query that contains the provided element IDs,
-     * ignoring the provided cache IDs.
+     * Returns cache IDs from a given entry query that contains the provided
+     * element IDs, ignoring the provided cache IDs.
      *
+     * @param int[][]|bool[] $elements
+     * @param int[] $ignoreCacheIds
      * @return int[]
      */
-    private function _getElementQueryCacheIds(ElementQueryRecord $elementQueryRecord, array $elementIds, array $ignoreCacheIds): array
+    private function _getElementQueryCacheIds(ElementQueryRecord $elementQueryRecord, array $elements, array $ignoreCacheIds): array
     {
         // Ensure class still exists as a plugin may have been removed since being saved
         if (!class_exists($elementQueryRecord->type)) {
@@ -195,6 +197,20 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         }
 
         $cacheIds = [];
+        $elementIds = [];
+
+        $fieldIds = Json::decodeIfJson($elementQueryRecord->fieldIds);
+
+        if (!empty($fieldIds)) {
+            // Include only elements that were not changed by fields
+            foreach ($elements as $elementId => $changedByFields) {
+                if (!empty(array_intersect($changedByFields, $fieldIds))) {
+                    $elementIds[] = $elementId;
+                }
+            }
+        } else {
+            $elementIds = array_keys($elements);
+        }
 
         /** @var Element $elementType */
         $elementType = $elementQueryRecord->type;
