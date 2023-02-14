@@ -341,7 +341,7 @@
 
         <!--#include virtual="{{ detectSsiActionUrl }}" -->
         <script>
-            document.getElementById('ssiEnabled-tip').lastElementChild.innerHTML = ssiDetected !== undefined ? '{{ 'SSI detected on web server.'|t('blitz') }}' : '{{ 'SSI not detected on web server.'|t('blitz') }}';
+            document.getElementById('ssiEnabled-tip').lastElementChild.innerHTML = (typeof blitzSsiDetected !== 'undefined') ? '{{ 'SSI detected on web server.'|t('blitz') }}' : '{{ 'SSI not detected on web server.'|t('blitz') }}';
         </script>
 
         {% set info %}
