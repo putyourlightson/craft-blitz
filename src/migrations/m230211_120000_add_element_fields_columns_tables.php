@@ -8,9 +8,10 @@ use craft\records\Field;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
+use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 
-class m230211_120000_add_track_fields_columns_table extends Migration
+class m230211_120000_add_element_fields_columns_tables extends Migration
 {
     /**
      * @inheritdoc
@@ -36,14 +37,6 @@ class m230211_120000_add_track_fields_columns_table extends Migration
             $this->addForeignKey(null, ElementFieldCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
             $this->addForeignKey(null, ElementFieldCacheRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');
             $this->addForeignKey(null, ElementFieldCacheRecord::tableName(), 'fieldId', Field::tableName(), 'id', 'CASCADE', 'CASCADE');
-        }
-
-        if (!$this->db->columnExists(ElementQueryRecord::tableName(), 'fieldIds')) {
-            $this->addColumn(
-                ElementQueryRecord::tableName(),
-                'fieldIds',
-                $this->string()->after('params'),
-            );
         }
 
         return true;

@@ -10,6 +10,7 @@ use craft\base\Element;
 use craft\elements\Asset;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
+use putyourlightson\blitz\helpers\FieldHelper;
 use yii\base\Behavior;
 
 /**
@@ -205,6 +206,6 @@ class ElementChangedBehavior extends Behavior
             $changedFieldHandles = $element->duplicateOf->getModifiedFields();
         }
 
-        return Blitz::$plugin->generateCache->getFieldIdsFromHandles($element, $changedFieldHandles);
+        return FieldHelper::getFieldIdsFromHandles($changedFieldHandles);
     }
 }

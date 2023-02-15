@@ -97,8 +97,11 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         foreach ($this->elements as $elementType => $elements) {
             // If we have elements then loop through element queries to check for matches
             if (count($elements)) {
+                $elementIds = array_keys($elements['elements']);
+                $fieldIds = $this->_getCombinedChangedByFields($elements['elements']);
+
                 $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
-                    $elementType, $elements['sourceIds'], $this->cacheIds
+                    $elementType, $elements['sourceIds'], $fieldIds, $this->cacheIds
                 );
 
                 $total = count($elementQueryRecords);
@@ -113,7 +116,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
                     foreach ($elementQueryRecords as $elementQueryRecord) {
                         // Merge in element query cache IDs
                         $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
-                            $elementQueryRecord, $elements, $this->cacheIds
+                            $elementQueryRecord, $elementIds, $this->cacheIds
                         );
 
                         $count++;
@@ -182,14 +185,41 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     }
 
     /**
+     * Returns an array of combined changed field IDs from multiple elements.
+     *
+     * @param int[][]|bool[] $elements
+     * @return int[]|bool
+     */
+    private function _getCombinedChangedByFields(array $elements): array|bool
+    {
+        $fieldIds = [];
+
+        foreach ($elements as $changedByFields) {
+            if (empty($changedByFields)) {
+                return [];
+            } elseif ($changedByFields === true) {
+                $fieldIds = true;
+            } elseif (is_array($fieldIds)) {
+                $fieldIds = array_merge($fieldIds, $changedByFields);
+            }
+        }
+
+        if (is_array($fieldIds)) {
+            return array_values(array_unique($fieldIds));
+        }
+
+        return $fieldIds;
+    }
+
+    /**
      * Returns cache IDs from a given entry query that contains the provided
      * element IDs, ignoring the provided cache IDs.
      *
-     * @param int[][]|bool[] $elements
+     * @param int[] $elementIds
      * @param int[] $ignoreCacheIds
      * @return int[]
      */
-    private function _getElementQueryCacheIds(ElementQueryRecord $elementQueryRecord, array $elements, array $ignoreCacheIds): array
+    private function _getElementQueryCacheIds(ElementQueryRecord $elementQueryRecord, array $elementIds, array $ignoreCacheIds): array
     {
         // Ensure class still exists as a plugin may have been removed since being saved
         if (!class_exists($elementQueryRecord->type)) {
@@ -197,20 +227,6 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         }
 
         $cacheIds = [];
-        $elementIds = [];
-
-        $fieldIds = Json::decodeIfJson($elementQueryRecord->fieldIds);
-
-        if (!empty($fieldIds)) {
-            // Include only elements that were not changed by fields
-            foreach ($elements as $elementId => $changedByFields) {
-                if (!empty(array_intersect($changedByFields, $fieldIds))) {
-                    $elementIds[] = $elementId;
-                }
-            }
-        } else {
-            $elementIds = array_keys($elements);
-        }
 
         /** @var Element $elementType */
         $elementType = $elementQueryRecord->type;

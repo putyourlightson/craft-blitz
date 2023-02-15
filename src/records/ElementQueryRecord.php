@@ -13,10 +13,10 @@ use yii\db\ActiveQueryInterface;
  * @property int $index
  * @property string $type
  * @property string $params
- * @property int[]|string|null $fieldIds
  *
  * @property-read ElementQueryCacheRecord[] $elementQueryCaches
  * @property-read ElementQuerySourceRecord[] $elementQuerySources
+ * @property-read ElementQueryFieldRecord[] $elementQueryFields
  */
 class ElementQueryRecord extends ActiveRecord
 {
@@ -42,5 +42,13 @@ class ElementQueryRecord extends ActiveRecord
     public function getElementQuerySources(): ActiveQueryInterface
     {
         return $this->hasMany(ElementQuerySourceRecord::class, ['queryId' => 'id']);
+    }
+
+    /**
+     * Returns the associated element query fields
+     */
+    public function getElementQueryFields(): ActiveQueryInterface
+    {
+        return $this->hasMany(ElementQueryFieldRecord::class, ['queryId' => 'id']);
     }
 }

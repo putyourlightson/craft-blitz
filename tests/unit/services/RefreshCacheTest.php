@@ -14,6 +14,7 @@ use DateInterval;
 use DateTime;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\FieldHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
@@ -108,7 +109,7 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        $fieldIds = Blitz::$plugin->generateCache->getFieldIdsFromHandles($this->entry1, ['text']);
+        $fieldIds = FieldHelper::getFieldIdsFromHandles(['text']);
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
             [$this->entry1->id => $fieldIds],
         );
@@ -122,7 +123,7 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        $fieldIds = Blitz::$plugin->generateCache->getFieldIdsFromHandles($this->entry1, ['text']);
+        $fieldIds = FieldHelper::getFieldIdsFromHandles(['text']);
         $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
             [$this->entry1->id => $fieldIds],
         );
@@ -203,7 +204,7 @@ class RefreshCacheTest extends Unit
         $this->entry1->setFieldValue('text', '123');
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        $fieldIds = Blitz::$plugin->generateCache->getFieldIdsFromHandles($this->entry1, ['text', '123']);
+        $fieldIds = FieldHelper::getFieldIdsFromHandles(['text', '123']);
 
         // Assert that the tracked element is correct
         $this->_assertTrackedElement($this->entry1, $fieldIds);
@@ -229,7 +230,7 @@ class RefreshCacheTest extends Unit
         $this->entry1->setFieldValue('moreText', '123');
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        $fieldIds = Blitz::$plugin->generateCache->getFieldIdsFromHandles($this->entry1, ['text', 'moreText']);
+        $fieldIds = FieldHelper::getFieldIdsFromHandles(['text', 'moreText']);
 
         // Assert that the tracked element is correct
         $this->_assertTrackedElement($this->entry1, $fieldIds);

@@ -178,29 +178,45 @@ class RefreshCacheService extends Component
      * with the provided source IDs, ignoring the provided cache IDs.
      *
      * @param int[] $sourceIds
+     * @param int[]|bool $fieldIds
      * @param int[] $ignoreCacheIds
      * @return ElementQueryRecord[]
      */
-    public function getElementTypeQueries(string $elementType, array $sourceIds, array $ignoreCacheIds): array
+    public function getElementTypeQueries(string $elementType, array $sourceIds, array|bool $fieldIds, array $ignoreCacheIds): array
     {
         // Get element query records without eager loading
-        /** @var ElementQueryRecord[] $records */
-        $records = ElementQueryRecord::find()
+        $query = ElementQueryRecord::find()
             ->where(['type' => $elementType])
-            ->innerJoinWith([
-                'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
-                    $query->where(['sourceId' => $sourceIds])
-                        ->orWhere(['sourceId' => null]);
-                },
-            ], false)
             ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
                     $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
                 },
-            ], false)
-            ->all();
+            ], false);
 
-        return $records;
+        if (!empty($sourceIds)) {
+            $query->innerJoinWith([
+                'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
+                    $query->where(['sourceId' => $sourceIds]);
+                },
+            ], false);
+        }
+
+        if (!empty($fieldIds)) {
+            if ($fieldIds === true) {
+                $condition = ['not', 'fieldId' => null];
+            } else {
+                $condition = ['fieldId' => $fieldIds];
+            }
+
+            $query->innerJoinWith([
+                'elementQueryFields' => function(ActiveQuery $query) use ($condition) {
+                    $query->where($condition);
+                },
+            ], false);
+        }
+
+        /** @var ElementQueryRecord[] */
+        return $query->all();
     }
 
     /**
@@ -331,9 +347,9 @@ class RefreshCacheService extends Component
                 $changedByFields = true;
             } else {
                 // Get unique values and reset keys (to help with testing).
-                $changedByFields = array_values(array_unique(
-                    array_merge($changedByFields, $elementChanged->changedByFields)
-                ));
+                $changedByFields = array_values(array_unique(array_merge(
+                    $changedByFields, $elementChanged->changedByFields,
+                )));
             }
         }
 

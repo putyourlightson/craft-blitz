@@ -13,7 +13,7 @@
 - Deprecated the `craft.blitz.options({cacheElementQueries})` property. Use `craft.blitz.options({trackElementQueries})` instead.
 - Deprecated the `craft.blitz.options.cacheElements()` function. Use `craft.blitz.options.trackElements()` instead.
 - Deprecated the `craft.blitz.options.cacheElementQueries()` function. Use `craft.blitz.options.trackElementQueries()` instead.
-- 
+
 ## 4.3.3 - 2023-02-14
 ### Changed
 - The `SSI Enabled` tip now also displays whether Server-Side Includes (SSI) are not enabled on the web server.

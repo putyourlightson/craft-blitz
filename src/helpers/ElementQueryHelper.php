@@ -6,10 +6,13 @@
 namespace putyourlightson\blitz\helpers;
 
 use craft\base\ElementInterface;
+use craft\behaviors\CustomFieldBehavior;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\ArrayHelper;
 use DateTime;
+use ReflectionClass;
+use ReflectionProperty;
 use yii\db\Expression;
 
 class ElementQueryHelper
@@ -64,12 +67,48 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns the field IDs that the element query depends on.
+     * Returns the field IDs that the element query is filtered or ordered by.
+     *
+     * @return int[]
+     * @see ElementQuery::criteriaAttributes()
      */
-    public static function getFieldsElementQueryDependsOn(ElementQuery $elementQuery): array
+    public static function getElementQueryFieldIds(ElementQuery $elementQuery): array
     {
-        //$elementQuery->criteriaAttributes();
-        return [];
+        $allFieldHandles = [];
+
+        /** @var CustomFieldBehavior $behavior */
+        $behavior = $elementQuery->getBehavior('customFields');
+        foreach ((new ReflectionClass($behavior))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            if (!$property->isStatic()) {
+                $name = $property->getName();
+                if (
+                    !in_array($name, ['canSetProperties', 'hasMethods', 'owner']) &&
+                    !method_exists($elementQuery, "get$name")
+                ) {
+                    $allFieldHandles[] = $property->getName();
+                }
+            }
+        }
+
+        $fieldHandles = [];
+        $criteria = $elementQuery->getCriteria();
+
+        foreach ($allFieldHandles as $fieldHandle) {
+            if ($criteria[$fieldHandle] !== null) {
+                $fieldHandles[] = $fieldHandle;
+            }
+        }
+
+        $orderBy = $elementQuery->orderBy;
+        if (is_array($orderBy)) {
+            foreach ($orderBy as $key => $value) {
+                if (in_array($key, $allFieldHandles)) {
+                    $fieldHandles[] = $key;
+                }
+            }
+        }
+
+        return FieldHelper::getFieldIdsFromHandles($fieldHandles);
     }
 
     /**
