@@ -310,7 +310,7 @@ class GenerateCacheTest extends Unit
         $sourceIds = ElementQuerySourceRecord::find()->select('sourceId')->column();
 
         // Assert that source IDs were saved
-        $this->assertEquals([null, 1, 1, 2, 3, 4, 5, 6], $sourceIds);
+        $this->assertEquals([0, 1, 1, 2, 3, 4, 5, 6], $sourceIds);
     }
 
     public function testSaveCacheTags()

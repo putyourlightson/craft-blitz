@@ -182,24 +182,24 @@ class RefreshCacheService extends Component
      * @param int[] $ignoreCacheIds
      * @return ElementQueryRecord[]
      */
-    public function getElementTypeQueries(string $elementType, array $sourceIds, array|bool $fieldIds, array $ignoreCacheIds): array
+    public function getElementTypeQueries(string $elementType, array $sourceIds = [], array|bool $fieldIds = [], array $ignoreCacheIds = []): array
     {
         // Get element query records without eager loading
         $query = ElementQueryRecord::find()
             ->where(['type' => $elementType])
             ->innerJoinWith([
+                'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
+                    $query->where(['or',
+                        ['sourceId' => 0],
+                        ['sourceId' => $sourceIds],
+                    ]);
+                },
+            ], false)
+            ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
                     $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
                 },
             ], false);
-
-        if (!empty($sourceIds)) {
-            $query->innerJoinWith([
-                'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
-                    $query->where(['sourceId' => $sourceIds]);
-                },
-            ], false);
-        }
 
         if (!empty($fieldIds)) {
             if ($fieldIds === true) {

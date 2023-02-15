@@ -267,16 +267,15 @@ class GenerateCacheService extends Component
                 // Use DB connection, so we can exclude audit columns when inserting
                 $db = Craft::$app->getDb();
 
-                $db->createCommand()
-                    ->insert(
-                        ElementQueryRecord::tableName(),
-                        [
-                            'index' => $index,
-                            'type' => $elementQuery->elementType,
-                            'params' => $params,
-                        ],
-                    )
-                    ->execute();
+                $db->createCommand()->insert(
+                    ElementQueryRecord::tableName(),
+                    [
+                        'index' => $index,
+                        'type' => $elementQuery->elementType,
+                        'params' => $params,
+                    ],
+                )
+                ->execute();
 
                 $queryId = $db->getLastInsertID();
 
@@ -300,7 +299,12 @@ class GenerateCacheService extends Component
     public function saveElementQuerySources(int $queryId, ElementQuery $elementQuery): void
     {
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
+
         $sourceIds = $sourceIdAttribute ? $elementQuery->{$sourceIdAttribute} : null;
+
+        // Use `0` to represent no source, since we need a row in the DB to store
+        // this and can't use `null` as part of the table’s primary key.
+        $sourceIds = $sourceIds ?: 0;
 
         // Normalize source IDs
         $sourceIds = ElementQueryHelper::getNormalizedElementQueryIdParam($sourceIds);
@@ -367,17 +371,16 @@ class GenerateCacheService extends Component
                 // Use DB connection, so we can exclude audit columns when inserting
                 $db = Craft::$app->getDb();
 
-                $db->createCommand()
-                    ->insert(
-                        IncludeRecord::tableName(),
-                        [
-                            'index' => $index,
-                            'siteId' => $siteId,
-                            'template' => $template,
-                            'params' => $params,
-                        ],
-                    )
-                    ->execute();
+                $db->createCommand()->insert(
+                    IncludeRecord::tableName(),
+                    [
+                        'index' => $index,
+                        'siteId' => $siteId,
+                        'template' => $template,
+                        'params' => $params,
+                    ],
+                )
+                ->execute();
 
                 $includeId = $db->getLastInsertID();
             } catch (Exception $exception) {
@@ -443,9 +446,7 @@ class GenerateCacheService extends Component
             'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
         ]);
 
-        $db->createCommand()
-            ->insert(CacheRecord::tableName(), $cacheValue)
-            ->execute();
+        $db->createCommand()->insert(CacheRecord::tableName(), $cacheValue)->execute();
 
         $cacheId = (int)$db->getLastInsertID();
 

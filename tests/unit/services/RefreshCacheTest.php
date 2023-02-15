@@ -148,35 +148,37 @@ class RefreshCacheTest extends Unit
 
         // Add a rogue element query (without a cache ID)
         $db = Craft::$app->getDb();
-        $db->createCommand()
-            ->insert(ElementQueryRecord::tableName(), [
+        $db->createCommand()->insert(
+            ElementQueryRecord::tableName(),
+            [
                 'index' => 1234567890,
                 'type' => Entry::class,
                 'params' => '[]',
-            ])
-            ->execute();
+            ]
+        )
+        ->execute();
         $queryId = $db->getLastInsertID();
 
         // Add source ID
-        $db->createCommand()
-            ->insert(ElementQuerySourceRecord::tableName(), [
-                'sourceId' => $this->entry1->sectionId,
+        $db->createCommand()->insert(
+            ElementQuerySourceRecord::tableName(),
+            [
                 'queryId' => $queryId,
-            ])
-            ->execute();
+                'sourceId' => $this->entry1->sectionId,
+            ]
+        )
+        ->execute();
 
         $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
-            Entry::class, [$this->entry1->sectionId], []
+            Entry::class, [$this->entry1->sectionId],
         );
 
-        // Assert that two element type queries were returned
         $this->assertCount(2, $elementTypeQueries);
 
         $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
-            Entry::class, [$this->entry2->sectionId], []
+            Entry::class, [$this->entry2->sectionId],
         );
 
-        // Assert that one element type query was returned
         $this->assertCount(1, $elementTypeQueries);
     }
 
