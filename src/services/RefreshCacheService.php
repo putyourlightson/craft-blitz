@@ -28,11 +28,10 @@ use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
+use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
-use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
-use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use yii\db\ActiveQuery;
 
@@ -98,125 +97,31 @@ class RefreshCacheService extends Component
     public const EVENT_AFTER_REFRESH_SITE_CACHE = 'afterRefreshSiteCache';
 
     /**
-     * @const array
-     */
-    public const DEFAULT_TRACKED_ELEMENT_TYPE = [
-        'elements' => [],
-        'sourceIds' => [],
-    ];
-
-    /**
      * @var bool
      */
     public bool $batchMode = false;
 
     /**
-     * @var int[]
+     * @var RefreshDataModel|null
      */
-    public array $cacheIds = [];
+    public ?RefreshDataModel $refreshData = null;
 
     /**
-     * @var array<string, array{
-     *          elements: array<int, int[]|bool>,
-     *          sourceIds: int[],
-     *      }>
+     * @inheritdoc
      */
-    public array $elements = [];
+    public function init(): void
+    {
+        parent::init();
+
+        $this->reset();
+    }
 
     /**
      * Resets the component, so it can be used multiple times in the same request.
      */
     public function reset(): void
     {
-        $this->cacheIds = [];
-        $this->elements = [];
-    }
-
-    /**
-     * Returns cache IDs given an array of element IDs and changed fields.
-     *
-     * @param array<int, int[]|bool> $elements
-     * @return int[]
-     */
-    public function getElementCacheIds(array $elements): array
-    {
-        $condition = ['or'];
-
-        foreach ($elements as $elementId => $changedByFields) {
-            $elementCondition = [
-                'and',
-                [ElementCacheRecord::tableName() . '.elementId' => $elementId],
-            ];
-
-            if (!empty($changedByFields)) {
-                if ($changedByFields === true) {
-                    $fieldCondition = ['not', ['fieldId' => null]];
-                } else {
-                    $fieldCondition = ['fieldId' => $changedByFields];
-                }
-
-                $elementCondition[] = [
-                    'or',
-                    ['trackAllFields' => true],
-                    $fieldCondition,
-                ];
-            }
-
-            $condition[] = $elementCondition;
-        }
-
-        return ElementCacheRecord::find()
-            ->select(ElementCacheRecord::tableName() . '.cacheId')
-            ->where($condition)
-            ->joinWith('elementFieldCaches')
-            ->groupBy(ElementCacheRecord::tableName() . '.cacheId')
-            ->column();
-    }
-
-    /**
-     * Returns element queries of the provided element type that can be joined
-     * with the provided source IDs, ignoring the provided cache IDs.
-     *
-     * @param int[] $sourceIds
-     * @param int[]|bool $fieldIds
-     * @param int[] $ignoreCacheIds
-     * @return ElementQueryRecord[]
-     */
-    public function getElementTypeQueries(string $elementType, array $sourceIds = [], array|bool $fieldIds = [], array $ignoreCacheIds = []): array
-    {
-        // Get element query records without eager loading
-        $query = ElementQueryRecord::find()
-            ->where(['type' => $elementType])
-            ->innerJoinWith([
-                'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
-                    $query->where(['or',
-                        ['sourceId' => 0],
-                        ['sourceId' => $sourceIds],
-                    ]);
-                },
-            ], false)
-            ->innerJoinWith([
-                'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
-                    $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
-                },
-            ], false);
-
-        if (!empty($fieldIds)) {
-            if ($fieldIds === true) {
-                $condition = ['not', 'fieldId' => null];
-            } else {
-                $condition = ['fieldId' => $fieldIds];
-            }
-
-            $query->innerJoinWith([
-                'elementQueryFields' => function(ActiveQuery $query) use ($condition) {
-                    $query->where($condition);
-                },
-            ], false);
-        }
-
-        /** @var ElementQueryRecord[] */
-        return $query->all();
+        $this->refreshData = RefreshDataModel::create();
     }
 
     /**
@@ -255,7 +160,7 @@ class RefreshCacheService extends Component
      */
     public function addCacheIds(array $cacheIds): void
     {
-        $this->cacheIds = array_unique(array_merge($this->cacheIds, $cacheIds));
+        $this->refreshData->addCacheIds($cacheIds);
     }
 
     /**
@@ -263,11 +168,7 @@ class RefreshCacheService extends Component
      */
     public function addElementIds(string $elementType, array $elementIds): void
     {
-        $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENT_TYPE;
-
-        foreach ($elementIds as $elementId) {
-            $this->elements[$elementType]['elements'][$elementId] = [];
-        }
+        $this->refreshData->addElementIds($elementType, $elementIds);
     }
 
     /**
@@ -299,7 +200,7 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $elementType = get_class($element);
+        $elementType = $element::class;
 
         // Don't proceed if not a cacheable element type
         if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
@@ -311,18 +212,12 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $this->elements[$elementType] = $this->elements[$elementType] ?? self::DEFAULT_TRACKED_ELEMENT_TYPE;
-
-        $changedByFields = [];
+        $changedByFields = $this->refreshData->getChangedByFields($elementType, $element->id);
 
         // Don’t proceed if element has already been added and something other
         // than fields were changed.
-        if (isset($this->elements[$elementType]['elements'][$element->id])) {
-            $changedByFields = $this->elements[$elementType]['elements'][$element->id];
-
-            if (empty($changedByFields)) {
-                return;
-            }
+        if ($changedByFields === []) {
+            return;
         }
 
         // If the element has the element changed behavior
@@ -345,11 +240,12 @@ class RefreshCacheService extends Component
 
             if ($changedByFields === true || $elementChanged->changedByFields === true) {
                 $changedByFields = true;
-            } else {
-                // Get unique values and reset keys (to help with testing).
-                $changedByFields = array_values(array_unique(array_merge(
+            } elseif (is_array($changedByFields)) {
+                $changedByFields = array_merge(
                     $changedByFields, $elementChanged->changedByFields,
-                )));
+                );
+            } else {
+                $changedByFields = $elementChanged->changedByFields;
             }
         }
 
@@ -361,16 +257,8 @@ class RefreshCacheService extends Component
         }
 
         // Add element
-        $this->elements[$elementType]['elements'][$element->id] = $changedByFields;
-
-        // Add source
-        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
-        if ($sourceIdAttribute !== null) {
-            $sourceId = $element->{$sourceIdAttribute};
-            if (!in_array($sourceId, $this->elements[$elementType]['sourceIds'])) {
-                $this->elements[$elementType]['sourceIds'][] = $sourceId;
-            }
-        }
+        $this->refreshData->addElement($element);
+        $this->refreshData->addChangedByFields($element, $changedByFields);
 
         // Add element expiry dates
         $this->addElementExpiryDates($element);
@@ -483,13 +371,12 @@ class RefreshCacheService extends Component
      */
     public function refresh(bool $forceClear = false, bool $forceGenerate = false): void
     {
-        if (empty($this->cacheIds) && empty($this->elements)) {
+        if (empty($this->refreshData->data)) {
             return;
         }
 
         $job = new RefreshCacheJob([
-            'cacheIds' => $this->cacheIds,
-            'elements' => $this->elements,
+            'data' => $this->refreshData->data,
             'forceClear' => $forceClear,
             'forceGenerate' => $forceGenerate,
         ]);

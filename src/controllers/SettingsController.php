@@ -233,7 +233,7 @@ class SettingsController extends Controller
     private function _getSelectOption(ComponentInterface $component): array
     {
         return [
-            'value' => get_class($component),
+            'value' => $component::class,
             'label' => $component::displayName(),
         ];
     }

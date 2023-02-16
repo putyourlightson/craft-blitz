@@ -8,8 +8,6 @@ use craft\records\Field;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
-use putyourlightson\blitz\records\ElementQueryFieldRecord;
-use putyourlightson\blitz\records\ElementQueryRecord;
 
 class m230211_120000_add_element_fields_columns_tables extends Migration
 {

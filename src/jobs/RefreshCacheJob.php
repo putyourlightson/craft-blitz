@@ -6,19 +6,15 @@
 namespace putyourlightson\blitz\jobs;
 
 use Craft;
-use craft\base\Element;
 use craft\base\ElementInterface;
-use craft\elements\db\ElementQuery;
-use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
-use Exception;
+use craft\queue\QueueInterface;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
+use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\records\ElementQueryCacheRecord;
-use putyourlightson\blitz\records\ElementQueryRecord;
-use yii\log\Logger;
+use putyourlightson\blitz\models\RefreshDataModel;
 use yii\queue\RetryableJobInterface;
 
 /**
@@ -27,17 +23,9 @@ use yii\queue\RetryableJobInterface;
 class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 {
     /**
-     * @var int[]
+     * @var array
      */
-    public array $cacheIds = [];
-
-    /**
-     * @var array<string, array{
-     *          elements: array<int, int[]|bool>,
-     *          sourceIds: int[],
-     *      }>
-     */
-    public array $elements = [];
+    public array $data = [];
 
     /**
      * @var bool
@@ -70,85 +58,33 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
      */
     public function execute($queue): void
     {
-        // Merge in element cache IDs
-        foreach ($this->elements as $element) {
-            $elementCacheIds = Blitz::$plugin->refreshCache->getElementCacheIds($element['elements']);
-            $this->cacheIds = array_merge($this->cacheIds, $elementCacheIds);
-        }
+        $refreshData = RefreshDataModel::create($this->data);
+
+        $this->_populateCacheIdsFromElementCaches($refreshData);
 
         $clearCache = Blitz::$plugin->settings->clearOnRefresh($this->forceClear);
 
         // If clear cache is enabled then clear the site URIs early
         if ($clearCache) {
-            $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
+            $siteUris = SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds());
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
-        // Merge in cache IDs that match any source tags
-        foreach ($this->elements as $elementType => $element) {
-            $this->cacheIds = array_unique(array_merge(
-                $this->cacheIds,
-                $this->_getSourceTagCacheIds($elementType, $element['sourceIds'])
-            ));
-        }
-
-        // Merge in cache IDs that match element query results
-        /** @var ElementInterface|string $elementType */
-        foreach ($this->elements as $elementType => $elements) {
-            // If we have elements then loop through element queries to check for matches
-            if (count($elements)) {
-                $elementIds = array_keys($elements['elements']);
-                $fieldIds = $this->_getCombinedChangedByFields($elements['elements']);
-
-                $elementQueryRecords = Blitz::$plugin->refreshCache->getElementTypeQueries(
-                    $elementType, $elements['sourceIds'], $fieldIds, $this->cacheIds
-                );
-
-                $total = count($elementQueryRecords);
-
-                if ($total > 0) {
-                    $count = 0;
-
-                    // Use sets and the splat operator rather than array_merge for performance
-                    // https://github.com/kalessil/phpinspectionsea/blob/master/docs/performance.md#slow-array-function-used-in-loop
-                    $elementQueryCacheIdSets = [];
-
-                    foreach ($elementQueryRecords as $elementQueryRecord) {
-                        // Merge in element query cache IDs
-                        $elementQueryCacheIdSets[] = $this->_getElementQueryCacheIds(
-                            $elementQueryRecord, $elementIds, $this->cacheIds
-                        );
-
-                        $count++;
-                        $this->setProgress($queue, $count / $total,
-                            Craft::t('blitz', 'Checking {count} of {total} {elementType} queries.', [
-                                'count' => $count,
-                                'total' => $total,
-                                // Don't use `lowerDisplayName` which was only introduced in Craft 3.3.17
-                                // https://github.com/putyourlightson/craft-blitz/issues/285
-                                'elementType' => StringHelper::toLowerCase($elementType::displayName()),
-                            ])
-                        );
-                    }
-
-                    $elementQueryCacheIds = array_merge(...$elementQueryCacheIdSets);
-                    $this->cacheIds = array_merge($this->cacheIds, $elementQueryCacheIds);
-                }
-            }
-        }
+        $this->_populateCacheIdsFromSourceTags($refreshData);
+        $this->_populateCacheIdsFromElementQueries($refreshData, $queue);
 
         // If clear cache is disabled then expire the cache IDs.
         if (!$clearCache) {
-            Blitz::$plugin->refreshCache->expireCacheIds($this->cacheIds);
+            Blitz::$plugin->refreshCache->expireCacheIds($refreshData->getCacheIds());
         }
 
-        $siteUris = SiteUriHelper::getCachedSiteUris($this->cacheIds);
+        $siteUris = SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds());
 
         // Merge in site URIs of element IDs to ensure that uncached elements are also generated
-        /** @var ElementInterface $elementType */
-        foreach ($this->elements as $elementType => $element) {
+        foreach ($refreshData->getElementTypes() as $elementType) {
+            /** @var ElementInterface|string $elementType */
             if ($elementType::hasUris()) {
-                $elementIds = array_keys($element['elements']);
+                $elementIds = $refreshData->getElementIds($elementType);
                 $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementIds));
             }
         }
@@ -167,117 +103,69 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     }
 
     /**
-     * Returns cache IDs that match any special source tags.
-     *
-     * @return int[]
+     * Populates cache IDs from the element caches.
      */
-    private function _getSourceTagCacheIds(string $elementType, array $sourceIds): array
+    private function _populateCacheIdsFromElementCaches(RefreshDataModel $refreshData): void
     {
-        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
-
-        $tags = [$sourceIdAttribute . ':*'];
-
-        foreach ($sourceIds as $sourceId) {
-            $tags[] = $sourceIdAttribute . ':' . $sourceId;
+        foreach ($refreshData->getElementTypes() as $elementType) {
+            $cacheIds = RefreshCacheHelper::getElementCacheIds($elementType, $refreshData);
+            $refreshData->addCacheIds($cacheIds);
         }
-
-        return Blitz::$plugin->cacheTags->getCacheIds($tags);
     }
 
     /**
-     * Returns an array of combined changed field IDs from multiple elements.
-     *
-     * @param int[][]|bool[] $elements
-     * @return int[]|bool
+     * Populates cache IDs from source tags.
      */
-    private function _getCombinedChangedByFields(array $elements): array|bool
+    private function _populateCacheIdsFromSourceTags(RefreshDataModel $refreshData): void
     {
-        $fieldIds = [];
+        foreach ($refreshData->getElementTypes() as $elementType) {
+            $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
 
-        foreach ($elements as $changedByFields) {
-            if (empty($changedByFields)) {
-                return [];
-            } elseif ($changedByFields === true) {
-                $fieldIds = true;
-            } elseif (is_array($fieldIds)) {
-                $fieldIds = array_merge($fieldIds, $changedByFields);
+            $tags = [$sourceIdAttribute . ':*'];
+
+            foreach ($refreshData->getSourceIds($elementType) as $sourceId) {
+                $tags[] = $sourceIdAttribute . ':' . $sourceId;
             }
-        }
 
-        if (is_array($fieldIds)) {
-            return array_values(array_unique($fieldIds));
-        }
+            $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
 
-        return $fieldIds;
+            $refreshData->addCacheIds($cacheIds);
+        }
     }
 
     /**
-     * Returns cache IDs from a given entry query that contains the provided
-     * element IDs, ignoring the provided cache IDs.
-     *
-     * @param int[] $elementIds
-     * @param int[] $ignoreCacheIds
-     * @return int[]
+     * Populates cache IDs from element queries.
      */
-    private function _getElementQueryCacheIds(ElementQueryRecord $elementQueryRecord, array $elementIds, array $ignoreCacheIds): array
+    private function _populateCacheIdsFromElementQueries(RefreshDataModel $refreshData, QueueInterface $queue): void
     {
-        // Ensure class still exists as a plugin may have been removed since being saved
-        if (!class_exists($elementQueryRecord->type)) {
-            return [];
-        }
+        foreach ($refreshData->getElementTypes() as $elementType) {
+            $elementIds = $refreshData->getElementIds($elementType);
 
-        $cacheIds = [];
+            if (count($elementIds)) {
+                $elementQueryRecords = RefreshCacheHelper::getElementTypeQueryRecords($elementType, $refreshData);
 
-        /** @var Element $elementType */
-        $elementType = $elementQueryRecord->type;
+                $total = count($elementQueryRecords);
 
-        /** @var ElementQuery $elementQuery */
-        $elementQuery = $elementType::find();
+                if ($total > 0) {
+                    $count = 0;
 
-        $params = Json::decodeIfJson($elementQueryRecord->params);
+                    foreach ($elementQueryRecords as $elementQueryRecord) {
+                        $cacheIds = RefreshCacheHelper::getElementQueryCacheIds($elementQueryRecord, $refreshData);
+                        $refreshData->addCacheIds($cacheIds);
 
-        // If json decode failed
-        if (!is_array($params)) {
-            return [];
-        }
-
-        foreach ($params as $key => $val) {
-            $elementQuery->{$key} = $val;
-        }
-
-        // If the element query has an offset then add it to the limit and make it null
-        if ($elementQuery->offset) {
-            if ($elementQuery->limit) {
-                // Cast values to integers before trying to add them, as they may have been set to strings
-                $elementQuery->limit((int)$elementQuery->limit + (int)$elementQuery->offset);
-            }
-
-            $elementQuery->offset(null);
-        }
-
-        $elementQueryIds = [];
-
-        // Execute the element query, ignoring any exceptions.
-        try {
-            $elementQueryIds = $elementQuery->ids();
-        } catch (Exception $exception) {
-            Blitz::$plugin->log('Element query with ID `' . $elementQueryRecord->id . '` could not be executed: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
-        }
-
-        // If one or more of the element IDs are in the element query's IDs
-        if (!empty(array_intersect($elementIds, $elementQueryIds))) {
-            // Get related element query cache records
-            /** @var ElementQueryCacheRecord[] $elementQueryCacheRecords */
-            $elementQueryCacheRecords = $elementQueryRecord->getElementQueryCaches()->all();
-
-            // Add cache IDs to the array that do not already exist
-            foreach ($elementQueryCacheRecords as $elementQueryCacheRecord) {
-                if (!in_array($elementQueryCacheRecord->cacheId, $ignoreCacheIds)) {
-                    $cacheIds[] = $elementQueryCacheRecord->cacheId;
+                        $count++;
+                        $this->setProgress($queue, $count / $total,
+                            Craft::t('blitz', 'Checking {count} of {total} {elementType} queries.', [
+                                'count' => $count,
+                                'total' => $total,
+                                // Don't use `lowerDisplayName` which was only introduced in Craft 3.3.17
+                                // https://github.com/putyourlightson/craft-blitz/issues/285
+                                'elementType' => StringHelper::toLowerCase($elementType::displayName()),
+                            ])
+                        );
+                    }
                 }
             }
         }
-
-        return $cacheIds;
     }
 }

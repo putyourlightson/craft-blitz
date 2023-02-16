@@ -15,12 +15,13 @@ use DateTime;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\FieldHelper;
+use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
+use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
-use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitztests\fixtures\EntryFixture;
 use UnitTester;
 
@@ -95,8 +96,9 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id => []],
+        $refreshData = RefreshDataModel::createFromElement($this->entry1);
+        $cacheIds = RefreshCacheHelper::getElementCacheIds(
+            Entry::class, $refreshData,
         );
 
         // Assert that one cache ID was returned
@@ -110,8 +112,10 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $fieldIds = FieldHelper::getFieldIdsFromHandles(['text']);
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id => $fieldIds],
+        $refreshData = RefreshDataModel::createFromElement($this->entry1);
+        $refreshData->addChangedByFields($this->entry1, $fieldIds);
+        $cacheIds = RefreshCacheHelper::getElementCacheIds(
+            Entry::class, $refreshData,
         );
 
         $this->assertCount(1, $cacheIds);
@@ -124,14 +128,18 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $fieldIds = FieldHelper::getFieldIdsFromHandles(['text']);
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id => $fieldIds],
+        $refreshData = RefreshDataModel::createFromElement($this->entry1);
+        $refreshData->addChangedByFields($this->entry1, $fieldIds);
+        $cacheIds = RefreshCacheHelper::getElementCacheIds(
+            Entry::class, $refreshData,
         );
 
         $this->assertCount(0, $cacheIds);
 
-        $cacheIds = Blitz::$plugin->refreshCache->getElementCacheIds(
-            [$this->entry1->id => []],
+        $refreshData = RefreshDataModel::createFromElement($this->entry1);
+        $refreshData->addChangedByFields($this->entry1, []);
+        $cacheIds = RefreshCacheHelper::getElementCacheIds(
+            Entry::class, $refreshData,
         );
 
         $this->assertCount(1, $cacheIds);
@@ -169,14 +177,16 @@ class RefreshCacheTest extends Unit
         )
         ->execute();
 
-        $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
-            Entry::class, [$this->entry1->sectionId],
+        $refreshData = RefreshDataModel::createFromElement($this->entry1);
+        $elementTypeQueries = RefreshCacheHelper::getElementTypeQueryRecords(
+            Entry::class, $refreshData,
         );
 
         $this->assertCount(2, $elementTypeQueries);
 
-        $elementTypeQueries = Blitz::$plugin->refreshCache->getElementTypeQueries(
-            Entry::class, [$this->entry2->sectionId],
+        $refreshData = RefreshDataModel::createFromElement($this->entry2);
+        $elementTypeQueries = RefreshCacheHelper::getElementTypeQueryRecords(
+            Entry::class, $refreshData,
         );
 
         $this->assertCount(1, $elementTypeQueries);
@@ -186,10 +196,8 @@ class RefreshCacheTest extends Unit
     {
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the elements are empty
-        $this->assertEquals(
-            RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE, Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        // Assert that the refresh data is empty
+        $this->assertEmpty(Blitz::$plugin->refreshCache->refreshData->data);
     }
 
     public function testAddElementWhenAttributeChanged()
@@ -271,10 +279,8 @@ class RefreshCacheTest extends Unit
         $this->entry1->enabled = false;
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
-        // Assert that the elements are empty
-        $this->assertEquals(
-            RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE, Blitz::$plugin->refreshCache->elements[Entry::class]
-        );
+        // Assert that the refresh data is empty
+        $this->assertEmpty(Blitz::$plugin->refreshCache->refreshData->data);
 
         $this->entry1->originalElement->enabled = true;
         Blitz::$plugin->refreshCache->addElement($this->entry1);
@@ -335,18 +341,6 @@ class RefreshCacheTest extends Unit
         );
     }
 
-    public function testRefreshReset()
-    {
-        Blitz::$plugin->refreshCache->cacheIds = [1];
-        Blitz::$plugin->refreshCache->elements = [Entry::class => RefreshCacheService::DEFAULT_TRACKED_ELEMENT_TYPE];
-
-        Blitz::$plugin->refreshCache->refresh();
-
-        // Assert that the values are empty
-        $this->assertEmpty(Blitz::$plugin->refreshCache->cacheIds);
-        $this->assertEmpty(Blitz::$plugin->refreshCache->elements);
-    }
-
     public function testRefreshElementQuery()
     {
         // Add element query and save
@@ -357,20 +351,12 @@ class RefreshCacheTest extends Unit
         // Assert that the output (which may also contain a timestamp) contains the cached value
         $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
 
+        $refreshData = RefreshDataModel::createFromElement($this->entry1);
         $refreshCacheJob = new RefreshCacheJob([
-            'cacheIds' => [],
-            'elements' => [
-                Entry::class => [
-                    'elements' => [$this->entry1->id => []],
-                    'sourceIds' => [$this->entry1->sectionId],
-                ],
-            ],
+            'data' => $refreshData->data,
             'forceClear' => true,
         ]);
         $refreshCacheJob->execute(Craft::$app->getQueue());
-
-        // Assert that the cache ID was found
-        $this->assertEquals([1], $refreshCacheJob->cacheIds);
 
         // Assert that the cached value is a blank string
         $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
@@ -385,20 +371,13 @@ class RefreshCacheTest extends Unit
         // Assert that the output (which may also contain a timestamp) contains the cached value
         $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
 
+        $refreshData = RefreshDataModel::create();
+        $refreshData->addSourceId($this->entry1::class, $this->entry1->sectionId);
         $refreshCacheJob = new RefreshCacheJob([
-            'cacheIds' => [],
-            'elements' => [
-                Entry::class => [
-                    'elements' => [],
-                    'sourceIds' => [$this->entry1->sectionId],
-                ],
-            ],
+            'data' => $refreshData->data,
             'forceClear' => true,
         ]);
         $refreshCacheJob->execute(Craft::$app->getQueue());
-
-        // Assert that the cache ID was found
-        $this->assertEquals([1], $refreshCacheJob->cacheIds);
 
         // Assert that the cached value is a blank string
         $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
@@ -453,15 +432,18 @@ class RefreshCacheTest extends Unit
         $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
     }
 
-    private function _assertTrackedElement(Element|ElementChangedBehavior $element, array|bool $changedByFields = [])
+    private function _assertTrackedElement(Element|ElementChangedBehavior $element, array|bool $changedByFields = false)
     {
-        $trackedElements = [
-            'elements' => [$element->id => $changedByFields],
-            'sourceIds' => !empty($element->sectionId) ? [$element->sectionId] : [],
-        ];
+        $refreshData = Blitz::$plugin->refreshCache->refreshData;
 
-        $refreshCacheElements = Blitz::$plugin->refreshCache->elements[$element::class];
+        $this->assertEquals(
+            $changedByFields,
+            $refreshData->getChangedByFields($element::class, $element->id),
+        );
 
-        $this->assertEquals($trackedElements, $refreshCacheElements);
+        $this->assertEquals(
+            !empty($element->sectionId) ? [$element->sectionId] : [],
+            $refreshData->getSourceIds($element::class),
+        );
     }
 }

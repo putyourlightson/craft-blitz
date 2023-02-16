@@ -6,7 +6,7 @@
 namespace putyourlightson\blitz\records;
 
 use craft\db\ActiveRecord;
-use yii\db\ActiveQueryInterface;
+use yii\db\ActiveQuery;
 
 /**
  * @property int $id
@@ -31,7 +31,7 @@ class ElementQueryRecord extends ActiveRecord
     /**
      * Returns the associated element query caches
      */
-    public function getElementQueryCaches(): ActiveQueryInterface
+    public function getElementQueryCaches(): ActiveQuery
     {
         return $this->hasMany(ElementQueryCacheRecord::class, ['queryId' => 'id']);
     }
@@ -39,7 +39,7 @@ class ElementQueryRecord extends ActiveRecord
     /**
      * Returns the associated element query sources
      */
-    public function getElementQuerySources(): ActiveQueryInterface
+    public function getElementQuerySources(): ActiveQuery
     {
         return $this->hasMany(ElementQuerySourceRecord::class, ['queryId' => 'id']);
     }
@@ -47,7 +47,7 @@ class ElementQueryRecord extends ActiveRecord
     /**
      * Returns the associated element query fields
      */
-    public function getElementQueryFields(): ActiveQueryInterface
+    public function getElementQueryFields(): ActiveQuery
     {
         return $this->hasMany(ElementQueryFieldRecord::class, ['queryId' => 'id']);
     }

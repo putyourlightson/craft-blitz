@@ -6,7 +6,6 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
-use craft\base\ElementInterface;
 
 class FieldHelper
 {

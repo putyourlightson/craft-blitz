@@ -44,6 +44,7 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
             $this->addForeignKey(null, ElementQueryFieldRecord::tableName(), 'fieldId', Field::tableName(), 'id', 'CASCADE', 'CASCADE');
         }
 
+        /** @var ElementQueryRecord[] $elementQueryRecords */
         $elementQueryRecords = ElementQueryRecord::find()->all();
         foreach ($elementQueryRecords as $elementQueryRecord) {
             $this->_populateTables($elementQueryRecord);
@@ -65,7 +66,7 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
     /**
      * Populates the tables from element queries.
      *
-     * @see RefreshCacheJob::_getElementQueryCacheIds()
+     * @see RefreshCacheJob::_populateCacheIdsFromElementQueryRecord()
      */
     private function _populateTables(ElementQueryRecord $elementQueryRecord): void
     {

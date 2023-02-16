@@ -38,6 +38,8 @@ use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\helpers\IntegrationHelper;
+use putyourlightson\blitz\helpers\RefreshCacheHelper;
+use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\services\CacheTagsService;
@@ -319,8 +321,11 @@ class Blitz extends Plugin
         Event::on(Elements::class, Elements::EVENT_BEFORE_DELETE_ELEMENT,
             function(DeleteElementEvent $event) {
                 if ($event->hardDelete) {
-                    $elements = [$event->element->getId() => []];
-                    $cacheIds = $this->refreshCache->getElementCacheIds($elements);
+                    $element = $event->element;
+                    $cacheIds = RefreshCacheHelper::getElementCacheIds(
+                        $element::class,
+                        RefreshDataModel::createFromElement($element),
+                    );
                     $this->refreshCache->addCacheIds($cacheIds);
                 }
             }

@@ -166,12 +166,12 @@ class GenerateCacheService extends Component
         }
 
         // Don’t proceed if not a cacheable element type
-        if (!ElementTypeHelper::getIsCacheableElementType(get_class($element))) {
+        if (!ElementTypeHelper::getIsCacheableElementType($element::class)) {
             return;
         }
 
-        if (!in_array($element->getId(), $this->elementCaches)) {
-            $this->elementCaches[] = $element->getId();
+        if (!in_array($element->id, $this->elementCaches)) {
+            $this->elementCaches[] = $element->id;
         }
 
         $this->_addElementTrackFields($element);
@@ -277,7 +277,7 @@ class GenerateCacheService extends Component
                 )
                 ->execute();
 
-                $queryId = $db->getLastInsertID();
+                $queryId = (int)$db->getLastInsertID();
 
                 $this->saveElementQuerySources($queryId, $elementQuery);
                 $this->saveElementQueryFields($queryId, $fieldIds);

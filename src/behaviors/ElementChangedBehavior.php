@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\behaviors;
 use Craft;
 use craft\base\Element;
 use craft\elements\Asset;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\FieldHelper;
 use yii\base\Behavior;
@@ -60,7 +59,7 @@ class ElementChangedBehavior extends Behavior
             return;
         }
 
-        $this->originalElement = Craft::$app->getElements()->getElementById($element->id, get_class($element), $element->siteId);
+        $this->originalElement = Craft::$app->getElements()->getElementById($element->id, $element::class, $element->siteId);
     }
 
     /**
@@ -156,7 +155,7 @@ class ElementChangedBehavior extends Behavior
     {
         $element = $this->owner;
         $elementStatus = $element->getStatus();
-        $liveStatus = ElementTypeHelper::getLiveStatus(get_class($element));
+        $liveStatus = ElementTypeHelper::getLiveStatus($element::class);
         $refreshableStatuses = [
             $liveStatus,
             'pending',
