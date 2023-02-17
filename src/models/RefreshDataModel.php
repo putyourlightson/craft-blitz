@@ -6,22 +6,21 @@
 namespace putyourlightson\blitz\models;
 
 use craft\base\ElementInterface;
-use craft\base\Model;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 
 /**
- * Stores, manipulates and populates refresh data.
+ * @inerhitdoc
  *
  * @property-read array $cacheIds
  * @property-read array $elementTypes
  * @property-read array|bool $combinedChangedByFields
  */
-class RefreshDataModel extends Model
+class RefreshDataModel extends BaseDataModel
 {
     /**
      * @var array{
      *          cacheIds: array<int, int[]|bool>,
-     *          elements: <string, array{
+     *          elements: array<string, array{
      *              sourceIds: array<int, int[]|bool>,
      *              elementIds: array<int, int[]|bool>,
      *              changedByAttributes: array<int, string[]>,
@@ -29,9 +28,12 @@ class RefreshDataModel extends Model
      *          }>
      *      }
      */
-    public array $data = [];
+    public array $data = [
+        'cacheIds' => [],
+        'elements' => [],
+    ];
 
-    public static function create(array $data = []): self
+    public static function createFromData(array $data): self
     {
         return new self(['data' => $data]);
     }
@@ -46,27 +48,27 @@ class RefreshDataModel extends Model
 
     public function getCacheIds(): array
     {
-        return $this->_getKeysAsValues(['cacheIds']);
+        return $this->getKeysAsValues(['cacheIds']);
     }
 
     public function getElementTypes(): array
     {
-        return $this->_getKeysAsValues(['elements']);
+        return $this->getKeysAsValues(['elements']);
     }
 
     public function getSourceIds(string $elementType): array
     {
-        return $this->_getKeysAsValues(['elements', $elementType, 'sourceIds']);
+        return $this->getKeysAsValues(['elements', $elementType, 'sourceIds']);
     }
 
     public function getElementIds(string $elementType): array
     {
-        return $this->_getKeysAsValues(['elements', $elementType, 'elementIds']);
+        return $this->getKeysAsValues(['elements', $elementType, 'elementIds']);
     }
 
     public function getChangedByAttributes(string $elementType, int $elementId): array|bool
     {
-        return $this->_getKeysAsValues(['elements', $elementType, 'changedByAttributes', $elementId]);
+        return $this->getKeysAsValues(['elements', $elementType, 'changedByAttributes', $elementId]);
     }
 
     public function getChangedByFields(string $elementType, int $elementId): array|bool|null
@@ -77,7 +79,7 @@ class RefreshDataModel extends Model
             return $changedByFields;
         }
 
-        return $this->_getKeysAsValues(['elements', $elementType, 'changedByFields', $elementId]);
+        return $this->getKeysAsValues(['elements', $elementType, 'changedByFields', $elementId]);
     }
 
     public function getCombinedChangedByFields(string $elementType): array|bool|null
@@ -160,16 +162,5 @@ class RefreshDataModel extends Model
         } else {
             $this->data['elements'][$element::class]['changedByFields'][$element->id] = true;
         }
-    }
-
-    private function _getKeysAsValues(array $indexes): array
-    {
-        $keys = $this->data;
-
-        foreach ($indexes as $index) {
-            $keys = $keys[$index] ?? [];
-        }
-
-        return array_keys($keys);
     }
 }

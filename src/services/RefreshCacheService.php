@@ -102,9 +102,9 @@ class RefreshCacheService extends Component
     public bool $batchMode = false;
 
     /**
-     * @var RefreshDataModel|null
+     * @var RefreshDataModel
      */
-    public ?RefreshDataModel $refreshData = null;
+    public RefreshDataModel $refreshData;
 
     /**
      * @inheritdoc
@@ -121,7 +121,7 @@ class RefreshCacheService extends Component
      */
     public function reset(): void
     {
-        $this->refreshData = RefreshDataModel::create();
+        $this->refreshData = new RefreshDataModel();
     }
 
     /**

@@ -22,6 +22,7 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\FieldHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
+use putyourlightson\blitz\models\GenerateDataModel;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
@@ -70,34 +71,14 @@ class GenerateCacheService extends Component
     public const MUTEX_LOCK_NAME_SSI_INCLUDE_RECORDS = 'blitz:ssiIncludeRecords';
 
     /**
+     * @var GenerateDataModel
+     */
+    public GenerateDataModel $generateData;
+
+    /**
      * @var CacheOptionsModel
      */
     public CacheOptionsModel $options;
-
-    /**
-     * @var int[]
-     */
-    public array $elementCaches = [];
-
-    /**
-     * @var int[][]|bool[]
-     */
-    public array $elementCachesTrackFields = [];
-
-    /**
-     * @var int[]
-     */
-    public array $elementQueryCaches = [];
-
-    /**
-     * @var int[][]|bool[]
-     */
-    public array $elementQueryCachesTrackFields = [];
-
-    /**
-     * @var int[]
-     */
-    public array $ssiIncludeCaches = [];
 
     /**
      * @inheritdoc
@@ -114,10 +95,7 @@ class GenerateCacheService extends Component
      */
     public function reset(): void
     {
-        $this->elementCaches = [];
-        $this->elementCachesTrackFields = [];
-        $this->elementQueryCaches = [];
-        $this->ssiIncludeCaches = [];
+        $this->generateData = new GenerateDataModel();
         $this->options = new CacheOptionsModel();
 
         // Set default attributes from the plugin settings
@@ -170,9 +148,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        if (!in_array($element->id, $this->elementCaches)) {
-            $this->elementCaches[] = $element->id;
-        }
+        $this->generateData->addElementId($element->id);
 
         $this->_addElementTrackFields($element);
     }
@@ -286,8 +262,8 @@ class GenerateCacheService extends Component
             }
         }
 
-        if ($queryId && !in_array($queryId, $this->elementQueryCaches)) {
-            $this->elementQueryCaches[] = $queryId;
+        if ($queryId) {
+            $this->generateData->addElementQueryId($queryId);
         }
 
         $mutex->release($lockName);
@@ -398,9 +374,7 @@ class GenerateCacheService extends Component
      */
     public function saveSsiInclude(int $includeId): void
     {
-        if (!in_array($includeId, $this->ssiIncludeCaches)) {
-            $this->ssiIncludeCaches[] = $includeId;
-        }
+        $this->generateData->addSsiIncludes($includeId);
     }
 
     /**
@@ -450,29 +424,23 @@ class GenerateCacheService extends Component
 
         $cacheId = (int)$db->getLastInsertID();
 
-        if (!empty($this->elementCaches)) {
-            $this->_batchInsertElementCaches($cacheId);
-        }
+        $this->_batchInsertElementCaches($cacheId);
 
-        if (!empty($this->elementQueryCaches)) {
-            $this->batchInsertCaches(
-                $cacheId,
-                $this->elementQueryCaches,
-                ElementQueryRecord::tableName(),
-                ElementQueryCacheRecord::tableName(),
-                'queryId',
-            );
-        }
+        $this->batchInsertCaches(
+            $cacheId,
+            $this->generateData->getElementQueryIds(),
+            ElementQueryRecord::tableName(),
+            ElementQueryCacheRecord::tableName(),
+            'queryId',
+        );
 
-        if (!empty($this->ssiIncludeCaches)) {
-            $this->batchInsertCaches(
-                $cacheId,
-                $this->ssiIncludeCaches,
-                IncludeRecord::tableName(),
-                SsiIncludeCacheRecord::tableName(),
-                'includeId',
-            );
-        }
+        $this->batchInsertCaches(
+            $cacheId,
+            $this->generateData->getSsiIncludeIds(),
+            IncludeRecord::tableName(),
+            SsiIncludeCacheRecord::tableName(),
+            'includeId',
+        );
 
         // Save cache tags
         if (!empty($this->options->tags)) {
@@ -530,6 +498,10 @@ class GenerateCacheService extends Component
      */
     public function batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraValues = null, string $extraColumnName = null): void
     {
+        if (empty($ids)) {
+            return;
+        }
+
         // Get valid IDs by selecting only records with existing IDs
         $validIds = ActiveRecord::find()
             ->select('id')
@@ -604,7 +576,7 @@ class GenerateCacheService extends Component
             $trackFields = FieldHelper::getFieldIdsFromHandles($trackFields);
         }
 
-        $this->elementCachesTrackFields[$element->id] = $trackFields;
+        $this->generateData->addElementTrackFields($element->id, $trackFields);
     }
 
     /**
@@ -615,17 +587,17 @@ class GenerateCacheService extends Component
         $trackAllFields = [];
         $trackFields = [];
 
-        foreach ($this->elementCachesTrackFields as $elementId => $elementCacheTrackFields) {
-            $trackAllFields[$elementId] = $elementCacheTrackFields === true;
+        foreach ($this->generateData->getElementTrackFields() as $elementId => $fields) {
+            $trackAllFields[$elementId] = $fields === true;
 
-            if (is_array($elementCacheTrackFields) && !empty($elementCacheTrackFields)) {
-                $trackFields[$elementId] = $elementCacheTrackFields;
+            if (is_array($fields) && !empty($fields)) {
+                $trackFields[$elementId] = $fields;
             }
         }
 
         $this->batchInsertCaches(
             $cacheId,
-            $this->elementCaches,
+            $this->generateData->getElementIds(),
             Element::tableName(),
             ElementCacheRecord::tableName(),
             'elementId',
@@ -636,7 +608,7 @@ class GenerateCacheService extends Component
         if (!empty($trackFields)) {
             $this->batchInsertCaches(
                 $cacheId,
-                $this->elementCaches,
+                $this->generateData->getElementIds(),
                 Element::tableName(),
                 ElementFieldCacheRecord::tableName(),
                 'elementId',

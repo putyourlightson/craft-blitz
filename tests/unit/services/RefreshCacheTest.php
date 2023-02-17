@@ -197,7 +197,7 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the refresh data is empty
-        $this->assertEmpty(Blitz::$plugin->refreshCache->refreshData->data);
+        $this->assertEmpty(Blitz::$plugin->refreshCache->refreshData->data['elements']);
     }
 
     public function testAddElementWhenAttributeChanged()
@@ -280,7 +280,7 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the refresh data is empty
-        $this->assertEmpty(Blitz::$plugin->refreshCache->refreshData->data);
+        $this->assertEmpty(Blitz::$plugin->refreshCache->refreshData->data['elements']);
 
         $this->entry1->originalElement->enabled = true;
         Blitz::$plugin->refreshCache->addElement($this->entry1);
@@ -371,7 +371,7 @@ class RefreshCacheTest extends Unit
         // Assert that the output (which may also contain a timestamp) contains the cached value
         $this->assertStringContainsString($this->output, Blitz::$plugin->cacheStorage->get($this->siteUri));
 
-        $refreshData = RefreshDataModel::create();
+        $refreshData = new RefreshDataModel();
         $refreshData->addSourceId($this->entry1::class, $this->entry1->sectionId);
         $refreshCacheJob = new RefreshCacheJob([
             'data' => $refreshData->data,

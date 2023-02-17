@@ -58,7 +58,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
      */
     public function execute($queue): void
     {
-        $refreshData = RefreshDataModel::create($this->data);
+        $refreshData = RefreshDataModel::createFromData($this->data);
 
         $this->_populateCacheIdsFromElementCaches($refreshData);
 
