@@ -140,8 +140,8 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'index' => $this->bigInteger()->notNull(),
                 'type' => $this->string()->notNull(),
-                'params' => $this->text(),
                 'hasSources' => $this->boolean()->notNull()->defaultValue(0),
+                'params' => $this->text(),
             ]);
         }
 

@@ -26,7 +26,7 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
             $this->addColumn(
                 ElementQueryRecord::tableName(),
                 'hasSources',
-                $this->boolean()->notNull()->defaultValue(0)->after('params'),
+                $this->boolean()->notNull()->defaultValue(0)->after('type'),
             );
         }
 
