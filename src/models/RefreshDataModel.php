@@ -11,7 +11,7 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
 /**
  * @inerhitdoc
  *
- * @property-read array $cacheIds
+ * @property-read int[] $cacheIds
  * @property-read array $elementTypes
  * @property-read array|bool $combinedChangedByFields
  */
@@ -46,31 +46,49 @@ class RefreshDataModel extends BaseDataModel
         return $refreshData;
     }
 
+    /**
+     * @return int[]
+     */
     public function getCacheIds(): array
     {
         return $this->getKeysAsValues(['cacheIds']);
     }
 
+    /**
+     * @return array
+     */
     public function getElementTypes(): array
     {
         return $this->getKeysAsValues(['elements']);
     }
 
+    /**
+     * @return int[]
+     */
     public function getSourceIds(string $elementType): array
     {
         return $this->getKeysAsValues(['elements', $elementType, 'sourceIds']);
     }
 
+    /**
+     * @return int[]
+     */
     public function getElementIds(string $elementType): array
     {
         return $this->getKeysAsValues(['elements', $elementType, 'elementIds']);
     }
 
-    public function getChangedByAttributes(string $elementType, int $elementId): array|bool
+    /**
+     * @return string[]
+     */
+    public function getChangedByAttributes(string $elementType, int $elementId): array
     {
         return $this->getKeysAsValues(['elements', $elementType, 'changedByAttributes', $elementId]);
     }
 
+    /**
+     * @return int[]|bool|null
+     */
     public function getChangedByFields(string $elementType, int $elementId): array|bool|null
     {
         $changedByFields = $this->data['elements'][$elementType]['changedByFields'][$elementId] ?? null;
@@ -82,6 +100,9 @@ class RefreshDataModel extends BaseDataModel
         return $this->getKeysAsValues(['elements', $elementType, 'changedByFields', $elementId]);
     }
 
+    /**
+     * @return int[]|bool|null
+     */
     public function getCombinedChangedByFields(string $elementType): array|bool|null
     {
         $fieldIds = [];

@@ -18,16 +18,15 @@ class FieldHelper
     public static function getFieldIdsFromHandles(array $handles): array
     {
         $fieldIds = [];
-        $fieldsService = Craft::$app->getFields();
 
         foreach ($handles as $handle) {
-            $field = $fieldsService->getFieldByHandle($handle);
+            $field = Craft::$app->getFields()->getFieldByHandle($handle);
 
             if ($field !== null) {
                 $fieldIds[] = $field->id;
             }
         }
 
-        return array_values(array_unique($fieldIds));
+        return $fieldIds;
     }
 }

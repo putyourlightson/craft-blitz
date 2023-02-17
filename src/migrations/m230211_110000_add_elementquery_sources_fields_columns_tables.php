@@ -2,12 +2,12 @@
 
 namespace putyourlightson\blitz\migrations;
 
+use Craft;
 use craft\base\Element;
 use craft\db\Migration;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
 use craft\records\Field;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
@@ -92,24 +92,38 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
             $elementQuery->{$key} = $val;
         }
 
+        $db = Craft::$app->getDb();
+
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
         $sourceIds = $params[$sourceIdAttribute] ?? [];
         $sourceIds = !is_array($sourceIds) ? [$sourceIds] : $sourceIds;
 
-        Blitz::$plugin->generateCache->batchInsertQueries(
-            $elementQueryRecord->id,
-            $sourceIds,
-            ElementQuerySourceRecord::tableName(),
-            'sourceId',
-        );
+        $values = [];
+        foreach ($sourceIds as $sourceId) {
+            $values[] = [$elementQueryRecord->id, $sourceId];
+        }
+
+        $db->createCommand()
+            ->batchInsert(
+                ElementQuerySourceRecord::tableName(),
+                ['queryId', 'sourceId'],
+                $values,
+            )
+            ->execute();
 
         $fieldIds = ElementQueryHelper::getElementQueryFieldIds($elementQuery);
 
-        Blitz::$plugin->generateCache->batchInsertQueries(
-            $elementQueryRecord->id,
-            $fieldIds,
-            ElementQueryFieldRecord::tableName(),
-            'fieldId',
-        );
+        $values = [];
+        foreach ($fieldIds as $fieldId) {
+            $values[] = [$elementQueryRecord->id, $fieldId];
+        }
+
+        $db->createCommand()
+            ->batchInsert(
+                ElementQueryFieldRecord::tableName(),
+                ['queryId', 'fieldId'],
+                $values,
+            )
+            ->execute();
     }
 }

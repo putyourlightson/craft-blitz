@@ -148,8 +148,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        $this->generateData->addElementId($element->id);
-
+        $this->generateData->addElement($element);
         $this->_addElementTrackFields($element);
     }
 
@@ -211,7 +210,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        $this->saveSsiInclude($includeId);
+        $this->generateData->addSsiIncludes($includeId);
     }
 
     /**
@@ -243,15 +242,16 @@ class GenerateCacheService extends Component
                 // Use DB connection, so we can exclude audit columns when inserting
                 $db = Craft::$app->getDb();
 
-                $db->createCommand()->insert(
-                    ElementQueryRecord::tableName(),
-                    [
-                        'index' => $index,
-                        'type' => $elementQuery->elementType,
-                        'params' => $params,
-                    ],
-                )
-                ->execute();
+                $db->createCommand()
+                    ->insert(
+                        ElementQueryRecord::tableName(),
+                        [
+                            'index' => $index,
+                            'type' => $elementQuery->elementType,
+                            'params' => $params,
+                        ],
+                    )
+                    ->execute();
 
                 $queryId = (int)$db->getLastInsertID();
 
@@ -297,7 +297,7 @@ class GenerateCacheService extends Component
             }
         }
 
-        $this->batchInsertQueries(
+        $this->_batchInsertQueries(
             $queryId,
             $sourceIds,
             ElementQuerySourceRecord::tableName(),
@@ -312,7 +312,7 @@ class GenerateCacheService extends Component
      */
     public function saveElementQueryFields(int $queryId, array $fieldIds): void
     {
-        $this->batchInsertQueries(
+        $this->_batchInsertQueries(
             $queryId,
             $fieldIds,
             ElementQueryFieldRecord::tableName(),
@@ -347,16 +347,17 @@ class GenerateCacheService extends Component
                 // Use DB connection, so we can exclude audit columns when inserting
                 $db = Craft::$app->getDb();
 
-                $db->createCommand()->insert(
-                    IncludeRecord::tableName(),
-                    [
-                        'index' => $index,
-                        'siteId' => $siteId,
-                        'template' => $template,
-                        'params' => $params,
-                    ],
-                )
-                ->execute();
+                $db->createCommand()
+                    ->insert(
+                        IncludeRecord::tableName(),
+                        [
+                            'index' => $index,
+                            'siteId' => $siteId,
+                            'template' => $template,
+                            'params' => $params,
+                        ],
+                    )
+                    ->execute();
 
                 $includeId = $db->getLastInsertID();
             } catch (Exception $exception) {
@@ -370,19 +371,11 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves an SSI include.
-     */
-    public function saveSsiInclude(int $includeId): void
-    {
-        $this->generateData->addSsiIncludes($includeId);
-    }
-
-    /**
      * Saves the content for a site URI to the cache.
      */
     public function save(string $content, SiteUriModel $siteUri): ?string
     {
-        if (!$this->options->cachingEnabled) {
+        if ($this->options->cachingEnabled === false) {
             return null;
         }
 
@@ -420,13 +413,18 @@ class GenerateCacheService extends Component
             'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
         ]);
 
-        $db->createCommand()->insert(CacheRecord::tableName(), $cacheValue)->execute();
+        $db->createCommand()
+            ->insert(
+                CacheRecord::tableName(),
+                $cacheValue
+            )
+            ->execute();
 
         $cacheId = (int)$db->getLastInsertID();
 
         $this->_batchInsertElementCaches($cacheId);
 
-        $this->batchInsertCaches(
+        $this->_batchInsertCaches(
             $cacheId,
             $this->generateData->getElementQueryIds(),
             ElementQueryRecord::tableName(),
@@ -434,7 +432,7 @@ class GenerateCacheService extends Component
             'queryId',
         );
 
-        $this->batchInsertCaches(
+        $this->_batchInsertCaches(
             $cacheId,
             $this->generateData->getSsiIncludeIds(),
             IncludeRecord::tableName(),
@@ -494,9 +492,63 @@ class GenerateCacheService extends Component
     }
 
     /**
+     * Adds the custom fields to track for an element ID.
+     */
+    private function _addElementTrackFields(ElementInterface $element): void
+    {
+        if ($this->options->trackCustomFields === true) {
+            $trackFields = true;
+        } elseif ($this->options->trackCustomFields === false) {
+            $trackFields = [];
+        } elseif (is_string($this->options->trackCustomFields)) {
+            $trackFields = StringHelper::split($this->options->trackCustomFields);
+        } else {
+            $trackFields = $this->options->trackCustomFields;
+        }
+
+        if (is_array($trackFields)) {
+            $trackFields = FieldHelper::getFieldIdsFromHandles($trackFields);
+        }
+
+        $this->generateData->addElementTrackFields($element, $trackFields);
+    }
+
+    /**
+     * Batch inserts element caches into the database.
+     */
+    private function _batchInsertElementCaches(int $cacheId): void
+    {
+        $elementIds = $this->generateData->getElementIds();
+        $trackAllFields = $this->generateData->getElementTrackAllFields();
+        $trackSpecificFields = $this->generateData->getElementTrackSpecificFields();
+
+        $this->_batchInsertCaches(
+            $cacheId,
+            $elementIds,
+            Element::tableName(),
+            ElementCacheRecord::tableName(),
+            'elementId',
+            $trackAllFields,
+            'trackAllFields',
+        );
+
+        if (!empty($trackSpecificFields)) {
+            $this->_batchInsertCaches(
+                $cacheId,
+                $elementIds,
+                Element::tableName(),
+                ElementFieldCacheRecord::tableName(),
+                'elementId',
+                $trackSpecificFields,
+                'fieldId',
+            );
+        }
+    }
+
+    /**
      * Batch inserts cache values into the database.
      */
-    public function batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraValues = null, string $extraColumnName = null): void
+    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraValues = null, string $extraColumnName = null): void
     {
         if (empty($ids)) {
             return;
@@ -529,18 +581,19 @@ class GenerateCacheService extends Component
             $columns[] = $extraColumnName;
         }
 
-        Craft::$app->getDb()->createCommand()->batchInsert(
-            $insertTable,
-            $columns,
-            $values,
-        )
-        ->execute();
+        Craft::$app->getDb()->createCommand()
+            ->batchInsert(
+                $insertTable,
+                $columns,
+                $values,
+            )
+            ->execute();
     }
 
     /**
      * Batch inserts query values into the database.
      */
-    public function batchInsertQueries(int $queryId, array $ids, string $insertTable, string $columnName): void
+    private function _batchInsertQueries(int $queryId, array $ids, string $insertTable, string $columnName): void
     {
         $values = [];
         foreach ($ids as $id) {
@@ -549,73 +602,13 @@ class GenerateCacheService extends Component
 
         $columns = ['queryId', $columnName];
 
-        Craft::$app->getDb()->createCommand()->batchInsert(
-            $insertTable,
-            $columns,
-            $values,
-        )
-        ->execute();
-    }
-
-    /**
-     * Adds the custom fields to track for an element ID.
-     */
-    private function _addElementTrackFields(ElementInterface $element): void
-    {
-        if ($this->options->trackCustomFields === true) {
-            $trackFields = true;
-        } elseif ($this->options->trackCustomFields === false) {
-            $trackFields = [];
-        } elseif (is_string($this->options->trackCustomFields)) {
-            $trackFields = StringHelper::split($this->options->trackCustomFields);
-        } else {
-            $trackFields = $this->options->trackCustomFields;
-        }
-
-        if (is_array($trackFields)) {
-            $trackFields = FieldHelper::getFieldIdsFromHandles($trackFields);
-        }
-
-        $this->generateData->addElementTrackFields($element->id, $trackFields);
-    }
-
-    /**
-     * Batch inserts element caches into the database.
-     */
-    private function _batchInsertElementCaches(int $cacheId): void
-    {
-        $trackAllFields = [];
-        $trackFields = [];
-
-        foreach ($this->generateData->getElementTrackFields() as $elementId => $fields) {
-            $trackAllFields[$elementId] = $fields === true;
-
-            if (is_array($fields) && !empty($fields)) {
-                $trackFields[$elementId] = $fields;
-            }
-        }
-
-        $this->batchInsertCaches(
-            $cacheId,
-            $this->generateData->getElementIds(),
-            Element::tableName(),
-            ElementCacheRecord::tableName(),
-            'elementId',
-            $trackAllFields,
-            'trackAllFields',
-        );
-
-        if (!empty($trackFields)) {
-            $this->batchInsertCaches(
-                $cacheId,
-                $this->generateData->getElementIds(),
-                Element::tableName(),
-                ElementFieldCacheRecord::tableName(),
-                'elementId',
-                $trackFields,
-                'fieldId',
-            );
-        }
+        Craft::$app->getDb()->createCommand()
+            ->batchInsert(
+                $insertTable,
+                $columns,
+                $values,
+            )
+            ->execute();
     }
 
     /**

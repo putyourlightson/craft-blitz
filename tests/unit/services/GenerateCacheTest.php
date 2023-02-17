@@ -143,7 +143,10 @@ class GenerateCacheTest extends Unit
 
         /** @var ElementCacheRecord $record */
         $record = ElementCacheRecord::find()
-            ->where(['elementId' => $element->id])
+            ->where([
+                'elementId' => $element->id,
+                'trackAllFields' => true,
+            ])
             ->one();
 
         $this->assertEquals($element->id, $record->elementId);
@@ -157,31 +160,34 @@ class GenerateCacheTest extends Unit
         Blitz::$plugin->generateCache->addElement($element);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        /** @var ElementCacheRecord $record */
-        $record = ElementCacheRecord::find()
-            ->where(['elementId' => $element->id])
-            ->one();
+        $count = ElementCacheRecord::find()
+            ->where([
+                'elementId' => $element->id,
+                'trackAllFields' => false,
+            ])
+            ->count();
 
-        $this->assertEquals($element->id, $record->elementId);
-        $this->assertFalse((bool)$record->trackAllFields);
+        $this->assertEquals(1, $count);
     }
 
     public function testSaveElementCacheRecordWithCustomFields()
     {
-        $entry = Entry::find()->one();
+        $element = Entry::find()->one();
         Blitz::$plugin->generateCache->options->trackCustomFields = ['text', 'moreText'];
-        Blitz::$plugin->generateCache->addElement($entry);
+        Blitz::$plugin->generateCache->addElement($element);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
-        /** @var ElementCacheRecord $record */
-        $record = ElementCacheRecord::find()
-            ->where(['elementId' => $entry->id])
-            ->one();
+        $count = ElementCacheRecord::find()
+            ->where([
+                'elementId' => $element->id,
+                'trackAllFields' => false,
+            ])
+            ->count();
 
-        $this->assertFalse((bool)$record->trackAllFields);
+        $this->assertEquals(1, $count);
 
         $count = ElementFieldCacheRecord::find()
-            ->where(['elementId' => $entry->id])
+            ->where(['elementId' => $element->id])
             ->count();
 
         $this->assertEquals(2, $count);
@@ -344,7 +350,7 @@ class GenerateCacheTest extends Unit
     public function testSaveSsiInclude()
     {
         [$includeId] = Blitz::$plugin->generateCache->saveInclude(1, 't', []);
-        Blitz::$plugin->generateCache->saveSsiInclude($includeId);
+        Blitz::$plugin->generateCache->addSsiInclude($includeId);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $count = SsiIncludeCacheRecord::find()->count();

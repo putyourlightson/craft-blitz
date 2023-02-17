@@ -5,54 +5,120 @@
 
 namespace putyourlightson\blitz\models;
 
+use craft\base\ElementInterface;
+
 /**
  * @inerhitdoc
  *
- * @property-read array $elementIds
- * @property-read array $elementQueryIds
- * @property-read array $ssiIncludeIds
- * @property-read array $elementTrackFields
+ * @property-read int[] $elementIds
+ * @property-read int[][]|bool[] $elementTrackFields
+ * @property-read bool[] $elementTrackAllFields
+ * @property-read int[][] $elementTrackSpecificFields
+ * @property-read int[] $elementQueryIds
+ * @property-read int[] $ssiIncludeIds
  */
 class GenerateDataModel extends BaseDataModel
 {
     /**
      * @var array{
-     *          elementIds: array<int, bool>,
+     *          elements: array{
+     *              elementIds: array<int, bool>,
+     *              trackFields: array<int, int[]|bool>,
+     *          },
      *          elementQueryIds: array<int, bool>,
      *          ssiIncludeIds: array<int, bool>,
-     *          elementTrackFields: array<int, int[]|bool>,
      *      }
      */
     public array $data = [
-        'elementIds' => [],
+        'elements' => [
+            'elementIds' => [],
+            'trackFields' => [],
+        ],
         'elementQueryIds' => [],
         'ssiIncludeIds' => [],
-        'elementTrackFields' => [],
     ];
 
+    /**
+     * @return int[]
+     */
     public function getElementIds(): array
     {
-        return $this->getKeysAsValues(['elementIds']);
+        return $this->getKeysAsValues(['elements', 'elementIds']);
     }
 
+    /**
+     * @return int[][]|bool[]
+     */
+    public function getElementTrackFields(): array
+    {
+        return $this->data['elements']['trackFields'];
+    }
+
+    /**
+     * @return bool[]
+     */
+    public function getElementTrackAllFields(): array
+    {
+        $trackFields = [];
+
+        foreach ($this->getElementTrackFields() as $elementId => $fields) {
+            if ($fields === true) {
+                $trackFields[$elementId] = true;
+            } else {
+                $trackFields[$elementId] = false;
+            }
+        }
+
+        return $trackFields;
+    }
+
+    /**
+     * @return int[][]
+     */
+    public function getElementTrackSpecificFields(): array
+    {
+        $trackFields = [];
+
+        foreach ($this->getElementTrackFields() as $elementId => $fields) {
+            if (is_array($fields)) {
+                $trackFields[$elementId] = $fields;
+            } else {
+                $trackFields[$elementId] = [];
+            }
+        }
+
+        return $trackFields;
+    }
+
+    /**
+     * @return int[]
+     */
     public function getElementQueryIds(): array
     {
         return $this->getKeysAsValues(['elementQueryIds']);
     }
 
+    /**
+     * @return int[]
+     */
     public function getSsiIncludeIds(): array
     {
         return $this->getKeysAsValues(['ssiIncludeIds']);
     }
 
-    public function getElementTrackFields(): array
-    {
-        return $this->data['elementTrackFields'];
-    }
-
     public function addElementId(int $elementId): void
     {
-        $this->data['elementIds'][$elementId] = true;
+        $this->data['elements']['elementIds'][$elementId] = true;
+    }
+
+    public function addElement(ElementInterface $element): void
+    {
+        $this->addElementId($element->id);
+    }
+
+    public function addElementTrackFields(ElementInterface $element, array|bool $fields): void
+    {
+        $this->data['elements']['trackFields'][$element->id] = $fields;
     }
 
     public function addElementQueryId(int $elementQuery): void
@@ -63,10 +129,5 @@ class GenerateDataModel extends BaseDataModel
     public function addSsiIncludes(int $ssiIncludeId): void
     {
         $this->data['ssiIncludeIds'][$ssiIncludeId] = true;
-    }
-
-    public function addElementTrackFields($elementId, $fieldIds): void
-    {
-        $this->data['elementTrackFields'][$elementId] = $fieldIds;
     }
 }
