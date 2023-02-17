@@ -11,7 +11,6 @@ use craft\records\Field;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
-use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
@@ -107,14 +106,6 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
         $sourceIds = $params[$sourceIdAttribute] ?? [];
         $sourceIds = is_array($sourceIds) ? [$sourceIds] : $sourceIds;
 
-        if (empty($sourceIds)) {
-            $db->createCommand()
-                ->update(
-                    ElementQueryRecord::tableName(),
-                )
-                ->execute();
-        }
-
         $values = [];
         foreach ($sourceIds as $sourceId) {
             $values[] = [$elementQueryRecord->id, $sourceId];
@@ -127,6 +118,18 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
                 $values,
             )
             ->execute();
+
+        if (!empty($sourceIds)) {
+            $db->createCommand()
+                ->update(
+                    ElementQueryRecord::tableName(),
+                    ['hasSources' => true],
+                    ['id' => $elementQueryRecord->id],
+                    [],
+                    false,
+                )
+                ->execute();
+        }
 
         $fieldIds = ElementQueryHelper::getElementQueryFieldIds($elementQuery);
 

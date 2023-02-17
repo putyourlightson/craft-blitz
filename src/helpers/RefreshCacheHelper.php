@@ -144,6 +144,7 @@ class RefreshCacheHelper
                 },
             ], false)
             // Ignore element queries linked to cache IDs that we already have
+            // TODO: verify whether this is too eager
             ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
                     $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
