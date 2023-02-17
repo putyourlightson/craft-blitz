@@ -13,6 +13,7 @@ use yii\db\ActiveQuery;
  * @property int $index
  * @property string $type
  * @property string $params
+ * @property bool $hasSources
  *
  * @property-read ElementQueryCacheRecord[] $elementQueryCaches
  * @property-read ElementQuerySourceRecord[] $elementQuerySources

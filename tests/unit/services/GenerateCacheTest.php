@@ -206,19 +206,24 @@ class GenerateCacheTest extends Unit
             Entry::find()->orderBy('Rand(123)'),
         ];
 
-        array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);
+        foreach ($elementQueries as $elementQuery) {
+            Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        }
+
         $count = ElementQueryRecord::find()->count();
 
         // Assert that no records were saved
         $this->assertEquals(0, $count);
 
-        $elementQueries = [
+        $elementQuerySets = [
             [
                 Entry::find(),
                 Entry::find()->limit(''),
                 Entry::find()->offset(0),
             ],
-            Entry::find()->id('not 1'),
+            [
+                Entry::find()->id('not 1'),
+            ],
             [
                 Entry::find()->id('not 1'),
                 Entry::find()->id(['not', 1]),
@@ -236,11 +241,16 @@ class GenerateCacheTest extends Unit
             ],
         ];
 
-        array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);
+        foreach ($elementQuerySets as $elementQuerySet) {
+            foreach ($elementQuerySet as $elementQuery) {
+                Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+            }
+        }
+
         $count = ElementQueryRecord::find()->count();
 
         // Assert that all records were saved
-        $this->assertEquals(count($elementQueries), $count);
+        $this->assertEquals(count($elementQuerySets), $count);
     }
 
     public function testSaveElementQueryWithJoin()
@@ -297,8 +307,12 @@ class GenerateCacheTest extends Unit
             Entry::find()->sectionId(['>', '1']),
         ];
 
-        array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);
-        $count = ElementQuerySourceRecord::find()->count();
+        foreach ($elementQueries as $elementQuery) {
+            Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        }
+
+        $count = ElementQuerySourceRecord::find()
+            ->count();
 
         // Assert that no records were saved
         $this->assertEquals(0, $count);
@@ -312,11 +326,22 @@ class GenerateCacheTest extends Unit
             MailingListElement::find()->mailingListTypeId(6),
         ];
 
-        array_walk_recursive($elementQueries, [Blitz::$plugin->generateCache, 'addElementQuery']);
-        $sourceIds = ElementQuerySourceRecord::find()->select('sourceId')->column();
+        foreach ($elementQueries as $elementQuery) {
+            Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        }
+
+        $count = ElementQueryRecord::find()
+            ->where(['hasSources' => true])
+            ->count();
+
+        $this->assertEquals(5, $count);
+
+        $sourceIds = ElementQuerySourceRecord::find()
+            ->select('sourceId')
+            ->column();
 
         // Assert that source IDs were saved
-        $this->assertEquals([0, 1, 1, 2, 3, 4, 5, 6], $sourceIds);
+        $this->assertEquals([1, 1, 2, 3, 4, 5, 6], $sourceIds);
     }
 
     public function testSaveCacheTags()

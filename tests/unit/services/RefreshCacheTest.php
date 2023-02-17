@@ -165,6 +165,7 @@ class RefreshCacheTest extends Unit
             ]
         )
         ->execute();
+
         $queryId = $db->getLastInsertID();
 
         // Add source ID

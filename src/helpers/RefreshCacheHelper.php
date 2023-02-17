@@ -135,10 +135,10 @@ class RefreshCacheHelper
         // Get element query records without eager loading
         $query = ElementQueryRecord::find()
             ->where(['type' => $elementType])
-            ->innerJoinWith([
+            ->joinWith([
                 'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
                     $query->where(['or',
-                        ['sourceId' => 0],
+                        ['hasSources' => false],
                         ['sourceId' => $sourceIds],
                     ]);
                 },

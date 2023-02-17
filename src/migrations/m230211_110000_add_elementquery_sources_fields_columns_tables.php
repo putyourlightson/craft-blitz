@@ -11,6 +11,7 @@ use craft\records\Field;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
+use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
@@ -22,7 +23,15 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
      */
     public function safeUp(): bool
     {
-        if ($this->db->tableExists(ElementQueryFieldRecord::tableName())) {
+        if (!$this->db->columnExists(ElementQueryRecord::tableName(), 'hasSources')) {
+            $this->addColumn(
+                ElementQueryRecord::tableName(),
+                'hasSources',
+                $this->boolean()->notNull()->defaultValue(0)->after('params'),
+            );
+        }
+
+        if ($this->db->tableExists(ElementQuerySourceRecord::tableName())) {
             $this->dropTable(ElementQuerySourceRecord::tableName());
             $this->createTable(ElementQuerySourceRecord::tableName(), [
                 'queryId' => $this->integer()->notNull(),
@@ -96,7 +105,15 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
 
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
         $sourceIds = $params[$sourceIdAttribute] ?? [];
-        $sourceIds = !is_array($sourceIds) ? [$sourceIds] : $sourceIds;
+        $sourceIds = is_array($sourceIds) ? [$sourceIds] : $sourceIds;
+
+        if (empty($sourceIds)) {
+            $db->createCommand()
+                ->update(
+                    ElementQueryRecord::tableName(),
+                )
+                ->execute();
+        }
 
         $values = [];
         foreach ($sourceIds as $sourceId) {

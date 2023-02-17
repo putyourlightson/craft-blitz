@@ -249,6 +249,7 @@ class GenerateCacheService extends Component
                             'index' => $index,
                             'type' => $elementQuery->elementType,
                             'params' => $params,
+                            'hasSources' => false,
                         ],
                     )
                     ->execute();
@@ -275,12 +276,11 @@ class GenerateCacheService extends Component
     public function saveElementQuerySources(int $queryId, ElementQuery $elementQuery): void
     {
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-
         $sourceIds = $sourceIdAttribute ? $elementQuery->{$sourceIdAttribute} : null;
 
-        // Use `0` to represent no source, since we need a row in the DB to store
-        // this and can't use `null` as part of the table’s primary key.
-        $sourceIds = $sourceIds ?: 0;
+        if (empty($sourceIds)) {
+            return;
+        }
 
         // Normalize source IDs
         $sourceIds = ElementQueryHelper::getNormalizedElementQueryIdParam($sourceIds);
@@ -303,6 +303,16 @@ class GenerateCacheService extends Component
             ElementQuerySourceRecord::tableName(),
             'sourceId',
         );
+
+        Craft::$app->getDb()->createCommand()
+            ->update(
+                ElementQueryRecord::tableName(),
+                ['hasSources' => true],
+                ['id' => $queryId],
+                [],
+                false,
+            )
+            ->execute();
     }
 
     /**
