@@ -33,9 +33,9 @@ class RefreshCacheHelper
                 [ElementCacheRecord::tableName() . '.elementId' => $elementId],
             ];
 
-            $changedByFieldsOnly = $refreshData->getChangedByFieldsOnly($elementType, $elementId);
+            $isChangedByFields = $refreshData->getIsChangedByFields($elementType, $elementId);
 
-            if ($changedByFieldsOnly) {
+            if ($isChangedByFields) {
                 $changedFields = $refreshData->getChangedFields($elementType, $elementId);
 
                 if ($changedFields === true) {
@@ -134,6 +134,8 @@ class RefreshCacheHelper
         $ignoreCacheIds = $refreshData->getCacheIds();
         $changedAttributes = $refreshData->getCombinedChangedAttributes($elementType);
         $changedFields = $refreshData->getCombinedChangedFields($elementType);
+        $isChangedByAttributes = $refreshData->getCombinedIsChangedByAttributes($elementType);
+        $isChangedByFields = $refreshData->getCombinedIsChangedByFields($elementType);
 
         // Get element query records without eager loading
         $query = ElementQueryRecord::find()
@@ -153,15 +155,17 @@ class RefreshCacheHelper
                 },
             ], false);
 
-        if (!empty($changedAttributes)) {
+        // Limit the query to changed attributes
+        if ($isChangedByAttributes) {
             $query->innerJoinWith([
                 'elementQueryAttributes' => function(ActiveQuery $query) use ($changedAttributes) {
-                    $query->where(['attributes' => $changedAttributes]);
+                    $query->where(['attribute' => $changedAttributes]);
                 },
             ], false);
         }
 
-        if (!empty($changedFields)) {
+        // Limit the query to changed fields
+        if ($isChangedByFields) {
             if ($changedFields === true) {
                 $condition = ['not', 'fieldId' => null];
             } else {

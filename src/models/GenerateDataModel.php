@@ -23,7 +23,7 @@ class GenerateDataModel extends BaseDataModel
      * @var array{
      *          elements: array{
      *              elementIds: array<int, bool>,
-     *              trackFields: array<int, int[]|bool>,
+     *              trackFields: array<int, array<int, bool>|bool>,
      *          },
      *          elementQueryIds: array<int, bool>,
      *          ssiIncludeIds: array<int, bool>,

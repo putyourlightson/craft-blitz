@@ -214,7 +214,8 @@ class RefreshCacheService extends Component
 
         $changedAttributes = [];
         $changedFields = [];
-        $changedByFieldsOnly = false;
+        $isChangedByAttributes = false;
+        $isChangedByFields = false;
 
         // If the element has the element changed behavior
         /** @var ElementChangedBehavior|null $elementChanged */
@@ -236,7 +237,8 @@ class RefreshCacheService extends Component
 
             $changedAttributes = $elementChanged->changedAttributes;
             $changedFields = $elementChanged->changedFields;
-            $changedByFieldsOnly = $elementChanged->changedByFieldsOnly;
+            $isChangedByAttributes = $elementChanged->isChangedByAttributes;
+            $isChangedByFields = $elementChanged->isChangedByFields;
         }
 
         $event = new RefreshElementEvent(['element' => $element]);
@@ -250,7 +252,8 @@ class RefreshCacheService extends Component
         $this->refreshData->addElement($element);
         $this->refreshData->addChangedAttributes($element, $changedAttributes);
         $this->refreshData->addChangedFields($element, $changedFields);
-        $this->refreshData->addChangedByFieldsOnly($element, $changedByFieldsOnly);
+        $this->refreshData->addIsChangedByAttributes($element, $isChangedByAttributes);
+        $this->refreshData->addIsChangedByFields($element, $isChangedByFields);
 
         // Add element expiry dates
         $this->addElementExpiryDates($element);

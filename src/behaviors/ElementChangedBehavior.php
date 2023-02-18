@@ -50,9 +50,14 @@ class ElementChangedBehavior extends Behavior
     public array|bool $changedFields = [];
 
     /**
-     * @var bool Whether the element was changed by field only.
+     * @var bool Whether the element was caused to change specifically by attributes.
      */
-    public bool $changedByFieldsOnly = false;
+    public bool $isChangedByAttributes = false;
+
+    /**
+     * @var bool Whether the element was caused to change specifically by fields.
+     */
+    public bool $isChangedByFields = false;
 
     /**
      * @inerhitdoc
@@ -98,11 +103,13 @@ class ElementChangedBehavior extends Behavior
         }
 
         if (!empty($this->changedAttributes)) {
+            $this->isChangedByAttributes = true;
+
             return true;
         }
 
         if (!empty($this->changedFields)) {
-            $this->changedByFieldsOnly = true;
+            $this->isChangedByFields = true;
 
             return true;
         }

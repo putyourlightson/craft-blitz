@@ -50,7 +50,7 @@ class ElementQueryRecord extends ActiveRecord
      */
     public function getElementQueryAttributes(): ActiveQuery
     {
-        return $this->hasMany(ElementQueryFieldRecord::class, ['queryId' => 'id']);
+        return $this->hasMany(ElementQueryAttributeRecord::class, ['queryId' => 'id']);
     }
 
     /**

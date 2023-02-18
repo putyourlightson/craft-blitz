@@ -147,7 +147,7 @@ class RefreshCacheTest extends Unit
         $fieldIds = FieldHelper::getFieldIdsFromHandles(['text']);
         $refreshData = RefreshDataModel::createFromElement($this->entry1);
         $refreshData->addChangedFields($this->entry1, $fieldIds);
-        $refreshData->addChangedByFieldsOnly($this->entry1, true);
+        $refreshData->addIsChangedByFields($this->entry1, true);
         $cacheIds = RefreshCacheHelper::getElementCacheIds(
             Entry::class, $refreshData,
         );
@@ -292,7 +292,7 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the refresh data is empty
-        $this->assertEmpty(Blitz::$plugin->refreshCache->refreshData->data['elements']);
+        $this->assertTrue(Blitz::$plugin->refreshCache->refreshData->isEmpty());
 
         $this->entry1->originalElement->enabled = true;
         Blitz::$plugin->refreshCache->addElement($this->entry1);
