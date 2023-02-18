@@ -16,6 +16,9 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\db\ActiveQuery;
 use yii\log\Logger;
 
+/**
+ * @since 4.4.0
+ */
 class RefreshCacheHelper
 {
     /**
@@ -155,28 +158,23 @@ class RefreshCacheHelper
                 },
             ], false);
 
-        // Limit the query to changed attributes
-        if ($isChangedByAttributes) {
-            $query->innerJoinWith([
-                'elementQueryAttributes' => function(ActiveQuery $query) use ($changedAttributes) {
-                    $query->where(['attribute' => $changedAttributes]);
-                },
-            ], false);
-        }
+        // Limit the query to changed attributes and/or fields.
+        if ($isChangedByAttributes || $isChangedByFields) {
+            $query->joinWith('elementQueryAttributes', false)
+                ->where([
+                    'or',
+                    ['attribute' => null],
+                    ['attribute' => $changedAttributes],
+                ]);
 
-        // Limit the query to changed fields
-        if ($isChangedByFields) {
-            if ($changedFields === true) {
-                $condition = ['not', 'fieldId' => null];
-            } else {
-                $condition = ['fieldId' => $changedFields];
+            if (is_array($changedFields)) {
+                $query->joinWith('elementQueryFields', false)
+                    ->where([
+                        'or',
+                        ['fieldId' => null],
+                        ['fieldId' => $changedFields],
+                    ]);
             }
-
-            $query->innerJoinWith([
-                'elementQueryFields' => function(ActiveQuery $query) use ($condition) {
-                    $query->where($condition);
-                },
-            ], false);
         }
 
         /** @var ElementQueryRecord[] */
