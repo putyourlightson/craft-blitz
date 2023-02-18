@@ -46,6 +46,14 @@ class ElementQueryRecord extends ActiveRecord
     }
 
     /**
+     * Returns the associated element query attributes
+     */
+    public function getElementQueryAttributes(): ActiveQuery
+    {
+        return $this->hasMany(ElementQueryFieldRecord::class, ['queryId' => 'id']);
+    }
+
+    /**
      * Returns the associated element query fields
      */
     public function getElementQueryFields(): ActiveQuery

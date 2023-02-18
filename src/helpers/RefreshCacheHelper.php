@@ -33,13 +33,15 @@ class RefreshCacheHelper
                 [ElementCacheRecord::tableName() . '.elementId' => $elementId],
             ];
 
-            $changedByFields = $refreshData->getChangedByFields($elementType, $elementId);
+            $changedByFieldsOnly = $refreshData->getChangedByFieldsOnly($elementType, $elementId);
 
-            if ($changedByFields !== null) {
-                if ($changedByFields === true) {
+            if ($changedByFieldsOnly) {
+                $changedFields = $refreshData->getChangedFields($elementType, $elementId);
+
+                if ($changedFields === true) {
                     $fieldCondition = ['not', ['fieldId' => null]];
                 } else {
-                    $fieldCondition = ['fieldId' => $changedByFields];
+                    $fieldCondition = ['fieldId' => $changedFields];
                 }
 
                 $elementCondition[] = [
@@ -47,9 +49,9 @@ class RefreshCacheHelper
                     ['trackAllFields' => true],
                     $fieldCondition,
                 ];
-            }
 
-            $condition[] = $elementCondition;
+                $condition[] = $elementCondition;
+            }
         }
 
         return ElementCacheRecord::find()
@@ -130,7 +132,8 @@ class RefreshCacheHelper
     {
         $sourceIds = $refreshData->getSourceIds($elementType);
         $ignoreCacheIds = $refreshData->getCacheIds();
-        $changedByFields = $refreshData->getCombinedChangedByFields($elementType);
+        $changedAttributes = $refreshData->getCombinedChangedAttributes($elementType);
+        $changedFields = $refreshData->getCombinedChangedFields($elementType);
 
         // Get element query records without eager loading
         $query = ElementQueryRecord::find()
@@ -144,18 +147,25 @@ class RefreshCacheHelper
                 },
             ], false)
             // Ignore element queries linked to cache IDs that we already have
-            // TODO: verify whether this is too eager
             ->innerJoinWith([
                 'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
                     $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
                 },
             ], false);
 
-        if (!empty($changedByFields)) {
-            if ($changedByFields === true) {
+        if (!empty($changedAttributes)) {
+            $query->innerJoinWith([
+                'elementQueryAttributes' => function(ActiveQuery $query) use ($changedAttributes) {
+                    $query->where(['attributes' => $changedAttributes]);
+                },
+            ], false);
+        }
+
+        if (!empty($changedFields)) {
+            if ($changedFields === true) {
                 $condition = ['not', 'fieldId' => null];
             } else {
-                $condition = ['fieldId' => $changedByFields];
+                $condition = ['fieldId' => $changedFields];
             }
 
             $query->innerJoinWith([

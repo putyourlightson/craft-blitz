@@ -16,6 +16,7 @@ use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
+use putyourlightson\blitz\records\ElementQueryAttributeRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
@@ -127,6 +128,14 @@ class Install extends Migration
             ]);
         }
 
+        if (!$this->db->tableExists(ElementQueryAttributeRecord::tableName())) {
+            $this->createTable(ElementQueryAttributeRecord::tableName(), [
+                'queryId' => $this->integer()->notNull(),
+                'attribute' => $this->string()->notNull(),
+                'PRIMARY KEY([[queryId]], [[attribute]])',
+            ]);
+        }
+
         if (!$this->db->tableExists(ElementQueryFieldRecord::tableName())) {
             $this->createTable(ElementQueryFieldRecord::tableName(), [
                 'queryId' => $this->integer()->notNull(),
@@ -140,8 +149,8 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'index' => $this->bigInteger()->notNull(),
                 'type' => $this->string()->notNull(),
-                'hasSources' => $this->boolean()->notNull()->defaultValue(0),
                 'params' => $this->text(),
+                'hasSources' => $this->boolean()->notNull()->defaultValue(0),
             ]);
         }
 
@@ -215,6 +224,7 @@ class Install extends Migration
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQuerySourceRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementQueryAttributeRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryFieldRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryFieldRecord::tableName(), 'fieldId', Field::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, CacheTagRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');

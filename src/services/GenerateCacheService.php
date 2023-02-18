@@ -28,6 +28,7 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
+use putyourlightson\blitz\records\ElementQueryAttributeRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
@@ -237,8 +238,6 @@ class GenerateCacheService extends Component
 
         if (!$queryId) {
             try {
-                $fieldIds = ElementQueryHelper::getElementQueryFieldIds($elementQuery);
-
                 // Use DB connection, so we can exclude audit columns when inserting
                 $db = Craft::$app->getDb();
 
@@ -256,8 +255,9 @@ class GenerateCacheService extends Component
 
                 $queryId = (int)$db->getLastInsertID();
 
-                $this->saveElementQuerySources($queryId, $elementQuery);
-                $this->saveElementQueryFields($queryId, $fieldIds);
+                $this->saveElementQuerySources($elementQuery, $queryId);
+                $this->saveElementQueryAttributes($elementQuery, $queryId);
+                $this->saveElementQueryFields($elementQuery, $queryId);
             } catch (Exception $exception) {
                 Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
             }
@@ -273,7 +273,7 @@ class GenerateCacheService extends Component
     /**
      * Saves an element query's sources.
      */
-    public function saveElementQuerySources(int $queryId, ElementQuery $elementQuery): void
+    public function saveElementQuerySources(ElementQuery $elementQuery, int $queryId): void
     {
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
         $sourceIds = $sourceIdAttribute ? $elementQuery->{$sourceIdAttribute} : null;
@@ -316,12 +316,27 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves an element query's fields.
-     *
-     * @param int[] $fieldIds
+     * Saves an element query's attributes.
      */
-    public function saveElementQueryFields(int $queryId, array $fieldIds): void
+    public function saveElementQueryAttributes(ElementQuery $elementQuery, int $queryId): void
     {
+        $attributes = ElementQueryHelper::getElementQueryAttributes($elementQuery);
+
+        $this->_batchInsertQueries(
+            $queryId,
+            $attributes,
+            ElementQueryAttributeRecord::tableName(),
+            'attribute',
+        );
+    }
+
+    /**
+     * Saves an element query's fields.
+     */
+    public function saveElementQueryFields(ElementQuery $elementQuery, int $queryId): void
+    {
+        $fieldIds = ElementQueryHelper::getElementQueryFieldIds($elementQuery);
+
         $this->_batchInsertQueries(
             $queryId,
             $fieldIds,

@@ -212,13 +212,9 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $changedByFields = $this->refreshData->getChangedByFields($elementType, $element->id);
-
-        // Don’t proceed if element has already been added and something other
-        // than fields were changed.
-        if ($changedByFields === []) {
-            return;
-        }
+        $changedAttributes = [];
+        $changedFields = [];
+        $changedByFieldsOnly = false;
 
         // If the element has the element changed behavior
         /** @var ElementChangedBehavior|null $elementChanged */
@@ -238,15 +234,9 @@ class RefreshCacheService extends Component
                 return;
             }
 
-            if ($changedByFields === true || $elementChanged->changedByFields === true) {
-                $changedByFields = true;
-            } elseif (is_array($changedByFields)) {
-                $changedByFields = array_merge(
-                    $changedByFields, $elementChanged->changedByFields,
-                );
-            } else {
-                $changedByFields = $elementChanged->changedByFields;
-            }
+            $changedAttributes = $elementChanged->changedAttributes;
+            $changedFields = $elementChanged->changedFields;
+            $changedByFieldsOnly = $elementChanged->changedByFieldsOnly;
         }
 
         $event = new RefreshElementEvent(['element' => $element]);
@@ -258,7 +248,9 @@ class RefreshCacheService extends Component
 
         // Add element
         $this->refreshData->addElement($element);
-        $this->refreshData->addChangedByFields($element, $changedByFields);
+        $this->refreshData->addChangedAttributes($element, $changedAttributes);
+        $this->refreshData->addChangedFields($element, $changedFields);
+        $this->refreshData->addChangedByFieldsOnly($element, $changedByFieldsOnly);
 
         // Add element expiry dates
         $this->addElementExpiryDates($element);
@@ -375,7 +367,7 @@ class RefreshCacheService extends Component
      */
     public function refresh(bool $forceClear = false, bool $forceGenerate = false): void
     {
-        if (empty($this->refreshData->data)) {
+        if ($this->refreshData->isEmpty()) {
             return;
         }
 

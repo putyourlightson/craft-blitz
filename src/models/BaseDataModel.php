@@ -9,7 +9,7 @@ use craft\base\Model;
 
 /**
  * Base class for storing, manipulating and returning data. Child classes provide
- * API methods that helps avoid managing complex arrays and ensuring values are
+ * API methods that help avoid managing complex arrays and ensuring values are
  * unique.
  */
 abstract class BaseDataModel extends Model
@@ -18,6 +18,23 @@ abstract class BaseDataModel extends Model
      * @var array
      */
     public array $data = [];
+
+    /**
+     * @var array
+     */
+    private array $_initialData = [];
+
+    public function init(): void
+    {
+        parent::init();
+
+        $this->_initialData = $this->data;
+    }
+
+    public function isEmpty(): bool
+    {
+        return $this->data === $this->_initialData;
+    }
 
     protected function getKeysAsValues(array $indexes): array
     {

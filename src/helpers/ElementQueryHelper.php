@@ -67,46 +67,65 @@ class ElementQueryHelper
     }
 
     /**
+     * Returns the attributes that the element query is filtered or ordered by.
+     *
+     * @return string[]
+     * @see ElementQuery::criteriaAttributes()
+     */
+    public static function getElementQueryAttributes(ElementQuery $elementQuery): array
+    {
+        $attributes = [];
+
+        // By default, include all public, non-static properties that were defined by a sub class, and certain ones in this class
+        foreach ((new ReflectionClass($elementQuery))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
+            if (!$property->isStatic()) {
+                $dec = $property->getDeclaringClass();
+                if (
+                    ($dec->getName() === ElementQuery::class || $dec->isSubclassOf(ElementQuery::class)) &&
+                    !in_array($property->getName(), ['elementType', 'query', 'subQuery', 'contentTable', 'customFields', 'asArray'], true)
+                ) {
+                    $attributes[] = $property->getName();
+                }
+            }
+        }
+
+        $attributes = self::_getFilteredElementQueryParams($elementQuery, $attributes);
+
+        // Manually add the default order by if none is set
+        if (empty($elementQuery->orderBy)) {
+            // Use reflection to extract the protected property value
+            $property = (new ReflectionClass($elementQuery))->getProperty('defaultOrderBy');
+            $property->setAccessible(true);
+            $defaultOrderBy = $property->getValue($elementQuery);
+
+            if (!empty($defaultOrderBy)) {
+                if (is_array($defaultOrderBy)) {
+                    $defaultOrderBy = array_key_first($defaultOrderBy);
+
+                    // Get the column name without the table
+                    $parts = explode('.', $defaultOrderBy);
+                    $attributes[] = end($parts);
+                } else {
+                    $attributes[] = $defaultOrderBy;
+                }
+            }
+        }
+
+        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
+        $ignoreAttributes = [$sourceIdAttribute, 'siteId', 'orderBy'];
+
+        return array_diff($attributes, $ignoreAttributes);
+    }
+
+    /**
      * Returns the field IDs that the element query is filtered or ordered by.
      *
      * @return int[]
-     * @see ElementQuery::criteriaAttributes()
      */
     public static function getElementQueryFieldIds(ElementQuery $elementQuery): array
     {
-        $allFieldHandles = [];
-
-        /** @var CustomFieldBehavior $behavior */
-        $behavior = $elementQuery->getBehavior('customFields');
-        foreach ((new ReflectionClass($behavior))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            if (!$property->isStatic()) {
-                $name = $property->getName();
-                if (
-                    !in_array($name, ['canSetProperties', 'hasMethods', 'owner']) &&
-                    !method_exists($elementQuery, "get$name")
-                ) {
-                    $allFieldHandles[] = $property->getName();
-                }
-            }
-        }
-
-        $fieldHandles = [];
-        $criteria = $elementQuery->getCriteria();
-
-        foreach ($allFieldHandles as $fieldHandle) {
-            if ($criteria[$fieldHandle] !== null) {
-                $fieldHandles[] = $fieldHandle;
-            }
-        }
-
-        $orderBy = $elementQuery->orderBy;
-        if (is_array($orderBy)) {
-            foreach ($orderBy as $key => $value) {
-                if (in_array($key, $allFieldHandles)) {
-                    $fieldHandles[] = $key;
-                }
-            }
-        }
+        $fieldHandles = CustomFieldBehavior::$fieldHandles;
+        $fieldHandles = self::_getFilteredElementQueryParams($elementQuery, $fieldHandles);
 
         return FieldHelper::getFieldIdsFromHandles($fieldHandles);
     }
@@ -310,6 +329,32 @@ class ElementQueryHelper
         }
 
         return false;
+    }
+
+    /**
+     * Returns the params used by the element query.
+     */
+    private static function _getFilteredElementQueryParams(ElementQuery $elementQuery, array $allParams): array
+    {
+        $uniqueParams = self::getUniqueElementQueryParams($elementQuery);
+        $filteredParams = [];
+
+        foreach ($uniqueParams as $param => $value) {
+            if (in_array($param, $allParams)) {
+                $filteredParams[] = $param;
+            }
+        }
+
+        $orderBy = $elementQuery->orderBy;
+        if (is_array($orderBy)) {
+            foreach ($orderBy as $param => $value) {
+                if (in_array($param, $allParams)) {
+                    $filteredParams[] = $param;
+                }
+            }
+        }
+
+        return $filteredParams;
     }
 
     /**

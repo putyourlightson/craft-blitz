@@ -40,10 +40,19 @@ class ElementChangedBehavior extends Behavior
     public ?Element $originalElement = null;
 
     /**
-     * @var int[]|bool The field IDs that caused the element to change, only set
-     * if nothing else has changed, or `true` if all fields changed.
+     * @var string[] The attributes that changed.
      */
-    public array|bool $changedByFields = [];
+    public array $changedAttributes = [];
+
+    /**
+     * @var int[]|bool The field IDs that changed, or `true` if all fields changed.
+     */
+    public array|bool $changedFields = [];
+
+    /**
+     * @var bool Whether the element was changed by field only.
+     */
+    public bool $changedByFieldsOnly = false;
 
     /**
      * @inerhitdoc
@@ -69,6 +78,9 @@ class ElementChangedBehavior extends Behavior
     {
         $element = $this->owner;
 
+        $this->changedAttributes = $this->_getChangedAttributes();
+        $this->changedFields = $this->_getChangedFields();
+
         if ($element->firstSave) {
             return true;
         }
@@ -85,12 +97,13 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        if ($this->getHaveAttributesChanged()) {
+        if (!empty($this->changedAttributes)) {
             return true;
         }
 
-        $this->changedByFields = $this->_getChangedFields();
-        if (!empty($this->changedByFields)) {
+        if (!empty($this->changedFields)) {
+            $this->changedByFieldsOnly = true;
+
             return true;
         }
 
@@ -166,17 +179,20 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns whether any of the element’s attributes have changed.
+     * Returns the attributes that have changed.
      */
-    public function getHaveAttributesChanged(): bool
+    private function _getChangedAttributes(): array
     {
         $element = $this->owner;
 
-        if ($element->duplicateOf !== null) {
-            return !empty($element->duplicateOf->getModifiedAttributes());
+        if ($element->duplicateOf === null) {
+            $changedAttributes = $element->getDirtyAttributes();
+        } else {
+            $changedAttributes = $element->duplicateOf->getModifiedAttributes();
         }
 
-        return !empty($element->getDirtyAttributes());
+        return $changedAttributes;
+
     }
 
     /**

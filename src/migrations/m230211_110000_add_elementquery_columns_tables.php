@@ -11,11 +11,12 @@ use craft\records\Field;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
+use putyourlightson\blitz\records\ElementQueryAttributeRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
-class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migration
+class m230211_110000_add_elementquery_columns_tables extends Migration
 {
     /**
      * @inheritdoc
@@ -26,7 +27,7 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
             $this->addColumn(
                 ElementQueryRecord::tableName(),
                 'hasSources',
-                $this->boolean()->notNull()->defaultValue(0)->after('type'),
+                $this->boolean()->notNull()->defaultValue(0)->after('params'),
             );
         }
 
@@ -39,6 +40,16 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
             ]);
 
             $this->addForeignKey(null, ElementQuerySourceRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        }
+
+        if (!$this->db->tableExists(ElementQueryAttributeRecord::tableName())) {
+            $this->createTable(ElementQueryAttributeRecord::tableName(), [
+                'queryId' => $this->integer()->notNull(),
+                'attribute' => $this->string()->notNull(),
+                'PRIMARY KEY([[queryId]], [[attribute]])',
+            ]);
+
+            $this->addForeignKey(null, ElementQueryAttributeRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         }
 
         if (!$this->db->tableExists(ElementQueryFieldRecord::tableName())) {
@@ -130,6 +141,21 @@ class m230211_110000_add_elementquery_sources_fields_columns_tables extends Migr
                 )
                 ->execute();
         }
+
+        $attributes = ElementQueryHelper::getElementQueryAttributes($elementQuery);
+
+        $values = [];
+        foreach ($attributes as $attribute) {
+            $values[] = [$elementQueryRecord->id, $attribute];
+        }
+
+        $db->createCommand()
+            ->batchInsert(
+                ElementQueryAttributeRecord::tableName(),
+                ['queryId', 'attribute'],
+                $values,
+            )
+            ->execute();
 
         $fieldIds = ElementQueryHelper::getElementQueryFieldIds($elementQuery);
 

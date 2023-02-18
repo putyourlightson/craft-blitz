@@ -13,7 +13,7 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
  *
  * @property-read int[] $cacheIds
  * @property-read array $elementTypes
- * @property-read array|bool $combinedChangedByFields
+ * @property-read array|bool $combinedChangedFields
  */
 class RefreshDataModel extends BaseDataModel
 {
@@ -21,10 +21,11 @@ class RefreshDataModel extends BaseDataModel
      * @var array{
      *          cacheIds: array<int, int[]|bool>,
      *          elements: array<string, array{
-     *              sourceIds: array<int, int[]|bool>,
-     *              elementIds: array<int, int[]|bool>,
-     *              changedByAttributes: array<int, string[]>,
-     *              changedByFields: array<int, int[]|bool>,
+     *              sourceIds: array<int, bool>,
+     *              elementIds: array<int, bool>,
+     *              changedAttributes: array<int, string[]>,
+     *              changedFields: array<int, int[]|bool>,
+     *              changedByFieldsOnly: array<int, bool>,
      *          }>
      *      }
      */
@@ -81,44 +82,72 @@ class RefreshDataModel extends BaseDataModel
     /**
      * @return string[]
      */
-    public function getChangedByAttributes(string $elementType, int $elementId): array
+    public function getChangedAttributes(string $elementType, int $elementId): array
     {
-        return $this->getKeysAsValues(['elements', $elementType, 'changedByAttributes', $elementId]);
+        return $this->getKeysAsValues(['elements', $elementType, 'changedAttributes', $elementId]);
     }
 
     /**
-     * @return int[]|bool|null
+     * @return string[]
      */
-    public function getChangedByFields(string $elementType, int $elementId): array|bool|null
+    public function getCombinedChangedAttributes(string $elementType): array
     {
-        $changedByFields = $this->data['elements'][$elementType]['changedByFields'][$elementId] ?? null;
+        $combinedAttributes = [];
+        $changedAttributes = $this->data['elements'][$elementType]['changedAttributes'] ?? [];
 
-        if (!is_array($changedByFields)) {
-            return $changedByFields;
-        }
-
-        return $this->getKeysAsValues(['elements', $elementType, 'changedByFields', $elementId]);
-    }
-
-    /**
-     * @return int[]|bool|null
-     */
-    public function getCombinedChangedByFields(string $elementType): array|bool|null
-    {
-        $fieldIds = [];
-        $changedByFields = $this->data['elements'][$elementType]['changedByFields'] ?? [];
-
-        foreach ($changedByFields as $fields) {
-            if (empty($fields)) {
-                return [];
-            } elseif ($fields === true) {
-                $fieldIds = true;
-            } elseif (is_array($fields)) {
-                $fieldIds = array_keys($changedByFields);
+        foreach ($changedAttributes as $attributes) {
+            foreach ($attributes as $attribute) {
+                $combinedAttributes[$attribute] = true;
             }
         }
 
-        return $fieldIds;
+        return array_keys($combinedAttributes);
+    }
+
+    /**
+     * @return int[]|bool
+     */
+    public function getChangedFields(string $elementType, int $elementId): array|bool
+    {
+        $changedFields = $this->data['elements'][$elementType]['changedFields'][$elementId] ?? [];
+
+        if (is_bool($changedFields)) {
+            return $changedFields;
+        }
+
+        return $this->getKeysAsValues(['elements', $elementType, 'changedFields', $elementId]);
+    }
+
+    /**
+     * @return int[]|bool|null
+     */
+    public function getCombinedChangedFields(string $elementType): array|bool|null
+    {
+        $combinedFields = [];
+        $changedFields = $this->data['elements'][$elementType]['changedFields'] ?? [];
+
+        foreach ($changedFields as $fields) {
+            if (empty($fields)) {
+                return [];
+            } elseif ($fields === true) {
+                $combinedFields = true;
+            } elseif (is_array($fields)) {
+                foreach ($fields as $field) {
+                    $combinedFields[$field] = true;
+                }
+            }
+        }
+
+        if (is_bool($combinedFields)) {
+            return $combinedFields;
+        }
+
+        return array_keys($combinedFields);
+    }
+
+    public function getChangedByFieldsOnly(string $elementType, int $elementId): bool
+    {
+        return $this->data['elements'][$elementType]['changedByFieldsOnly'][$elementId] ?? false;
     }
 
     public function addCacheId(int $cacheId): void
@@ -167,21 +196,32 @@ class RefreshDataModel extends BaseDataModel
         }
     }
 
-    public function addChangedByAttributes(ElementInterface $element, array $changedByAttributes): void
+    public function addChangedAttributes(ElementInterface $element, array $changedAttributes): void
     {
-        foreach ($changedByAttributes as $attribute) {
-            $this->data['elements'][$element::class]['changedByAttributes'][$element->id][$attribute] = true;
+        foreach ($changedAttributes as $attribute) {
+            $this->data['elements'][$element::class]['changedAttributes'][$element->id][$attribute] = true;
         }
     }
 
-    public function addChangedByFields(ElementInterface $element, array|bool $changedByFields): void
+    public function addChangedFields(ElementInterface $element, array|bool $changedFields): void
     {
-        if (is_array($changedByFields)) {
-            foreach ($changedByFields as $fieldId) {
-                $this->data['elements'][$element::class]['changedByFields'][$element->id][$fieldId] = true;
-            }
-        } else {
-            $this->data['elements'][$element::class]['changedByFields'][$element->id] = true;
+        $previousChangedFields = $this->data['elements'][$element::class]['changedFields'][$element->id] ?? [];
+
+        // If either is `true` for this element, make it `true`.
+        if ($previousChangedFields === true || $changedFields === true) {
+            $this->data['elements'][$element::class]['changedFields'][$element->id] = true;
+            return;
         }
+
+        foreach ($changedFields as $fieldId) {
+            $this->data['elements'][$element::class]['changedFields'][$element->id][$fieldId] = true;
+        }
+    }
+
+    public function addChangedByFieldsOnly(ElementInterface $element, bool $changedByFieldsOnly): void
+    {
+        $previousValue = $this->data['elements'][$element::class]['changedByFieldsOnly'][$element->id] ?? true;
+
+        $this->data['elements'][$element::class]['changedByFieldsOnly'][$element->id] = $previousValue && $changedByFieldsOnly;
     }
 }
