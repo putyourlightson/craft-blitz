@@ -16,12 +16,19 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use yii\log\Logger;
 
 /**
+ * This class provides methods that are mostly called by the [[RefreshCacheJob]]
+ * class. They have been extracted into this class to make them testable, and
+ * they have been added here instead of in [[RefreshCacheService]] since they
+ * don’t relate to a current refresh request.
+ *
  * @since 4.4.0
  */
 class RefreshCacheHelper
 {
     /**
      * Returns cache IDs for an element type using the provided refresh data.
+     * If one or more custom fields caused the elements to change, then only
+     * elements that track those fields or all fields are returned.
      *
      * @return int[]
      */
@@ -59,7 +66,60 @@ class RefreshCacheHelper
     }
 
     /**
-     * Returns cache IDs for an element query record using the provided refresh data.
+     * Returns element query records of the provided element type using the
+     * provided refresh data. If either attributes or custom fields caused the
+     * elements to change, then only element queries that depend on those
+     * attributes or fields are returned.
+     *
+     * @return ElementQueryRecord[]
+     */
+    public static function getElementTypeQueryRecords(string $elementType, RefreshDataModel $refreshData): array
+    {
+        $ignoreCacheIds = $refreshData->getCacheIds();
+        $sourceIds = $refreshData->getSourceIds($elementType);
+        $changedAttributes = $refreshData->getCombinedChangedAttributes($elementType);
+        $changedFields = $refreshData->getCombinedChangedFields($elementType);
+        $isChangedByAttributes = $refreshData->getCombinedIsChangedByAttributes($elementType);
+        $isChangedByFields = $refreshData->getCombinedIsChangedByFields($elementType);
+
+        // Get element query records without eager loading
+        $query = ElementQueryRecord::find()
+            ->where(['type' => $elementType]);
+
+        // Ignore element queries linked to cache IDs that we already have
+        $query->innerJoinWith('elementQueryCaches', false)
+            ->andWhere([
+                'not',
+                ['cacheId' => $ignoreCacheIds],
+            ]);
+
+        // Limit to queries with no sources or sources in `sourceIds`
+        $query->joinWith('elementQuerySources', false)
+            ->andWhere([
+                'or',
+                ['sourceId' => null],
+                ['sourceId' => $sourceIds],
+            ]);
+
+        // Only limit the query if the elements were changed by attributes and/or fields.
+        if ($isChangedByAttributes || $isChangedByFields) {
+            // Limit queries to only those with attributes or fields that have changed
+            $query->joinWith('elementQueryAttributes', false)
+                ->joinWith('elementQueryFields', false)
+                ->andWhere([
+                    'or',
+                    ['attribute' => $changedAttributes],
+                    ['fieldId' => $changedFields],
+                ]);
+        }
+
+        /** @var ElementQueryRecord[] */
+        return $query->all();
+    }
+
+    /**
+     * Returns cache IDs for an element query record using the provided refresh
+     * data.
      *
      * @return int[]
      */
@@ -117,54 +177,5 @@ class RefreshCacheHelper
         return $elementQueryRecord->getElementQueryCaches()
             ->select('cacheId')
             ->column();
-    }
-
-    /**
-     * Returns element query records of the provided element type using the provided refresh data.
-     *
-     * @return ElementQueryRecord[]
-     */
-    public static function getElementTypeQueryRecords(string $elementType, RefreshDataModel $refreshData): array
-    {
-        $ignoreCacheIds = $refreshData->getCacheIds();
-        $sourceIds = $refreshData->getSourceIds($elementType);
-        $changedAttributes = $refreshData->getCombinedChangedAttributes($elementType);
-        $changedFields = $refreshData->getCombinedChangedFields($elementType);
-        $isChangedByAttributes = $refreshData->getCombinedIsChangedByAttributes($elementType);
-        $isChangedByFields = $refreshData->getCombinedIsChangedByFields($elementType);
-
-        // Get element query records without eager loading
-        $query = ElementQueryRecord::find()
-            ->where(['type' => $elementType]);
-
-        // Ignore element queries linked to cache IDs that we already have
-        $query->innerJoinWith('elementQueryCaches', false)
-            ->andWhere([
-                'not',
-                ['cacheId' => $ignoreCacheIds],
-            ]);
-
-        // Limit to queries with no sources or sources in `sourceIds`
-        $query->joinWith('elementQuerySources', false)
-            ->andWhere([
-                'or',
-                ['sourceId' => null],
-                ['sourceId' => $sourceIds],
-            ]);
-
-        // Only limit the query if the elements were changed by attributes and/or fields.
-        if ($isChangedByAttributes || $isChangedByFields) {
-            // Limit queries to only those with attributes or fields that have changed
-            $query->joinWith('elementQueryAttributes', false)
-                ->joinWith('elementQueryFields', false)
-                ->andWhere([
-                    'or',
-                    ['attribute' => $changedAttributes],
-                    ['fieldId' => $changedFields],
-                ]);
-        }
-
-        /** @var ElementQueryRecord[] */
-        return $query->all();
     }
 }
