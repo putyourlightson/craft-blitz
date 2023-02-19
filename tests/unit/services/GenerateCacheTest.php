@@ -331,10 +331,10 @@ class GenerateCacheTest extends Unit
         }
 
         $count = ElementQueryRecord::find()
-            ->where(['hasSources' => true])
+            ->joinWith('elementQuerySources', false)
+            ->where(['not', ['sourceId' => null]])
             ->count();
-
-        $this->assertEquals(5, $count);
+        $this->assertEquals(7, $count);
 
         $sourceIds = ElementQuerySourceRecord::find()
             ->select('sourceId')

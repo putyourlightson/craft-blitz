@@ -21,12 +21,6 @@ return [
                         'type' => PlainText::class,
                         'required' => false,
                     ],
-                    [
-                        'name' => 'Even More Text',
-                        'handle' => 'evenMoreText',
-                        'type' => PlainText::class,
-                        'required' => false,
-                    ],
                 ],
             ],
         ],

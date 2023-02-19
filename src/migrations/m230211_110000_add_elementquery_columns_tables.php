@@ -23,14 +23,6 @@ class m230211_110000_add_elementquery_columns_tables extends Migration
      */
     public function safeUp(): bool
     {
-        if (!$this->db->columnExists(ElementQueryRecord::tableName(), 'hasSources')) {
-            $this->addColumn(
-                ElementQueryRecord::tableName(),
-                'hasSources',
-                $this->boolean()->notNull()->defaultValue(0)->after('params'),
-            );
-        }
-
         if ($this->db->tableExists(ElementQuerySourceRecord::tableName())) {
             $this->dropTable(ElementQuerySourceRecord::tableName());
             $this->createTable(ElementQuerySourceRecord::tableName(), [
@@ -129,18 +121,6 @@ class m230211_110000_add_elementquery_columns_tables extends Migration
                 $values,
             )
             ->execute();
-
-        if (!empty($sourceIds)) {
-            $db->createCommand()
-                ->update(
-                    ElementQueryRecord::tableName(),
-                    ['hasSources' => true],
-                    ['id' => $elementQueryRecord->id],
-                    [],
-                    false,
-                )
-                ->execute();
-        }
 
         $attributes = ElementQueryHelper::getElementQueryAttributes($elementQuery);
 

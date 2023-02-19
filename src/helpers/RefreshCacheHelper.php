@@ -13,7 +13,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
-use yii\db\ActiveQuery;
 use yii\log\Logger;
 
 /**
@@ -41,16 +40,10 @@ class RefreshCacheHelper
             if ($isChangedByFields) {
                 $changedFields = $refreshData->getChangedFields($elementType, $elementId);
 
-                if ($changedFields === true) {
-                    $fieldCondition = ['not', ['fieldId' => null]];
-                } else {
-                    $fieldCondition = ['fieldId' => $changedFields];
-                }
-
                 $elementCondition[] = [
                     'or',
                     ['trackAllFields' => true],
-                    $fieldCondition,
+                    ['fieldId' => $changedFields],
                 ];
 
                 $condition[] = $elementCondition;
@@ -133,8 +126,8 @@ class RefreshCacheHelper
      */
     public static function getElementTypeQueryRecords(string $elementType, RefreshDataModel $refreshData): array
     {
-        $sourceIds = $refreshData->getSourceIds($elementType);
         $ignoreCacheIds = $refreshData->getCacheIds();
+        $sourceIds = $refreshData->getSourceIds($elementType);
         $changedAttributes = $refreshData->getCombinedChangedAttributes($elementType);
         $changedFields = $refreshData->getCombinedChangedFields($elementType);
         $isChangedByAttributes = $refreshData->getCombinedIsChangedByAttributes($elementType);
@@ -142,39 +135,33 @@ class RefreshCacheHelper
 
         // Get element query records without eager loading
         $query = ElementQueryRecord::find()
-            ->where(['type' => $elementType])
-            ->joinWith([
-                'elementQuerySources' => function(ActiveQuery $query) use ($sourceIds) {
-                    $query->where(['or',
-                        ['hasSources' => false],
-                        ['sourceId' => $sourceIds],
-                    ]);
-                },
-            ], false)
-            // Ignore element queries linked to cache IDs that we already have
-            ->innerJoinWith([
-                'elementQueryCaches' => function(ActiveQuery $query) use ($ignoreCacheIds) {
-                    $query->where(['not', ['cacheId' => $ignoreCacheIds]]);
-                },
-            ], false);
+            ->where(['type' => $elementType]);
 
-        // Limit the query to changed attributes and/or fields.
+        // Ignore element queries linked to cache IDs that we already have
+        $query->innerJoinWith('elementQueryCaches', false)
+            ->andWhere([
+                'not',
+                ['cacheId' => $ignoreCacheIds],
+            ]);
+
+        // Limit to queries with no sources or sources in `sourceIds`
+        $query->joinWith('elementQuerySources', false)
+            ->andWhere([
+                'or',
+                ['sourceId' => null],
+                ['sourceId' => $sourceIds],
+            ]);
+
+        // Only limit the query if the elements were changed by attributes and/or fields.
         if ($isChangedByAttributes || $isChangedByFields) {
+            // Limit queries to only those with attributes or fields that have changed
             $query->joinWith('elementQueryAttributes', false)
-                ->where([
+                ->joinWith('elementQueryFields', false)
+                ->andWhere([
                     'or',
-                    ['attribute' => null],
                     ['attribute' => $changedAttributes],
+                    ['fieldId' => $changedFields],
                 ]);
-
-            if (is_array($changedFields)) {
-                $query->joinWith('elementQueryFields', false)
-                    ->where([
-                        'or',
-                        ['fieldId' => null],
-                        ['fieldId' => $changedFields],
-                    ]);
-            }
         }
 
         /** @var ElementQueryRecord[] */

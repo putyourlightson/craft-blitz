@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\models;
 
 use craft\base\ElementInterface;
+use putyourlightson\blitz\helpers\FieldHelper;
 
 /**
  * @inerhitdoc
@@ -118,6 +119,10 @@ class GenerateDataModel extends BaseDataModel
 
     public function addElementTrackFields(ElementInterface $element, array|bool $fields): void
     {
+        if (is_array($fields)) {
+            $fields = FieldHelper::getFieldIdsFromHandles($fields);
+        }
+
         $this->data['elements']['trackFields'][$element->id] = $fields;
     }
 

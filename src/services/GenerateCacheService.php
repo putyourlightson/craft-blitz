@@ -19,7 +19,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
-use putyourlightson\blitz\helpers\FieldHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\GenerateDataModel;
@@ -248,7 +247,6 @@ class GenerateCacheService extends Component
                             'index' => $index,
                             'type' => $elementQuery->elementType,
                             'params' => $params,
-                            'hasSources' => false,
                         ],
                     )
                     ->execute();
@@ -303,16 +301,6 @@ class GenerateCacheService extends Component
             ElementQuerySourceRecord::tableName(),
             'sourceId',
         );
-
-        Craft::$app->getDb()->createCommand()
-            ->update(
-                ElementQueryRecord::tableName(),
-                ['hasSources' => true],
-                ['id' => $queryId],
-                [],
-                false,
-            )
-            ->execute();
     }
 
     /**
@@ -529,10 +517,6 @@ class GenerateCacheService extends Component
             $trackFields = StringHelper::split($this->options->trackCustomFields);
         } else {
             $trackFields = $this->options->trackCustomFields;
-        }
-
-        if (is_array($trackFields)) {
-            $trackFields = FieldHelper::getFieldIdsFromHandles($trackFields);
         }
 
         $this->generateData->addElementTrackFields($element, $trackFields);

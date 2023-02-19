@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Element;
 use craft\elements\Asset;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
-use putyourlightson\blitz\helpers\FieldHelper;
 use yii\base\Behavior;
 
 /**
@@ -45,9 +44,9 @@ class ElementChangedBehavior extends Behavior
     public array $changedAttributes = [];
 
     /**
-     * @var int[]|bool The field IDs that changed, or `true` if all fields changed.
+     * @var string[] The field handles that changed.
      */
-    public array|bool $changedFields = [];
+    public array $changedFields = [];
 
     /**
      * @var bool Whether the element was caused to change specifically by attributes.
@@ -199,35 +198,25 @@ class ElementChangedBehavior extends Behavior
         }
 
         return $changedAttributes;
-
     }
 
     /**
-     * Returns the IDs of the custom fields that have changed, or `true` if all have.
+     * Returns the handles of the custom fields that have changed.
      *
-     * @return int[]|bool
+     * @return string[]
      */
-    private function _getChangedFields(): array|bool
+    private function _getChangedFields(): array
     {
         $element = $this->owner;
 
-        if ($element->duplicateOf == null) {
+        if ($element->duplicateOf === null) {
             // Only elements that support drafts can track changed fields:
             // https://github.com/craftcms/cms/discussions/12667
             $changedFieldHandles = $element->getDirtyFields();
-
-            // Check if all custom fields are dirty
-            $fieldLayout = $element->getFieldLayout();
-            $customFields = $fieldLayout->getCustomFields();
-            $customFieldHandles = array_map(fn($field) => $field->handle, $customFields);
-
-            if (empty(array_diff($customFieldHandles, $changedFieldHandles))) {
-                return true;
-            }
         } else {
             $changedFieldHandles = $element->duplicateOf->getModifiedFields();
         }
 
-        return FieldHelper::getFieldIdsFromHandles($changedFieldHandles);
+        return $changedFieldHandles;
     }
 }
