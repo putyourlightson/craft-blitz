@@ -148,7 +148,6 @@ class GenerateCacheService extends Component
 
         // Replace the custom field behavior with our own
         $customFields = $element->getBehavior('customFields');
-        $element->detachBehavior('customFields');
         $element->attachBehavior('customFields',
             new BlitzCustomFieldBehavior(['customFields' => $customFields])
         );
