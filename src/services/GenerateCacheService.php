@@ -300,7 +300,7 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves an element query's attributes.
+     * Saves an element query’s attributes.
      */
     public function saveElementQueryAttributes(ElementQuery $elementQuery, int $queryId): void
     {

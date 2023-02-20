@@ -18,6 +18,11 @@ use yii\db\Expression;
 class ElementQueryHelper
 {
     /**
+     * @var string[][]
+     */
+    public static array $_filterableElementQueryAttributes = [];
+
+    /**
      * @var array
      */
     private static array $_defaultElementQueryParams = [];
@@ -74,22 +79,8 @@ class ElementQueryHelper
      */
     public static function getElementQueryAttributes(ElementQuery $elementQuery): array
     {
-        $attributes = [];
-
-        // By default, include all public, non-static properties that were defined by a sub class, and certain ones in this class
-        foreach ((new ReflectionClass($elementQuery))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            if (!$property->isStatic()) {
-                $dec = $property->getDeclaringClass();
-                if (
-                    ($dec->getName() === ElementQuery::class || $dec->isSubclassOf(ElementQuery::class)) &&
-                    !in_array($property->getName(), ['elementType', 'query', 'subQuery', 'contentTable', 'customFields', 'asArray'], true)
-                ) {
-                    $attributes[] = $property->getName();
-                }
-            }
-        }
-
-        $attributes = self::_getFilteredElementQueryParams($elementQuery, $attributes);
+        $attributes = self::_getFilterableElementQueryAttributes($elementQuery);
+        $attributes = self::_getUsedElementQueryAttributes($elementQuery, $attributes);
 
         // Manually add the default order by if none is set
         if (empty($elementQuery->orderBy)) {
@@ -125,7 +116,7 @@ class ElementQueryHelper
     public static function getElementQueryFieldIds(ElementQuery $elementQuery): array
     {
         $fieldHandles = CustomFieldBehavior::$fieldHandles;
-        $fieldHandles = self::_getFilteredElementQueryParams($elementQuery, $fieldHandles);
+        $fieldHandles = self::_getUsedElementQueryAttributes($elementQuery, $fieldHandles);
 
         return FieldHelper::getFieldIdsFromHandles($fieldHandles);
     }
@@ -332,29 +323,74 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns the params used by the element query.
+     * Returns an element query’s filterable attributes, which is the
+     * intersection of its attributes and its element type’s attributes.
      */
-    private static function _getFilteredElementQueryParams(ElementQuery $elementQuery, array $allParams): array
+    private static function _getFilterableElementQueryAttributes(ElementQuery $elementQuery): array
+    {
+        if (!empty(self::$_filterableElementQueryAttributes[$elementQuery::class])) {
+            return self::$_filterableElementQueryAttributes[$elementQuery::class];
+        }
+
+        $elementQueryAttributes = [];
+        foreach (self::_getPublicNonStaticProperties($elementQuery::class) as $property) {
+            $elementQueryAttributes[] = $property;
+        }
+
+        $elementTypeAttributes = [];
+        foreach (self::_getPublicNonStaticProperties($elementQuery->elementType) as $property) {
+            $elementTypeAttributes[] = $property;
+        }
+
+        self::$_filterableElementQueryAttributes[$elementQuery::class] = array_intersect(
+            $elementQueryAttributes,
+            $elementTypeAttributes,
+        );
+
+        return self::$_filterableElementQueryAttributes[$elementQuery::class];
+    }
+
+    /**
+     * Returns a class’ public, non-static properties.
+     */
+    private static function _getPublicNonStaticProperties(string $class): array
+    {
+        $properties = [];
+
+        $publicProperties = (new ReflectionClass($class))->getProperties(ReflectionProperty::IS_PUBLIC);
+        foreach ($publicProperties as $property) {
+            if (!$property->isStatic()) {
+                $properties[] = $property->getName();
+            }
+        }
+
+        return $properties;
+    }
+
+    /**
+     * Returns the attributes used by the element query.
+     */
+    private static function _getUsedElementQueryAttributes(ElementQuery $elementQuery, array $allAttributes): array
     {
         $uniqueParams = self::getUniqueElementQueryParams($elementQuery);
-        $filteredParams = [];
+        $attributes = [];
 
-        foreach ($uniqueParams as $param => $value) {
-            if (in_array($param, $allParams)) {
-                $filteredParams[] = $param;
+        foreach ($uniqueParams as $name => $value) {
+            if (in_array($name, $allAttributes)) {
+                $attributes[] = $name;
             }
         }
 
         $orderBy = $elementQuery->orderBy;
         if (is_array($orderBy)) {
-            foreach ($orderBy as $param => $value) {
-                if (in_array($param, $allParams)) {
-                    $filteredParams[] = $param;
+            foreach ($orderBy as $name => $value) {
+                if (in_array($name, $allAttributes)) {
+                    $attributes[] = $name;
                 }
             }
         }
 
-        return $filteredParams;
+        return $attributes;
     }
 
     /**
