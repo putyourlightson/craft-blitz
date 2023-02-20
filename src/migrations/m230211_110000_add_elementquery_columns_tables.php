@@ -107,7 +107,7 @@ class m230211_110000_add_elementquery_columns_tables extends Migration
 
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
         $sourceIds = $params[$sourceIdAttribute] ?? [];
-        $sourceIds = is_array($sourceIds) ? [$sourceIds] : $sourceIds;
+        $sourceIds = is_array($sourceIds) ? $sourceIds : [$sourceIds];
 
         $values = [];
         foreach ($sourceIds as $sourceId) {
