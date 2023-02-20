@@ -4,6 +4,7 @@
 /.gitignore export-ignore
 /codeception.yml export-ignore
 /ecs.php export-ignore
+/lib/craft/behaviors/CustomFieldBehavior.php export-ignore
 /phpstan.neon export-ignore
 /tests/ export-ignore
 /tsconfig.json export-ignore

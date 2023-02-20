@@ -4,5 +4,7 @@ parameters:
     level: 5
     paths:
         - src
+    scanFiles:
+        - lib/craft/behaviors/CustomFieldBehavior.php
     bootstrapFiles:
         - %currentWorkingDirectory%/bootstrap.php
