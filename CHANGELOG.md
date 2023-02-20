@@ -2,17 +2,7 @@
 
 ## 4.4.0 - Unreleased
 ### Added
-- Added the `trackCustomFields` page specific option property and function that allows you to specify which custom fields should be tracked.
-
-### Changed
-- Renamed the `cacheElements` page specific option property and function to `trackElements`.
-- Renamed the `cacheElementQueries` page specific option property and function to `trackElementQueries`.
-
-### Deprecated
-- Deprecated the `craft.blitz.options({cacheElements})` property. Use `craft.blitz.options({trackElements})` instead.
-- Deprecated the `craft.blitz.options({cacheElementQueries})` property. Use `craft.blitz.options({trackElementQueries})` instead.
-- Deprecated the `craft.blitz.options.cacheElements()` function. Use `craft.blitz.options.trackElements()` instead.
-- Deprecated the `craft.blitz.options.cacheElementQueries()` function. Use `craft.blitz.options.trackElementQueries()` instead.
+- Added automatic tracking of which custom fields are used per element per page, as well as which attributes and custom fields are changed on each element save, to greatly reduce the number of invalidated cached pages when content is changed.
 
 ## 4.3.3 - 2023-02-14
 ### Changed

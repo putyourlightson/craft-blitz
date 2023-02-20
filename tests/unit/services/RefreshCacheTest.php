@@ -107,13 +107,12 @@ class RefreshCacheTest extends Unit
 
     public function testGetElementCacheIdsWithAttributes()
     {
-        Blitz::$plugin->generateCache->options->trackCustomFields(false);
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $refreshData = RefreshDataModel::createFromElement($this->entry1);
-        $refreshData->addChangedFields($this->entry1, ['text']);
-        $refreshData->addChangedAttributes($this->entry1, ['title']);
+        $refreshData->addChangedField($this->entry1, 'text');
+        $refreshData->addChangedAttribute($this->entry1, 'title');
         $cacheIds = RefreshCacheHelper::getElementCacheIds(
             Entry::class, $refreshData,
         );
@@ -123,12 +122,13 @@ class RefreshCacheTest extends Unit
 
     public function testGetElementCacheIdsWithCustomFields()
     {
-        Blitz::$plugin->generateCache->options->trackCustomFields(['text']);
         Blitz::$plugin->generateCache->addElement($this->entry1);
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $text = $this->entry1->text;
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $refreshData = RefreshDataModel::createFromElement($this->entry1);
-        $refreshData->addChangedFields($this->entry1, ['text']);
+        $refreshData->addChangedField($this->entry1, 'text');
         $cacheIds = RefreshCacheHelper::getElementCacheIds(
             Entry::class, $refreshData,
         );
@@ -138,12 +138,11 @@ class RefreshCacheTest extends Unit
 
     public function testGetElementCacheIdsWithoutCustomFields()
     {
-        Blitz::$plugin->generateCache->options->trackCustomFields(false);
         Blitz::$plugin->generateCache->addElement($this->entry1);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $refreshData = RefreshDataModel::createFromElement($this->entry1);
-        $refreshData->addChangedFields($this->entry1, ['text']);
+        $refreshData->addChangedField($this->entry1, 'text');
         $refreshData->addIsChangedByFields($this->entry1, true);
         $cacheIds = RefreshCacheHelper::getElementCacheIds(
             Entry::class, $refreshData,
@@ -218,10 +217,10 @@ class RefreshCacheTest extends Unit
         $refreshData->addIsChangedByAttributes($this->entry1, true);
         $this->_assertElementTypeQueryRecordCount(0, $refreshData);
 
-        $refreshData->addChangedAttributes($this->entry1, ['slug']);
+        $refreshData->addChangedAttribute($this->entry1, 'slug');
         $this->_assertElementTypeQueryRecordCount(0, $refreshData);
 
-        $refreshData->addChangedAttributes($this->entry1, ['title']);
+        $refreshData->addChangedAttribute($this->entry1, 'title');
         $this->_assertElementTypeQueryRecordCount(1, $refreshData);
     }
 
@@ -236,10 +235,10 @@ class RefreshCacheTest extends Unit
         $refreshData->addIsChangedByFields($this->entry1, true);
         $this->_assertElementTypeQueryRecordCount(0, $refreshData);
 
-        $refreshData->addChangedFields($this->entry1, ['moreText']);
+        $refreshData->addChangedField($this->entry1, 'moreText');
         $this->_assertElementTypeQueryRecordCount(0, $refreshData);
 
-        $refreshData->addChangedFields($this->entry1, ['text']);
+        $refreshData->addChangedField($this->entry1, 'text');
         $this->_assertElementTypeQueryRecordCount(1, $refreshData);
     }
 
@@ -266,7 +265,7 @@ class RefreshCacheTest extends Unit
         Blitz::$plugin->refreshCache->addElement($this->entry1);
 
         // Assert that the tracked element is correct
-        $this->_assertTrackedElement($this->entry1, [], ['text', '123']);
+        $this->_assertTrackedElement($this->entry1, [], ['text']);
     }
 
     public function testAddElementMultipleTimesWhenAttributesChanged()

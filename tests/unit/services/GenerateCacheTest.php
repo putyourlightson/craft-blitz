@@ -143,28 +143,20 @@ class GenerateCacheTest extends Unit
 
         /** @var ElementCacheRecord $record */
         $record = ElementCacheRecord::find()
-            ->where([
-                'elementId' => $element->id,
-                'trackAllFields' => true,
-            ])
+            ->where(['elementId' => $element->id])
             ->one();
 
         $this->assertEquals($element->id, $record->elementId);
-        $this->assertTrue((bool)$record->trackAllFields);
     }
 
     public function testSaveElementCacheRecordWithoutCustomFields()
     {
         $element = User::find()->one();
-        Blitz::$plugin->generateCache->options->trackCustomFields = false;
         Blitz::$plugin->generateCache->addElement($element);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $count = ElementCacheRecord::find()
-            ->where([
-                'elementId' => $element->id,
-                'trackAllFields' => false,
-            ])
+            ->where(['elementId' => $element->id])
             ->count();
 
         $this->assertEquals(1, $count);
@@ -173,15 +165,15 @@ class GenerateCacheTest extends Unit
     public function testSaveElementCacheRecordWithCustomFields()
     {
         $element = Entry::find()->one();
-        Blitz::$plugin->generateCache->options->trackCustomFields = ['text', 'moreText'];
         Blitz::$plugin->generateCache->addElement($element);
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $text = $element->text;
+        /** @noinspection PhpUnusedLocalVariableInspection */
+        $moreText = $element->moreText;
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $count = ElementCacheRecord::find()
-            ->where([
-                'elementId' => $element->id,
-                'trackAllFields' => false,
-            ])
+            ->where(['elementId' => $element->id])
             ->count();
 
         $this->assertEquals(1, $count);

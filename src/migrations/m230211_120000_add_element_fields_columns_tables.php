@@ -16,14 +16,6 @@ class m230211_120000_add_element_fields_columns_tables extends Migration
      */
     public function safeUp(): bool
     {
-        if (!$this->db->columnExists(ElementCacheRecord::tableName(), 'trackAllFields')) {
-            $this->addColumn(
-                ElementCacheRecord::tableName(),
-                'trackAllFields',
-                $this->boolean()->notNull()->defaultValue(1)->after('elementId'),
-            );
-        }
-
         if (!$this->db->tableExists(ElementFieldCacheRecord::tableName())) {
             $this->createTable(ElementFieldCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),

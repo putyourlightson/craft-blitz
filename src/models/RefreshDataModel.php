@@ -182,10 +182,15 @@ class RefreshDataModel extends BaseDataModel
         }
     }
 
-    public function addChangedAttributes(ElementInterface $element, array $changedAttributes): void
+    public function addChangedAttribute(ElementInterface $element, string $attribute): void
     {
-        foreach ($changedAttributes as $attribute) {
-            $this->data['elements'][$element::class]['changedAttributes'][$element->id][$attribute] = true;
+        $this->data['elements'][$element::class]['changedAttributes'][$element->id][$attribute] = true;
+    }
+
+    public function addChangedAttributes(ElementInterface $element, array $attributes): void
+    {
+        foreach ($attributes as $attribute) {
+            $this->addChangedAttribute($element, $attribute);
         }
     }
 
@@ -196,10 +201,15 @@ class RefreshDataModel extends BaseDataModel
         $this->data['elements'][$element::class]['isChangedByAttributes'][$element->id] = $previousValue && $isChangedByAttributes;
     }
 
-    public function addChangedFields(ElementInterface $element, array $changedFields): void
+    public function addChangedField(ElementInterface $element, string $field): void
     {
-        foreach ($changedFields as $field) {
-            $this->data['elements'][$element::class]['changedFields'][$element->id][$field] = true;
+        $this->data['elements'][$element::class]['changedFields'][$element->id][$field] = true;
+    }
+
+    public function addChangedFields(ElementInterface $element, array $fields): void
+    {
+        foreach ($fields as $field) {
+            $this->addChangedField($element, $field);
         }
     }
 

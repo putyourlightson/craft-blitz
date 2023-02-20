@@ -28,7 +28,7 @@ class RefreshCacheHelper
     /**
      * Returns cache IDs for an element type using the provided refresh data.
      * If one or more custom fields caused the elements to change, then only
-     * elements that track those fields or all fields are returned.
+     * elements that track those fields are returned.
      *
      * @return int[]
      */
@@ -46,13 +46,7 @@ class RefreshCacheHelper
 
             if ($isChangedByFields) {
                 $changedFields = $refreshData->getChangedFields($elementType, $elementId);
-
-                $elementCondition[] = [
-                    'or',
-                    ['trackAllFields' => true],
-                    ['fieldId' => $changedFields],
-                ];
-
+                $elementCondition[] = ['fieldId' => $changedFields];
                 $condition[] = $elementCondition;
             }
         }

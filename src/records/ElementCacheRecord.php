@@ -11,7 +11,6 @@ use yii\db\ActiveQueryInterface;
 /**
  * @property int $cacheId
  * @property int $elementId
- * @property bool|int $trackAllFields
  * @property CacheRecord $cache
  * @property ElementFieldCacheRecord[] $elementFieldCaches
  */

@@ -67,7 +67,6 @@ use yii\web\Response;
  * @property-read BaseCacheGenerator $cacheGenerator
  * @property-read BaseCachePurger $cachePurger
  * @property-read BaseDeployer $deployer
- *
  * @property-read SettingsModel $settings
  */
 class Blitz extends Plugin

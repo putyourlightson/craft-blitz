@@ -12,9 +12,7 @@ use putyourlightson\blitz\helpers\FieldHelper;
  * @inerhitdoc
  *
  * @property-read int[] $elementIds
- * @property-read int[][]|bool[] $elementTrackFields
- * @property-read bool[] $elementTrackAllFields
- * @property-read int[][] $elementTrackSpecificFields
+ * @property-read int[][] $elementIndexedTrackFields
  * @property-read int[] $elementQueryIds
  * @property-read int[] $ssiIncludeIds
  */
@@ -24,7 +22,7 @@ class GenerateDataModel extends BaseDataModel
      * @var array{
      *          elements: array{
      *              elementIds: array<int, bool>,
-     *              trackFields: array<int, array<int, bool>|bool>,
+     *              trackFields: array<int, array<string, bool>>,
      *          },
      *          elementQueryIds: array<int, bool>,
      *          ssiIncludeIds: array<int, bool>,
@@ -48,47 +46,20 @@ class GenerateDataModel extends BaseDataModel
     }
 
     /**
-     * @return int[][]|bool[]
-     */
-    public function getElementTrackFields(): array
-    {
-        return $this->data['elements']['trackFields'];
-    }
-
-    /**
-     * @return bool[]
-     */
-    public function getElementTrackAllFields(): array
-    {
-        $trackFields = [];
-
-        foreach ($this->getElementTrackFields() as $elementId => $fields) {
-            if ($fields === true) {
-                $trackFields[$elementId] = true;
-            } else {
-                $trackFields[$elementId] = false;
-            }
-        }
-
-        return $trackFields;
-    }
-
-    /**
      * @return int[][]
      */
-    public function getElementTrackSpecificFields(): array
+    public function getElementIndexedTrackFields(): array
     {
-        $trackFields = [];
+        $indexedFields = [];
+        $trackFields = $this->data['elements']['trackFields'];
 
-        foreach ($this->getElementTrackFields() as $elementId => $fields) {
-            if (is_array($fields)) {
-                $trackFields[$elementId] = $fields;
-            } else {
-                $trackFields[$elementId] = [];
-            }
+        foreach ($trackFields as $elementId => $fields) {
+            $fieldHandles = array_keys($fields);
+            $fieldIds = FieldHelper::getFieldIdsFromHandles($fieldHandles);
+            $indexedFields[$elementId] = $fieldIds;
         }
 
-        return $trackFields;
+        return $indexedFields;
     }
 
     /**
@@ -117,13 +88,9 @@ class GenerateDataModel extends BaseDataModel
         $this->addElementId($element->id);
     }
 
-    public function addElementTrackFields(ElementInterface $element, array|bool $fields): void
+    public function addElementTrackField(ElementInterface $element, $field): void
     {
-        if (is_array($fields)) {
-            $fields = FieldHelper::getFieldIdsFromHandles($fields);
-        }
-
-        $this->data['elements']['trackFields'][$element->id] = $fields;
+        $this->data['elements']['trackFields'][$element->id][$field] = true;
     }
 
     public function addElementQueryId(int $elementQuery): void

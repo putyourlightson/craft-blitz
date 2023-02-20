@@ -16,6 +16,8 @@ use yii\base\Behavior;
  *
  * @since 3.6.0
  *
+ * @property Element $owner
+ *
  * @property-read bool $hasChanged
  * @property-read bool $hasBeenDeleted
  * @property-read bool $hasStatusChanged
@@ -24,7 +26,6 @@ use yii\base\Behavior;
  * @property-read bool $haveAttributesChanged
  * @property-read bool $haveFieldsChanged
  * @property-read string[] $changedFields
- * @property Element $owner
  */
 class ElementChangedBehavior extends Behavior
 {

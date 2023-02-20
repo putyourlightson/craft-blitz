@@ -5,7 +5,6 @@
 
 namespace putyourlightson\blitz\models;
 
-use Craft;
 use craft\base\Model;
 use craft\helpers\ConfigHelper;
 use craft\validators\DateTimeValidator;
@@ -17,34 +16,17 @@ use DateTime;
 class CacheOptionsModel extends Model
 {
     /**
-     * @var bool
+     * @var bool Whether caching is enabled.
      */
     public bool $cachingEnabled = true;
 
     /**
-     * @var bool Whether elements should be tracked in the database.
-     */
-    public bool $trackElements = true;
-
-    /**
-     * @var bool Whether element queries should be tracked in the database.
-     */
-    public bool $trackElementQueries = true;
-
-    /**
-     * @var string[]|string|bool Whether and which custom fields should be tracked.
-     */
-    public array|string|bool $trackCustomFields = true;
-
-    /**
-     * @var bool
-     * @deprecated in 4.4.0. Use [[$trackElements]] instead.
+     * @var bool Whether elements should be cached in the database.
      */
     public bool $cacheElements = true;
 
     /**
-     * @var bool
-     * @deprecated in 4.4.0. Use [[$trackElementQueries]] instead.
+     * @var bool Whether element queries should be cached in the database.
      */
     public bool $cacheElementQueries = true;
 
@@ -119,59 +101,21 @@ class CacheOptionsModel extends Model
     }
 
     /**
-     * Sets the track elements option.
-     */
-    public function trackElements(bool $value): self
-    {
-        $this->trackElements = $value;
-
-        return $this;
-    }
-
-    /**
-     * Sets the track element queries option.
-     */
-    public function trackElementQueries(bool $value): self
-    {
-        $this->trackElementQueries = $value;
-
-        return $this;
-    }
-
-    /**
-     * Sets the track custom fields option.
-     */
-    public function trackCustomFields(array|string|bool $value = true): self
-    {
-        $this->trackCustomFields = $value;
-
-        return $this;
-    }
-
-    /**
      * Sets the cache elements option.
-     *
-     * @deprecated in 4.4.0. Use [[trackElements()]] instead.
      */
     public function cacheElements(bool $value): self
     {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.options.cacheElements()` has been deprecated. Use `craft.blitz.options.trackElements()` instead.');
-
-        $this->trackElements = $value;
+        $this->cacheElements = $value;
 
         return $this;
     }
 
     /**
      * Sets the cache element queries option.
-     *
-     * @deprecated in 4.4.0. Use [[trackElementQueries()]] instead.
      */
     public function cacheElementQueries(bool $value): self
     {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.options.cacheElementQueries()` has been deprecated. Use `craft.blitz.options.trackElementQueries()` instead.');
-
-        $this->trackElementQueries = $value;
+        $this->cacheElementQueries = $value;
 
         return $this;
     }

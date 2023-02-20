@@ -15,6 +15,7 @@ use craft\events\PopulateElementEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
+use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -133,12 +134,7 @@ class GenerateCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
-        // Don’t proceed if element tracking is disabled
-        if (!Blitz::$plugin->settings->trackElements || !$this->options->trackElements) {
-            return;
-        }
-
-        // Check deprecated values in case they’re still being used.
+        // Don’t proceed if element caching is disabled
         if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
             return;
         }
@@ -149,7 +145,13 @@ class GenerateCacheService extends Component
         }
 
         $this->generateData->addElement($element);
-        $this->_addElementTrackFields($element);
+
+        // Replace the custom field behavior with our own
+        $customFields = $element->getBehavior('customFields');
+        $element->detachBehavior('customFields');
+        $element->attachBehavior('customFields',
+            new BlitzCustomFieldBehavior(['customFields' => $customFields])
+        );
     }
 
     /**
@@ -157,12 +159,7 @@ class GenerateCacheService extends Component
      */
     public function addElementQuery(ElementQuery $elementQuery): void
     {
-        // Don’t proceed if element query tracking is disabled
-        if (!Blitz::$plugin->settings->trackElementQueries || !$this->options->trackElementQueries) {
-            return;
-        }
-
-        // Check deprecated values in case they’re still being used.
+        // Don’t proceed if element query caching is disabled
         if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
             return;
         }
@@ -505,31 +502,12 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Adds the custom fields to track for an element ID.
-     */
-    private function _addElementTrackFields(ElementInterface $element): void
-    {
-        if ($this->options->trackCustomFields === true) {
-            $trackFields = true;
-        } elseif ($this->options->trackCustomFields === false) {
-            $trackFields = [];
-        } elseif (is_string($this->options->trackCustomFields)) {
-            $trackFields = StringHelper::split($this->options->trackCustomFields);
-        } else {
-            $trackFields = $this->options->trackCustomFields;
-        }
-
-        $this->generateData->addElementTrackFields($element, $trackFields);
-    }
-
-    /**
      * Batch inserts element caches into the database.
      */
     private function _batchInsertElementCaches(int $cacheId): void
     {
         $elementIds = $this->generateData->getElementIds();
-        $trackAllFields = $this->generateData->getElementTrackAllFields();
-        $trackSpecificFields = $this->generateData->getElementTrackSpecificFields();
+        $elementIndexedTrackFields = $this->generateData->getElementIndexedTrackFields();
 
         $this->_batchInsertCaches(
             $cacheId,
@@ -537,18 +515,16 @@ class GenerateCacheService extends Component
             Element::tableName(),
             ElementCacheRecord::tableName(),
             'elementId',
-            $trackAllFields,
-            'trackAllFields',
         );
 
-        if (!empty($trackSpecificFields)) {
+        if (!empty($elementIndexedTrackFields)) {
             $this->_batchInsertCaches(
                 $cacheId,
                 $elementIds,
                 Element::tableName(),
                 ElementFieldCacheRecord::tableName(),
                 'elementId',
-                $trackSpecificFields,
+                $elementIndexedTrackFields,
                 'fieldId',
             );
         }
@@ -575,12 +551,8 @@ class GenerateCacheService extends Component
             if ($extraValues === null) {
                 $values[] = [$cacheId, $id];
             } elseif (isset($extraValues[$id])) {
-                if (is_array($extraValues[$id])) {
-                    foreach ($extraValues[$id] as $extraValue) {
-                        $values[] = [$cacheId, $id, $extraValue];
-                    }
-                } else {
-                    $values[] = [$cacheId, $id, $extraValues[$id]];
+                foreach ($extraValues[$id] as $extraValue) {
+                    $values[] = [$cacheId, $id, $extraValue];
                 }
             }
         }
