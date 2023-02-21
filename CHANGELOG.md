@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
 ## 4.4.0 - Unreleased
+> {warning} Tracking of custom fields takes place when pages are cached, therefore it is important to clear or refresh the cache after this update completes.
+
 ### Added
 - Added automatic tracking of which custom fields are used per element per page, as well as which attributes and custom fields are changed on each element save, to greatly reduce the number of invalidated cached pages when content is changed.
+- Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
 
 ## 4.3.3 - 2023-02-14
 ### Changed
