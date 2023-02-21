@@ -342,9 +342,15 @@ class ElementQueryHelper
             $elementTypeAttributes[] = $property;
         }
 
-        self::$_filterableElementQueryAttributes[$elementQuery::class] = array_intersect(
-            $elementQueryAttributes,
-            $elementTypeAttributes,
+        // Ignore attributes that cannot be changed by users
+        $ignoreAttributes = ['structureId'];
+
+        self::$_filterableElementQueryAttributes[$elementQuery::class] = array_diff(
+            array_intersect(
+                $elementQueryAttributes,
+                $elementTypeAttributes,
+            ),
+            $ignoreAttributes,
         );
 
         return self::$_filterableElementQueryAttributes[$elementQuery::class];
@@ -352,6 +358,8 @@ class ElementQueryHelper
 
     /**
      * Returns a class’ public, non-static properties.
+     *
+     * @see ElementQuery::criteriaAttributes()
      */
     private static function _getPublicNonStaticProperties(string $class): array
     {

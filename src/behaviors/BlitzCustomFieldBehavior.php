@@ -12,8 +12,8 @@ use yii\base\Behavior;
 
 /**
  * This class is a replacement of [[CustomFieldBehavior]] that routes requests
- * through its properties and methods, allowing this class’s magic getter method
- * to register when custom fields are accessed.
+ * through its methods, allowing this class’s magic getter method to register
+ * when custom fields are accessed.
  */
 class BlitzCustomFieldBehavior extends Behavior
 {
@@ -21,6 +21,30 @@ class BlitzCustomFieldBehavior extends Behavior
      * @var CustomFieldBehavior
      */
     public CustomFieldBehavior $customFields;
+
+    /**
+     * @inheritdoc
+     */
+    public function __call($name, $params)
+    {
+        return $this->customFields->__call($name, $params);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function hasMethod($name): bool
+    {
+        return $this->customFields->hasMethod($name);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function __isset($name): bool
+    {
+        return $this->customFields->__isset($name);
+    }
 
     /**
      * Adds a field to track on the element, if the property is a custom field.
@@ -33,30 +57,30 @@ class BlitzCustomFieldBehavior extends Behavior
             Blitz::$plugin->generateCache->generateData->addElementTrackField($element, $name);
         }
 
-        return $this->customFields->$name;
-    }
-
-    /**
-     * @inerhitdoc
-     */
-    public function __call($name, $params)
-    {
-        return $this->customFields->$name($params);
+        return $this->customFields->__get($name);
     }
 
     /**
      * @inheritdoc
      */
-    public function __isset($name): bool
+    public function __set($name, $value)
     {
-        return isset($this->customFields->$name);
+        $this->customFields->__set($name, $value);
     }
 
     /**
-     * @inerhitdoc
+     * @inheritdoc
      */
-    public function __set($name, $value)
+    public function canGetProperty($name, $checkVars = true): bool
     {
-        $this->customFields->$name = $value;
+        return $this->customFields->canGetProperty($name, $checkVars);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canSetProperty($name, $checkVars = true): bool
+    {
+        return $this->customFields->canSetProperty($name, $checkVars);
     }
 }

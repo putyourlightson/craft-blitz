@@ -71,7 +71,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         }
 
         $this->_populateCacheIdsFromSourceTags($refreshData);
-        $this->_populateCacheIdsFromElementQueries($refreshData, $queue);
+        $this->_populateCacheIdsFromElementQueryCaches($refreshData, $queue);
 
         // If clear cache is disabled then expire the cache IDs.
         if (!$clearCache) {
@@ -134,9 +134,9 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     }
 
     /**
-     * Populates cache IDs from element queries.
+     * Populates cache IDs from element query caches.
      */
-    private function _populateCacheIdsFromElementQueries(RefreshDataModel $refreshData, QueueInterface $queue): void
+    private function _populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, QueueInterface $queue): void
     {
         foreach ($refreshData->getElementTypes() as $elementType) {
             $elementIds = $refreshData->getElementIds($elementType);
