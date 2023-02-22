@@ -11,9 +11,9 @@ use putyourlightson\blitz\Blitz;
 use yii\base\Behavior;
 
 /**
- * This class is a replacement of [[CustomFieldBehavior]] that routes requests
- * through its methods, allowing this class’s magic getter method to register
- * when custom fields are accessed.
+ * This class is a replacement of [[CustomFieldBehavior]], but not a sub-class,
+ * that routes requests through its methods, allowing this class’s magic getter
+ * method to register when custom fields are accessed.
  */
 class BlitzCustomFieldBehavior extends Behavior
 {

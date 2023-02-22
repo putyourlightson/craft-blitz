@@ -236,6 +236,18 @@ class RefreshCacheHelperTest extends Unit
         $this->_assertElementTypeQueryRecordCount(1, $refreshData);
     }
 
+    public function testGetElementTypeQueryRecordsWithChangedDateUpdated()
+    {
+        Blitz::$plugin->generateCache->addElementQuery(
+            Entry::find()->orderBy('dateUpdated, text')
+        );
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        $refreshData = RefreshDataModel::createFromElement($this->entry1);
+        $refreshData->addIsChangedByFields($this->entry1, true);
+        $this->_assertElementTypeQueryRecordCount(1, $refreshData);
+    }
+
     private function _assertElementTypeQueryRecordCount(int $count, RefreshDataModel $refreshData)
     {
         $this->assertCount(

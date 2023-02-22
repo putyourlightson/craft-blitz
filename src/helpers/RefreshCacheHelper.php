@@ -47,8 +47,9 @@ class RefreshCacheHelper
             if ($isChangedByFields) {
                 $changedFields = $refreshData->getChangedFields($elementType, $elementId);
                 $elementCondition[] = ['fieldId' => $changedFields];
-                $condition[] = $elementCondition;
             }
+
+            $condition[] = $elementCondition;
         }
 
         return ElementCacheRecord::find()
@@ -102,6 +103,8 @@ class RefreshCacheHelper
                 ->joinWith('elementQueryFields', false)
                 ->andWhere([
                     'or',
+                    // Any date updated attributes should always be included
+                    ['attribute' => ['dateUpdated']],
                     ['attribute' => $changedAttributes],
                     ['fieldId' => $changedFields],
                 ]);

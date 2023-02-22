@@ -267,7 +267,6 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      */
     protected function isPageUrl(string $url): bool
     {
-
         return !str_contains($url, CacheRequestService::CACHED_INCLUDE_PATH . '?action=' . BlitzVariable::CACHED_INCLUDE_ACTION);
     }
 }
