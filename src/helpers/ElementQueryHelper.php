@@ -37,7 +37,7 @@ class ElementQueryHelper
         $defaultValues = self::getDefaultElementQueryValues($elementQuery->elementType);
 
         foreach ($defaultValues as $key => $default) {
-            // Ensure the property exists (has not been unset):
+            // Ensure the property exists and has not been unset
             // https://github.com/putyourlightson/craft-blitz/issues/471
             if (isset($elementQuery->{$key})) {
                 $value = $elementQuery->{$key};
@@ -49,7 +49,12 @@ class ElementQueryHelper
         }
 
         // Ignore specific empty params as they are redundant
-        $ignoreEmptyParams = ['structureId', 'orderBy', 'limit', 'offset'];
+        $ignoreEmptyParams = [
+            'structureId',
+            'orderBy',
+            'limit',
+            'offset',
+        ];
 
         foreach ($ignoreEmptyParams as $key) {
             // Use `array_key_exists` rather than `isset` as it will return `true` for null results
@@ -342,7 +347,15 @@ class ElementQueryHelper
         // Ignore attributes that never change. The `orderBy` attribute is
         // extracted separately later.
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-        $ignoreAttributes = [$sourceIdAttribute, 'id', 'uid', 'siteId', 'structureId', 'orderBy'];
+        $ignoreAttributes = [
+            $sourceIdAttribute,
+            'id',
+            'uid',
+            'siteId',
+            'structureId',
+            'level',
+            'orderBy',
+        ];
 
         self::$_filterableElementQueryAttributes[$elementQuery::class] = array_diff(
             array_intersect(
