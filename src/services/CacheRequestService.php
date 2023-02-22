@@ -223,6 +223,7 @@ class CacheRequestService extends Component
         // Includes based on the URI takes preference
         if ($uri !== null) {
             $uri = trim($uri, '/');
+
             return str_starts_with($uri, self::CACHED_INCLUDE_PATH);
         }
 

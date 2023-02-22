@@ -14,6 +14,8 @@ use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\services\CacheRequestService;
+use putyourlightson\blitz\variables\BlitzVariable;
 
 /**
  * @property-read array $siteOptions
@@ -252,7 +254,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
 
         foreach ($siteUris as $siteUri) {
             $uri = is_array($siteUri) ? $siteUri['uri'] : $siteUri->uri;
-            if (!str_starts_with($uri, '_includes')) {
+            if (!str_starts_with($uri, CacheRequestService::CACHED_INCLUDE_PATH)) {
                 $count++;
             }
         }
@@ -265,6 +267,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      */
     protected function isPageUrl(string $url): bool
     {
-        return !str_contains($url, '_includes?action=blitz');
+
+        return !str_contains($url, CacheRequestService::CACHED_INCLUDE_PATH . '?action=' . BlitzVariable::CACHED_INCLUDE_ACTION);
     }
 }

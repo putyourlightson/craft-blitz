@@ -265,7 +265,7 @@ class ElementQueryHelper
      */
     public static function isOrderByRandom(ElementQuery $elementQuery): bool
     {
-        if (empty($elementQuery->orderBy)) {
+        if (empty($elementQuery->orderBy) || !is_array($elementQuery->orderBy)) {
             return false;
         }
 

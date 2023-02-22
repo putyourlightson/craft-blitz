@@ -11,6 +11,7 @@ use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\services\CacheRequestService;
 use yii\base\ErrorException;
 use yii\base\Exception;
 use yii\base\InvalidArgumentException;
@@ -302,7 +303,7 @@ class FileStorage extends BaseCacheStorage
         }
 
         return count(FileHelper::findFiles($path, [
-            'except' => ['_includes/'],
+            'except' => [CacheRequestService::CACHED_INCLUDE_PATH . '/'],
             'only' => ['index.html'],
         ]));
     }
@@ -316,7 +317,7 @@ class FileStorage extends BaseCacheStorage
             return 0;
         }
 
-        $path = rtrim($path, '/') . '/_includes';
+        $path = rtrim($path, '/') . '/' . CacheRequestService::CACHED_INCLUDE_PATH;
 
         if (!is_dir($path)) {
             return 0;
