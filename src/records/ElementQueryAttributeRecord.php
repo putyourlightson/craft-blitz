@@ -10,7 +10,7 @@ use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $queryId
- * @property int $fieldId
+ * @property string $attribute
  * @property ElementQueryRecord $elementQuery
  */
 class ElementQueryAttributeRecord extends ActiveRecord

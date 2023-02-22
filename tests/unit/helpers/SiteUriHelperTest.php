@@ -15,7 +15,6 @@ use UnitTester;
 /**
  * @since 3.9.0
  */
-
 class SiteUriHelperTest extends Unit
 {
     /**

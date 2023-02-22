@@ -82,7 +82,7 @@ class ElementQueryHelper
         $attributes = self::_getFilterableElementQueryAttributes($elementQuery);
         $attributes = self::_getUsedElementQueryAttributes($elementQuery, $attributes);
 
-        // Manually add the default order by if none is set
+        // Manually add the default order by if no order is set
         if (empty($elementQuery->orderBy)) {
             // Use reflection to extract the protected property value
             $property = (new ReflectionClass($elementQuery))->getProperty('defaultOrderBy');
@@ -102,10 +102,7 @@ class ElementQueryHelper
             }
         }
 
-        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-        $ignoreAttributes = [$sourceIdAttribute, 'siteId', 'orderBy'];
-
-        return array_diff($attributes, $ignoreAttributes);
+        return $attributes;
     }
 
     /**
@@ -268,7 +265,7 @@ class ElementQueryHelper
      */
     public static function isOrderByRandom(ElementQuery $elementQuery): bool
     {
-        if (empty($elementQuery->orderBy) || !is_array($elementQuery->orderBy)) {
+        if (empty($elementQuery->orderBy)) {
             return false;
         }
 
@@ -342,8 +339,10 @@ class ElementQueryHelper
             $elementTypeAttributes[] = $property;
         }
 
-        // Ignore attributes that cannot be changed by users
-        $ignoreAttributes = ['structureId'];
+        // Ignore attributes that never change. The `orderBy` attribute is
+        // extracted separately later.
+        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
+        $ignoreAttributes = [$sourceIdAttribute, 'id', 'uid', 'siteId', 'structureId', 'orderBy'];
 
         self::$_filterableElementQueryAttributes[$elementQuery::class] = array_diff(
             array_intersect(

@@ -12,12 +12,15 @@ use craft\db\FixedOrderExpression;
 use craft\elements\Entry;
 use craft\elements\User;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\FieldHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
+use putyourlightson\blitz\records\ElementQueryAttributeRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\IncludeRecord;
@@ -303,8 +306,7 @@ class GenerateCacheTest extends Unit
             Blitz::$plugin->generateCache->addElementQuery($elementQuery);
         }
 
-        $count = ElementQuerySourceRecord::find()
-            ->count();
+        $count = ElementQuerySourceRecord::find()->count();
 
         // Assert that no records were saved
         $this->assertEquals(0, $count);
@@ -326,14 +328,69 @@ class GenerateCacheTest extends Unit
             ->joinWith('elementQuerySources', false)
             ->where(['not', ['sourceId' => null]])
             ->count();
+
         $this->assertEquals(7, $count);
 
         $sourceIds = ElementQuerySourceRecord::find()
             ->select('sourceId')
             ->column();
 
-        // Assert that source IDs were saved
+        // Assert that the source IDs were saved
         $this->assertEquals([1, 1, 2, 3, 4, 5, 6], $sourceIds);
+    }
+
+    public function testSaveElementQueryAttributeRecords()
+    {
+        $elementQuery = Entry::find()
+            ->title('x');
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        $attributes = ElementQueryAttributeRecord::find()
+            ->select('attribute')
+            ->column();
+
+        $this->assertEquals(['postDate', 'title'], $attributes);
+    }
+
+    public function testSaveElementQueryAttributeRecordsWithOrderBy()
+    {
+        $elementQuery = Entry::find()
+            ->orderBy('title');
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        $attributes = ElementQueryAttributeRecord::find()
+            ->select('attribute')
+            ->column();
+
+        $this->assertEquals(['title'], $attributes);
+
+        $elementQuery = Entry::find()
+            ->orderBy(['title' => SORT_ASC]);
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        $attributes = ElementQueryAttributeRecord::find()
+            ->select('attribute')
+            ->column();
+
+        $this->assertEquals(['title'], $attributes);
+    }
+
+    public function testSaveElementQueryFieldRecordsWithOrderBy()
+    {
+        $elementQuery = Entry::find()
+            ->orderBy('text');
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        $fieldIds = ElementQueryFieldRecord::find()
+            ->select('fieldId')
+            ->column();
+
+        $this->assertEquals(FieldHelper::getFieldIdsFromHandles(['text']), $fieldIds);
+
+        $elementQuery = Entry::find()
+            ->orderBy(['text' => SORT_ASC]);
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        $fieldIds = ElementQueryFieldRecord::find()
+            ->select('fieldId')
+            ->column();
+
+        $this->assertEquals(FieldHelper::getFieldIdsFromHandles(['text']), $fieldIds);
     }
 
     public function testSaveCacheTags()
