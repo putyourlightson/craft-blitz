@@ -212,18 +212,15 @@ class RefreshCacheService extends Component
             return;
         }
 
-        $changedAttributes = [];
-        $changedFields = [];
-        $isChangedByAttributes = false;
-        $isChangedByFields = false;
-
         // If the element has the element changed behavior
         /** @var ElementChangedBehavior|null $elementChanged */
         $elementChanged = $element->getBehavior(ElementChangedBehavior::BEHAVIOR_NAME);
 
         if ($elementChanged !== null) {
             // Don't proceed if element has not changed (and the config setting allows)
-            if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged && !$elementChanged->getHasChanged()) {
+            if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged
+                && !$elementChanged->getHasChanged()
+            ) {
                 return;
             }
 
@@ -234,11 +231,6 @@ class RefreshCacheService extends Component
             ) {
                 return;
             }
-
-            $changedAttributes = $elementChanged->changedAttributes;
-            $changedFields = $elementChanged->changedFields;
-            $isChangedByAttributes = $elementChanged->isChangedByAttributes;
-            $isChangedByFields = $elementChanged->isChangedByFields;
         }
 
         $event = new RefreshElementEvent(['element' => $element]);
@@ -248,12 +240,8 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Add element
-        $this->refreshData->addElement($element);
-        $this->refreshData->addChangedAttributes($element, $changedAttributes);
-        $this->refreshData->addChangedFields($element, $changedFields);
-        $this->refreshData->addIsChangedByAttributes($element, $isChangedByAttributes);
-        $this->refreshData->addIsChangedByFields($element, $isChangedByFields);
+        // Add element to refresh data
+        $this->refreshData->addElement($element, $elementChanged);
 
         // Add element expiry dates
         $this->addElementExpiryDates($element);
@@ -389,7 +377,7 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false): void
+    public function refreshSiteUris(array $siteUris, array $purgeSiteUris = [], bool $forceClear = false, bool $forceGenerate = false): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_CACHE, $event);
@@ -400,7 +388,7 @@ class RefreshCacheService extends Component
 
         $siteUris = $event->siteUris;
 
-        $this->_refreshSiteUris($siteUris, $forceClear, $forceGenerate);
+        $this->_refreshSiteUris($siteUris, $purgeSiteUris, $forceClear, $forceGenerate);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
@@ -603,13 +591,13 @@ class RefreshCacheService extends Component
      *
      * @param SiteUriModel[] $siteUris
      */
-    private function _refreshSiteUris(array $siteUris, bool $forceClear = false, bool $forceGenerate = false): void
+    private function _refreshSiteUris(array $siteUris, array $purgeSiteUris = [], bool $forceClear = false, bool $forceGenerate = false): void
     {
-        $purgeableSiteUris = $siteUris;
+        $purgeableSiteUris = array_merge($siteUris, $purgeSiteUris);
 
         // If SSI is enabled, merge site URIs from SSI includes into purgeable site URIs.
         if (Blitz::$plugin->settings->ssiEnabled) {
-            $purgeableSiteUris = array_merge($siteUris, $this->getSsiIncludeSiteUris($siteUris));
+            $purgeableSiteUris = array_merge($purgeableSiteUris, $this->getSsiIncludeSiteUris($siteUris));
         }
 
         if (Blitz::$plugin->settings->clearOnRefresh($forceClear)) {

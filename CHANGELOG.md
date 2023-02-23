@@ -5,6 +5,7 @@
 
 ### Added
 - Added automatic tracking of which custom fields are used per element per page, as well as which attributes and custom fields are changed on each element save, to greatly reduce the number of invalidated cached pages when content is changed.
+- Added automatic purging of assets when image dimensions or focal points are changed.
 - Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
 
 ### Fixed

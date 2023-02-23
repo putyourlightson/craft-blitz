@@ -8,6 +8,7 @@ namespace putyourlightson\blitztests\unit\services;
 use Codeception\Test\Unit;
 use Craft;
 use craft\base\Element;
+use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\helpers\Db;
 use DateInterval;
@@ -19,6 +20,7 @@ use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
+use putyourlightson\blitztests\fixtures\AssetFixture;
 use putyourlightson\blitztests\fixtures\EntryFixture;
 use UnitTester;
 
@@ -48,6 +50,11 @@ class RefreshCacheTest extends Unit
     private Entry|ElementChangedBehavior $entry;
 
     /**
+     * @var Asset|ElementChangedBehavior
+     */
+    private Asset|ElementChangedBehavior $asset;
+
+    /**
      * @return array
      */
     public function _fixtures(): array
@@ -55,6 +62,9 @@ class RefreshCacheTest extends Unit
         return [
             'entries' => [
                 'class' => EntryFixture::class,
+            ],
+            'assets' => [
+                'class' => AssetFixture::class,
             ],
         ];
     }
@@ -75,6 +85,14 @@ class RefreshCacheTest extends Unit
 
         $this->entry = Entry::find()->sectionId(1)->one();
         $this->entry->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+
+        $this->asset = Asset::find()->one();
+        $this->asset->setFocalPoint([
+            'x' => 0.1,
+            'y' => 0.1,
+        ]);
+        Craft::$app->elements->saveElement($this->asset);
+        $this->asset->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
         Blitz::$plugin->refreshCache->reset();
         Blitz::$plugin->refreshCache->batchMode = true;
@@ -138,6 +156,23 @@ class RefreshCacheTest extends Unit
 
         // Assert that the tracked element is correct
         $this->_assertTrackedElement($this->entry, ['title'], ['text']);
+    }
+
+    public function testAddElementWhenFocalPointChanged()
+    {
+        $this->asset->setFocalPoint([
+            'x' => 101,
+            'y' => 101,
+        ]);
+        Blitz::$plugin->refreshCache->addElement($this->asset);
+
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->asset);
+
+        $this->assertEquals(
+            [$this->asset->id],
+            Blitz::$plugin->refreshCache->refreshData->getAssetsChangedByImage(),
+        );
     }
 
     public function testAddElementWhenStatusChanged()

@@ -21,8 +21,8 @@ use yii\base\Behavior;
  * @property-read bool $hasChanged
  * @property-read bool $hasBeenDeleted
  * @property-read bool $hasStatusChanged
- * @property-read bool $hasFocalPointChanged
  * @property-read bool $hasRefreshableStatus
+ * @property-read bool $hasAssetImageChanged
  * @property-read bool $haveAttributesChanged
  * @property-read bool $haveFieldsChanged
  * @property-read string[] $changedFields
@@ -58,6 +58,11 @@ class ElementChangedBehavior extends Behavior
      * @var bool Whether the element was caused to change specifically by fields.
      */
     public bool $isChangedByFields = false;
+
+    /**
+     * @var bool Whether the element is an asset and its image has changed.
+     */
+    public bool $isChangedByAssetImage = false;
 
     /**
      * @inerhitdoc
@@ -98,7 +103,9 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        if ($this->getHasFocalPointChanged()) {
+        if ($this->getHasAssetImageChanged()) {
+            $this->isChangedByAssetImage = true;
+
             return true;
         }
 
@@ -142,27 +149,35 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns whether the element's focal point has changed, if an asset, which takes
-     * image cropping and rotation into account too.
+     * Returns whether the element is an asset and its image has changed.
      */
-    public function getHasFocalPointChanged(): bool
+    public function getHasAssetImageChanged(): bool
     {
         $element = $this->owner;
 
-        if (!($element instanceof Asset) || !($this->originalElement instanceof Asset)) {
+        if (!($element instanceof Asset)
+            || !($this->originalElement instanceof Asset)
+            || $element->kind !== Asset::KIND_IMAGE
+        ) {
             return false;
+        }
+
+        if ($element->getDimensions() != $this->originalElement->getDimensions()) {
+            return true;
         }
 
         // Comparing floats is problematic, so we convert to a fixed precision first.
         // https://www.php.net/manual/en/language.types.float.php
         $precision = 5;
+        $originalFocalPoint = $this->originalElement->getFocalPoint();
         $originalFocalPoint = [
-            number_format($this->originalElement->focalPoint['x'], $precision),
-            number_format($this->originalElement->focalPoint['y'], $precision),
+            number_format($originalFocalPoint['x'], $precision),
+            number_format($originalFocalPoint['y'], $precision),
         ];
+        $focalPoint = $element->getFocalPoint();
         $focalPoint = [
-            number_format($element->focalPoint['x'], $precision),
-            number_format($element->focalPoint['y'], $precision),
+            number_format($focalPoint['x'], $precision),
+            number_format($focalPoint['y'], $precision),
         ];
 
         return $focalPoint != $originalFocalPoint;

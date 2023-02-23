@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\services;
 use Craft;
 use craft\base\Component;
 use craft\base\ElementInterface;
+use craft\behaviors\CustomFieldBehavior;
 use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
@@ -147,9 +148,10 @@ class GenerateCacheService extends Component
         $this->generateData->addElement($element);
 
         // Replace the custom field behavior with our own
+        /** @var CustomFieldBehavior $customFields */
         $customFields = $element->getBehavior('customFields');
         $element->attachBehavior('customFields',
-            new BlitzCustomFieldBehavior(['customFields' => $customFields])
+            BlitzCustomFieldBehavior::create($customFields)
         );
     }
 

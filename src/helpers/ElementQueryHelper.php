@@ -270,6 +270,7 @@ class ElementQueryHelper
      */
     public static function isOrderByRandom(ElementQuery $elementQuery): bool
     {
+        /** @phpstan-ignore-next-line */
         if (empty($elementQuery->orderBy) || !is_array($elementQuery->orderBy)) {
             return false;
         }

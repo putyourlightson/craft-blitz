@@ -6,6 +6,8 @@
 namespace putyourlightson\blitz\models;
 
 use craft\base\ElementInterface;
+use craft\elements\Asset;
+use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\FieldHelper;
 
@@ -14,6 +16,7 @@ use putyourlightson\blitz\helpers\FieldHelper;
  *
  * @property-read int[] $cacheIds
  * @property-read array $elementTypes
+ * @property-read int[] $assetsChangedByImage
  */
 class RefreshDataModel extends BaseDataModel
 {
@@ -27,7 +30,8 @@ class RefreshDataModel extends BaseDataModel
      *              changedFields: array<int, array<int, bool>>,
      *              isChangedByAttributes: array<int, bool>,
      *              isChangedByFields: array<int, bool>,
-     *          }>
+     *              isChangedByAssetImage: array<int, bool>,
+     *          }>,
      *      }
      */
     public array $data = [
@@ -136,6 +140,14 @@ class RefreshDataModel extends BaseDataModel
         return $this->_getCombinedIsChangedBy($elementType, 'isChangedByFields');
     }
 
+    /**
+     * @return int[]
+     */
+    public function getAssetsChangedByImage(): array
+    {
+        return $this->getKeysAsValues(['elements', Asset::class, 'isChangedByAssetImage']);
+    }
+
     public function addCacheId(int $cacheId): void
     {
         $this->data['cacheIds'][$cacheId] = true;
@@ -165,13 +177,21 @@ class RefreshDataModel extends BaseDataModel
         }
     }
 
-    public function addElement(ElementInterface $element): void
+    public function addElement(ElementInterface $element, ?ElementChangedBehavior $elementChanged = null): void
     {
         $this->addElementId($element::class, $element->id);
 
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($element::class);
         if ($sourceIdAttribute !== null) {
             $this->addSourceId($element::class, $element->{$sourceIdAttribute});
+        }
+
+        if ($elementChanged !== null) {
+            $this->addChangedAttributes($element, $elementChanged->changedAttributes);
+            $this->addChangedFields($element, $elementChanged->changedFields);
+            $this->addIsChangedByAttributes($element, $elementChanged->isChangedByAttributes);
+            $this->addIsChangedByFields($element, $elementChanged->isChangedByFields);
+            $this->addIsChangedByAssetImage($element, $elementChanged->isChangedByAssetImage);
         }
     }
 
@@ -218,6 +238,13 @@ class RefreshDataModel extends BaseDataModel
         $previousValue = $this->data['elements'][$element::class]['isChangedByFields'][$element->id] ?? true;
 
         $this->data['elements'][$element::class]['isChangedByFields'][$element->id] = $previousValue && $isChangedByFields;
+    }
+
+    public function addIsChangedByAssetImage(ElementInterface $element, bool $isChangedByAssetImage): void
+    {
+        if ($isChangedByAssetImage === true) {
+            $this->data['elements'][$element::class]['isChangedByAssetImage'][$element->id] = true;
+        }
     }
 
     private function _getCombinedChanged(string $elementType, string $key): array

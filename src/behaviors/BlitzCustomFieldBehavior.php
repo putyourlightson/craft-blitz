@@ -22,6 +22,11 @@ class BlitzCustomFieldBehavior extends Behavior
      */
     public CustomFieldBehavior $customFields;
 
+    public static function create(CustomFieldBehavior $customFields): self
+    {
+        return new self(['customFields' => $customFields]);
+    }
+
     /**
      * @inheritdoc
      */
