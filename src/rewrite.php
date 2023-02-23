@@ -4,6 +4,7 @@
  */
 
 use craft\config\GeneralConfig;
+use craft\helpers\App;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\variables\BlitzVariable;
 
@@ -44,7 +45,8 @@ $config = require CRAFT_BASE_PATH . '/config/general.php';
 if ($config instanceof GeneralConfig) {
     $tokenParam = $config->tokenParam;
 } else {
-    $tokenParam = $config['tokenParam'] ?? $config[CRAFT_ENVIRONMENT]['tokenParam'] ?? $config['*']['tokenParam'] ?? 'token';
+    $environment = App::env('CRAFT_ENVIRONMENT') ?? App::env('ENVIRONMENT') ?? 'production';
+    $tokenParam = $config['tokenParam'] ?? $config[$environment]['tokenParam'] ?? $config['*']['tokenParam'] ?? 'token';
 }
 if (!empty($_GET[$tokenParam])) {
     return;

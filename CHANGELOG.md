@@ -7,6 +7,9 @@
 - Added automatic tracking of which custom fields are used per element per page, as well as which attributes and custom fields are changed on each element save, to greatly reduce the number of invalidated cached pages when content is changed.
 - Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
 
+### Fixed
+- Fixed the `rewrite.php` file not detecting the environment using the `ENVIRONMENT` environment variable.
+
 ## 4.3.3 - 2023-02-14
 ### Changed
 - The `SSI Enabled` tip now also displays whether Server-Side Includes (SSI) are not enabled on the web server.
