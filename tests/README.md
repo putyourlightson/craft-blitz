@@ -18,7 +18,18 @@ To run the Easy Coding Standard on the plugin, install [ECS for Craft CMS](https
 
 ## Unit Tests
 
-To unit test the plugin, install Codeception, update `.env` and run the following command from the root of your project.
+
+To unit test the plugin, install Codeception, update `.env` and add the following autoload namespace to the project’s main `composer.json` file.
+
+```
+    "autoload-dev": {
+        "psr-4": {
+          "putyourlightson\\blitztests\\": "vendor/putyourlightson/craft-blitz/tests/"
+        }
+    },
+```
+
+Then run the following command from the root of your project.
 
 ```shell
 ./vendor/bin/codecept run -c vendor/putyourlightson/craft-blitz unit

@@ -12,7 +12,6 @@ use yii\web\BadRequestHttpException;
 /**
  * @since 2.3.0
  */
-
 class TemplatesControllerTest extends BaseControllerTest
 {
     public function testGetSuccess()

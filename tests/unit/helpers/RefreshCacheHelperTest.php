@@ -13,7 +13,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\records\ElementQueryAttributeRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitztests\fixtures\EntryFixture;

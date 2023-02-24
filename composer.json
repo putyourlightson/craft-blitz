@@ -31,8 +31,12 @@
     },
     "autoload": {
         "psr-4": {
-          "putyourlightson\\blitz\\": "src/",
-          "putyourlightson\\blitztests\\fixtures\\": "tests/fixtures/"
+          "putyourlightson\\blitz\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+          "putyourlightson\\blitztests\\": "tests/"
         }
     },
     "support": {
