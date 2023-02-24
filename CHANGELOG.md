@@ -4,7 +4,7 @@
 > {warning} Tracking of custom fields takes place when pages are cached, therefore it is important to clear or refresh the cache after this update completes.
 
 ### Added
-- Added automatic tracking of which custom fields are used per element per page, as well as which attributes and custom fields are changed on each element save, to greatly reduce the number of invalidated cached pages when content is changed.
+- Added automatic tracking of which custom fields are used per element per page, as well as which attributes and custom fields are changed on each element save, greatly reducing the number of element queries that must be executed and the number of cached pages that must be invalidated when content changes ([#465](https://github.com/putyourlightson/craft-blitz/issues/465), [#466](https://github.com/putyourlightson/craft-blitz/issues/466)).
 - Added automatic purging of assets when image dimensions or focal points are changed.
 - Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
 
