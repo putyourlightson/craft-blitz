@@ -1,7 +1,7 @@
 # Release Notes for Blitz
 
 ## 4.4.0 - Unreleased
-> {warning} Tracking of custom fields takes place when pages are cached, therefore it is important to clear or refresh the cache after this update completes.
+> {warning} Tracking of custom fields takes place when pages are cached, therefore it is important to clear, generate or refresh the cache after this update completes.
 
 ### Added
 - Added automatic detection of which attributes and custom fields are changed on each element save.

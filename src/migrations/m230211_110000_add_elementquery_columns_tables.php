@@ -2,15 +2,8 @@
 
 namespace putyourlightson\blitz\migrations;
 
-use Craft;
-use craft\base\Element;
 use craft\db\Migration;
-use craft\elements\db\ElementQuery;
-use craft\helpers\Json;
 use craft\records\Field;
-use putyourlightson\blitz\helpers\ElementQueryHelper;
-use putyourlightson\blitz\helpers\ElementTypeHelper;
-use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\records\ElementQueryAttributeRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
@@ -55,11 +48,10 @@ class m230211_110000_add_elementquery_columns_tables extends Migration
             $this->addForeignKey(null, ElementQueryFieldRecord::tableName(), 'fieldId', Field::tableName(), 'id', 'CASCADE', 'CASCADE');
         }
 
-        /** @var ElementQueryRecord[] $elementQueryRecords */
-        $elementQueryRecords = ElementQueryRecord::find()->all();
-        foreach ($elementQueryRecords as $elementQueryRecord) {
-            $this->_populateTables($elementQueryRecord);
-        }
+        // Delete all element query records so that associated attributes and
+        // fields will be regenerated, rather than doing it via a migration,
+        // as a cache clear alone will not delete these records.
+        ElementQueryRecord::deleteAll();
 
         return true;
     }
@@ -72,84 +64,5 @@ class m230211_110000_add_elementquery_columns_tables extends Migration
         echo self::class . " cannot be reverted.\n";
 
         return true;
-    }
-
-    /**
-     * Populates the tables from element queries.
-     *
-     * @see RefreshCacheJob::_populateCacheIdsFromElementQueryRecord()
-     */
-    private function _populateTables(ElementQueryRecord $elementQueryRecord): void
-    {
-        // Ensure class still exists as a plugin may have been removed since being saved
-        if (!class_exists($elementQueryRecord->type)) {
-            return;
-        }
-
-        /** @var Element $elementType */
-        $elementType = $elementQueryRecord->type;
-
-        /** @var ElementQuery $elementQuery */
-        $elementQuery = $elementType::find();
-
-        $params = Json::decodeIfJson($elementQueryRecord->params);
-
-        // If json decode failed
-        if (!is_array($params)) {
-            return;
-        }
-
-        foreach ($params as $key => $val) {
-            $elementQuery->{$key} = $val;
-        }
-
-        $db = Craft::$app->getDb();
-
-        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
-        $sourceIds = $params[$sourceIdAttribute] ?? [];
-        $sourceIds = is_array($sourceIds) ? $sourceIds : [$sourceIds];
-
-        $values = [];
-        foreach ($sourceIds as $sourceId) {
-            $values[] = [$elementQueryRecord->id, $sourceId];
-        }
-
-        $db->createCommand()
-            ->batchInsert(
-                ElementQuerySourceRecord::tableName(),
-                ['queryId', 'sourceId'],
-                $values,
-            )
-            ->execute();
-
-        $attributes = ElementQueryHelper::getElementQueryAttributes($elementQuery);
-
-        $values = [];
-        foreach ($attributes as $attribute) {
-            $values[] = [$elementQueryRecord->id, $attribute];
-        }
-
-        $db->createCommand()
-            ->batchInsert(
-                ElementQueryAttributeRecord::tableName(),
-                ['queryId', 'attribute'],
-                $values,
-            )
-            ->execute();
-
-        $fieldIds = ElementQueryHelper::getElementQueryFieldIds($elementQuery);
-
-        $values = [];
-        foreach ($fieldIds as $fieldId) {
-            $values[] = [$elementQueryRecord->id, $fieldId];
-        }
-
-        $db->createCommand()
-            ->batchInsert(
-                ElementQueryFieldRecord::tableName(),
-                ['queryId', 'fieldId'],
-                $values,
-            )
-            ->execute();
     }
 }
