@@ -62,7 +62,8 @@ class BlitzCustomFieldBehavior extends Behavior
             Blitz::$plugin->generateCache->generateData->addElementTrackField($element, $name);
         }
 
-        return $this->customFields->__get($name);
+        // Get the property directly rather than going through the magic getter
+        return $this->customFields->$name;
     }
 
     /**
@@ -70,7 +71,8 @@ class BlitzCustomFieldBehavior extends Behavior
      */
     public function __set($name, $value)
     {
-        $this->customFields->__set($name, $value);
+        // Set the property directly rather than going through the magic setter
+        $this->customFields->$name = $value;
     }
 
     /**
