@@ -1,17 +1,27 @@
 # Release Notes for Blitz
 
 ## 4.4.0 - Unreleased
-> {warning} Tracking of custom fields takes place when pages are cached, therefore it is important to clear, generate or refresh the cache after this update completes.
+> {warning} Tracking of attributes and custom fields takes place when pages are cached, therefore it is important to clear or refresh the cache after this update completes.
 
 ### Added
 - Added purging of asset image URLs and existing image transforms when image dimensions or focal points are changed.
 - Added detection of which attributes and custom fields are changed on each element save.
 - Added tracking of which custom fields are output per element per page, greatly reducing the number of cached pages that must be invalidated when content changes ([#465](https://github.com/putyourlightson/craft-blitz/issues/465)).
-- Added tracking of which attributes and custom fields are used in each element query, greatly reducing the number of element queries that must be executed during the cache refresh process ([#466](https://github.com/putyourlightson/craft-blitz/issues/466)).
+- Added tracking of which attributes and custom fields are used by each element query, greatly reducing the number of element queries that must be executed during the cache refresh process ([#466](https://github.com/putyourlightson/craft-blitz/issues/466)).
 - Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
 
+### Changed
+- Renamed the `cacheElements` config setting and page specific option to `trackElements`.
+- Renamed the `cacheElementQueries` config setting and page specific option to `trackElementQueries`.
+
 ### Fixed
-- Fixed the `rewrite.php` file not detecting the environment using the `ENVIRONMENT` environment variable.
+- Fixed the `rewrite.php` file not detecting the `ENVIRONMENT` environment variable.
+
+### Deprecated
+- Deprecated the `cacheElements` config setting. Use `trackElements` instead.
+- Deprecated the `cacheElementQueries` config setting. Use `trackElementQueries` instead.
+- Deprecated the `craft.blitz.options.cacheElements()` template variable. Use `craft.blitz.options.trackElements()` instead.
+- Deprecated the `craft.blitz.options.cacheElementQueries()` template variable. Use `craft.blitz.options.trackElementQueries()` instead.
 
 ## 4.3.3 - 2023-02-14
 ### Changed

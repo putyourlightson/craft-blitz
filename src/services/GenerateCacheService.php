@@ -135,6 +135,11 @@ class GenerateCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
+        // Don’t proceed if element tracking is disabled
+        if (!Blitz::$plugin->settings->trackElements || !$this->options->trackElements) {
+            return;
+        }
+
         // Don’t proceed if element caching is disabled
         if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
             return;
@@ -160,6 +165,11 @@ class GenerateCacheService extends Component
      */
     public function addElementQuery(ElementQuery $elementQuery): void
     {
+        // Don’t proceed if element query tracking is disabled
+        if (!Blitz::$plugin->settings->trackElementQueries || !$this->options->trackElementQueries) {
+            return;
+        }
+
         // Don’t proceed if element query caching is disabled
         if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
             return;

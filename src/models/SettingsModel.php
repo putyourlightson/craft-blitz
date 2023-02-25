@@ -287,12 +287,26 @@ class SettingsModel extends Model
     public bool $cacheNonHtmlResponses = false;
 
     /**
+     * @var bool Whether elements should be tracked in the database.
+     */
+    public bool $trackElements = true;
+
+    /**
+     * @var bool Whether element queries should be tracked in the database.
+     */
+    public bool $trackElementQueries = true;
+
+    /**
      * @var bool Whether elements should be cached in the database.
+     *
+     * @deprecated in 4.4.0. Use [[trackElements]] instead.
      */
     public bool $cacheElements = true;
 
     /**
      * @var bool Whether element queries should be cached in the database.
+     *
+     * @deprecated in 4.4.0. Use [[trackElementQueries]] instead.
      */
     public bool $cacheElementQueries = true;
 
