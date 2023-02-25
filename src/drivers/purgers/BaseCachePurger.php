@@ -12,6 +12,9 @@ use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 
+/**
+ * @mixin CachePurgerTrait
+ */
 abstract class BaseCachePurger extends SavableComponent implements CachePurgerInterface
 {
     use CachePurgerTrait;
