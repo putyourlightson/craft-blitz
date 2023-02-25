@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
+use craft\elements\Asset;
 use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
 use craft\records\Element;
@@ -230,12 +231,42 @@ class SiteUriHelper
         $siteUris = Element_SiteSettings::find()
             ->select(['siteId', 'uri'])
             ->where(['elementId' => $elementIds])
-            ->andWhere(['not', ['uri' => null]])
+            ->andWhere(['not',
+                ['uri' => null],
+            ])
             ->asArray()
             ->all();
 
         foreach ($siteUris as $siteUri) {
             $siteUriModels[] = new SiteUriModel($siteUri);
+        }
+
+        return $siteUriModels;
+    }
+
+    /**
+     * Returns the site URIs of an array of asset IDs.
+     *
+     * @param int[] $elementIds
+     * @return SiteUriModel[]
+     * @since 4.4.0
+     */
+    public static function getAssetSiteUris(array $elementIds): array
+    {
+        if (empty($elementIds)) {
+            return [];
+        }
+
+        $siteUriModels = [];
+        $assets = Asset::find()
+            ->id($elementIds)
+            ->all();
+
+        foreach ($assets as $asset) {
+            $siteUriModels[] = new SiteUriModel([
+                'siteId' => $asset->siteId,
+                'uri' => $asset->uri,
+            ]);
         }
 
         return $siteUriModels;
