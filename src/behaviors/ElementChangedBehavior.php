@@ -12,7 +12,7 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
 
 /**
- * This behavior detects whether an element has changed.
+ * Detects whether and what specifically about an element has changed.
  *
  * @since 3.6.0
  *
@@ -23,9 +23,6 @@ use yii\base\Behavior;
  * @property-read bool $hasStatusChanged
  * @property-read bool $hasRefreshableStatus
  * @property-read bool $hasAssetImageChanged
- * @property-read bool $haveAttributesChanged
- * @property-read bool $haveFieldsChanged
- * @property-read string[] $changedFields
  */
 class ElementChangedBehavior extends Behavior
 {

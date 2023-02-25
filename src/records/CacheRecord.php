@@ -5,9 +5,9 @@
 
 namespace putyourlightson\blitz\records;
 
+use craft\db\ActiveQuery;
 use craft\db\ActiveRecord;
 use DateTime;
-use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
@@ -15,7 +15,7 @@ use yii\db\ActiveQueryInterface;
  * @property string $uri
  * @property int|null $paginate
  * @property DateTime|null $expiryDate
- * @property-read ActiveQueryInterface $elements
+ * @property-read ElementCacheRecord[] $elements
  */
 class CacheRecord extends ActiveRecord
 {
@@ -30,7 +30,7 @@ class CacheRecord extends ActiveRecord
     /**
      * Returns the associated elements
      */
-    public function getElements(): ActiveQueryInterface
+    public function getElements(): ActiveQuery
     {
         return $this->hasMany(ElementCacheRecord::class, ['cacheId' => 'id']);
     }

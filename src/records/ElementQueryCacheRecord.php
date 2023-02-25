@@ -5,14 +5,14 @@
 
 namespace putyourlightson\blitz\records;
 
+use craft\db\ActiveQuery;
 use craft\db\ActiveRecord;
-use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $cacheId
  * @property int $queryId
- * @property CacheRecord $cache
- * @property ElementQueryRecord $elementQuery
+ * @property-read CacheRecord $cache
+ * @property-read ElementQueryRecord $elementQuery
  */
 class ElementQueryCacheRecord extends ActiveRecord
 {
@@ -27,7 +27,7 @@ class ElementQueryCacheRecord extends ActiveRecord
     /**
      * Returns the associated cache
      */
-    public function getCache(): ActiveQueryInterface
+    public function getCache(): ActiveQuery
     {
         return $this->hasOne(CacheRecord::class, ['id' => 'cacheId']);
     }
@@ -35,7 +35,7 @@ class ElementQueryCacheRecord extends ActiveRecord
     /**
      * Returns the associated element query
      */
-    public function getElementQuery(): ActiveQueryInterface
+    public function getElementQuery(): ActiveQuery
     {
         return $this->hasOne(ElementQueryRecord::class, ['id' => 'queryId']);
     }

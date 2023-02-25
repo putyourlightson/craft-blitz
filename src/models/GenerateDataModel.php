@@ -9,12 +9,15 @@ use craft\base\ElementInterface;
 use putyourlightson\blitz\helpers\FieldHelper;
 
 /**
- * @inerhitdoc
+ * Used for storing, manipulating and returning data during a generate cache
+ * request.
  *
  * @property-read int[] $elementIds
  * @property-read int[][] $elementIndexedTrackFields
  * @property-read int[] $elementQueryIds
  * @property-read int[] $ssiIncludeIds
+ *
+ * @since 4.4.0
  */
 class GenerateDataModel extends BaseDataModel
 {

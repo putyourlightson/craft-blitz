@@ -5,15 +5,15 @@
 
 namespace putyourlightson\blitz\records;
 
+use craft\db\ActiveQuery;
 use craft\db\ActiveRecord;
-use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $id
  * @property int $siteId
  * @property string $template
  * @property string $params
- * @property SsiIncludeCacheRecord[] $ssiIncludeCaches
+ * @property-read SsiIncludeCacheRecord[] $ssiIncludeCaches
  */
 class IncludeRecord extends ActiveRecord
 {
@@ -28,7 +28,7 @@ class IncludeRecord extends ActiveRecord
     /**
      * Returns the associated SSI include caches
      */
-    public function getSsiIncludeCaches(): ActiveQueryInterface
+    public function getSsiIncludeCaches(): ActiveQuery
     {
         return $this->hasMany(SsiIncludeCacheRecord::class, ['includeId' => 'id']);
     }

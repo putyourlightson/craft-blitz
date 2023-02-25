@@ -11,6 +11,8 @@ use craft\base\Model;
  * Base class for storing, manipulating and returning data. Child classes provide
  * API methods that help avoid managing complex arrays and ensuring values are
  * unique.
+ *
+ * @since 4.4.0
  */
 abstract class BaseDataModel extends Model
 {

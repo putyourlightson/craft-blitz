@@ -5,13 +5,13 @@
 
 namespace putyourlightson\blitz\records;
 
+use craft\db\ActiveQuery;
 use craft\db\ActiveRecord;
-use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $cacheId
  * @property int $includeId
- * @property IncludeRecord[] $include
+ * @property-read IncludeRecord $include
  */
 class SsiIncludeCacheRecord extends ActiveRecord
 {
@@ -26,7 +26,7 @@ class SsiIncludeCacheRecord extends ActiveRecord
     /**
      * Returns the associated include
      */
-    public function getInclude(): ActiveQueryInterface
+    public function getInclude(): ActiveQuery
     {
         return $this->hasOne(IncludeRecord::class, ['id' => 'includeId']);
     }

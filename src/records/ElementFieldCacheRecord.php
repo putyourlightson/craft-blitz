@@ -11,6 +11,8 @@ use craft\db\ActiveRecord;
  * @property int $cacheId
  * @property int $elementId
  * @property int $fieldId
+ *
+ * @since 4.4.0
  */
 class ElementFieldCacheRecord extends ActiveRecord
 {

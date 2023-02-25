@@ -19,7 +19,7 @@ use yii\log\Logger;
  * This class provides methods that are mostly called by the [[RefreshCacheJob]]
  * class. They have been extracted into this class to make them testable, and
  * they have been added here instead of in [[RefreshCacheService]] since they
- * don’t relate to a current refresh request.
+ * don’t relate to a current refresh cache request.
  *
  * @since 4.4.0
  */

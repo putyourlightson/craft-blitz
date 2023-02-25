@@ -5,13 +5,15 @@
 
 namespace putyourlightson\blitz\records;
 
+use craft\db\ActiveQuery;
 use craft\db\ActiveRecord;
-use yii\db\ActiveQueryInterface;
 
 /**
  * @property int $queryId
  * @property string $attribute
- * @property ElementQueryRecord $elementQuery
+ * @property-read ElementQueryRecord $elementQuery
+ *
+ * @since 4.4.0
  */
 class ElementQueryAttributeRecord extends ActiveRecord
 {
@@ -26,7 +28,7 @@ class ElementQueryAttributeRecord extends ActiveRecord
     /**
      * Returns the associated element query
      */
-    public function getElementQuery(): ActiveQueryInterface
+    public function getElementQuery(): ActiveQuery
     {
         return $this->hasOne(ElementQueryRecord::class, ['id' => 'queryId']);
     }

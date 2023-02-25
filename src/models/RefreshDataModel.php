@@ -12,11 +12,14 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\FieldHelper;
 
 /**
- * @inerhitdoc
+ * Used for storing, manipulating and returning data during a refresh cache
+ * request.
  *
  * @property-read int[] $cacheIds
  * @property-read array $elementTypes
  * @property-read int[] $assetsChangedByImage
+ *
+ * @since 4.4.0
  */
 class RefreshDataModel extends BaseDataModel
 {
