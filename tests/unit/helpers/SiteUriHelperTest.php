@@ -59,6 +59,28 @@ class SiteUriHelperTest extends Unit
         }
     }
 
+    public function testGetSiteUrisFromAssetWithTransform()
+    {
+        $asset = Asset::find()->one();
+
+        // A named transform won't work here, as all transforms are fetched on init
+        $asset->getUrl(['width' => 30, 'height' => 30], true);
+
+        $siteUris = SiteUriHelper::getAssetSiteUris([$asset->id]);
+        $this->assertEquals([
+                new SiteUriModel([
+                    'siteId' => $asset->siteId,
+                    'uri' => 'test-volume-1/' . $asset->filename,
+                ]),
+                new SiteUriModel([
+                    'siteId' => $asset->siteId,
+                    'uri' => 'test-volume-1/_30x30_crop_center-center_none/' . $asset->filename,
+                ]),
+            ],
+            $siteUris,
+        );
+    }
+
     public function testGetMimeType()
     {
         $siteUri = new SiteUriModel(['siteId' => 1]);
@@ -68,13 +90,6 @@ class SiteUriHelperTest extends Unit
 
         $siteUri->uri = 'xyz?test.txt';
         $this->assertTrue(SiteUriHelper::hasHtmlMimeType($siteUri));
-    }
-
-    public function testGetSiteUrisFromAsset()
-    {
-        $asset = Asset::find()->one();
-        $siteUris = SiteUriHelper::getAssetSiteUris([$asset->id]);
-        $this->assertCount(1, $siteUris);
     }
 
     public function testIsPaginatedUri()

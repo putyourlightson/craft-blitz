@@ -6,6 +6,8 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
+use craft\db\Query;
+use craft\db\Table;
 use craft\elements\Asset;
 use craft\helpers\FileHelper;
 use craft\helpers\UrlHelper;
@@ -245,7 +247,8 @@ class SiteUriHelper
     }
 
     /**
-     * Returns the site URIs of an array of asset IDs.
+     * Returns the site URIs of an array of asset IDs, as well as existing image
+     * transform URLs.
      *
      * @param int[] $elementIds
      * @return SiteUriModel[]
@@ -263,7 +266,31 @@ class SiteUriHelper
             ->all();
 
         foreach ($assets as $asset) {
-            $urls[] = $asset->getUrl();
+            $url = $asset->getUrl();
+            $urls[] = $url;
+
+            // Get all existing image transform URLs
+            if ($asset->kind === Asset::KIND_IMAGE) {
+                $indexes = (new Query())
+                    ->select([
+                        'filename',
+                        'transformString',
+                    ])
+                    ->from([Table::IMAGETRANSFORMINDEX])
+                    ->where([
+                        'assetId' => $asset->id,
+                        'fileExists' => true,
+                    ])
+                    ->all();
+
+                foreach ($indexes as $index) {
+                    $urls[] = str_replace(
+                        $asset->filename,
+                        $index['transformString'] . '/' . $asset->filename,
+                        $url,
+                    );
+                }
+            }
         }
 
         return self::getSiteUrisFromUrls($urls);
