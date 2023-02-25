@@ -257,19 +257,16 @@ class SiteUriHelper
             return [];
         }
 
-        $siteUriModels = [];
+        $urls = [];
         $assets = Asset::find()
             ->id($elementIds)
             ->all();
 
         foreach ($assets as $asset) {
-            $siteUriModels[] = new SiteUriModel([
-                'siteId' => $asset->siteId,
-                'uri' => $asset->uri,
-            ]);
+            $urls[] = $asset->getUrl();
         }
 
-        return $siteUriModels;
+        return self::getSiteUrisFromUrls($urls);
     }
 
     /**

@@ -7,9 +7,11 @@ namespace putyourlightson\blitztests\unit\helpers;
 
 use Codeception\Test\Unit;
 use Craft;
+use craft\elements\Asset;
 use craft\models\Site;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitztests\fixtures\AssetFixture;
 use UnitTester;
 
 /**
@@ -26,6 +28,18 @@ class SiteUriHelperTest extends Unit
      * @var Site|null
      */
     private ?Site $secondarySite = null;
+
+    /**
+     * @return array
+     */
+    public function _fixtures(): array
+    {
+        return [
+            'assets' => [
+                'class' => AssetFixture::class,
+            ],
+        ];
+    }
 
     protected function _before()
     {
@@ -56,11 +70,11 @@ class SiteUriHelperTest extends Unit
         $this->assertTrue(SiteUriHelper::hasHtmlMimeType($siteUri));
     }
 
-    public function testGetSiteUriFromUrl()
+    public function testGetSiteUrisFromAsset()
     {
-        $siteUri = SiteUriHelper::getSiteUriFromUrl($this->secondarySite->getBaseUrl() . 'page');
-        $siteId = Craft::$app->sites->getSiteByHandle('secondary')->id;
-        $this->assertEquals($siteId, $siteUri->siteId);
+        $asset = Asset::find()->one();
+        $siteUris = SiteUriHelper::getAssetSiteUris([$asset->id]);
+        $this->assertCount(1, $siteUris);
     }
 
     public function testIsPaginatedUri()

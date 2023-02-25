@@ -15,7 +15,7 @@ use yii\test\ArrayFixture;
 
 class FsFixture extends ArrayFixture
 {
-    public const BASE_URL = 'https://cdn.test.craftcms.test/';
+    public const BASE_URL = 'https://test.craftcms.test/';
 
     /**
      * @inheritdoc
