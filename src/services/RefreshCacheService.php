@@ -176,17 +176,17 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
-        // Don't proceed if not an actual element
+        // Don’t proceed if not an actual element
         if (!($element instanceof Element)) {
             return;
         }
 
-        // Don't proceed if the element is an asset that is being indexed
-        if ($element instanceof Asset && $element->getScenario() == Asset::SCENARIO_INDEX) {
+        // Don’t proceed if the element is an asset that is being indexed
+        if ($element instanceof Asset && $element->getScenario() === Asset::SCENARIO_INDEX) {
             return;
         }
 
-        // Don't proceed if propagating
+        // Don’t proceed if propagating
         if ($element->propagating) {
             return;
         }
@@ -202,12 +202,12 @@ class RefreshCacheService extends Component
 
         $elementType = $element::class;
 
-        // Don't proceed if not a cacheable element type
+        // Don’t proceed if not a cacheable element type
         if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
             return;
         }
 
-        // Don't proceed if element is a draft or revision
+        // Don’t proceed if element is a draft or revision
         if (ElementHelper::isDraftOrRevision($element)) {
             return;
         }
@@ -217,14 +217,14 @@ class RefreshCacheService extends Component
         $elementChanged = $element->getBehavior(ElementChangedBehavior::BEHAVIOR_NAME);
 
         if ($elementChanged !== null) {
-            // Don't proceed if element has not changed (and the config setting allows)
+            // Don’t proceed if element has not changed (and the config setting allows)
             if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged
                 && !$elementChanged->getHasChanged()
             ) {
                 return;
             }
 
-            // Don't proceed if the element status has not changed and is not refreshable (and the config setting allows). Refreshing pending (https://github.com/putyourlightson/craft-blitz/issues/422) and expired (https://github.com/putyourlightson/craft-blitz/issues/267) elements is necessary to clear cached pages.
+            // Don’t proceed if the element status has not changed and is not refreshable (and the config setting allows). Refreshing pending (https://github.com/putyourlightson/craft-blitz/issues/422) and expired (https://github.com/putyourlightson/craft-blitz/issues/267) elements is necessary to clear cached pages.
             if (!Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive
                 && !$elementChanged->getHasStatusChanged()
                 && !$elementChanged->getHasRefreshableStatus()

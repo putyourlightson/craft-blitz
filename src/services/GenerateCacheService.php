@@ -534,7 +534,7 @@ class GenerateCacheService extends Component
     /**
      * Batch inserts cache values into the database.
      */
-    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraValues = null, string $extraColumnName = null): void
+    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraColumnValues = null, string $extraColumnName = null): void
     {
         if (empty($ids)) {
             return;
@@ -549,10 +549,10 @@ class GenerateCacheService extends Component
 
         $values = [];
         foreach ($validIds as $id) {
-            if ($extraValues === null) {
+            if ($extraColumnValues === null) {
                 $values[] = [$cacheId, $id];
-            } elseif (isset($extraValues[$id])) {
-                foreach ($extraValues[$id] as $extraValue) {
+            } elseif (isset($extraColumnValues[$id])) {
+                foreach ($extraColumnValues[$id] as $extraValue) {
                     $values[] = [$cacheId, $id, $extraValue];
                 }
             }
