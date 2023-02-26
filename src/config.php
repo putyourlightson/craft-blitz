@@ -169,6 +169,9 @@ return [
         // Whether pages containing query string parameters should be generated.
         //'generatePagesWithQueryStringParams' => true,
 
+        // Whether asset images should be purged when changed.
+        //'purgeAssetImagesWhenChanged' => true,
+
         // Whether the cache should automatically be refreshed after a global set is updated.
         //'refreshCacheAutomaticallyForGlobals' => true,
 

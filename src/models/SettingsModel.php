@@ -262,6 +262,11 @@ class SettingsModel extends Model
     public bool $generatePagesWithQueryStringParams = true;
 
     /**
+     * @var bool Whether asset images should be purged when changed.
+     */
+    public bool $purgeAssetImagesWhenChanged = true;
+
+    /**
      * @var bool Whether the cache should automatically be refreshed after a global set is updated.
      */
     public bool $refreshCacheAutomaticallyForGlobals = true;
@@ -459,6 +464,29 @@ class SettingsModel extends Model
     public function purgeAfterGenerate(bool $forceClear = false, bool $forceGenerate = false): bool
     {
         return !$this->clearOnRefresh($forceClear) && $this->generateOnRefresh($forceGenerate);
+    }
+
+    /**
+     * Returns whether the page should be generated based on whether a query
+     * string exists in the URI.
+     *
+     * @since 4.4.0
+     */
+    public function generatePageBasedOnQueryString(string $uri): bool
+    {
+        $hasQueryString = str_contains('?', $uri);
+
+        return $this->generatePagesWithQueryStringParams || !$hasQueryString;
+    }
+
+    /**
+     * Returns whether the cache should be purged after being generated.
+     *
+     * @since 4.4.0
+     */
+    public function purgeAssetImages(): bool
+    {
+        return $this->purgeAssetImagesWhenChanged && $this->cachePurgerType !== DummyPurger::class;
     }
 
     /**

@@ -9,10 +9,12 @@
 - Added tracking of which custom fields are output per element per page, greatly reducing the number of cached pages that must be invalidated when content changes ([#465](https://github.com/putyourlightson/craft-blitz/issues/465)).
 - Added tracking of which attributes and custom fields are used by each element query, greatly reducing the number of element queries that must be executed during the cache refresh process ([#466](https://github.com/putyourlightson/craft-blitz/issues/466)).
 - Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
+- Added a `purgeAssetImagesWhenChanged` config setting that determines whether asset images should be purged when changed.
 
 ### Changed
 - Renamed the `cacheElements` config setting and page specific option to `trackElements`.
 - Renamed the `cacheElementQueries` config setting and page specific option to `trackElementQueries`.
+- Reverted the removal of the `generatePagesWithQueryStringParams` config setting.
 
 ### Fixed
 - Fixed the `rewrite.php` file not detecting the `ENVIRONMENT` environment variable.
