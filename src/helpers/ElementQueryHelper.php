@@ -303,9 +303,14 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns whether the element query is a relation query.
+     * Returns whether the element query is a relation field query.
+     * For example:
+     *
+     * ```twig
+     * {% set relatedEntries = entry.relatedEntries.all() %}
+     * ```
      */
-    public static function isRelationQuery(ElementQuery $elementQuery): bool
+    public static function isRelationFieldQuery(ElementQuery $elementQuery): bool
     {
         if (empty($elementQuery->join)) {
             return false;

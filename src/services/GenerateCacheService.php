@@ -200,8 +200,8 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don’t proceed if this is a relation query
-        if (ElementQueryHelper::isRelationQuery($elementQuery)) {
+        // Don’t proceed if this is a relation field query
+        if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
             return;
         }
 

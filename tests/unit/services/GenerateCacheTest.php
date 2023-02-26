@@ -263,12 +263,21 @@ class GenerateCacheTest extends Unit
         $this->assertEquals(1, ElementQueryRecord::find()->count());
     }
 
-    public function testSaveElementQueryWithRelations()
+    public function testSaveElementQueryWithRelationFields()
     {
-        $elementQuery = Entry::find()->innerJoin('{{%relations}} relations');
+        $element = Entry::find()->one();
+        $elementQuery = $element->relatedEntries;
         Blitz::$plugin->generateCache->addElementQuery($elementQuery);
 
         $this->assertEquals(0, ElementQueryRecord::find()->count());
+    }
+
+    public function testSaveElementQueryWithRelatedToParam()
+    {
+        $elementQuery = Entry::find()->relatedTo(1);
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+        $this->assertEquals(1, ElementQueryRecord::find()->count());
     }
 
     public function testSaveElementQueryWithExpression()
