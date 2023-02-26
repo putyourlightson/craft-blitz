@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\drivers\generators;
 
+use Amp\Parallel\Sync\ContextPanicError;
 use Amp\Sync\LocalSemaphore;
 use Craft;
 use Exception;
@@ -100,9 +101,14 @@ class LocalGenerator extends BaseCacheGenerator
         try {
             wait($promise);
         }
-        // Catch all possible exceptions to avoid interrupting progress.
+        // Catch all exceptions and errors to avoid interrupting progress.
         catch (Exception $exception) {
             Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
+        }
+        catch (ContextPanicError $error) {
+            Blitz::$plugin->debug($error->getMessage());
+            Blitz::$plugin->debug($error->getTraceAsString());
+            Blitz::$plugin->debug($error->getOriginalTraceAsString());
         }
     }
 

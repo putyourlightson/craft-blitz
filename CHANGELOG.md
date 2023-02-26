@@ -15,6 +15,7 @@
 - Renamed the `cacheElements` config setting and page specific option to `trackElements`.
 - Renamed the `cacheElementQueries` config setting and page specific option to `trackElementQueries`.
 - Reverted the removal of the `generatePagesWithQueryStringParams` config setting.
+- The Local Generator now catches context panic errors ([#476](https://github.com/putyourlightson/craft-blitz/issues/476)).
 
 ### Fixed
 - Fixed the `rewrite.php` file not detecting the `ENVIRONMENT` environment variable.
