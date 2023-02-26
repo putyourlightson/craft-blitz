@@ -229,6 +229,10 @@ class ElementQueryHelper
 
             if (is_array($value)) {
                 $value = $value[0] ?? null;
+
+                if ($value === null) {
+                    return true;
+                }
             }
 
             if (is_numeric($value)) {
