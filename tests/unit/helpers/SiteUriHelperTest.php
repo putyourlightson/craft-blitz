@@ -9,8 +9,11 @@ use Codeception\Test\Unit;
 use Craft;
 use craft\elements\Asset;
 use craft\models\Site;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitztests\fixtures\AssetFixture;
 use UnitTester;
 
@@ -79,6 +82,30 @@ class SiteUriHelperTest extends Unit
             ],
             $siteUris,
         );
+    }
+
+    public function testGetSiteUrisForSiteWithQueryString()
+    {
+        Blitz::$plugin->settings->includedUriPatterns = [
+            'siteId' => 1,
+            'uriPattern' => '.*',
+        ];
+        Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
+
+        $siteUri = new SiteUriModel([
+            'siteId' => 1,
+            'uri' => 'abc?x=3',
+        ]);
+
+        $record = new CacheRecord($siteUri->toArray());
+        $record->save();
+
+        $siteUris = SiteUriHelper::getSiteUrisForSite(1, true);
+        $this->assertEquals([$siteUri], $siteUris);
+
+        Blitz::$plugin->settings->generatePagesWithQueryStringParams =false;
+        $siteUris = SiteUriHelper::getSiteUrisForSite(1, true);
+        $this->assertEquals([], $siteUris);
     }
 
     public function testGetMimeType()

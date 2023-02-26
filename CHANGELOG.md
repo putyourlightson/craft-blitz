@@ -4,12 +4,12 @@
 > {warning} Tracking of attributes and custom fields takes place when pages are cached, therefore it is important to clear or refresh the cache after this update completes.
 
 ### Added
-- Added purging of asset image URLs and existing image transforms when image dimensions or focal points are changed.
 - Added detection of which attributes and custom fields are changed on each element save.
 - Added tracking of which custom fields are output per element per page, greatly reducing the number of cached pages that must be invalidated when content changes ([#465](https://github.com/putyourlightson/craft-blitz/issues/465)).
 - Added tracking of which attributes and custom fields are used by each element query, greatly reducing the number of element queries that must be executed during the cache refresh process ([#466](https://github.com/putyourlightson/craft-blitz/issues/466)).
-- Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
+- Added purging of asset image URLs and existing image transforms when image dimensions or focal points are changed.
 - Added a `purgeAssetImagesWhenChanged` config setting that determines whether asset images should be purged when changed.
+- Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
 
 ### Changed
 - Renamed the `cacheElements` config setting and page specific option to `trackElements`.

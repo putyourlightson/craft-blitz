@@ -405,6 +405,10 @@ class ElementQueryHelper
         $orderBy = $elementQuery->orderBy;
         if (is_array($orderBy)) {
             foreach ($orderBy as $name => $value) {
+                // Extract the attribute in case of `table.column` format
+                $parts = explode('.', $name);
+                $name = end($parts);
+
                 if (in_array($name, $allAttributes)) {
                     $attributes[] = $name;
                 }

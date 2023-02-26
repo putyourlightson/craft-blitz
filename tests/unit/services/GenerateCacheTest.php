@@ -361,9 +361,12 @@ class GenerateCacheTest extends Unit
             ->column();
 
         $this->assertEquals(['title'], $attributes);
+    }
 
+    public function testSaveElementQueryAttributeRecordsWithOrderByPartsArray()
+    {
         $elementQuery = Entry::find()
-            ->orderBy(['title' => SORT_ASC]);
+            ->orderBy(['entries.title' => SORT_DESC]);
         Blitz::$plugin->generateCache->addElementQuery($elementQuery);
         $attributes = ElementQueryAttributeRecord::find()
             ->select('attribute')
@@ -382,7 +385,10 @@ class GenerateCacheTest extends Unit
             ->column();
 
         $this->assertEquals(FieldHelper::getFieldIdsFromHandles(['text']), $fieldIds);
+    }
 
+    public function testSaveElementQueryFieldRecordsWithOrderByArray()
+    {
         $elementQuery = Entry::find()
             ->orderBy(['text' => SORT_ASC]);
         Blitz::$plugin->generateCache->addElementQuery($elementQuery);
