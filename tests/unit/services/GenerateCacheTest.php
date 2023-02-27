@@ -415,6 +415,19 @@ class GenerateCacheTest extends Unit
         $this->assertEquals(FieldHelper::getFieldIdsFromHandles(['text']), $fieldIds);
     }
 
+    public function testSaveElementQueryFieldRecordsWithBefore()
+    {
+        $elementQuery = Entry::find()
+            ->before('1999-12-31')
+            ->orderBy('text');
+        Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+        $attributes = ElementQueryAttributeRecord::find()
+            ->select('attribute')
+            ->column();
+
+        $this->assertEquals(['postDate'], $attributes);
+    }
+
     public function testSaveCacheTags()
     {
         $tags = ['tag1', 'tag2', 'tag3'];

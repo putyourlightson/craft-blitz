@@ -20,7 +20,7 @@ class ElementQueryHelper
     /**
      * @var string[][]
      */
-    public static array $_filterableElementQueryAttributes = [];
+    public static array $_filterableElementQueryParams = [];
 
     /**
      * @var array
@@ -84,8 +84,8 @@ class ElementQueryHelper
      */
     public static function getElementQueryAttributes(ElementQuery $elementQuery): array
     {
-        $attributes = self::_getFilterableElementQueryAttributes($elementQuery);
-        $attributes = self::_getUsedElementQueryAttributes($elementQuery, $attributes);
+        $params = self::_getFilterableElementQueryParams($elementQuery);
+        $attributes = self::_getUsedElementQueryParams($elementQuery, $params);
 
         // Manually add the default order by if no order is set
         if (empty($elementQuery->orderBy)) {
@@ -107,7 +107,15 @@ class ElementQueryHelper
             }
         }
 
-        return $attributes;
+        // Add `postDate` attribute if either `before` or `after` params exist
+        if (!empty($elementQuery->before) || !empty($elementQuery->after)) {
+            // Only add if it is a potential param
+            if (in_array('postDate', $params)) {
+                $attributes[] = 'postDate';
+            }
+        }
+
+        return array_unique($attributes);
     }
 
     /**
@@ -118,7 +126,7 @@ class ElementQueryHelper
     public static function getElementQueryFieldIds(ElementQuery $elementQuery): array
     {
         $fieldHandles = CustomFieldBehavior::$fieldHandles;
-        $fieldHandles = self::_getUsedElementQueryAttributes($elementQuery, $fieldHandles);
+        $fieldHandles = self::_getUsedElementQueryParams($elementQuery, $fieldHandles);
 
         return FieldHelper::getFieldIdsFromHandles($fieldHandles);
     }
@@ -335,29 +343,29 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns an element query’s filterable attributes, which is the
-     * intersection of its attributes and its element type’s attributes.
+     * Returns an element query’s filterable params, which is the intersection
+     * of its params and its element type’s params.
      */
-    private static function _getFilterableElementQueryAttributes(ElementQuery $elementQuery): array
+    private static function _getFilterableElementQueryParams(ElementQuery $elementQuery): array
     {
-        if (!empty(self::$_filterableElementQueryAttributes[$elementQuery::class])) {
-            return self::$_filterableElementQueryAttributes[$elementQuery::class];
+        if (!empty(self::$_filterableElementQueryParams[$elementQuery::class])) {
+            return self::$_filterableElementQueryParams[$elementQuery::class];
         }
 
-        $elementQueryAttributes = [];
+        $elementQueryParams = [];
         foreach (self::_getPublicNonStaticProperties($elementQuery::class) as $property) {
-            $elementQueryAttributes[] = $property;
+            $elementQueryParams[] = $property;
         }
 
-        $elementTypeAttributes = [];
+        $elementTypeParams = [];
         foreach (self::_getPublicNonStaticProperties($elementQuery->elementType) as $property) {
-            $elementTypeAttributes[] = $property;
+            $elementTypeParams[] = $property;
         }
 
-        // Ignore attributes that never change. The `orderBy` attribute is
+        // Ignore params that never change. The `orderBy` attribute is
         // extracted separately later.
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-        $ignoreAttributes = [
+        $ignoreParams = [
             $sourceIdAttribute,
             'id',
             'uid',
@@ -367,15 +375,15 @@ class ElementQueryHelper
             'orderBy',
         ];
 
-        self::$_filterableElementQueryAttributes[$elementQuery::class] = array_diff(
+        self::$_filterableElementQueryParams[$elementQuery::class] = array_diff(
             array_intersect(
-                $elementQueryAttributes,
-                $elementTypeAttributes,
+                $elementQueryParams,
+                $elementTypeParams,
             ),
-            $ignoreAttributes,
+            $ignoreParams,
         );
 
-        return self::$_filterableElementQueryAttributes[$elementQuery::class];
+        return self::$_filterableElementQueryParams[$elementQuery::class];
     }
 
     /**
@@ -398,16 +406,16 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns the attributes used by the element query.
+     * Returns the params used by the element query.
      */
-    private static function _getUsedElementQueryAttributes(ElementQuery $elementQuery, array $allAttributes): array
+    private static function _getUsedElementQueryParams(ElementQuery $elementQuery, array $allParams): array
     {
         $uniqueParams = self::getUniqueElementQueryParams($elementQuery);
-        $attributes = [];
+        $params = [];
 
         foreach ($uniqueParams as $name => $value) {
-            if (in_array($name, $allAttributes)) {
-                $attributes[] = $name;
+            if (in_array($name, $allParams)) {
+                $params[] = $name;
             }
         }
 
@@ -418,13 +426,13 @@ class ElementQueryHelper
                 $parts = explode('.', $name);
                 $name = end($parts);
 
-                if (in_array($name, $allAttributes)) {
-                    $attributes[] = $name;
+                if (in_array($name, $allParams)) {
+                    $params[] = $name;
                 }
             }
         }
 
-        return $attributes;
+        return array_unique($params);
     }
 
     /**
