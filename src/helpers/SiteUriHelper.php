@@ -92,6 +92,7 @@ class SiteUriHelper
         $cachedUris = CacheRecord::find()
             ->select('uri')
             ->where(['siteId' => $siteId])
+            ->orderBy(['uri' => SORT_ASC])
             ->column();
 
         $paginatedUris = self::getPaginatedUrisForSite($siteId);
@@ -110,6 +111,7 @@ class SiteUriHelper
             ])
             ->andWhere(['not', ['uri' => null]])
             ->joinWith('element')
+            ->orderBy(['uri' => SORT_ASC])
             ->column();
 
         // Merge arrays, order by URI and keep unique values only
@@ -152,6 +154,7 @@ class SiteUriHelper
             ->select(['uri', 'paginate'])
             ->where(['siteId' => $siteId])
             ->andWhere(['not', ['paginate' => null]])
+            ->orderBy(['uri' => SORT_ASC])
             ->all();
 
         $pageTrigger = Craft::$app->getConfig()->getGeneral()->getPageTrigger();
@@ -213,6 +216,10 @@ class SiteUriHelper
         $siteUris = CacheRecord::find()
             ->select(['siteId', 'uri'])
             ->where(['id' => $cacheIds])
+            ->orderBy([
+                'siteId' => SORT_ASC,
+                'uri' => SORT_ASC,
+            ])
             ->asArray()
             ->all();
 
@@ -353,6 +360,7 @@ class SiteUriHelper
                     ->select('uri')
                     ->where(['siteId' => $siteUri->siteId])
                     ->andWhere(['like', 'uri', str_replace('*', '%', $siteUri->uri), false])
+                    ->orderBy(['uri' => SORT_ASC])
                     ->column();
 
                 foreach ($wildcardUris as $wildcardUri) {
