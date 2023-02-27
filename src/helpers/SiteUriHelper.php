@@ -63,7 +63,8 @@ class SiteUriHelper
         // Begin with the primary site
         $primarySite = $sitesService->getPrimarySite();
 
-        // Use sets and the splat operator rather than array_merge for performance (https://goo.gl/9mntEV)
+        // Use sets and the splat operator rather than array_merge for performance
+        // https://goo.gl/9mntEV
         $siteUriSets = [self::getSiteUrisForSite($primarySite->id, true)];
 
         // Loop through all sites to ensure we generate all site element URLs
@@ -111,8 +112,10 @@ class SiteUriHelper
             ->joinWith('element')
             ->column();
 
-        // Merge arrays and keep unique values only
-        $uris = array_unique(array_merge($cachedUris, $paginatedUris, $elementUris));
+        // Merge arrays, order by URI and keep unique values only
+        $uris = array_merge($cachedUris, $paginatedUris, $elementUris);
+        sort($uris);
+        $uris = array_unique($uris);
 
         foreach ($uris as $uri) {
             $siteUri = new SiteUriModel([

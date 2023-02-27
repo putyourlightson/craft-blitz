@@ -15,6 +15,7 @@
 - Renamed the `cacheElements` config setting and page specific option to `trackElements`.
 - Renamed the `cacheElementQueries` config setting and page specific option to `trackElementQueries`.
 - Reverted the removal of the `generatePagesWithQueryStringParams` config setting.
+- Cached pages are now generated in a more deterministic order, by URI ascending.
 - The Local Generator now catches context panic errors ([#476](https://github.com/putyourlightson/craft-blitz/issues/476)).
 
 ### Fixed
