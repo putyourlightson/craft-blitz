@@ -12,6 +12,7 @@
 - Added a tip about excluding the cache folder path from search engine indexing to the Blitz File Storage settings.
 
 ### Changed
+- Cookies are now removed from cached responses as they can prevent edge-side caching.
 - Renamed the `cacheElements` config setting and page specific option to `trackElements`.
 - Renamed the `cacheElementQueries` config setting and page specific option to `trackElementQueries`.
 - Reverted the removal of the `generatePagesWithQueryStringParams` config setting.

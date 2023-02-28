@@ -580,6 +580,10 @@ class CacheRequestService extends Component
             $headers->add('Surrogate-Control', 'content="ESI/1.0"');
         }
 
+        // Remove cookies as the `Set-Cookie` header can prevent edge-side caching.
+        // https://developers.cloudflare.com/cache/about/default-cache-behavior
+        $response->getCookies()->removeAll();
+
         // Get the mime type from the site URI
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
