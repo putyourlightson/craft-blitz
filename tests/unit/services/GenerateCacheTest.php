@@ -401,7 +401,7 @@ class GenerateCacheTest extends Unit
             ->select('attribute')
             ->column();
 
-        $this->assertEquals(['postDate'], $attributes);
+        $this->assertEquals(['postDate', 'title'], $attributes);
     }
 
     public function testSaveElementQueryFieldRecordsWithOrderBy()

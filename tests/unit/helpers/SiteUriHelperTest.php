@@ -103,7 +103,7 @@ class SiteUriHelperTest extends Unit
         $siteUris = SiteUriHelper::getSiteUrisForSite(1, true);
         $this->assertEquals([$siteUri], $siteUris);
 
-        Blitz::$plugin->settings->generatePagesWithQueryStringParams =false;
+        Blitz::$plugin->settings->generatePagesWithQueryStringParams = false;
         $siteUris = SiteUriHelper::getSiteUrisForSite(1, true);
         $this->assertEquals([], $siteUris);
     }

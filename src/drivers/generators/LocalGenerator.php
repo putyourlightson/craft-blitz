@@ -104,8 +104,7 @@ class LocalGenerator extends BaseCacheGenerator
         // Catch all exceptions and errors to avoid interrupting progress.
         catch (Exception $exception) {
             Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
-        }
-        catch (ContextPanicError $error) {
+        } catch (ContextPanicError $error) {
             Blitz::$plugin->debug($error->getMessage());
             Blitz::$plugin->debug($error->getTraceAsString());
             Blitz::$plugin->debug($error->getOriginalTraceAsString());
