@@ -80,7 +80,7 @@ class FileStorageTest extends Unit
         $this->assertStringContainsString($this->output, $value);
 
         [$value, $encoding] = $this->cacheStorage->getWithEncoding($this->siteUri, ['gzip']);
-        $this->assertStringContainsString(gzencode($this->output), $value);
+        $this->assertStringContainsString($this->output, gzdecode($value));
         $this->assertEquals('gzip', $encoding);
     }
 

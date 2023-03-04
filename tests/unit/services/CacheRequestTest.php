@@ -11,6 +11,7 @@ use craft\helpers\App;
 use craft\helpers\UrlHelper;
 use craft\web\Request;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use UnitTester;
@@ -233,6 +234,25 @@ class CacheRequestTest extends Unit
 
         // Assert that the response is not null
         $this->assertStringContainsString('xyz', $value);
+    }
+
+    public function testGetResponseEncoded()
+    {
+        /** @var FileStorage $cacheStorage */
+        $cacheStorage = Blitz::$plugin->cacheStorage;
+        $cacheStorage->deleteAll();
+        $cacheStorage->createGzipFiles = true;
+
+        // Save a value for the site URI
+        $output = 'xyz';
+        $cacheStorage->save($output, $this->siteUri);
+
+        Craft::$app->getRequest()->getHeaders()->set('Accept-Encoding', 'br, deflate, gzip');
+        $response = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri);
+
+        // Assert that the response is encoded
+        $this->assertEquals('gzip', $response->getHeaders()->get('Content-Encoding'));
+        $this->assertStringContainsString($output, gzdecode($response->content));
     }
 
     public function testGetResponseWithOutputComments()

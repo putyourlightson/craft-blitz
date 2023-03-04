@@ -29,7 +29,7 @@ use yii\web\Response;
  * @property-read bool $isGeneratorRequest
  * @property-read null|SiteUriModel $requestedCacheableSiteUri
  * @property-read string $allowedQueryString
- * @property-read string[] $acceptedEncodings
+ * @property-read string[] $acceptedRequestEncodings
  */
 class CacheRequestService extends Component
 {
@@ -362,7 +362,7 @@ class CacheRequestService extends Component
         }
 
         $siteUri = $event->siteUri;
-        $encodings = $this->getAcceptedEncodings();
+        $encodings = $this->getAcceptedRequestEncodings();
         [$content, $encoding] = Blitz::$plugin->cacheStorage->getWithEncoding($siteUri, $encodings);
 
         if (empty($content)) {
@@ -374,18 +374,15 @@ class CacheRequestService extends Component
         $this->_addCraftHeaders($response);
         $this->_prepareResponse($response, $siteUri, $content, $encoding);
 
-        if ($this->getIsCachedInclude() === false) {
-            // Append the served by comment if this is a cacheable response and if an HTML mime type.
-            if ($this->getIsCacheableResponse($response) && SiteUriHelper::hasHtmlMimeType($siteUri)) {
-                $outputComments = Blitz::$plugin->generateCache->options->outputComments;
+        if ($this->_shouldAppendServedByComments($response, $siteUri, $encoding)) {
+            $comments = '<!-- Served by Blitz on ' . date('c') . ' -->';
 
-                if ($outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED) {
-                    $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
-                }
+            if ($encoding === 'gzip' && function_exists('gzencode')) {
+                $comments = gzencode($comments);
             }
-        }
 
-        $response->content = $content;
+            $response->content .= $comments;
+        }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_GET_RESPONSE)) {
             $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
@@ -529,7 +526,7 @@ class CacheRequestService extends Component
      *
      * @return string[]
      */
-    public function getAcceptedEncodings(): array
+    public function getAcceptedRequestEncodings(): array
     {
         $request = Craft::$app->getRequest();
         $encoding = $request->getHeaders()->get('Accept-Encoding');
@@ -576,11 +573,8 @@ class CacheRequestService extends Component
      *
      * @since 3.12.0
      */
-    private function _prepareResponse(Response $response, SiteUriModel $siteUri, string $content, ?string
-        $encoding = null): void
+    private function _prepareResponse(Response $response, SiteUriModel $siteUri, string $content, ?string $encoding = null): void
     {
-        $response->content = $content;
-
         $headers = $response->getHeaders();
         $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
 
@@ -620,6 +614,27 @@ class CacheRequestService extends Component
                 $response->format = Response::FORMAT_RAW;
             }
         }
+
+        $response->content = $content;
+    }
+
+    /**
+     * Returns whether the served by comment should be appended to the output.
+     * Brotli encoded values do not support appending.
+     */
+    private function _shouldAppendServedByComments(Response $response, SiteUriModel $siteUri, ?string $encoding): bool
+    {
+        if ($this->getIsCachedInclude()
+            || !$this->getIsCacheableResponse($response)
+            || !SiteUriHelper::hasHtmlMimeType($siteUri)
+            || $encoding === 'brotli'
+        ) {
+            return false;
+        }
+
+        $outputComments = Blitz::$plugin->generateCache->options->outputComments;
+
+        return $outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED;
     }
 
     /**
