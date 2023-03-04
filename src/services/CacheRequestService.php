@@ -627,7 +627,7 @@ class CacheRequestService extends Component
         if ($this->getIsCachedInclude()
             || !$this->getIsCacheableResponse($response)
             || !SiteUriHelper::hasHtmlMimeType($siteUri)
-            || $encoding === 'brotli'
+            || $encoding === 'br'
         ) {
             return false;
         }

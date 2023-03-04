@@ -396,7 +396,7 @@ class FileStorage extends BaseCacheStorage
     }
 
     /**
-     * Returns whether brotli files can be created.
+     * Returns whether Brotli files can be created.
      */
     public function canCreateBrotliFiles(): bool
     {
