@@ -14,7 +14,7 @@ use yii\db\Exception;
 /**
  * Uses Craft’s cache storage method, especially useful for distributed systems.
  * The cached values can be compressed if gzip is supported, to help reduce the
- * memory required for storage. While Gzip is not as fast as other compression
+ * memory required for storage. While gzip is not as fast as other compression
  * algorithms such as Snappy and LZO, it is more widely supported and accepted
  * by most browsers. This allows us to return compressed values to the browser
  * directly, provided it accepts gzip encoding.

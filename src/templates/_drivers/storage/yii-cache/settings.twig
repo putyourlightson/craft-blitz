@@ -3,7 +3,7 @@
 {% set info %}
     <span class="info">{{ 'With this setting enabled, Blitz will compress cached values using gzip, resulting in reduced storage and improved performance. The cache should be cleared or refreshed after changing this setting.'|t('blitz') }}</span>
 {% endset %}
-{% set tip = compressionSupported ? 'Gzip compression is supported by the web server.'|t('blitz') : 'Gzip compression is _not_ supported by the web server.'|t('blitz') %}
+{% set tip = compressionSupported ? 'gzip compression is supported by the web server.'|t('blitz') : 'gzip compression is _not_ supported by the web server.'|t('blitz') %}
 {{ forms.lightswitchField({
     label: "Compress Cached Values"|t('blitz'),
     instructions: "Whether cached values should be compressed using gzip."|t('blitz') ~ info,

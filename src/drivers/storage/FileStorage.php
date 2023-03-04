@@ -48,7 +48,7 @@ class FileStorage extends BaseCacheStorage
     public string $folderPath = '@webroot/cache/blitz';
 
     /**
-     * @var bool Whether Gzip files should be created.
+     * @var bool Whether gzip files should be created.
      */
     public bool $createGzipFiles = false;
 
