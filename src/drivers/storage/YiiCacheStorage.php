@@ -6,13 +6,14 @@
 namespace putyourlightson\blitz\drivers\storage;
 
 use Craft;
+use ErrorException;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\caching\CacheInterface;
 use yii\db\Exception;
 
 /**
- * @property-read null|string $settingsHtml
+ * @property-read string|null $settingsHtml
  */
 class YiiCacheStorage extends BaseCacheStorage
 {
@@ -62,11 +63,19 @@ class YiiCacheStorage extends BaseCacheStorage
 
         // Redis cache can throw an exception if the connection is broken
         try {
-            // Cast the site ID to an integer to avoid an incorrect key
-            // https://github.com/putyourlightson/craft-blitz/issues/257
-            $value = $this->_cache->get([
-                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
-            ]);
+            $value = $this->_cache->get($this->_getKey($siteUri));
+
+            // Decompress the value, if gzip is supported
+            if (function_exists('gzdecode')) {
+                // Catch E_WARNING level errors on failure
+                try {
+                    // Assign only if the decoded value is not `false`
+                    $value = gzdecode($value) ?: $value;
+                }
+                /** @noinspection PhpRedundantCatchClauseInspection */
+                catch (ErrorException) {
+                }
+            }
         }
         /** @noinspection PhpRedundantCatchClauseInspection */
         catch (Exception) {
@@ -84,11 +93,12 @@ class YiiCacheStorage extends BaseCacheStorage
             return;
         }
 
-        // Cast the site ID to an integer to avoid an incorrect key
-        // https://github.com/putyourlightson/craft-blitz/issues/257
-        $this->_cache->set([
-            self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
-        ], $value, $duration);
+        // Compress the value, if gzip is supported
+        if (function_exists('gzencode')) {
+            $value = gzencode($value);
+        }
+
+        $this->_cache->set($this->_getKey($siteUri), $value, $duration);
     }
 
     /**
@@ -108,11 +118,7 @@ class YiiCacheStorage extends BaseCacheStorage
         }
 
         foreach ($siteUris as $siteUri) {
-            // Cast the site ID to an integer to avoid an incorrect key
-            // https://github.com/putyourlightson/craft-blitz/issues/257
-            $this->_cache->delete([
-                self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri,
-            ]);
+            $this->_cache->delete($this->_getKey($siteUri));
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_URIS)) {
@@ -151,5 +157,15 @@ class YiiCacheStorage extends BaseCacheStorage
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/yii-cache/settings', [
             'driver' => $this,
         ]);
+    }
+
+    /**
+     * Returns a key from the site URI.
+     */
+    private function _getKey(SiteUriModel $siteUri): array
+    {
+        // Cast the site ID to an integer to avoid an incorrect key
+        // https://github.com/putyourlightson/craft-blitz/issues/257
+        return [self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri];
     }
 }

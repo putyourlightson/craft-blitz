@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
 ## 4.4.1 - Unreleased
+### Changed
+- Cached values are now compressed before being saved in Yii Cache Storage, to help reduce the amount of memory used for storage.
+
 ### Fixed
 - Fixed the `generatePageBasedOnQueryString` check and ensured that cached includes are always allowed.
 
