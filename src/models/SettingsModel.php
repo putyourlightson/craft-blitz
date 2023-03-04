@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
 use putyourlightson\blitz\drivers\integrations\CommerceIntegration;
@@ -474,9 +475,16 @@ class SettingsModel extends Model
      */
     public function generatePageBasedOnQueryString(string $uri): bool
     {
-        $hasQueryString = str_contains('?', $uri);
+        if ($this->generatePagesWithQueryStringParams === true) {
+            return true;
+        }
 
-        return $this->generatePagesWithQueryStringParams || !$hasQueryString;
+        // Cached includes are always allowed
+        if (Blitz::$plugin->cacheRequest->getIsCachedInclude($uri)) {
+            return true;
+        }
+
+        return !str_contains($uri, '?');
     }
 
     /**

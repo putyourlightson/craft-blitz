@@ -86,10 +86,10 @@ class SiteUriHelperTest extends Unit
 
     public function testGetSiteUrisForSiteWithQueryString()
     {
-        Blitz::$plugin->settings->includedUriPatterns = [
+        Blitz::$plugin->settings->includedUriPatterns = [[
             'siteId' => 1,
             'uriPattern' => '.*',
-        ];
+        ]];
         Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
 
         $siteUri = new SiteUriModel([
