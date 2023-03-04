@@ -55,21 +55,33 @@ class FileStorageTest extends Unit
             'siteId' => 1,
             'uri' => 'möbelträgerfüße',
         ]);
-
-        Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri);
     }
 
     public function testSave()
     {
+        $this->cacheStorage->save($this->output, $this->siteUri);
         $value = $this->cacheStorage->get($this->siteUri);
         $this->assertStringContainsString($this->output, $value);
     }
 
     public function testSaveDecoded()
     {
+        $this->cacheStorage->save($this->output, $this->siteUri);
         $this->siteUri->uri = rawurldecode($this->siteUri->uri);
         $value = $this->cacheStorage->get($this->siteUri);
         $this->assertStringContainsString($this->output, $value);
+    }
+
+    public function testSaveCompressed()
+    {
+        $this->cacheStorage->createGzipFiles = true;
+        $this->cacheStorage->save($this->output, $this->siteUri);
+        $value = $this->cacheStorage->get($this->siteUri);
+        $this->assertStringContainsString($this->output, $value);
+
+        [$value, $encoding] = $this->cacheStorage->getWithEncoding($this->siteUri, ['gzip']);
+        $this->assertStringContainsString(gzencode($this->output), $value);
+        $this->assertEquals('gzip', $encoding);
     }
 
     public function testDelete()

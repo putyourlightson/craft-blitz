@@ -1,8 +1,10 @@
 # Release Notes for Blitz
 
-## 4.4.1 - Unreleased
-### Changed
-- Cached values are now compressed before being saved in Yii Cache Storage, to help reduce the amount of memory used for storage.
+## 4.5.0 - Unreleased
+### Added
+- Added the ability to send compressed responses to browsers that accept supported encodings.
+- Added the ability to saved compress cached values in the Yii Cache Storage to help reduce the amount of memory required.
+- Added tips that display whether `Gzip` and `Brotli` are enabled on the web server in the Blitz File Storage settings.
 
 ### Fixed
 - Fixed the `generatePageBasedOnQueryString` check and ensured that cached includes are always allowed.

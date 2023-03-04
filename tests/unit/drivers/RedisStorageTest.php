@@ -87,6 +87,18 @@ class RedisStorageTest extends Unit
         $this->assertStringContainsString($this->output, $value);
     }
 
+    public function testSaveCompressed()
+    {
+        $this->cacheStorage->compressCachedValues = true;
+        $this->cacheStorage->save($this->output, $this->siteUri);
+        $value = $this->cacheStorage->get($this->siteUri);
+        $this->assertStringContainsString($this->output, $value);
+
+        [$value, $encoding] = $this->cacheStorage->getWithEncoding($this->siteUri, ['gzip']);
+        $this->assertStringContainsString(gzencode($this->output), $value);
+        $this->assertEquals('gzip', $encoding);
+    }
+
     public function testDelete()
     {
         $this->cacheStorage->deleteUris([$this->siteUri]);

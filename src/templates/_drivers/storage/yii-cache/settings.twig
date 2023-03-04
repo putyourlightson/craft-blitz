@@ -1,3 +1,17 @@
+{% import "_includes/forms" as forms %}
+
+{% set info %}
+    <span class="info">{{ 'With this setting enabled, Blitz will compress cached values using gzip, resulting in reduced storage and improved performance. The cache should be cleared or refreshed after changing this setting.'|t('blitz') }}</span>
+{% endset %}
+{% set tip = compressionSupported ? 'Gzip compression is supported by the web server.'|t('blitz') : 'Gzip compression is _not_ supported by the web server.'|t('blitz') %}
+{{ forms.lightswitchField({
+    label: "Compress Cached Values"|t('blitz'),
+    instructions: "Whether cached values should be compressed using gzip."|t('blitz') ~ info,
+    tip: tip,
+    name: 'compressCachedValues',
+    on: driver.compressCachedValues,
+}) }}
+
 <p class="light">
     {{ 'Yii cache drivers can be swapped out by overriding the cache application component. <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://docs.craftcms.com/v3/config/app.html#cache-component'})|raw }}
 </p>

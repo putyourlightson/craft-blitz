@@ -15,6 +15,15 @@ interface CacheStorageInterface
     public function get(SiteUriModel $siteUri): string;
 
     /**
+     * Returns the cached value for the provided site and URI with an encoding,
+     * based on the provided acceptable encodings.
+     *
+     * @param string[] $encodings
+     * @return array{string|null, string|null}
+     */
+    public function getWithEncoding(SiteUriModel $siteUri, array $encodings = []): array;
+
+    /**
      * Saves the cache value for the provided site and URI.
      */
     public function save(string $value, SiteUriModel $siteUri, int $duration = null);

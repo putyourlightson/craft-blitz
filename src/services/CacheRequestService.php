@@ -29,6 +29,7 @@ use yii\web\Response;
  * @property-read bool $isGeneratorRequest
  * @property-read null|SiteUriModel $requestedCacheableSiteUri
  * @property-read string $allowedQueryString
+ * @property-read string[] $acceptedEncodings
  */
 class CacheRequestService extends Component
 {
@@ -361,7 +362,8 @@ class CacheRequestService extends Component
         }
 
         $siteUri = $event->siteUri;
-        $content = Blitz::$plugin->cacheStorage->get($siteUri);
+        $encodings = $this->getAcceptedEncodings();
+        [$content, $encoding] = Blitz::$plugin->cacheStorage->getWithEncoding($siteUri, $encodings);
 
         if (empty($content)) {
             return null;
@@ -370,7 +372,7 @@ class CacheRequestService extends Component
         $response = $event->response;
 
         $this->_addCraftHeaders($response);
-        $this->_prepareResponse($response, $content, $siteUri);
+        $this->_prepareResponse($response, $siteUri, $content, $encoding);
 
         if ($this->getIsCachedInclude() === false) {
             // Append the served by comment if this is a cacheable response and if an HTML mime type.
@@ -413,7 +415,7 @@ class CacheRequestService extends Component
         $content = Blitz::$plugin->generateCache->save($response->content, $siteUri);
 
         if ($content) {
-            $this->_prepareResponse($response, $content, $siteUri);
+            $this->_prepareResponse($response, $siteUri, $content);
         }
     }
 
@@ -521,6 +523,25 @@ class CacheRequestService extends Component
     }
 
     /**
+     * Returns the accepted encodings for the request, sorted by quality values
+     * descending.
+     * https://developer.mozilla.org/en-US/docs/Glossary/Quality_values.
+     *
+     * @return string[]
+     */
+    public function getAcceptedEncodings(): array
+    {
+        $request = Craft::$app->getRequest();
+        $encoding = $request->getHeaders()->get('Accept-Encoding');
+        $encodings = $request->parseAcceptHeader($encoding);
+
+        // Sort by quality values descending, maintaining keys
+        uasort($encodings, fn($a, $b) => $b['q'] <=> $a['q']);
+
+        return array_keys($encodings);
+    }
+
+    /**
      * Adds headers that Craft normally would.
      *
      * @see Application::handleRequest()
@@ -555,12 +576,17 @@ class CacheRequestService extends Component
      *
      * @since 3.12.0
      */
-    private function _prepareResponse(Response $response, string $content, SiteUriModel $siteUri): void
+    private function _prepareResponse(Response $response, SiteUriModel $siteUri, string $content, ?string
+        $encoding = null): void
     {
         $response->content = $content;
 
         $headers = $response->getHeaders();
         $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
+
+        if (!empty($encoding)) {
+            $headers->set('Content-Encoding', $encoding);
+        }
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
             $original = $headers->get('X-Powered-By');

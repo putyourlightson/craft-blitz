@@ -18,7 +18,11 @@ use yii\base\InvalidArgumentException;
 use yii\log\Logger;
 
 /**
+ * The recommended cache storage method, due to its simplicity and performance,
+ * especially when used with server rewrites.
+ *
  * @property-read null|string $settingsHtml
+ * @property-read string[] $enabledEncodings
  */
 class FileStorage extends BaseCacheStorage
 {
@@ -29,6 +33,14 @@ class FileStorage extends BaseCacheStorage
     {
         return Craft::t('blitz', 'Blitz File Storage (recommended)');
     }
+
+    /**
+     * @const string
+     */
+    public const FILE_EXTENSIONS = [
+        'gzip' => 'gz',
+        'br' => 'br',
+    ];
 
     /**
      * @var string The storage folder path.
@@ -93,6 +105,28 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
+    public function getWithEncoding(SiteUriModel $siteUri, array $encodings = []): array
+    {
+        $filePaths = $this->getFilePaths($siteUri);
+        $encodings = $this->getEnabledEncodings($encodings);
+
+        foreach ($filePaths as $filePath) {
+            foreach ($encodings as $encoding) {
+                $encodedFilePath = $filePath . '.' . self::FILE_EXTENSIONS[$encoding];
+                if (is_file($encodedFilePath)) {
+                    $value = file_get_contents($encodedFilePath);
+
+                    return [$value, $encoding];
+                }
+            }
+        }
+
+        return [$this->get($siteUri), null];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function save(string $value, SiteUriModel $siteUri, int $duration = null): void
     {
         $filePaths = $this->getFilePaths($siteUri);
@@ -105,13 +139,15 @@ class FileStorage extends BaseCacheStorage
             foreach ($filePaths as $filePath) {
                 FileHelper::writeToFile($filePath, $value);
 
-                if ($this->createGzipFiles && function_exists('gzencode')) {
-                    FileHelper::writeToFile($filePath . '.gz', gzencode($value));
+                if ($this->canCreateGzipFiles()) {
+                    $fileExtension = self::FILE_EXTENSIONS['gzip'];
+                    FileHelper::writeToFile($filePath . '.' . $fileExtension, gzencode($value));
                 }
 
-                if ($this->createBrotliFiles && function_exists('brotli_compress')) {
+                if ($this->canCreateBrotliFiles()) {
+                    $fileExtension = self::FILE_EXTENSIONS['br'];
                     /** @noinspection PhpUndefinedFunctionInspection */
-                    FileHelper::writeToFile($filePath . '.br', brotli_compress($value));
+                    FileHelper::writeToFile($filePath . '.' . $fileExtension, brotli_compress($value));
                 }
             }
         } catch (Exception|ErrorException|InvalidArgumentException $exception) {
@@ -213,6 +249,8 @@ class FileStorage extends BaseCacheStorage
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/settings', [
             'driver' => $this,
+            'gzipSupported' => function_exists('gzencode'),
+            'brotliSupported' => function_exists('brotli_compress'),
         ]);
     }
 
@@ -326,6 +364,43 @@ class FileStorage extends BaseCacheStorage
         return count(FileHelper::findFiles($path, [
             'only' => ['index.html'],
         ]));
+    }
+
+    /**
+     * Returns the enabled encoding types, from the provided encoding types.
+     *
+     * @param string[] $encodings
+     * @return string[]
+     */
+    public function getEnabledEncodings(array $encodings): array
+    {
+        $enabledEncodings = [];
+
+        if (in_array('gzip', $encodings) && $this->canCreateGzipFiles()) {
+            $enabledEncodings[] = 'gzip';
+        }
+
+        if (in_array('br', $encodings) && $this->canCreateBrotliFiles()) {
+            $enabledEncodings[] = 'br';
+        }
+
+        return $enabledEncodings;
+    }
+
+    /**
+     * Returns whether gzip files can be created.
+     */
+    public function canCreateGzipFiles(): bool
+    {
+        return $this->createGzipFiles && function_exists('gzencode');
+    }
+
+    /**
+     * Returns whether brotli files can be created.
+     */
+    public function canCreateBrotliFiles(): bool
+    {
+        return $this->createBrotliFiles && function_exists('brotli_compress');
     }
 
     /**
