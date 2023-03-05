@@ -88,7 +88,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function get(SiteUriModel $siteUri, bool $acceptsEncoding = false): string
+    public function get(SiteUriModel $siteUri): string
     {
         $filePaths = $this->getFilePaths($siteUri);
 
@@ -121,7 +121,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function save(string $value, SiteUriModel $siteUri, int $duration = null): void
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null, bool $allowEncoding = true): void
     {
         $filePaths = $this->getFilePaths($siteUri);
 
@@ -133,7 +133,7 @@ class FileStorage extends BaseCacheStorage
             foreach ($filePaths as $filePath) {
                 FileHelper::writeToFile($filePath, $value);
 
-                if ($this->canCompressCachedValues()) {
+                if ($allowEncoding && $this->canCompressCachedValues()) {
                     FileHelper::writeToFile($filePath . '.gz', gzencode($value));
                 }
             }

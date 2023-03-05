@@ -363,19 +363,18 @@ class CacheRequestService extends Component
         }
 
         $cacheStorage = Blitz::$plugin->cacheStorage;
-
         $siteUri = $event->siteUri;
         $encoded = $this->requestAcceptsEncoding();
         $content = '';
 
         if ($encoded && $cacheStorage->canCompressCachedValues()) {
-            $content = Blitz::$plugin->cacheStorage->getCompressed($siteUri);
+            $content = $cacheStorage->getCompressed($siteUri);
         }
 
-        // Fall back to uncompressed cached value
+        // Fall back to unencoded, in case of cached includes or SSI includes
         if (empty($content)) {
             $encoded = false;
-            $content = Blitz::$plugin->cacheStorage->get($siteUri);
+            $content = $cacheStorage->get($siteUri);
         }
 
         if (empty($content)) {
@@ -616,10 +615,15 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Appends the served by comment. Brotli encoded values cannot be appended.
+     * Appends the served by comment to the response content.
      */
     private function _appendServedByComment(Response $response, SiteUriModel $siteUri, bool $encoded): void
     {
+        // Appending onto encoded content is not possible
+        if ($encoded) {
+            return;
+        }
+
         if ($this->getIsCachedInclude()
             || !$this->getIsCacheableResponse($response)
             || !SiteUriHelper::hasHtmlMimeType($siteUri)
@@ -633,13 +637,7 @@ class CacheRequestService extends Component
             return;
         }
 
-        $comment = '<!-- Served by Blitz on ' . date('c') . ' -->';
-
-        if ($encoded && function_exists('gzencode')) {
-            $comment = gzencode($comment);
-        }
-
-        $response->content .= $comment;
+        $response->content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
     }
 
     /**

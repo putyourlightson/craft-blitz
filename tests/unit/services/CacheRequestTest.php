@@ -229,11 +229,12 @@ class CacheRequestTest extends Unit
         $this->assertNull(Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri));
 
         // Save a value for the site URI
-        Blitz::$plugin->cacheStorage->save('xyz', $this->siteUri);
+        $output = 'xyz';
+        Blitz::$plugin->cacheStorage->save($output, $this->siteUri);
         $value = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri)->content;
 
         // Assert that the response is not null
-        $this->assertStringContainsString('xyz', $value);
+        $this->assertStringContainsString($output, $value);
     }
 
     public function testGetResponseEncoded()
@@ -252,7 +253,26 @@ class CacheRequestTest extends Unit
 
         // Assert that the response is encoded
         $this->assertEquals('gzip', $response->getHeaders()->get('Content-Encoding'));
-        $this->assertStringContainsString($output, gzdecode($response->content));
+        $this->assertEquals($output, gzdecode($response->content));
+    }
+
+    public function testGetResponseUnencoded()
+    {
+        /** @var FileStorage $cacheStorage */
+        $cacheStorage = Blitz::$plugin->cacheStorage;
+        $cacheStorage->deleteAll();
+        $cacheStorage->compressCachedValues = true;
+
+        // Save a value for the site URI
+        $output = 'xyz';
+        $cacheStorage->save($output, $this->siteUri, null, false);
+
+        Craft::$app->getRequest()->getHeaders()->set('Accept-Encoding', 'deflate, gzip');
+        $response = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri);
+
+        // Assert that the response is unencoded
+        $this->assertNull($response->getHeaders()->get('Content-Encoding'));
+        $this->assertStringContainsString($output, $response->content);
     }
 
     public function testGetResponseWithOutputComments()

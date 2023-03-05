@@ -24,4 +24,9 @@ class SaveCacheEvent extends CancelableEvent
      * @var int|null
      */
     public ?int $duration = null;
+
+    /**
+     * @var bool
+     */
+    public bool $allowEncoding = true;
 }

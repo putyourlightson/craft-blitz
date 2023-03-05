@@ -141,6 +141,7 @@ class GenerateCacheService extends Component
         }
 
         // Don’t proceed if element caching is disabled
+        /** @noinspection PhpDeprecationInspection */
         if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
             return;
         }
@@ -171,6 +172,7 @@ class GenerateCacheService extends Component
         }
 
         // Don’t proceed if element query caching is disabled
+        /** @noinspection PhpDeprecationInspection */
         if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
             return;
         }
@@ -453,9 +455,10 @@ class GenerateCacheService extends Component
             'queryId',
         );
 
+        $ssiIncludeIds = $this->generateData->getSsiIncludeIds();
         $this->_batchInsertCaches(
             $cacheId,
-            $this->generateData->getSsiIncludeIds(),
+            $ssiIncludeIds,
             IncludeRecord::tableName(),
             SsiIncludeCacheRecord::tableName(),
             'includeId',
@@ -466,7 +469,8 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        if (!Blitz::$plugin->cacheRequest->getIsCachedInclude()) {
+        $isCachedInclude = Blitz::$plugin->cacheRequest->getIsCachedInclude();
+        if (!$isCachedInclude) {
             $outputComments = $this->options->outputComments === true
                 || $this->options->outputComments === SettingsModel::OUTPUT_COMMENTS_CACHED;
 
@@ -476,7 +480,12 @@ class GenerateCacheService extends Component
             }
         }
 
-        $this->saveOutput($content, $siteUri, $this->options->getCacheDuration());
+        $duration = $this->options->getCacheDuration();
+
+        // Disallow encoding for cache includes or pages that contain SSI includes
+        $allowEncoding = empty($ssiIncludeIds) && !$isCachedInclude;
+
+        $this->saveOutput($content, $siteUri, $duration, $allowEncoding);
 
         $this->reset();
 
@@ -488,12 +497,13 @@ class GenerateCacheService extends Component
     /**
      * Saves the output for a site URI.
      */
-    public function saveOutput(string $output, SiteUriModel $siteUri, int $duration = null): void
+    public function saveOutput(string $output, SiteUriModel $siteUri, int $duration = null, bool $allowEncoding = true): void
     {
         $event = new SaveCacheEvent([
             'output' => $output,
             'siteUri' => $siteUri,
             'duration' => $duration,
+            'allowEncoding' => $allowEncoding,
         ]);
         $this->trigger(self::EVENT_BEFORE_SAVE_CACHE, $event);
 
@@ -505,7 +515,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        Blitz::$plugin->cacheStorage->save($event->output, $event->siteUri, $event->duration);
+        Blitz::$plugin->cacheStorage->save($event->output, $event->siteUri, $event->duration, $event->allowEncoding);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);

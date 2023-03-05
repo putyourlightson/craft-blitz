@@ -62,6 +62,18 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function get(SiteUriModel $siteUri): string
     {
+        if ($this->canCompressCachedValues()) {
+            $value = $this->getCompressed($siteUri);
+
+            if (!empty($value)) {
+                $value = gzdecode($value);
+
+                if ($value) {
+                    return $value;
+                }
+            }
+        }
+
         $key = $this->_getKey($siteUri);
 
         return $this->_getFromCache($key);
@@ -80,7 +92,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function save(string $value, SiteUriModel $siteUri, int $duration = null): void
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null, bool $allowEncoding = true): void
     {
         if ($this->_cache === null) {
             return;
@@ -88,7 +100,7 @@ class YiiCacheStorage extends BaseCacheStorage
 
         $key = $this->_getKey($siteUri);
 
-        if ($this->canCompressCachedValues()) {
+        if ($allowEncoding && $this->canCompressCachedValues()) {
             $key[] = self::ENCODING;
             $value = gzencode($value);
         }

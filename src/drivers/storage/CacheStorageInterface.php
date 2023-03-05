@@ -24,7 +24,7 @@ interface CacheStorageInterface
     /**
      * Saves the cache value for the provided site URI.
      */
-    public function save(string $value, SiteUriModel $siteUri, int $duration = null);
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null, bool $allowEncoding = true);
 
     /**
      * Deletes the cache values for the provided site URIs.
