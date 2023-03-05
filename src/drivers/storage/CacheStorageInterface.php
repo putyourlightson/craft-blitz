@@ -10,21 +10,19 @@ use putyourlightson\blitz\models\SiteUriModel;
 interface CacheStorageInterface
 {
     /**
-     * Returns the cached value for the provided site and URI.
+     * Returns the cached value for the provided site URI.
      */
     public function get(SiteUriModel $siteUri): string;
 
     /**
-     * Returns the cached value for the provided site and URI with an encoding,
-     * based on the provided acceptable encodings.
+     * Returns the compressed cached value for the provided site URI.
      *
-     * @param string[] $encodings
-     * @return array{string|null, string|null}
+     * @since 4.5.0
      */
-    public function getWithEncoding(SiteUriModel $siteUri, array $encodings = []): array;
+    public function getCompressed(SiteUriModel $siteUri): string;
 
     /**
-     * Saves the cache value for the provided site and URI.
+     * Saves the cache value for the provided site URI.
      */
     public function save(string $value, SiteUriModel $siteUri, int $duration = null);
 
@@ -49,4 +47,9 @@ interface CacheStorageInterface
      * Returns the widget HTML.
      */
     public function getWidgetHtml(): string;
+
+    /**
+     * Returns whether cached values can be compressed.
+     */
+    public function canCompressCachedValues(): bool;
 }

@@ -16,6 +16,7 @@ use craft\web\Application;
 use craft\web\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
+use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
@@ -361,9 +362,21 @@ class CacheRequestService extends Component
             return null;
         }
 
+        $cacheStorage = Blitz::$plugin->cacheStorage;
+
         $siteUri = $event->siteUri;
-        $encodings = $this->getAcceptedRequestEncodings();
-        [$content, $encoding] = Blitz::$plugin->cacheStorage->getWithEncoding($siteUri, $encodings);
+        $encoded = $this->requestAcceptsEncoding();
+        $content = '';
+
+        if ($encoded && $cacheStorage->canCompressCachedValues()) {
+            $content = Blitz::$plugin->cacheStorage->getCompressed($siteUri);
+        }
+
+        // Fall back to uncompressed cached value
+        if (empty($content)) {
+            $encoded = false;
+            $content = Blitz::$plugin->cacheStorage->get($siteUri);
+        }
 
         if (empty($content)) {
             return null;
@@ -371,8 +384,8 @@ class CacheRequestService extends Component
 
         $response = $event->response;
         $this->_addCraftHeaders($response);
-        $this->_prepareResponse($response, $siteUri, $content, $encoding);
-        $this->_appendServedByComment($response, $siteUri, $encoding);
+        $this->_prepareResponse($response, $siteUri, $content, $encoded);
+        $this->_appendServedByComment($response, $siteUri, $encoded);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_GET_RESPONSE)) {
             $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
@@ -510,22 +523,16 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the accepted encodings for the request, sorted by quality values
-     * descending.
+     * Returns whether the request accepts encoding.
      * https://developer.mozilla.org/en-US/docs/Glossary/Quality_values.
-     *
-     * @return string[]
      */
-    public function getAcceptedRequestEncodings(): array
+    public function requestAcceptsEncoding(): bool
     {
         $request = Craft::$app->getRequest();
         $encoding = $request->getHeaders()->get('Accept-Encoding');
         $encodings = $request->parseAcceptHeader($encoding);
 
-        // Sort by quality values descending, maintaining keys
-        uasort($encodings, fn($a, $b) => $b['q'] <=> $a['q']);
-
-        return array_keys($encodings);
+        return isset($encodings[BaseCacheStorage::ENCODING]);
     }
 
     /**
@@ -563,15 +570,15 @@ class CacheRequestService extends Component
      *
      * @since 3.12.0
      */
-    private function _prepareResponse(Response $response, SiteUriModel $siteUri, string $content, ?string $encoding = null): void
+    private function _prepareResponse(Response $response, SiteUriModel $siteUri, string $content, bool $encoded = false): void
     {
         $response->content = $content;
 
         $headers = $response->getHeaders();
         $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
 
-        if (!empty($encoding)) {
-            $headers->set('Content-Encoding', $encoding);
+        if ($encoded) {
+            $headers->set('Content-Encoding', BaseCacheStorage::ENCODING);
         }
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
@@ -611,12 +618,11 @@ class CacheRequestService extends Component
     /**
      * Appends the served by comment. Brotli encoded values cannot be appended.
      */
-    private function _appendServedByComment(Response $response, SiteUriModel $siteUri, ?string $encoding): void
+    private function _appendServedByComment(Response $response, SiteUriModel $siteUri, bool $encoded): void
     {
         if ($this->getIsCachedInclude()
             || !$this->getIsCacheableResponse($response)
             || !SiteUriHelper::hasHtmlMimeType($siteUri)
-            || $encoding === 'br'
         ) {
             return;
         }
@@ -629,7 +635,7 @@ class CacheRequestService extends Component
 
         $comment = '<!-- Served by Blitz on ' . date('c') . ' -->';
 
-        if ($encoding === 'gzip' && function_exists('gzencode')) {
+        if ($encoded && function_exists('gzencode')) {
             $comment = gzencode($comment);
         }
 

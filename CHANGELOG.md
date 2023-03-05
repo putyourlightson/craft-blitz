@@ -4,10 +4,18 @@
 ### Added
 - Added the ability to send compressed responses to browsers that accept supported encodings.
 - Added the ability to save compressed cached values in the Yii Cache Storage to help reduce the memory required.
-- Added tips that display whether `gzip` and `Brotli` are enabled on the web server in the Blitz File Storage settings.
+- Added tips that display whether `gzip` is enabled on the web server in the Blitz File Storage settings.
+
+### Changed
+- Renamed the `createGzipFiles` setting to `compressCachedValues`.
+- Removed the ability to create Brotli files and removed the `createBrotliFiles` setting.
 
 ### Fixed
 - Fixed the `generatePageBasedOnQueryString` check and ensured that cached includes are always allowed.
+
+### Deprecated
+- Deprecated the `createGzipFiles` setting.
+- Deprecated the `createBrotliFiles` setting.
 
 ## 4.4.0 - 2023-03-01
 > {warning} Tracking of attributes and custom fields takes place when pages are cached, therefore it is important to clear or refresh the cache after this update completes.

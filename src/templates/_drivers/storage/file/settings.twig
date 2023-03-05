@@ -17,27 +17,15 @@
 }) }}
 
 {% set info %}
-    <span class="info">{{ 'With this setting enabled, Blitz will compress cached files using gzip and write them to `index.html.gz` files for improved performance (requires extra code in server rewrites). <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#server-rewrites'})|raw }}</span>
+    <span class="info">{{ 'With this setting enabled, Blitz will compress cached files using gzip and write them to `index.html.gz` files for improved performance (requires extra code when using server rewrites). <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#server-rewrites'})|raw }}</span>
 {% endset %}
 {% set tip = gzipSupported ? 'gzip compression is supported by the web server.'|t('blitz') : 'gzip compression is _not_ supported by the web server.'|t('blitz') %}
 {{ forms.lightswitchField({
-    label: "Create gzip Files"|t('blitz'),
+    label: "Compress Cached Values"|t('blitz'),
     instructions: "Whether compressed versions of cached files should be created using gzip."|t('blitz') ~ info,
     tip: tip,
-    name: 'createGzipFiles',
-    on: driver.createGzipFiles,
-}) }}
-
-{% set info %}
-    <span class="info">{{ 'With this setting enabled, Blitz will compress cached files using Brotli and write them to `index.html.br` files for improved performance (requires that the Brotli PHP extension is installed and extra code in server rewrites). <a href="{url}" class="go" target="_blank">Learn more</a>'|t('blitz', {url: 'https://putyourlightson.com/plugins/blitz#server-rewrites'})|raw }}</span>
-{% endset %}
-{% set tip = brotliSupported ? 'Brotli compression is supported by the web server.'|t('blitz') : 'Brotli compression is _not_ supported by the web server.'|t('blitz') %}
-{{ forms.lightswitchField({
-    label: "Create Brotli Files"|t('blitz'),
-    instructions: "Whether compressed versions of cached files should be created using Brotli."|t('blitz') ~ info,
-    tip: tip,
-    name: 'createBrotliFiles',
-    on: driver.createBrotliFiles,
+    name: 'compressCachedValues',
+    on: driver.compressCachedValues,
 }) }}
 
 <p class="light">

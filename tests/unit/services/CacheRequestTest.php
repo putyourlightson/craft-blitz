@@ -241,13 +241,13 @@ class CacheRequestTest extends Unit
         /** @var FileStorage $cacheStorage */
         $cacheStorage = Blitz::$plugin->cacheStorage;
         $cacheStorage->deleteAll();
-        $cacheStorage->createGzipFiles = true;
+        $cacheStorage->compressCachedValues = true;
 
         // Save a value for the site URI
         $output = 'xyz';
         $cacheStorage->save($output, $this->siteUri);
 
-        Craft::$app->getRequest()->getHeaders()->set('Accept-Encoding', 'br, deflate, gzip');
+        Craft::$app->getRequest()->getHeaders()->set('Accept-Encoding', 'deflate, gzip');
         $response = Blitz::$plugin->cacheRequest->getCachedResponse($this->siteUri);
 
         // Assert that the response is encoded

@@ -74,14 +74,13 @@ class FileStorageTest extends Unit
 
     public function testSaveCompressed()
     {
-        $this->cacheStorage->createGzipFiles = true;
+        $this->cacheStorage->compressCachedValues = true;
         $this->cacheStorage->save($this->output, $this->siteUri);
         $value = $this->cacheStorage->get($this->siteUri);
         $this->assertStringContainsString($this->output, $value);
 
-        [$value, $encoding] = $this->cacheStorage->getWithEncoding($this->siteUri, ['gzip']);
+        $value = $this->cacheStorage->getCompressed($this->siteUri);
         $this->assertStringContainsString($this->output, gzdecode($value));
-        $this->assertEquals('gzip', $encoding);
     }
 
     public function testDelete()

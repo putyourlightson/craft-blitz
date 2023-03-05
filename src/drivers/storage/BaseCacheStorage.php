@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\storage;
 
 use craft\base\SavableComponent;
+use putyourlightson\blitz\models\SiteUriModel;
 
 /**
  * @property-read string $utilityHtml
@@ -34,6 +35,25 @@ abstract class BaseCacheStorage extends SavableComponent implements CacheStorage
     public const EVENT_AFTER_DELETE_ALL = 'afterDeleteAll';
 
     /**
+     * @const string
+     */
+    public const ENCODING = 'gzip';
+
+    /**
+     * @var bool Whether cached values should be compressed using gzip.
+     * @since 4.5.0
+     */
+    public bool $compressCachedValues = false;
+
+    /**
+     * @inheritdoc
+     */
+    public function getCompressed(SiteUriModel $siteUri): string
+    {
+        return '';
+    }
+
+    /**
      * @inheritdoc
      */
     public function getUtilityHtml(): string
@@ -47,5 +67,13 @@ abstract class BaseCacheStorage extends SavableComponent implements CacheStorage
     public function getWidgetHtml(): string
     {
         return '';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canCompressCachedValues(): bool
+    {
+        return $this->compressCachedValues && function_exists('gzencode');
     }
 }

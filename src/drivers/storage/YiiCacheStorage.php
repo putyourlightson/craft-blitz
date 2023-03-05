@@ -17,7 +17,7 @@ use yii\db\Exception;
  * memory required for storage. While gzip is not as fast as other compression
  * algorithms such as Snappy and LZO, it is more widely supported and accepted
  * by most browsers. This allows us to return compressed values to the browser
- * directly, provided it accepts gzip encoding.
+ * directly, provided it accepts encoding.
  * https://docs.redis.com/latest/ri/memory-optimizations/#compress-values
  *
  * @property-read string|null $settingsHtml
@@ -30,19 +30,9 @@ class YiiCacheStorage extends BaseCacheStorage
     public const KEY_PREFIX = 'blitz';
 
     /**
-     * @const string
-     */
-    public const ENCODING = 'gzip';
-
-    /**
      * @var string
      */
     public string $cacheComponent = 'cache';
-
-    /**
-     * @var bool Whether cached values should be compressed using gzip.
-     */
-    public bool $compressCachedValues = false;
 
     /**
      * @var CacheInterface|null
@@ -72,46 +62,19 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function get(SiteUriModel $siteUri): string
     {
-        if ($this->_cache === null) {
-            return '';
-        }
-
         $key = $this->_getKey($siteUri);
 
-        if ($this->canCompressCachedValues()) {
-            $key[] = self::ENCODING;
-            $value = $this->_getFromCache($key);
-
-            if ($value) {
-                $value = gzdecode($value);
-            }
-        } else {
-            $value = $this->_cache->get($key);
-        }
-
-        return $value ?: '';
+        return $this->_getFromCache($key);
     }
 
     /**
      * @inheritdoc
      */
-    public function getWithEncoding(SiteUriModel $siteUri, array $encodings = []): array
+    public function getCompressed(SiteUriModel $siteUri): string
     {
-        if ($this->_cache === null) {
-            return [null, null];
-        }
+        $key = $this->_getKey($siteUri, true);
 
-        if ($this->canCompressCachedValues() && in_array(self::ENCODING, $encodings)) {
-            $key = $this->_getKey($siteUri);
-            $key[] = self::ENCODING;
-            $value = $this->_getFromCache($key);
-
-            if ($value) {
-                return [$value, self::ENCODING];
-            }
-        }
-
-        return [$this->get($siteUri), null];
+        return $this->_getFromCache($key);
     }
 
     /**
@@ -192,19 +155,20 @@ class YiiCacheStorage extends BaseCacheStorage
         ]);
     }
 
-    public function canCompressCachedValues(): bool
-    {
-        return $this->compressCachedValues && function_exists('gzencode');
-    }
-
     /**
-     * Returns a key from the site URI.
+     * Returns a key from the site URI and an encoded boolean.
      */
-    private function _getKey(SiteUriModel $siteUri): array
+    private function _getKey(SiteUriModel $siteUri, bool $encoded = false): array
     {
         // Cast the site ID to an integer to avoid an incorrect key
         // https://github.com/putyourlightson/craft-blitz/issues/257
-        return [self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri];
+        $key = [self::KEY_PREFIX, (int)$siteUri->siteId, $siteUri->uri];
+
+        if ($encoded) {
+            $key[] = BaseCacheStorage::ENCODING;
+        }
+
+        return $key;
     }
 
     /**
@@ -212,6 +176,10 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     private function _getFromCache(array $key): string
     {
+        if ($this->_cache === null) {
+            return '';
+        }
+
         // Redis cache can throw an exception if the connection is broken
         try {
             $value = $this->_cache->get($key);

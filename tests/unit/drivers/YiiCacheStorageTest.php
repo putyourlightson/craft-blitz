@@ -89,9 +89,8 @@ class YiiCacheStorageTest extends Unit
         $value = $this->cacheStorage->get($this->siteUri);
         $this->assertStringContainsString($this->output, $value);
 
-        [$value, $encoding] = $this->cacheStorage->getWithEncoding($this->siteUri, ['gzip']);
+        $value = $this->cacheStorage->getCompressed($this->siteUri);
         $this->assertStringContainsString($this->output, gzdecode($value));
-        $this->assertEquals('gzip', $encoding);
     }
 
     public function testDelete()
