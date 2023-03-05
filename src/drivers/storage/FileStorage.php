@@ -139,14 +139,15 @@ class FileStorage extends BaseCacheStorage
             foreach ($filePaths as $filePath) {
                 FileHelper::writeToFile($filePath, $value);
 
-                if ($this->canCreateGzipFiles()) {
+                if ($this->shouldCreateGzipFiles()) {
                     $fileExtension = self::FILE_EXTENSIONS['gzip'];
                     FileHelper::writeToFile($filePath . '.' . $fileExtension, gzencode($value));
                 }
 
-                if ($this->canCreateBrotliFiles()) {
+                if ($this->shouldCreateBrotliFiles()) {
                     $fileExtension = self::FILE_EXTENSIONS['br'];
                     /** @noinspection PhpUndefinedFunctionInspection */
+                    /** @phpstan-ignore-next-line */
                     FileHelper::writeToFile($filePath . '.' . $fileExtension, brotli_compress($value));
                 }
             }
@@ -376,11 +377,11 @@ class FileStorage extends BaseCacheStorage
     {
         $enabledEncodings = [];
 
-        if (in_array('gzip', $encodings) && $this->canCreateGzipFiles()) {
+        if (in_array('gzip', $encodings) && $this->shouldCreateGzipFiles()) {
             $enabledEncodings[] = 'gzip';
         }
 
-        if (in_array('br', $encodings) && $this->canCreateBrotliFiles()) {
+        if (in_array('br', $encodings) && $this->shouldCreateBrotliFiles()) {
             $enabledEncodings[] = 'br';
         }
 
@@ -388,17 +389,17 @@ class FileStorage extends BaseCacheStorage
     }
 
     /**
-     * Returns whether gzip files can be created.
+     * Returns whether gzip files should be created.
      */
-    public function canCreateGzipFiles(): bool
+    public function shouldCreateGzipFiles(): bool
     {
         return $this->createGzipFiles && function_exists('gzencode');
     }
 
     /**
-     * Returns whether Brotli files can be created.
+     * Returns whether Brotli files should be created.
      */
-    public function canCreateBrotliFiles(): bool
+    public function shouldCreateBrotliFiles(): bool
     {
         return $this->createBrotliFiles && function_exists('brotli_compress');
     }

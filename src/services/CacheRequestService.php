@@ -370,19 +370,9 @@ class CacheRequestService extends Component
         }
 
         $response = $event->response;
-
         $this->_addCraftHeaders($response);
         $this->_prepareResponse($response, $siteUri, $content, $encoding);
-
-        if ($this->_shouldAppendServedByComments($response, $siteUri, $encoding)) {
-            $comments = '<!-- Served by Blitz on ' . date('c') . ' -->';
-
-            if ($encoding === 'gzip' && function_exists('gzencode')) {
-                $comments = gzencode($comments);
-            }
-
-            $response->content .= $comments;
-        }
+        $this->_appendServedByComment($response, $siteUri, $encoding);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_GET_RESPONSE)) {
             $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
@@ -575,6 +565,8 @@ class CacheRequestService extends Component
      */
     private function _prepareResponse(Response $response, SiteUriModel $siteUri, string $content, ?string $encoding = null): void
     {
+        $response->content = $content;
+
         $headers = $response->getHeaders();
         $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
 
@@ -614,27 +606,34 @@ class CacheRequestService extends Component
                 $response->format = Response::FORMAT_RAW;
             }
         }
-
-        $response->content = $content;
     }
 
     /**
-     * Returns whether the served by comment should be appended to the output.
-     * Brotli encoded values do not support appending.
+     * Appends the served by comment. Brotli encoded values cannot be appended.
      */
-    private function _shouldAppendServedByComments(Response $response, SiteUriModel $siteUri, ?string $encoding): bool
+    private function _appendServedByComment(Response $response, SiteUriModel $siteUri, ?string $encoding): void
     {
         if ($this->getIsCachedInclude()
             || !$this->getIsCacheableResponse($response)
             || !SiteUriHelper::hasHtmlMimeType($siteUri)
             || $encoding === 'br'
         ) {
-            return false;
+            return;
         }
 
         $outputComments = Blitz::$plugin->generateCache->options->outputComments;
 
-        return $outputComments === true || $outputComments == SettingsModel::OUTPUT_COMMENTS_SERVED;
+        if ($outputComments !== true && $outputComments !== SettingsModel::OUTPUT_COMMENTS_SERVED) {
+            return;
+        }
+
+        $comment = '<!-- Served by Blitz on ' . date('c') . ' -->';
+
+        if ($encoding === 'gzip' && function_exists('gzencode')) {
+            $comment = gzencode($comment);
+        }
+
+        $response->content .= $comment;
     }
 
     /**
