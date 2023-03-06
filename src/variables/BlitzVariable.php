@@ -222,10 +222,9 @@ class BlitzVariable
      */
     private function _getSsiTag(string $uri, array $params, int $includeId): Markup
     {
-        $uri = $this->_getUriWithParams($uri, $params);
-
         // Add an SSI include, so we can purge it whenever necessary
         Blitz::$plugin->generateCache->addSsiInclude($includeId);
+        $uri = $this->_getUriWithParams($uri, $params);
 
         return Template::raw('<!--#include virtual="' . $uri . '" -->');
     }
@@ -235,6 +234,7 @@ class BlitzVariable
      */
     private function _getEsiTag(string $uri, array $params): Markup
     {
+        Blitz::$plugin->generateCache->generateData->setHasEsiIncludes();
         $uri = $this->_getUriWithParams($uri, $params);
 
         // Add surrogate control header

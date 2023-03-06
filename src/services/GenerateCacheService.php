@@ -455,10 +455,9 @@ class GenerateCacheService extends Component
             'queryId',
         );
 
-        $ssiIncludeIds = $this->generateData->getSsiIncludeIds();
         $this->_batchInsertCaches(
             $cacheId,
-            $ssiIncludeIds,
+            $this->generateData->getSsiIncludeIds(),
             IncludeRecord::tableName(),
             SsiIncludeCacheRecord::tableName(),
             'includeId',
@@ -482,8 +481,10 @@ class GenerateCacheService extends Component
 
         $duration = $this->options->getCacheDuration();
 
-        // Disallow encoding for cache includes or pages that contain SSI includes
-        $allowEncoding = empty($ssiIncludeIds) && !$isCachedInclude;
+        // Disallow encoding for cache includes and pages with SSI or ESI includes
+        $allowEncoding = !$isCachedInclude
+            && !$this->generateData->getHasSsiIncludes()
+            && !$this->generateData->getHasEsiIncludes();
 
         $this->saveOutput($content, $siteUri, $duration, $allowEncoding);
 

@@ -7,6 +7,7 @@
 - Added tips that display whether `gzip` is enabled on the web server in the Blitz File Storage settings.
 
 ### Changed
+- Cached includes and pages that contain SSI or ESI includes are now never compressed.
 - Renamed the `createGzipFiles` setting to `compressCachedValues`.
 - Removed the ability to create Brotli files and removed the `createBrotliFiles` setting.
 
