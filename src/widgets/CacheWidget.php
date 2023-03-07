@@ -7,7 +7,7 @@ namespace putyourlightson\blitz\widgets;
 
 use Craft;
 use craft\base\Widget;
-use craft\helpers\Html;
+use craft\web\twig\Extension;
 use putyourlightson\blitz\assets\BlitzAsset;
 use putyourlightson\blitz\Blitz;
 
@@ -55,12 +55,19 @@ class CacheWidget extends Widget
         $user = Craft::$app->getUser()->getIdentity();
         $iconPath = '@putyourlightson/blitz/resources/icons/';
 
+        /**
+         * TODO: replace usages of `Extension::svgFunction()` with `Html::svg()` (added in Craft 4.3.0) in Blitz 5.
+         * https://github.com/putyourlightson/craft-blitz/issues/480
+         * @var Extension $twigExtension
+         */
+        $twigExtension = Craft::$app->getView()->getTwig()->getExtension(Extension::class);
+
         if ($user->can('blitz:refresh-urls')) {
             $actions[] = [
                 'id' => 'refresh-urls',
                 'label' => Craft::t('blitz', 'Refresh Cached URLs'),
                 'instructions' => Craft::t('blitz', 'Refresh pages with specific URLs'),
-                'icon' => Html::svg($iconPath . 'target.svg'),
+                'icon' => $twigExtension->svgFunction($iconPath . 'target.svg'),
             ];
         }
 
@@ -77,7 +84,7 @@ class CacheWidget extends Widget
                 'label' => Craft::t('blitz', 'Refresh Site Cache'),
                 'instructions' => Craft::t('blitz', 'Refresh all pages in a site'),
                 'options' => $options,
-                'icon' => Html::svg($iconPath . 'archive.svg'),
+                'icon' => $twigExtension->svgFunction($iconPath . 'archive.svg'),
             ];
         }
 
@@ -86,7 +93,7 @@ class CacheWidget extends Widget
                 'id' => 'refresh',
                 'label' => Craft::t('blitz', 'Refresh Entire Cache'),
                 'instructions' => Craft::t('blitz', 'Refresh the entire cache'),
-                'icon' => Html::svg($iconPath . 'refresh.svg'),
+                'icon' => $twigExtension->svgFunction($iconPath . 'refresh.svg'),
             ];
         }
 
