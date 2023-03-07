@@ -1,8 +1,9 @@
 # Release Notes for Blitz
 
-## 4.4.1 - Unreleased
+## 4.4.1 - 2023-03-07
 ### Fixed
 - Fixed the `generatePageBasedOnQueryString` check and ensured that cached includes are always allowed.
+- Fixed usage of the `Html::svg()` method, which was only added in Craft 4.3.0 ([#480](https://github.com/putyourlightson/craft-blitz/issues/480)).
 
 ## 4.4.0 - 2023-03-01
 > {warning} Tracking of attributes and custom fields takes place when pages are cached, therefore it is important to clear or refresh the cache after this update completes.
