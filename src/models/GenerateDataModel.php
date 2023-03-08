@@ -16,8 +16,7 @@ use putyourlightson\blitz\helpers\FieldHelper;
  * @property-read int[][] $elementIndexedTrackFields
  * @property-read int[] $elementQueryIds
  * @property-read int[] $ssiIncludeIds
- * @property-read bool $hasSsiIncludes
- * @property bool $hasEsiIncludes
+ * @property bool $hasIncludes
  *
  * @since 4.4.0
  */
@@ -31,7 +30,7 @@ class GenerateDataModel extends BaseDataModel
      *          },
      *          elementQueryIds: array<int, bool>,
      *          ssiIncludeIds: array<int, bool>,
-     *          hasEsiIncludes: bool,
+     *          hasIncludes: bool,
      *      }
      */
     public array $data = [
@@ -41,7 +40,7 @@ class GenerateDataModel extends BaseDataModel
         ],
         'elementQueryIds' => [],
         'ssiIncludeIds' => [],
-        'hasEsiIncludes' => false,
+        'hasIncludes' => false,
     ];
 
     /**
@@ -85,14 +84,9 @@ class GenerateDataModel extends BaseDataModel
         return $this->getKeysAsValues(['ssiIncludeIds']);
     }
 
-    public function getHasSsiIncludes(): bool
+    public function getHasIncludes(): bool
     {
-        return !empty($this->getSsiIncludeIds());
-    }
-
-    public function getHasEsiIncludes(): bool
-    {
-        return $this->data['hasEsiIncludes'] ?? false;
+        return $this->data['hasIncludes'] ?? false;
     }
 
     public function addElementId(int $elementId): void
@@ -118,10 +112,11 @@ class GenerateDataModel extends BaseDataModel
     public function addSsiIncludes(int $ssiIncludeId): void
     {
         $this->data['ssiIncludeIds'][$ssiIncludeId] = true;
+        $this->setHasIncludes();
     }
 
-    public function setHasEsiIncludes(bool $value = true): void
+    public function setHasIncludes(bool $value = true): void
     {
-        $this->data['hasEsiIncludes'] = $value;
+        $this->data['hasIncludes'] = $value;
     }
 }

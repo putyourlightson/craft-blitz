@@ -481,10 +481,8 @@ class GenerateCacheService extends Component
 
         $duration = $this->options->getCacheDuration();
 
-        // Disallow encoding for cache includes and pages with SSI or ESI includes
-        $allowEncoding = !$isCachedInclude
-            && !$this->generateData->getHasSsiIncludes()
-            && !$this->generateData->getHasEsiIncludes();
+        // Disallow encoding for cache includes and pages with includes
+        $allowEncoding = !$isCachedInclude && !$this->generateData->getHasIncludes();
 
         $this->saveOutput($content, $siteUri, $duration, $allowEncoding);
 

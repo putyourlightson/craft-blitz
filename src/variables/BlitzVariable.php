@@ -234,7 +234,7 @@ class BlitzVariable
      */
     private function _getEsiTag(string $uri, array $params): Markup
     {
-        Blitz::$plugin->generateCache->generateData->setHasEsiIncludes();
+        Blitz::$plugin->generateCache->generateData->setHasIncludes();
         $uri = $this->_getUriWithParams($uri, $params);
 
         // Add surrogate control header
