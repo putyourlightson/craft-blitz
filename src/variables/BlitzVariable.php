@@ -116,7 +116,7 @@ class BlitzVariable
      */
     public function getUri(string $uri, array $params = []): Markup
     {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getUri()` has been deprecated. Use `craft.blitz.fetch()` instead.');
+        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getUri()` has been deprecated. Use `craft.blitz.fetchUri()` instead.');
 
         $params['no-cache'] = 1;
 
