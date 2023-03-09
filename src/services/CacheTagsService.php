@@ -7,9 +7,9 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use craft\helpers\StringHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheTagRecord;
-use putyourlightson\campaign\helpers\StringHelper;
 
 /**
  * @property-read string[] $allTags

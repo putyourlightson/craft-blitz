@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.4.2 - 2023-03-09
+### Fixed
+- Fixed a bug in which the wrong instance of `StringHelper` was being used ([#481](https://github.com/putyourlightson/craft-blitz/issues/481)).
+
 ## 4.4.1 - 2023-03-07
 ### Fixed
 - Fixed the `generatePageBasedOnQueryString` check and ensured that cached includes are always allowed.
