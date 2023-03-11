@@ -9,7 +9,7 @@
 ### Changed
 - Cached includes and pages that contain SSI or ESI includes are now never compressed.
 - Renamed the `createGzipFiles` setting to `compressCachedValues`.
-- Removed the ability to create Brotli files and removed the `createBrotliFiles` setting.
+- Removed the ability to create Brotli files and removed the setting.
 
 ### Deprecated
 - Deprecated the `createGzipFiles` setting.
