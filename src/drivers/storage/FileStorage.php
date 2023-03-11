@@ -151,6 +151,8 @@ class FileStorage extends BaseCacheStorage
         }
     }
 
+    public bool $compressCachedValues = false;
+
     /**
      * @inheritdoc
      */

@@ -11,6 +11,9 @@ use craft\helpers\UrlHelper;
 use craft\web\Application;
 use craft\web\Controller;
 use craft\web\twig\variables\Paginate;
+use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\SiteUriHelper;
+use Throwable;
 use yii\base\Event;
 use yii\web\Response;
 
@@ -94,6 +97,21 @@ class GeneratorController extends Controller
         $urlManager->setRouteParams([], false);
         $urlManager->setMatchedElement(null);
 
-        return $app->handleRequest($this->request, true);
+        try {
+            $response = $app->handleRequest($this->request, true);
+        } catch (Throwable) {
+            $response = null;
+        }
+
+        // If the response failed, delete the cached value
+        // https://github.com/putyourlightson/craft-blitz/issues/483
+        if ($response === null || !$response->getIsOk()) {
+            $siteUri = SiteUriHelper::getSiteUriFromRequest($this->request);
+            if ($siteUri !== null) {
+                Blitz::$plugin->cacheStorage->deleteUris([$siteUri]);
+            }
+        }
+
+        return $response;
     }
 }

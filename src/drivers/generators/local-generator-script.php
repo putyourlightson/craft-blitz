@@ -1,12 +1,10 @@
 <?php
-
-/** @noinspection PhpParamsInspection */
-
 /**
  * @copyright Copyright (c) PutYourLightsOn
  */
 
 use Amp\Parallel\Sync\Channel;
+use Amp\Parallel\Sync\ContextPanicError;
 use craft\services\Plugins;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
@@ -57,6 +55,7 @@ return function(Channel $channel): Generator {
     define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
 
     // Load Composer's autoloader
+    /** @noinspection PhpIncludeInspection */
     require_once CRAFT_VENDOR_PATH . '/autoload.php';
 
     // Load dotenv, depending on the available method and version.
@@ -70,11 +69,13 @@ return function(Channel $channel): Generator {
         }
         // Dotenv v3
         elseif (method_exists('Dotenv\Dotenv', 'create')) {
+            /** @noinspection PhpParamsInspection */
             /** @phpstan-ignore-next-line */
             Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();
         }
         // Dotenv v2
         else {
+            /** @noinspection PhpParamsInspection */
             /** @phpstan-ignore-next-line */
             (new Dotenv\Dotenv(CRAFT_BASE_PATH))->load();
         }
@@ -100,6 +101,11 @@ return function(Channel $channel): Generator {
 
     try {
         $success = $app->run() == 0;
+    } catch (ContextPanicError $error) {
+        Blitz::$plugin->log($error->getMessage());
+        Blitz::$plugin->log($error->getTraceAsString());
+        Blitz::$plugin->log($error->getOriginalTraceAsString());
+        $success = 1;
     } catch (Throwable $exception) {
         Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         $success = 1;

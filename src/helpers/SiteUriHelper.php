@@ -410,6 +410,24 @@ class SiteUriHelper
     }
 
     /**
+     * Returns site URI from a given request.
+     */
+    public static function getSiteUriFromRequest(Request $request): ?SiteUriModel
+    {
+        $params = $request->getQueryParams();
+
+        // Ensure the path param is removed from query params
+        $pathParam = Craft::$app->getConfig()->getGeneral()->pathParam;
+        if (isset($params[$pathParam])) {
+            unset($params[$pathParam]);
+        }
+
+        $url = UrlHelper::siteUrl($request->getPathInfo(), $params);
+
+        return self::getSiteUriFromUrl($url);
+    }
+
+    /**
      * Returns site URIs grouped by site.
      */
     public static function getSiteUrisGroupedBySite(array $siteUris): array

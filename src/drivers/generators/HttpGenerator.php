@@ -10,8 +10,8 @@ use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
 use Amp\Sync\LocalSemaphore;
 use Craft;
-use Exception;
 use putyourlightson\blitz\Blitz;
+use Throwable;
 use yii\log\Logger;
 
 use function Amp\Iterator\fromIterable;
@@ -97,7 +97,7 @@ class HttpGenerator extends BaseCacheGenerator
             wait($promise);
         }
         // Catch all possible exceptions to avoid interrupting progress.
-        catch (Exception $exception) {
+        catch (Throwable $exception) {
             Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
         }
     }

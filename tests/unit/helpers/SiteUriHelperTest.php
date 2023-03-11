@@ -97,6 +97,7 @@ class SiteUriHelperTest extends Unit
             'uri' => 'abc?x=3',
         ]);
 
+        CacheRecord::deleteAll();
         $record = new CacheRecord($siteUri->toArray());
         $record->save();
 
