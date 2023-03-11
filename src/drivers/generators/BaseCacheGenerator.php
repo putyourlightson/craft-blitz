@@ -16,6 +16,7 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\variables\BlitzVariable;
+use Throwable;
 
 /**
  * @property-read array $siteOptions
@@ -213,7 +214,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     /**
      * Returns all messages for an exception, for easier debugging.
      */
-    protected function getAllExceptionMessages(Exception $exception): string
+    protected function getAllExceptionMessages(Throwable $exception): string
     {
         $messages = [
             $exception->getMessage(),
