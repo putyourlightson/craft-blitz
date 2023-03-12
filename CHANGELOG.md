@@ -17,7 +17,7 @@
 
 ## 4.4.3 - Unreleased
 ### Fixed
-- Fixed a bug in which cached pages were not being deleted when elements were disabled with the “Expire the cache and regenerate in a queue job” refresh mode selected ([#483](https://github.com/putyourlightson/craft-blitz/issues/483)).
+- Fixed a bug in which cached pages were not being deleted for disabled elements or error pages with the “Expire the cache and regenerate in a queue job” refresh mode selected ([#483](https://github.com/putyourlightson/craft-blitz/issues/483)).
 
 ## 4.4.2 - 2023-03-09
 ### Fixed
