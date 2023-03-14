@@ -1,6 +1,5 @@
 # Release Notes for Blitz
 
-<<<<<<< HEAD
 ## 4.5.0 - Unreleased
 ### Added
 - Added the ability to send compressed responses to browsers that accept supported encodings.
