@@ -63,7 +63,7 @@ class GeneratorController extends Controller
      *
      * @see PreviewController::actionPreview()
      */
-    private function _generateResponse(): Response
+    private function _generateResponse(): Response|false
     {
         // Remove the token query param.
         $tokenParam = Craft::$app->config->general->tokenParam;
@@ -110,6 +110,8 @@ class GeneratorController extends Controller
             if ($siteUri !== null) {
                 Blitz::$plugin->cacheStorage->deleteUris([$siteUri]);
             }
+
+            return false;
         }
 
         return $response;
