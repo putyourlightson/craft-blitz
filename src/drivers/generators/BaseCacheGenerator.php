@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\drivers\generators;
 use Amp\MultiReasonException;
 use Craft;
 use craft\base\SavableComponent;
-use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
