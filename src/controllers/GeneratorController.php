@@ -41,7 +41,7 @@ class GeneratorController extends Controller
     /**
      * Generates and returns a response with the output suppressed.
      */
-    public function actionGenerate(): Response
+    public function actionGenerate(): ?Response
     {
         $response = $this->_generateResponse();
 
@@ -63,7 +63,7 @@ class GeneratorController extends Controller
      *
      * @see PreviewController::actionPreview()
      */
-    private function _generateResponse(): Response
+    private function _generateResponse(): ?Response
     {
         // Remove the token query param.
         $tokenParam = Craft::$app->config->general->tokenParam;
