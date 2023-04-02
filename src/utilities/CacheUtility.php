@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\utilities;
 
 use Craft;
 use craft\base\Utility;
+use putyourlightson\blitz\assets\BlitzAsset;
 use putyourlightson\blitz\Blitz;
 
 class CacheUtility extends Utility
@@ -49,6 +50,8 @@ class CacheUtility extends Utility
      */
     public static function contentHtml(): string
     {
+        Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
+
         return Craft::$app->getView()->renderTemplate('blitz/_utility', [
             'driverHtml' => Blitz::$plugin->cacheStorage->getUtilityHtml(),
             'actions' => self::getActions(),

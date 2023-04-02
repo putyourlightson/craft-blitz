@@ -202,6 +202,10 @@ class FileStorage extends BaseCacheStorage
      */
     public function getUtilityHtml(): string
     {
+        if ($this->countCachedFiles === false) {
+            return '';
+        }
+
         $sites = [];
 
         $allSites = Craft::$app->getSites()->getAllSites();
@@ -336,7 +340,7 @@ class FileStorage extends BaseCacheStorage
     public function getCachedFileCount(string $path)
     {
         if (!$this->countCachedFiles) {
-            return '-';
+            return 0;
         }
 
         return is_dir($path) ? count(FileHelper::findFiles($path, ['only' => ['index.html']])) : 0;
