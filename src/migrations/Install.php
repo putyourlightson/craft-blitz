@@ -52,6 +52,7 @@ class Install extends Migration
     {
         $this->dropTableIfExists(DriverDataRecord::tableName());
         $this->dropTableIfExists(ElementQueryFieldRecord::tableName());
+        $this->dropTableIfExists(ElementQueryAttributeRecord::tableName());
         $this->dropTableIfExists(ElementQuerySourceRecord::tableName());
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
         $this->dropTableIfExists(ElementQueryRecord::tableName());

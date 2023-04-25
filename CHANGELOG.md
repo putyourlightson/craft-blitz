@@ -15,6 +15,10 @@
 - Deprecated the `createGzipFiles` setting.
 - Deprecated the `createBrotliFiles` setting.
 
+## 4.4.4 - 2023-03-27
+### Fixed
+- Fixed a bug in which uninstalling the plugin could throw an error ([#490](https://github.com/putyourlightson/craft-blitz/issues/490)).
+
 ## 4.4.3 - 2023-03-14
 ### Fixed
 - Fixed a bug in which cached pages were not being deleted for disabled elements or error pages with the “Expire the cache and regenerate in a queue job” refresh mode selected ([#483](https://github.com/putyourlightson/craft-blitz/issues/483)).

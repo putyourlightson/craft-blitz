@@ -138,6 +138,10 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableResponse(Response $response): bool
     {
+        if ($response->content === null) {
+            return false;
+        }
+
         if ($this->getIsCachedInclude()) {
             return true;
         }
