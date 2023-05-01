@@ -10,6 +10,7 @@
 - Cached includes and pages that contain SSI or ESI includes are now never compressed.
 - Renamed the `createGzipFiles` setting to `compressCachedValues`.
 - Removed the ability to create Brotli files and removed the setting.
+- Improved the performance of cache refresh jobs by optimising database queries ([#496](https://github.com/putyourlightson/craft-blitz/issues/496)). 
 
 ### Deprecated
 - Deprecated the `createGzipFiles` setting.

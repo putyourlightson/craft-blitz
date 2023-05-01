@@ -34,22 +34,29 @@ class RefreshCacheHelper
      */
     public static function getElementCacheIds(string $elementType, RefreshDataModel $refreshData): array
     {
-        $condition = ['or'];
+        $elementIds = $refreshData->getElementIds($elementType);
+        $condition = [ElementCacheRecord::tableName() . '.elementId' => $elementIds];
 
-        foreach ($refreshData->getElementIds($elementType) as $elementId) {
-            $elementCondition = [
-                'and',
-                [ElementCacheRecord::tableName() . '.elementId' => $elementId],
-            ];
+        // Handle changed by fields only if necessary, to keep queries shorter.
+        // https://github.com/putyourlightson/craft-blitz/issues/496
+        if ($refreshData->getCombinedIsChangedByFields($elementType)) {
+            $condition = ['or'];
 
-            $isChangedByFields = $refreshData->getIsChangedByFields($elementType, $elementId);
+            foreach ($elementIds as $elementId) {
+                $elementCondition = [
+                    'and',
+                    [ElementCacheRecord::tableName() . '.elementId' => $elementId],
+                ];
 
-            if ($isChangedByFields) {
-                $changedFields = $refreshData->getChangedFields($elementType, $elementId);
-                $elementCondition[] = ['fieldId' => $changedFields];
+                $isChangedByFields = $refreshData->getIsChangedByFields($elementType, $elementId);
+
+                if ($isChangedByFields) {
+                    $changedFields = $refreshData->getChangedFields($elementType, $elementId);
+                    $elementCondition[] = ['fieldId' => $changedFields];
+                }
+
+                $condition[] = $elementCondition;
             }
-
-            $condition[] = $elementCondition;
         }
 
         return ElementCacheRecord::find()
