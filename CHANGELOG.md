@@ -11,6 +11,7 @@
 - Renamed the `createGzipFiles` setting to `compressCachedValues`.
 - Removed the ability to create Brotli files and removed the setting.
 - Improved the performance of cache refresh jobs by optimising database queries ([#496](https://github.com/putyourlightson/craft-blitz/issues/496)). 
+- Changed the URL that checks whether SSI is enabled on the web server to a relative URL.
 
 ### Deprecated
 - Deprecated the `createGzipFiles` setting.

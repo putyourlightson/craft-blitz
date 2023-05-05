@@ -97,7 +97,9 @@ class SettingsController extends Controller
         $deployerDrivers = DeployerHelper::getAllDrivers();
 
         // SSI URLs only work with an `action` parameter.
-        $detectSsiActionUrl = UrlHelper::siteUrl('', ['action' => 'blitz/settings/detect-ssi']);
+        $detectSsiActionUrl = UrlHelper::rootRelativeUrl(
+            UrlHelper::siteUrl('', ['action' => 'blitz/settings/detect-ssi'])
+        );
 
         return $this->renderTemplate('blitz/_settings', [
             'settings' => $settings,
