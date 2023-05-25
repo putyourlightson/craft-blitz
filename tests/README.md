@@ -18,7 +18,6 @@ To run the Easy Coding Standard on the plugin, install [ECS for Craft CMS](https
 
 ## Unit Tests
 
-
 To unit test the plugin, install Codeception, update `.env` and add the following autoload namespace to the project’s main `composer.json` file.
 
 ```
