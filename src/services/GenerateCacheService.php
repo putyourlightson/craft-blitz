@@ -12,7 +12,7 @@ use craft\behaviors\CustomFieldBehavior;
 use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
-use craft\events\PopulateElementEvent;
+use craft\events\PopulateElementsEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
@@ -109,11 +109,13 @@ class GenerateCacheService extends Component
      */
     public function registerElementPrepareEvents(): void
     {
-        // Register element populate event
-        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event) {
+        // Register populate elements event
+        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENTS,
+            function(PopulateElementsEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
-                    $this->addElement($event->element);
+                    foreach ($event->elements as $element) {
+                        $this->addElement($element);
+                    }
                 }
             }
         );
@@ -152,6 +154,14 @@ class GenerateCacheService extends Component
         }
 
         $this->generateData->addElement($element);
+
+        // Add eager-loaded fields since they will be accessed directly on the element
+        $fieldHandles = array_keys(CustomFieldBehavior::$fieldHandles);
+        foreach ($fieldHandles as $handle) {
+            if ($element->hasEagerLoadedElements($handle)) {
+                Blitz::$plugin->generateCache->generateData->addElementTrackField($element, $handle);
+            }
+        }
 
         // Replace the custom field behavior with our own
         /** @var CustomFieldBehavior $customFields */

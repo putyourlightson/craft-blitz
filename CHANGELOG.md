@@ -17,6 +17,12 @@
 - Deprecated the `createGzipFiles` setting.
 - Deprecated the `createBrotliFiles` setting.
 
+## 4.4.5 - 2023-05-25
+> {warning} To ensure the fix is applied, the cache should be cleared or refreshed after this update completes.
+
+### Fixed
+- Fixed a bug in which eager-loaded custom fields were not being tracked on cached pages ([#507](https://github.com/putyourlightson/craft-blitz/issues/507)).
+
 ## 4.4.4 - 2023-03-27
 ### Fixed
 - Fixed a bug in which uninstalling the plugin could throw an error ([#490](https://github.com/putyourlightson/craft-blitz/issues/490)).
