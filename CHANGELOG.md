@@ -4,7 +4,7 @@
 ### Added
 - Added the ability to send compressed responses to browsers that accept supported encodings.
 - Added the ability to save compressed cached values in the Yii Cache Storage to help reduce the memory required.
-- Added tips that display whether `gzip` is enabled on the web server in the Blitz File Storage settings.
+- Added tips that display whether `gzip` is enabled on the web server in the Cache Storage settings.
 
 ### Changed
 - Cached includes and pages that contain SSI or ESI includes are now never compressed.
