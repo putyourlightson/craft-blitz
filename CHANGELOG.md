@@ -13,6 +13,9 @@
 - Improved the performance of cache refresh jobs by optimising database queries ([#496](https://github.com/putyourlightson/craft-blitz/issues/496)). 
 - Changed the URL that checks whether SSI is enabled on the web server to a relative URL.
 
+### Fixed
+- Fixed a bug in which a validation error could occur when an invalid email address was entered in the Cloudflare API Key Email field even when the authentication method was set to API Token.
+
 ### Deprecated
 - Deprecated the `createGzipFiles` setting.
 - Deprecated the `createBrotliFiles` setting.
