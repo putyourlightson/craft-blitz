@@ -404,8 +404,12 @@ class CacheRequestService extends Component
      *
      * @since 3.12.0
      */
-    public function saveAndPrepareResponse(Response $response, SiteUriModel $siteUri): void
+    public function saveAndPrepareResponse(?Response $response, SiteUriModel $siteUri): void
     {
+        if ($response === null) {
+            return;
+        }
+
         if (!$response->getIsOk()) {
             return;
         }
