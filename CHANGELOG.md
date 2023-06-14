@@ -11,7 +11,7 @@
 - Renamed the `createGzipFiles` setting to `compressCachedValues`.
 - Removed the ability to create Brotli files and removed the setting.
 - Improved the performance of cache refresh jobs by optimising database queries ([#496](https://github.com/putyourlightson/craft-blitz/issues/496)).
-- The cache refresh process is now triggered when asset filenames are changed ([#514](https://github.com/putyourlightson/craft-blitz/issues/514)).
+- The cache refresh process is now triggered when an asset’s file is replaced or its filename is changed ([#514](https://github.com/putyourlightson/craft-blitz/issues/514)).
 - Hardened checks against null responses to avoid errors.
 - Changed the URL that checks whether SSI is enabled on the web server to a relative URL.
 

@@ -156,6 +156,10 @@ class ElementChangedBehavior extends Behavior
             return false;
         }
 
+        if ($element->scenario == Asset::SCENARIO_REPLACE) {
+            return true;
+        }
+
         if ($element->filename != $this->originalElement->filename) {
             return true;
         }

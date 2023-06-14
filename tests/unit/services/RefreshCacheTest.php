@@ -158,6 +158,20 @@ class RefreshCacheTest extends Unit
         $this->_assertTrackedElement($this->entry, ['title'], ['text']);
     }
 
+    public function testAddElementWhenFileReplaced()
+    {
+        $this->asset->scenario = Asset::SCENARIO_REPLACE;
+        Blitz::$plugin->refreshCache->addElement($this->asset);
+
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->asset);
+
+        $this->assertEquals(
+            [$this->asset->id],
+            Blitz::$plugin->refreshCache->refreshData->getAssetsChangedByFile(),
+        );
+    }
+
     public function testAddElementWhenFilenameChanged()
     {
         $this->asset->filename = 'new-name.jpg';
