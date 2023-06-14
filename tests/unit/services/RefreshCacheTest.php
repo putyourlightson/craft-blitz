@@ -69,7 +69,7 @@ class RefreshCacheTest extends Unit
         ];
     }
 
-    protected function _before()
+    protected function _before(): void
     {
         parent::_before();
 
@@ -158,6 +158,20 @@ class RefreshCacheTest extends Unit
         $this->_assertTrackedElement($this->entry, ['title'], ['text']);
     }
 
+    public function testAddElementWhenFilenameChanged()
+    {
+        $this->asset->filename = 'new-name.jpg';
+        Blitz::$plugin->refreshCache->addElement($this->asset);
+
+        // Assert that the tracked element is correct
+        $this->_assertTrackedElement($this->asset);
+
+        $this->assertEquals(
+            [$this->asset->id],
+            Blitz::$plugin->refreshCache->refreshData->getAssetsChangedByFile(),
+        );
+    }
+
     public function testAddElementWhenFocalPointChanged()
     {
         $this->asset->setFocalPoint([
@@ -171,7 +185,7 @@ class RefreshCacheTest extends Unit
 
         $this->assertEquals(
             [$this->asset->id],
-            Blitz::$plugin->refreshCache->refreshData->getAssetsChangedByImage(),
+            Blitz::$plugin->refreshCache->refreshData->getAssetsChangedByFile(),
         );
     }
 
@@ -330,7 +344,7 @@ class RefreshCacheTest extends Unit
         $this->assertEquals('', Blitz::$plugin->cacheStorage->get($this->siteUri));
     }
 
-    private function _assertTrackedElement(Element|ElementChangedBehavior $element, array $changedAttributes = [], array $changedFields = [])
+    private function _assertTrackedElement(Element|ElementChangedBehavior $element, array $changedAttributes = [], array $changedFields = []): void
     {
         $refreshData = Blitz::$plugin->refreshCache->refreshData;
 

@@ -94,7 +94,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         if (Blitz::$plugin->settings->purgeAssetImages()) {
             // Purge assets whose image has changed
-            $assetIds = $refreshData->getAssetsChangedByImage();
+            $assetIds = $refreshData->getAssetsChangedByFile();
             $purgeSiteUris = SiteUriHelper::getAssetSiteUris($assetIds);
         }
 

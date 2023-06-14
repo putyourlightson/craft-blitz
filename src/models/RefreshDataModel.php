@@ -33,7 +33,7 @@ class RefreshDataModel extends BaseDataModel
      *              changedFields: array<int, array<int, bool>>,
      *              isChangedByAttributes: array<int, bool>,
      *              isChangedByFields: array<int, bool>,
-     *              isChangedByAssetImage: array<int, bool>,
+     *              isChangedByAssetFile: array<int, bool>,
      *          }>,
      *      }
      */
@@ -146,9 +146,9 @@ class RefreshDataModel extends BaseDataModel
     /**
      * @return int[]
      */
-    public function getAssetsChangedByImage(): array
+    public function getAssetsChangedByFile(): array
     {
-        return $this->getKeysAsValues(['elements', Asset::class, 'isChangedByAssetImage']);
+        return $this->getKeysAsValues(['elements', Asset::class, 'isChangedByAssetFile']);
     }
 
     public function addCacheId(int $cacheId): void
@@ -194,7 +194,7 @@ class RefreshDataModel extends BaseDataModel
             $this->addChangedFields($element, $elementChanged->changedFields);
             $this->addIsChangedByAttributes($element, $elementChanged->isChangedByAttributes);
             $this->addIsChangedByFields($element, $elementChanged->isChangedByFields);
-            $this->addIsChangedByAssetImage($element, $elementChanged->isChangedByAssetImage);
+            $this->addIsChangedByAssetFile($element, $elementChanged->isChangedByAssetFile);
         }
     }
 
@@ -243,10 +243,10 @@ class RefreshDataModel extends BaseDataModel
         $this->data['elements'][$element::class]['isChangedByFields'][$element->id] = $previousValue && $isChangedByFields;
     }
 
-    public function addIsChangedByAssetImage(ElementInterface $element, bool $isChangedByAssetImage): void
+    public function addIsChangedByAssetFile(ElementInterface $element, bool $isChangedByAssetFile): void
     {
-        if ($isChangedByAssetImage === true) {
-            $this->data['elements'][$element::class]['isChangedByAssetImage'][$element->id] = true;
+        if ($isChangedByAssetFile === true) {
+            $this->data['elements'][$element::class]['isChangedByAssetFile'][$element->id] = true;
         }
     }
 

@@ -57,9 +57,9 @@ class ElementChangedBehavior extends Behavior
     public bool $isChangedByFields = false;
 
     /**
-     * @var bool Whether the element is an asset and its image has changed.
+     * @var bool Whether the element is an asset and its file has changed.
      */
-    public bool $isChangedByAssetImage = false;
+    public bool $isChangedByAssetFile = false;
 
     /**
      * @inerhitdoc
@@ -100,8 +100,8 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        if ($this->getHasAssetImageChanged()) {
-            $this->isChangedByAssetImage = true;
+        if ($this->getHasAssetFileChanged()) {
+            $this->isChangedByAssetFile = true;
 
             return true;
         }
@@ -146,38 +146,47 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns whether the element is an asset and its image has changed.
+     * Returns whether the element is an asset and its file has changed.
      */
-    public function getHasAssetImageChanged(): bool
+    public function getHasAssetFileChanged(): bool
     {
         $element = $this->owner;
 
-        if (!($element instanceof Asset)
-            || !($this->originalElement instanceof Asset)
-            || $element->kind !== Asset::KIND_IMAGE
-        ) {
+        if (!($element instanceof Asset) || !($this->originalElement instanceof Asset)) {
             return false;
         }
 
-        if ($element->getDimensions() != $this->originalElement->getDimensions()) {
+        if ($element->filename != $this->originalElement->filename) {
             return true;
         }
 
-        // Comparing floats is problematic, so we convert to a fixed precision first.
-        // https://www.php.net/manual/en/language.types.float.php
-        $precision = 5;
-        $originalFocalPoint = $this->originalElement->getFocalPoint();
-        $originalFocalPoint = [
-            number_format($originalFocalPoint['x'], $precision),
-            number_format($originalFocalPoint['y'], $precision),
-        ];
-        $focalPoint = $element->getFocalPoint();
-        $focalPoint = [
-            number_format($focalPoint['x'], $precision),
-            number_format($focalPoint['y'], $precision),
-        ];
+        if ($element->kind === Asset::KIND_IMAGE) {
+            if ($element->getDimensions() != $this->originalElement->getDimensions()) {
+                return true;
+            }
 
-        return $focalPoint != $originalFocalPoint;
+            if ($element->getDimensions() != $this->originalElement->getDimensions()) {
+                return true;
+            }
+
+            // Comparing floats is problematic, so we convert to a fixed precision first.
+            // https://www.php.net/manual/en/language.types.float.php
+            $precision = 5;
+            $originalFocalPoint = $this->originalElement->getFocalPoint();
+            $originalFocalPoint = [
+                number_format($originalFocalPoint['x'], $precision),
+                number_format($originalFocalPoint['y'], $precision),
+            ];
+            $focalPoint = $element->getFocalPoint();
+            $focalPoint = [
+                number_format($focalPoint['x'], $precision),
+                number_format($focalPoint['y'], $precision),
+            ];
+
+            return $focalPoint != $originalFocalPoint;
+        }
+
+        return false;
     }
 
     /**
