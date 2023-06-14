@@ -29,7 +29,6 @@ class BlitzVariable
      */
     public const DYNAMIC_INCLUDE_ACTION = 'blitz/include/dynamic';
 
-
     /**
      * @var int
      */
@@ -245,6 +244,9 @@ class BlitzVariable
 
     private function _getUriWithParams(string $uri, array $params): string
     {
+        // Get the URL path only
+        $uri = parse_url(UrlHelper::siteUrl($uri), PHP_URL_PATH);
+
         return $uri . '?' . http_build_query($params);
     }
 
