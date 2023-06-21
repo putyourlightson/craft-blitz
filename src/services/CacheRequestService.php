@@ -406,15 +406,15 @@ class CacheRequestService extends Component
      */
     public function saveAndPrepareResponse(?Response $response, SiteUriModel $siteUri): void
     {
-        if ($response === null) {
+        if ($response === null || $response->content === null) {
             return;
         }
 
-        if (!$response->getIsOk()) {
+        if ($response->getIsOk() === false) {
             return;
         }
 
-        if (!$this->getIsCacheableResponse($response)) {
+        if ($this->getIsCacheableResponse($response) === false) {
             return;
         }
 
