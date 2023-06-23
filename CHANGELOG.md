@@ -19,6 +19,7 @@
 
 ### Fixed
 - Fixed a bug in which a validation error could occur when an invalid email address was entered in the Cloudflare API Key Email field even when the authentication method was set to API Token.
+- Fixed a bug in which refreshing the cache could fail when using the Redis queue driver ([#522](https://github.com/putyourlightson/craft-blitz/issues/522)).
 
 ### Deprecated
 - Deprecated the `createGzipFiles` setting.
