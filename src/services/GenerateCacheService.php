@@ -12,7 +12,7 @@ use craft\behaviors\CustomFieldBehavior;
 use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
-use craft\events\PopulateElementsEvent;
+use craft\events\PopulateElementEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
@@ -109,13 +109,13 @@ class GenerateCacheService extends Component
      */
     public function registerElementPrepareEvents(): void
     {
-        // Register populate elements event
-        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENTS,
-            function(PopulateElementsEvent $event) {
+        // Register element populate event (this event must be used over `EVENT_AFTER_POPULATE_ELEMENTS`
+        // to ensure that eager-loaded elements are included).
+        // https://github.com/putyourlightson/craft-blitz/issues/514
+        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
+            function(PopulateElementEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
-                    foreach ($event->elements as $element) {
-                        $this->addElement($element);
-                    }
+                    $this->addElement($event->element);
                 }
             }
         );
