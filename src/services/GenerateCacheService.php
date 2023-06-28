@@ -13,6 +13,7 @@ use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
 use craft\events\PopulateElementEvent;
+use craft\events\PopulateElementsEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element;
@@ -36,6 +37,7 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
+use yii\base\Behavior;
 use yii\base\Event;
 use yii\db\Exception;
 use yii\log\Logger;
@@ -109,9 +111,9 @@ class GenerateCacheService extends Component
      */
     public function registerElementPrepareEvents(): void
     {
-        // Register element populate event (this event must be used over `EVENT_AFTER_POPULATE_ELEMENTS`
-        // to ensure that eager-loaded elements are included).
-        // https://github.com/putyourlightson/craft-blitz/issues/514
+        // Both the `EVENT_AFTER_POPULATE_ELEMENT` and `EVENT_AFTER_POPULATE_ELEMENTS` events
+        // must be used to ensure that eager-loaded elements and eager-loaded fields are included
+        // respectively (https://github.com/putyourlightson/craft-blitz/issues/514).
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
             function(PopulateElementEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
@@ -119,8 +121,16 @@ class GenerateCacheService extends Component
                 }
             }
         );
+        Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENTS,
+            function(PopulateElementsEvent $event) {
+                if (Craft::$app->getResponse()->getIsOk()) {
+                    foreach ($event->elements as $element) {
+                        $this->addElement($element);
+                    }
+                }
+            }
+        );
 
-        // Register element query prepare event
         Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
             function(CancelableEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
@@ -163,11 +173,12 @@ class GenerateCacheService extends Component
         }
 
         // Replace the custom field behavior with our own
-        /** @var CustomFieldBehavior $customFields */
         $customFields = $element->getBehavior('customFields');
-        $element->attachBehavior('customFields',
-            BlitzCustomFieldBehavior::create($customFields)
-        );
+        if ($customFields instanceof CustomFieldBehavior) {
+            $element->attachBehavior('customFields',
+                BlitzCustomFieldBehavior::create($customFields)
+            );
+        }
     }
 
     /**
