@@ -1,6 +1,8 @@
 # Release Notes for Blitz
 
 ## 4.5.0 - Unreleased
+> {warning} The cache must be cleared or refreshed after this update completes.
+
 ### Added
 - Added the ability to send compressed responses to browsers that accept supported encodings.
 - Added the ability to save compressed cached values in the Yii Cache Storage to help reduce the memory required.
