@@ -18,6 +18,7 @@
 - Removed the ability to create Brotli files and removed the setting (use gzip instead).
 
 ### Fixed
+- Fixed a bug in which eager-loading of auto-injected elements was not being tracked on cached pages.
 - Fixed a bug in which a validation error could occur when an invalid email address was entered in the Cloudflare API Key Email field even when the authentication method was set to API Token.
 - Fixed a bug in which refreshing the cache could fail when using the Redis queue driver ([#522](https://github.com/putyourlightson/craft-blitz/issues/522)).
 

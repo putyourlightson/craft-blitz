@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\behaviors\CustomFieldBehavior;
 use craft\db\ActiveRecord;
@@ -14,9 +15,11 @@ use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\PopulateElementsEvent;
+use craft\events\TemplateEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
-use craft\records\Element;
+use craft\records\Element as ElementRecord;
+use craft\web\View;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
@@ -37,7 +40,6 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
-use yii\base\Behavior;
 use yii\base\Event;
 use yii\db\Exception;
 use yii\log\Logger;
@@ -111,9 +113,12 @@ class GenerateCacheService extends Component
      */
     public function registerElementPrepareEvents(): void
     {
-        // Both the `EVENT_AFTER_POPULATE_ELEMENT` and `EVENT_AFTER_POPULATE_ELEMENTS` events
-        // must be used to ensure that eager-loaded elements and eager-loaded fields are included
-        // respectively (https://github.com/putyourlightson/craft-blitz/issues/514).
+        /**
+         * Both the `EVENT_AFTER_POPULATE_ELEMENT` and `EVENT_AFTER_POPULATE_ELEMENTS` events
+         * must be used to ensure that eager-loaded elements and eager-loaded fields are tracked
+         * respectively.
+         * @link https://github.com/putyourlightson/craft-blitz/issues/514
+         */
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
             function(PopulateElementEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
@@ -126,6 +131,23 @@ class GenerateCacheService extends Component
                 if (Craft::$app->getResponse()->getIsOk()) {
                     foreach ($event->elements as $element) {
                         $this->addElement($element);
+                    }
+                }
+            }
+        );
+
+        /**
+         * Catch elements injected into rendered templates as variables, so we can also track
+         * fields eager-loaded via `eagerLoadElements()`.
+         * @see Elements::eagerLoadElements()
+         */
+        Event::on(View::class, View::EVENT_AFTER_RENDER_TEMPLATE,
+            function(TemplateEvent $event) {
+                if (Craft::$app->getResponse()->getIsOk()) {
+                    foreach ($event->variables as $variable) {
+                        if ($variable instanceof Element) {
+                            $this->addElement($variable);
+                        }
                     }
                 }
             }
@@ -169,11 +191,11 @@ class GenerateCacheService extends Component
         $fieldHandles = array_keys(CustomFieldBehavior::$fieldHandles);
         foreach ($fieldHandles as $handle) {
             if ($element->hasEagerLoadedElements($handle)) {
-                Blitz::$plugin->generateCache->generateData->addElementTrackField($element, $handle);
+                $this->generateData->addElementTrackField($element, $handle);
             }
         }
 
-        // Replace the custom field behavior with our own
+        // Replace the custom field behavior with our own (at most once)
         $customFields = $element->getBehavior('customFields');
         if ($customFields instanceof CustomFieldBehavior) {
             $element->attachBehavior('customFields',
@@ -553,7 +575,7 @@ class GenerateCacheService extends Component
         $this->_batchInsertCaches(
             $cacheId,
             $elementIds,
-            Element::tableName(),
+            ElementRecord::tableName(),
             ElementCacheRecord::tableName(),
             'elementId',
         );
@@ -562,7 +584,7 @@ class GenerateCacheService extends Component
             $this->_batchInsertCaches(
                 $cacheId,
                 $elementIds,
-                Element::tableName(),
+                ElementRecord::tableName(),
                 ElementFieldCacheRecord::tableName(),
                 'elementId',
                 $elementIndexedTrackFields,

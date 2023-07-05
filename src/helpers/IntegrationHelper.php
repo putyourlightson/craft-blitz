@@ -43,7 +43,6 @@ class IntegrationHelper
     public static function getActiveIntegrations(): array
     {
         $integrations = [];
-        $pluginsService = Craft::$app->getPlugins();
 
         /** @var IntegrationInterface $integration */
         foreach (self::getAllIntegrations() as $integration) {
@@ -58,7 +57,7 @@ class IntegrationHelper
                     $handle = $handle['handle'] ?? '';
                 }
 
-                $plugin = $pluginsService->getPlugin($handle);
+                $plugin = Craft::$app->getPlugins()->getPlugin($handle);
 
                 if ($plugin === null) {
                     $enabled = false;

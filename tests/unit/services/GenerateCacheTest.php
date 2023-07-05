@@ -47,6 +47,11 @@ class GenerateCacheTest extends Unit
     private SiteUriModel $siteUri;
 
     /**
+     * @var Entry
+     */
+    private Entry $entry;
+
+    /**
      * @var string
      */
     private string $output = 'xyz';
@@ -63,7 +68,7 @@ class GenerateCacheTest extends Unit
         ];
     }
 
-    protected function _before()
+    protected function _before(): void
     {
         parent::_before();
 
@@ -75,6 +80,12 @@ class GenerateCacheTest extends Unit
             'siteId' => 1,
             'uri' => 'page',
         ]);
+
+        $entries = Entry::find()->limit(2)->all();
+        $this->entry = $entries[0];
+        $this->entry->relatedEntries = [$entries[1]->id];
+        Craft::$app->elements->saveElement($this->entry);
+        Blitz::$plugin->generateCache->reset();
     }
 
     public function testSaveCache()
@@ -163,16 +174,25 @@ class GenerateCacheTest extends Unit
             ->count();
 
         $this->assertEquals(1, $count);
+
+        $count = ElementFieldCacheRecord::find()
+            ->where(['elementId' => $element->id])
+            ->count();
+
+        $this->assertEquals(0, $count);
     }
 
     public function testSaveElementCacheRecordWithCustomFields()
     {
         $element = Entry::find()->one();
         Blitz::$plugin->generateCache->addElement($element);
+
+        // Access the fields to register usage
         /** @noinspection PhpUnusedLocalVariableInspection */
         $text = $element->text;
         /** @noinspection PhpUnusedLocalVariableInspection */
         $moreText = $element->moreText;
+
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $count = ElementCacheRecord::find()
@@ -190,10 +210,8 @@ class GenerateCacheTest extends Unit
 
     public function testSaveElementCacheRecordWithEagerLoadedCustomFields()
     {
-        $element = Entry::find()->with('text')->one();
+        $element = Entry::find()->with(['relatedEntries'])->one();
         Blitz::$plugin->generateCache->addElement($element);
-        /** @noinspection PhpUnusedLocalVariableInspection */
-        $text = $element->text;
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
 
         $count = ElementCacheRecord::find()
@@ -204,6 +222,25 @@ class GenerateCacheTest extends Unit
 
         $count = ElementFieldCacheRecord::find()
             ->where(['elementId' => $element->id])
+            ->count();
+
+        $this->assertEquals(1, $count);
+    }
+
+    public function testSaveElementCacheRecordWithEagerLoadedCustomFieldsInVariable()
+    {
+        Craft::$app->elements->eagerLoadElements(Entry::class, [$this->entry], ['relatedEntries']);
+        Blitz::$plugin->generateCache->addElement($this->entry);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
+
+        $count = ElementCacheRecord::find()
+            ->where(['elementId' => $this->entry->id])
+            ->count();
+
+        $this->assertEquals(1, $count);
+
+        $count = ElementFieldCacheRecord::find()
+            ->where(['elementId' => $this->entry->id])
             ->count();
 
         $this->assertEquals(1, $count);
