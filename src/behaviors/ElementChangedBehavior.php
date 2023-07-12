@@ -22,6 +22,7 @@ use yii\base\Behavior;
  * @property-read bool $hasBeenDeleted
  * @property-read bool $hasStatusChanged
  * @property-read bool $hasRefreshableStatus
+ * @property-read bool $hasAssetFileChanged
  * @property-read bool $hasAssetImageChanged
  */
 class ElementChangedBehavior extends Behavior
