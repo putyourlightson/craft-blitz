@@ -214,7 +214,7 @@ class CacheRequestService extends Component
 
     /**
      * Returns whether this is a cached include.
-     * Doesn't memoize the result, which would disrupt the local cache generator.
+     * Doesn’t memoize the result, which would disrupt the local cache generator.
      *
      * @since 4.3.0
      */
