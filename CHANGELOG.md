@@ -1,6 +1,9 @@
 # Release Notes for Blitz
 
 ## 4.4.7 - Unreleased
+### Changed
+- Hardened checks against null responses to help avoid errors ([#531](https://github.com/putyourlightson/craft-blitz/issues/504)).
+
 ### Fixed
 - Fixed a race condition that could result in an SQL error if the database used read/write splitting ([#531](https://github.com/putyourlightson/craft-blitz/issues/531)).
 

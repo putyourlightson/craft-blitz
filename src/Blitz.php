@@ -302,7 +302,7 @@ class Blitz extends Plugin
                 // Register after prepare response event
                 Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
                     function(Event $event) use ($siteUri) {
-                        /** @var Response $response */
+                        /** @var Response|null $response */
                         $response = $event->sender;
                         $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
                     }
