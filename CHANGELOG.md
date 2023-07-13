@@ -5,6 +5,7 @@
 - Hardened checks against null responses to help avoid errors ([#531](https://github.com/putyourlightson/craft-blitz/issues/504)).
 
 ### Fixed
+- Fixed a bug in which refreshing the cache could fail when using the Redis queue driver ([#522](https://github.com/putyourlightson/craft-blitz/issues/522)).
 - Fixed a race condition that could result in an SQL error if the database used read/write splitting ([#531](https://github.com/putyourlightson/craft-blitz/issues/531)).
 - Fixed a bug in which a validation error could occur when an invalid email address was entered in the Cloudflare API Key Email field even when the authentication method was set to API Token.
 

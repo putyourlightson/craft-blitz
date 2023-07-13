@@ -15,6 +15,7 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
+use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
 /**
@@ -143,7 +144,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * Populates cache IDs from element query caches.
      */
-    private function _populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, QueueInterface $queue): void
+    private function _populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, Queue|QueueInterface $queue): void
     {
         foreach ($refreshData->getElementTypes() as $elementType) {
             $elementIds = $refreshData->getElementIds($elementType);
