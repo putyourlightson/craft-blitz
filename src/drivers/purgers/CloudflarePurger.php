@@ -185,7 +185,9 @@ class CloudflarePurger extends BaseCachePurger
             [['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
                 return $purger->authenticationMethod == 'apiKey';
             }],
-            [['email'], 'email'],
+            [['email'], 'email', 'when' => function(CloudflarePurger $purger) {
+                return $purger->authenticationMethod == 'apiKey';
+            }],
         ];
     }
 

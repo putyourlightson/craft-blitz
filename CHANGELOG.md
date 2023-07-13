@@ -6,6 +6,7 @@
 
 ### Fixed
 - Fixed a race condition that could result in an SQL error if the database used read/write splitting ([#531](https://github.com/putyourlightson/craft-blitz/issues/531)).
+- Fixed a bug in which a validation error could occur when an invalid email address was entered in the Cloudflare API Key Email field even when the authentication method was set to API Token.
 
 ## 4.4.6 - 2023-06-28
 > {warning} To ensure the fix is applied, the cache should be cleared or refreshed after this update completes.
