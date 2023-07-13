@@ -282,17 +282,18 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Get element query record from index or create one if it does not exist
-        $queryId = ElementQueryRecord::find()
+        $db = Craft::$app->getDb();
+
+        // Use the primary connection when fetching the record
+        $queryId = $db->usePrimary(fn() => ElementQueryRecord::find()
             ->select('id')
             ->where(['index' => $index])
-            ->scalar();
+            ->scalar()
+        );
 
         if (!$queryId) {
             try {
                 // Use DB connection, so we can exclude audit columns when inserting
-                $db = Craft::$app->getDb();
-
                 $db->createCommand()
                     ->insert(
                         ElementQueryRecord::tableName(),
@@ -402,17 +403,18 @@ class GenerateCacheService extends Component
             return null;
         }
 
-        // Get record or create one if it does not exist
-        $includeId = IncludeRecord::find()
+        $db = Craft::$app->getDb();
+
+        // Use the primary connection when fetching the record
+        $includeId = $db->usePrimary(fn() => IncludeRecord::find()
             ->select('id')
             ->where(['index' => $index])
-            ->scalar();
+            ->scalar()
+        );
 
         if (!$includeId) {
             try {
                 // Use DB connection, so we can exclude audit columns when inserting
-                $db = Craft::$app->getDb();
-
                 $db->createCommand()
                     ->insert(
                         IncludeRecord::tableName(),

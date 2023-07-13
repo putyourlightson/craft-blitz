@@ -9,11 +9,13 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
+use craft\queue\QueueInterface;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
+use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
 /**
@@ -142,7 +144,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * Populates cache IDs from element query caches.
      */
-    private function _populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, $queue): void
+    private function _populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, Queue|QueueInterface $queue): void
     {
         foreach ($refreshData->getElementTypes() as $elementType) {
             $elementIds = $refreshData->getElementIds($elementType);
