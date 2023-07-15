@@ -166,6 +166,16 @@ class CacheRequestTest extends Unit
         $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
     }
 
+    public function testGetIsCacheableSiteUriWithCpTrigger()
+    {
+        Blitz::$plugin->settings->includedUriPatterns = [$this->uriPattern];
+        $this->siteUri->uri = 'admin';
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+
+        $this->siteUri->uri = 'admin-page';
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($this->siteUri));
+    }
+
     public function testGetIsCacheableSiteUriWithIndex()
     {
         Blitz::$plugin->settings->includedUriPatterns = [[

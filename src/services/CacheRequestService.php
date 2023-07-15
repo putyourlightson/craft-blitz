@@ -161,7 +161,7 @@ class CacheRequestService extends Component
         // Ignore URIs that are CP pages
         $generalConfig = Craft::$app->getConfig()->getGeneral();
 
-        if ($generalConfig->cpTrigger && str_contains($uri, $generalConfig->cpTrigger)) {
+        if ($generalConfig->cpTrigger && trim('/', $uri) === $generalConfig->cpTrigger) {
             return false;
         }
 
