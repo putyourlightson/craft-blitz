@@ -181,12 +181,8 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
     {
-        // Ignore URIs that are CP pages
+        $url = $siteUri->getUrl();
         $generalConfig = Craft::$app->getConfig()->getGeneral();
-
-        if ($generalConfig->cpTrigger && strpos($siteUri->uri, $generalConfig->cpTrigger) !== false) {
-            return false;
-        }
 
         // Ignore URIs that are resources
         $resourceBaseUri = trim(parse_url(Craft::getAlias($generalConfig->resourceBaseUrl), PHP_URL_PATH), '/');
@@ -197,7 +193,7 @@ class CacheRequestService extends Component
 
         // Ignore URIs that contain index.php
         if (strpos($siteUri->uri, 'index.php') !== false) {
-            Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $siteUri->getUrl());
+            Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $url);
 
             return false;
         }
@@ -206,20 +202,20 @@ class CacheRequestService extends Component
         if (strlen($siteUri->uri) > self::MAX_URI_LENGTH) {
             Blitz::$plugin->debug('Page not cached because it exceeds the max URI length of {max} characters.', [
                 'max' => self::MAX_URI_LENGTH
-            ], $siteUri->getUrl());
+            ], $url);
 
             return false;
         }
 
         // Excluded URI patterns take priority
         if ($this->matchesUriPatterns($siteUri, Blitz::$plugin->settings->excludedUriPatterns)) {
-            Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.', [], $siteUri->getUrl());
+            Blitz::$plugin->debug('Page not cached because it matches an excluded URI pattern.', [], $url);
 
             return false;
         }
 
         if (!$this->matchesUriPatterns($siteUri, Blitz::$plugin->settings->includedUriPatterns)) {
-            Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.', [], $siteUri->getUrl());
+            Blitz::$plugin->debug('Page not cached because it does not match an included URI pattern.', [], $url);
 
             return false;
         }

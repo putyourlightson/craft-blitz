@@ -1,5 +1,8 @@
 # Release Notes for Blitz
 
+## 3.12.10 - Unreleased
+### Fixed
+- Fixed a bug in which URLs containing the control panel trigger were not being cached ([#532](https://github.com/putyourlightson/craft-blitz/issues/532)).
 ## 3.12.9 - 2023-04-02
 ### Fixed
 - Fixed a bug in which the Blitz Cache Utility was throwing an error when the `countCachedFiles` config setting was enabled ([#492](https://github.com/putyourlightson/craft-blitz/issues/492)).
