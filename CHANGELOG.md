@@ -2,7 +2,7 @@
 
 ## 4.4.7 - 2023-07-17
 ### Changed
-- Hardened checks against null responses to help avoid errors ([#531](https://github.com/putyourlightson/craft-blitz/issues/531)).
+- Hardened checks against null responses to help avoid errors ([#519](https://github.com/putyourlightson/craft-blitz/issues/519)).
 
 ### Fixed
 - Fixed a bug in which refreshing the cache could fail when using the Redis queue driver ([#522](https://github.com/putyourlightson/craft-blitz/issues/522)).
