@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.4.7 - Unreleased
+## 4.4.7 - 2023-07-17
 ### Changed
 - Hardened checks against null responses to help avoid errors ([#531](https://github.com/putyourlightson/craft-blitz/issues/531)).
 
