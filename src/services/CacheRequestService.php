@@ -163,18 +163,12 @@ class CacheRequestService extends Component
         }
 
         $url = $siteUri->getUrl();
-
-        // Ignore URIs that are CP pages
         $generalConfig = Craft::$app->getConfig()->getGeneral();
-
-        if ($generalConfig->cpTrigger && str_contains($uri, $generalConfig->cpTrigger)) {
-            return false;
-        }
 
         // Ignore URIs that are resources
         $resourceBaseUri = trim(parse_url(Craft::getAlias($generalConfig->resourceBaseUrl), PHP_URL_PATH), '/');
 
-        if ($resourceBaseUri && str_contains($uri, $resourceBaseUri)) {
+        if ($resourceBaseUri && str_starts_with($uri, $resourceBaseUri)) {
             return false;
         }
 
