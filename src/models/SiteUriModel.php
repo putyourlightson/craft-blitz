@@ -24,17 +24,6 @@ class SiteUriModel extends Model
     public string $uri = '';
 
     /**
-     * @inheritdoc
-     */
-    public function init(): void
-    {
-        parent::init();
-
-        // Normalize the URI attribute
-        $this->uri = str_replace('__home__', '', $this->uri);
-    }
-
-    /**
      * Returns a URL with optional params.
      */
     public function getUrl(array $params = []): string

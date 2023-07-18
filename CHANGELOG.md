@@ -3,6 +3,7 @@
 ## 4.4.8 - Unreleased
 ### Fixed
 - Fixed a bug in which the `cacheDuration` config setting was not being applied when the value was not an integer ([#536](https://github.com/putyourlightson/craft-blitz/issues/536)).
+- Fixed a bug in which the `__home__` URI was not responding with a 404 error when it should have ([#538](https://github.com/putyourlightson/craft-blitz/issues/538)).
 
 ## 4.4.7 - 2023-07-17
 ### Changed
