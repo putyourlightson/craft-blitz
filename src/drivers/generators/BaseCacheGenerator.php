@@ -44,7 +44,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      *
      *         if (str_contains($siteUri->uri, 'leave-us-all-out-of-this')) {
      *             // Prevents the cache from being generated.
-     *             return false;
+     *             $event->isValid = false;
      *         }
      *     }
      * });
@@ -59,19 +59,6 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
 
     /**
      * @event RefreshCacheEvent The event that is triggered before the entire cache is generated.
-     *
-     * You may set [[\yii\base\ModelEvent::$isValid]] to `false` to prevent the cache from being generated.
-     *
-     * ```php
-     * use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
-     * use putyourlightson\blitz\drivers\generators\HttpGenerator;
-     * use putyourlightson\blitz\events\RefreshCacheEvent;
-     * use yii\base\Event;
-     *
-     * Event::on(HttpGenerator::class, BaseCacheGenerator::EVENT_BEFORE_GENERATE_ALL_CACHE, function(RefreshCacheEvent $e) {
-     *     return false;
-     * });
-     * ```
      */
     public const EVENT_BEFORE_GENERATE_ALL_CACHE = 'beforeGenerateAllCache';
 

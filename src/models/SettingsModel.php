@@ -317,10 +317,10 @@ class SettingsModel extends Model
     public bool $cacheElementQueries = true;
 
     /**
-     * @var int|null The amount of time after which the cache should expire (if not 0).
+     * @var mixed The amount of time after which the cache should expire (if not 0).
      * See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
      */
-    public ?int $cacheDuration = null;
+    public mixed $cacheDuration = null;
 
     /**
      * @var string[] Element types that should not be cached (in addition to the defaults).
