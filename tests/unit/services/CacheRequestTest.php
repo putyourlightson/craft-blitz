@@ -8,6 +8,7 @@ namespace putyourlightson\blitztests\unit\services;
 use Codeception\Test\Unit;
 use Craft;
 use craft\helpers\App;
+use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use craft\web\Request;
 use putyourlightson\blitz\Blitz;
@@ -190,6 +191,34 @@ class CacheRequestTest extends Unit
         $siteUri = new SiteUriModel([
             'siteId' => 1,
             'uri' => 'index.php',
+        ]);
+
+        $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri));
+    }
+
+    public function testGetIsCacheableSiteUriWithMaxUriLength()
+    {
+        Blitz::$plugin->settings->includedUriPatterns = [[
+            'siteId' => '',
+            'uriPattern' => '.*',
+        ]];
+        $siteUri = new SiteUriModel([
+            'siteId' => 1,
+            'uri' => StringHelper::randomString(Blitz::$plugin->settings->maxUriLength),
+        ]);
+
+        $this->assertTrue(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri));
+    }
+
+    public function testGetIsCacheableSiteUriWithMaxUriLengthExceeded()
+    {
+        Blitz::$plugin->settings->includedUriPatterns = [[
+            'siteId' => '',
+            'uriPattern' => '.*',
+        ]];
+        $siteUri = new SiteUriModel([
+            'siteId' => 1,
+            'uri' => StringHelper::randomString(Blitz::$plugin->settings->maxUriLength + 1),
         ]);
 
         $this->assertFalse(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri));

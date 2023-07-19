@@ -8,6 +8,7 @@ namespace putyourlightson\blitztests\unit\drivers;
 use Codeception\Test\Unit;
 use Craft;
 use craft\helpers\App;
+use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\storage\CacheStorageInterface;
 use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
@@ -45,7 +46,7 @@ class YiiCacheStorageTest extends Unit
      */
     private string $output = 'xyz';
 
-    protected function _before()
+    protected function _before(): void
     {
         parent::_before();
 
@@ -69,8 +70,10 @@ class YiiCacheStorageTest extends Unit
         Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri, $this->duration);
     }
 
-    public function testSave()
+    public function testSaveLongUri()
     {
+        $this->siteUri->uri = StringHelper::randomString(1000);
+        Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri);
         $value = $this->cacheStorage->get($this->siteUri);
         $this->assertStringContainsString($this->output, $value);
     }

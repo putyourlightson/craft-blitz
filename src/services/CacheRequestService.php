@@ -158,6 +158,14 @@ class CacheRequestService extends Component
     {
         $uri = strtolower($siteUri->uri);
 
+        // Ignore URIs that are longer than the max URI length
+        $max = Blitz::$plugin->settings->maxUriLength;
+        if (strlen($uri) > $max) {
+            Blitz::$plugin->debug('Page not cached because it exceeds the max URI length of {max}.', ['max' => $max], $uri);
+
+            return false;
+        }
+
         if ($this->getIsCachedInclude($uri)) {
             return true;
         }

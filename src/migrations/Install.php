@@ -10,6 +10,7 @@ use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Field;
 use craft\records\Site;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
@@ -81,7 +82,7 @@ class Install extends Migration
             $this->createTable(CacheRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string()->notNull(),
+                'uri' => $this->string(Blitz::$plugin->settings->maxUriLength)->notNull(),
                 'paginate' => $this->integer(),
                 'expiryDate' => $this->dateTime(),
             ]);

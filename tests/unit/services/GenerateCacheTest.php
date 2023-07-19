@@ -11,6 +11,7 @@ use craft\commerce\elements\Product;
 use craft\db\FixedOrderExpression;
 use craft\elements\Entry;
 use craft\elements\User;
+use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\FieldHelper;
 use putyourlightson\blitz\models\SettingsModel;
@@ -138,14 +139,14 @@ class GenerateCacheTest extends Unit
         $this->assertStringNotContainsString('Cached by Blitz on', $value);
     }
 
-    public function testSaveCacheRecord()
+    public function testSaveCacheRecordWithMaxUriLength()
     {
+        $this->siteUri->uri = StringHelper::randomString(Blitz::$plugin->settings->maxUriLength);
         Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
         $count = CacheRecord::find()
             ->where($this->siteUri->toArray())
             ->count();
 
-        // Assert that the record was saved
         $this->assertEquals(1, $count);
     }
 

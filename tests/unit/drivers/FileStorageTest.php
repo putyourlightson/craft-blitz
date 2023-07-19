@@ -6,6 +6,7 @@
 namespace putyourlightson\blitztests\unit\drivers;
 
 use Codeception\Test\Unit;
+use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\storage\CacheStorageInterface;
 use putyourlightson\blitz\drivers\storage\FileStorage;
@@ -38,7 +39,7 @@ class FileStorageTest extends Unit
      */
     private string $output = 'xyz';
 
-    protected function _before()
+    protected function _before(): void
     {
         parent::_before();
 
@@ -57,11 +58,20 @@ class FileStorageTest extends Unit
         ]);
     }
 
-    public function testSave()
+    public function testSaveWithMaxUriLength()
     {
-        $this->cacheStorage->save($this->output, $this->siteUri);
+        $this->siteUri->uri = StringHelper::randomString(255);
+        Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri);
         $value = $this->cacheStorage->get($this->siteUri);
         $this->assertStringContainsString($this->output, $value);
+    }
+
+    public function testDontSaveWithMaxUriLengthExceeded()
+    {
+        $this->siteUri->uri = StringHelper::randomString(256);
+        Blitz::$plugin->cacheStorage->save($this->output, $this->siteUri);
+        $value = $this->cacheStorage->get($this->siteUri);
+        $this->assertEmpty($value);
     }
 
     public function testSaveDecoded()

@@ -221,9 +221,18 @@ class BlitzVariable
      */
     private function _getSsiTag(string $uri, array $params, int $includeId): Markup
     {
+        $uri = $this->_getUriWithParams($uri, $params);
+
+        // Ignore URIs that are longer than the max SSI value length
+        $max = Blitz::$plugin->settings->maxSsiValueLength;
+        if (strlen($uri) > $max) {
+            Blitz::$plugin->debug('SSI tag not generated because it exceeds the max SSI value length of {max}.', ['max' => $max], $uri);
+
+            return Template::raw('');
+        }
+
         // Add an SSI include, so we can purge it whenever necessary
         Blitz::$plugin->generateCache->addSsiInclude($includeId);
-        $uri = $this->_getUriWithParams($uri, $params);
 
         return Template::raw('<!--#include virtual="' . $uri . '" -->');
     }
@@ -233,8 +242,17 @@ class BlitzVariable
      */
     private function _getEsiTag(string $uri, array $params): Markup
     {
-        Blitz::$plugin->generateCache->generateData->setHasIncludes();
         $uri = $this->_getUriWithParams($uri, $params);
+
+        // Ignore URIs that are longer than the max ESI value length
+        $max = Blitz::$plugin->settings->maxEsiValueLength;
+        if (strlen($uri) > $max) {
+            Blitz::$plugin->debug('ESI tag not generated because it exceeds the max ESI value length of {max}.', ['max' => $max], $uri);
+
+            return Template::raw('');
+        }
+
+        Blitz::$plugin->generateCache->generateData->setHasIncludes();
 
         // Add surrogate control header
         Craft::$app->getResponse()->getHeaders()->add('Surrogate-Control', 'content="ESI/1.0"');
