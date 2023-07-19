@@ -1,13 +1,13 @@
 # Release Notes for Blitz
 
-## 4.5.0 - Unreleased
+## 4.5.0 - 2023-07-19
 > {warning} The cache must be cleared or refreshed after this update completes.
 
 ### Added
 - Added the ability to send compressed responses to browsers that accept supported encodings.
 - Added the ability to save compressed cached values in the Yii Cache Storage to help reduce the memory required.
 - Added tips that display whether `gzip` is enabled on the web server in the Cache Storage settings.
-- Added the `maxUriLength` config setting.
+- Added the `maxUriLength` config setting ([#539](https://github.com/putyourlightson/craft-blitz/issues/539)).
 
 ### Changed
 - Cached includes and pages that contain SSI or ESI includes are now never compressed.
