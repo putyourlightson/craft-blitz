@@ -30,6 +30,7 @@ use putyourlightson\blitztests\fixtures\EntryFixture;
 use putyourlightson\campaign\elements\CampaignElement;
 use putyourlightson\campaign\elements\MailingListElement;
 use UnitTester;
+use yii\db\Exception;
 
 /**
  * @since 2.3.0
@@ -148,6 +149,13 @@ class GenerateCacheTest extends Unit
             ->count();
 
         $this->assertEquals(1, $count);
+    }
+
+    public function testSaveCacheRecordWithMaxUriLengthExceededThrowsException()
+    {
+        $this->expectException(Exception::class);
+        $this->siteUri->uri = StringHelper::randomString(Blitz::$plugin->settings->maxUriLength + 1);
+        Blitz::$plugin->generateCache->save($this->output, $this->siteUri);
     }
 
     public function testSaveElementCacheRecord()

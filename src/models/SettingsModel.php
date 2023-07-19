@@ -392,11 +392,6 @@ class SettingsModel extends Model
     public int $maxRetryAttempts = 10;
 
     /**
-     * @var int The time in seconds to wait for mutex locks to be released.
-     */
-    public int $mutexTimeout = 1;
-
-    /**
      * @var int The maximum length of URIs that may be cached. Increasing this value requires manually updating the limit in the `uri` column of the `blitz_caches` database table. Note that the prefix length limit is 3072 bytes for InnoDB tables that use the DYNAMIC or COMPRESSED row format. Assuming a `utf8mb4` character set and a maximum of 4 bytes for each character, this is 768 characters.
      * https://dev.mysql.com/doc/refman/8.0/en/column-indexes.html#column-indexes-prefix
      *
@@ -406,16 +401,9 @@ class SettingsModel extends Model
     public int $maxUriLength = 255;
 
     /**
-     * @var int The maximum length of SSI values that may be cached.
-     * https://nginx.org/en/docs/http/ngx_http_ssi_module.html#ssi_value_length
+     * @var int The time in seconds to wait for mutex locks to be released.
      */
-    public int $maxSsiValueLength = 256;
-
-    /**
-     * @var int The maximum length of ESI values that may be cached.
-     * https://nginx.org/en/docs/http/ngx_http_ssi_module.html#ssi_value_length
-     */
-    public int $maxEsiValueLength = 256;
+    public int $mutexTimeout = 1;
 
     /**
      * @var array The paths to executable shell commands.
