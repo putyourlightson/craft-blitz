@@ -117,17 +117,18 @@ class GenerateCacheService extends Component
          * Both the `EVENT_AFTER_POPULATE_ELEMENT` and `EVENT_AFTER_POPULATE_ELEMENTS` events
          * must be used to ensure that eager-loaded elements and eager-loaded fields are tracked
          * respectively.
+         *
          * @link https://github.com/putyourlightson/craft-blitz/issues/514
          */
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
-            function(PopulateElementEvent $event) {
+            function (PopulateElementEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
                     $this->addElement($event->element);
                 }
             }
         );
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENTS,
-            function(PopulateElementsEvent $event) {
+            function (PopulateElementsEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
                     foreach ($event->elements as $element) {
                         $this->addElement($element);
@@ -139,10 +140,11 @@ class GenerateCacheService extends Component
         /**
          * Catch elements injected into rendered templates as variables, so we can also track
          * fields eager-loaded via `eagerLoadElements()`.
+         *
          * @see Elements::eagerLoadElements()
          */
         Event::on(View::class, View::EVENT_AFTER_RENDER_TEMPLATE,
-            function(TemplateEvent $event) {
+            function (TemplateEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
                     foreach ($event->variables as $variable) {
                         if ($variable instanceof Element) {
@@ -154,7 +156,7 @@ class GenerateCacheService extends Component
         );
 
         Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
-            function(CancelableEvent $event) {
+            function (CancelableEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
                     /** @var ElementQuery $elementQuery */
                     $elementQuery = $event->sender;
@@ -285,7 +287,7 @@ class GenerateCacheService extends Component
         $db = Craft::$app->getDb();
 
         // Use the primary connection when fetching the record
-        $queryId = $db->usePrimary(fn() => ElementQueryRecord::find()
+        $queryId = $db->usePrimary(fn () => ElementQueryRecord::find()
             ->select('id')
             ->where(['index' => $index])
             ->scalar()
@@ -406,7 +408,7 @@ class GenerateCacheService extends Component
         $db = Craft::$app->getDb();
 
         // Use the primary connection when fetching the record
-        $includeId = $db->usePrimary(fn() => IncludeRecord::find()
+        $includeId = $db->usePrimary(fn () => IncludeRecord::find()
             ->select('id')
             ->where(['index' => $index])
             ->scalar()

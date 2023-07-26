@@ -47,10 +47,10 @@ class GeneratorController extends Controller
 
         // Suppress the output using a dummy stream
         Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
-            function(Event $event) {
+            function (Event $event) {
                 /** @var Response $response */
                 $response = $event->sender;
-                $response->stream = fn() => ['data' => ''];
+                $response->stream = fn () => ['data' => ''];
             }
         );
 
@@ -76,12 +76,14 @@ class GeneratorController extends Controller
 
         /**
          * Update the query string to avoid the token being added to URLs.
+         *
          * @see Paginate::getPageUrl()
          */
         $_SERVER['QUERY_STRING'] = http_build_query($queryParams);
 
         /**
          * Unset the token to avoid it being added to URLs.
+         *
          * @see UrlHelper::_createUrl()
          */
         $this->request->setToken(null);

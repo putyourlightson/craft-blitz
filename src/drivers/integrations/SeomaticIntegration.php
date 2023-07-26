@@ -32,7 +32,7 @@ class SeomaticIntegration extends BaseIntegration
     {
         // Set up invalidate container caches event listeners
         Event::on(MetaContainers::class, MetaContainers::EVENT_INVALIDATE_CONTAINER_CACHES,
-            function(InvalidateContainerCachesEvent $event) {
+            function (InvalidateContainerCachesEvent $event) {
                 if ($event->uri === null && $event->siteId === null && $event->sourceId === null && $event->sourceType === null) {
                     // Refresh the entire cache.
                     Blitz::$plugin->refreshCache->refreshAll();

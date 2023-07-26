@@ -27,13 +27,13 @@ class FeedMeIntegration extends BaseIntegration
     public static function registerEvents(): void
     {
         Event::on(Process::class, Process::EVENT_BEFORE_PROCESS_FEED,
-            function() {
+            function () {
                 Blitz::$plugin->refreshCache->batchMode = true;
             }
         );
 
         Event::on(Process::class, Process::EVENT_AFTER_PROCESS_FEED,
-            function() {
+            function () {
                 Blitz::$plugin->refreshCache->refresh();
             }
         );

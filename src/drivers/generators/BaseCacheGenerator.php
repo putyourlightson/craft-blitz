@@ -35,7 +35,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      * use putyourlightson\blitz\events\RefreshCacheEvent;
      * use yii\base\Event;
      *
-     * Event::on(HttpGenerator::class, BaseCacheGenerator::EVENT_BEFORE_GENERATE_CACHE, function(RefreshCacheEvent $event) {
+     * Event::on(HttpGenerator::class, BaseCacheGenerator::EVENT_BEFORE_GENERATE_CACHE, function (RefreshCacheEvent $event) {
      *     foreach ($event->siteUris as $key => $siteUri) {
      *         if (str_contains($siteUri->uri, 'leave-me-out-of-this')) {
      *             // Removes a single site URI.

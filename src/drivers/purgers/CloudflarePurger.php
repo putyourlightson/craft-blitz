@@ -161,7 +161,7 @@ class CloudflarePurger extends BaseCachePurger
      */
     protected function defineBehaviors(): array
     {
-        return[
+        return [
             'parser' => [
                 'class' => EnvAttributeParserBehavior::class,
                 'attributes' => [
@@ -179,13 +179,13 @@ class CloudflarePurger extends BaseCachePurger
     protected function defineRules(): array
     {
         return [
-            [['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
+            [['apiToken'], 'required', 'when' => function (CloudflarePurger $purger) {
                 return $purger->authenticationMethod == 'apiToken';
             }],
-            [['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
+            [['apiKey', 'email'], 'required', 'when' => function (CloudflarePurger $purger) {
                 return $purger->authenticationMethod == 'apiKey';
             }],
-            [['email'], 'email', 'when' => function(CloudflarePurger $purger) {
+            [['email'], 'email', 'when' => function (CloudflarePurger $purger) {
                 return $purger->authenticationMethod == 'apiKey';
             }],
         ];
@@ -242,10 +242,10 @@ class CloudflarePurger extends BaseCachePurger
 
         // Create a pool of requests
         $pool = new Pool($client, $requests, [
-            'fulfilled' => function() use (&$response) {
+            'fulfilled' => function () use (&$response) {
                 $response = true;
             },
-            'rejected' => function($reason) {
+            'rejected' => function ($reason) {
                 if ($reason instanceof RequestException) {
                     /** RequestException $reason */
                     preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);

@@ -65,7 +65,7 @@ class HttpGenerator extends BaseCacheGenerator
         $promise = \Amp\Sync\ConcurrentIterator\each(
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
-            function(string $url) use ($setProgressHandler, &$count, $pages, $client) {
+            function (string $url) use ($setProgressHandler, &$count, $pages, $client) {
                 if ($this->isPageUrl($url)) {
                     $count++;
                 }
@@ -95,8 +95,7 @@ class HttpGenerator extends BaseCacheGenerator
         // Exceptions are thrown only when the promise is resolved.
         try {
             wait($promise);
-        }
-        // Catch all possible exceptions to avoid interrupting progress.
+        } // Catch all possible exceptions to avoid interrupting progress.
         catch (Throwable $exception) {
             Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
         }

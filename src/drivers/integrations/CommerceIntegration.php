@@ -33,7 +33,7 @@ class CommerceIntegration extends BaseIntegration
         // Refresh variants on order completion so that their stock is updated.
         // https://github.com/putyourlightson/craft-blitz/issues/432
         Event::on(Order::class, Order::EVENT_AFTER_COMPLETE_ORDER,
-            function(Event $event) {
+            function (Event $event) {
                 /** @var Order $order */
                 $order = $event->sender;
                 foreach ($order->getLineItems() as $lineItem) {

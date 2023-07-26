@@ -19,7 +19,7 @@ use yii\log\Logger;
  *
  * @see putyourlightson\blitz\drivers\generators\LocalGenerator::generateUrisWithProgress()
  */
-return function(Channel $channel): Generator {
+return function (Channel $channel): Generator {
     $config = yield $channel->receive();
 
     $url = $config['url'];
@@ -32,6 +32,7 @@ return function(Channel $channel): Generator {
 
     /**
      * Mock a web server request
+     *
      * @see \craft\test\Craft::recreateClient
      */
     $_SERVER = array_merge($_SERVER, [
@@ -66,14 +67,12 @@ return function(Channel $channel): Generator {
             // By default, this will allow .env file values to override environment variables
             // with matching names. Use `createUnsafeImmutable` to disable this.
             Dotenv\Dotenv::createUnsafeMutable(CRAFT_BASE_PATH)->safeLoad();
-        }
-        // Dotenv v3
+        } // Dotenv v3
         elseif (method_exists('Dotenv\Dotenv', 'create')) {
             /** @noinspection PhpParamsInspection */
             /** @phpstan-ignore-next-line */
             Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();
-        }
-        // Dotenv v2
+        } // Dotenv v2
         else {
             /** @noinspection PhpParamsInspection */
             /** @phpstan-ignore-next-line */
@@ -83,7 +82,7 @@ return function(Channel $channel): Generator {
 
     // Force a web request before plugins are loaded (as early as possible)
     Event::on(Plugins::class, Plugins::EVENT_BEFORE_LOAD_PLUGINS,
-        function() {
+        function () {
             Craft::$app->getRequest()->setIsConsoleRequest(false);
 
             // Force the template mode too
@@ -94,6 +93,7 @@ return function(Channel $channel): Generator {
 
     /**
      * Load and run the Craft web application, checking success based on exit code
+     *
      * @see \yii\base\Response::$exitStatus
      * @var craft\web\Application $app
      */
