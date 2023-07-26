@@ -158,6 +158,18 @@ class RefreshCacheTest extends Unit
         $this->_assertTrackedElement($this->entry, ['title'], ['text']);
     }
 
+    public function testAddElementWhenStatusAndFieldChanged()
+    {
+        $this->entry->enabled = false;
+        $this->entry->setFieldValue('text', '123');
+        Blitz::$plugin->refreshCache->addElement($this->entry);
+
+        // Assert that the tracked element is correct
+        $this->assertFalse(Blitz::$plugin->refreshCache->refreshData->getIsChangedByAttributes(Entry::class, $this->entry->id));
+        $this->assertFalse(Blitz::$plugin->refreshCache->refreshData->getIsChangedByFields(Entry::class, $this->entry->id));
+        $this->_assertTrackedElement($this->entry, [], ['text']);
+    }
+
     public function testAddElementWhenFileReplaced()
     {
         $this->asset->scenario = Asset::SCENARIO_REPLACE;
