@@ -652,6 +652,10 @@ class CacheRequestService extends Component
 
         $outputComments = Blitz::$plugin->generateCache->options->outputComments;
 
+        if ($outputComments === null) {
+            $outputComments = Blitz::$plugin->settings->outputComments;
+        }
+
         if ($outputComments !== true && $outputComments !== SettingsModel::OUTPUT_COMMENTS_SERVED) {
             return;
         }

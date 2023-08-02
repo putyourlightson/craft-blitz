@@ -65,22 +65,22 @@ class SettingsModel extends Model
     public const OUTPUT_COMMENTS_SERVED = 3;
 
     /**
-     * @var bool With this setting enabled, Blitz will log detailed messages to `storage/logs/blitz.php`.
+     * With this setting enabled, Blitz will log detailed messages to `storage/logs/blitz.php`.
      */
     public bool $debug = false;
 
     /**
-     * @var bool With this setting enabled, Blitz will provide template performance hints in a utility.
+     * With this setting enabled, Blitz will provide template performance hints in a utility.
      */
     public bool $hintsEnabled = true;
 
     /**
-     * @var bool With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
+     * With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
      */
     public bool $cachingEnabled = false;
 
     /**
-     * @var int Determines when and how the cache should be refreshed.
+     * Determines when and how the cache should be refreshed.
      *
      * - `self::REFRESH_MODE_EXPIRE`: Expire the cache, regenerate manually
      * - `self::REFRESH_MODE_CLEAR`: Clear the cache, regenerate manually or organically
@@ -90,7 +90,7 @@ class SettingsModel extends Model
     public int $refreshMode = self::REFRESH_MODE_CLEAR_AND_GENERATE;
 
     /**
-     * @var array The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
+     * The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
      *
      * [
      *     [
@@ -106,7 +106,7 @@ class SettingsModel extends Model
     public array $includedUriPatterns = [];
 
     /**
-     * @var array The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
+     * The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
      *
      * [
      *     [
@@ -118,37 +118,39 @@ class SettingsModel extends Model
     public array $excludedUriPatterns = [];
 
     /**
-     * @var string The storage type to use.
+     * The storage type to use.
      */
     public string $cacheStorageType = FileStorage::class;
 
     /**
-     * @var array The storage settings.
+     * The storage settings.
      */
     public array $cacheStorageSettings = [];
 
     /**
-     * @var array The storage type classes to add to the plugin’s default storage types.
+     * The storage type classes to add to the plugin’s default storage types.
      */
     public array $cacheStorageTypes = [];
 
     /**
-     * @var string The generator type to use.
+     * The generator type to use.
      */
     public string $cacheGeneratorType = HttpGenerator::class;
 
     /**
-     * @var array The generator settings.
+     * The generator settings.
      */
     public array $cacheGeneratorSettings = [];
 
     /**
-     * @var string[] The generator type classes to add to the plugin’s default generator types.
+     * The generator type classes to add to the plugin’s default generator types.
+     *
+     * @var string[]
      */
     public array $cacheGeneratorTypes = [];
 
     /**
-     * @var array Custom site URIs to generate when either a site or the entire cache is generated.
+     * Custom site URIs to generate when either a site or the entire cache is generated.
      *
      * [
      *     [
@@ -162,47 +164,51 @@ class SettingsModel extends Model
     public array $customSiteUris = [];
 
     /**
-     * @var string The purger type to use.
+     * The purger type to use.
      */
     public string $cachePurgerType = DummyPurger::class;
 
     /**
-     * @var array The purger settings.
+     * The purger settings.
      */
     public array $cachePurgerSettings = [];
 
     /**
-     * @var string[] The purger type classes to add to the plugin’s default purger types.
+     * The purger type classes to add to the plugin’s default purger types.
+     *
+     * @var string[]
      */
     public array $cachePurgerTypes = [];
 
     /**
-     * @var string The deployer type to use.
+     * The deployer type to use.
      */
     public string $deployerType = DummyDeployer::class;
 
     /**
-     * @var array The deployer settings.
+     * The deployer settings.
      */
     public array $deployerSettings = [];
 
     /**
-     * @var string[] The deployer type classes to add to the plugin’s default deployer types.
+     * The deployer type classes to add to the plugin’s default deployer types.
+     *
+     * @var string[]
      */
     public array $deployerTypes = [];
 
     /**
-     * @var bool With this setting enabled, Blitz will fetch cached includes using Server-Side Includes (SSI), which must be enabled on the server.
+     * With this setting enabled, Blitz will fetch cached includes using Server-Side Includes (SSI), which must be enabled on the server.
      */
     public bool $ssiEnabled = false;
 
     /**
-     * @var bool With this setting enabled, Blitz will fetch cached includes using Edge-Side Includes (ESI), which must be enabled on the server.
+     * With this setting enabled, Blitz will fetch cached includes using Edge-Side Includes (ESI), which must be enabled on the server.
      */
     public bool $esiEnabled = false;
 
     /**
-     * @var int Whether URLs with query strings should be cached and how.
+     * Whether URLs with query strings should be cached and how.
      *
      * - `self::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
      * - `self::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES`: Cache URLs with query strings as unique pages
@@ -211,7 +217,7 @@ class SettingsModel extends Model
     public int $queryStringCaching = self::QUERY_STRINGS_DO_NOT_CACHE_URLS;
 
     /**
-     * @var array The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
+     * The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
      *
      * [
      *     [
@@ -228,7 +234,7 @@ class SettingsModel extends Model
     ];
 
     /**
-     * @var array The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
+     * The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
      *
      * [
      *     [
@@ -253,92 +259,101 @@ class SettingsModel extends Model
     ];
 
     /**
-     * @var string An API key that can be used via a URL (min. 16 characters).
+     * An API key that can be used via a URL (min. 16 characters).
      */
     public string $apiKey = '';
 
     /**
-     * @var bool Whether pages containing query string parameters should be generated.
+     * Whether pages containing query string parameters should be generated.
      */
     public bool $generatePagesWithQueryStringParams = true;
 
     /**
-     * @var bool Whether asset images should be purged when changed.
+     * Whether asset images should be purged when changed.
      */
     public bool $purgeAssetImagesWhenChanged = true;
 
     /**
-     * @var bool Whether the cache should automatically be refreshed after a global set is updated.
+     * Whether the cache should automatically be refreshed after a global set is updated.
      */
     public bool $refreshCacheAutomaticallyForGlobals = true;
 
     /**
-     * @var bool Whether the cache should be refreshed when an element is moved within a structure.
+     * Whether the cache should be refreshed when an element is moved within a structure.
      */
     public bool $refreshCacheWhenElementMovedInStructure = true;
 
     /**
-     * @var bool Whether the cache should be refreshed when an element is saved but unchanged.
+     * Whether the cache should be refreshed when an element is saved but unchanged.
      */
     public bool $refreshCacheWhenElementSavedUnchanged = false;
 
     /**
-     * @var bool Whether the cache should be refreshed when an element is saved but not live.
+     * Whether the cache should be refreshed when an element is saved but not live.
      */
     public bool $refreshCacheWhenElementSavedNotLive = false;
 
     /**
-     * @var bool Whether non-HTML responses should be cached.
+     * Whether non-HTML responses should be cached.
      */
     public bool $cacheNonHtmlResponses = false;
 
     /**
-     * @var bool Whether elements should be tracked in the database.
+     * Whether elements should be tracked in the database.
      */
     public bool $trackElements = true;
 
     /**
-     * @var bool Whether element queries should be tracked in the database.
+     * Whether element queries should be tracked in the database.
      */
     public bool $trackElementQueries = true;
 
     /**
-     * @var bool Whether elements should be cached in the database.
+     * Whether elements should be cached in the database.
      *
      * @deprecated in 4.4.0. Use [[trackElements]] instead.
      */
     public bool $cacheElements = true;
 
     /**
-     * @var bool Whether element queries should be cached in the database.
+     * Whether element queries should be cached in the database.
      *
      * @deprecated in 4.4.0. Use [[trackElementQueries]] instead.
      */
     public bool $cacheElementQueries = true;
 
     /**
-     * @var mixed The amount of time after which the cache should expire (if not 0).
-     * See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
+     * The amount of time after which the cache should expire (if not 0).
+     *
+     * @see ConfigHelper::durationInSeconds()
      */
     public mixed $cacheDuration = null;
 
     /**
-     * @var string[] Element types that should not be cached (in addition to the defaults).
+     * Element types that should not be cached (in addition to the defaults).
+     *
+     * @var string[]
      */
     public array $nonCacheableElementTypes = [];
 
     /**
-     * @var string[] Source ID attributes for element types (in addition to the defaults).
+     * Source ID attributes for element types (in addition to the defaults).
+     *
+     * @var string[]
      */
     public array $sourceIdAttributes = [];
 
     /**
-     * @var string[] Live statuses for element types (in addition to the defaults).
+     * Live statuses for element types (in addition to the defaults).
+     *
+     * @var string[]
      */
     public array $liveStatuses = [];
 
     /**
-     * @var string[] The integrations to initialise.
+     * The integrations to initialise.
+     *
+     * @var string[]
      */
     public array $integrations = [
         CommerceIntegration::class,
@@ -347,7 +362,7 @@ class SettingsModel extends Model
     ];
 
     /**
-     * @var string The value to send in the cache control header.
+     * The value to send in the cache control header.
      *
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
      * https://developers.cloudflare.com/cache/about/cache-control/
@@ -355,12 +370,12 @@ class SettingsModel extends Model
     public string $cacheControlHeader = 'public, s-maxage=31536000, max-age=0';
 
     /**
-     * @var bool Whether an `X-Powered-By: Blitz` header should be sent.
+     * Whether an `X-Powered-By: Blitz` header should be sent.
      */
     public bool $sendPoweredByHeader = true;
 
     /**
-     * @var int|bool Whether the "cached on" and "served by" timestamp comments should be appended to the cached output.
+     * Whether the "cached on" and "served by" timestamp comments should be appended to the cached output.
      *
      * Can be set to any of the following:
      *
@@ -372,27 +387,27 @@ class SettingsModel extends Model
     public int|bool $outputComments = true;
 
     /**
-     * @var int The priority to give the refresh cache job (the lower the number, the higher the priority).
+     * The priority to give the refresh cache job (the lower the number, the higher the priority).
      */
     public int $refreshCacheJobPriority = 10;
 
     /**
-     * @var int The priority to give driver jobs (the lower the number, the higher the priority).
+     * The priority to give driver jobs (the lower the number, the higher the priority).
      */
     public int $driverJobPriority = 100;
 
     /**
-     * @var int The time to reserve for queue jobs in seconds.
+     * The time to reserve for queue jobs in seconds.
      */
     public int $queueJobTtr = 300;
 
     /**
-     * @var int The maximum number of times to attempt retrying a failed queue job.
+     * The maximum number of times to attempt retrying a failed queue job.
      */
     public int $maxRetryAttempts = 10;
 
     /**
-     * @var int The maximum length of URIs that may be cached. Increasing this value requires manually updating the limit in the `uri` column of the `blitz_caches` database table. Note that the prefix length limit is 3072 bytes for InnoDB tables that use the DYNAMIC or COMPRESSED row format. Assuming a `utf8mb4` character set and a maximum of 4 bytes for each character, this is 768 characters.
+     * The maximum length of URIs that may be cached. Increasing this value requires manually updating the limit in the `uri` column of the `blitz_caches` database table. Note that the prefix length limit is 3072 bytes for InnoDB tables that use the DYNAMIC or COMPRESSED row format. Assuming a `utf8mb4` character set and a maximum of 4 bytes for each character, this is 768 characters.
      * https://dev.mysql.com/doc/refman/8.0/en/column-indexes.html#column-indexes-prefix
      *
      * Warning: if using the File Storage driver, this value should not exceed 255 unless using a file system that supports longer filenames.
@@ -401,21 +416,23 @@ class SettingsModel extends Model
     public int $maxUriLength = 255;
 
     /**
-     * @var int The time in seconds to wait for mutex locks to be released.
+     * The time in seconds to wait for mutex locks to be released.
      */
     public int $mutexTimeout = 1;
 
     /**
-     * @var array The paths to executable shell commands.
+     * The paths to executable shell commands.
      *
      * [
      *     'git' => '/usr/bin/git',
      * ]
+     *
+     * @var array<string, string>
      */
     public array $commands = [];
 
     /**
-     * @var string The name of the JavaScript event that will trigger a script inject.
+     * The name of the JavaScript event that will trigger a script inject.
      */
     public string $injectScriptEvent = 'DOMContentLoaded';
 
@@ -544,17 +561,21 @@ class SettingsModel extends Model
         return [
             [['cacheStorageType', 'cacheGeneratorType', 'queryStringCaching'], 'required'],
             [['cacheStorageType', 'cacheGeneratorType', 'cachePurgerType', 'deployerType'], 'string', 'max' => 255],
-            [['refreshMode'], 'in', 'range' => [
+            [
+                ['refreshMode'], 'in', 'range' => [
                 self::REFRESH_MODE_EXPIRE,
                 self::REFRESH_MODE_CLEAR,
                 self::REFRESH_MODE_EXPIRE_AND_GENERATE,
                 self::REFRESH_MODE_CLEAR_AND_GENERATE,
-            ]],
-            [['queryStringCaching'], 'in', 'range' => [
+            ],
+            ],
+            [
+                ['queryStringCaching'], 'in', 'range' => [
                 self::QUERY_STRINGS_DO_NOT_CACHE_URLS,
                 self::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES,
                 self::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE,
-            ]],
+            ],
+            ],
             [['apiKey'], 'string', 'length' => [16]],
             [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
         ];

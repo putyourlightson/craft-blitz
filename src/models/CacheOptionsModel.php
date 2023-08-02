@@ -17,55 +17,59 @@ use DateTime;
 class CacheOptionsModel extends Model
 {
     /**
-     * @var bool Whether caching is enabled.
+     * Whether caching is enabled.
      */
     public bool $cachingEnabled = true;
 
     /**
-     * @var bool Whether elements should be tracked in the database.
+     * Whether elements should be tracked in the database.
      *
      * @since 4.4.0
      */
     public bool $trackElements = true;
 
     /**
-     * @var bool Whether element queries should be tracked in the database.
+     * Whether element queries should be tracked in the database.
      *
      * @since 4.4.0
      */
     public bool $trackElementQueries = true;
 
     /**
-     * @var bool Whether elements should be cached in the database.
+     * Whether elements should be cached in the database.
      *
      * @deprecated in 4.4.0. Use [[trackElements]] instead.
      */
     public bool $cacheElements = true;
 
     /**
-     * @var bool Whether element queries should be cached in the database.
+     * Whether element queries should be cached in the database.
      *
      * @deprecated in 4.4.0. Use [[trackElementQueries]] instead.
      */
     public bool $cacheElementQueries = true;
 
     /**
-     * @var int|bool
+     * Whether the "cached on" and "served by" timestamp comments should be appended to the cached output.
+     *
+     * @see SettingsModel::outputComments
      */
-    public int|bool $outputComments = true;
+    public int|bool|null $outputComments = null;
 
     /**
+     * One or more tags (array or string separated by commas) to associate with this page.
+     *
      * @var string[]|string
      */
     public array|string $tags = [];
 
     /**
-     * @var int|null
+     * Mark the current page for pagination of the specified number of pages.
      */
     public ?int $paginate = null;
 
     /**
-     * @var DateTime|null
+     * When the cache should expire.
      */
     public ?DateTime $expiryDate = null;
 
@@ -142,6 +146,7 @@ class CacheOptionsModel extends Model
 
         return $this;
     }
+
     /**
      * Sets the cache elements option.
      *

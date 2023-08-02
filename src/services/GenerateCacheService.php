@@ -517,8 +517,13 @@ class GenerateCacheService extends Component
 
         $isCachedInclude = Blitz::$plugin->cacheRequest->getIsCachedInclude();
         if (!$isCachedInclude) {
-            $outputComments = $this->options->outputComments === true
-                || $this->options->outputComments === SettingsModel::OUTPUT_COMMENTS_CACHED;
+            $outputComments = $this->options->outputComments;
+
+            if ($outputComments === null) {
+                $outputComments = Blitz::$plugin->settings->outputComments;
+            }
+
+            $outputComments = $outputComments === true || $outputComments === SettingsModel::OUTPUT_COMMENTS_CACHED;
 
             // Append cached by comment if allowed and has HTML mime type
             if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
