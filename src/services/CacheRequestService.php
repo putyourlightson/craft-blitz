@@ -316,10 +316,19 @@ class CacheRequestService extends Component
 
         $site = Craft::$app->getSites()->getCurrentSite();
         $uri = Craft::$app->getRequest()->getFullUri();
-        $queryString = Craft::$app->getRequest()->getQueryString();
+
+        /**
+         * Build the query string from the query params, so that [[Request::getQueryString()]]
+         * doesn’t get called, which is determined from the `$_SERVER` global variable
+         * and which breaks our Pest tests.
+         *
+         * @see Request::getQueryString()
+         */
+        $queryString = http_build_query(Craft::$app->getRequest()->getQueryParams());
 
         /**
          * Remove the base site path from the full URI
+         *
          * @see Request::init()
          */
         $baseSitePath = parse_url($site->getBaseUrl(), PHP_URL_PATH);
