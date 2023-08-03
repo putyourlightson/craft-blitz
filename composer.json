@@ -8,9 +8,10 @@
   "keywords": [
     "cache",
     "caching",
+    "fast",
     "performance",
     "speed",
-    "fast"
+    "static"
   ],
   "require": {
     "php": "^8.0.2",
