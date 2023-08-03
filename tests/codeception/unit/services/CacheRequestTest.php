@@ -21,7 +21,6 @@ use yii\web\Response;
 /**
  * @since 3.0.0
  */
-
 class CacheRequestTest extends Unit
 {
     /**
@@ -170,10 +169,12 @@ class CacheRequestTest extends Unit
 
     public function testGetIsCacheableSiteUriWithAdmin()
     {
-        Blitz::$plugin->settings->includedUriPatterns = [[
-            'siteId' => '',
-            'uriPattern' => '.*',
-        ]];
+        Blitz::$plugin->settings->includedUriPatterns = [
+            [
+                'siteId' => '',
+                'uriPattern' => '.*',
+            ],
+        ];
         $siteUri = new SiteUriModel([
             'siteId' => 1,
             'uri' => 'admin-page',
@@ -184,10 +185,12 @@ class CacheRequestTest extends Unit
 
     public function testGetIsCacheableSiteUriWithIndex()
     {
-        Blitz::$plugin->settings->includedUriPatterns = [[
-            'siteId' => '',
-            'uriPattern' => '.*',
-        ]];
+        Blitz::$plugin->settings->includedUriPatterns = [
+            [
+                'siteId' => '',
+                'uriPattern' => '.*',
+            ],
+        ];
         $siteUri = new SiteUriModel([
             'siteId' => 1,
             'uri' => 'index.php',
@@ -198,10 +201,12 @@ class CacheRequestTest extends Unit
 
     public function testGetIsCacheableSiteUriWithMaxUriLength()
     {
-        Blitz::$plugin->settings->includedUriPatterns = [[
-            'siteId' => '',
-            'uriPattern' => '.*',
-        ]];
+        Blitz::$plugin->settings->includedUriPatterns = [
+            [
+                'siteId' => '',
+                'uriPattern' => '.*',
+            ],
+        ];
         $siteUri = new SiteUriModel([
             'siteId' => 1,
             'uri' => StringHelper::randomString(Blitz::$plugin->settings->maxUriLength),
@@ -212,10 +217,12 @@ class CacheRequestTest extends Unit
 
     public function testGetIsCacheableSiteUriWithMaxUriLengthExceeded()
     {
-        Blitz::$plugin->settings->includedUriPatterns = [[
-            'siteId' => '',
-            'uriPattern' => '.*',
-        ]];
+        Blitz::$plugin->settings->includedUriPatterns = [
+            [
+                'siteId' => '',
+                'uriPattern' => '.*',
+            ],
+        ];
         $siteUri = new SiteUriModel([
             'siteId' => 1,
             'uri' => StringHelper::randomString(Blitz::$plugin->settings->maxUriLength + 1),
@@ -363,7 +370,7 @@ class CacheRequestTest extends Unit
         $this->assertStringNotContainsString('Served by Blitz on', $response->content);
     }
 
-    private function _mockRequest(string $url)
+    private function _mockRequest(string $url): void
     {
         /**
          * Mock the web server request

@@ -1,0 +1,26 @@
+actor: Tester
+paths:
+  tests: .
+  log: _output
+  output: _output
+  data: _data
+  support: _support
+  envs: _envs
+bootstrap: _bootstrap.php
+params:
+  - .env
+modules:
+  config:
+    \craft\test\Craft:
+      configFile: '_craft/config/test.php'
+      entryUrl: 'http://localhost:8004/index.php'
+      entryScript: 'index.php'
+      projectConfig: { }
+      migrations: [ ]
+      plugins:
+        blitz:
+          class: '\putyourlightson\blitz\Blitz'
+          handle: blitz
+      cleanup: true
+      transaction: true
+      dbSetup: { clean: true, setupCraft: true }
