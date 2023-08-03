@@ -1,56 +1,58 @@
 {
-    "name": "putyourlightson/craft-blitz",
-    "description": "Intelligent static page caching for creating lightning-fast sites.",
-    "version": "4.5.0",
-    "type": "craft-plugin",
-    "homepage": "https://putyourlightson.com/plugins/blitz",
-    "license": "proprietary",
-    "keywords": [
-        "cache",
-        "caching",
-        "performance",
-        "speed",
-        "fast"
-    ],
-    "require": {
-        "php": "^8.0.2",
-        "amphp/http-client": "^4.0",
-        "amphp/parallel": "^1.0",
-        "craftcms/cms": "^4.0",
-        "cypresslab/gitelephant": "^4.0",
-        "putyourlightson/craft-blitz-hints": "^1.0.1"
-    },
-    "require-dev": {
-        "codeception/codeception": "^4.1.29",
-        "codeception/module-asserts": "^1.3.1",
-        "codeception/module-yii2": "^1.1.5",
-        "craftcms/ecs": "dev-main",
-        "craftcms/phpstan": "dev-main",
-        "yiisoft/yii2-redis": "^2.0",
-        "vlucas/phpdotenv": "^5.4.1"
-    },
-    "autoload": {
-        "psr-4": {
-          "putyourlightson\\blitz\\": "src/"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-          "putyourlightson\\blitztests\\": "tests/"
-        }
-    },
-    "support": {
-        "docs": "https://putyourlightson.com/plugins/blitz",
-        "source": "https://github.com/putyourlightson/craft-blitz",
-        "issues": "https://github.com/putyourlightson/craft-blitz/issues"
-    },
-    "extra": {
-        "name": "Blitz",
-        "handle": "blitz",
-        "developer": "PutYourLightsOn",
-        "developerUrl": "https://putyourlightson.com/",
-        "documentationUrl": "https://putyourlightson.com/plugins/blitz",
-        "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v4/CHANGELOG.md",
-        "class": "putyourlightson\\blitz\\Blitz"
+  "name": "putyourlightson/craft-blitz",
+  "description": "Intelligent static page caching for creating lightning-fast sites.",
+  "version": "4.5.0",
+  "type": "craft-plugin",
+  "homepage": "https://putyourlightson.com/plugins/blitz",
+  "license": "proprietary",
+  "keywords": [
+    "cache",
+    "caching",
+    "performance",
+    "speed",
+    "fast"
+  ],
+  "require": {
+    "php": "^8.0.2",
+    "amphp/http-client": "^4.0",
+    "amphp/parallel": "^1.0",
+    "craftcms/cms": "^4.0",
+    "cypresslab/gitelephant": "^4.0",
+    "putyourlightson/craft-blitz-hints": "^1.0.1"
+  },
+  "require-dev": {
+    "codeception/codeception": "^4.1.29",
+    "codeception/module-asserts": "^1.3.1",
+    "codeception/module-yii2": "^1.1.5",
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main",
+    "markhuot/craft-pest": "^1.0@alpha",
+    "putyourlightson/craft-generate-test-spec": "dev-main",
+    "yiisoft/yii2-redis": "^2.0",
+    "vlucas/phpdotenv": "^5.4.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "putyourlightson\\blitz\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "putyourlightson\\blitztests\\": "tests/"
+    }
+  },
+  "support": {
+    "docs": "https://putyourlightson.com/plugins/blitz",
+    "source": "https://github.com/putyourlightson/craft-blitz",
+    "issues": "https://github.com/putyourlightson/craft-blitz/issues"
+  },
+  "extra": {
+    "name": "Blitz",
+    "handle": "blitz",
+    "developer": "PutYourLightsOn",
+    "developerUrl": "https://putyourlightson.com/",
+    "documentationUrl": "https://putyourlightson.com/plugins/blitz",
+    "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v4/CHANGELOG.md",
+    "class": "putyourlightson\\blitz\\Blitz"
+  }
 }
