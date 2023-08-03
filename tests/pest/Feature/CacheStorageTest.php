@@ -18,7 +18,7 @@ test('255 character site URI can be saved', function (string $driver) {
         ->toBe($output);
 })->with('cacheStorageDrivers');
 
-test('long site URI can be saved except for by file storage driver', function (string $driver) {
+test('Long site URI can be saved except for by file storage driver', function (string $driver) {
     $output = createOutput();
     $siteUri = createSiteUri(uri: StringHelper::randomString(1000));
     Blitz::$plugin->set('cacheStorage', $driver);
@@ -40,7 +40,7 @@ test('Site URI is decoded before being saved', function (string $driver) {
         ->toBe($output);
 })->with('cacheStorageDrivers');
 
-test('compressed cached value can be fetched compressed and uncompressed', function (string $driver) {
+test('Compressed cached value can be fetched compressed and uncompressed', function (string $driver) {
     $output = createOutput();
     $siteUri = createSiteUri();
     Blitz::$plugin->set('cacheStorage', $driver);
@@ -53,7 +53,7 @@ test('compressed cached value can be fetched compressed and uncompressed', funct
         ->toBe($output);
 })->with('cacheStorageDrivers');
 
-test('cached value of site URI can be deleted', function (string $driver) {
+test('Cached value of site URI can be deleted', function (string $driver) {
     $siteUri = createSiteUri();
     Blitz::$plugin->set('cacheStorage', $driver);
     Blitz::$plugin->cacheStorage->save(createOutput(), $siteUri);
@@ -63,7 +63,7 @@ test('cached value of site URI can be deleted', function (string $driver) {
         ->toBeEmpty();
 })->with('cacheStorageDrivers');
 
-test('cached value of decoded site URI can be deleted', function (string $driver) {
+test('Cached value of decoded site URI can be deleted', function (string $driver) {
     $siteUri = createSiteUri(uri: 'möbelträgerfüße');
     Blitz::$plugin->set('cacheStorage', $driver);
     Blitz::$plugin->cacheStorage->save(createOutput(), $siteUri);
@@ -74,7 +74,7 @@ test('cached value of decoded site URI can be deleted', function (string $driver
         ->toBeEmpty();
 })->with('cacheStorageDrivers');
 
-test('all cached values can be deleted', function (string $driver) {
+test('All cached values can be deleted', function (string $driver) {
     $siteUri = createSiteUri();
     Blitz::$plugin->set('cacheStorage', $driver);
     Blitz::$plugin->cacheStorage->save(createOutput(), $siteUri);

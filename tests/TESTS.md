@@ -26,8 +26,8 @@ This document outlines the test specification for the Blitz plugin.
 - Site URI with `index.php` in uri is not cacheable.
 - Site URI with max uri length is cacheable.
 - Site URI with max uri length exceeded is not cacheable.
-- Uri patterns with matching regular expressions are matched.
-- Uri patterns without matching regular expressions are not matched.
+- URI patterns with matching regular expressions are matched.
+- URI patterns without matching regular expressions are not matched.
 - Response is encoded when compression is enabled.
 - Response is not encoded when compression is disabled.
 - Response contains output comments when enabled.

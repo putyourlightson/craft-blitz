@@ -37,7 +37,7 @@ beforeEach(function () {
     Craft::$app->set('mutex', $mutex);
 });
 
-test('cached value is saved with output comments', function () {
+test('Cached value is saved with output comments', function () {
     $output = createOutput();
     $siteUri = createSiteUri();
     Blitz::$plugin->generateCache->save($output, $siteUri);
@@ -46,7 +46,7 @@ test('cached value is saved with output comments', function () {
         ->toContain($output, 'Cached by Blitz on');
 });
 
-test('cached value is saved without output comments', function () {
+test('Cached value is saved without output comments', function () {
     $output = createOutput();
     $siteUri = createSiteUri();
     Blitz::$plugin->generateCache->options->outputComments = false;
@@ -57,7 +57,7 @@ test('cached value is saved without output comments', function () {
         ->not()->toContain('Cached by Blitz on');
 });
 
-test('cached value is saved with output comments when file extension is html', function () {
+test('Cached value is saved with output comments when file extension is html', function () {
     $siteUri = createSiteUri(uri: 'page.html');
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 
@@ -65,7 +65,7 @@ test('cached value is saved with output comments when file extension is html', f
         ->toContain('Cached by Blitz on');
 });
 
-test('cached value is saved without output comments when file extension is not html', function () {
+test('Cached value is saved without output comments when file extension is not html', function () {
     $siteUri = createSiteUri(uri: 'page.json');
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 
@@ -73,7 +73,7 @@ test('cached value is saved without output comments when file extension is not h
         ->not()->toContain('Cached by Blitz on');
 });
 
-test('cache record with max uri length is saved', function () {
+test('Cache record with max uri length is saved', function () {
     $siteUri = createSiteUri(uri: StringHelper::randomString(Blitz::$plugin->settings->maxUriLength));
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
     $count = CacheRecord::find()
@@ -84,12 +84,12 @@ test('cache record with max uri length is saved', function () {
         ->toEqual(1);
 });
 
-test('cache record with max uri length exceeded throws exception', function () {
+test('Cache record with max uri length exceeded throws exception', function () {
     $siteUri = createSiteUri(uri: StringHelper::randomString(Blitz::$plugin->settings->maxUriLength + 1));
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 })->throws(Exception::class);
 
-test('element cache record is saved without custom fields', function () {
+test('Element cache record is saved without custom fields', function () {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElement($entry);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -100,7 +100,7 @@ test('element cache record is saved without custom fields', function () {
         ->toHaveRecordCount(0, ['elementId' => $entry->id]);
 });
 
-test('element cache record is saved with custom fields', function () {
+test('Element cache record is saved with custom fields', function () {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElement($entry);
     // Access the fields to register usage
@@ -114,7 +114,7 @@ test('element cache record is saved with custom fields', function () {
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
 });
 
-test('element cache record is saved with eager loaded custom fields', function () {
+test('Element cache record is saved with eager loaded custom fields', function () {
     $entry = Entry::find()->with(['relatedTo'])->one();
     Blitz::$plugin->generateCache->addElement($entry);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -125,7 +125,7 @@ test('element cache record is saved with eager loaded custom fields', function (
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
 });
 
-test('element cache record is saved with eager loaded custom fields in variable', function () {
+test('Element cache record is saved with eager loaded custom fields in variable', function () {
     $entry = createEntryWithRelationship();
     Craft::$app->elements->eagerLoadElements(Entry::class, [$entry], ['relatedTo']);
     Blitz::$plugin->generateCache->addElement($entry);
@@ -137,7 +137,7 @@ test('element cache record is saved with eager loaded custom fields in variable'
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
 });
 
-test('element query records without specific identifiers are saved', function () {
+test('Element query records without specific identifiers are saved', function () {
     $elementQuerySets = [
         [
             Entry::find(),
@@ -179,7 +179,7 @@ test('element query records without specific identifiers are saved', function ()
         ->toHaveRecordCount(count($elementQuerySets));
 });
 
-test('element query records with specific identifiers are not saved', function () {
+test('Element query records with specific identifiers are not saved', function () {
     $elementQueries = [
         Entry::find()->id(1),
         Entry::find()->id('1'),
@@ -201,7 +201,7 @@ test('element query records with specific identifiers are not saved', function (
         ->toHaveRecordCount(0);
 });
 
-test('element query record with join is saved', function () {
+test('Element query record with join is saved', function () {
     $elementQuery = Entry::find()->innerJoin('{{%users}}');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
 
@@ -209,7 +209,7 @@ test('element query record with join is saved', function () {
         ->toHaveRecordCount(1);
 });
 
-test('element query record with relation field is not saved', function () {
+test('Element query record with relation field is not saved', function () {
     $entry = createEntryWithRelationship();
     ElementQueryRecord::deleteAll();
     $elementQuery = $entry->relatedTo;
@@ -219,7 +219,7 @@ test('element query record with relation field is not saved', function () {
         ->toHaveRecordCount(0);
 });
 
-test('element query record with related to param is saved', function () {
+test('Element query record with related to param is saved', function () {
     $elementQuery = Entry::find()->relatedTo(1);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
 
@@ -227,7 +227,7 @@ test('element query record with related to param is saved', function () {
         ->toHaveRecordCount(1);
 });
 
-test('element query record with expression is not saved', function () {
+test('Element query record with expression is not saved', function () {
     $expression = new FixedOrderExpression('elements.id', [], Craft::$app->db);
     $elementQuery = Entry::find()->orderBy($expression);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
@@ -236,7 +236,7 @@ test('element query record with expression is not saved', function () {
         ->toHaveRecordCount(0);
 });
 
-test('element query cache records are saved', function () {
+test('Element query cache records are saved', function () {
     $elementQuery = Entry::find();
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -247,7 +247,7 @@ test('element query cache records are saved', function () {
         ->toHaveRecordCount(2);
 });
 
-test('element query source records with specific source identifiers are saved', function () {
+test('Element query source records with specific source identifiers are saved', function () {
     $elementQueries = [
         Entry::find(),
         Entry::find()->sectionId(1),
@@ -277,7 +277,7 @@ test('element query source records with specific source identifiers are saved', 
         ->toEqual([1, 1, 2, 3, 4, 5, 6]);
 });
 
-test('element query source records without specific source identifiers are not saved', function () {
+test('Element query source records without specific source identifiers are not saved', function () {
     $elementQueries = [
         Entry::find()->sectionId('not 1'),
         Entry::find()->sectionId('> 1'),
@@ -294,7 +294,7 @@ test('element query source records without specific source identifiers are not s
         ->toHaveRecordCount(0);
 });
 
-test('element query attribute records are saved', function () {
+test('Element query attribute records are saved', function () {
     $elementQuery = Entry::find()->title('x');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $attributes = ElementQueryAttributeRecord::find()
@@ -305,7 +305,7 @@ test('element query attribute records are saved', function () {
         ->toEqual(['postDate', 'title']);
 });
 
-test('element query attribute records are saved with order by', function () {
+test('Element query attribute records are saved with order by', function () {
     $elementQuery = Entry::find()->orderBy('title');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $attributes = ElementQueryAttributeRecord::find()
@@ -316,7 +316,7 @@ test('element query attribute records are saved with order by', function () {
         ->toEqual(['title']);
 });
 
-test('element query attribute records are saved with order by parts array', function () {
+test('Element query attribute records are saved with order by parts array', function () {
     $elementQuery = Entry::find()->orderBy(['entries.title' => SORT_DESC]);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $attributes = ElementQueryAttributeRecord::find()
@@ -327,7 +327,7 @@ test('element query attribute records are saved with order by parts array', func
         ->toEqual(['title']);
 });
 
-test('element query attribute records are saved with before', function () {
+test('Element query attribute records are saved with before', function () {
     $elementQuery = Entry::find()
         ->before('1999-12-31')
         ->orderBy('title');
@@ -340,7 +340,7 @@ test('element query attribute records are saved with before', function () {
         ->toEqual(['postDate', 'title']);
 });
 
-test('element query field records are saved with order by', function () {
+test('Element query field records are saved with order by', function () {
     $elementQuery = Entry::find()->orderBy('plainText');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $fieldIds = ElementQueryFieldRecord::find()
@@ -351,7 +351,7 @@ test('element query field records are saved with order by', function () {
         ->toEqual(FieldHelper::getFieldIdsFromHandles(['plainText']));
 });
 
-test('element query field records are saved with order by array', function () {
+test('Element query field records are saved with order by array', function () {
     $elementQuery = Entry::find()->orderBy(['plainText' => SORT_ASC]);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $fieldIds = ElementQueryFieldRecord::find()
@@ -362,7 +362,7 @@ test('element query field records are saved with order by array', function () {
         ->toEqual(FieldHelper::getFieldIdsFromHandles(['plainText']));
 });
 
-test('cache tags are saved', function () {
+test('Cache tags are saved', function () {
     $tags = ['tag1', 'tag2', 'tag3'];
     Blitz::$plugin->generateCache->options->tags = $tags;
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -371,7 +371,7 @@ test('cache tags are saved', function () {
         ->toHaveCount(1);
 });
 
-test('include record is saved', function () {
+test('Include record is saved', function () {
     IncludeRecord::deleteAll();
     Blitz::$plugin->generateCache->saveInclude(1, 't', []);
 
@@ -379,7 +379,7 @@ test('include record is saved', function () {
         ->toHaveRecordCount(1);
 });
 
-test('ssi include cache record is saved', function () {
+test('Ssi include cache record is saved', function () {
     [$includeId] = Blitz::$plugin->generateCache->saveInclude(1, 't', []);
     Blitz::$plugin->generateCache->addSsiInclude($includeId);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
