@@ -1,3 +1,3 @@
 .DS_Store
-tests/_craft/storage/
-/tests/_craft/config/project
+tests/codeception/_craft/storage/
+tests/codeception/_craft/config/project
