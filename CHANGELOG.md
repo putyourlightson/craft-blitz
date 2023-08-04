@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Fixed a bug in which using dynamic includes with nginx server rewrites set to cache pages with query strings as the same page could inclorrectly include the home page.
+- Fixed a bug in which using dynamic includes with nginx server rewrites set to cache pages with query strings as the same page could incorrectly include the home page.
 
 ## 4.5.0 - 2023-07-19
 
