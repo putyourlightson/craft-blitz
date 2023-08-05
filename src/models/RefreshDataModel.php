@@ -17,6 +17,7 @@ use putyourlightson\blitz\helpers\FieldHelper;
  *
  * @property-read int[] $cacheIds
  * @property-read array $elementTypes
+ * @property-read int[] $assetsChangedByFile
  * @property-read int[] $assetsChangedByImage
  *
  * @since 4.4.0

@@ -186,7 +186,7 @@ test('Element query type records are returned when an entry is changed', functio
         ->toHaveCount(2);
 });
 
-test('Element query type records without a cache id are not returned when an entry is changed', function () {
+test('Element query type records without a cache ID are not returned when an entry is changed', function () {
     $entry = createEntry();
     $refreshData = RefreshDataModel::createFromElement($entry);
 

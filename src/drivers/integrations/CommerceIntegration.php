@@ -43,7 +43,9 @@ class CommerceIntegration extends BaseIntegration
                     }
                 }
 
-                Blitz::$plugin->refreshCache->refresh();
+                if (Blitz::$plugin->refreshCache->batchMode === false) {
+                    Blitz::$plugin->refreshCache->refresh();
+                }
             }
         );
     }

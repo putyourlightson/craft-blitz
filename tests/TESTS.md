@@ -100,7 +100,7 @@ This document outlines the test specification for the Blitz plugin.
 - Element cache IDs are returned when an entry is changed by attributes.
 - Element cache IDs are not returned when an entry is changed by custom fields.
 - Element query type records are returned when an entry is changed.
-- Element query type records without a cache id are not returned when an entry is changed.
+- Element query type records without a cache ID are not returned when an entry is changed.
 - Element query type records are returned when an entry is changed by attributes used in the query.
 - Element query type records are not returned when an entry is changed by attributes not used in the query.
 - Element query type records are returned when an entry is changed by custom fields used in the query.
@@ -116,3 +116,23 @@ This document outlines the test specification for the Blitz plugin.
 - JSON mime type is returned when site URI is JSON.
 - Site URIs with page triggers are paginated.
 - Site URIs without page triggers are not paginated.
+
+## [Integration Tests](pest/Integration)
+
+### [Seomatic](pest/Integration/SeomaticTest.php)
+
+> _/
+    $refreshCache = Blitz::$plugin->refreshCache;
+    $refreshCache->shouldNotReceive('refresh');
+    $refreshCache->shouldReceive('refreshAll')->once();
+
+    createEntry(batchMode: true);
+    Seomatic::$plugin->metaContainers->invalidateCaches();
+})->skip(fn () => !in_array(SeomaticIntegration::class, IntegrationHelper::getActiveIntegrations()), 'SEOmatic integration not found in active integrations.');
+
+test('Invalidate container caches event with a specific source triggers a refresh', function () {
+    /** @var MockInterface $refreshCache_
+
+- Invalidate container caches event without a URL or source should trigger a refresh all.
+- Invalidate container caches event with a specific source triggers a refresh.
+- Invalidate container caches event for a specific element does not trigger a refresh.

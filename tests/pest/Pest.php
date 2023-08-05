@@ -131,6 +131,16 @@ expect()->extend('toHaveRecordCount', function (int $count, array $where = []) {
 
 /*
 |--------------------------------------------------------------------------
+| Constants
+|--------------------------------------------------------------------------
+*/
+
+const TEST_SITE_ID = 1;
+const TEST_SECTION_ID = 6;
+const TEST_VOLUME_HANDLE = 'test';
+
+/*
+|--------------------------------------------------------------------------
 | Functions
 |--------------------------------------------------------------------------
 |
@@ -153,16 +163,20 @@ function createSiteUri(int $siteId = 1, string $uri = 'page'): SiteUriModel
     ]);
 }
 
-function createEntry(): Entry
+function createEntry(int $sectionId = TEST_SECTION_ID, bool $batchMode = false): Entry
 {
+    $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
+    Blitz::$plugin->refreshCache->batchMode = $batchMode;
+
     $entry = EntryFactory::factory()
-        ->section('blog')
+        ->section($sectionId)
         ->create();
 
     $entry->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
     Blitz::$plugin->generateCache->reset();
     Blitz::$plugin->refreshCache->reset();
+    Blitz::$plugin->refreshCache->batchMode = $originalBatchMode;
 
     return $entry;
 }
@@ -183,7 +197,7 @@ function createEntryWithRelationship(): Entry
 function createAsset(): Asset
 {
     $asset = AssetFactory::factory()
-        ->volume('test')
+        ->volume(TEST_VOLUME_HANDLE)
         ->create();
 
     $asset->setFocalPoint([
