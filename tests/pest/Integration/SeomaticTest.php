@@ -1,6 +1,9 @@
 <?php
 
-use craft\elements\Entry;
+/**
+ * Tests that cached pages are refreshed when SEOmatic meta containers are invalidated.
+ */
+
 use Mockery\MockInterface;
 use nystudio107\seomatic\seoelements\SeoEntry;
 use nystudio107\seomatic\Seomatic;
@@ -24,7 +27,7 @@ beforeEach(function () {
     Seomatic::$plugin->metaBundles->deleteMetaBundleBySourceId(SeoEntry::getMetaBundleType(), TEST_SECTION_ID, TEST_SITE_ID);
 });
 
-test('Invalidate container caches event without a URL or source should trigger a refresh all', function () {
+test('Invalidate container caches event without a URL or source triggers a refresh all', function () {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldNotReceive('refresh');
@@ -43,7 +46,7 @@ test('Invalidate container caches event with a specific source triggers a refres
     $entry = createEntry(batchMode: true);
     Seomatic::$plugin->metaContainers->invalidateContainerCacheById(TEST_SECTION_ID, SeoEntry::getMetaBundleType(), TEST_SITE_ID);
 
-    expect(Blitz::$plugin->refreshCache->refreshData->getElementIds(Entry::class))
+    expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($entry::class))
         ->toContain($entry->id);
 })->skip(fn () => !in_array(SeomaticIntegration::class, IntegrationHelper::getActiveIntegrations()), 'SEOmatic integration not found in active integrations.');
 

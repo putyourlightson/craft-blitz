@@ -119,19 +119,15 @@ This document outlines the test specification for the Blitz plugin.
 
 ## [Integration Tests](pest/Integration)
 
+### [Commerce](pest/Integration/CommerceTest.php)
+
+> _Tests that Commerce variants are refreshed on order completion so that their stock is updated._
+
+- Variants are refreshed on order completion.
+
 ### [Seomatic](pest/Integration/SeomaticTest.php)
 
-> _/
-    $refreshCache = Blitz::$plugin->refreshCache;
-    $refreshCache->shouldNotReceive('refresh');
-    $refreshCache->shouldReceive('refreshAll')->once();
-
-    createEntry(batchMode: true);
-    Seomatic::$plugin->metaContainers->invalidateCaches();
-})->skip(fn () => !in_array(SeomaticIntegration::class, IntegrationHelper::getActiveIntegrations()), 'SEOmatic integration not found in active integrations.');
-
-test('Invalidate container caches event with a specific source triggers a refresh', function () {
-    /** @var MockInterface $refreshCache_
+> _Tests that cached pages are refreshed when SEOmatic meta containers are invalidated._
 
 - Invalidate container caches event without a URL or source should trigger a refresh all.
 - Invalidate container caches event with a specific source triggers a refresh.

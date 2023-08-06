@@ -1,6 +1,10 @@
 <?php
 
 use craft\base\Element;
+use craft\commerce\elements\Order;
+use craft\commerce\elements\Product;
+use craft\commerce\elements\Variant;
+use craft\commerce\models\LineItem;
 use craft\db\ActiveRecord;
 use craft\elements\Asset;
 use craft\elements\Entry;
@@ -137,6 +141,7 @@ expect()->extend('toHaveRecordCount', function (int $count, array $where = []) {
 
 const TEST_SITE_ID = 1;
 const TEST_SECTION_ID = 6;
+const TEST_PRODUCT_TYPE_ID = 1;
 const TEST_VOLUME_HANDLE = 'test';
 
 /*
@@ -194,10 +199,10 @@ function createEntryWithRelationship(): Entry
     return $entry;
 }
 
-function createAsset(): Asset
+function createAsset(string $volumeHandle = TEST_VOLUME_HANDLE): Asset
 {
     $asset = AssetFactory::factory()
-        ->volume(TEST_VOLUME_HANDLE)
+        ->volume($volumeHandle)
         ->create();
 
     $asset->setFocalPoint([
@@ -211,6 +216,45 @@ function createAsset(): Asset
     $asset->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
     return $asset;
+}
+
+function createProductVariantOrder(int $typeId = TEST_PRODUCT_TYPE_ID, bool $batchMode = false): array
+{
+    $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
+    Blitz::$plugin->refreshCache->batchMode = $batchMode;
+
+    $product = new Product([
+        'title' => 'Test Product',
+        'slug' => 'test-product',
+        'typeId' => $typeId,
+    ]);
+    Craft::$app->elements->saveElement($product);
+
+    $variant = new Variant([
+        'sku' => 'test-sku',
+        'price' => 10,
+        'stock' => 100,
+        'productId' => $product->id,
+    ]);
+    Craft::$app->elements->saveElement($variant);
+
+    $variant->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+
+    $order = new Order();
+    $lineItem = new LineItem([
+        'qty' => 1,
+        'purchasableId' => $variant->id,
+        'taxCategoryId' => 1,
+        'shippingCategoryId' => 1,
+    ]);
+    $order->addLineItem($lineItem);
+    Craft::$app->getElements()->saveElement($order);
+
+    Blitz::$plugin->generateCache->reset();
+    Blitz::$plugin->refreshCache->reset();
+    Blitz::$plugin->refreshCache->batchMode = $originalBatchMode;
+
+    return [$variant, $order];
 }
 
 function sendRequest(string $uri = ''): TestableResponse
