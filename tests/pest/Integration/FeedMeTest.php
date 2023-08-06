@@ -29,4 +29,4 @@ test('Cache is refreshed with batch mode enabled', function () {
 
     expect(Blitz::$plugin->refreshCache->batchMode)
         ->toBeTrue();
-})->skip(getIsIntegrationInactive(FeedMeIntegration::class), 'Feed Me integration not found in active integrations.');
+})->skip(fn () => !integrationIsActive(FeedMeIntegration::class), 'Feed Me integration not found in active integrations.');

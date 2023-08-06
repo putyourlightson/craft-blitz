@@ -19,10 +19,11 @@ beforeEach(function () {
     Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
     Blitz::$plugin->settings->outputComments = false;
     Blitz::$plugin->generateCache->options->outputComments = null;
+    Blitz::$plugin->cacheStorage->deleteAll();
 });
 
-afterEach(function () {
-    sendRequest();
+afterAll(function () {
+    Blitz::$plugin->cacheStorage->deleteAll();
 });
 
 test('Request matching included uri pattern is cacheable', function () {
@@ -61,7 +62,7 @@ test('Request with `_includes` path is a cached include', function () {
 });
 
 test('Request with include action is a cached include', function () {
-    sendRequest(UrlHelper::siteUrl('', ['action' => 'blitz/include/cached']));
+    sendRequest(UrlHelper::actionUrl('', ['action' => 'blitz/include/cached']));
 
     expect(Blitz::$plugin->cacheRequest->getIsCachedInclude())
         ->toBeTrue();

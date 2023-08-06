@@ -8,6 +8,10 @@ use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 
+afterEach(function () {
+    Blitz::$plugin->cacheStorage->deleteAll();
+});
+
 test('255 character site URI can be saved', function (string $driver) {
     $output = createOutput();
     $siteUri = createSiteUri(uri: StringHelper::randomString(255));

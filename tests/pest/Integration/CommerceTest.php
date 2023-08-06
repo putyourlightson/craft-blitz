@@ -29,4 +29,4 @@ test('Variants are refreshed on order completion', function () {
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($variant::class))
         ->toBe([$variant->id]);
-})->skip(getIsIntegrationInactive(CommerceIntegration::class), 'Commerce integration not found in active integrations.');
+})->skip(fn () => !integrationIsActive(CommerceIntegration::class), 'Commerce integration not found in active integrations.');

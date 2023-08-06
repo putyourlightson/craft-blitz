@@ -17,7 +17,7 @@ beforeEach(function () {
     Blitz::$plugin->cacheStorage->deleteAll();
 });
 
-afterEach(function () {
+afterAll(function () {
     Blitz::$plugin->cacheStorage->deleteAll();
 });
 

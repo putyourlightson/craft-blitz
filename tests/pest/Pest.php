@@ -166,10 +166,9 @@ const TEST_VOLUME_HANDLE = 'test';
 |
 */
 
-function getIsIntegrationInactive(string $class): callable
+function integrationIsActive(string $class): bool
 {
-    // Return a callable, so it is only executed when the test is run.
-    return fn () => !in_array($class, IntegrationHelper::getActiveIntegrations());
+    return in_array($class, IntegrationHelper::getActiveIntegrations());
 }
 
 function createOutput(): string
