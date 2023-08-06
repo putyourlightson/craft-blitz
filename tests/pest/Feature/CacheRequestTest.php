@@ -22,10 +22,6 @@ beforeEach(function () {
     Blitz::$plugin->cacheStorage->deleteAll();
 });
 
-afterAll(function () {
-    Blitz::$plugin->cacheStorage->deleteAll();
-});
-
 test('Request matching included uri pattern is cacheable', function () {
     sendRequest();
 

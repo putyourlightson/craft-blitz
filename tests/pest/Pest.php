@@ -9,6 +9,7 @@ use craft\db\ActiveRecord;
 use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\helpers\Db;
+use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use markhuot\craftpest\factories\Asset as AssetFactory;
 use markhuot\craftpest\factories\Entry as EntryFactory;
@@ -34,7 +35,16 @@ use yii\web\Response;
 |
 */
 
-uses(TestCase::class)->in('./');
+uses(TestCase::class)
+    ->beforeAll(function () {
+        // Clear the cache directory without using Blitz, which is not yet instantiated.
+        FileHelper::clearDirectory(getcwd() . '/web/cache');
+    })
+    ->afterAll(function () {
+        Blitz::$plugin->cacheStorage->deleteAll();
+        Craft::$app->queue->releaseAll();
+    })
+    ->in('./');
 
 /*
 |--------------------------------------------------------------------------
