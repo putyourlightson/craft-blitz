@@ -10,7 +10,6 @@ use nystudio107\seomatic\Seomatic;
 use nystudio107\seomatic\services\MetaBundles;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
-use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\services\RefreshCacheService;
 
 // TODO: move skips from tests to the beforeEach function
@@ -35,7 +34,7 @@ test('Invalidate container caches event without a URL or source triggers a refre
 
     createEntry(batchMode: true);
     Seomatic::$plugin->metaContainers->invalidateCaches();
-})->skip(fn () => !in_array(SeomaticIntegration::class, IntegrationHelper::getActiveIntegrations()), 'SEOmatic integration not found in active integrations.');
+})->skip(getIsIntegrationInactive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
 
 test('Invalidate container caches event with a specific source triggers a refresh', function () {
     /** @var MockInterface $refreshCache */
@@ -48,7 +47,7 @@ test('Invalidate container caches event with a specific source triggers a refres
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($entry::class))
         ->toContain($entry->id);
-})->skip(fn () => !in_array(SeomaticIntegration::class, IntegrationHelper::getActiveIntegrations()), 'SEOmatic integration not found in active integrations.');
+})->skip(getIsIntegrationInactive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
 
 test('Invalidate container caches event for a specific element does not trigger a refresh', function () {
     /** @var MockInterface $refreshCache */
@@ -58,4 +57,4 @@ test('Invalidate container caches event for a specific element does not trigger 
 
     $entry = createEntry(batchMode: true);
     Seomatic::$plugin->metaContainers->invalidateContainerCacheByPath($entry->uri);
-})->skip(fn () => !in_array(SeomaticIntegration::class, IntegrationHelper::getActiveIntegrations()), 'SEOmatic integration not found in active integrations.');
+})->skip(getIsIntegrationInactive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');

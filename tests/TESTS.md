@@ -125,10 +125,16 @@ This document outlines the test specification for the Blitz plugin.
 
 - Variants are refreshed on order completion.
 
+### [Feed Me](pest/Integration/FeedMeTest.php)
+
+> _Tests that Feed Me imports refresh the cache with batch mode enabled._
+
+- Cache is refreshed with batch mode enabled.
+
 ### [Seomatic](pest/Integration/SeomaticTest.php)
 
 > _Tests that cached pages are refreshed when SEOmatic meta containers are invalidated._
 
-- Invalidate container caches event without a URL or source should trigger a refresh all.
+- Invalidate container caches event without a URL or source triggers a refresh all.
 - Invalidate container caches event with a specific source triggers a refresh.
 - Invalidate container caches event for a specific element does not trigger a refresh.

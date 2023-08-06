@@ -18,6 +18,7 @@ use markhuot\craftpest\web\TestableResponse;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\FieldHelper;
+use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 
@@ -154,6 +155,12 @@ const TEST_VOLUME_HANDLE = 'test';
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
+
+function getIsIntegrationInactive(string $class): callable
+{
+    // Return a callable, so it is only executed when the test is run.
+    return fn () => !in_array($class, IntegrationHelper::getActiveIntegrations());
+}
 
 function createOutput(): string
 {

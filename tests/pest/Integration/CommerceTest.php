@@ -8,7 +8,6 @@ use craft\commerce\elements\Order;
 use Mockery\MockInterface;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\integrations\CommerceIntegration;
-use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\services\RefreshCacheService;
 
 // TODO: move skips from tests to the beforeEach function
@@ -30,4 +29,4 @@ test('Variants are refreshed on order completion', function () {
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($variant::class))
         ->toBe([$variant->id]);
-})->skip(fn () => !in_array(CommerceIntegration::class, IntegrationHelper::getActiveIntegrations()), 'Commerce integration not found in active integrations.');
+})->skip(getIsIntegrationInactive(CommerceIntegration::class), 'Commerce integration not found in active integrations.');
