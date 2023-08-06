@@ -21,7 +21,7 @@ afterAll(function () {
     Blitz::$plugin->cacheStorage->deleteAll();
 });
 
-test('Response adds “powered by” header once', function () {
+test('Response adds `X-Powered-By` header once', function () {
     Craft::$app->config->general->sendPoweredByHeader = true;
     $response = sendRequest();
 
@@ -29,7 +29,7 @@ test('Response adds “powered by” header once', function () {
         ->toContainOnce('Blitz', 'Craft CMS');
 });
 
-test('Response overwrites “powered by” header', function () {
+test('Response overwrites `X-Powered-By` header', function () {
     Craft::$app->config->general->sendPoweredByHeader = false;
     $response = sendRequest();
 

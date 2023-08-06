@@ -140,8 +140,8 @@ This document outlines the test specification for the Blitz plugin.
 
 > _Tests that cached web responses contain the correct headers and comments._
 
-- Response adds “powered by” header once.
-- Response overwrites “powered by” header.
+- Response adds `X-Powered-By` header once.
+- Response overwrites `X-Powered-By` header.
 - Response contains output comments when enabled.
 - Response does not contain output comments when disabled.
 - Response with mime type has headers and does not contain output comments.
