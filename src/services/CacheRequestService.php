@@ -602,6 +602,8 @@ class CacheRequestService extends Component
 
         if ($encoded) {
             $headers->set('Content-Encoding', BaseCacheStorage::ENCODING);
+        } else {
+            $headers->remove('Content-Encoding');
         }
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {

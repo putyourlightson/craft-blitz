@@ -21,6 +21,7 @@ use putyourlightson\blitz\helpers\FieldHelper;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
+use yii\web\Response;
 
 /*
 |--------------------------------------------------------------------------
@@ -273,8 +274,11 @@ function createProductVariantOrder(int $typeId = TEST_PRODUCT_TYPE_ID, bool $bat
     return [$variant, $order];
 }
 
-function sendRequest(string $uri = ''): TestableResponse
+function sendRequest(string $uri = '', array $headers = []): TestableResponse
 {
-    return (new RequestBuilder('get', $uri))->send();
+    $response = (new RequestBuilder('get', $uri))->send();
+    $response->trigger(Response::EVENT_AFTER_PREPARE);
+
+    return $response;
 }
 

@@ -28,11 +28,6 @@ This document outlines the test specification for the Blitz plugin.
 - Site URI with max uri length exceeded is not cacheable.
 - URI patterns with matching regular expressions are matched.
 - URI patterns without matching regular expressions are not matched.
-- Response is encoded when compression is enabled.
-- Response is not encoded when compression is disabled.
-- Response contains output comments when enabled.
-- Response does not contain output comments when disabled.
-- Response with mime type has headers and does not contain output comments.
 
 ### [Cache Storage](pest/Feature/CacheStorageTest.php)
 
@@ -145,6 +140,10 @@ This document outlines the test specification for the Blitz plugin.
 
 > _Tests that cached web responses contain the correct headers and comments._
 
-- Cached response contains “powered by” header once.
-- Cached response overwrites “powered by” header.
-- Cached response contains comments.
+- Response adds “powered by” header once.
+- Response overwrites “powered by” header.
+- Response contains output comments when enabled.
+- Response does not contain output comments when disabled.
+- Response with mime type has headers and does not contain output comments.
+- Response is encoded when compression is enabled.
+- Response is not encoded when compression is disabled.
