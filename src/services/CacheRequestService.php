@@ -576,8 +576,13 @@ class CacheRequestService extends Component
         // Send the X-Powered-By header?
         if ($generalConfig->sendPoweredByHeader) {
             $original = $headers->get('X-Powered-By');
-            $headers->set('X-Powered-By', $original . ($original ? ',' : '') . Craft::$app->name);
+
+            if (!str_contains($original, Craft::$app->name)) {
+                $headers->set('X-Powered-By', $original . ($original ? ',' : '') . Craft::$app->name);
+            }
         } else {
+            $headers->remove('X-Powered-By');
+
             // In case PHP is already setting one
             header_remove('X-Powered-By');
         }
@@ -600,8 +605,11 @@ class CacheRequestService extends Component
         }
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $original = $headers->get('X-Powered-By');
-            $headers->set('X-Powered-By', $original . ($original ? ',' : '') . 'Blitz');
+            $original = $headers->get('X-Powered-By') ?? '';
+
+            if (!str_contains($original, 'Blitz')) {
+                $headers->set('X-Powered-By', $original . ($original ? ',' : '') . 'Blitz');
+            }
         }
 
         // Add cache tag header if set

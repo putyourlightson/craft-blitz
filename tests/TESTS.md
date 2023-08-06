@@ -138,3 +138,13 @@ This document outlines the test specification for the Blitz plugin.
 - Invalidate container caches event without a URL or source triggers a refresh all.
 - Invalidate container caches event with a specific source triggers a refresh.
 - Invalidate container caches event for a specific element does not trigger a refresh.
+
+## [Interface Tests](pest/Interface)
+
+### [Web Response](pest/Interface/WebResponseTest.php)
+
+> _Tests that cached web responses contain the correct headers and comments._
+
+- Cached response contains “powered by” header once.
+- Cached response overwrites “powered by” header.
+- Cached response contains comments.
