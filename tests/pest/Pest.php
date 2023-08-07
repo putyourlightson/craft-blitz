@@ -11,6 +11,7 @@ use craft\elements\Entry;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
+use Faker\Factory as FakerFactory;
 use markhuot\craftpest\factories\Asset as AssetFactory;
 use markhuot\craftpest\factories\Entry as EntryFactory;
 use markhuot\craftpest\http\RequestBuilder;
@@ -248,10 +249,10 @@ function createProductVariantOrder(int $typeId = TEST_PRODUCT_TYPE_ID, bool $bat
 {
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
+    $faker = FakerFactory::create();
 
     $product = new Product([
-        'title' => 'Test Product',
-        'slug' => 'test-product',
+        'title' => $faker->sentence,
         'typeId' => $typeId,
     ]);
     Craft::$app->elements->saveElement($product);
