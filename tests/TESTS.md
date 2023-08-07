@@ -10,7 +10,7 @@ This document outlines the test specification for the Blitz plugin.
 
 > _Tests whether requests are cacheable and under what circumstances._
 
-- Request matching included uri pattern is cacheable.
+- Request matching included URI pattern is cacheable.
 - Request with generate token is cacheable.
 - Request with `no-cache` param is not cacheable.
 - Request with token is not cacheable.
@@ -20,12 +20,12 @@ This document outlines the test specification for the Blitz plugin.
 - Requested cacheable site URI does not include query strings when urls cached as same page.
 - Requested cacheable site URI includes page trigger.
 - Requested cacheable site URI works with regular expressions.
-- Site URI with included uri pattern is cacheable.
-- Site URI with excluded uri pattern is not cacheable.
-- Site URI with `admin` in uri is cacheable.
-- Site URI with `index.php` in uri is not cacheable.
-- Site URI with max uri length is cacheable.
-- Site URI with max uri length exceeded is not cacheable.
+- Site URI with included URI pattern is cacheable.
+- Site URI with excluded URI pattern is not cacheable.
+- Site URI with `admin` in URI is cacheable.
+- Site URI with `index.php` in URI is not cacheable.
+- Site URI with max URI length is cacheable.
+- Site URI with max URI length exceeded is not cacheable.
 - URI patterns with matching regular expressions are matched.
 - URI patterns without matching regular expressions are not matched.
 
@@ -47,10 +47,10 @@ This document outlines the test specification for the Blitz plugin.
 
 - Cached value is saved with output comments.
 - Cached value is saved without output comments.
-- Cached value is saved with output comments when file extension is html.
-- Cached value is saved without output comments when file extension is not html.
-- Cache record with max uri length is saved.
-- Cache record with max uri length exceeded throws exception.
+- Cached value is saved with output comments when file extension is `.html`.
+- Cached value is saved without output comments when file extension is not `.html`.
+- Cache record with max URI length is saved.
+- Cache record with max URI length exceeded throws exception.
 - Element cache record is saved without custom fields.
 - Element cache record is saved with custom fields.
 - Element cache record is saved with eager loaded custom fields.
@@ -72,7 +72,7 @@ This document outlines the test specification for the Blitz plugin.
 - Element query field records are saved with order by array.
 - Cache tags are saved.
 - Include record is saved.
-- Ssi include cache record is saved.
+- SSI include cache record is saved.
 
 ### [Refresh Cache](pest/Feature/RefreshCacheTest.php)
 

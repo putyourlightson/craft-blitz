@@ -22,7 +22,7 @@ beforeEach(function () {
     Blitz::$plugin->cacheStorage->deleteAll();
 });
 
-test('Request matching included uri pattern is cacheable', function () {
+test('Request matching included URI pattern is cacheable', function () {
     sendRequest();
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableRequest())
@@ -103,14 +103,14 @@ test('Requested cacheable site URI works with regular expressions', function () 
         ->toBe('page?sort=asc&search=waldo');
 });
 
-test('Site URI with included uri pattern is cacheable', function () {
+test('Site URI with included URI pattern is cacheable', function () {
     $siteUri = createSiteUri();
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
         ->toBeTrue();
 });
 
-test('Site URI with excluded uri pattern is not cacheable', function () {
+test('Site URI with excluded URI pattern is not cacheable', function () {
     $siteUri = createSiteUri(uri: 'page-to-exclude');
     Blitz::$plugin->settings->excludedUriPatterns = [
         [
@@ -123,28 +123,28 @@ test('Site URI with excluded uri pattern is not cacheable', function () {
         ->toBeFalse();
 });
 
-test('Site URI with `admin` in uri is cacheable', function () {
+test('Site URI with `admin` in URI is cacheable', function () {
     $siteUri = createSiteUri(uri: 'admin-page');
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
         ->toBeTrue();
 });
 
-test('Site URI with `index.php` in uri is not cacheable', function () {
+test('Site URI with `index.php` in URI is not cacheable', function () {
     $siteUri = createSiteUri(uri: 'index.php');
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
         ->toBeFalse();
 });
 
-test('Site URI with max uri length is cacheable', function () {
+test('Site URI with max URI length is cacheable', function () {
     $siteUri = createSiteUri(uri: StringHelper::randomString(Blitz::$plugin->settings->maxUriLength));
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
         ->toBeTrue();
 });
 
-test('Site URI with max uri length exceeded is not cacheable', function () {
+test('Site URI with max URI length exceeded is not cacheable', function () {
     $siteUri = createSiteUri(uri: StringHelper::randomString(Blitz::$plugin->settings->maxUriLength + 1));
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))

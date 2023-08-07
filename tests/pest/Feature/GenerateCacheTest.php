@@ -57,7 +57,7 @@ test('Cached value is saved without output comments', function () {
         ->not()->toContain('Cached by Blitz on');
 });
 
-test('Cached value is saved with output comments when file extension is html', function () {
+test('Cached value is saved with output comments when file extension is `.html`', function () {
     $siteUri = createSiteUri(uri: 'page.html');
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 
@@ -65,7 +65,7 @@ test('Cached value is saved with output comments when file extension is html', f
         ->toContain('Cached by Blitz on');
 });
 
-test('Cached value is saved without output comments when file extension is not html', function () {
+test('Cached value is saved without output comments when file extension is not `.html`', function () {
     $siteUri = createSiteUri(uri: 'page.json');
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 
@@ -73,7 +73,7 @@ test('Cached value is saved without output comments when file extension is not h
         ->not()->toContain('Cached by Blitz on');
 });
 
-test('Cache record with max uri length is saved', function () {
+test('Cache record with max URI length is saved', function () {
     $siteUri = createSiteUri(uri: StringHelper::randomString(Blitz::$plugin->settings->maxUriLength));
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
     $count = CacheRecord::find()
@@ -84,7 +84,7 @@ test('Cache record with max uri length is saved', function () {
         ->toEqual(1);
 });
 
-test('Cache record with max uri length exceeded throws exception', function () {
+test('Cache record with max URI length exceeded throws exception', function () {
     $siteUri = createSiteUri(uri: StringHelper::randomString(Blitz::$plugin->settings->maxUriLength + 1));
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 })->throws(Exception::class);
@@ -379,7 +379,7 @@ test('Include record is saved', function () {
         ->toHaveRecordCount(1);
 });
 
-test('Ssi include cache record is saved', function () {
+test('SSI include cache record is saved', function () {
     [$includeId] = Blitz::$plugin->generateCache->saveInclude(1, 't', []);
     Blitz::$plugin->generateCache->addSsiInclude($includeId);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
