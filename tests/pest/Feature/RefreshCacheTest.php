@@ -18,6 +18,7 @@ beforeEach(function () {
     Blitz::$plugin->generateCache->options->cachingEnabled = true;
     Blitz::$plugin->refreshCache->batchMode = true;
     Blitz::$plugin->refreshCache->reset();
+    Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged = false;
 });
 
 test('Element is not tracked when it is unchanged', function () {
@@ -26,6 +27,24 @@ test('Element is not tracked when it is unchanged', function () {
 
     expect($entry)
         ->toNotBeTracked();
+});
+
+test('Element is not tracked when disabled and its attribute is changed', function () {
+    $entry = createEntry(enabled: false);
+    $entry->title = 'Title123';
+    Blitz::$plugin->refreshCache->addElement($entry);
+
+    expect($entry)
+        ->toNotBeTracked();
+});
+
+test('Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` and it is unchanged', function () {
+    $entry = createEntry();
+    Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged = true;
+    Blitz::$plugin->refreshCache->addElement($entry);
+
+    expect($entry)
+        ->toBeTracked();
 });
 
 test('Element is tracked when its status is changed', function () {

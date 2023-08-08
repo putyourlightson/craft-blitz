@@ -195,13 +195,14 @@ function createSiteUri(int $siteId = 1, string $uri = 'page'): SiteUriModel
     ]);
 }
 
-function createEntry(int $sectionId = TEST_SECTION_ID, bool $batchMode = false): Entry
+function createEntry(int $sectionId = TEST_SECTION_ID, bool $enabled = true, bool $batchMode = false): Entry
 {
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
 
     $entry = EntryFactory::factory()
         ->section($sectionId)
+        ->enabled($enabled)
         ->create();
 
     $entry->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
