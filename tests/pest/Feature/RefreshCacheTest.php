@@ -19,6 +19,7 @@ beforeEach(function () {
     Blitz::$plugin->refreshCache->batchMode = true;
     Blitz::$plugin->refreshCache->reset();
     Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged = false;
+    Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive = false;
 });
 
 test('Element is not tracked when it is unchanged', function () {
@@ -38,14 +39,23 @@ test('Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` 
         ->toBeTracked();
 });
 
-test('Element is not tracked when disabled and its attribute and field are changed', function () {
+test('Element is not tracked when disabled and its attribute is changed', function () {
     $entry = createEntry(enabled: false);
     $entry->title = 'Title123';
-    $entry->plainText = 'Text123';
     Blitz::$plugin->refreshCache->addElement($entry);
 
     expect($entry)
         ->toNotBeTracked();
+});
+
+test('Element is tracked when disabled and `refreshCacheWhenElementSavedNotLive` is `true` and its attribute is changed', function () {
+    $entry = createEntry(enabled: false);
+    Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive = true;
+    $entry->title = 'Title123';
+    Blitz::$plugin->refreshCache->addElement($entry);
+
+    expect($entry)
+        ->toBeTracked('attributes', ['title']);
 });
 
 test('Element is tracked when its status is changed', function () {
