@@ -79,8 +79,8 @@ This document outlines the test specification for the Blitz plugin.
 > _Tests the tracking of changes to elements and the resulting element cache IDs and element query type records._
 
 - Element is not tracked when it is unchanged.
-- Element is not tracked when disabled and its attribute is changed.
 - Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` and it is unchanged.
+- Element is not tracked when disabled and its attribute and field are changed.
 - Element is tracked when its status is changed.
 - Element is tracked when it expires.
 - Element is tracked when it is deleted.
