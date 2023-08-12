@@ -266,7 +266,7 @@ class CacheController extends Controller
 
         if (is_array($values)) {
             // Flatten multi-dimensional arrays
-            array_walk($values, function (&$value) {
+            array_walk($values, function(&$value) {
                 if (is_array($value)) {
                     $value = reset($value);
                 }

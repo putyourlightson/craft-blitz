@@ -13,13 +13,13 @@ use putyourlightson\blitz\services\RefreshCacheService;
 
 // TODO: move skips from tests to the beforeEach function
 
-beforeEach(function () {
+beforeEach(function() {
     Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh]'));
     Blitz::$plugin->refreshCache->reset();
     Blitz::$plugin->refreshCache->batchMode = false;
 });
 
-test('Cache is refreshed with batch mode enabled', function () {
+test('Cache is refreshed with batch mode enabled', function() {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldReceive('refresh')->once();
@@ -29,4 +29,4 @@ test('Cache is refreshed with batch mode enabled', function () {
 
     expect(Blitz::$plugin->refreshCache->batchMode)
         ->toBeTrue();
-})->skip(fn () => !integrationIsActive(FeedMeIntegration::class), 'Feed Me integration not found in active integrations.');
+})->skip(fn() => !integrationIsActive(FeedMeIntegration::class), 'Feed Me integration not found in active integrations.');

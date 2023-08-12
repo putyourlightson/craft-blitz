@@ -7,7 +7,7 @@
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 
-beforeEach(function () {
+beforeEach(function() {
     Blitz::$plugin->settings->includedUriPatterns = [
         [
             'siteId' => '',
@@ -17,11 +17,11 @@ beforeEach(function () {
     Blitz::$plugin->cacheStorage->deleteAll();
 });
 
-afterAll(function () {
+afterAll(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
 });
 
-test('Response adds `X-Powered-By` header once', function () {
+test('Response adds `X-Powered-By` header once', function() {
     Craft::$app->config->general->sendPoweredByHeader = true;
     $response = sendRequest();
 
@@ -29,7 +29,7 @@ test('Response adds `X-Powered-By` header once', function () {
         ->toContainOnce('Blitz', 'Craft CMS');
 });
 
-test('Response overwrites `X-Powered-By` header', function () {
+test('Response overwrites `X-Powered-By` header', function() {
     Craft::$app->config->general->sendPoweredByHeader = false;
     $response = sendRequest();
 
@@ -38,7 +38,7 @@ test('Response overwrites `X-Powered-By` header', function () {
         ->not()->toContain('Craft CMS');
 });
 
-test('Response contains output comments when enabled', function () {
+test('Response contains output comments when enabled', function() {
     foreach ([true, SettingsModel::OUTPUT_COMMENTS_SERVED] as $value) {
         Blitz::$plugin->settings->outputComments = $value;
         $response = sendRequest();
@@ -48,7 +48,7 @@ test('Response contains output comments when enabled', function () {
     }
 });
 
-test('Response does not contain output comments when disabled', function () {
+test('Response does not contain output comments when disabled', function() {
     foreach ([false, SettingsModel::OUTPUT_COMMENTS_CACHED] as $value) {
         Blitz::$plugin->settings->outputComments = $value;
         $response = sendRequest();
@@ -58,7 +58,7 @@ test('Response does not contain output comments when disabled', function () {
     }
 });
 
-test('Response with mime type has headers and does not contain output comments', function () {
+test('Response with mime type has headers and does not contain output comments', function() {
     $output = createOutput();
     $siteUri = createSiteUri(uri: 'page.json');
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
@@ -70,7 +70,7 @@ test('Response with mime type has headers and does not contain output comments',
         ->toBe($output);
 });
 
-test('Response is encoded when compression is enabled', function () {
+test('Response is encoded when compression is enabled', function() {
     $output = createOutput();
     $siteUri = createSiteUri();
     Blitz::$plugin->cacheStorage->compressCachedValues = true;
@@ -84,7 +84,7 @@ test('Response is encoded when compression is enabled', function () {
         ->toBe($output);
 });
 
-test('Response is not encoded when compression is disabled', function () {
+test('Response is not encoded when compression is disabled', function() {
     $output = createOutput();
     $siteUri = createSiteUri();
     Blitz::$plugin->cacheStorage->compressCachedValues = false;

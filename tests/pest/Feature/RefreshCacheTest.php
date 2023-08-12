@@ -12,7 +12,7 @@ use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
-beforeEach(function () {
+beforeEach(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
     Blitz::$plugin->flushCache->flushAll();
     Blitz::$plugin->generateCache->options->cachingEnabled = true;
@@ -22,7 +22,7 @@ beforeEach(function () {
     Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive = false;
 });
 
-test('Element is not tracked when it is unchanged', function () {
+test('Element is not tracked when it is unchanged', function() {
     $entry = createEntry();
     Blitz::$plugin->refreshCache->addElement($entry);
 
@@ -30,7 +30,7 @@ test('Element is not tracked when it is unchanged', function () {
         ->toNotBeTracked();
 });
 
-test('Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` and it is unchanged', function () {
+test('Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` and it is unchanged', function() {
     $entry = createEntry();
     Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged = true;
     Blitz::$plugin->refreshCache->addElement($entry);
@@ -39,7 +39,7 @@ test('Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` 
         ->toBeTracked();
 });
 
-test('Element is not tracked when disabled and its attribute is changed', function () {
+test('Element is not tracked when disabled and its attribute is changed', function() {
     $entry = createEntry(enabled: false);
     $entry->title = 'Title123';
     Blitz::$plugin->refreshCache->addElement($entry);
@@ -48,7 +48,7 @@ test('Element is not tracked when disabled and its attribute is changed', functi
         ->toNotBeTracked();
 });
 
-test('Element is tracked when disabled and `refreshCacheWhenElementSavedNotLive` is `true` and its attribute is changed', function () {
+test('Element is tracked when disabled and `refreshCacheWhenElementSavedNotLive` is `true` and its attribute is changed', function() {
     $entry = createEntry(enabled: false);
     Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive = true;
     $entry->title = 'Title123';
@@ -58,7 +58,7 @@ test('Element is tracked when disabled and `refreshCacheWhenElementSavedNotLive`
         ->toBeTracked('attributes', ['title']);
 });
 
-test('Element is tracked when its status is changed', function () {
+test('Element is tracked when its status is changed', function() {
     $entry = createEntry();
     $entry->enabled = false;
     Blitz::$plugin->refreshCache->addElement($entry);
@@ -67,7 +67,7 @@ test('Element is tracked when its status is changed', function () {
         ->toBeTracked();
 });
 
-test('Element is tracked when it expires', function () {
+test('Element is tracked when it expires', function() {
     $entry = createEntry();
     $entry->expiryDate = new DateTime('20010101');
     Blitz::$plugin->refreshCache->addElement($entry);
@@ -76,7 +76,7 @@ test('Element is tracked when it expires', function () {
         ->toBeTracked();
 });
 
-test('Element is tracked when it is deleted', function () {
+test('Element is tracked when it is deleted', function() {
     $entry = createEntry();
     Craft::$app->getElements()->deleteElement($entry);
 
@@ -84,7 +84,7 @@ test('Element is tracked when it is deleted', function () {
         ->toBeTracked();
 });
 
-test('Element is tracked when its attribute is changed', function () {
+test('Element is tracked when its attribute is changed', function() {
     $entry = createEntry();
     $entry->title = 'Title123';
     Blitz::$plugin->refreshCache->addElement($entry);
@@ -93,7 +93,7 @@ test('Element is tracked when its attribute is changed', function () {
         ->toBeTracked('attributes', ['title']);
 });
 
-test('Element is tracked when its field is changed', function () {
+test('Element is tracked when its field is changed', function() {
     $entry = createEntry();
     $entry->plainText = 'Text123';
     Blitz::$plugin->refreshCache->addElement($entry);
@@ -102,7 +102,7 @@ test('Element is tracked when its field is changed', function () {
         ->toBeTracked('fields', [], ['plainText']);
 });
 
-test('Element is tracked when its attribute and field are changed', function () {
+test('Element is tracked when its attribute and field are changed', function() {
     $entry = createEntry();
     $entry->title = 'Title123';
     $entry->plainText = 'Text123';
@@ -112,7 +112,7 @@ test('Element is tracked when its attribute and field are changed', function () 
         ->toBeTracked('attributes', ['title'], ['plainText']);
 });
 
-test('Element is tracked when its status and attribute and field are changed', function () {
+test('Element is tracked when its status and attribute and field are changed', function() {
     $entry = createEntry();
     $entry->enabled = false;
     $entry->title = 'Title123';
@@ -123,7 +123,7 @@ test('Element is tracked when its status and attribute and field are changed', f
         ->toBeTracked('', ['title'], ['plainText']);
 });
 
-test('Asset is tracked when its file is replaced', function () {
+test('Asset is tracked when its file is replaced', function() {
     $asset = createAsset();
     $asset->scenario = Asset::SCENARIO_REPLACE;
     Blitz::$plugin->refreshCache->addElement($asset);
@@ -132,7 +132,7 @@ test('Asset is tracked when its file is replaced', function () {
         ->toBeChangedByFile();
 });
 
-test('Asset is tracked when its filename is changed', function () {
+test('Asset is tracked when its filename is changed', function() {
     $asset = createAsset();
     $asset->filename = 'new-filename.jpg';
     Blitz::$plugin->refreshCache->addElement($asset);
@@ -141,7 +141,7 @@ test('Asset is tracked when its filename is changed', function () {
         ->toBeChangedByFile();
 });
 
-test('Asset is tracked when its focal point is changed', function () {
+test('Asset is tracked when its focal point is changed', function() {
     $asset = createAsset();
     $asset->setFocalPoint([
         'x' => 101,
@@ -153,7 +153,7 @@ test('Asset is tracked when its focal point is changed', function () {
         ->toBeChangedByFile();
 });
 
-test('Element expiry date record is saved when an entry has a future post date', function () {
+test('Element expiry date record is saved when an entry has a future post date', function() {
     $entry = createEntry();
     $entry->postDate = (new DateTime('now'))->add(new DateInterval('P2D'));
     Blitz::$plugin->refreshCache->addElementExpiryDates($entry);
@@ -162,7 +162,7 @@ test('Element expiry date record is saved when an entry has a future post date',
         ->toExpireOn($entry->postDate);
 });
 
-test('Element expiry date record is saved when an entry has a future expiry date', function () {
+test('Element expiry date record is saved when an entry has a future expiry date', function() {
     $entry = createEntry();
     $entry->expiryDate = (new DateTime('now'))->add(new DateInterval('P2D'));
     Blitz::$plugin->refreshCache->addElementExpiryDates($entry);
@@ -171,7 +171,7 @@ test('Element expiry date record is saved when an entry has a future expiry date
         ->toExpireOn($entry->expiryDate);
 });
 
-test('Element cache IDs are returned when an entry is changed', function () {
+test('Element cache IDs are returned when an entry is changed', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElement($entry);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -181,7 +181,7 @@ test('Element cache IDs are returned when an entry is changed', function () {
         ->toHaveCount(1);
 });
 
-test('Element cache IDs are returned when an entry is changed by attributes', function () {
+test('Element cache IDs are returned when an entry is changed by attributes', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElement($entry);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -193,7 +193,7 @@ test('Element cache IDs are returned when an entry is changed by attributes', fu
         ->toHaveCount(1);
 });
 
-test('Element cache IDs are not returned when an entry is changed by custom fields', function () {
+test('Element cache IDs are not returned when an entry is changed by custom fields', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElement($entry);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -205,7 +205,7 @@ test('Element cache IDs are not returned when an entry is changed by custom fiel
         ->toHaveCount(0);
 });
 
-test('Element query type records are returned when an entry is changed', function () {
+test('Element query type records are returned when an entry is changed', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElementQuery(Entry::find());
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->sectionId($entry->sectionId));
@@ -216,7 +216,7 @@ test('Element query type records are returned when an entry is changed', functio
         ->toHaveCount(2);
 });
 
-test('Element query type records without a cache ID are not returned when an entry is changed', function () {
+test('Element query type records without a cache ID are not returned when an entry is changed', function() {
     $entry = createEntry();
     $refreshData = RefreshDataModel::createFromElement($entry);
 
@@ -238,7 +238,7 @@ test('Element query type records without a cache ID are not returned when an ent
         ->toHaveCount(0);
 });
 
-test('Element query type records are returned when an entry is changed by attributes used in the query', function () {
+test('Element query type records are returned when an entry is changed by attributes used in the query', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->title('xyz'));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -250,7 +250,7 @@ test('Element query type records are returned when an entry is changed by attrib
         ->toHaveCount(1);
 });
 
-test('Element query type records are not returned when an entry is changed by attributes not used in the query', function () {
+test('Element query type records are not returned when an entry is changed by attributes not used in the query', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->title('xyz'));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -261,7 +261,7 @@ test('Element query type records are not returned when an entry is changed by at
         ->toHaveCount(0);
 });
 
-test('Element query type records are returned when an entry is changed by custom fields used in the query', function () {
+test('Element query type records are returned when an entry is changed by custom fields used in the query', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy('plainText'));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -273,7 +273,7 @@ test('Element query type records are returned when an entry is changed by custom
         ->toHaveCount(1);
 });
 
-test('Element query type records are not returned when an entry is changed by custom fields not used in the query', function () {
+test('Element query type records are not returned when an entry is changed by custom fields not used in the query', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy('plainText'));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -284,7 +284,7 @@ test('Element query type records are not returned when an entry is changed by cu
         ->toHaveCount(0);
 });
 
-test('Element query type records are returned when an entry is changed with the date updated used in the query', function () {
+test('Element query type records are returned when an entry is changed with the date updated used in the query', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy('dateUpdated'));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());

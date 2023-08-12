@@ -5,12 +5,16 @@ use craft\commerce\elements\Order;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
 use craft\commerce\models\LineItem;
+use craft\commerce\records\Product as ProductRecord;
 use craft\db\ActiveRecord;
 use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
+use craft\records\Asset as AssetRecord;
+use craft\records\Element as ElementRecord;
+use craft\records\Entry as EntryRecord;
 use Faker\Factory as FakerFactory;
 use markhuot\craftpest\factories\Asset as AssetFactory;
 use markhuot\craftpest\factories\Entry as EntryFactory;
@@ -37,13 +41,14 @@ use yii\web\Response;
 */
 
 uses(TestCase::class)
-    ->beforeAll(function () {
+    ->beforeAll(function() {
         // Clear the cache directory without using Blitz, which is not yet instantiated.
         FileHelper::clearDirectory(getcwd() . '/web/cache');
     })
-    ->afterAll(function () {
-        Blitz::$plugin->cacheStorage->deleteAll();
+    ->afterAll(function() {
+        cleanUpElements();
         Craft::$app->queue->releaseAll();
+        Blitz::$plugin->cacheStorage->deleteAll();
     })
     ->in('./');
 
@@ -58,7 +63,7 @@ uses(TestCase::class)
 |
 */
 
-expect()->extend('toContainOnce', function (...$needles) {
+expect()->extend('toContainOnce', function(...$needles) {
     foreach ($needles as $needle) {
         expect($this->value)
             ->toContain($needle);
@@ -67,7 +72,7 @@ expect()->extend('toContainOnce', function (...$needles) {
     return $this;
 });
 
-expect()->extend('toBeTracked', function (string $changedBy = '', array $changedAttributes = [], array $changedFields = []) {
+expect()->extend('toBeTracked', function(string $changedBy = '', array $changedAttributes = [], array $changedFields = []) {
     /** @var Element|ElementChangedBehavior|null $element */
     $element = $this->value;
     $refreshData = Blitz::$plugin->refreshCache->refreshData;
@@ -107,7 +112,7 @@ expect()->extend('toBeTracked', function (string $changedBy = '', array $changed
     return $this;
 });
 
-expect()->extend('toNotBeTracked', function () {
+expect()->extend('toNotBeTracked', function() {
     /** @var Element|ElementChangedBehavior|null $element */
     $element = $this->value;
     $refreshData = Blitz::$plugin->refreshCache->refreshData;
@@ -118,7 +123,7 @@ expect()->extend('toNotBeTracked', function () {
     return $this;
 });
 
-expect()->extend('toBeChangedByFile', function () {
+expect()->extend('toBeChangedByFile', function() {
     /** @var Element|ElementChangedBehavior|null $element */
     $element = $this->value;
 
@@ -130,7 +135,7 @@ expect()->extend('toBeChangedByFile', function () {
     return $this;
 });
 
-expect()->extend('toExpireOn', function (?DateTime $expiryDate) {
+expect()->extend('toExpireOn', function(?DateTime $expiryDate) {
     /** @var Entry $entry */
     $entry = $this->value;
 
@@ -144,7 +149,7 @@ expect()->extend('toExpireOn', function (?DateTime $expiryDate) {
     return $this;
 });
 
-expect()->extend('toHaveRecordCount', function (int $count, array $where = []) {
+expect()->extend('toHaveRecordCount', function(int $count, array $where = []) {
     /** @var ActiveRecord $class */
     $class = $this->value;
     $recordCount = $class::find()->where($where)->count();
@@ -162,9 +167,9 @@ expect()->extend('toHaveRecordCount', function (int $count, array $where = []) {
 */
 
 const TEST_SITE_ID = 1;
-const TEST_SECTION_ID = 6;
-const TEST_PRODUCT_TYPE_ID = 1;
-const TEST_VOLUME_HANDLE = 'test';
+const TEST_SECTION_ID = 12;
+const TEST_VOLUME_ID = 2;
+const TEST_PRODUCT_TYPE_ID = 2;
 
 /*
 |--------------------------------------------------------------------------
@@ -227,10 +232,11 @@ function createEntryWithRelationship(): Entry
     return $entry;
 }
 
-function createAsset(string $volumeHandle = TEST_VOLUME_HANDLE): Asset
+function createAsset(int $volumeId = TEST_VOLUME_ID): Asset
 {
+    $volume = Craft::$app->volumes->getVolumeById($volumeId);
     $asset = AssetFactory::factory()
-        ->volume($volumeHandle)
+        ->volume($volume->handle)
         ->create();
 
     $asset->setFocalPoint([
@@ -293,3 +299,21 @@ function sendRequest(string $uri = '', array $headers = []): TestableResponse
     return $response;
 }
 
+function cleanUpElements(): void
+{
+    $entryIds = EntryRecord::find()
+        ->select('id')
+        ->where(['sectionId' => TEST_SECTION_ID])
+        ->column();
+    $assetIds = AssetRecord::find()
+        ->select('id')
+        ->where(['volumeId' => TEST_VOLUME_ID])
+        ->column();
+    $productIds = ProductRecord::find()
+        ->select('id')
+        ->where(['typeId' => TEST_PRODUCT_TYPE_ID])
+        ->column();
+    ElementRecord::deleteAll(['id' => array_merge($entryIds, $assetIds, $productIds)]);
+
+    Craft::$app->elements->invalidateAllCaches();
+}

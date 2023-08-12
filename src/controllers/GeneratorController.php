@@ -47,10 +47,10 @@ class GeneratorController extends Controller
 
         // Suppress the output using a dummy stream
         Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
-            function (Event $event) {
+            function(Event $event) {
                 /** @var Response $response */
                 $response = $event->sender;
-                $response->stream = fn () => ['data' => ''];
+                $response->stream = fn() => ['data' => ''];
             }
         );
 

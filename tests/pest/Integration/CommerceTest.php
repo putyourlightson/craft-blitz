@@ -12,13 +12,13 @@ use putyourlightson\blitz\services\RefreshCacheService;
 
 // TODO: move skips from tests to the beforeEach function
 
-beforeEach(function () {
+beforeEach(function() {
     Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh,refreshAll]'));
     Blitz::$plugin->refreshCache->reset();
     Blitz::$plugin->refreshCache->batchMode = false;
 });
 
-test('Variants are refreshed on order completion', function () {
+test('Variants are refreshed on order completion', function() {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldReceive('refresh')->once();
@@ -29,4 +29,4 @@ test('Variants are refreshed on order completion', function () {
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($variant::class))
         ->toBe([$variant->id]);
-})->skip(fn () => !integrationIsActive(CommerceIntegration::class), 'Commerce integration not found in active integrations.');
+})->skip(fn() => !integrationIsActive(CommerceIntegration::class), 'Commerce integration not found in active integrations.');

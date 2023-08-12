@@ -14,7 +14,7 @@ use putyourlightson\blitz\services\RefreshCacheService;
 
 // TODO: move skips from tests to the beforeEach function
 
-beforeEach(function () {
+beforeEach(function() {
     Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh,refreshAll]'));
     Blitz::$plugin->refreshCache->reset();
     Blitz::$plugin->refreshCache->batchMode = false;
@@ -28,7 +28,7 @@ beforeEach(function () {
     }
 });
 
-test('Invalidate container caches event without a URL or source triggers a refresh all', function () {
+test('Invalidate container caches event without a URL or source triggers a refresh all', function() {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldNotReceive('refresh');
@@ -36,9 +36,9 @@ test('Invalidate container caches event without a URL or source triggers a refre
 
     createEntry(batchMode: true);
     Seomatic::$plugin->metaContainers->invalidateCaches();
-})->skip(fn () => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
+})->skip(fn() => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
 
-test('Invalidate container caches event with a specific source triggers a refresh', function () {
+test('Invalidate container caches event with a specific source triggers a refresh', function() {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldReceive('refresh')->once();
@@ -49,9 +49,9 @@ test('Invalidate container caches event with a specific source triggers a refres
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($entry::class))
         ->toContain($entry->id);
-})->skip(fn () => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
+})->skip(fn() => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
 
-test('Invalidate container caches event for a specific element does not trigger a refresh', function () {
+test('Invalidate container caches event for a specific element does not trigger a refresh', function() {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
     $refreshCache->shouldNotReceive('refresh');
@@ -59,4 +59,4 @@ test('Invalidate container caches event for a specific element does not trigger 
 
     $entry = createEntry(batchMode: true);
     Seomatic::$plugin->metaContainers->invalidateContainerCacheByPath($entry->uri);
-})->skip(fn () => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
+})->skip(fn() => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');

@@ -19,7 +19,7 @@ use yii\log\Logger;
  *
  * @see putyourlightson\blitz\drivers\generators\LocalGenerator::generateUrisWithProgress()
  */
-return function (Channel $channel): Generator {
+return function(Channel $channel): Generator {
     $config = yield $channel->receive();
 
     $url = $config['url'];
@@ -82,7 +82,7 @@ return function (Channel $channel): Generator {
 
     // Force a web request before plugins are loaded (as early as possible)
     Event::on(Plugins::class, Plugins::EVENT_BEFORE_LOAD_PLUGINS,
-        function () {
+        function() {
             Craft::$app->getRequest()->setIsConsoleRequest(false);
 
             // Force the template mode too

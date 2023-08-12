@@ -8,13 +8,13 @@ use yii\redis\Connection;
 
 dataset('cacheStorageDrivers', [
     'FileStorage' => FileStorage::class,
-    'YiiCacheStorage' => function () {
+    'YiiCacheStorage' => function() {
         // Set cache component to Craft’s default
         Craft::$app->set('cache', App::cacheConfig());
 
         return YiiCacheStorage::class;
     },
-    'RedisStorage' => function () {
+    'RedisStorage' => function() {
         // Set cache component to Redis
         Craft::$app->set('redis', [
             'class' => Connection::class,

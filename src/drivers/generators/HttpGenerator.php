@@ -65,7 +65,7 @@ class HttpGenerator extends BaseCacheGenerator
         $promise = \Amp\Sync\ConcurrentIterator\each(
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
-            function (string $url) use ($setProgressHandler, &$count, $pages, $client) {
+            function(string $url) use ($setProgressHandler, &$count, $pages, $client) {
                 if ($this->isPageUrl($url)) {
                     $count++;
                 }
