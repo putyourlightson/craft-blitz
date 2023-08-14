@@ -205,6 +205,17 @@ test('Element cache IDs are not returned when an entry is changed by custom fiel
         ->toHaveCount(0);
 });
 
+test('Element query cache IDs are returned when a disabled entry is changed', function() {
+    $entry = createEntry(enabled: false);
+    Blitz::$plugin->generateCache->addElementQuery(Entry::find());
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+    $refreshData = RefreshDataModel::createFromElement($entry);
+    $elementQueryRecord = ElementQueryRecord::find()->orderBy('id DESC')->one();
+
+    expect(RefreshCacheHelper::getElementQueryCacheIds($elementQueryRecord, $refreshData))
+        ->toHaveCount(1);
+});
+
 test('Element query type records are returned when an entry is changed', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElementQuery(Entry::find());

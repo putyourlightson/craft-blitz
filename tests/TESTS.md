@@ -104,6 +104,7 @@ This document outlines the test specification for the Blitz plugin.
 - Element query type records are returned when an entry is changed by custom fields used in the query.
 - Element query type records are not returned when an entry is changed by custom fields not used in the query.
 - Element query type records are returned when an entry is changed with the date updated used in the query.
+- Element query cache IDs returned when a disabled entry is changed.
 
 ### [Site Uri](pest/Feature/SiteUriTest.php)
 

@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.5.2 - 2023-08-14
+
+### Fixed
+
+- Fixed a bug in which tracked element queries were ignoring disabled elements when determining which cached pages to refresh ([#527](https://github.com/putyourlightson/craft-blitz/issues/527)).
+
 ## 4.5.1 - 2023-08-09
 
 ### Fixed

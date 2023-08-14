@@ -140,6 +140,10 @@ class RefreshCacheHelper
         /** @var ElementQuery $elementQuery */
         $elementQuery = $elementType::find();
 
+        // Get elements with all statuses
+        // https://github.com/putyourlightson/craft-blitz/issues/527
+        $elementQuery->status(null);
+
         $params = Json::decodeIfJson($elementQueryRecord->params);
 
         // If json decode failed
