@@ -8,8 +8,7 @@ This document outlines the test specification for the Blitz plugin.
 
 ### [CacheRequest](pest/Feature/CacheRequestTest.php)
 
-> [!NOTE]
-> _Tests whether requests are cacheable and under what circumstances._
+_Tests whether requests are cacheable and under what circumstances._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request matching included URI pattern is cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request with generate token is cacheable.  
@@ -32,8 +31,7 @@ This document outlines the test specification for the Blitz plugin.
 
 ### [CacheStorage](pest/Feature/CacheStorageTest.php)
 
-> [!NOTE]
-> _Tests the storing of cached values using the cache storage drivers._
+_Tests the storing of cached values using the cache storage drivers._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) 255 character site URI can be saved with data set "FileStorage".  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) 255 character site URI can be saved with data set "YiiCacheStorage".  
@@ -59,8 +57,7 @@ This document outlines the test specification for the Blitz plugin.
 
 ### [GenerateCache](pest/Feature/GenerateCacheTest.php)
 
-> [!NOTE]
-> _Tests the saving of cached values, element cache records and element query records._
+_Tests the saving of cached values, element cache records and element query records._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved with output comments.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved without output comments.  
@@ -93,8 +90,7 @@ This document outlines the test specification for the Blitz plugin.
 
 ### [RefreshCache](pest/Feature/RefreshCacheTest.php)
 
-> [!NOTE]
-> _Tests the tracking of changes to elements and the resulting element cache IDs and element query type records._
+_Tests the tracking of changes to elements and the resulting element cache IDs and element query type records._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is not tracked when it is unchanged.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` and it is unchanged.  
@@ -126,8 +122,7 @@ This document outlines the test specification for the Blitz plugin.
 
 ### [SiteUri](pest/Feature/SiteUriTest.php)
 
-> [!NOTE]
-> _Tests the site URI helper methods._
+_Tests the site URI helper methods._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URIs are returned from assets with transforms.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) HTML mime type is returned when site URI is HTML.  
@@ -139,22 +134,19 @@ This document outlines the test specification for the Blitz plugin.
 
 ### [Commerce](pest/Integration/CommerceTest.php)
 
-> [!NOTE]
-> _Tests that Commerce variants are refreshed on order completion so that their stock is updated._
+_Tests that Commerce variants are refreshed on order completion so that their stock is updated._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Variants are refreshed on order completion.  
 
 ### [FeedMe](pest/Integration/FeedMeTest.php)
 
-> [!NOTE]
-> _Tests that Feed Me imports refresh the cache with batch mode enabled._
+_Tests that Feed Me imports refresh the cache with batch mode enabled._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cache is refreshed with batch mode enabled.  
 
 ### [Seomatic](pest/Integration/SeomaticTest.php)
 
-> [!NOTE]
-> _Tests that cached pages are refreshed when SEOmatic meta containers are invalidated._
+_Tests that cached pages are refreshed when SEOmatic meta containers are invalidated._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Invalidate container caches event without a URL or source triggers a refresh all.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Invalidate container caches event with a specific source triggers a refresh.  
@@ -164,8 +156,7 @@ This document outlines the test specification for the Blitz plugin.
 
 ### [WebResponse](pest/Interface/WebResponseTest.php)
 
-> [!NOTE]
-> _Tests that cached web responses contain the correct headers and comments._
+_Tests that cached web responses contain the correct headers and comments._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response adds `X-Powered-By` header once.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response overwrites `X-Powered-By` header.  
