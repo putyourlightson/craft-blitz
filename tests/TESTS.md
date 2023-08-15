@@ -110,7 +110,7 @@ This document outlines the test specification for the Blitz plugin.
 🟢 Element expiry date record is saved when an entry has a future expiry date.  
 🟢 Element cache IDs are returned when an entry is changed.  
 🟢 Element cache IDs are returned when an entry is changed by attributes.  
-🔴 Element cache IDs are not returned when an entry is changed by custom fields.  
+🟢 Element cache IDs are not returned when an entry is changed by custom fields.  
 🟢 Element query cache IDs are returned when a disabled entry is changed.  
 🟢 Element query type records are returned when an entry is changed.  
 🟢 Element query type records without a cache ID are not returned when an entry is changed.  
