@@ -141,9 +141,10 @@ class SiteUriHelper
 
     /**
      * Returns paginated URIs for a given site.
-     * @see Paginate::getPageUrl()
      *
      * @return string[]
+     * @see Paginate::getPageUrl()
+     *
      */
     public static function getPaginatedUrisForSite(int $siteId): array
     {
@@ -181,6 +182,7 @@ class SiteUriHelper
 
     /**
      * Returns whether the provided URI is a paginated URI.
+     *
      * @see Request::init()
      */
     public static function isPaginatedUri(string $uri): bool
@@ -249,7 +251,8 @@ class SiteUriHelper
         $siteUris = Element_SiteSettings::find()
             ->select(['siteId', 'uri'])
             ->where(['elementId' => $elementIds])
-            ->andWhere(['not',
+            ->andWhere([
+                'not',
                 ['uri' => null],
             ])
             ->asArray()

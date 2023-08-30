@@ -17,7 +17,6 @@ use yii\base\Behavior;
  * @since 3.6.0
  *
  * @property Element $owner
- *
  * @property-read bool $hasChanged
  * @property-read bool $hasBeenDeleted
  * @property-read bool $hasStatusChanged
@@ -133,7 +132,7 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns whether the element's status has changed.
+     * Returns whether the element’s status has changed.
      */
     public function getHasStatusChanged(): bool
     {
