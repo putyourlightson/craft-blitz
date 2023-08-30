@@ -1,3 +1,4 @@
 .DS_Store
 tests/codeception/_craft/storage/
 tests/codeception/_craft/config/project
+/tests/pest/test-results.xml
