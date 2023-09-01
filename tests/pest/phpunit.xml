@@ -6,7 +6,9 @@
 >
     <testsuites>
         <testsuite name="Test Suite">
-            <directory suffix="Test.php">vendor/putyourlightson/craft-blitz/pest-tests</directory>
+            <directory suffix="Test.php">
+                vendor/putyourlightson/craft-blitz/pest/tests
+            </directory>
         </testsuite>
     </testsuites>
 </phpunit>
