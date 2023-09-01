@@ -12,3 +12,24 @@
     ```shell
     php craft pest/test --test-directory=vendor/putyourlightson/craft-blitz/tests/pest
     ```
+
+### Makefile
+
+A Makefile can be used to simplify the running of tests.
+
+```makefile
+# Default values
+vendor?=putyourlightson
+plugin?=blitz
+filter?=test
+test:
+    php craft pest/test --test-directory=vendor/$(vendor)/craft-$(plugin)/tests/pest --filter=$(filter)
+```
+
+```shell
+# Run tests using the default values
+make test
+
+# Run tests using all optional values
+make test vendor=putyourlightson plugin=blitz filter=queue
+```
