@@ -10,5 +10,5 @@
 2. Copy `phpunit.xml` to the root of your project.
 3. Execute the following command from the root of your project.
     ```shell
-    php craft pest/test --test-directory=vendor/putyourlightson/craft-blitz/pest-tests
+    php craft pest/test --test-directory=vendor/putyourlightson/craft-blitz/tests/pest
     ```
