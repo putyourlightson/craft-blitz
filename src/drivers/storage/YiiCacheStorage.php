@@ -101,7 +101,7 @@ class YiiCacheStorage extends BaseCacheStorage
         $key = $this->_getKey($siteUri);
 
         if ($allowEncoding && $this->canCompressCachedValues()) {
-            $key[] = self::ENCODING;
+            $key = $this->_getKey($siteUri, true);
             $value = gzencode($value);
         }
 
@@ -125,7 +125,7 @@ class YiiCacheStorage extends BaseCacheStorage
         }
 
         foreach ($siteUris as $siteUri) {
-            $this->_cache->delete($this->_getKey($siteUri));
+            $this->_delete($siteUri);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_URIS)) {
@@ -204,5 +204,14 @@ class YiiCacheStorage extends BaseCacheStorage
         }
 
         return '';
+    }
+
+    /**
+     * Deletes the cached values for a site URI.
+     */
+    private function _delete(SiteUriModel $siteUri): void
+    {
+        $this->_cache->delete($this->_getKey($siteUri));
+        $this->_cache->delete($this->_getKey($siteUri, true));
     }
 }

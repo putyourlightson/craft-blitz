@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.5.3 - 2023-09-12
+
+### Fixed
+
+- Fixed a bug in which cached pages were not being cleared when using the Yii Cache Storage driver with gzip compression enabled.
+
 ## 4.5.2 - 2023-08-14
 
 ### Fixed

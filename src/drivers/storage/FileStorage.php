@@ -158,14 +158,7 @@ class FileStorage extends BaseCacheStorage
             $filePaths = $this->getFilePaths($siteUri);
 
             foreach ($filePaths as $filePath) {
-                // Delete file if it exists
-                if (is_file($filePath)) {
-                    unlink($filePath);
-                }
-
-                if (is_file($filePath . '.gz')) {
-                    unlink($filePath . '.gz');
-                }
+                $this->_delete($filePath);
             }
         }
 
@@ -425,5 +418,14 @@ class FileStorage extends BaseCacheStorage
         }
 
         return false;
+    }
+
+    /**
+     * Deletes the cached values for a file path.
+     */
+    private function _delete(string $filePath): void
+    {
+        FileHelper::unlink($filePath);
+        FileHelper::unlink($filePath . '.gz');
     }
 }

@@ -45,15 +45,18 @@ _Tests the storing of cached values using the cache storage drivers._
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set "FileStorage".  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set "YiiCacheStorage".  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI can be deleted with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI can be deleted with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI can be deleted with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI can be deleted with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI can be deleted with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI can be deleted with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values can be deleted with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values can be deleted with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values can be deleted with data set "RedisStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set "FileStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set "YiiCacheStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set "RedisStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set "FileStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set "YiiCacheStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set "RedisStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set "FileStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set "YiiCacheStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set "RedisStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set "FileStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set "YiiCacheStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set "RedisStorage".  
 
 ### [GenerateCache](pest/Feature/GenerateCacheTest.php)
 
