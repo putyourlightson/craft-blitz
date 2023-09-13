@@ -8,11 +8,11 @@ namespace putyourlightson\blitz\helpers;
 use craft\base\Element;
 use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
-use Exception;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use Throwable;
 use yii\log\Logger;
 
 /**
@@ -170,7 +170,7 @@ class RefreshCacheHelper
         // Execute the element query, ignoring any exceptions.
         try {
             $elementQueryIds = $elementQuery->ids();
-        } catch (Exception $exception) {
+        } catch (Throwable $exception) {
             Blitz::$plugin->log('Element query with ID `' . $elementQueryRecord->id . '` could not be executed: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
 

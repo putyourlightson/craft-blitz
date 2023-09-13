@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.5.4 - Unreleased
+
+### Fixed
+
+- Fixed a bug in which error exceptions were not being caught when produced by cached element queries during the refresh cache process.
+
 ## 4.5.3 - 2023-09-12
 
 ### Fixed
