@@ -9,6 +9,8 @@ use craft\base\ElementInterface;
 use craft\behaviors\CustomFieldBehavior;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
+use craft\fields\data\MultiOptionsFieldData;
+use craft\fields\data\OptionData;
 use craft\helpers\ArrayHelper;
 use DateTime;
 use ReflectionClass;
@@ -177,6 +179,7 @@ class ElementQueryHelper
 
         /**
          * Copied from Db helper
+         *
          * @see \craft\helpers\Db::_toArray
          */
         if (is_string($value)) {
@@ -362,8 +365,7 @@ class ElementQueryHelper
             $elementTypeParams[] = $property;
         }
 
-        // Ignore params that never change. The `orderBy` attribute is
-        // extracted separately later.
+        // Ignore params that never change. The `orderBy` attribute is extracted separately later.
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
         $ignoreParams = [
             $sourceIdAttribute,
@@ -455,6 +457,20 @@ class ElementQueryHelper
         // Convert DateTime objects to Unix timestamp
         if ($value instanceof DateTime) {
             $value = $value->getTimestamp();
+        }
+
+        // Convert OptionData objects to their values (ignoring whether selected).
+        if ($value instanceof OptionData) {
+            $value = $value->value;
+        }
+
+        // Convert MultiOptionsFieldData objects to arrays of values (ignoring whether selected).
+        if ($value instanceof MultiOptionsFieldData) {
+            $options = $value->getOptions();
+            $value = [];
+            foreach ($options as $option) {
+                $value[] = $option->value;
+            }
         }
     }
 }

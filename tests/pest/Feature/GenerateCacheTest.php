@@ -7,6 +7,8 @@
 use craft\commerce\elements\Product;
 use craft\db\FixedOrderExpression;
 use craft\elements\Entry;
+use craft\fields\data\MultiOptionsFieldData;
+use craft\fields\data\OptionData;
 use craft\helpers\StringHelper;
 use craft\mutex\Mutex;
 use putyourlightson\blitz\Blitz;
@@ -234,6 +236,36 @@ test('Element query record with expression is not saved', function() {
 
     expect(ElementQueryRecord::class)
         ->toHaveRecordCount(0);
+});
+
+test('Element query record with option field data is converted to value', function() {
+    $optionFieldData = new OptionData('One', 1, true);
+    $elementQuery = Entry::find()->dropdown($optionFieldData);
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    /** @var ElementQueryRecord $record */
+    $record = ElementQueryRecord::find()->one();
+    $params = json_decode($record->params);
+
+    expect($params->dropdown)
+        ->toEqual(1);
+});
+
+test('Element query record with multi options field data is converted to array of values', function() {
+    $optionFieldData = new MultiOptionsFieldData();
+    $optionFieldData->setOptions([
+        new OptionData('One', 1, true),
+        new OptionData('Two', 2, false),
+    ]);
+    $elementQuery = Entry::find()->multiSelect($optionFieldData);
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    /** @var ElementQueryRecord $record */
+    $record = ElementQueryRecord::find()->one();
+    $params = json_decode($record->params);
+
+    expect($params->multiSelect)
+        ->toEqual([1, 2]);
 });
 
 test('Element query cache records are saved', function() {
