@@ -9,13 +9,13 @@ use Craft;
 use craft\helpers\Html;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
+use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
-use yii\web\View;
 
 class BlitzVariable
 {
@@ -87,7 +87,7 @@ class BlitzVariable
         Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.includeCached()` or `craft.blitz.includeDynamic()` instead.');
 
         // Ensure the site template exists
-        if (!Craft::$app->getView()->resolveTemplate($template, 'site')) {
+        if (!Craft::$app->getView()->resolveTemplate($template, View::TEMPLATE_MODE_SITE)) {
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
