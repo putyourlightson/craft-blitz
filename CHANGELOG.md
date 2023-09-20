@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.5.5 - 2023-09-20
+
+### Fixed
+
+- Fixed a security issue.
+
 ## 4.5.4 - 2023-09-15
 
 ### Fixed
