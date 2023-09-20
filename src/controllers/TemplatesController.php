@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\web\Controller;
+use craft\web\View;
 use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
@@ -42,7 +43,7 @@ class TemplatesController extends Controller
         }
 
         $params = Craft::$app->getRequest()->getParam('params', []);
-        $output = Craft::$app->getView()->renderPageTemplate($template, $params);
+        $output = Craft::$app->getView()->renderPageTemplate($template, $params, View::TEMPLATE_MODE_SITE);
 
         return $this->asRaw($output);
     }

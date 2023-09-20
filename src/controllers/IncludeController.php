@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\controllers;
 use Craft;
 use craft\helpers\Json;
 use craft\web\Controller;
+use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
@@ -52,13 +53,13 @@ class IncludeController extends Controller
 
         $template = $include->template;
 
-        if (!Craft::$app->getView()->resolveTemplate($template)) {
+        if (!Craft::$app->getView()->resolveTemplate($template, View::TEMPLATE_MODE_SITE)) {
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
         Craft::$app->getSites()->setCurrentSite($include->siteId);
         $params = Json::decodeIfJson($include->params);
-        $output = Craft::$app->getView()->renderPageTemplate($template, $params);
+        $output = Craft::$app->getView()->renderPageTemplate($template, $params, View::TEMPLATE_MODE_SITE);
 
         return $this->asRaw($output);
     }
