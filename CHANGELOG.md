@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Fixed a security issue.
+- Fixed a potential security issue.
 
 ## 4.5.4 - 2023-09-15
 
