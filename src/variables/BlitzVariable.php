@@ -86,8 +86,8 @@ class BlitzVariable
     {
         Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.includeCached()` or `craft.blitz.includeDynamic()` instead.');
 
-        // Ensure template exists
-        if (!Craft::$app->getView()->resolveTemplate($template)) {
+        // Ensure the site template exists
+        if (!Craft::$app->getView()->resolveTemplate($template, 'site')) {
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
