@@ -225,7 +225,12 @@ class BlitzVariable
         Blitz::$plugin->generateCache->addSsiInclude($includeId);
         $uri = $this->_getUriWithParams($uri, $params);
 
-        return Template::raw('<!--#include virtual="' . $uri . '" -->');
+        if (Blitz::$plugin->settings->caddySSI) {
+            return Template::raw('{{httpInclude "' . $uri . '" }}');
+        }
+        else {
+            return Template::raw('<!--#include virtual="' . $uri . '" -->');
+        }
     }
 
     /**

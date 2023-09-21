@@ -203,6 +203,11 @@ class SettingsModel extends Model
     public bool $ssiEnabled = false;
 
     /**
+     * With this setting enabled, Blitz will output "SSI" tags in the Caddy Server Templates syntax; this is not compatible with nGinx or Apache's standard SSI syntax. This should only be set to true if you are running Caddy Server.
+     */
+    public bool $caddySSI = false;
+
+    /**
      * With this setting enabled, Blitz will fetch cached includes using Edge-Side Includes (ESI), which must be enabled on the server.
      */
     public bool $esiEnabled = false;

@@ -338,6 +338,16 @@
             on: settings.ssiEnabled,
             fieldClass: 'width-50',
         }) }}
+        {{ forms.lightswitchField({
+            id: 'caddySSI',
+            label: "Use Caddy Server Templates syntax instead of SSI syntax"|t('blitz'),
+            instructions: instructions("Only enable this if you are running Caddy Server."|t('blitz'), info),
+            tip: '...',
+            warning: config.caddySSI is defined ? configWarning('caddySSI'),
+            name: 'settings[caddySSI]',
+            on: settings.caddySSI,
+            fieldClass: 'width-50',
+        }) }}
 
         <!--#include virtual="{{ detectSsiActionUrl }}" -->
         <script>

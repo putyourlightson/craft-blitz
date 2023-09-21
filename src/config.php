@@ -134,6 +134,9 @@ return [
         // With this setting enabled, Blitz will statically include templates using Server-Side Includes (SSI), which must be enabled on the web server.
         //'ssiEnabled' => false,
 
+        // With this setting enabled, Blitz will output "SSI" tags in the Caddy Server Templates syntax; this is not compatible with nGinx or Apache's standard SSI syntax. This should only be set to true if you are running Caddy Server
+        //'caddySSI' => false,
+
         // With this setting enabled, Blitz will statically include templates using Edge-Side Includes (ESI), which must be enabled on the web server or CDN.
         //'esiEnabled' => false,
 
