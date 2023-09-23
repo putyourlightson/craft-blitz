@@ -226,7 +226,7 @@ class BlitzVariable
         $uri = $this->_getUriWithParams($uri, $params);
 
         if (Blitz::$plugin->settings->caddySSI) {
-            return Template::raw('{{httpInclude "' . $uri . '" }}');
+            return Template::raw('<!--#caddy httpInclude "' . $uri . '" -->');
         }
         else {
             return Template::raw('<!--#include virtual="' . $uri . '" -->');
