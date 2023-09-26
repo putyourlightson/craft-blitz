@@ -196,7 +196,7 @@ class BlitzVariable
         [$includeId, $index] = Blitz::$plugin->generateCache->saveInclude($siteId, $template, $params);
 
         // Create a root relative URL to account for sub-folders
-        $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($uriPrefix));
+        $uri = UrlHelper::rootRelativeUrl(UrlHelper::baseSiteUrl($uriPrefix));
 
         $params = [
             'action' => $action,
