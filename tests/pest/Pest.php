@@ -9,6 +9,7 @@ use craft\commerce\records\Product as ProductRecord;
 use craft\db\ActiveRecord;
 use craft\elements\Asset;
 use craft\elements\Entry;
+use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
@@ -219,11 +220,16 @@ function createEntry(int $sectionId = TEST_SECTION_ID, bool $enabled = true, boo
     return $entry;
 }
 
-function createEntryWithRelationship(): Entry
+function createEntryWithRelationship(array $relatedEntries = []): Entry
 {
-    $relatedEntry = createEntry();
+    if (empty($relatedEntries)) {
+        $relatedEntries = [createEntry()];
+    }
+
+    $relatedEntryIds = ArrayHelper::getColumn($relatedEntries, 'id');
+
     $entry = createEntry();
-    $entry->relatedTo = [$relatedEntry->id];
+    $entry->relatedTo = $relatedEntryIds;
     Craft::$app->elements->saveElement($entry);
 
     Blitz::$plugin->generateCache->reset();

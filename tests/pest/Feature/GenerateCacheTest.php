@@ -9,6 +9,7 @@ use craft\db\FixedOrderExpression;
 use craft\elements\Entry;
 use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
+use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\mutex\Mutex;
 use putyourlightson\blitz\Blitz;
@@ -139,6 +140,32 @@ test('Element cache record is saved with eager loaded custom fields in variable'
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
 });
 
+test('Element cache records are saved with all statuses for relation field queries', function() {
+    $entry = createEntryWithRelationship([
+        createEntry(),
+        createEntry(enabled: false),
+    ]);
+
+    // The entries must be fetched from the DB for the test to work.
+    $entries = Entry::find()->id($entry->id)->with('relatedTo')->all();
+    ElementQueryRecord::deleteAll();
+
+    /** @var ElementQueryRecord $record */
+    $record = ElementQueryRecord::find()->one();
+    $params = Json::decodeIfJson($record->params);
+    $entryQuery = Entry::find();
+    $entryQuery->join = $params['join'] ?? [];
+
+    expect(ElementQueryHelper::isRelationFieldQuery($entryQuery))
+        ->toBeTrue();
+
+    $elementQuery = $entry->relatedTo;
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    expect(ElementQueryRecord::class)
+        ->toHaveRecordCount(0);
+});
+
 test('Element query records without specific identifiers are saved', function() {
     $elementQuerySets = [
         [
@@ -245,9 +272,9 @@ test('Element query record with option field data is converted to value', functi
 
     /** @var ElementQueryRecord $record */
     $record = ElementQueryRecord::find()->one();
-    $params = json_decode($record->params);
+    $params = Json::decodeIfJson($record->params);
 
-    expect($params->dropdown)
+    expect($params['dropdown'])
         ->toEqual(1);
 });
 
@@ -262,9 +289,9 @@ test('Element query record with multi options field data is converted to array o
 
     /** @var ElementQueryRecord $record */
     $record = ElementQueryRecord::find()->one();
-    $params = json_decode($record->params);
+    $params = Json::decodeIfJson($record->params);
 
-    expect($params->multiSelect)
+    expect($params['multiSelect'])
         ->toEqual([1, 2]);
 });
 

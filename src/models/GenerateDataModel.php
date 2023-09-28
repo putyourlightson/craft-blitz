@@ -94,6 +94,13 @@ class GenerateDataModel extends BaseDataModel
         $this->data['elements']['elementIds'][$elementId] = true;
     }
 
+    public function addElementIds(array $elementIds): void
+    {
+        foreach ($elementIds as $elementId) {
+            $this->addElementId($elementId);
+        }
+    }
+
     public function addElement(ElementInterface $element): void
     {
         $this->addElementId($element->id);

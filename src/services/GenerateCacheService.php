@@ -19,6 +19,7 @@ use craft\events\TemplateEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\records\Element as ElementRecord;
+use craft\services\Elements;
 use craft\web\View;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
@@ -114,9 +115,9 @@ class GenerateCacheService extends Component
     public function registerElementPrepareEvents(): void
     {
         /**
-         * Both the `EVENT_AFTER_POPULATE_ELEMENT` and `EVENT_AFTER_POPULATE_ELEMENTS` events
-         * must be used to ensure that eager-loaded elements and eager-loaded fields are tracked
-         * respectively.
+         * Both the `EVENT_AFTER_POPULATE_ELEMENT` and `EVENT_AFTER_POPULATE_ELEMENTS`
+         * events must be used to ensure that eager-loaded elements and eager-loaded
+         * fields are tracked respectively.
          *
          * @link https://github.com/putyourlightson/craft-blitz/issues/514
          */
@@ -171,19 +172,7 @@ class GenerateCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
-        // Don’t proceed if element tracking is disabled
-        if (!Blitz::$plugin->settings->trackElements || !$this->options->trackElements) {
-            return;
-        }
-
-        // Don’t proceed if element caching is disabled
-        /** @noinspection PhpDeprecationInspection */
-        if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
-            return;
-        }
-
-        // Don’t proceed if not a cacheable element type
-        if (!ElementTypeHelper::getIsCacheableElementType($element::class)) {
+        if (!$this->_shouldTrackElementsOfType($element::class)) {
             return;
         }
 
@@ -197,7 +186,7 @@ class GenerateCacheService extends Component
             }
         }
 
-        // Replace the custom field behavior with our own (at most once)
+        // Replace the custom field behavior with our own (only once)
         $customFields = $element->getBehavior('customFields');
         if ($customFields instanceof CustomFieldBehavior) {
             $element->attachBehavior('customFields',
@@ -211,19 +200,7 @@ class GenerateCacheService extends Component
      */
     public function addElementQuery(ElementQuery $elementQuery): void
     {
-        // Don’t proceed if element query tracking is disabled
-        if (!Blitz::$plugin->settings->trackElementQueries || !$this->options->trackElementQueries) {
-            return;
-        }
-
-        // Don’t proceed if element query caching is disabled
-        /** @noinspection PhpDeprecationInspection */
-        if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
-            return;
-        }
-
-        // Don’t proceed if not a cacheable element type
-        if (!ElementTypeHelper::getIsCacheableElementType($elementQuery->elementType)) {
+        if (!$this->_shouldTrackElementQueriesOfType($elementQuery->elementType)) {
             return;
         }
 
@@ -249,6 +226,8 @@ class GenerateCacheService extends Component
 
         // Don’t proceed if this is a relation field query
         if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
+            $this->_addRelatedElementIds($elementQuery);
+
             return;
         }
 
@@ -571,6 +550,72 @@ class GenerateCacheService extends Component
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);
         }
+    }
+
+    private function _shouldTrackElementsOfType(string $elementType): bool
+    {
+        // Don’t proceed if element tracking is disabled
+        if (!Blitz::$plugin->settings->trackElements || !$this->options->trackElements) {
+            return false;
+        }
+
+        // Don’t proceed if element caching is disabled
+        /** @noinspection PhpDeprecationInspection */
+        if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
+            return false;
+        }
+
+        // Don’t proceed if not a cacheable element type
+        if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function _shouldTrackElementQueriesOfType(string $elementType): bool
+    {
+        // Don’t proceed if element query tracking is disabled
+        if (!Blitz::$plugin->settings->trackElementQueries || !$this->options->trackElementQueries) {
+            return false;
+        }
+
+        // Don’t proceed if element query caching is disabled
+        /** @noinspection PhpDeprecationInspection */
+        if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
+            return false;
+        }
+
+        // Don’t proceed if not a cacheable element type
+        if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Adds related element IDs with all statuses so that disabled elements will
+     * trigger a refresh whenever enabled.
+     * https://github.com/putyourlightson/craft-blitz/issues/555
+     */
+    private function _addRelatedElementIds(ElementQuery $elementQuery): void
+    {
+        if (!$this->_shouldTrackElementsOfType($elementQuery->elementType)) {
+            return;
+        }
+
+        // Temporarily disable element query tracking to prevent an endless loop.
+        $originalTrackElementQueries = $this->options->trackElementQueries;
+        $this->options->trackElementQueries = false;
+
+        // Clone the original element query rather than manipulating it directly.
+        $elementQueryClone = clone $elementQuery;
+        $elementQueryClone->status(null);
+        $elementIds = $elementQueryClone->ids();
+        $this->generateData->addElementIds($elementIds);
+
+        $this->options->trackElementQueries = $originalTrackElementQueries;
     }
 
     /**
