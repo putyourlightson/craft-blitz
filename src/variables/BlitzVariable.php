@@ -61,7 +61,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->_includeTemplate($template, 'index.php', self::DYNAMIC_INCLUDE_ACTION, $params, $config);
+        return $this->_includeTemplate($template, '', self::DYNAMIC_INCLUDE_ACTION, $params, $config);
     }
 
     /**
