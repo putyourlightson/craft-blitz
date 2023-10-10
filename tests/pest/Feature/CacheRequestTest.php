@@ -57,10 +57,22 @@ test('Request with `_includes` path is a cached include', function() {
         ->toBeTrue();
 });
 
-test('Request with include action is a cached include', function() {
+test('Request with cached include action is a cached include', function() {
     sendRequest(UrlHelper::actionUrl('', ['action' => 'blitz/include/cached']));
 
     expect(Blitz::$plugin->cacheRequest->getIsCachedInclude())
+        ->toBeTrue();
+});
+
+test('Request with `_dynamicIncludes` path is a dynamic include', function() {
+    expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamicIncludes'))
+        ->toBeTrue();
+});
+
+test('Request with dynamic include action is a dynamic include', function() {
+    sendRequest(UrlHelper::actionUrl('', ['action' => 'blitz/include/dynamic']));
+
+    expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude())
         ->toBeTrue();
 });
 
