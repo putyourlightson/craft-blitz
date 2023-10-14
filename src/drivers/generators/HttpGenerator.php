@@ -74,7 +74,7 @@ class HttpGenerator extends BaseCacheGenerator
                     $request = $this->_createRequest($url);
                     $response = yield $client->request($request);
 
-                    if ($response->getStatus() == 200) {
+                    if ($response->getStatus() === 200) {
                         $this->generated++;
                     } else {
                         Blitz::$plugin->debug('{status} error: {reason}', [
