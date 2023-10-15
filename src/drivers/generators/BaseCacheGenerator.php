@@ -14,7 +14,6 @@ use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
-use putyourlightson\blitz\variables\BlitzVariable;
 use Throwable;
 
 /**
@@ -254,6 +253,6 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      */
     protected function isPageUrl(string $url): bool
     {
-        return !str_contains($url, CacheRequestService::CACHED_INCLUDE_PATH . '?action=' . BlitzVariable::CACHED_INCLUDE_ACTION);
+        return !str_contains($url, CacheRequestService::CACHED_INCLUDE_PATH . '?action=' . CacheRequestService::CACHED_INCLUDE_ACTION);
     }
 }

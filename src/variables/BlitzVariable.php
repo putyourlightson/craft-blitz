@@ -21,6 +21,22 @@ use yii\web\View as BaseView;
 class BlitzVariable
 {
     /**
+     * Keep this around for backwards compatibility.
+     *
+     * @todo Remove in version 5.
+     * @const string
+     */
+    public const CACHED_INCLUDE_ACTION = 'blitz/include/cached';
+
+    /**
+     * Keep this around for backwards compatibility.
+     *
+     * @todo Remove in version 5.
+     * @const string
+     */
+    public const DYNAMIC_INCLUDE_ACTION = 'blitz/include/dynamic';
+
+    /**
      * @var int
      */
     private int $_injected = 0;

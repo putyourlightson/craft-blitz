@@ -6,7 +6,6 @@
 use craft\config\GeneralConfig;
 use craft\helpers\App;
 use putyourlightson\blitz\services\CacheRequestService;
-use putyourlightson\blitz\variables\BlitzVariable;
 
 /**
  * Blitz rewrite.php
@@ -69,12 +68,13 @@ if ($includeQueryString) {
 
 /**
  * Modify the URI for include action requests.
+ *
  * @see CacheRequestService::getRequestedCacheableSiteUri()
  */
 $action = $_GET['action'] ?? null;
-if ($action === BlitzVariable::CACHED_INCLUDE_ACTION) {
+if ($action === CacheRequestService::CACHED_INCLUDE_ACTION) {
     $uri = CacheRequestService::CACHED_INCLUDE_PATH . '/' . http_build_query($_GET);
-} elseif ($action === BlitzVariable::DYNAMIC_INCLUDE_ACTION) {
+} elseif ($action === CacheRequestService::DYNAMIC_INCLUDE_ACTION) {
     $uri = http_build_query($_GET);
 }
 
