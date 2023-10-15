@@ -13,6 +13,7 @@ use craft\behaviors\CustomFieldBehavior;
 use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
 use craft\events\CancelableEvent;
+use craft\events\EagerLoadElementsEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\PopulateElementsEvent;
 use craft\events\TemplateEvent;
@@ -118,8 +119,7 @@ class GenerateCacheService extends Component
          * Both the `EVENT_AFTER_POPULATE_ELEMENT` and `EVENT_AFTER_POPULATE_ELEMENTS`
          * events must be used to ensure that eager-loaded elements and eager-loaded
          * fields are tracked respectively.
-         *
-         * @link https://github.com/putyourlightson/craft-blitz/issues/514
+         * https://github.com/putyourlightson/craft-blitz/issues/514
          */
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
             function(PopulateElementEvent $event) {
@@ -139,8 +139,30 @@ class GenerateCacheService extends Component
         );
 
         /**
+         * Track eager-loaded elements, including disabled elements, from the mapping target.
+         * https://github.com/putyourlightson/craft-blitz/issues/555
+         *
+         * @see Elements::_eagerLoadElementsInternal()
+         */
+        Event::on(Elements::class, Elements::EVENT_BEFORE_EAGER_LOAD_ELEMENTS,
+            function(EagerLoadElementsEvent $event) {
+                foreach ($event->with as $plan) {
+                    // Get the eager-loading map from the source element type
+                    /** @var ElementInterface|string $elementType */
+                    $elementType = $event->elementType;
+                    $map = $elementType::eagerLoadingMap($event->elements, $plan->handle);
+                    if (!empty($map['map'])) {
+                        foreach ($map['map'] as $mapping) {
+                            $this->generateData->addElementId($mapping['target']);
+                        }
+                    }
+                }
+            }
+        );
+
+        /**
          * Catch elements injected into rendered templates as variables, so we can also track
-         * fields eager-loaded via `eagerLoadElements()`.
+         * fields eager-loaded via `eagerLoadElements()` directly.
          *
          * @see Elements::eagerLoadElements()
          */

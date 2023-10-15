@@ -141,29 +141,30 @@ test('Element cache record is saved with eager loaded custom fields in variable'
 });
 
 test('Element cache records are saved with all statuses for relation field queries', function() {
-    $entry = createEntryWithRelationship([
-        createEntry(),
-        createEntry(enabled: false),
-    ]);
+    $enabledEntry = createEntry();
+    $disabledEntry = createEntry(enabled: false);
+    $entry = createEntryWithRelationship([$enabledEntry, $disabledEntry]);
 
-    // The entries must be fetched from the DB for the test to work.
-    $entries = Entry::find()->id($entry->id)->with('relatedTo')->all();
-    ElementQueryRecord::deleteAll();
+    // The entry must be fetched from the DB for the test to work.
+    $entry = Entry::find()->id($entry->id)->one();
+    $entry->relatedTo->all();
 
-    /** @var ElementQueryRecord $record */
-    $record = ElementQueryRecord::find()->one();
-    $params = Json::decodeIfJson($record->params);
-    $entryQuery = Entry::find();
-    $entryQuery->join = $params['join'] ?? [];
+    expect(Blitz::$plugin->generateCache->generateData->getElementIds())
+        ->toContain($enabledEntry->id, $disabledEntry->id);
+});
 
-    expect(ElementQueryHelper::isRelationFieldQuery($entryQuery))
-        ->toBeTrue();
+test('Element cache records are saved with all statuses for eager loaded relation field queries', function() {
+    $enabledEntry = createEntry();
+    $disabledEntry = createEntry(enabled: false);
+    $entry = createEntryWithRelationship([$enabledEntry, $disabledEntry]);
 
-    $elementQuery = $entry->relatedTo;
-    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+    Blitz::$plugin->generateCache->reset();
 
-    expect(ElementQueryRecord::class)
-        ->toHaveRecordCount(0);
+    // The entry must be fetched from the DB for the test to work.
+    Entry::find()->id($entry->id)->with('relatedTo')->one();
+
+    expect(Blitz::$plugin->generateCache->generateData->getElementIds())
+        ->toContain($enabledEntry->id, $disabledEntry->id);
 });
 
 test('Element query records without specific identifiers are saved', function() {
