@@ -8,6 +8,7 @@ use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
+use putyourlightson\blitz\services\CacheRequestService;
 
 beforeEach(function() {
     Blitz::$plugin->settings->includedUriPatterns = [
@@ -52,25 +53,25 @@ test('Request with token is not cacheable', function() {
         ->toBeFalse();
 });
 
-test('Request with `_includes` path is a cached include', function() {
+test('Request starting with `_includes` is a cached include', function() {
     expect(Blitz::$plugin->cacheRequest->getIsCachedInclude('/_includes/xyz'))
         ->toBeTrue();
 });
 
 test('Request with cached include action is a cached include', function() {
-    sendRequest(UrlHelper::actionUrl('', ['action' => 'blitz/include/cached']));
+    sendRequest(UrlHelper::actionUrl('', ['action' => CacheRequestService::CACHED_INCLUDE_ACTION]));
 
     expect(Blitz::$plugin->cacheRequest->getIsCachedInclude())
         ->toBeTrue();
 });
 
-test('Request with `_dynamicIncludes` path is a dynamic include', function() {
-    expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamicIncludes'))
+test('Request starting with `_dynamic` is a dynamic include', function() {
+    expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamic/xyz'))
         ->toBeTrue();
 });
 
 test('Request with dynamic include action is a dynamic include', function() {
-    sendRequest(UrlHelper::actionUrl('', ['action' => 'blitz/include/dynamic']));
+    sendRequest(UrlHelper::actionUrl('', ['action' => CacheRequestService::DYNAMIC_INCLUDE_ACTION]));
 
     expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude())
         ->toBeTrue();

@@ -16,19 +16,10 @@ use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
+use yii\web\View as BaseView;
 
 class BlitzVariable
 {
-    /**
-     * @const string
-     */
-    public const CACHED_INCLUDE_ACTION = 'blitz/include/cached';
-
-    /**
-     * @const string
-     */
-    public const DYNAMIC_INCLUDE_ACTION = 'blitz/include/dynamic';
-
     /**
      * @var int
      */
@@ -46,7 +37,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->_includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PATH, self::CACHED_INCLUDE_ACTION, $params, $config);
+        return $this->_includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PATH, CacheRequestService::CACHED_INCLUDE_ACTION, $params, $config);
     }
 
     /**
@@ -61,7 +52,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->_includeTemplate($template, CacheRequestService::DYNAMIC_INCLUDE_PATH, self::DYNAMIC_INCLUDE_ACTION, $params, $config);
+        return $this->_includeTemplate($template, CacheRequestService::DYNAMIC_INCLUDE_PATH, CacheRequestService::DYNAMIC_INCLUDE_ACTION, $params, $config);
     }
 
     /**
@@ -198,22 +189,22 @@ class BlitzVariable
         // Create a root relative URL to account for sub-folders
         $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($uriPrefix));
 
-        $params = [
+        $includeParams = [
             'action' => $action,
             'index' => $index,
         ];
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
             if (Blitz::$plugin->settings->ssiEnabled) {
-                return $this->_getSsiTag($uri, $params, $includeId);
+                return $this->_getSsiTag($uri, $includeParams, $includeId);
             }
 
             if (Blitz::$plugin->settings->esiEnabled) {
-                return $this->_getEsiTag($uri, $params);
+                return $this->_getEsiTag($uri, $includeParams);
             }
         }
 
-        return $this->_getScript($uri, $params, $config);
+        return $this->_getScript($uri, $includeParams, $config);
     }
 
     /**
@@ -247,7 +238,13 @@ class BlitzVariable
         // Get the URL path only
         $uri = parse_url(UrlHelper::siteUrl($uri), PHP_URL_PATH);
 
-        return $uri . '?' . http_build_query($params);
+        $queryString = http_build_query($params);
+
+        // Decode slashes to prevent Apache returning a 404 if `AllowEncodedSlashes` is off.
+        // https://github.com/putyourlightson/craft-blitz/issues/564
+        $queryString = str_replace('%2F', '/', $queryString);
+
+        return $uri . '?' . $queryString;
     }
 
     /**
@@ -274,7 +271,7 @@ class BlitzVariable
         // Register polyfills for IE11 only, using the `module/nomodule` pattern.
         // https://3perf.com/blog/polyfills/#modulenomodule
         $view->registerJsFile($polyfillUrl, ['nomodule' => true]);
-        $view->registerJs($js, View::POS_END);
+        $view->registerJs($js, BaseView::POS_END);
 
         $this->_injected++;
         $id = $this->_injected;

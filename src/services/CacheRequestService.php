@@ -22,7 +22,6 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\IncludeRecord;
-use putyourlightson\blitz\variables\BlitzVariable;
 use yii\web\Response;
 
 /**
@@ -52,12 +51,22 @@ class CacheRequestService extends Component
     /**
      * @const string
      */
+    public const CACHED_INCLUDE_ACTION = 'blitz/include/cached';
+
+    /**
+     * @const string
+     */
+    public const DYNAMIC_INCLUDE_ACTION = 'blitz/include/dynamic';
+
+    /**
+     * @const string
+     */
     public const CACHED_INCLUDE_PATH = '_includes';
 
     /**
      * @const string
      */
-    public const DYNAMIC_INCLUDE_PATH = '_dynamicIncludes';
+    public const DYNAMIC_INCLUDE_PATH = '_dynamic';
 
     /**
      * @var bool|null
@@ -251,7 +260,7 @@ class CacheRequestService extends Component
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             $action = implode('/', Craft::$app->getRequest()->getActionSegments());
 
-            return $action == BlitzVariable::CACHED_INCLUDE_ACTION;
+            return $action == self::CACHED_INCLUDE_ACTION;
         }
 
         return false;
@@ -275,7 +284,7 @@ class CacheRequestService extends Component
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             $action = implode('/', Craft::$app->getRequest()->getActionSegments());
 
-            return $action == BlitzVariable::DYNAMIC_INCLUDE_ACTION;
+            return $action == self::DYNAMIC_INCLUDE_ACTION;
         }
 
         return false;
