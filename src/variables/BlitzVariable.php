@@ -254,13 +254,14 @@ class BlitzVariable
         // Get the URL path only
         $uri = parse_url(UrlHelper::siteUrl($uri), PHP_URL_PATH);
 
-        $queryString = http_build_query($params);
+        return $uri . '?' . $this->_getQueryString($params);
+    }
 
+    private function _getQueryString(array $params): string
+    {
         // Decode slashes to prevent Apache returning a 404 if `AllowEncodedSlashes` is off.
         // https://github.com/putyourlightson/craft-blitz/issues/564
-        $queryString = str_replace('%2F', '/', $queryString);
-
-        return $uri . '?' . $queryString;
+        return str_replace('%2F', '/', http_build_query($params));
     }
 
     /**
@@ -295,7 +296,7 @@ class BlitzVariable
         $data = [
             'blitz-id' => $id,
             'blitz-uri' => $uri,
-            'blitz-params' => http_build_query($params),
+            'blitz-params' => $this->_getQueryString($params),
             'blitz-property' => $config->property,
         ];
 

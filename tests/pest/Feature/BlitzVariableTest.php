@@ -14,3 +14,12 @@ test('Include cached tag does not contain encoded slashes in params', function()
         ->not()
         ->toContain('%2F');
 });
+
+test('Fetch URI tag does not contain encoded slashes in params', function() {
+    $variable = new BlitzVariable();
+    $tagString = (string)$variable->fetchUri('test', ['action' => 'x/y/z']);
+
+    expect($tagString)
+        ->not()
+        ->toContain('%2F');
+});
