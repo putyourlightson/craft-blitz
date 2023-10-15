@@ -21,11 +21,17 @@ use yii\web\View as BaseView;
 class BlitzVariable
 {
     /**
+     * Keep this around for backwards compatibility.
+     *
+     * @todo Remove in version 5.
      * @const string
      */
     public const CACHED_INCLUDE_ACTION = 'blitz/include/cached';
 
     /**
+     * Keep this around for backwards compatibility.
+     *
+     * @todo Remove in version 5.
      * @const string
      */
     public const DYNAMIC_INCLUDE_ACTION = 'blitz/include/dynamic';
@@ -47,7 +53,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->_includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PATH, self::CACHED_INCLUDE_ACTION, $params, $config);
+        return $this->_includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PATH, CacheRequestService::CACHED_INCLUDE_ACTION, $params, $config);
     }
 
     /**
@@ -62,7 +68,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->_includeTemplate($template, 'index.php', self::DYNAMIC_INCLUDE_ACTION, $params, $config);
+        return $this->_includeTemplate($template, CacheRequestService::DYNAMIC_INCLUDE_PATH, CacheRequestService::DYNAMIC_INCLUDE_ACTION, $params, $config);
     }
 
     /**
@@ -199,22 +205,22 @@ class BlitzVariable
         // Create a root relative URL to account for sub-folders
         $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($uriPrefix));
 
-        $params = [
+        $includeParams = [
             'action' => $action,
             'index' => $index,
         ];
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
             if (Blitz::$plugin->settings->ssiEnabled) {
-                return $this->_getSsiTag($uri, $params, $includeId);
+                return $this->_getSsiTag($uri, $includeParams, $includeId);
             }
 
             if (Blitz::$plugin->settings->esiEnabled) {
-                return $this->_getEsiTag($uri, $params);
+                return $this->_getEsiTag($uri, $includeParams);
             }
         }
 
-        return $this->_getScript($uri, $params, $config);
+        return $this->_getScript($uri, $includeParams, $config);
     }
 
     /**
@@ -248,7 +254,14 @@ class BlitzVariable
         // Get the URL path only
         $uri = parse_url(UrlHelper::siteUrl($uri), PHP_URL_PATH);
 
-        return $uri . '?' . http_build_query($params);
+        return $uri . '?' . $this->_getQueryString($params);
+    }
+
+    private function _getQueryString(array $params): string
+    {
+        // Decode slashes to prevent Apache returning a 404 if `AllowEncodedSlashes` is off.
+        // https://github.com/putyourlightson/craft-blitz/issues/564
+        return str_replace('%2F', '/', http_build_query($params));
     }
 
     /**
@@ -283,7 +296,7 @@ class BlitzVariable
         $data = [
             'blitz-id' => $id,
             'blitz-uri' => $uri,
-            'blitz-params' => http_build_query($params),
+            'blitz-params' => $this->_getQueryString($params),
             'blitz-property' => $config->property,
         ];
 

@@ -1,5 +1,12 @@
 # Release Notes for Blitz
 
+## 4.6.0 - Unreleased
+
+### Changed
+
+- Changed the dynamic include path to account for sites that live within a subfolder ([#562](https://github.com/putyourlightson/craft-blitz/issues/562)).
+- Include action tags now ensure that slashes are not encoded to account for URL encoding issues ([#564](https://github.com/putyourlightson/craft-blitz/issues/564)).
+
 ## 4.5.5 - 2023-09-20
 
 ### Fixed
