@@ -1,6 +1,10 @@
 # Release Notes for Blitz
 
-## 4.6.0 - Unreleased
+## 4.6.0 - 2023-10-17
+
+### Added
+
+- Added the ability for Blitz to track disabled elements in relation field queries so that cached pages are refreshed when their status is set to enabled ([#555](https://github.com/putyourlightson/craft-blitz/issues/555)).
 
 ### Changed
 
