@@ -4,7 +4,7 @@
 
 ### Changed
 
-- Changed the refreshable status check to always refresh elements with `live` and `active` statuses ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
+- Changed the refreshable status check to always conside elements with `live` and `active` statuses as refreshable ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
 
 ## 4.6.0 - 2023-10-17
 
