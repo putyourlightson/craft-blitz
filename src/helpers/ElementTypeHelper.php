@@ -59,6 +59,8 @@ class ElementTypeHelper
 
     /**
      * @const string[]
+     *
+     * @deprecated in 4.6.1
      */
     public const LIVE_STATUSES = [
         Entry::class => Entry::STATUS_LIVE,
@@ -196,7 +198,6 @@ class ElementTypeHelper
         Event::trigger(self::class, self::EVENT_REGISTER_LIVE_STATUSES, $event);
 
         self::$_liveStatuses = array_merge(
-            self::LIVE_STATUSES,
             $event->liveStatuses
         );
 

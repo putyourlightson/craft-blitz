@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.6.1 - Unreleased
+
+### Changed
+
+- Changed the refreshable status check to always refresh elements with `live` and `active` statuses ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
+
 ## 4.6.0 - 2023-10-17
 
 ### Added

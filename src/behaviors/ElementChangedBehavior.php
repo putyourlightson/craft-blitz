@@ -203,6 +203,8 @@ class ElementChangedBehavior extends Behavior
         $liveStatus = ElementTypeHelper::getLiveStatus($element::class);
         $refreshableStatuses = [
             $liveStatus,
+            'live',
+            'active',
             'pending',
             'expired',
         ];
