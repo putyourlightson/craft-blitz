@@ -4,8 +4,8 @@
 
 ### Changed
 
-- Changed the refreshable status check to always conside elements with `live` and `active` statuses as refreshable ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
-- Refreshing expired cached now forcibly generates new cached pages if they are not cleared ([#573](https://github.com/putyourlightson/craft-blitz/issues/573)).
+- Changed the refreshable status check to always consider elements with `live` and `active` statuses as refreshable ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
+- Refreshing expired cached now forcibly generates new cached pages if they are not cleared ([#571](https://github.com/putyourlightson/craft-blitz/issues/571)).
 
 ### Fixed
 

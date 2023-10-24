@@ -17,6 +17,18 @@ beforeEach(function() {
             'uriPattern' => '.*',
         ],
     ];
+    Blitz::$plugin->settings->includedQueryStringParams = [
+        [
+            'siteId' => '',
+            'queryStringParam' => '.*',
+        ],
+    ];
+    Blitz::$plugin->settings->excludedQueryStringParams = [
+        [
+            'siteId' => '',
+            'queryStringParam' => 'gclid',
+        ],
+    ];
     Blitz::$plugin->settings->queryStringCaching = SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES;
     Blitz::$plugin->settings->outputComments = false;
     Blitz::$plugin->generateCache->options->outputComments = null;
