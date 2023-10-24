@@ -250,7 +250,7 @@ class CacheRequestService extends Component
      */
     public function getIsCachedInclude(string $uri = null): bool
     {
-        // Includes based on the URI takes preference
+        // Includes based on the provided URI takes preference
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
@@ -263,7 +263,9 @@ class CacheRequestService extends Component
             return $action == self::CACHED_INCLUDE_ACTION;
         }
 
-        return false;
+        $uri = Craft::$app->getRequest()->getFullUri();
+
+        return str_starts_with($uri, self::CACHED_INCLUDE_PATH);
     }
 
     /**
@@ -344,19 +346,22 @@ class CacheRequestService extends Component
      */
     public function getRequestedCacheableSiteUri(): ?SiteUriModel
     {
-        $request = Craft::$app->getRequest();
-
         if ($this->getIsCachedInclude()) {
-            $index = $request->getParam('index');
+            $index = Craft::$app->getRequest()->getParam('index');
             $include = $this->getIncludeByIndex($index);
 
             if ($include === null) {
                 return null;
             }
 
+            $queryParams = [
+                'action' => Craft::$app->getRequest()->getParam('action'),
+                'index' => $index,
+            ];
+
             return new SiteUriModel([
                 'siteId' => $include->siteId,
-                'uri' => self::CACHED_INCLUDE_PATH . '?' . http_build_query($request->getQueryParams()),
+                'uri' => self::CACHED_INCLUDE_PATH . '?' . http_build_query($queryParams),
             ]);
         }
 
@@ -592,9 +597,8 @@ class CacheRequestService extends Component
      */
     public function requestAcceptsEncoding(): bool
     {
-        $request = Craft::$app->getRequest();
-        $encoding = $request->getHeaders()->get('Accept-Encoding');
-        $encodings = $request->parseAcceptHeader($encoding);
+        $encoding = Craft::$app->getRequest()->getHeaders()->get('Accept-Encoding');
+        $encodings = Craft::$app->getRequest()->parseAcceptHeader($encoding);
 
         return isset($encodings[BaseCacheStorage::ENCODING]);
     }

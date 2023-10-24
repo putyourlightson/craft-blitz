@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Fixed a bug in which the cached include path could be incorrectly set if specific included query string parameters were selected ([#573](https://github.com/putyourlightson/craft-blitz/issues/573)).
 - Fixed a bug in which saving included and excluded query string parameters was not possible were no values were specified.
 
 ## 4.6.0 - 2023-10-17
