@@ -416,10 +416,10 @@ class RefreshCacheService extends Component
 
         $this->addCacheIds($cacheIds);
 
-        // Force clear the cache if it will not be regenerated.
-        $forceClear = !Blitz::$plugin->settings->generateOnRefresh();
+        // Forcibly generate the cache if it will not be cleared.
+        $forceGenerate = !Blitz::$plugin->settings->clearOnRefresh();
 
-        $this->refresh($forceClear);
+        $this->refresh(false, $forceGenerate);
     }
 
     /**
@@ -530,10 +530,10 @@ class RefreshCacheService extends Component
             }
         }
 
-        // Force clear the cache if it will not be regenerated.
-        $forceClear = !Blitz::$plugin->settings->generateOnRefresh();
+        // Forcibly generate the cache if it will not be cleared.
+        $forceGenerate = !Blitz::$plugin->settings->clearOnRefresh();
 
-        $this->refresh($forceClear);
+        $this->refresh(false, $forceGenerate);
     }
 
     /**

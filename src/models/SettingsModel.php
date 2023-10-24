@@ -460,8 +460,8 @@ class SettingsModel extends Model
             return true;
         }
 
-        return $this->refreshMode == self::REFRESH_MODE_CLEAR
-            || $this->refreshMode == self::REFRESH_MODE_CLEAR_AND_GENERATE;
+        return $this->refreshMode === self::REFRESH_MODE_CLEAR
+            || $this->refreshMode === self::REFRESH_MODE_CLEAR_AND_GENERATE;
     }
 
     /**
@@ -479,8 +479,8 @@ class SettingsModel extends Model
             return false;
         }
 
-        return $this->refreshMode == self::REFRESH_MODE_EXPIRE_AND_GENERATE
-            || $this->refreshMode == self::REFRESH_MODE_CLEAR_AND_GENERATE;
+        return $this->refreshMode === self::REFRESH_MODE_EXPIRE_AND_GENERATE
+            || $this->refreshMode === self::REFRESH_MODE_CLEAR_AND_GENERATE;
     }
 
     /**
