@@ -67,7 +67,7 @@
         <div class="flex">
             {{ include('blitz/_includes/welcome/step', { step: 1, text: 'Enable caching' }) }}
 
-            <div class="flex-grow field">
+            <div class="flex-grow">
                 {% set info %}
                     {{ 'With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disabling this setting will prevent Blitz from caching any new pages.'|t('blitz') }}
                 {% endset %}
@@ -81,12 +81,10 @@
             </div>
         </div>
 
-        <div class="flex">
+        <div class="flex field">
             {{ include('blitz/_includes/welcome/step', { step: 2, text: 'Select an invalidation mode' }) }}
 
             <div class="flex-grow">
-                {# This empty span ensures that the field is not the first element, which throws off vertical margin. #}
-                <span></span>
                 {% set info %}
                     <p>
                         <strong>Clear the cache and regenerate in a queue job</strong>
@@ -108,7 +106,9 @@
                         <br>
                         Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are regenerated manually (via a cron job).
                     </p>
-                    <a href="{{ docs ~ 'refresh-mode' }}" class="go" target="_blank">Learn more</a>
+                    <a href="{{ docs ~ 'refresh-mode' }}" class="go" target="_blank">
+                        {{ 'Learn more'|t('blitz') }}
+                    </a>
                 {% endset %}
                 {{ forms.selectField({
                     label: "Refresh Mode"|t('blitz'),
@@ -126,7 +126,7 @@
             </div>
         </div>
 
-        <div class="flex">
+        <div class="flex field">
             {{ include('blitz/_includes/welcome/step', { step: 3, text: 'Add at least one included URI pattern' }) }}
 
             <div class="flex-grow">
@@ -144,7 +144,6 @@
                     }
                 }) %}
 
-                <input type="hidden" name="includedUriPatterns" value="" />
                 {% set info %}
                     {{ 'Only URIs that match one or more included URI patterns will be cached.'|t('blitz') }}
                 {% endset %}
@@ -162,7 +161,6 @@
                     allowReorder: true,
                 }) }}
 
-                <input type="hidden" name="excludedUriPatterns" value="" />
                 {% set info %}
                     {{ 'URIs that match one or more excluded URI patterns will not be cached. Excluded URI patterns will override any matching included URI patterns.'|t('blitz') }}
                 {% endset %}
@@ -187,7 +185,8 @@
 
     <div id="storage" class="hidden">
         {% set info %}
-            {{ 'The storage type determines how and where cached pages are stored. You can extend Blitz to add your own or third-party cache storage types.'|t('blitz') }} <a href="{{ docs ~ 'cache-storage' }}" class="go" target="_blank">Learn more</a>
+            {{ 'The storage type determines how and where cached pages are stored. You can extend Blitz to add your own or third-party cache storage types.'|t('blitz') }}
+            <a href="{{ docs ~ 'cache-storage' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Storage"|t('blitz'),
@@ -213,7 +212,8 @@
 
     <div id="generation" class="hidden">
         {% set info %}
-            {{ 'The generator determines how the cache is generated. You can extend Blitz to add your own or third-party cache generators.'|t('blitz') }} <a href="{{ docs ~ 'cache-generation' }}" class="go" target="_blank">Learn more</a>
+            {{ 'The generator determines how the cache is generated. You can extend Blitz to add your own or third-party cache generators.'|t('blitz') }}
+            <a href="{{ docs ~ 'cache-generation' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Cache Generator"|t('blitz'),
@@ -252,7 +252,6 @@
             }
         } %}
 
-        <input type="hidden" name="customSiteUris" value="" />
         {% set info %}
             {{ 'Add any URIs that Craft doesn’t know about here and they will be generated when either a site or the entire cache is generated.'|t('blitz') }}
         {% endset %}
@@ -273,7 +272,8 @@
 
     <div id="purging" class="hidden">
         {% set info %}
-            {{ 'A purger allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated. You can extend Blitz to add your own or third-party reverse proxy purgers.'|t('blitz') }} <a href="{{ docs ~ 'reverse-proxy-purging' }}" class="go" target="_blank">Learn more</a>
+            {{ 'A purger allows you to use a reverse proxy cache service and CDN such as Cloudflare to deliver cached pages. Selecting a purger will tell Blitz to automatically purge the appropriate pages whenever they are updated. You can extend Blitz to add your own or third-party reverse proxy purgers.'|t('blitz') }}
+            <a href="{{ docs ~ 'reverse-proxy-purging' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Reverse Proxy Purger"|t('blitz'),
@@ -299,7 +299,8 @@
 
     <div id="deployment" class="hidden">
         {% set info %}
-            {{ 'A deployer allows you to deploy cached files to a remote location. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been generated. You can extend Blitz to add your own or third-party deployers.'|t('blitz') }} <a href="{{ docs ~ 'remote-deployment' }}" class="go" target="_blank">Learn more</a>
+            {{ 'A deployer allows you to deploy cached files to a remote location. Selecting a deployer will tell Blitz to automatically deploy the appropriate pages once they have been generated. You can extend Blitz to add your own or third-party deployers.'|t('blitz') }}
+            <a href="{{ docs ~ 'remote-deployment' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
         {{ forms.selectField({
             label: "Remote Deployer"|t('blitz'),
@@ -360,17 +361,24 @@
             <p>
                 <strong>Do not cache URLs with query strings</strong>
                 <br>
-                URLs with query strings (anything following a <code>?</code> in a URL) will not be cached.
+                URLs with query strings (anything following a
+                <code>?</code> in a URL) will not be cached.
             </p>
             <p>
                 <strong>Cache URLs with query strings as unique pages</strong>
                 <br>
-                URLs with query strings will be cached as unique pages, so <code>domain.com/about</code>, <code>domain.com/about?utm_source=twitter</code> and <code>domain.com/about?utm_source=facebook</code> will be cached separately.
+                URLs with query strings will be cached as unique pages, so
+                <code>domain.com/about</code>,
+                <code>domain.com/about?utm_source=twitter</code> and
+                <code>domain.com/about?utm_source=facebook</code> will be cached separately.
             </p>
             <p>
                 <strong>Cache URLs with query strings as the same page</strong>
                 <br>
-                URLs with query strings will be cached as the same page, so <code>domain.com/about</code>, <code>domain.com/about?utm_source=twitter</code> and <code>domain.com/about?utm_source=facebook</code> will all be cached with the same output.
+                URLs with query strings will be cached as the same page, so
+                <code>domain.com/about</code>,
+                <code>domain.com/about?utm_source=twitter</code> and
+                <code>domain.com/about?utm_source=facebook</code> will all be cached with the same output.
             </p>
             <a href="{{ docs ~ 'query-string-caching' }}" class="go" target="_blank">Learn more</a>
         {% endset %}
@@ -395,7 +403,6 @@
             }
         }) %}
 
-        <input type="hidden" name="includedQueryStringParams" value="" />
         {{ forms.editableTableField({
             label: "Included Query String Parameters"|t('blitz'),
             instructions: "The query string parameters to include when determining if and how a page should be cached (regular expressions may be used)."|t('blitz'),
@@ -410,7 +417,6 @@
             allowReorder: true,
         }) }}
 
-        <input type="hidden" name="excludedQueryStringParams" value="" />
         {{ forms.editableTableField({
             label: "Excluded Query String Parameters"|t('blitz'),
             instructions: "The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used)."|t('blitz'),
@@ -439,7 +445,8 @@
         {% endif %}
 
         <p class="light">
-            {{ 'More advanced settings are available using config settings.'|t('blitz') }} <a href="{{ docs ~ 'config-settings' }}" class="go" target="_blank">Learn more</a>
+            {{ 'More advanced settings are available using config settings.'|t('blitz') }}
+            <a href="{{ docs ~ 'config-settings' }}" class="go" target="_blank">Learn more</a>
         </p>
     </div>
 

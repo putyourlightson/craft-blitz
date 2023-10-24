@@ -103,7 +103,7 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array $includedUriPatterns = [];
+    public array|string $includedUriPatterns = [];
 
     /**
      * The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
@@ -115,7 +115,7 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array $excludedUriPatterns = [];
+    public array|string $excludedUriPatterns = [];
 
     /**
      * The storage type to use.
@@ -161,7 +161,7 @@ class SettingsModel extends Model
      *
      * @used-by getCustomSiteUris()
      */
-    public array $customSiteUris = [];
+    public array|string $customSiteUris = [];
 
     /**
      * The purger type to use.
@@ -226,7 +226,7 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array $includedQueryStringParams = [
+    public array|string $includedQueryStringParams = [
         [
             'siteId' => '',
             'queryStringParam' => '.*',
@@ -247,7 +247,7 @@ class SettingsModel extends Model
      *     ],
      * ]
      */
-    public array $excludedQueryStringParams = [
+    public array|string $excludedQueryStringParams = [
         [
             'siteId' => '',
             'queryStringParam' => 'gclid',

@@ -6,6 +6,10 @@
 
 - Changed the refreshable status check to always conside elements with `live` and `active` statuses as refreshable ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
 
+### Fixed
+
+- Fixed a bug in which saving included and excluded query string parameters was not possible were no values were specified.
+
 ## 4.6.0 - 2023-10-17
 
 ### Added
