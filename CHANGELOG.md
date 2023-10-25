@@ -1,6 +1,10 @@
 # Release Notes for Blitz
 
-## 4.6.1 - Unreleased
+## 4.7.0 - Unreleased
+
+### Added
+
+- Added a `DummyStorage` class that allows selecting no cache storage driver, useful if pages should be cached on a reverse proxy only.
 
 ### Changed
 

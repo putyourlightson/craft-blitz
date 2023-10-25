@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\DummyStorage;
 use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use yii\base\Event;
@@ -27,6 +28,7 @@ class CacheStorageHelper extends BaseDriverHelper
     public static function getAllTypes(): array
     {
         $storageTypes = [
+            DummyStorage::class,
             FileStorage::class,
             YiiCacheStorage::class,
         ];
