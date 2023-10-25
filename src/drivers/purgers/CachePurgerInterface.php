@@ -15,17 +15,17 @@ interface CachePurgerInterface extends SavableComponentInterface
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function purgeUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true);
+    public function purgeUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void;
 
     /**
      * Purges the cache for a given site ID.
      */
-    public function purgeSite(int $siteId, callable $setProgressHandler = null, bool $queue = true);
+    public function purgeSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void;
 
     /**
      * Purges the entire cache.
      */
-    public function purgeAll(callable $setProgressHandler = null, bool $queue = true);
+    public function purgeAll(callable $setProgressHandler = null, bool $queue = true): void;
 
     /**
      * Tests the purger settings.

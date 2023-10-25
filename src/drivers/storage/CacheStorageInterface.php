@@ -24,19 +24,19 @@ interface CacheStorageInterface
     /**
      * Saves the cache value for the provided site URI.
      */
-    public function save(string $value, SiteUriModel $siteUri, int $duration = null, bool $allowEncoding = true);
+    public function save(string $value, SiteUriModel $siteUri, int $duration = null, bool $allowEncoding = true): void;
 
     /**
      * Deletes the cache values for the provided site URIs.
      *
      * @param SiteUriModel[] $siteUris
      */
-    public function deleteUris(array $siteUris);
+    public function deleteUris(array $siteUris): void;
 
     /**
      * Deletes all cached values.
      */
-    public function deleteAll();
+    public function deleteAll(): void;
 
     /**
      * Returns the utility HTML.
