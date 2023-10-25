@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\jobs;
 
 use Craft;
 use craft\base\ElementInterface;
-use craft\helpers\StringHelper;
 use craft\queue\BaseJob;
 use craft\queue\QueueInterface;
 use putyourlightson\blitz\Blitz;
@@ -147,6 +146,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     private function _populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, Queue|QueueInterface $queue): void
     {
         foreach ($refreshData->getElementTypes() as $elementType) {
+            /** @var ElementInterface $elementType */
             $elementIds = $refreshData->getElementIds($elementType);
 
             if (count($elementIds)) {
@@ -166,9 +166,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
                             Craft::t('blitz', 'Checking {count} of {total} {elementType} queries.', [
                                 'count' => $count,
                                 'total' => $total,
-                                // Don't use `lowerDisplayName` which was only introduced in Craft 3.3.17
-                                // https://github.com/putyourlightson/craft-blitz/issues/285
-                                'elementType' => StringHelper::toLowerCase($elementType::displayName()),
+                                'elementType' => $elementType::lowerDisplayName(),
                             ])
                         );
                     }

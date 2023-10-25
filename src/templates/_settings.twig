@@ -107,7 +107,7 @@
                         Select this for higher traffic sites, to continue serving expired (stale) cached pages until they are regenerated manually (via a cron job).
                     </p>
                     <a href="{{ docs ~ 'refresh-mode' }}" class="go" target="_blank">
-                        {{ 'Learn more'|t('blitz') }}
+                        {{- 'Learn more'|t('blitz') -}}
                     </a>
                 {% endset %}
                 {{ forms.selectField({
