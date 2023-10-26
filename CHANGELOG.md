@@ -1,15 +1,15 @@
 # Release Notes for Blitz
 
-## 4.7.0 - Unreleased
+## 4.7.0 - 2023-10-26
 
 ### Added
 
-- Added a `DummyStorage` class that allows selecting no cache storage driver, useful if pages should be cached on a reverse proxy only ([#502](https://github.com/putyourlightson/craft-blitz/issues/502)).
+- Added a `DummyStorage` class that allows the cache storage driver to be set to `None`, useful if pages should be cached on a reverse proxy only ([#502](https://github.com/putyourlightson/craft-blitz/issues/502)).
 
 ### Changed
 
-- Changed the refreshable status check to always consider elements with `live` and `active` statuses as refreshable ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
 - Refreshing expired cached now forcibly generates new cached pages if they are not cleared ([#571](https://github.com/putyourlightson/craft-blitz/issues/571)).
+- Changed the refreshable status check to always consider elements with `live` and `active` statuses as refreshable ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
 
 ### Fixed
 
