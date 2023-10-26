@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added a `DummyStorage` class that allows selecting no cache storage driver, useful if pages should be cached on a reverse proxy only.
+- Added a `DummyStorage` class that allows selecting no cache storage driver, useful if pages should be cached on a reverse proxy only ([#502](https://github.com/putyourlightson/craft-blitz/issues/502)).
 
 ### Changed
 

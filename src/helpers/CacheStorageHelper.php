@@ -28,9 +28,9 @@ class CacheStorageHelper extends BaseDriverHelper
     public static function getAllTypes(): array
     {
         $storageTypes = [
-            DummyStorage::class,
             FileStorage::class,
             YiiCacheStorage::class,
+            DummyStorage::class,
         ];
 
         $storageTypes = array_unique(array_merge(
