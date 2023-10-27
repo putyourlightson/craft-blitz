@@ -98,7 +98,7 @@ class SettingsController extends Controller
 
         // SSI URLs only work with an `action` parameter.
         $detectSsiActionUrl = UrlHelper::rootRelativeUrl(
-            UrlHelper::siteUrl('', ['action' => 'blitz/settings/detect-ssi'])
+            UrlHelper::cpUrl('', ['action' => 'blitz/settings/detect-ssi'])
         );
 
         return $this->renderTemplate('blitz/_settings', [
