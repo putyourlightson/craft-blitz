@@ -427,21 +427,17 @@ class RefreshCacheService extends Component
      */
     public function refreshAll(): void
     {
-        $event = new RefreshCacheEvent();
+        // Get site URIs before flushing the cache
+        $siteUris = array_merge(
+            SiteUriHelper::getAllSiteUris(),
+            Blitz::$plugin->settings->getCustomSiteUris(),
+        );
+
+        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_REFRESH_ALL_CACHE, $event);
 
         if (!$event->isValid) {
             return;
-        }
-
-        $generateOnRefresh = Blitz::$plugin->settings->generateOnRefresh();
-
-        // Get site URIs to generate before flushing the cache
-        if ($generateOnRefresh) {
-            $siteUris = array_merge(
-                SiteUriHelper::getAllSiteUris(),
-                Blitz::$plugin->settings->getCustomSiteUris(),
-            );
         }
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
@@ -453,7 +449,7 @@ class RefreshCacheService extends Component
             Blitz::$plugin->cachePurger->purgeAll();
         }
 
-        if ($generateOnRefresh) {
+        if (Blitz::$plugin->settings->generateOnRefresh()) {
             Blitz::$plugin->cacheGenerator->generateUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
 
@@ -488,7 +484,7 @@ class RefreshCacheService extends Component
             }
         }
 
-        $this->_refreshSiteUris($siteUris);
+        $this->refreshSiteUris($siteUris);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_SITE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_SITE_CACHE, $event);
