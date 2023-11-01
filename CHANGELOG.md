@@ -8,7 +8,7 @@
 
 ### Fixed
 
-- Fixed a potential issue with detecting whether SSI is enabled on the web server from the control panel ([#575](https://github.com/putyourlightson/craft-blitz/issues/575)).
+- Fixed a potential issue with detecting whether SSI is enabled on the web server from the control panel.
 
 ## 4.7.0 - 2023-10-26
 
