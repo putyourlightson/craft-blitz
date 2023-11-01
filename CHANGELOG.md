@@ -2,6 +2,10 @@
 
 ## 4.7.1 - Unreleased
 
+### Changed
+
+- Bumped the required version of the Blitz Hints package.
+
 ### Fixed
 
 - Fixed a potential issue with detecting whether SSI is enabled on the web server from the control panel ([#575](https://github.com/putyourlightson/craft-blitz/issues/575)).
