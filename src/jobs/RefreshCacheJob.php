@@ -163,7 +163,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
                         $count++;
                         $this->setProgress($queue, $count / $total,
-                            Craft::t('blitz', 'Checking {count} of {total} {elementType} queries.', [
+                            Craft::t('blitz', 'Checking {count} of {total} {elementType} queries', [
                                 'count' => $count,
                                 'total' => $total,
                                 'elementType' => $elementType::lowerDisplayName(),

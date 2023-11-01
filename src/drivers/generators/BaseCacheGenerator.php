@@ -149,14 +149,14 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     /**
      * Calls the provided progress handles.
      */
-    protected function callProgressHandler(callable $setProgressHandler, int $count, int $pages): void
+    protected function callProgressHandler(callable $setProgressHandler, int $count, int $total): void
     {
-        $progressLabel = Craft::t('blitz', 'Generating {count} of {pages} pages.', [
+        $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages', [
             'count' => $count,
-            'pages' => $pages,
+            'total' => $total,
         ]);
 
-        call_user_func($setProgressHandler, $count, $pages, $progressLabel);
+        call_user_func($setProgressHandler, $count, $total, $progressLabel);
     }
 
     /**

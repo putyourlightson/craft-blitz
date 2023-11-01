@@ -95,7 +95,7 @@ class CloudflarePurger extends BaseCachePurger
     {
         $count = 0;
         $total = count($siteUris);
-        $label = 'Purging {total} pages.';
+        $label = 'Purging {total} pages';
 
         if (is_callable($setProgressHandler)) {
             $progressLabel = Craft::t('blitz', $label, ['total' => $total]);
@@ -179,15 +179,21 @@ class CloudflarePurger extends BaseCachePurger
     protected function defineRules(): array
     {
         return [
-            [['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
+            [
+                ['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
                 return $purger->authenticationMethod == 'apiToken';
-            }],
-            [['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
+            },
+            ],
+            [
+                ['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
                 return $purger->authenticationMethod == 'apiKey';
-            }],
-            [['email'], 'email', 'when' => function(CloudflarePurger $purger) {
+            },
+            ],
+            [
+                ['email'], 'email', 'when' => function(CloudflarePurger $purger) {
                 return $purger->authenticationMethod == 'apiKey';
-            }],
+            },
+            ],
         ];
     }
 

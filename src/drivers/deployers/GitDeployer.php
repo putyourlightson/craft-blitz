@@ -102,7 +102,7 @@ class GitDeployer extends BaseDeployer
     {
         $count = 0;
         $total = 0;
-        $label = 'Deploying {count} of {total} files.';
+        $label = 'Deploying {count} of {total} files';
 
         $deployGroupedSiteUris = [];
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
@@ -147,7 +147,7 @@ class GitDeployer extends BaseDeployer
             }
 
             if (is_callable($setProgressHandler)) {
-                $progressLabel = Craft::t('blitz', 'Deploying to remote.');
+                $progressLabel = Craft::t('blitz', 'Deploying to remote');
                 call_user_func($setProgressHandler, $count, $total, $progressLabel);
             }
 

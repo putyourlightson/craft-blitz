@@ -1,6 +1,6 @@
 {% macro instructions(instructionText, infoText) -%}
     <div>
-        {{ instructionText }}
+        {{ instructionText|t('blitz') }}
         <div class="info">
             {{ infoText }}
         </div>
