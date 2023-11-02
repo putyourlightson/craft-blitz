@@ -580,11 +580,13 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if ($this->matchesQueryStringParams($siteId, $param, Blitz::$plugin->settings->excludedQueryStringParams)) {
+        $excludedQueryStringParams = is_array(Blitz::$plugin->settings->excludedQueryStringParams) ? Blitz::$plugin->settings->excludedQueryStringParams : [];
+        if ($this->matchesQueryStringParams($siteId, $param, $excludedQueryStringParams)) {
             return false;
         }
 
-        if ($this->matchesQueryStringParams($siteId, $param, Blitz::$plugin->settings->includedQueryStringParams)) {
+        $includedQueryStringParams = is_array(Blitz::$plugin->settings->includedQueryStringParams) ? Blitz::$plugin->settings->includedQueryStringParams : [];
+        if ($this->matchesQueryStringParams($siteId, $param, $includedQueryStringParams)) {
             return true;
         }
 

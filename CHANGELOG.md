@@ -9,6 +9,7 @@
 ### Fixed
 
 - Fixed a potential issue with detecting whether SSI is enabled on the web server from the control panel.
+- Fixed a bug in which generating the cache could throw an exception if no custom site URLs were added in the settings ([#578](https://github.com/putyourlightson/craft-blitz/issues/578)).
 
 ## 4.7.0 - 2023-10-26
 
