@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.8.0 - Unreleased
+
+### Changed
+
+- Cache control headers are no longer sent when a cached response is sent for an expired site URI.
+
 ## 4.7.1 - 2023-11-03
 
 ### Changed

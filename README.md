@@ -11,11 +11,11 @@ Blitz provides intelligent static page caching for creating lightning-fast sites
 - Your site remains available even when performing updates and maintenance.
 - Your entire site can be served statically from a CDN such as [Cloudflare](https://www.cloudflare.com/cdn/) or [Netlify Edge](https://www.netlify.com/products/edge/).
 
-![Server response time](https://putyourlightson.com/assets/images/plugins/blitz/server-response-time.png)  
+![Server response time](https://putyourlightson.com/assets/images/plugins/blitz/server-response-time.png)
 
 ## Documentation
 
-Learn more and read the documentation at [putyourlightson.com/plugins/blitz »](https://putyourlightson.com/plugins/blitz)
+Learn more and read the documentation at [putyourlightson.com/plugins/blitz →](https://putyourlightson.com/plugins/blitz)
 
 ## License
 

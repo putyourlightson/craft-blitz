@@ -125,6 +125,20 @@ class RefreshCacheService extends Component
     }
 
     /**
+     * Returns expired site URIs with the provided condition.
+     *
+     * @return int[]
+     */
+    public function getExpiredCacheIds(array $condition = []): array
+    {
+        return CacheRecord::find()
+            ->select('id')
+            ->where(['<', 'expiryDate', Db::prepareDateForDb('now')])
+            ->andWhere($condition)
+            ->column();
+    }
+
+    /**
      * Returns site URIs from SSI includes related to the provided site URIs.
      *
      * @param SiteUriModel[] $siteUris
@@ -354,7 +368,7 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes the cache.
+     * Refreshes the cache via a queue job.
      */
     public function refresh(bool $forceClear = false, bool $forceGenerate = false): void
     {
@@ -394,32 +408,6 @@ class RefreshCacheService extends Component
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
         }
-    }
-
-    /**
-     * Refreshes a site URI if it has expired.
-     */
-    public function refreshSiteUriIfExpired(SiteUriModel $siteUri): void
-    {
-        $now = Db::prepareDateForDb(new DateTime());
-
-        // Get the cache IDs of expired site URIs
-        $cacheIds = CacheRecord::find()
-            ->select('id')
-            ->where($siteUri->toArray())
-            ->andWhere(['<', 'expiryDate', $now])
-            ->column();
-
-        if (empty($cacheIds)) {
-            return;
-        }
-
-        $this->addCacheIds($cacheIds);
-
-        // Forcibly generate the cache if it will not be cleared.
-        $forceGenerate = !Blitz::$plugin->settings->clearOnRefresh();
-
-        $this->refresh(false, $forceGenerate);
     }
 
     /**
@@ -492,25 +480,31 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes expired cache.
+     * Refreshes an expired site URI.
+     */
+    public function refreshExpiredSiteUri(SiteUriModel $siteUri): void
+    {
+        $cacheIds = $this->getExpiredCacheIds($siteUri->toArray());
+        $this->addCacheIds($cacheIds);
+
+        // Forcibly generate the cache if it will not be cleared.
+        $forceGenerate = !Blitz::$plugin->settings->clearOnRefresh();
+
+        $this->refresh(false, $forceGenerate);
+    }
+
+    /**
+     * Refreshes all expired cache.
      */
     public function refreshExpiredCache(): void
     {
         $this->batchMode = true;
-        $now = Db::prepareDateForDb(new DateTime());
-
-        // Check for expired caches to invalidate
-        $cacheIds = CacheRecord::find()
-            ->select('id')
-            ->where(['<', 'expiryDate', $now])
-            ->column();
-
-        $this->addCacheIds($cacheIds);
+        $this->addCacheIds($this->getExpiredCacheIds());
 
         // Check for expired elements to invalidate
         /** @var ElementExpiryDateRecord[] $elementExpiryDates */
         $elementExpiryDates = ElementExpiryDateRecord::find()
-            ->where(['<', 'expiryDate', $now])
+            ->where(['<', 'expiryDate', Db::prepareDateForDb('now')])
             ->all();
 
         $elementsService = Craft::$app->getElements();

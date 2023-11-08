@@ -243,6 +243,16 @@ class CacheRequestService extends Component
     }
 
     /**
+     * Returns whether the site URI is expired.
+     *
+     * @since 4.8.0
+     */
+    public function getIsExpiredSiteUri(SiteUriModel $siteUri): bool
+    {
+        return empty(Blitz::$plugin->refreshCache->getExpiredCacheIds($siteUri->toArray()));
+    }
+
+    /**
      * Returns whether this is a cached include.
      * Doesn’t memoize the result, which would disrupt the local cache generator.
      *
@@ -456,7 +466,10 @@ class CacheRequestService extends Component
             $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
         }
 
-        Blitz::$plugin->refreshCache->refreshSiteUriIfExpired($siteUri);
+        if ($this->getIsExpiredSiteUri($siteUri)) {
+            Blitz::$plugin->refreshCache->refreshExpiredSiteUri($siteUri);
+            $response->setNoCacheHeaders();
+        }
 
         return $response;
     }
