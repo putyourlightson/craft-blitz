@@ -2,9 +2,13 @@
 
 ## 4.8.0 - Unreleased
 
+### Added
+
+- Added the `cacheControlHeaderExpired` config setting.
+
 ### Changed
 
-- Cache control headers are no longer sent when a cached response is sent for an expired site URI.
+- Cache control headers are now set to the new `cacheControlHeaderExpired` config setting when a cached response is sent for an expired site URI.
 
 ## 4.7.1 - 2023-11-03
 
