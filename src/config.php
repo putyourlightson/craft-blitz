@@ -216,6 +216,9 @@ return [
         // The value to send in the cache control header.
         //'cacheControlHeader' => 'public, s-maxage=31536000, max-age=0',
 
+        // The value to send in the cache control header when a page is expired.
+        //'cacheControlHeaderExpired' => 'public, s-maxage=5, max-age=0',
+
         // Whether an `X-Powered-By: Blitz` header should be sent.
         //'sendPoweredByHeader' => true,
 

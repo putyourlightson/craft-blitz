@@ -369,9 +369,16 @@ class SettingsModel extends Model
      * The value to send in the cache control header.
      *
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
-     * https://developers.cloudflare.com/cache/about/cache-control/
+     * https://developers.cloudflare.com/cache/concepts/cache-control/
      */
     public string $cacheControlHeader = 'public, s-maxage=31536000, max-age=0';
+
+    /**
+     * The value to send in the cache control header when a page is expired.
+     *
+     * https://developers.cloudflare.com/cache/concepts/cache-control/#revalidation
+     */
+    public string $cacheControlHeaderExpired = 'public, s-maxage=5, max-age=0';
 
     /**
      * Whether an `X-Powered-By: Blitz` header should be sent.

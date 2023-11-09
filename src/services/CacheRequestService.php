@@ -466,11 +466,6 @@ class CacheRequestService extends Component
             $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
         }
 
-        if ($this->getIsExpiredSiteUri($siteUri)) {
-            Blitz::$plugin->refreshCache->refreshExpiredSiteUri($siteUri);
-            $response->setNoCacheHeaders();
-        }
-
         return $response;
     }
 
@@ -662,8 +657,15 @@ class CacheRequestService extends Component
     {
         $response->content = $content;
 
+        $cacheControlHeader = Blitz::$plugin->settings->cacheControlHeader;
+
+        if ($this->getIsExpiredSiteUri($siteUri)) {
+            $cacheControlHeader = Blitz::$plugin->settings->cacheControlHeaderExpired;
+            Blitz::$plugin->refreshCache->refreshExpiredSiteUri($siteUri);
+        }
+
         $headers = $response->getHeaders();
-        $headers->set('Cache-Control', Blitz::$plugin->settings->cacheControlHeader);
+        $headers->set('Cache-Control', $cacheControlHeader);
 
         if ($encoded) {
             $headers->set('Content-Encoding', BaseCacheStorage::ENCODING);
