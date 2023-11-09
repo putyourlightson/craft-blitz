@@ -196,6 +196,8 @@ class CacheController extends Controller
             $this->_clearCache();
             $this->_flushCache(null, true);
             $this->_purgeCache();
+        } else {
+            $this->_expireCache();
         }
 
         if ($generateOnRefresh) {
@@ -234,6 +236,8 @@ class CacheController extends Controller
             $this->_clearCache($siteUris);
             $this->_flushCache($siteUris, true);
             $this->_purgeCache($siteUris);
+        } else {
+            $this->_expireCache($siteUris);
         }
 
         if (Blitz::$plugin->settings->generateOnRefresh()) {
@@ -343,6 +347,17 @@ class CacheController extends Controller
         }
 
         $this->_output('Blitz cache successfully cleared.');
+    }
+
+    private function _expireCache(array $siteUris = null): void
+    {
+        if ($siteUris !== null) {
+            Blitz::$plugin->expireCache->expireUris($siteUris);
+        } else {
+            Blitz::$plugin->expireCache->expireAll();
+        }
+
+        $this->_output('Blitz cache successfully marked as expired.');
     }
 
     private function _flushCache(array $siteUris = null, bool $afterClear = false): void

@@ -316,6 +316,26 @@ class SiteUriHelper
     }
 
     /**
+     * Returns cache IDs from the given site URIs.
+     *
+     * @param SiteUriModel[] $siteUris
+     * @return int[]
+     */
+    public static function getCacheIdsFromSiteUris(array $siteUris): array
+    {
+        $condition = ['or'];
+
+        foreach ($siteUris as $siteUri) {
+            $condition[] = $siteUri->toArray();
+        }
+
+        return CacheRecord::find()
+            ->select('id')
+            ->where($condition)
+            ->column();
+    }
+
+    /**
      * Returns URLs from the given site URIs.
      *
      * @return string[]

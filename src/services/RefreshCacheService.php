@@ -313,34 +313,6 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Adds an expiry date for the given cache IDs.
-     *
-     * @param int[] $cacheIds
-     */
-    public function expireCacheIds(array $cacheIds, DateTime $expiryDate = null): void
-    {
-        if (empty($cacheIds)) {
-            return;
-        }
-
-        if ($expiryDate === null) {
-            $expiryDate = new DateTime();
-        }
-
-        $expiryDate = Db::prepareDateForDb($expiryDate);
-
-        Craft::$app->getDb()->createCommand()
-            ->update(
-                CacheRecord::tableName(),
-                ['expiryDate' => $expiryDate],
-                ['id' => $cacheIds],
-                [],
-                false
-            )
-            ->execute();
-    }
-
-    /**
      * Generates element expiry dates.
      */
     public function generateExpiryDates(string $elementType = null): void
@@ -435,6 +407,8 @@ class RefreshCacheService extends Component
             Blitz::$plugin->clearCache->clearAll();
             Blitz::$plugin->flushCache->flushAll(true);
             Blitz::$plugin->cachePurger->purgeAll();
+        } else {
+            Blitz::$plugin->expireCache->expireAll();
         }
 
         if (Blitz::$plugin->settings->generateOnRefresh()) {
@@ -595,6 +569,8 @@ class RefreshCacheService extends Component
         if (Blitz::$plugin->settings->clearOnRefresh($forceClear)) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
             Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
+        } else {
+            Blitz::$plugin->expireCache->expireUris($siteUris);
         }
 
         if (Blitz::$plugin->settings->generateOnRefresh($forceGenerate)) {

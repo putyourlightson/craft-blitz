@@ -73,11 +73,6 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         $this->_populateCacheIdsFromSourceTags($refreshData);
         $this->_populateCacheIdsFromElementQueryCaches($refreshData, $queue);
 
-        // If clear cache is disabled then expire the cache IDs.
-        if (!$clearCache) {
-            Blitz::$plugin->refreshCache->expireCacheIds($refreshData->getCacheIds());
-        }
-
         $siteUris = SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds());
 
         // Merge in site URIs of element IDs to ensure that uncached elements are also generated

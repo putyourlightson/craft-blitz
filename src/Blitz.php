@@ -44,6 +44,7 @@ use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\services\CacheTagsService;
 use putyourlightson\blitz\services\ClearCacheService;
+use putyourlightson\blitz\services\ExpireCacheService;
 use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
@@ -60,6 +61,7 @@ use yii\web\Response;
  * @property-read CacheRequestService $cacheRequest
  * @property-read CacheTagsService $cacheTags
  * @property-read ClearCacheService $clearCache
+ * @property-read ExpireCacheService $expireCache
  * @property-read FlushCacheService $flushCache
  * @property-read GenerateCacheService $generateCache
  * @property-read RefreshCacheService $refreshCache
@@ -86,6 +88,7 @@ class Blitz extends Plugin
                 'cacheRequest' => ['class' => CacheRequestService::class],
                 'cacheTags' => ['class' => CacheTagsService::class],
                 'clearCache' => ['class' => ClearCacheService::class],
+                'expireCache' => ['class' => ExpireCacheService::class],
                 'flushCache' => ['class' => FlushCacheService::class],
                 'generateCache' => ['class' => GenerateCacheService::class],
                 'refreshCache' => ['class' => RefreshCacheService::class],

@@ -4,10 +4,12 @@
 
 ### Added
 
-- Added the `cacheControlHeaderExpired` config setting.
+- Added a new `ExpireCacheService` class.
+- Added a new `cacheControlHeaderExpired` config setting.
 
 ### Changed
 
+- Cached pages are now expired when refreshed via the utility or console commands and when the refresh mode does not allow clearing.
 - Cache control headers are now set to the new `cacheControlHeaderExpired` config setting when a cached response is sent for an expired site URI.
 
 ## 4.7.1 - 2023-11-03
