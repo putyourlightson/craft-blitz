@@ -4,13 +4,13 @@
 
 ### Added
 
-- Added a new `ExpireCacheService` class.
-- Added a new `cacheControlHeaderExpired` config setting.
+- Added a new `ExpireCacheService` class that handles marking cache as expired when the refresh mode is set to expire the cache.
+- Added a new `cacheControlHeaderExpired` config setting that reduces the max cache age for public reverse proxies to 5 seconds by default for expired pages.
 
 ### Changed
 
-- Cached pages are now expired when refreshed via the utility or console commands and when the refresh mode does not allow clearing.
-- Cache control headers are now set to the new `cacheControlHeaderExpired` config setting when a cached response is sent for an expired site URI.
+- Cache control headers are now set to the new `cacheControlHeaderExpired` config setting when a cached response is sent for an expired page, meaning that expired cache can now be organically regenerated.
+- Cached pages are now expired when refreshed via the utility or console commands and when the refresh mode is set to expire the cache.
 
 ## 4.7.1 - 2023-11-03
 

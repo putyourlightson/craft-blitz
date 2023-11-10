@@ -82,10 +82,10 @@ class SettingsModel extends Model
     /**
      * Determines when and how the cache should be refreshed.
      *
-     * - `self::REFRESH_MODE_EXPIRE`: Expire the cache, regenerate manually
-     * - `self::REFRESH_MODE_CLEAR`: Clear the cache, regenerate manually or organically
-     * - `self::REFRESH_MODE_EXPIRE_AND_GENERATE`: Expire the cache and regenerate in a queue job
      * - `self::REFRESH_MODE_CLEAR_AND_GENERATE`: Clear the cache and regenerate in a queue job
+     * - `self::REFRESH_MODE_EXPIRE_AND_GENERATE`: Expire the cache and regenerate in a queue job
+     * - `self::REFRESH_MODE_CLEAR`: Clear the cache, regenerate manually or organically
+     * - `self::REFRESH_MODE_EXPIRE`: Expire the cache, regenerate manually or organically*
      */
     public int $refreshMode = self::REFRESH_MODE_CLEAR_AND_GENERATE;
 
@@ -374,7 +374,7 @@ class SettingsModel extends Model
     public string $cacheControlHeader = 'public, s-maxage=31536000, max-age=0';
 
     /**
-     * The value to send in the cache control header when a page is expired.
+     * The value to send in the cache control header when a page’s cache is expired.
      *
      * https://developers.cloudflare.com/cache/concepts/cache-control/#revalidation
      */

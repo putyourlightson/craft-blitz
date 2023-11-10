@@ -29,10 +29,10 @@ return [
         //'cachingEnabled' => false,
 
         // Determines when and how the cache should be refreshed.
-        // - `0`: Expire the cache, regenerate manually
-        // - `1`: Clear the cache, regenerate manually or organically
-        // - `2`: Expire the cache and regenerate in a queue job
         // - `3`: Clear the cache and regenerate in a queue job
+        // - `2`: Expire the cache and regenerate in a queue job
+        // - `1`: Clear the cache, regenerate manually or organically
+        // - `0`: Expire the cache, regenerate manually or organically*
         //'refreshMode' => 3,
 
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
