@@ -67,6 +67,14 @@ _Tests the storing of cached values using the cache storage drivers._
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set "YiiCacheStorage".  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set "RedisStorage".  
 
+### [ExpireCache](pest/Feature/ExpireCacheTest.php)
+
+_Tests marking cached values as expired when `REFRESH_MODE_EXPIRE` is selected._
+
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Refreshing the entire cache marks the cache as expired.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Refreshing a site marks the cache as expired.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Refreshing a site URI marks the cache as expired.  
+
 ### [GenerateCache](pest/Feature/GenerateCacheTest.php)
 
 _Tests the saving of cached values, element cache records and element query records._

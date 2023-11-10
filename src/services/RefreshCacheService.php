@@ -30,7 +30,6 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use yii\db\ActiveQuery;
@@ -122,20 +121,6 @@ class RefreshCacheService extends Component
     public function reset(): void
     {
         $this->refreshData = new RefreshDataModel();
-    }
-
-    /**
-     * Returns expired site URIs with the provided condition.
-     *
-     * @return int[]
-     */
-    public function getExpiredCacheIds(array $condition = []): array
-    {
-        return CacheRecord::find()
-            ->select('id')
-            ->where(['<', 'expiryDate', Db::prepareDateForDb('now')])
-            ->andWhere($condition)
-            ->column();
     }
 
     /**
@@ -458,7 +443,7 @@ class RefreshCacheService extends Component
      */
     public function refreshExpiredSiteUri(SiteUriModel $siteUri): void
     {
-        $cacheIds = $this->getExpiredCacheIds($siteUri->toArray());
+        $cacheIds = Blitz::$plugin->expireCache->getExpiredCacheIds($siteUri->toArray());
         $this->addCacheIds($cacheIds);
 
         // Forcibly generate the cache if it will not be cleared.
@@ -473,7 +458,7 @@ class RefreshCacheService extends Component
     public function refreshExpiredCache(): void
     {
         $this->batchMode = true;
-        $this->addCacheIds($this->getExpiredCacheIds());
+        $this->addCacheIds(Blitz::$plugin->expireCache->getExpiredCacheIds());
 
         // Check for expired elements to invalidate
         /** @var ElementExpiryDateRecord[] $elementExpiryDates */
