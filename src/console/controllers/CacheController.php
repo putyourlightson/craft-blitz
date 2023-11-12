@@ -190,23 +190,25 @@ class CacheController extends Controller
         }
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
-            // Release jobs, since we're anyway clearing the cache
+            // Release jobs, since we’re anyway clearing the cache.
             Blitz::$plugin->refreshCache->releaseJobs();
 
             $this->_clearCache();
             $this->_flushCache(null, true);
             $this->_purgeCache();
-        } else {
+        }
+
+        if (Blitz::$plugin->settings->expireOnRefresh()) {
             $this->_expireCache();
         }
 
         if ($generateOnRefresh) {
             $this->_generateCache($siteUris);
             $this->_deploy($siteUris);
+        }
 
-            if (Blitz::$plugin->settings->purgeAfterGenerate()) {
-                $this->_purgeCache($siteUris);
-            }
+        if (Blitz::$plugin->settings->purgeAfterRefresh()) {
+            $this->_purgeCache();
         }
 
         return ExitCode::OK;
@@ -236,7 +238,9 @@ class CacheController extends Controller
             $this->_clearCache($siteUris);
             $this->_flushCache($siteUris, true);
             $this->_purgeCache($siteUris);
-        } else {
+        }
+
+        if (Blitz::$plugin->settings->expireOnRefresh()) {
             $this->_expireCache($siteUris);
         }
 
@@ -245,7 +249,7 @@ class CacheController extends Controller
             $this->_deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeAfterGenerate()) {
+        if (Blitz::$plugin->settings->purgeAfterRefresh()) {
             $this->_purgeCache($siteUris);
         }
 

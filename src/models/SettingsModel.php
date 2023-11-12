@@ -476,6 +476,25 @@ class SettingsModel extends Model
     }
 
     /**
+     * Returns whether the cache should be expired on refresh.
+     *
+     * @since 4.8.0
+     */
+    public function expireOnRefresh(bool $forceClear = false): bool
+    {
+        if ($forceClear) {
+            return false;
+        }
+
+        if (!$this->cachingEnabled) {
+            return false;
+        }
+
+        return $this->refreshMode === self::REFRESH_MODE_EXPIRE
+            || $this->refreshMode === self::REFRESH_MODE_EXPIRE_AND_GENERATE;
+    }
+
+    /**
      * Returns whether the cache should be generated on refresh.
      *
      * @since 4.0.0
@@ -495,9 +514,21 @@ class SettingsModel extends Model
     }
 
     /**
+     * Returns whether the cache should be purged after being refreshed.
+     *
+     * @since 4.8.0
+     */
+    public function purgeAfterRefresh(bool $forceClear = false, bool $forceGenerate = false): bool
+    {
+        return $this->expireOnRefresh($forceClear);
+    }
+
+    /**
      * Returns whether the cache should be purged after being generated.
      *
      * @since 4.0.0
+     *
+     * @deprecated in 4.8.0. Use [[purgeAfterRefresh]] instead.
      */
     public function purgeAfterGenerate(bool $forceClear = false, bool $forceGenerate = false): bool
     {
