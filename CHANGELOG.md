@@ -6,6 +6,7 @@
 
 - Added a new `ExpireCacheService` class that handles marking cache as expired when the refresh mode is set to expire the cache.
 - Added a new `cacheControlHeaderExpired` config setting that reduces the max cache age in public reverse proxies to 5 seconds by default for expired pages.
+- Added a new `setDefaultNoCacheHeaders` config setting that determines whether no cache headers should be sent by default if no other cache headers are sent.
 
 ### Changed
 

@@ -366,6 +366,11 @@ class SettingsModel extends Model
     ];
 
     /**
+     * Whether to set default no cache headers.
+     */
+    public bool $setDefaultNoCacheHeaders = true;
+
+    /**
      * The value to send in the cache control header.
      *
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control

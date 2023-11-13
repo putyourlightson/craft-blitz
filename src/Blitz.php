@@ -277,12 +277,12 @@ class Blitz extends Plugin
         // Register application init event
         Event::on(Application::class, Application::EVENT_INIT,
             function() {
-                // Ensure the request is cacheable
+                $this->cacheRequest->setDefaultCacheHeaders();
+
                 if (!$this->cacheRequest->getIsCacheableRequest()) {
                     return;
                 }
 
-                // Ensure the requested site URI is cacheable
                 $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
 
                 if ($siteUri === null || !$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
@@ -302,7 +302,6 @@ class Blitz extends Plugin
 
                 $this->generateCache->registerElementPrepareEvents();
 
-                // Register after prepare response event
                 Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
                     function(Event $event) use ($siteUri) {
                         /** @var Response|null $response */

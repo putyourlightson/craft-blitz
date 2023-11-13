@@ -34,6 +34,11 @@ use yii\web\Response;
 class CacheRequestService extends Component
 {
     /**
+     * @event CancelableEvent
+     */
+    public const EVENT_BEFORE_SET_DEFAULT_CACHE_HEADERS = 'beforeSetDefaultCacheHeaders';
+
+    /**
      * @const CancelableEvent
      */
     public const EVENT_IS_CACHEABLE_REQUEST = 'isCacheableRequest';
@@ -77,6 +82,23 @@ class CacheRequestService extends Component
      * @var array|null
      */
     private ?array $_allowedQueryStrings = [];
+
+    /**
+     * Sets the default cache headers.
+     */
+    public function setDefaultCacheHeaders(): void
+    {
+        $event = new CancelableEvent();
+        $this->trigger(self::EVENT_BEFORE_SET_DEFAULT_CACHE_HEADERS, $event);
+
+        if (!$event->isValid) {
+            return;
+        }
+
+        if (Blitz::$plugin->settings->setDefaultNoCacheHeaders) {
+            Craft::$app->getResponse()->setNoCacheHeaders(false);
+        }
+    }
 
     /**
      * Returns whether the request is cacheable.
