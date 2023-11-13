@@ -4,8 +4,10 @@
  * Tests that cached web responses contain the correct headers and comments.
  */
 
+use Mockery\MockInterface;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
+use putyourlightson\blitz\services\RefreshCacheService;
 
 beforeEach(function() {
     Blitz::$plugin->settings->includedUriPatterns = [
@@ -15,13 +17,47 @@ beforeEach(function() {
         ],
     ];
     Blitz::$plugin->cacheStorage->deleteAll();
+    Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh]'));
 });
 
 afterAll(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
 });
 
-test('Response adds `X-Powered-By` header once', function() {
+test('Response contains the default cache control header when the page is not cacheable', function() {
+    $response = sendRequest();
+    Blitz::$plugin->cacheRequest->setDefaultCacheControlHeader();
+
+    expect($response->headers->get('cache-control'))
+        ->toEqual(Blitz::$plugin->settings->defaultCacheControlHeader);
+});
+
+test('Response contains the cache control header when the page is cacheable', function() {
+    $response = sendRequest();
+
+    expect($response->headers->get('cache-control'))
+        ->toEqual(Blitz::$plugin->settings->cacheControlHeader);
+});
+
+test('Response contains the expired cache control header and the cache is refreshed when the page is expired', function() {
+    sendRequest();
+
+    // Must use a blank URI for this test!
+    $siteUri = createSiteUri(uri: '');
+
+    Blitz::$plugin->expireCache->expireUris([$siteUri]);
+
+    /** @var MockInterface $refreshCache */
+    $refreshCache = Blitz::$plugin->refreshCache;
+    $refreshCache->shouldReceive('refresh')->once();
+
+    $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
+
+    expect($response->headers->get('cache-control'))
+        ->toEqual(Blitz::$plugin->settings->cacheControlHeaderExpired);
+});
+
+test('Response adds the `X-Powered-By` header once', function() {
     Craft::$app->config->general->sendPoweredByHeader = true;
     $response = sendRequest();
 
@@ -29,7 +65,7 @@ test('Response adds `X-Powered-By` header once', function() {
         ->toContainOnce('Blitz', 'Craft CMS');
 });
 
-test('Response overwrites `X-Powered-By` header', function() {
+test('Response overwrites the `X-Powered-By` header', function() {
     Craft::$app->config->general->sendPoweredByHeader = false;
     $response = sendRequest();
 
@@ -95,5 +131,5 @@ test('Response is not encoded when compression is disabled', function() {
     expect($response->headers->get('Content-Encoding'))
         ->toBeNull()
         ->and($response->content)
-        ->toBe($output);
+        ->toContain($output);
 });

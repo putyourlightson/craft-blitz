@@ -277,7 +277,7 @@ class Blitz extends Plugin
         // Register application init event
         Event::on(Application::class, Application::EVENT_INIT,
             function() {
-                $this->cacheRequest->setDefaultCacheHeaders();
+                $this->cacheRequest->setDefaultCacheControlHeader();
 
                 if (!$this->cacheRequest->getIsCacheableRequest()) {
                     return;

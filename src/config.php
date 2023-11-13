@@ -213,8 +213,8 @@ return [
         //    'putyourlightson\blitz\drivers\integrations\SeomaticIntegration',
         //],
 
-        // Whether to set default no cache headers.
-        //'setDefaultNoCacheHeaders' => true,
+        // The value to send in the cache control header by default, if not null.
+        //'defaultCacheControlHeader' => 'no-cache, no-store, must-revalidate',
 
         // The value to send in the cache control header.
         //'cacheControlHeader' => 'public, s-maxage=31536000, max-age=0',

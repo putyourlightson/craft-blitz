@@ -366,9 +366,9 @@ class SettingsModel extends Model
     ];
 
     /**
-     * Whether to set default no cache headers.
+     * The value to send in the cache control header by default, if not null.
      */
-    public bool $setDefaultNoCacheHeaders = true;
+    public ?string $defaultCacheControlHeader = 'no-cache, no-store, must-revalidate';
 
     /**
      * The value to send in the cache control header.

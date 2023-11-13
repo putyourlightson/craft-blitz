@@ -50,6 +50,7 @@ uses(TestCase::class)
         cleanUpElements();
         Craft::$app->queue->releaseAll();
         Blitz::$plugin->cacheStorage->deleteAll();
+        Blitz::$plugin->flushCache->flushAll();
     })
     ->in('./');
 
@@ -297,7 +298,7 @@ function createProductVariantOrder(int $typeId = TEST_PRODUCT_TYPE_ID, bool $bat
     return [$variant, $order];
 }
 
-function sendRequest(string $uri = '', array $headers = []): TestableResponse
+function sendRequest(string $uri = ''): TestableResponse
 {
     $response = (new RequestBuilder('get', $uri))->send();
     $response->trigger(Response::EVENT_AFTER_PREPARE);
