@@ -523,21 +523,9 @@ class SettingsModel extends Model
      *
      * @since 4.8.0
      */
-    public function purgeAfterRefresh(bool $forceClear = false, bool $forceGenerate = false): bool
+    public function purgeAfterRefresh(bool $forceClear = false): bool
     {
         return $this->expireOnRefresh($forceClear);
-    }
-
-    /**
-     * Returns whether the cache should be purged after being generated.
-     *
-     * @since 4.0.0
-     *
-     * @deprecated in 4.8.0. Use [[purgeAfterRefresh]] instead.
-     */
-    public function purgeAfterGenerate(bool $forceClear = false, bool $forceGenerate = false): bool
-    {
-        return !$this->clearOnRefresh($forceClear) && $this->generateOnRefresh($forceGenerate);
     }
 
     /**

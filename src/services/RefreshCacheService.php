@@ -306,7 +306,7 @@ class RefreshCacheService extends Component
             $elementType = Entry::class;
         }
 
-        $now = Db::prepareDateForDb(new DateTime());
+        $now = Db::prepareDateForDb('now');
 
         /** @var Element $elementType */
         /** @var Element[] $elements */
@@ -473,7 +473,7 @@ class RefreshCacheService extends Component
         foreach ($elementExpiryDates as $elementExpiryDate) {
             $element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
 
-            // This should happen before invalidating the element so that other expiry dates will be saved
+            // Do this before invalidating the element so that other expiry dates will be saved
             $elementExpiryDate->delete();
 
             if ($element !== null) {

@@ -83,7 +83,7 @@ class CacheRequestService extends Component
      */
     public function setDefaultCacheControlHeader(): void
     {
-        if (Blitz::$plugin->settings->defaultCacheControlHeader) {
+        if (Blitz::$plugin->settings->defaultCacheControlHeader !== null) {
             Craft::$app->getResponse()->getHeaders()->set('Cache-Control', Blitz::$plugin->settings->defaultCacheControlHeader);
         }
     }
