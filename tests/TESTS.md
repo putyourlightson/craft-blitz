@@ -4,6 +4,14 @@ This document outlines the test specification for the Blitz plugin.
 
 ---
 
+## Drivers Tests
+
+### [FileStorage](pest/Drivers/FileStorageTest.php)
+
+_Tests functionality specific to the file storage driver._
+
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Getting a site path works for a disabled or non-existent site.  
+
 ## Feature Tests
 
 ### [BlitzVariable](pest/Feature/BlitzVariableTest.php)

@@ -242,7 +242,7 @@ class FileStorage extends BaseCacheStorage
     {
         $sitePath = $this->getSitePath($siteUri->siteId);
 
-        if ($sitePath == '') {
+        if (empty($sitePath)) {
             return [];
         }
 
@@ -282,22 +282,26 @@ class FileStorage extends BaseCacheStorage
     /**
      * Returns site path from provided site ID.
      */
-    public function getSitePath(int $siteId): string
+    public function getSitePath(int $siteId): ?string
     {
         if (!empty($this->_sitePaths[$siteId])) {
             return $this->_sitePaths[$siteId];
         }
 
         if (empty($this->_cacheFolderPath)) {
-            return '';
+            return null;
         }
 
-        // Get the site host and path from the site's base URL
-        $site = Craft::$app->getSites()->getSiteById($siteId);
+        // Get the site host and path from the site’s base URL.
+        $site = Craft::$app->getSites()->getSiteById($siteId, true);
+        if ($site === null) {
+            return null;
+        }
+
         $siteUrl = Craft::getAlias($site->getBaseUrl());
         $siteHostPath = preg_replace('/^(http|https):\/\//i', '', $siteUrl);
 
-        // Remove colons in path, for port numbers for example
+        // Remove colons in path, for port numbers for example.
         // https://github.com/putyourlightson/craft-blitz/issues/369
         $siteHostPath = str_replace(':', '', $siteHostPath);
 
@@ -363,13 +367,14 @@ class FileStorage extends BaseCacheStorage
 
         foreach ($allSites as $site) {
             $sitePath = $this->getSitePath($site->id);
-
-            $sites[$site->id] = [
-                'name' => $site->name,
-                'path' => $sitePath,
-                'pageCount' => $this->getCachedPageCount($sitePath),
-                'includeCount' => $this->getCachedIncludeCount($sitePath),
-            ];
+            if (!empty($sitePath)) {
+                $sites[$site->id] = [
+                    'name' => $site->name,
+                    'path' => $sitePath,
+                    'pageCount' => $this->getCachedPageCount($sitePath),
+                    'includeCount' => $this->getCachedIncludeCount($sitePath),
+                ];
+            }
         }
 
         foreach ($sites as $siteId => &$site) {

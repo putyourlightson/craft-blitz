@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.8.1 - Unreleased
+
+### Fixed
+
+- Fixed a bug in which previewing a disabled site could throw an exception with the File Cache Storage selected ([#581](https://github.com/putyourlightson/craft-blitz/issues/581)).
+
 ## 4.8.0 - 2023-11-14
 
 ### Added
