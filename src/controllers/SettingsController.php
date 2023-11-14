@@ -226,7 +226,7 @@ class SettingsController extends Controller
      */
     public function actionDetectSsi(): string
     {
-        return '<script>const blitzSsiDetected = true;</script>';
+        return '<script>blitzSsiDetected = true;</script>';
     }
 
     /**
