@@ -129,10 +129,8 @@ class Blitz extends Plugin
         parent::init();
         self::$plugin = $this;
 
-        // Create the queue component, ensuring it is of the correct type.
-        $this->queue = Instance::ensure($this->queue, Queue::class);
-
         $this->_registerComponents();
+        $this->_registerInstances();
         $this->_registerVariables();
         $this->_registerLogTarget();
 
@@ -234,6 +232,14 @@ class Blitz extends Plugin
                 $this->settings->deployerSettings,
             ));
         }
+    }
+
+    /**
+     * Registers instances configured via `config/app.php`, ensuring they are of the correct type.
+     */
+    private function _registerInstances(): void
+    {
+        $this->queue = Instance::ensure($this->queue, Queue::class);
     }
 
     /**

@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added the ability to configure a custom queue component to use for running queue jobs in Blitz ([#577](https://github.com/putyourlightson/craft-blitz/issues/577)).
+- Added the ability to configure a custom queue component via `config/app.php` to use when running queue jobs ([#577](https://github.com/putyourlightson/craft-blitz/issues/577)).
 
 ## 4.8.1 - Unreleased
 
