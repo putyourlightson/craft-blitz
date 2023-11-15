@@ -54,7 +54,9 @@ use putyourlightson\blitz\widgets\CacheWidget;
 use putyourlightson\blitzhints\BlitzHints;
 use yii\base\Controller;
 use yii\base\Event;
+use yii\di\Instance;
 use yii\log\Logger;
+use yii\queue\Queue;
 use yii\web\Response;
 
 /**
@@ -112,12 +114,23 @@ class Blitz extends Plugin
     public string $minVersionRequired = '3.10.0';
 
     /**
+     * The queue to use for running jobs.
+     *
+     * @see \craft\feedme\Plugin::$queue
+     * @since 4.9.0
+     */
+    public Queue|array|string $queue = 'queue';
+
+    /**
      * @inheritdoc
      */
     public function init(): void
     {
         parent::init();
         self::$plugin = $this;
+
+        // Create the queue component, ensuring it is of the correct type.
+        $this->queue = Instance::ensure($this->queue, Queue::class);
 
         $this->_registerComponents();
         $this->_registerVariables();

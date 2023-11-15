@@ -338,7 +338,11 @@ class RefreshCacheService extends Component
             'forceClear' => $forceClear,
             'forceGenerate' => $forceGenerate,
         ]);
-        Queue::push($job, Blitz::$plugin->settings->refreshCacheJobPriority);
+        Queue::push(
+            job: $job,
+            priority: Blitz::$plugin->settings->refreshCacheJobPriority,
+            queue: Blitz::$plugin->queue,
+        );
 
         $this->reset();
     }

@@ -68,7 +68,11 @@ class BaseDriverHelper
             'driverMethod' => $driverMethod,
             'description' => $description,
         ]);
-        Queue::push($job, $priority);
+        Queue::push(
+            job: $job,
+            priority: $priority,
+            queue: Blitz::$plugin->queue,
+        );
     }
 
     /**

@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.9.0 - Unreleased
+
+### Added
+
+- Added the ability to configure a custom queue component to use for running queue jobs in Blitz ([#577](https://github.com/putyourlightson/craft-blitz/issues/577)).
+
 ## 4.8.1 - Unreleased
 
 ### Fixed
