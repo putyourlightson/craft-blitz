@@ -6,8 +6,6 @@
 
 - Added the ability to configure a custom queue component via `config/app.php` to use when running queue jobs ([#577](https://github.com/putyourlightson/craft-blitz/issues/577)).
 
-## 4.8.1 - Unreleased
-
 ### Fixed
 
 - Fixed a bug in which previewing a disabled site could throw an exception with the File Cache Storage selected ([#581](https://github.com/putyourlightson/craft-blitz/issues/581)).
