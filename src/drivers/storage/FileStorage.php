@@ -213,11 +213,13 @@ class FileStorage extends BaseCacheStorage
         foreach ($allSites as $site) {
             $sitePath = $this->getSitePath($site->id);
 
-            $sites[$site->id] = [
-                'name' => $site->name,
-                'path' => $sitePath,
-                'count' => $this->getCachedFileCount($sitePath),
-            ];
+            if (!empty($sitePath)) {
+                $sites[$site->id] = [
+                    'name' => $site->name,
+                    'path' => $sitePath,
+                    'count' => $this->getCachedFileCount($sitePath),
+                ];
+            }
         }
 
         foreach ($sites as $siteId => &$site) {
@@ -259,7 +261,7 @@ class FileStorage extends BaseCacheStorage
     {
         $sitePath = $this->getSitePath($siteUri->siteId);
 
-        if ($sitePath == '') {
+        if (empty($sitePath)) {
             return [];
         }
 
@@ -304,20 +306,24 @@ class FileStorage extends BaseCacheStorage
      *
      * @param int $siteId
      *
-     * @return string
+     * @return string|null
      */
-    public function getSitePath(int $siteId): string
+    public function getSitePath(int $siteId)
     {
         if (!empty($this->_sitePaths[$siteId])) {
             return $this->_sitePaths[$siteId];
         }
 
         if (empty($this->_cacheFolderPath)) {
-            return '';
+            return null;
         }
 
-        // Get the site host and path from the site's base URL
-        $site = Craft::$app->getSites()->getSiteById($siteId);
+        // Get the site host and path from the site’s base URL.
+        $site = Craft::$app->getSites()->getSiteById($siteId, true);
+        if ($site === null) {
+            return null;
+        }
+
         $siteUrl = Craft::getAlias($site->getBaseUrl());
         $siteHostPath = preg_replace('/^(http|https):\/\//i', '', $siteUrl);
 
