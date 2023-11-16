@@ -411,8 +411,6 @@ class RefreshCacheService extends Component
             'clearCache' => (Blitz::$plugin->settings->clearCacheAutomatically || $forceClear),
         ]);
 
-        $queue = Craft::$app->getQueue();
-
         /**
          * Some queue drivers, for example Redis, don't support custom push priorities,
          * but it's not enough to check whether the `priority()` method exists,
@@ -421,12 +419,11 @@ class RefreshCacheService extends Component
          * See https://github.com/putyourlightson/craft-blitz/issues/400
          */
         try {
-            $queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)
-                ->push($refreshCacheJob);
+            Blitz::$plugin->queue->priority(Blitz::$plugin->settings->refreshCacheJobPriority)->push($refreshCacheJob);
         }
         /** @noinspection PhpRedundantCatchClauseInspection */
         catch (NotSupportedException $e) {
-            $queue->push($refreshCacheJob);
+            Blitz::$plugin->queue->push($refreshCacheJob);
         }
 
         // Reset values
@@ -476,7 +473,7 @@ class RefreshCacheService extends Component
         if (!$event->isValid) {
             return;
         }
-        
+
         $warmCacheAutomatically = Blitz::$plugin->settings->cachingEnabled && Blitz::$plugin->settings->warmCacheAutomatically;
 
         // Get warmable site URIs before flushing the cache

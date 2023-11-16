@@ -49,6 +49,8 @@ use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\logtofile\LogToFile;
 use yii\base\Controller;
 use yii\base\Event;
+use yii\di\Instance;
+use yii\queue\Queue;
 
 /**
  *
@@ -76,6 +78,12 @@ class Blitz extends Plugin
      */
     public static $plugin;
 
+    /**
+     * @var Queue|array|string The queue to use for running jobs
+     * @see \craft\feedme\Plugin::$queue
+     * @since 3.13.0
+     */
+    public $queue = 'queue';
 
     // Public Methods
     // =========================================================================
@@ -89,18 +97,15 @@ class Blitz extends Plugin
 
         self::$plugin = $this;
 
-        // Register services and variables before processing the request
         $this->_registerComponents();
+        $this->_registerInstances();
         $this->_registerVariables();
-
-        // Register events
         $this->_registerCacheableRequestEvents();
         $this->_registerElementEvents();
         $this->_registerResaveElementEvents();
         $this->_registerIntegrationEvents();
         $this->_registerClearCaches();
 
-        // Register control panel events
         if (Craft::$app->getRequest()->getIsCpRequest()) {
             $this->_registerCpUrlRules();
             $this->_registerUtilities();
@@ -194,6 +199,14 @@ class Blitz extends Plugin
                 $this->settings->deployerSettings
             ),
         ]);
+    }
+
+    /**
+     * Registers instances configured via `config/app.php`, ensuring they are of the correct type.
+     */
+    private function _registerInstances()
+    {
+        $this->queue = Instance::ensure($this->queue, Queue::class);
     }
 
     /**

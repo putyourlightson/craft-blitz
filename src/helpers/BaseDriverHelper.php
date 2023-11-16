@@ -91,17 +91,14 @@ class BaseDriverHelper
             'delay' => $delay,
         ]);
 
-        // Add job to queue with a priority
-        /** @var Queue $queue */
-        $queue = Craft::$app->getQueue();
-
+        // Add job to queue with a priority if supported
         try {
-            $queue->priority($priority)->push($job);
+            Blitz::$plugin->queue->priority($priority)->push($job);
         }
         /** @noinspection PhpRedundantCatchClauseInspection */
-        catch (NotSupportedException $e) {
+        catch (NotSupportedException $exception) {
             // The queue probably doesn't support custom push priorities. Try again without one.
-            $queue->push($job);
+            Blitz::$plugin->queue->push($job);
         }
     }
 }

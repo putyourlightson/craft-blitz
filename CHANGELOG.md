@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 3.13.0 - 2023-11-17
+
+### Added
+
+- Added the ability to configure a custom queue component via `config/app.php` to use when running queue jobs in Craft 3.4.0 and above ([#577](https://github.com/putyourlightson/craft-blitz/issues/577)).
+
 ## 3.12.10 - 2023-07-17
 ### Fixed
 - Fixed a bug in which URLs containing the control panel trigger were not being cached ([#532](https://github.com/putyourlightson/craft-blitz/issues/532)).
