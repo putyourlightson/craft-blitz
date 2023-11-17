@@ -134,7 +134,8 @@ return [
         // With this setting enabled, Blitz will statically include templates using Server-Side Includes (SSI), which must be enabled on the web server.
         //'ssiEnabled' => false,
 
-        // The format to use for SSI tags, in which `{uri}` will be replaced. You can change this when using the Caddy Server Template syntax, for example.
+        // The format to use for SSI tags, in which `{uri}` will be replaced. You can change this when using Caddy’s `httpInclude` template function, for example.
+        // https://caddyserver.com/docs/modules/http.handlers.templates#httpinclude
         //'ssiTagFormat' => '<!--#include virtual="{uri}" -->',
 
         // With this setting enabled, Blitz will statically include templates using Edge-Side Includes (ESI), which must be enabled on the web server or CDN.

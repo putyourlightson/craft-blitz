@@ -203,7 +203,8 @@ class SettingsModel extends Model
     public bool $ssiEnabled = false;
 
     /**
-     * The format to use for SSI tags, in which `{uri}` will be replaced. You can change this when using the Caddy Server Template syntax, for example.
+     * The format to use for SSI tags, in which `{uri}` will be replaced. You can change this when using Caddy’s `httpInclude` template function, for example.
+     * https://caddyserver.com/docs/modules/http.handlers.templates#httpinclude
      */
     public string $ssiTagFormat = '<!--#include virtual="{uri}" -->';
 
