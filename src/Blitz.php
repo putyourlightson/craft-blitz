@@ -116,7 +116,6 @@ class Blitz extends Plugin
     /**
      * The queue to use for running jobs.
      *
-     * @see \craft\feedme\Plugin::$queue
      * @since 4.9.0
      */
     public Queue|array|string $queue = 'queue';
