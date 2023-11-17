@@ -203,6 +203,11 @@ class SettingsModel extends Model
     public bool $ssiEnabled = false;
 
     /**
+     * The format to use for SSI tags, in which `{uri}` will be replaced. You can change this when using the Caddy Server Template syntax, for example.
+     */
+    public string $ssiTagFormat = '<!--#include virtual="{uri}" -->';
+
+    /**
      * With this setting enabled, Blitz will fetch cached includes using Edge-Side Includes (ESI), which must be enabled on the server.
      */
     public bool $esiEnabled = false;

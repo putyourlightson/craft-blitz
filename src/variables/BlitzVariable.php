@@ -230,9 +230,11 @@ class BlitzVariable
     {
         // Add an SSI include, so we can purge it whenever necessary
         Blitz::$plugin->generateCache->addSsiInclude($includeId);
-        $uri = $this->_getUriWithParams($uri, $params);
 
-        return Template::raw('<!--#include virtual="' . $uri . '" -->');
+        $uri = $this->_getUriWithParams($uri, $params);
+        $ssiTag = str_replace('{uri}', $uri, Blitz::$plugin->settings->ssiTagFormat);
+
+        return Template::raw($ssiTag);
     }
 
     /**

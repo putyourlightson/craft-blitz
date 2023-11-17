@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.9.1 - Unreleased
+
+### Added
+
+- Added a `ssiTagFormat` config setting that allows defining the format of SSI tags ([#558](https://github.com/putyourlightson/craft-blitz/issues/558)).
+
 ## 4.9.0 - 2023-11-17
 
 ### Added
