@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\base\ComponentInterface;
+use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use putyourlightson\blitz\Blitz;
@@ -96,10 +97,11 @@ class SettingsController extends Controller
 
         $deployerDrivers = DeployerHelper::getAllDrivers();
 
-        // SSI URLs only work with an `action` parameter.
-        $detectSsiActionUrl = UrlHelper::rootRelativeUrl(
+        // SSI URIs only work with an `action` parameter.
+        $uri = UrlHelper::rootRelativeUrl(
             UrlHelper::cpUrl('', ['action' => 'blitz/settings/detect-ssi'])
         );
+        $detectSsiTag = Blitz::$plugin->settings->getSsiTag($uri);
 
         return $this->renderTemplate('blitz/_settings', [
             'settings' => $settings,
@@ -117,7 +119,7 @@ class SettingsController extends Controller
             'deployerDriver' => $deployerDriver,
             'deployerDrivers' => $deployerDrivers,
             'deployerTypeOptions' => array_map([$this, '_getSelectOption'], $deployerDrivers),
-            'detectSsiActionUrl' => $detectSsiActionUrl,
+            'detectSsiTag' => Template::raw($detectSsiTag),
         ]);
     }
 

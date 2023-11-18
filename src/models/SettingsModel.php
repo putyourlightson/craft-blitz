@@ -205,6 +205,8 @@ class SettingsModel extends Model
     /**
      * The format to use for SSI tags, in which `{uri}` will be replaced. You can change this when using Caddy’s `httpInclude` template function, for example.
      * https://caddyserver.com/docs/modules/http.handlers.templates#httpinclude
+     *
+     * @since 4.9.1
      */
     public string $ssiTagFormat = '<!--#include virtual="{uri}" -->';
 
@@ -579,6 +581,16 @@ class SettingsModel extends Model
         }
 
         return $customSiteUris;
+    }
+
+    /**
+     * Returns an SSI tag using the provided URI.
+     *
+     * @since 4.9.1
+     */
+    public function getSsiTag(string $uri): string
+    {
+        return str_replace('{uri}', $uri, $this->ssiTagFormat);
     }
 
     /**

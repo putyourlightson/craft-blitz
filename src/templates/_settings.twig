@@ -346,7 +346,7 @@
         <script>
             let blitzSsiDetected = false;
         </script>
-        <!--#include virtual="{{ detectSsiActionUrl }}" -->
+        {{ detectSsiTag }}
         <script>
             document.getElementById('ssiEnabled-tip').lastElementChild.innerHTML = blitzSsiDetected ? '{{ 'SSI was detected on the web server.'|t('blitz') }}' : '{{ 'SSI was <em>not</em> detected on the web server.'|t('blitz')|raw }}';
         </script>

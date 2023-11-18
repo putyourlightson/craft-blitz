@@ -232,7 +232,7 @@ class BlitzVariable
         Blitz::$plugin->generateCache->addSsiInclude($includeId);
 
         $uri = $this->_getUriWithParams($uri, $params);
-        $ssiTag = str_replace('{uri}', $uri, Blitz::$plugin->settings->ssiTagFormat);
+        $ssiTag = Blitz::$plugin->settings->getSsiTag($uri);
 
         return Template::raw($ssiTag);
     }
