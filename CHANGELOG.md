@@ -5,6 +5,7 @@
 ### Added
 
 - Added a `ssiTagFormat` config setting that allows defining the format of SSI tags ([#558](https://github.com/putyourlightson/craft-blitz/issues/558)).
+- Added a `detectSsiEnabled` config setting that determines whether Blitz should detect whether SSI is enabled on the web server ([#575](https://github.com/putyourlightson/craft-blitz/issues/575)).
 
 ## 4.9.0 - 2023-11-17
 
