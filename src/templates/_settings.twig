@@ -343,13 +343,19 @@
             fieldClass: 'width-50',
         }) }}
 
-        <script>
-            let blitzSsiDetected = false;
-        </script>
-        {{ detectSsiTag }}
-        <script>
-            document.getElementById('ssiEnabled-tip').lastElementChild.innerHTML = blitzSsiDetected ? '{{ 'SSI was detected on the web server.'|t('blitz') }}' : '{{ 'SSI was <em>not</em> detected on the web server.'|t('blitz')|raw }}';
-        </script>
+        {% if detectSsiTag is null %}
+            <script>
+                document.getElementById('ssiEnabled-tip').remove();
+            </script>
+        {% else %}
+            <script>
+                let blitzSsiDetected = false;
+            </script>
+            {{ detectSsiTag }}
+            <script>
+                document.getElementById('ssiEnabled-tip').lastElementChild.innerHTML = blitzSsiDetected ? '{{ 'SSI was detected on the web server.'|t('blitz') }}' : '{{ 'SSI was <em>not</em> detected on the web server.'|t('blitz')|raw }}';
+            </script>
+        {% endif %}
 
         {% set info %}
             {{ 'With this setting enabled, Blitz will fetch cached includes using Edge-Side Includes (ESI), which must be enabled on the server.'|t('blitz') }}

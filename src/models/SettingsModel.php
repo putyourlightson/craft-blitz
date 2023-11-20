@@ -211,6 +211,13 @@ class SettingsModel extends Model
     public string $ssiTagFormat = '<!--#include virtual="{uri}" -->';
 
     /**
+     * Whether SSI detection via the control panel should be enabled.
+     *
+     * @since 4.9.1
+     */
+    public bool $detectSsiEnabled = true;
+
+    /**
      * With this setting enabled, Blitz will fetch cached includes using Edge-Side Includes (ESI), which must be enabled on the server.
      */
     public bool $esiEnabled = false;

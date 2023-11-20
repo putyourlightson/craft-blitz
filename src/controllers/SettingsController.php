@@ -97,11 +97,14 @@ class SettingsController extends Controller
 
         $deployerDrivers = DeployerHelper::getAllDrivers();
 
-        // SSI URIs only work with an `action` parameter.
-        $uri = UrlHelper::rootRelativeUrl(
-            UrlHelper::cpUrl('', ['action' => 'blitz/settings/detect-ssi'])
-        );
-        $detectSsiTag = Blitz::$plugin->settings->getSsiTag($uri);
+        $detectSsiTag = null;
+        if (Blitz::$plugin->settings->detectSsiEnabled) {
+            // SSI URIs only work with an `action` parameter.
+            $uri = UrlHelper::rootRelativeUrl(
+                UrlHelper::cpUrl('', ['action' => 'blitz/settings/detect-ssi'])
+            );
+            $detectSsiTag = Template::raw(Blitz::$plugin->settings->getSsiTag($uri));
+        }
 
         return $this->renderTemplate('blitz/_settings', [
             'settings' => $settings,
@@ -119,7 +122,7 @@ class SettingsController extends Controller
             'deployerDriver' => $deployerDriver,
             'deployerDrivers' => $deployerDrivers,
             'deployerTypeOptions' => array_map([$this, '_getSelectOption'], $deployerDrivers),
-            'detectSsiTag' => Template::raw($detectSsiTag),
+            'detectSsiTag' => $detectSsiTag,
         ]);
     }
 

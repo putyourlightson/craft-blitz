@@ -138,6 +138,9 @@ return [
         // https://caddyserver.com/docs/modules/http.handlers.templates#httpinclude
         //'ssiTagFormat' => '<!--#include virtual="{uri}" -->',
 
+        // Whether SSI detection via the control panel should be enabled.
+        //'detectSsiEnabled' => true,
+
         // With this setting enabled, Blitz will statically include templates using Edge-Side Includes (ESI), which must be enabled on the web server or CDN.
         //'esiEnabled' => false,
 
