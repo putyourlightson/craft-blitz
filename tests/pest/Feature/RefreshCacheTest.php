@@ -30,7 +30,7 @@ test('Element is not tracked when it is unchanged', function() {
         ->toNotBeTracked();
 });
 
-test('Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` and it is unchanged', function() {
+test('Element is tracked when “refreshCacheWhenElementSavedUnchanged” is “true” and it is unchanged', function() {
     $entry = createEntry();
     Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged = true;
     Blitz::$plugin->refreshCache->addElement($entry);
@@ -48,7 +48,7 @@ test('Element is not tracked when disabled and its attribute is changed', functi
         ->toNotBeTracked();
 });
 
-test('Element is tracked when disabled and `refreshCacheWhenElementSavedNotLive` is `true` and its attribute is changed', function() {
+test('Element is tracked when disabled and “refreshCacheWhenElementSavedNotLive” is “true” and its attribute is changed', function() {
     $entry = createEntry(enabled: false);
     Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive = true;
     $entry->title = 'Title123';

@@ -50,7 +50,7 @@ test('Request with generate token is cacheable', function() {
         ->toBeTrue();
 });
 
-test('Request with `no-cache` param is not cacheable', function() {
+test('Request with “no-cache” param is not cacheable', function() {
     sendRequest('page?no-cache=1');
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableRequest())
@@ -65,7 +65,7 @@ test('Request with token is not cacheable', function() {
         ->toBeFalse();
 });
 
-test('Request starting with `_includes` is a cached include', function() {
+test('Request starting with “_includes” is a cached include', function() {
     expect(Blitz::$plugin->cacheRequest->getIsCachedInclude('/_includes/xyz'))
         ->toBeTrue();
 });
@@ -77,7 +77,7 @@ test('Request with cached include action is a cached include', function() {
         ->toBeTrue();
 });
 
-test('Request starting with `_dynamic` is a dynamic include', function() {
+test('Request starting with “_dynamic” is a dynamic include', function() {
     expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamic/xyz'))
         ->toBeTrue();
 });
@@ -148,14 +148,14 @@ test('Site URI with excluded URI pattern is not cacheable', function() {
         ->toBeFalse();
 });
 
-test('Site URI with `admin` in URI is cacheable', function() {
+test('Site URI with “admin” in URI is cacheable', function() {
     $siteUri = createSiteUri(uri: 'admin-page');
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
         ->toBeTrue();
 });
 
-test('Site URI with `index.php` in URI is not cacheable', function() {
+test('Site URI with “index.php” in URI is not cacheable', function() {
     $siteUri = createSiteUri(uri: 'index.php');
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))

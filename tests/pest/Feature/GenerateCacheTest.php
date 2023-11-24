@@ -60,7 +60,7 @@ test('Cached value is saved without output comments', function() {
         ->not()->toContain('Cached by Blitz on');
 });
 
-test('Cached value is saved with output comments when file extension is `.html`', function() {
+test('Cached value is saved with output comments when file extension is “.html”', function() {
     $siteUri = createSiteUri(uri: 'page.html');
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 
@@ -68,7 +68,7 @@ test('Cached value is saved with output comments when file extension is `.html`'
         ->toContain('Cached by Blitz on');
 });
 
-test('Cached value is saved without output comments when file extension is not `.html`', function() {
+test('Cached value is saved without output comments when file extension is not “.html”', function() {
     $siteUri = createSiteUri(uri: 'page.json');
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 
