@@ -66,7 +66,7 @@ class GeneratorController extends Controller
     private function _generateResponse(): ?Response
     {
         // Remove the token query param.
-        $tokenParam = Craft::$app->config->general->tokenParam;
+        $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
         $queryParams = $this->request->getQueryParams();
 
         if (isset($queryParams[$tokenParam])) {

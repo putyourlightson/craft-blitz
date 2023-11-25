@@ -19,6 +19,7 @@ use craft\events\PopulateElementsEvent;
 use craft\events\TemplateEvent;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
+use craft\models\Section;
 use craft\records\Element as ElementRecord;
 use craft\services\Elements;
 use craft\web\View;
@@ -161,15 +162,23 @@ class GenerateCacheService extends Component
         );
 
         /**
-         * Catch elements injected into rendered templates as variables, so we can also track
-         * fields eager-loaded via `eagerLoadElements()` directly.
+         * Catch elements injected into rendered templates as variables or preloaded singles,
+         * so we can also track fields eager-loaded via `eagerLoadElements()` directly.
          *
          * @see Elements::eagerLoadElements()
          */
         Event::on(View::class, View::EVENT_AFTER_RENDER_TEMPLATE,
             function(TemplateEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
-                    foreach ($event->variables as $variable) {
+                    $variables = $event->variables;
+
+                    if (Craft::$app->getConfig()->getGeneral()->preloadSingles ?? false) {
+                        $singles = Craft::$app->getSections()->getSectionsByType(Section::TYPE_SINGLE);
+                        $handles = array_map(fn(Section $section) => $section->handle, $singles);
+                        $variables += Craft::$app->getEntries()->getSingleEntriesByHandle($handles);
+                    }
+
+                    foreach ($variables as $variable) {
                         if ($variable instanceof Element) {
                             $this->addElement($variable);
                         }

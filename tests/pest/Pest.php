@@ -170,6 +170,7 @@ expect()->extend('toHaveRecordCount', function(int $count, array $where = []) {
 
 const TEST_SITE_ID = 1;
 const TEST_SECTION_ID = 12;
+const TEST_SINGLE_SECTION_ID = 14;
 const TEST_VOLUME_ID = 2;
 const TEST_PRODUCT_TYPE_ID = 2;
 

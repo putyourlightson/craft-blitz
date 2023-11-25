@@ -27,7 +27,7 @@
     "codeception/module-yii2": "^1.1.5",
     "craftcms/ecs": "dev-main",
     "craftcms/phpstan": "dev-main",
-    "markhuot/craft-pest": "^1.0@alpha",
+    "markhuot/craft-pest": "dev-master",
     "putyourlightson/craft-generate-test-spec": "dev-main",
     "yiisoft/yii2-redis": "^2.0",
     "vlucas/phpdotenv": "^5.4.1"
