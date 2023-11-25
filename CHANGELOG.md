@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.9.2 - Unreleased
+
+### Fixed
+
+- Fixed a bug in which eager-loading custom fields of preloaded singles was not being tracked on cached pages ([#585](https://github.com/putyourlightson/craft-blitz/issues/585)).
+
 ## 4.9.1 - 2023-11-20
 
 ### Added

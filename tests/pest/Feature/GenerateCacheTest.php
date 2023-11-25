@@ -140,6 +140,28 @@ test('Element cache record is saved with eager loaded custom fields in variable'
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
 });
 
+test('Element cache record is saved for preloaded single', function() {
+    Craft::$app->config->general->preloadSingles = true;
+    Craft::$app->view->renderString('{{ single.title }}');
+    $entry = Entry::find()->sectionId(TEST_SINGLE_SECTION_ID)->one();
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+
+    expect(ElementCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id]);
+});
+
+test('Element cache record is saved with eager loaded custom fields for preloaded single', function() {
+    Craft::$app->config->general->preloadSingles = true;
+    $entry = Entry::find()->sectionId(TEST_SINGLE_SECTION_ID)->one();
+    Craft::$app->view->renderTemplate('test/_eager.twig');
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+
+    expect(ElementCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id])
+        ->and(ElementFieldCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id]);
+});
+
 test('Element cache records are saved with all statuses for relation field queries', function() {
     $enabledEntry = createEntry();
     $disabledEntry = createEntry(enabled: false);

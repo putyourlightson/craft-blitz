@@ -173,7 +173,7 @@ class ElementChangedBehavior extends Behavior
                 return true;
             }
 
-            // Comparing floats is problematic, so we convert to a fixed precision first.
+            // Comparing floats is problematic, so convert to a fixed precision first.
             // https://www.php.net/manual/en/language.types.float.php
             $precision = 5;
             $originalFocalPoint = $this->originalElement->getFocalPoint();
