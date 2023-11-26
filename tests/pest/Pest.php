@@ -9,6 +9,7 @@ use craft\commerce\records\Product as ProductRecord;
 use craft\db\ActiveRecord;
 use craft\elements\Asset;
 use craft\elements\Entry;
+use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
@@ -168,12 +169,6 @@ expect()->extend('toHaveRecordCount', function(int $count, array $where = []) {
 |--------------------------------------------------------------------------
 */
 
-const TEST_SITE_ID = 1;
-const TEST_SECTION_ID = 12;
-const TEST_SINGLE_SECTION_ID = 14;
-const TEST_VOLUME_ID = 2;
-const TEST_PRODUCT_TYPE_ID = 2;
-
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -203,11 +198,12 @@ function createSiteUri(int $siteId = 1, string $uri = 'page'): SiteUriModel
     ]);
 }
 
-function createEntry(int $sectionId = TEST_SECTION_ID, bool $enabled = true, bool $batchMode = false): Entry
+function createEntry(int $sectionId = null, bool $enabled = true, bool $batchMode = false): Entry
 {
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
 
+    $sectionId = $sectionId ?? App::env('TEST_SECTION_ID');
     $entry = EntryFactory::factory()
         ->section($sectionId)
         ->enabled($enabled)
@@ -240,8 +236,9 @@ function createEntryWithRelationship(array $relatedEntries = []): Entry
     return $entry;
 }
 
-function createAsset(int $volumeId = TEST_VOLUME_ID): Asset
+function createAsset(int $volumeId = null): Asset
 {
+    $volumeId = $volumeId ?? App::env('TEST_VOLUME_ID');
     $volume = Craft::$app->volumes->getVolumeById($volumeId);
     $asset = AssetFactory::factory()
         ->volume($volume->handle)
@@ -260,8 +257,9 @@ function createAsset(int $volumeId = TEST_VOLUME_ID): Asset
     return $asset;
 }
 
-function createProductVariantOrder(int $typeId = TEST_PRODUCT_TYPE_ID, bool $batchMode = false): array
+function createProductVariantOrder(int $typeId = null, bool $batchMode = false): array
 {
+    $typeId = $typeId ?? App::env('TEST_PRODUCT_TYPE_ID');
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
     $faker = FakerFactory::create();
@@ -311,15 +309,15 @@ function cleanUpElements(): void
 {
     $entryIds = EntryRecord::find()
         ->select('id')
-        ->where(['sectionId' => TEST_SECTION_ID])
+        ->where(['sectionId' => App::env('TEST_SECTION_ID')])
         ->column();
     $assetIds = AssetRecord::find()
         ->select('id')
-        ->where(['volumeId' => TEST_VOLUME_ID])
+        ->where(['volumeId' => App::env('TEST_VOLUME_ID')])
         ->column();
     $productIds = ProductRecord::find()
         ->select('id')
-        ->where(['typeId' => TEST_PRODUCT_TYPE_ID])
+        ->where(['typeId' => App::env('TEST_PRODUCT_TYPE_ID')])
         ->column();
     ElementRecord::deleteAll(['id' => array_merge($entryIds, $assetIds, $productIds)]);
 

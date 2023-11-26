@@ -4,6 +4,7 @@
  * Tests that cached pages are refreshed when SEOmatic meta containers are invalidated.
  */
 
+use craft\helpers\App;
 use Mockery\MockInterface;
 use nystudio107\seomatic\seoelements\SeoEntry;
 use nystudio107\seomatic\Seomatic;
@@ -24,7 +25,7 @@ beforeEach(function() {
         $metaBundles = Mockery::mock(MetaBundles::class . '[invalidateMetaBundleByElement]');
         $metaBundles->shouldReceive('invalidateMetaBundleByElement');
         Seomatic::$plugin->set('metaBundles', $metaBundles);
-        Seomatic::$plugin->metaBundles->deleteMetaBundleBySourceId(SeoEntry::getMetaBundleType(), TEST_SECTION_ID, TEST_SITE_ID);
+        Seomatic::$plugin->metaBundles->deleteMetaBundleBySourceId(SeoEntry::getMetaBundleType(), App::env('TEST_SECTION_ID'), App::env('TEST_SITE_ID'));
     }
 });
 
@@ -45,7 +46,7 @@ test('Invalidate container caches event with a specific source triggers a refres
     $refreshCache->shouldNotReceive('refreshAll');
 
     $entry = createEntry(batchMode: true);
-    Seomatic::$plugin->metaContainers->invalidateContainerCacheById(TEST_SECTION_ID, SeoEntry::getMetaBundleType(), TEST_SITE_ID);
+    Seomatic::$plugin->metaContainers->invalidateContainerCacheById(App::env('TEST_SECTION_ID'), SeoEntry::getMetaBundleType(), App::env('TEST_SITE_ID'));
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($entry::class))
         ->toContain($entry->id);
