@@ -710,13 +710,17 @@ class GenerateCacheService extends Component
             $columns[] = $extraColumnName;
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->batchInsert(
-                $insertTable,
-                $columns,
-                $values,
-            )
-            ->execute();
+        try {
+            Craft::$app->getDb()->createCommand()
+                ->batchInsert(
+                    $insertTable,
+                    $columns,
+                    $values,
+                )
+                ->execute();
+        } catch (Exception $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
+        }
     }
 
     /**
@@ -731,13 +735,17 @@ class GenerateCacheService extends Component
 
         $columns = ['queryId', $columnName];
 
-        Craft::$app->getDb()->createCommand()
-            ->batchInsert(
-                $insertTable,
-                $columns,
-                $values,
-            )
-            ->execute();
+        try {
+            Craft::$app->getDb()->createCommand()
+                ->batchInsert(
+                    $insertTable,
+                    $columns,
+                    $values,
+                )
+                ->execute();
+        } catch (Exception $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
+        }
     }
 
     /**

@@ -2,6 +2,10 @@
 
 ## 4.9.2 - Unreleased
 
+### Changed
+
+- Integrity constraint violation exceptions are now caught when batch inserting rows into the database ([#588](https://github.com/putyourlightson/craft-blitz/issues/588)).
+
 ### Fixed
 
 - Fixed a bug in which eager-loading custom fields of preloaded singles was not being tracked on cached pages ([#585](https://github.com/putyourlightson/craft-blitz/issues/585)).
