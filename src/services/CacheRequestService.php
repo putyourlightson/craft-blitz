@@ -574,7 +574,7 @@ class CacheRequestService extends Component
             return $this->_allowedQueryStrings[$siteId][$uri];
         }
 
-        $queryString = parse_url($uri, PHP_URL_QUERY);
+        $queryString = parse_url($uri, PHP_URL_QUERY) ?: '';
         parse_str($queryString, $queryStringParams);
 
         foreach ($queryStringParams as $key => $value) {
@@ -617,7 +617,7 @@ class CacheRequestService extends Component
      */
     public function requestAcceptsEncoding(): bool
     {
-        $encoding = Craft::$app->getRequest()->getHeaders()->get('Accept-Encoding');
+        $encoding = Craft::$app->getRequest()->getHeaders()->get('Accept-Encoding', '');
         $encodings = Craft::$app->getRequest()->parseAcceptHeader($encoding);
 
         return isset($encodings[BaseCacheStorage::ENCODING]);
