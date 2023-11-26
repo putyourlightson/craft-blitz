@@ -8,8 +8,11 @@ namespace putyourlightson\blitz\services;
 use Craft;
 use craft\base\Component;
 use craft\helpers\StringHelper;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheTagRecord;
+use yii\db\Exception;
+use yii\log\Logger;
 
 /**
  * @property-read string[] $allTags
@@ -77,12 +80,16 @@ class CacheTagsService extends Component
             $values[] = [$cacheId, $tag];
         }
 
-        Craft::$app->getDb()->createCommand()
-            ->batchInsert(
-                CacheTagRecord::tableName(),
-                ['cacheId', 'tag'],
-                $values,
-            )
-            ->execute();
+        try {
+            Craft::$app->getDb()->createCommand()
+                ->batchInsert(
+                    CacheTagRecord::tableName(),
+                    ['cacheId', 'tag'],
+                    $values,
+                )
+                ->execute();
+        } catch (Exception $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
+        }
     }
 }
