@@ -24,7 +24,7 @@ beforeEach(function() {
         $metaBundles = Mockery::mock(MetaBundles::class . '[invalidateMetaBundleByElement]');
         $metaBundles->shouldReceive('invalidateMetaBundleByElement');
         Seomatic::$plugin->set('metaBundles', $metaBundles);
-        Seomatic::$plugin->metaBundles->deleteMetaBundleBySourceId(SeoEntry::getMetaBundleType(), TEST_SECTION_ID, TEST_SITE_ID);
+        Seomatic::$plugin->metaBundles->deleteMetaBundleBySourceId(SeoEntry::getMetaBundleType(), getChannelSectionId(), getSiteId());
     }
 });
 
@@ -45,7 +45,7 @@ test('Invalidate container caches event with a specific source triggers a refres
     $refreshCache->shouldNotReceive('refreshAll');
 
     $entry = createEntry(batchMode: true);
-    Seomatic::$plugin->metaContainers->invalidateContainerCacheById(TEST_SECTION_ID, SeoEntry::getMetaBundleType(), TEST_SITE_ID);
+    Seomatic::$plugin->metaContainers->invalidateContainerCacheById($entry->sectionId, SeoEntry::getMetaBundleType(), $entry->siteId);
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($entry::class))
         ->toContain($entry->id);

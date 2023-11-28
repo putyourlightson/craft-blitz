@@ -4,13 +4,21 @@ This document outlines the test specification for the Blitz plugin.
 
 ---
 
+## Architecture Tests
+
+### [Architecture](pest/Architecture/ArchitectureTest.php)
+
+_Tests the architecture of the plugin._
+
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Code does not contain “die” statements.  
+
 ## Drivers Tests
 
 ### [FileStorage](pest/Drivers/FileStorageTest.php)
 
 _Tests functionality specific to the file storage driver._
 
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Getting a site path works for a disabled or non-existent site.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Getting a site path works for a disabled or non existent site.  
 
 ## Feature Tests
 
@@ -27,11 +35,11 @@ _Tests whether requests are cacheable and under what circumstances._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request matching included URI pattern is cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request with generate token is cacheable.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request with `no-cache` param is not cacheable.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request with “no cache” param is not cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request with token is not cacheable.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request starting with `_includes` is a cached include.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request starting with “_includes” is a cached include.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request with cached include action is a cached include.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request starting with `_dynamic` is a dynamic include.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request starting with “_dynamic” is a dynamic include.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request with dynamic include action is a dynamic include.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Requested cacheable site URI includes allowed query strings when urls cached as unique pages.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Requested cacheable site URI does not include query strings when urls cached as same page.  
@@ -39,8 +47,8 @@ _Tests whether requests are cacheable and under what circumstances._
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Requested cacheable site URI works with regular expressions.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI with included URI pattern is cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI with excluded URI pattern is not cacheable.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI with `admin` in URI is cacheable.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI with `index.php` in URI is not cacheable.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI with “admin” in URI is cacheable.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI with “index php” in URI is not cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI with max URI length is cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI with max URI length exceeded is not cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) URI patterns with matching regular expressions are matched.  
@@ -50,30 +58,30 @@ _Tests whether requests are cacheable and under what circumstances._
 
 _Tests the storing of cached values using the cache storage drivers._
 
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) 255 character site URI can be saved with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) 255 character site URI can be saved with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) 255 character site URI can be saved with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Long site URI can be saved except for by file storage driver with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Long site URI can be saved except for by file storage driver with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Long site URI can be saved except for by file storage driver with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI is decoded before being saved with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI is decoded before being saved with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI is decoded before being saved with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set "RedisStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set "FileStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set "YiiCacheStorage".  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set "RedisStorage".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) 255 character site URI can be saved with data set “FileStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) 255 character site URI can be saved with data set “YiiCacheStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) 255 character site URI can be saved with data set “RedisStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Long site URI can be saved except for by file storage driver with data set “FileStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Long site URI can be saved except for by file storage driver with data set “YiiCacheStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Long site URI can be saved except for by file storage driver with data set “RedisStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI is decoded before being saved with data set “FileStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI is decoded before being saved with data set “YiiCacheStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Site URI is decoded before being saved with data set “RedisStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set “FileStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set “YiiCacheStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value can be fetched compressed and uncompressed with data set “RedisStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set “FileStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set “YiiCacheStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of site URI is deleted with data set “RedisStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set “FileStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set “YiiCacheStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Compressed cached value of site URI is deleted with data set “RedisStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set “FileStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set “YiiCacheStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value of decoded site URI is deleted with data set “RedisStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set “FileStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set “YiiCacheStorage”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) All cached values are deleted with data set “RedisStorage”.  
 
 ### [ExpireCache](pest/Feature/ExpireCacheTest.php)
 
@@ -89,8 +97,8 @@ _Tests the saving of cached values, element cache records and element query reco
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved with output comments.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved without output comments.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved with output comments when file extension is `.html`.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved without output comments when file extension is not `.html`.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved with output comments when file extension is “ html”.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved without output comments when file extension is not “ html”.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cache record with max URI length is saved.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cache record with max URI length exceeded throws exception.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element cache record is saved without custom fields.  
@@ -127,9 +135,9 @@ _Tests the saving of cached values, element cache records and element query reco
 _Tests the tracking of changes to elements and the resulting element cache IDs and element query type records._
 
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is not tracked when it is unchanged.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is tracked when `refreshCacheWhenElementSavedUnchanged` is `true` and it is unchanged.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is tracked when “refreshCacheWhenElementSavedUnchanged” is “true” and it is unchanged.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is not tracked when disabled and its attribute is changed.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is tracked when disabled and `refreshCacheWhenElementSavedNotLive` is `true` and its attribute is changed.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is tracked when disabled and “refreshCacheWhenElementSavedNotLive” is “true” and its attribute is changed.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is tracked when its status is changed.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is tracked when it expires.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element is tracked when it is deleted.  
@@ -195,8 +203,8 @@ _Tests that cached web responses contain the correct headers and comments._
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the default cache control header when the page is not cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the cache control header when the page is cacheable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the expired cache control header and the cache is refreshed when the page is expired.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response adds the `X-Powered-By` header once.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response overwrites the `X-Powered-By` header.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response adds the “X Powered By” header once.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response overwrites the “X Powered By” header.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains output comments when enabled.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response does not contain output comments when disabled.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response with mime type has headers and does not contain output comments.  

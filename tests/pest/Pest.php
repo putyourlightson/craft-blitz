@@ -5,10 +5,12 @@ use craft\commerce\elements\Order;
 use craft\commerce\elements\Product;
 use craft\commerce\elements\Variant;
 use craft\commerce\models\LineItem;
+use craft\commerce\Plugin;
 use craft\commerce\records\Product as ProductRecord;
 use craft\db\ActiveRecord;
 use craft\elements\Asset;
 use craft\elements\Entry;
+use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\FileHelper;
@@ -168,12 +170,6 @@ expect()->extend('toHaveRecordCount', function(int $count, array $where = []) {
 |--------------------------------------------------------------------------
 */
 
-const TEST_SITE_ID = 1;
-const TEST_SECTION_ID = 12;
-const TEST_SINGLE_SECTION_ID = 14;
-const TEST_VOLUME_ID = 2;
-const TEST_PRODUCT_TYPE_ID = 2;
-
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -184,6 +180,16 @@ const TEST_PRODUCT_TYPE_ID = 2;
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
+
+function getSiteId(): int
+{
+    return Craft::$app->sites->getSiteByHandle(App::env('TEST_SITE_HANDLE'))->id;
+}
+
+function getChannelSectionId(): int
+{
+    return Craft::$app->sections->getSectionByHandle(App::env('TEST_CHANNEL_SECTION_HANDLE'))->id;
+}
 
 function integrationIsActive(string $class): bool
 {
@@ -203,13 +209,13 @@ function createSiteUri(int $siteId = 1, string $uri = 'page'): SiteUriModel
     ]);
 }
 
-function createEntry(int $sectionId = TEST_SECTION_ID, bool $enabled = true, bool $batchMode = false): Entry
+function createEntry(bool $enabled = true, bool $batchMode = false): Entry
 {
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
 
     $entry = EntryFactory::factory()
-        ->section($sectionId)
+        ->section(App::env('TEST_CHANNEL_SECTION_HANDLE'))
         ->enabled($enabled)
         ->create();
 
@@ -231,7 +237,7 @@ function createEntryWithRelationship(array $relatedEntries = []): Entry
     $relatedEntryIds = ArrayHelper::getColumn($relatedEntries, 'id');
 
     $entry = createEntry();
-    $entry->relatedTo = $relatedEntryIds;
+    $entry->setFieldValue('relatedTo', $relatedEntryIds);
     Craft::$app->elements->saveElement($entry);
 
     Blitz::$plugin->generateCache->reset();
@@ -240,9 +246,9 @@ function createEntryWithRelationship(array $relatedEntries = []): Entry
     return $entry;
 }
 
-function createAsset(int $volumeId = TEST_VOLUME_ID): Asset
+function createAsset(): Asset
 {
-    $volume = Craft::$app->volumes->getVolumeById($volumeId);
+    $volume = Craft::$app->volumes->getVolumeByHandle(App::env('TEST_VOLUME_HANDLE'));
     $asset = AssetFactory::factory()
         ->volume($volume->handle)
         ->create();
@@ -260,15 +266,16 @@ function createAsset(int $volumeId = TEST_VOLUME_ID): Asset
     return $asset;
 }
 
-function createProductVariantOrder(int $typeId = TEST_PRODUCT_TYPE_ID, bool $batchMode = false): array
+function createProductVariantOrder(bool $batchMode = false): array
 {
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
     $faker = FakerFactory::create();
 
+    $type = Plugin::getInstance()->productTypes->getProductTypeByHandle(App::env('TEST_PRODUCT_TYPE_HANDLE'));
     $product = new Product([
-        'title' => $faker->sentence,
-        'typeId' => $typeId,
+        'title' => $faker->sentence(),
+        'typeId' => $type->id,
     ]);
     Craft::$app->elements->saveElement($product);
 
@@ -309,18 +316,24 @@ function sendRequest(string $uri = ''): TestableResponse
 
 function cleanUpElements(): void
 {
+    $section = Craft::$app->sections->getSectionByHandle(App::env('TEST_CHANNEL_SECTION_HANDLE'));
     $entryIds = EntryRecord::find()
         ->select('id')
-        ->where(['sectionId' => TEST_SECTION_ID])
+        ->where(['sectionId' => $section->id])
         ->column();
+
+    $volume = Craft::$app->volumes->getVolumeByHandle(App::env('TEST_VOLUME_HANDLE'));
     $assetIds = AssetRecord::find()
         ->select('id')
-        ->where(['volumeId' => TEST_VOLUME_ID])
+        ->where(['volumeId' => $volume->id])
         ->column();
+
+    $type = Plugin::getInstance()->productTypes->getProductTypeByHandle(App::env('TEST_PRODUCT_TYPE_HANDLE'));
     $productIds = ProductRecord::find()
         ->select('id')
-        ->where(['typeId' => TEST_PRODUCT_TYPE_ID])
+        ->where(['typeId' => $type->id])
         ->column();
+
     ElementRecord::deleteAll(['id' => array_merge($entryIds, $assetIds, $productIds)]);
 
     Craft::$app->elements->invalidateAllCaches();

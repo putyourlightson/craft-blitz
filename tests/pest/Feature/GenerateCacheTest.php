@@ -9,6 +9,7 @@ use craft\db\FixedOrderExpression;
 use craft\elements\Entry;
 use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
+use craft\helpers\App;
 use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\mutex\Mutex;
@@ -60,7 +61,7 @@ test('Cached value is saved without output comments', function() {
         ->not()->toContain('Cached by Blitz on');
 });
 
-test('Cached value is saved with output comments when file extension is `.html`', function() {
+test('Cached value is saved with output comments when file extension is “.html”', function() {
     $siteUri = createSiteUri(uri: 'page.html');
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 
@@ -68,7 +69,7 @@ test('Cached value is saved with output comments when file extension is `.html`'
         ->toContain('Cached by Blitz on');
 });
 
-test('Cached value is saved without output comments when file extension is not `.html`', function() {
+test('Cached value is saved without output comments when file extension is not “.html”', function() {
     $siteUri = createSiteUri(uri: 'page.json');
     Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
 
@@ -143,7 +144,7 @@ test('Element cache record is saved with eager loaded custom fields in variable'
 test('Element cache record is saved for preloaded single', function() {
     Craft::$app->config->general->preloadSingles = true;
     Craft::$app->view->renderString('{{ single.title }}');
-    $entry = Entry::find()->sectionId(TEST_SINGLE_SECTION_ID)->one();
+    $entry = Entry::find()->section(App::env('TEST_SINGLE_SECTION_HANDLE'))->one();
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)
@@ -152,7 +153,7 @@ test('Element cache record is saved for preloaded single', function() {
 
 test('Element cache record is saved with eager loaded custom fields for preloaded single', function() {
     Craft::$app->config->general->preloadSingles = true;
-    $entry = Entry::find()->sectionId(TEST_SINGLE_SECTION_ID)->one();
+    $entry = Entry::find()->section(App::env('TEST_SINGLE_SECTION_HANDLE'))->one();
     Craft::$app->view->renderTemplate('test/_eager.twig');
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 

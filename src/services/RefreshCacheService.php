@@ -133,7 +133,7 @@ class RefreshCacheService extends Component
     {
         $indexes = [];
         foreach ($siteUris as $siteUri) {
-            $queryString = parse_url($siteUri->uri, PHP_URL_QUERY);
+            $queryString = parse_url($siteUri->uri, PHP_URL_QUERY) ?: '';
             parse_str($queryString, $queryStringParams);
             $index = $queryStringParams['index'] ?? null;
 
@@ -376,17 +376,21 @@ class RefreshCacheService extends Component
      */
     public function refreshAll(): void
     {
-        // Get site URIs before flushing the cache
-        $siteUris = array_merge(
-            SiteUriHelper::getAllSiteUris(),
-            Blitz::$plugin->settings->getCustomSiteUris(),
-        );
-
-        $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
+        $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_REFRESH_ALL_CACHE, $event);
 
         if (!$event->isValid) {
             return;
+        }
+
+        $siteUris = [];
+
+        // Get site URIs to generate before flushing the cache
+        if (Blitz::$plugin->settings->generateOnRefresh()) {
+            $siteUris = array_merge(
+                SiteUriHelper::getAllSiteUris(),
+                Blitz::$plugin->settings->getCustomSiteUris(),
+            );
         }
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
