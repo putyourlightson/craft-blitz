@@ -4,7 +4,6 @@
  * Tests that cached pages are refreshed when SEOmatic meta containers are invalidated.
  */
 
-use craft\helpers\App;
 use Mockery\MockInterface;
 use nystudio107\seomatic\seoelements\SeoEntry;
 use nystudio107\seomatic\Seomatic;
