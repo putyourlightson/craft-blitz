@@ -10,6 +10,7 @@ use craft\commerce\records\Product as ProductRecord;
 use craft\db\ActiveRecord;
 use craft\elements\Asset;
 use craft\elements\Entry;
+use craft\fs\Local;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
@@ -342,5 +343,8 @@ function clearElements(): void
 
 function clearAssets(): void
 {
-    FileHelper::clearDirectory(CRAFT_BASE_PATH . '/web/assets/' . App::env('TEST_VOLUME_HANDLE'));
+    $volume = Craft::$app->volumes->getVolumeByHandle(App::env('TEST_VOLUME_HANDLE'));
+    /** @var Local $fs */
+    $fs = $volume->getFs();
+    FileHelper::clearDirectory($fs->path);
 }
