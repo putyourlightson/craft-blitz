@@ -391,6 +391,8 @@ class RefreshCacheService extends Component
                 SiteUriHelper::getAllSiteUris(),
                 Blitz::$plugin->settings->getCustomSiteUris(),
             );
+
+            $event->siteUris = $siteUris;
         }
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
