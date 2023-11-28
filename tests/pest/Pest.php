@@ -181,6 +181,16 @@ expect()->extend('toHaveRecordCount', function(int $count, array $where = []) {
 |
 */
 
+function getSiteId(): int
+{
+    return Craft::$app->sites->getSiteByHandle(App::env('TEST_SITE_HANDLE'))->id;
+}
+
+function getChannelSectionId(): int
+{
+    return Craft::$app->sections->getSectionByHandle(App::env('TEST_CHANNEL_SECTION_HANDLE'))->id;
+}
+
 function integrationIsActive(string $class): bool
 {
     return in_array($class, IntegrationHelper::getActiveIntegrations());

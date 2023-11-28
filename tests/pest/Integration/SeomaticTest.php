@@ -25,7 +25,7 @@ beforeEach(function() {
         $metaBundles = Mockery::mock(MetaBundles::class . '[invalidateMetaBundleByElement]');
         $metaBundles->shouldReceive('invalidateMetaBundleByElement');
         Seomatic::$plugin->set('metaBundles', $metaBundles);
-        Seomatic::$plugin->metaBundles->deleteMetaBundleBySourceId(SeoEntry::getMetaBundleType(), App::env('TEST_CHANNEL_SECTION_HANDLE'), App::env('TEST_SITE_HANDLE'));
+        Seomatic::$plugin->metaBundles->deleteMetaBundleBySourceId(SeoEntry::getMetaBundleType(), getChannelSectionId(), getSiteId());
     }
 });
 
