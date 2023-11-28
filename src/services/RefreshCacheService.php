@@ -133,7 +133,7 @@ class RefreshCacheService extends Component
     {
         $indexes = [];
         foreach ($siteUris as $siteUri) {
-            $queryString = parse_url($siteUri->uri, PHP_URL_QUERY);
+            $queryString = parse_url($siteUri->uri, PHP_URL_QUERY) ?: '';
             parse_str($queryString, $queryStringParams);
             $index = $queryStringParams['index'] ?? null;
 
