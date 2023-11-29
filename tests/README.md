@@ -34,34 +34,3 @@ Or to run a specific test.
 ```shell
 php craft pest -- --configuration=vendor/putyourlightson/craft-blitz/tests/pest/phpunit.xml --test-directory=vendor/putyourlightson/craft-blitz/tests/pest --filter=CacheRequestTest
 ```
-
-## Codeception Tests (legacy)
-
-> Codeception tests are being phased out in place of Pest tests.
-
-To run Codeception tests, install Codeception, update `.env` and add the
-following autoload namespace to
-the project’s main `composer.json` file.
-
-```
-    "autoload-dev": {
-        "psr-4": {
-          "putyourlightson\\blitztests\\": "vendor/putyourlightson/craft-blitz/tests/codeception/"
-        }
-    },
-```
-
-Then run the following command from the root of your project.
-
-```shell
-./vendor/bin/codecept run -c vendor/putyourlightson/craft-blitz/tests/codeception unit
-```
-
-Or to run a specific test.
-
-```shell
-./vendor/bin/codecept run -c ./vendor/putyourlightson/craft-blitz/tests/codeception unit services/GenerateCacheTest:cacheSaved
-```
-
-> Ensure that the database you specify in `.env` is not one that actually
-> contains any data as it will be cleared when the tests are run. 
