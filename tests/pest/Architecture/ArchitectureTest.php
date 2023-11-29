@@ -4,6 +4,6 @@
  * Tests the architecture of the plugin.
  */
 
-test('Code does not contain “die” statements')
-    ->expect(['dd', 'die'])
+test('Source code does not contain any “dump or die” statements')
+    ->expect(['var_dump', 'die'])
     ->not->toBeUsed();
