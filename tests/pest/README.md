@@ -1,35 +1,14 @@
 # Testing
 
-## Usage
-
-1. Install the [Craft Pest](https://craft-pest.com) plugin.
-    ```shell
-    composer require-dev markhuot/craft-pest --dev
-    php craft plugin/install pest
-    ```
-2. Copy `phpunit.xml` to the root of your project.
-3. Execute the following command from the root of your project.
-    ```shell
-    php craft pest/test --test-directory=vendor/putyourlightson/craft-blitz/tests/pest
-    ```
-
-### Makefile
-
-A Makefile can be used to simplify the running of tests.
-
-```makefile
-# Default values
-vendor?=putyourlightson
-plugin?=blitz
-filter?=test
-test:
-    php craft pest/test --test-directory=vendor/$(vendor)/craft-$(plugin)/tests/pest --filter=$(filter)
-```
+To run Pest tests, first install [Craft Pest](https://craft-pest.com/) core by running `composer require markhuot/craft-pest-core:^2.0.0-rc2 --dev` and then run the
+following command from the root of your project.
 
 ```shell
-# Run tests using the default values
-make test
+php craft pest -- --configuration=vendor/putyourlightson/craft-blitz/tests/pest/phpunit.xml --test-directory=vendor/putyourlightson/craft-blitz/tests/pest
+```
 
-# Run tests using all optional values
-make test vendor=putyourlightson plugin=blitz filter=queue
+Or to run a specific test.
+
+```shell
+php craft pest -- --configuration=vendor/putyourlightson/craft-blitz/tests/pest/phpunit.xml --test-directory=vendor/putyourlightson/craft-blitz/tests/pest --filter=RefreshCacheTest
 ```
