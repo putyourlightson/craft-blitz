@@ -6,6 +6,7 @@
 
 use craft\commerce\elements\Product;
 use craft\db\FixedOrderExpression;
+use craft\db\Query;
 use craft\elements\Entry;
 use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
@@ -278,6 +279,19 @@ test('Element query record with related to param is saved', function() {
 
     expect(ElementQueryRecord::class)
         ->toHaveRecordCount(1);
+});
+
+test('Element query record with query param is saved without the param', function() {
+    $elementQuery = Entry::find();
+    $elementQuery->query = new Query();
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    /** @var ElementQueryRecord $record */
+    $record = ElementQueryRecord::find()->one();
+    $params = Json::decodeIfJson($record->params);
+
+    expect($params['query'] ?? null)
+        ->toBeNull();
 });
 
 test('Element query record with expression is not saved', function() {
