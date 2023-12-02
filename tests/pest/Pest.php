@@ -50,8 +50,7 @@ uses(TestCase::class)
         FileHelper::clearDirectory(getcwd() . '/web/cache');
     })
     ->afterAll(function() {
-        clearElements();
-        clearAssets();
+        cleanup();
         Craft::$app->queue->releaseAll();
         Blitz::$plugin->cacheStorage->deleteAll();
         Blitz::$plugin->flushCache->flushAll();
@@ -316,7 +315,7 @@ function sendRequest(string $uri = ''): TestableResponse
     return $response;
 }
 
-function clearElements(): void
+function cleanup(): void
 {
     $section = Craft::$app->sections->getSectionByHandle(App::env('TEST_CHANNEL_SECTION_HANDLE'));
     $entryIds = EntryRecord::find()
@@ -339,10 +338,7 @@ function clearElements(): void
     ElementRecord::deleteAll(['id' => array_merge($entryIds, $assetIds, $productIds)]);
 
     Craft::$app->elements->invalidateAllCaches();
-}
 
-function clearAssets(): void
-{
     $volume = Craft::$app->volumes->getVolumeByHandle(App::env('TEST_VOLUME_HANDLE'));
     /** @var Local $fs */
     $fs = $volume->getFs();
