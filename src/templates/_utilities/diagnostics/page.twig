@@ -1,0 +1,78 @@
+{% import "_includes/forms" as forms %}
+
+<nav aria-label="Breadcrumbs" style="margin-top: -15px;">
+    <ul class="breadcrumb-list">
+        <li>
+            <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
+                {{ 'Cached Page Tracking'|t('blitz') }}
+            </a>
+        </li>
+        <li>
+            /{{ pageUri }}
+        </li>
+    </ul>
+</nav>
+
+<br>
+<h1>
+    {{ elementTypes|length ? 'Tracked Elements'|t('blitz') : 'No Tracked Elements'|t('blitz') }}
+</h1>
+
+{% set cols = {
+    type: {
+        type: 'heading',
+        heading: 'Element Type'|t('blitz'),
+    },
+    count: {
+        type: 'html',
+        heading: 'Elements'|t('blitz'),
+    },
+} %}
+
+{% set rows = [] %}
+{% for elementType in elementTypes %}
+    {% set rows = rows|merge([{
+        type: elementType.type,
+        count: elementType.count,
+    }]) %}
+{% endfor %}
+
+{{ forms.editableTableField({
+    name: 'elements',
+    id: 'elements',
+    cols: cols,
+    rows: rows,
+    staticRows: true,
+}) }}
+
+<br>
+<h1>
+    {{ elementQueryTypes|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
+</h1>
+
+{% set cols = {
+    type: {
+        type: 'heading',
+        heading: 'Element Query Type'|t('blitz'),
+    },
+    count: {
+        type: 'html',
+        heading: 'Element Queries'|t('blitz'),
+    },
+} %}
+
+{% set rows = [] %}
+{% for elementQueryType in elementQueryTypes %}
+    {% set rows = rows|merge([{
+        type: elementQueryType.type,
+        count: elementQueryType.count,
+    }]) %}
+{% endfor %}
+
+{{ forms.editableTableField({
+    name: 'elementQueries',
+    id: 'elementQueries',
+    cols: cols,
+    rows: rows,
+    staticRows: true,
+}) }}

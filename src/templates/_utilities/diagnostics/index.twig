@@ -1,0 +1,38 @@
+{% import "_includes/forms" as forms %}
+
+<h1>{{ 'Cached Page Tracking'|t('blitz') }}</h1>
+
+{% set cols = {
+    uri: {
+        type: 'heading',
+        heading: 'Page'|t('blitz'),
+    },
+    elementCount: {
+        type: 'html',
+        heading: 'Elements'|t('blitz'),
+    },
+    elementQueryCount: {
+        type: 'html',
+        heading: 'Element Queries'|t('blitz'),
+    },
+} %}
+
+{% set rows = [] %}
+{% for page in pages %}
+    {% set rows = rows|merge([{
+        uri: tag('a', {
+            href: '?id=' ~ page.id,
+            text: '/' ~ page.uri,
+        }),
+        elementCount: page.elementCount ?? 0,
+        elementQueryCount: page.elementQueryCount ?? 0,
+    }]) %}
+{% endfor %}
+
+{{ forms.editableTableField({
+    name: 'pages',
+    id: 'pages',
+    cols: cols,
+    rows: rows,
+    staticRows: true,
+}) }}

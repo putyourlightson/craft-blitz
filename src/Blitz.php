@@ -49,6 +49,7 @@ use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
+use putyourlightson\blitz\utilities\DiagnosticsUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\blitz\widgets\CacheWidget;
 use putyourlightson\blitzhints\BlitzHints;
@@ -492,6 +493,7 @@ class Blitz extends Plugin
         Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = CacheUtility::class;
+                $event->types[] = DiagnosticsUtility::class;
             }
         );
     }

@@ -49,7 +49,7 @@ class CacheUtility extends Utility
     {
         Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
 
-        return Craft::$app->getView()->renderTemplate('blitz/_utility', [
+        return Craft::$app->getView()->renderTemplate('blitz/_utilities/cache', [
             'driverHtml' => Blitz::$plugin->cacheStorage->getUtilityHtml(),
             'actions' => self::getActions(),
             'tagSuggestions' => self::getTagSuggestions(),
@@ -155,9 +155,11 @@ class CacheUtility extends Utility
             ];
         }
 
-        return [[
-            'label' => Craft::t('blitz', 'Tags'),
-            'data' => $data,
-        ]];
+        return [
+            [
+                'label' => Craft::t('blitz', 'Tags'),
+                'data' => $data,
+            ],
+        ];
     }
 }
