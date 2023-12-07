@@ -1,8 +1,8 @@
 {% do sprig.setConfig({ requestClass: 'busy' }) %}
 {% set showSiteMenu = showSiteMenu ?? true %}
 
-<div class="flex" style="margin-bottom: 10px;">
-    <h1 style="margin: 0;">{{ 'Tracked Pages'|t('blitz') }}</h1>
+<div class="blitz-diagnostics-header flex">
+    <h1>{{ 'Tracked Pages'|t('blitz') }}</h1>
     {% if craft.app.getIsMultiSite() %}
         {% include '_elements/sitemenu' with {
             selectedSiteId: siteId,

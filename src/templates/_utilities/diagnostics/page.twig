@@ -4,16 +4,18 @@
     {% redirect 'utilities/blitz-diagnostics' %}
 {% endif %}
 
-<ul class="breadcrumb-list">
-    <li>
-        <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
-            {{ 'Tracked Pages'|t('blitz') }}
-        </a>
-    </li>
-    <li class="code">
-        /{{ page.uri }}
-    </li>
-</ul>
+<div id="crumbs">
+    <ul class="breadcrumb-list">
+        <li>
+            <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
+                {{ 'Tracked Pages'|t('blitz') }}
+            </a>
+        </li>
+        <li class="code">
+            /{{ page.uri }}
+        </li>
+    </ul>
+</div>
 
 <h1 style="margin-top: 40px;">
     {{ elementTypes|length ? 'Tracked Element Types'|t('blitz') : 'No Tracked Element Types'|t('blitz') }}

@@ -98,6 +98,18 @@ table.editable th.code {
     border: none;
 }
 
+.content-pane #crumbs {
+    padding: 0;
+}
+
+.blitz-diagnostics-header {
+    margin-bottom: 15px;
+}
+
+.blitz-diagnostics-header h1 {
+    margin: 0;
+}
+
 #footer {
     margin: 1px;
     position: initial;
