@@ -95,9 +95,11 @@ class DiagnosticsUtility extends Utility
             ]);
         }
 
-        $siteId = Craft::$app->getRequest()->getParam('siteId');
-        if ($siteId) {
-            $siteId = Craft::$app->getSites()->getSiteById($siteId) ? $siteId : null;
+        $siteId = null;
+        $site = Craft::$app->getRequest()->getParam('site');
+        if ($site) {
+            $site = Craft::$app->getSites()->getSiteByHandle($site);
+            $siteId = $site ? $site->id : null;
         }
         if (empty($siteId)) {
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;

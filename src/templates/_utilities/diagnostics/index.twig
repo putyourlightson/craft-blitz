@@ -8,7 +8,7 @@
             {% if craft.app.getIsMultiSite() %}
                 {% include '_elements/sitemenu' with {
                     selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics?siteId={id}&site={handle}',
+                    urlFormat: 'utilities/blitz-diagnostics?site={handle}',
                 } only %}
             {% endif %}
         </div>
