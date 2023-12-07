@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.10.0 - Unreleased
+
+### Added
+
+- Added a diagnostics utility.
+
 ## 4.9.3 - 2023-11-28
 
 ### Changed
@@ -11,7 +17,7 @@
 ### Changed
 
 - Integrity constraint violation exceptions are now caught when batch inserting rows into the database ([#588](https://github.com/putyourlightson/craft-blitz/issues/588)).
-- Reverted sending site URIs to the refresh cache event ([#590](https://github.com/putyourlightson/craft-blitz/issues/590)). 
+- Reverted sending site URIs to the refresh cache event ([#590](https://github.com/putyourlightson/craft-blitz/issues/590)).
 
 ### Fixed
 
