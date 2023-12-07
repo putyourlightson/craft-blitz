@@ -75,7 +75,15 @@ class DiagnosticsUtility extends Utility
         return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index');
     }
 
-    public static function getPagesQuery(): Query
+    public static function getPageUri(int $id): string
+    {
+        return CacheRecord::find()
+            ->select(['uri'])
+            ->where(['id' => $id])
+            ->scalar();
+    }
+
+    public function getPagesQuery(): Query
     {
         return CacheRecord::find()
             ->select(['id', 'uri', 'elementCount', 'elementQueryCount'])
@@ -91,15 +99,7 @@ class DiagnosticsUtility extends Utility
             ], 'id = elementQueries.cacheId');
     }
 
-    public static function getPageUri(int $id): string
-    {
-        return CacheRecord::find()
-            ->select(['uri'])
-            ->where(['id' => $id])
-            ->scalar();
-    }
-
-    public static function getElementsQuery(int $id): Query
+    public function getElementsQuery(int $id): Query
     {
         return ElementCacheRecord::find()
             ->select(['cacheId', 'count(*) as count', 'type'])
@@ -108,7 +108,7 @@ class DiagnosticsUtility extends Utility
             ->groupBy(['type']);
     }
 
-    public static function getElementQueriesQuery(int $id): Query
+    public function getElementQueriesQuery(int $id): Query
     {
         return ElementQueryCacheRecord::find()
             ->select(['cacheId', 'count(*) as count', 'type'])

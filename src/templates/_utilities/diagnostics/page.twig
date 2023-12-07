@@ -1,5 +1,6 @@
-{% import "_includes/forms" as forms %}
+{% import '_includes/forms' as forms %}
 
+{% do sprig.setConfig({ requestClass: 'busy' }) %}
 {% set id = craft.app.request.getParam('id') %}
 
 <nav aria-label="Breadcrumbs" style="margin: -15px 0;">

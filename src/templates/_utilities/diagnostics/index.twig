@@ -1,3 +1,5 @@
+{% do sprig.setConfig({ requestClass: 'busy' }) %}
+
 <h1>{{ 'Tracked Pages'|t('blitz') }}</h1>
 
 {{ sprig('blitz/_utilities/diagnostics/components/pages') }}
