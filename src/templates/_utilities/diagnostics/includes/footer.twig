@@ -1,0 +1,27 @@
+<div class="centeralign hidden">
+    <div class="spinner loadingmore"></div>
+</div>
+
+<div id="footer" class="flex flex-justify">
+    <div id="count-spinner" class="spinner small hidden"></div>
+    <div id="count-container" class="light">
+        <div class="flex pagination">
+            <nav class="flex">
+                {% if offset > 0 %}
+                    <button type="button" sprig s-val:offset="{{ offset - limit }}" class="page-link prev-page" title="Previous Page"></button>
+                {% else %}
+                    <button type="button" class="page-link prev-page disabled" title="Previous Page"></button>
+                {% endif %}
+                {% if results|length < total %}
+                    <button type="button" sprig s-val:offset="{{ offset + limit }}" class="page-link next-page" title="Next Page"></button>
+                {% else %}
+                    <button type="button" role="button" class="page-link next-page disabled" title="Next Page"></button>
+                {% endif %}
+            </nav>
+            <div class="page-info">
+                {% set maxVisible = results|length + offset %}
+                {{ maxVisible > 0 ? offset + 1 : 0 }}–{{ maxVisible }} of {{ total }} {{ itemName ?? 'results' }}
+            </div>
+        </div>
+    </div>
+</div>

@@ -70,25 +70,25 @@ class DiagnosticsUtility extends Utility
         if ($id) {
             $elementType = Craft::$app->getRequest()->getParam('elementType');
             if ($elementType) {
-                return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elements', [
+                /** @var Element $elementType */
+                return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elementType', [
                     'page' => self::getPage($id),
-                    'elementType' => $elementType,
-                    'elements' => self::getElements($id, $elementType),
+                    'elementType' => new $elementType(),
                 ]);
             }
 
             $elementQueryType = Craft::$app->getRequest()->getParam('elementQueryType');
             if ($elementQueryType) {
-                return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elementQueries', [
+                /** @var Element $elementQueryType */
+                return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elementQueryType', [
                     'page' => self::getPage($id),
-                    'elementQueryType' => $elementQueryType,
-                    'elementQueries' => self::getElementQueries($id, $elementQueryType),
+                    'elementQueryType' => new $elementQueryType(),
                 ]);
             }
 
             return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/page', [
                 'page' => self::getPage($id),
-                'elementTypes' => self::getElementQueryTypes($id),
+                'elementTypes' => self::getElementTypes($id),
                 'elementQueryTypes' => self::getElementQueryTypes($id),
             ]);
         }
@@ -145,7 +145,7 @@ class DiagnosticsUtility extends Utility
             ->all();
     }
 
-    public static function getElements(int $id, string $elementType): array
+    public static function getElementsQuery(int $id, string $elementType): Query
     {
         $elementIds = ElementCacheRecord::find()
             ->select(['id'])
@@ -160,29 +160,26 @@ class DiagnosticsUtility extends Utility
         /** @var Element $elementType */
         return $elementType::find()
             ->id($elementIds)
-            ->all();
+            ->status(null);
     }
 
-    public static function getElementQueries(int $id, string $elementQueryType): array
+    public static function getElementQueriesQuery(int $id, string $elementQueryType): Query
     {
-        $elementQueries = ElementQueryCacheRecord::find()
+        return ElementQueryCacheRecord::find()
             ->select(['params'])
             ->innerJoinWith('elementQuery')
             ->where([
                 'cacheId' => $id,
                 'type' => $elementQueryType,
-            ])
-            ->asArray()
-            ->all();
+            ]);
+    }
 
-        foreach ($elementQueries as &$elementQuery) {
-            /** @var Element $elementQueryType */
-            $elementQuery['sql'] = $elementQueryType::find()
-                ->status(null)
-                ->createCommand()
-                ->getRawSql();
-        }
-
-        return $elementQueries;
+    public static function getElementQuerySql(string $elementQueryType, string $params): string
+    {
+        /** @var Element $elementQueryType */
+        return $elementQueryType::find()
+            ->status(null)
+            ->createCommand()
+            ->getRawSql();
     }
 }

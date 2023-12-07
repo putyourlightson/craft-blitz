@@ -1,0 +1,57 @@
+{% set orderBy = orderBy ?? 'title' %}
+{% set sortBy = sortBy ?? 'asc' %}
+{% set offset = offset ?? 0 %}
+{% set limit = 50 %}
+{% set search = search ?? null %}
+
+{% set query = craft.blitz.getDiagnosticsElementsQuery(id, elementType)
+    .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
+    .offset(offset)
+    .limit(limit) %}
+{% if search %}
+    {% do query.andWhere(['like', 'title', search]) %}
+{% endif %}
+
+{% set total = query.count() %}
+{% set elements = query.all() %}
+
+{{ hiddenInput('orderBy', orderBy) }}
+{{ hiddenInput('sortBy', sortBy) }}
+
+<div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements">
+    <div class="set-table flex">
+        <div class="search-container flex-grow texticon has-filter-btn">
+            <span class="texticon-icon search icon" aria-hidden="true"></span>
+            <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+        </div>
+    </div>
+    <div id="elements" class="elements" style="margin-top: 1rem;">
+        <div class="update-spinner spinner spinner-absolute"></div>
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th class="{{ orderBy == 'title' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                        <button type="button" sprig s-val:order-by="title" s-val:sort-by="{{ orderBy == 'title' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                            {{ 'Title'|t('blitz') }}
+                        </button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for element in elements %}
+                    <tr>
+                        <td>
+                            <div class="element small hasstatus">
+                                <span class="status {{ element.status }}"></span>
+                                <a href="{{ element.cpEditUrl }}" class="go" target="_blank">
+                                    {{- element.title -}}
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ include('blitz/_utilities/diagnostics/includes/footer', { results: elements }) }}
+    </div>
+</div>

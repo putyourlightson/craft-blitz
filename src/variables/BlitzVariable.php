@@ -200,6 +200,30 @@ class BlitzVariable
     }
 
     /**
+     * Returns a diagnostics utility elements query.
+     */
+    public static function getDiagnosticsElementsQuery(int $id, string $elementType): Query
+    {
+        return DiagnosticsUtility::getElementsQuery($id, $elementType);
+    }
+
+    /**
+     * Returns a diagnostics utility element queries query.
+     */
+    public static function getDiagnosticsElementQueriesQuery(int $id, string $elementQueryType): Query
+    {
+        return DiagnosticsUtility::getElementQueriesQuery($id, $elementQueryType);
+    }
+
+    /**
+     * Returns a diagnostics utility element query’s raw SQL.
+     */
+    public static function getDiagnosticsElementQuerySql(string $elementQueryType, string $params): string
+    {
+        return DiagnosticsUtility::getElementQuerySql($elementQueryType, $params);
+    }
+
+    /**
      * Returns the code to inject the output of a template.
      */
     private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params, VariableConfigModel $config): Markup

@@ -1,0 +1,29 @@
+{% if page is null %}
+    {% redirect 'utilities/blitz-diagnostics' %}
+{% endif %}
+
+<ul class="breadcrumb-list">
+    <li>
+        <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
+            {{ 'Tracked Pages'|t('blitz') }}
+        </a>
+    </li>
+    <li class="code">
+        <a href="{{ cpUrl('utilities/blitz-diagnostics', { id: page.id }) }}">
+            /{{ page.uri }}
+        </a>
+    </li>
+    <li class="code">
+        {{ className(elementType) }}
+    </li>
+</ul>
+
+<h1 style="margin-top: 40px;">
+    Tracked {{ elementType.pluralDisplayName }}
+</h1>
+
+{{ sprig('blitz/_utilities/diagnostics/components/elements', {
+    id: page.id,
+    elementType: className(elementType),
+    itemName: elementType.pluralLowerDisplayName,
+}) }}

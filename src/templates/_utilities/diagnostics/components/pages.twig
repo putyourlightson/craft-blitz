@@ -66,30 +66,9 @@
                 {% endfor %}
             </tbody>
         </table>
-        <div class="centeralign hidden">
-            <div class="spinner loadingmore"></div>
-        </div>
-        <div id="footer" class="flex flex-justify">
-            <div id="count-spinner" class="spinner small hidden"></div>
-            <div id="count-container" class="light">
-                <div class="flex pagination">
-                    <nav class="flex">
-                        {% if offset > 0 %}
-                            <button type="button" sprig s-val:offset="{{ offset - limit }}" class="page-link prev-page" title="Previous Page"></button>
-                        {% else %}
-                            <button type="button" class="page-link prev-page disabled" title="Previous Page"></button>
-                        {% endif %}
-                        {% if pages|length < total %}
-                            <button type="button" sprig s-val:offset="{{ offset + limit }}" class="page-link next-page" title="Next Page"></button>
-                        {% else %}
-                            <button type="button" role="button" class="page-link next-page disabled" title="Next Page"></button>
-                        {% endif %}
-                    </nav>
-                    <div class="page-info">
-                        {{ maxVisible > 0 ? offset + 1 : 0 }}–{{ maxVisible }} of {{ total }} pages
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{ include('blitz/_utilities/diagnostics/includes/footer', {
+            results: pages,
+            itemName: 'pages'|t('blitz'),
+        }) }}
     </div>
 </div>

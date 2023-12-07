@@ -1,0 +1,63 @@
+{% set orderBy = orderBy ?? 'params' %}
+{% set sortBy = sortBy ?? 'asc' %}
+{% set offset = offset ?? 0 %}
+{% set limit = 50 %}
+{% set search = search ?? null %}
+
+{% set query = craft.blitz.getDiagnosticsElementQueriesQuery(id, elementQueryType)
+    .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
+    .offset(offset)
+    .limit(limit) %}
+{% if search %}
+    {% do query.andWhere(['like', 'params', search]) %}
+{% endif %}
+
+{% set total = query.count() %}
+{% set elementQueries = query.asArray().all() %}
+
+{{ hiddenInput('orderBy', orderBy) }}
+{{ hiddenInput('sortBy', sortBy) }}
+
+<div s-replace="#elementqueries" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries">
+    <div class="set-table flex">
+        <div class="search-container flex-grow texticon has-filter-btn">
+            <span class="texticon-icon search icon" aria-hidden="true"></span>
+            <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+        </div>
+    </div>
+    <div id="elementqueries" class="elements" style="margin-top: 1rem;">
+        <div class="update-spinner spinner spinner-absolute"></div>
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th class="{{ orderBy == 'params' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                        <button type="button" sprig s-val:order-by="params" s-val:sort-by="{{ orderBy == 'params' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                            {{ 'Params'|t('blitz') }}
+                        </button>
+                    </th>
+                    <th>
+                        {{ 'SQL'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementQuery in elementQueries %}
+                    <tr>
+                        <td class="code">
+                            {{ elementQuery.params }}
+                        </td>
+                        <td class="code">
+                            {% set sql = 'test' %}
+                            {% include '_includes/forms/copytext' with {
+                                id: 'auth-header',
+                                buttonId: 'copy-btn',
+                                value: craft.blitz.getDiagnosticsElementQuerySql(elementQueryType, elementQuery.params),
+                            } %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {{ include('blitz/_utilities/diagnostics/includes/footer', { results: elementQueries }) }}
+    </div>
+</div>
