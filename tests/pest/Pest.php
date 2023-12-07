@@ -159,4 +159,3 @@ expect()->extend('toHaveRecordCount', function(int $count, array $where = []) {
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
-

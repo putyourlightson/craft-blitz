@@ -68,19 +68,20 @@ class DiagnosticsUtility extends Utility
 
         if ($id) {
             return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/page', [
-                'pageUri' => self::getPageUri($id),
+                'page' => self::getPage($id),
             ]);
         }
 
         return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index');
     }
 
-    public static function getPageUri(int $id): string
+    public static function getPage(int $id): array|null
     {
         return CacheRecord::find()
             ->select(['uri'])
             ->where(['id' => $id])
-            ->scalar();
+            ->asArray()
+            ->one();
     }
 
     public function getPagesQuery(): Query
