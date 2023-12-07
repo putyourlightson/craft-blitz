@@ -4,7 +4,7 @@
 {% set limit = 50 %}
 {% set search = search ?? null %}
 
-{% set query = craft.blitz.getDiagnosticsElementQueriesQuery(id, elementQueryType)
+{% set query = craft.blitz.diagnostics.getElementQueriesQuery(id, elementQueryType)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
@@ -51,7 +51,7 @@
                             {% include '_includes/forms/copytext' with {
                                 id: 'auth-header',
                                 buttonId: 'copy-btn',
-                                value: craft.blitz.getDiagnosticsElementQuerySql(elementQueryType, elementQuery.params),
+                                value: craft.blitz.diagnostics.getElementQuerySql(elementQueryType, elementQuery.params),
                             } %}
                         </td>
                     </tr>

@@ -1,5 +1,14 @@
 {% do sprig.setConfig({ requestClass: 'busy' }) %}
+{% set showSiteMenu = showSiteMenu ?? true %}
 
-<h1>{{ 'Tracked Pages'|t('blitz') }}</h1>
+<div class="flex" style="margin-bottom: 10px;">
+    <h1 style="margin: 0;">{{ 'Tracked Pages'|t('blitz') }}</h1>
+    {% if craft.app.getIsMultiSite() %}
+        {% include '_elements/sitemenu' with {
+            selectedSiteId: siteId,
+            urlFormat: 'utilities/blitz-diagnostics?siteId={id}&site={handle}',
+        } only %}
+    {% endif %}
+</div>
 
-{{ sprig('blitz/_utilities/diagnostics/components/pages') }}
+{{ sprig('blitz/_utilities/diagnostics/components/pages', { siteId: siteId }) }}

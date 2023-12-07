@@ -12,12 +12,11 @@ use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
-use putyourlightson\blitz\utilities\DiagnosticsUtility;
 use Twig\Markup;
-use yii\db\Query;
 use yii\web\NotFoundHttpException;
 use yii\web\View as BaseView;
 
@@ -193,10 +192,11 @@ class BlitzVariable
     }
 
     /**
-     * Returns a diagnostics utility pages query.
+     * Returns an instance of the diagnostics helper.
      */
-    public static function getDiagnosticsPagesQuery(): Query
+    public static function getDiagnostics(): DiagnosticsHelper
     {
+<<<<<<< Updated upstream
         return DiagnosticsUtility::getPagesQuery();
     }
 
@@ -222,6 +222,9 @@ class BlitzVariable
     public static function getDiagnosticsElementQuerySql(string $elementQueryType, string $params): string
     {
         return DiagnosticsUtility::getElementQuerySql($elementQueryType, $params);
+=======
+        return new DiagnosticsHelper();
+>>>>>>> Stashed changes
     }
 
     /**

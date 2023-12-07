@@ -4,7 +4,7 @@
 {% set limit = 50 %}
 {% set search = search ?? null %}
 
-{% set query = craft.blitz.getDiagnosticsElementsQuery(id, elementType)
+{% set query = craft.blitz.diagnostics.getElementsQuery(id, elementType)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}

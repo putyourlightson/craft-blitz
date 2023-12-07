@@ -17,7 +17,6 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\sprig\Sprig;
-use yii\db\Query;
 
 /**
  * @since 4.10.0
@@ -96,23 +95,17 @@ class DiagnosticsUtility extends Utility
             ]);
         }
 
-        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index');
-    }
+        $siteId = Craft::$app->getRequest()->getParam('siteId');
+        if ($siteId) {
+            $siteId = Craft::$app->getSites()->getSiteById($siteId) ? $siteId : null;
+        }
+        if (empty($siteId)) {
+            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        }
 
-    public static function getPagesQuery(): Query
-    {
-        return CacheRecord::find()
-            ->select(['id', 'uri', 'elementCount', 'elementQueryCount'])
-            ->leftJoin([
-                'elements' => ElementCacheRecord::find()
-                    ->select(['cacheId', 'count(*) as elementCount'])
-                    ->groupBy(['cacheId']),
-            ], 'id = elements.cacheId')
-            ->leftJoin([
-                'elementQueries' => ElementQueryCacheRecord::find()
-                    ->select(['cacheId', 'count(*) as elementQueryCount'])
-                    ->groupBy(['cacheId']),
-            ], 'id = elementQueries.cacheId');
+        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index', [
+            'siteId' => $siteId,
+        ]);
     }
 
     public static function getPage(int $id): array|null
@@ -147,6 +140,7 @@ class DiagnosticsUtility extends Utility
             ->asArray()
             ->all();
     }
+<<<<<<< Updated upstream
 
     public static function getElementsQuery(int $id, string $elementType): ElementQueryInterface
     {
@@ -193,4 +187,6 @@ class DiagnosticsUtility extends Utility
             ->createCommand()
             ->getRawSql();
     }
+=======
+>>>>>>> Stashed changes
 }
