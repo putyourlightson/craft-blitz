@@ -9,7 +9,11 @@
     .offset(offset)
     .limit(limit) %}
 {% if search %}
-    {% do query.andWhere(['like', 'uri', search]) %}
+    {% if search == '/' %}
+        {% do query.andWhere({ uri: ''} ) %}
+    {% else %}
+        {% do query.andWhere(['like', 'uri', search]) %}
+    {% endif %}
 {% endif %}
 
 {% set total = query.count() %}
