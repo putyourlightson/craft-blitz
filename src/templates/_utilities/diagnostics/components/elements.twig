@@ -32,22 +32,27 @@
                 <tr>
                     <th class="{{ orderBy == 'title' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                         <button type="button" sprig s-val:order-by="title" s-val:sort-by="{{ orderBy == 'title' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                            {{ 'Title'|t('blitz') }}
+                            {{ displayName }}
                         </button>
                     </th>
+                    {% if hasUris %}
+                        <th>
+                            <span data-icon="world"></span>
+                        </th>
+                    {% endif %}
                 </tr>
             </thead>
             <tbody>
                 {% for element in elements %}
                     <tr>
                         <td>
-                            <div class="element small hasstatus">
-                                <span class="status {{ element.status }}"></span>
-                                <a href="{{ element.cpEditUrl }}" class="go" target="_blank">
-                                    {{- element.title -}}
-                                </a>
-                            </div>
+                            {{ include ('_elements/element') }}
                         </td>
+                        {% if hasUris %}
+                            <td data-title="Link" data-attr="link">
+                                <a href="{{ element.uri }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
+                            </td>
+                        {% endif %}
                     </tr>
                 {% endfor %}
             </tbody>

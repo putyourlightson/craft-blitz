@@ -25,5 +25,7 @@
 {{ sprig('blitz/_utilities/diagnostics/components/elements', {
     id: page.id,
     elementType: className(elementType),
-    itemName: elementType.pluralLowerDisplayName,
+    displayName: elementType.displayName,
+    displayNamePlural: elementType.pluralLowerDisplayName,
+    hasUris: elementType.hasUris,
 }) }}

@@ -25,5 +25,5 @@
 {{ sprig('blitz/_utilities/diagnostics/components/elementQueries', {
     id: page.id,
     elementQueryType: className(elementQueryType),
-    itemName: elementQueryType.pluralLowerDisplayName,
+    displayNamePlural: elementQueryType.lowerDisplayName ~ ' queries',
 }) }}
