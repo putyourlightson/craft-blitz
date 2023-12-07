@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\variables;
 
 use Craft;
+use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Html;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
@@ -202,7 +203,7 @@ class BlitzVariable
     /**
      * Returns a diagnostics utility elements query.
      */
-    public static function getDiagnosticsElementsQuery(int $id, string $elementType): Query
+    public static function getDiagnosticsElementsQuery(int $id, string $elementType): ElementQueryInterface
     {
         return DiagnosticsUtility::getElementsQuery($id, $elementType);
     }

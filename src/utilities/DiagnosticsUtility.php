@@ -9,7 +9,10 @@ use Craft;
 use craft\base\Element;
 use craft\base\Utility;
 use craft\db\Table;
+use craft\elements\db\ElementQueryInterface;
+use craft\helpers\Json;
 use putyourlightson\blitz\assets\BlitzAsset;
+use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
@@ -145,7 +148,7 @@ class DiagnosticsUtility extends Utility
             ->all();
     }
 
-    public static function getElementsQuery(int $id, string $elementType): Query
+    public static function getElementsQuery(int $id, string $elementType): ElementQueryInterface
     {
         $elementIds = ElementCacheRecord::find()
             ->select(['id'])
@@ -176,9 +179,17 @@ class DiagnosticsUtility extends Utility
 
     public static function getElementQuerySql(string $elementQueryType, string $params): string
     {
-        /** @var Element $elementQueryType */
-        return $elementQueryType::find()
-            ->status(null)
+        $params = Json::decodeIfJson($params);
+
+        // If json decode failed
+        if (!is_array($params)) {
+            return 'Invalid params.';
+        }
+
+        $elementQuery = RefreshCacheHelper::getElementQueryWithParams($elementQueryType, $params);
+
+        return $elementQuery
+            ->select(['elementId' => 'elements.id'])
             ->createCommand()
             ->getRawSql();
     }

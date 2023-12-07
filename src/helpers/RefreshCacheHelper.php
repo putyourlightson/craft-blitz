@@ -6,7 +6,7 @@
 namespace putyourlightson\blitz\helpers;
 
 use craft\base\Element;
-use craft\elements\db\ElementQuery;
+use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Json;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\RefreshDataModel;
@@ -122,8 +122,7 @@ class RefreshCacheHelper
     }
 
     /**
-     * Returns cache IDs for an element query record using the provided refresh
-     * data.
+     * Returns cache IDs for an element query record using the provided refresh data.
      *
      * @return int[]
      */
@@ -134,16 +133,6 @@ class RefreshCacheHelper
             return [];
         }
 
-        /** @var Element $elementType */
-        $elementType = $elementQueryRecord->type;
-
-        /** @var ElementQuery $elementQuery */
-        $elementQuery = $elementType::find();
-
-        // Get elements with all statuses
-        // https://github.com/putyourlightson/craft-blitz/issues/527
-        $elementQuery->status(null);
-
         $params = Json::decodeIfJson($elementQueryRecord->params);
 
         // If json decode failed
@@ -151,20 +140,9 @@ class RefreshCacheHelper
             return [];
         }
 
-        foreach ($params as $key => $val) {
-            $elementQuery->{$key} = $val;
-        }
-
-        // If the element query has an offset then add it to the limit and make it null
-        if ($elementQuery->offset) {
-            if ($elementQuery->limit) {
-                // Cast values to integers before trying to add them, as they may have been set to strings
-                $elementQuery->limit((int)$elementQuery->limit + (int)$elementQuery->offset);
-            }
-
-            $elementQuery->offset(null);
-        }
-
+        /** @var Element $elementType */
+        $elementType = $elementQueryRecord->type;
+        $elementQuery = self::getElementQueryWithParams($elementType, $params);
         $elementQueryIds = [];
 
         // Execute the element query, ignoring any exceptions.
@@ -185,5 +163,34 @@ class RefreshCacheHelper
         return $elementQueryRecord->getElementQueryCaches()
             ->select('cacheId')
             ->column();
+    }
+
+    /**
+     * Returns an element query of the provided element type with the params applied.
+     */
+    public static function getElementQueryWithParams(string $elementType, array $params): ElementQueryInterface
+    {
+        /** @var Element $elementType */
+        $elementQuery = $elementType::find();
+
+        // Get elements with all statuses
+        // https://github.com/putyourlightson/craft-blitz/issues/527
+        $elementQuery->status(null);
+
+        foreach ($params as $key => $val) {
+            $elementQuery->{$key} = $val;
+        }
+
+        // If the element query has an offset then add it to the limit and make it null
+        if ($elementQuery->offset) {
+            if ($elementQuery->limit) {
+                // Cast values to integers before trying to add them, as they may have been set to strings
+                $elementQuery->limit((int)$elementQuery->limit + (int)$elementQuery->offset);
+            }
+
+            $elementQuery->offset(null);
+        }
+
+        return $elementQuery;
     }
 }
