@@ -12,12 +12,21 @@ use putyourlightson\blitz\assets\BlitzAsset;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\sprig\Sprig;
+use yii\db\Query;
 
 /**
  * @since 4.10.0
  */
 class DiagnosticsUtility extends Utility
 {
+    public function init(): void
+    {
+        parent::init();
+
+        Sprig::getInstance()->init();
+    }
+
     /**
      * @inheritdoc
      */
@@ -60,22 +69,14 @@ class DiagnosticsUtility extends Utility
         if ($id) {
             return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/page', [
                 'pageUri' => self::getPageUri($id),
-                'elementTypes' => self::getPageElements($id),
-                'elementQueryTypes' => self::getPageElementQueries($id),
             ]);
         }
 
-        $order = Craft::$app->getRequest()->getParam('order');
-
-        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index', [
-            'pages' => self::getPages($order),
-        ]);
+        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index');
     }
 
-    public static function getPages(?string $order = null): array
+    public static function getPagesQuery(): Query
     {
-        $order = $order ?? 'elementCount';
-
         return CacheRecord::find()
             ->select(['id', 'uri', 'elementCount', 'elementQueryCount'])
             ->leftJoin([
@@ -87,11 +88,7 @@ class DiagnosticsUtility extends Utility
                 'elementQueries' => ElementQueryCacheRecord::find()
                     ->select(['cacheId', 'count(*) as elementQueryCount'])
                     ->groupBy(['cacheId']),
-            ], 'id = elementQueries.cacheId')
-            ->orderBy([$order => SORT_DESC])
-            ->limit(100)
-            ->asArray()
-            ->all();
+            ], 'id = elementQueries.cacheId');
     }
 
     public static function getPageUri(int $id): string
@@ -102,27 +99,21 @@ class DiagnosticsUtility extends Utility
             ->scalar();
     }
 
-    public static function getPageElements(int $id): array
+    public static function getElementsQuery(int $id): Query
     {
         return ElementCacheRecord::find()
             ->select(['cacheId', 'count(*) as count', 'type'])
             ->innerJoin(Table::ELEMENTS, 'id = elementId')
             ->where(['cacheId' => $id])
-            ->groupBy(['type'])
-            ->orderBy(['count' => SORT_DESC])
-            ->asArray()
-            ->all();
+            ->groupBy(['type']);
     }
 
-    public static function getPageElementQueries(int $id): array
+    public static function getElementQueriesQuery(int $id): Query
     {
         return ElementQueryCacheRecord::find()
             ->select(['cacheId', 'count(*) as count', 'type'])
             ->innerJoinWith('elementQuery')
             ->where(['cacheId' => $id])
-            ->groupBy(['type'])
-            ->orderBy(['count' => SORT_DESC])
-            ->asArray()
-            ->all();
+            ->groupBy(['type']);
     }
 }

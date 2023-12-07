@@ -90,6 +90,11 @@ table.editable th.code {
     font-size: inherit !important;
 }
 
+#footer {
+    margin: 1px;
+    position: initial;
+}
+
 .putyourlightson\\blitz\\widgets\\cachewidget .front .pane {
     padding: 0;
 }

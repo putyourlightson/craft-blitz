@@ -1,0 +1,95 @@
+{% set orderBy = orderBy ?? 'elementCount' %}
+{% set sortBy = sortBy ?? 'desc' %}
+{% set offset = offset ?? 0 %}
+{% set limit = 100 %}
+{% set search = search ?? null %}
+
+{% set query = craft.blitz.diagnostics.getPagesQuery()
+    .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
+    .offset(offset)
+    .limit(limit) %}
+{% if search %}
+    {% do query.andWhere(['like', 'uri', search]) %}
+{% endif %}
+
+{% set total = query.count() %}
+{% set pages = query.asArray().all() %}
+{% set maxVisible = pages|length + offset %}
+
+{{ hiddenInput('orderBy', orderBy) }}
+{{ hiddenInput('sortBy', sortBy) }}
+
+<div s-replace="#results" s-indicator="#results">
+    <div class="set-table flex">
+        <div class="search-container flex-grow texticon has-filter-btn">
+            <span class="texticon-icon search icon" aria-hidden="true"></span>
+            <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+        </div>
+    </div>
+    <div id="results" class="elements" style="margin-top: 1rem;">
+        <div class="update-spinner spinner spinner-absolute"></div>
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th class="{{ orderBy == 'uri' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                        <button type="button" sprig s-val:order-by="uri" s-val:sort-by="{{ orderBy == 'uri' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                            {{ 'Page'|t('blitz') }}
+                        </button>
+                    </th>
+                    <th class="{{ orderBy == 'elementCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                        <button type="button" sprig s-val:order-by="elementCount" s-val:sort-by="{{ orderBy == 'elementCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                            {{ 'Elements'|t('blitz') }}
+                        </button>
+                    </th>
+                    <th class="{{ orderBy == 'elementQueryCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                        <button type="button" sprig s-val:order-by="elementQueryCount" s-val:sort-by="{{ orderBy == 'elementQueryCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                            {{ 'Element Queries'|t('blitz') }}
+                        </button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for page in pages %}
+                    <tr>
+                        <td>
+                            <a href="{{ cpUrl('utilities/blitz-diagnostics?id=' ~ page.id) }}">
+                                /{{ page.uri }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ page.elementCount ?? 0 }}
+                        </td>
+                        <td>
+                            {{ page.elementQueryCount ?? 0 }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="centeralign hidden">
+            <div class="spinner loadingmore"></div>
+        </div>
+        <div id="footer" class="flex flex-justify">
+            <div id="count-spinner" class="spinner small hidden"></div>
+            <div id="count-container" class="light">
+                <div class="flex pagination">
+                    <nav class="flex">
+                        {% if offset > 0 %}
+                            <button type="button" sprig s-val:offset="{{ offset - limit }}" class="page-link prev-page" title="Previous Page"></button>
+                        {% else %}
+                            <button type="button" class="page-link prev-page disabled" title="Previous Page"></button>
+                        {% endif %}
+                        {% if pages|length < total %}
+                            <button type="button" sprig s-val:offset="{{ offset + limit }}" class="page-link next-page" title="Next Page"></button>
+                        {% else %}
+                            <button type="button" role="button" class="page-link next-page disabled" title="Next Page"></button>
+                        {% endif %}
+                    </nav>
+                    <div class="page-info">
+                        {{ maxVisible > 0 ? offset + 1 : 0 }}–{{ maxVisible }} of {{ total }} pages
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
