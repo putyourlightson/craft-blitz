@@ -1,0 +1,10 @@
+{% do sprig.setConfig({ requestClass: 'busy' }) %}
+
+{% block outerContent %}
+
+    <div class="blitz-diagnostics">
+
+        {% block content %}{% endblock %}
+
+    </div>
+{% endblock %}

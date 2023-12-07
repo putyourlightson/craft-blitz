@@ -90,29 +90,33 @@ table.editable th.code {
     font-size: inherit !important;
 }
 
-.content-pane .breadcrumb-list {
-    margin: -15px 0;
-}
-
-.content-pane .breadcrumb-list li:last-of-type:after {
-    border: none;
-}
-
-.content-pane #crumbs {
+.blitz-diagnostics #crumbs {
     padding: 0;
 }
 
-.blitz-diagnostics-header {
-    margin-bottom: 15px;
+.blitz-diagnostics .breadcrumb-list {
+    margin: -15px 0;
 }
 
-.blitz-diagnostics-header h1 {
+.blitz-diagnostics .breadcrumb-list li:last-of-type:after {
+    border: none;
+}
+
+.blitz-diagnostics #header {
+    padding-left: 0;
+    margin-bottom: 0.5rem;
+}
+
+.blitz-diagnostics #header h1 {
     margin: 0;
+}
+
+.blitz-diagnostics h1 {
+    margin-top: 2.5rem;
 }
 
 #footer {
     margin: 1px;
-    position: initial;
 }
 
 .putyourlightson\\blitz\\widgets\\cachewidget .front .pane {

@@ -1,94 +1,98 @@
-{% import '_includes/forms' as forms %}
+{% extends 'blitz/_utilities/diagnostics/layout.twig' %}
 
 {% if page is null %}
     {% redirect 'utilities/blitz-diagnostics' %}
 {% endif %}
 
-<div id="crumbs">
-    <ul class="breadcrumb-list">
-        <li>
-            <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
-                {{ 'Tracked Pages'|t('blitz') }}
-            </a>
-        </li>
-        <li class="code">
-            /{{ page.uri }}
-        </li>
-    </ul>
-</div>
+{% block content %}
 
-<h1 style="margin-top: 40px;">
-    {{ elementTypes|length ? 'Tracked Element Types'|t('blitz') : 'No Tracked Element Types'|t('blitz') }}
-</h1>
-
-{% if elementTypes|length %}
-    <div class="elements" style="margin-top: 1rem;">
-        <table class="data fullwidth">
-            <thead>
-                <tr>
-                    <th>
-                        {{ 'Element Type'|t('blitz') }}
-                    </th>
-                    <th>
-                        {{ 'Elements'|t('blitz') }}
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for elementType in elementTypes %}
-                    <tr>
-                        <td class="code">
-                            <a href="{{ cpUrl('utilities/blitz-diagnostics', {
-                                id: page.id,
-                                elementType: elementType.type
-                            }) }}">
-                                {{ elementType.type }}
-                            </a>
-                        </td>
-                        <td>
-                            {{ elementType.count }}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <div id="crumbs">
+        <ul class="breadcrumb-list">
+            <li>
+                <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
+                    {{ 'Tracked Pages'|t('blitz') }}
+                </a>
+            </li>
+            <li class="code">
+                /{{ page.uri }}
+            </li>
+        </ul>
     </div>
-{% endif %}
 
-<h1 style="margin-top: 40px;">
-    {{ elementQueryTypes|length ? 'Tracked Element Query Types'|t('blitz') : 'No Tracked Element Query Types'|t('blitz') }}
-</h1>
+    <h1>
+        {{ elementTypes|length ? 'Tracked Element Types'|t('blitz') : 'No Tracked Element Types'|t('blitz') }}
+    </h1>
 
-{% if elementQueryTypes|length %}
-    <div class="elements" style="margin-top: 1rem;">
-        <table class="data fullwidth">
-            <thead>
-                <tr>
-                    <th>
-                        {{ 'Element Query Type'|t('blitz') }}
-                    </th>
-                    <th>
-                        {{ 'Element Queries'|t('blitz') }}
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for elementQueryType in elementQueryTypes %}
+    {% if elementTypes|length %}
+        <div class="elements" style="margin-top: 1rem;">
+            <table class="data fullwidth">
+                <thead>
                     <tr>
-                        <td class="code">
-                            <a href="{{ cpUrl('utilities/blitz-diagnostics', {
-                                id: page.id,
-                                elementQueryType: elementQueryType.type
-                            }) }}">
-                                {{ elementQueryType.type }}
-                            </a>
-                        </td>
-                        <td>
-                            {{ elementQueryType.count }}
-                        </td>
+                        <th>
+                            {{ 'Element Type'|t('blitz') }}
+                        </th>
+                        <th>
+                            {{ 'Elements'|t('blitz') }}
+                        </th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-{% endif %}
+                </thead>
+                <tbody>
+                    {% for elementType in elementTypes %}
+                        <tr>
+                            <td class="code">
+                                <a href="{{ cpUrl('utilities/blitz-diagnostics', {
+                                    id: page.id,
+                                    elementType: elementType.type
+                                }) }}">
+                                    {{ elementType.type }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ elementType.count }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+    <h1>
+        {{ elementQueryTypes|length ? 'Tracked Element Query Types'|t('blitz') : 'No Tracked Element Query Types'|t('blitz') }}
+    </h1>
+
+    {% if elementQueryTypes|length %}
+        <div class="elements" style="margin-top: 1rem;">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>
+                            {{ 'Element Query Type'|t('blitz') }}
+                        </th>
+                        <th>
+                            {{ 'Element Queries'|t('blitz') }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for elementQueryType in elementQueryTypes %}
+                        <tr>
+                            <td class="code">
+                                <a href="{{ cpUrl('utilities/blitz-diagnostics', {
+                                    id: page.id,
+                                    elementQueryType: elementQueryType.type
+                                }) }}">
+                                    {{ elementQueryType.type }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ elementQueryType.count }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+{% endblock %}

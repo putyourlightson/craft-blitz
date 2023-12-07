@@ -1,14 +1,19 @@
-{% do sprig.setConfig({ requestClass: 'busy' }) %}
-{% set showSiteMenu = showSiteMenu ?? true %}
+{% extends 'blitz/_utilities/diagnostics/layout.twig' %}
 
-<div class="blitz-diagnostics-header flex">
-    <h1>{{ 'Tracked Pages'|t('blitz') }}</h1>
-    {% if craft.app.getIsMultiSite() %}
-        {% include '_elements/sitemenu' with {
-            selectedSiteId: siteId,
-            urlFormat: 'utilities/blitz-diagnostics?siteId={id}&site={handle}',
-        } only %}
-    {% endif %}
-</div>
+{% block content %}
 
-{{ sprig('blitz/_utilities/diagnostics/components/pages', { siteId: siteId }) }}
+    <header id="header">
+        <div class="page-title flex">
+            <h1>{{ 'Tracked Pages'|t('blitz') }}</h1>
+            {% if craft.app.getIsMultiSite() %}
+                {% include '_elements/sitemenu' with {
+                    selectedSiteId: siteId,
+                    urlFormat: 'utilities/blitz-diagnostics?siteId={id}&site={handle}',
+                } only %}
+            {% endif %}
+        </div>
+    </header>
+
+    {{ sprig('blitz/_utilities/diagnostics/components/pages', { siteId: siteId }) }}
+
+{% endblock %}

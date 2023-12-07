@@ -1,33 +1,39 @@
+{% extends 'blitz/_utilities/diagnostics/layout.twig' %}
+
 {% if page is null %}
     {% redirect 'utilities/blitz-diagnostics' %}
 {% endif %}
 
-<div id="crumbs">
-    <ul class="breadcrumb-list">
-        <li>
-            <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
-                {{ 'Tracked Pages'|t('blitz') }}
-            </a>
-        </li>
-        <li class="code">
-            <a href="{{ cpUrl('utilities/blitz-diagnostics', { id: page.id }) }}">
-                /{{ page.uri }}
-            </a>
-        </li>
-        <li class="code">
-            {{ className(elementType) }}
-        </li>
-    </ul>
-</div>
+{% block content %}
 
-<h1 style="margin-top: 40px;">
-    Tracked {{ elementType.pluralDisplayName }}
-</h1>
+    <div id="crumbs">
+        <ul class="breadcrumb-list">
+            <li>
+                <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
+                    {{ 'Tracked Pages'|t('blitz') }}
+                </a>
+            </li>
+            <li class="code">
+                <a href="{{ cpUrl('utilities/blitz-diagnostics', { id: page.id }) }}">
+                    /{{ page.uri }}
+                </a>
+            </li>
+            <li class="code">
+                {{ className(elementType) }}
+            </li>
+        </ul>
+    </div>
 
-{{ sprig('blitz/_utilities/diagnostics/components/elements', {
-    id: page.id,
-    elementType: className(elementType),
-    displayName: elementType.displayName,
-    displayNamePlural: elementType.pluralLowerDisplayName,
-    hasUris: elementType.hasUris,
-}) }}
+    <h1>
+        Tracked {{ elementType.pluralDisplayName }}
+    </h1>
+
+    {{ sprig('blitz/_utilities/diagnostics/components/elements', {
+        id: page.id,
+        elementType: className(elementType),
+        displayName: elementType.displayName,
+        displayNamePlural: elementType.pluralLowerDisplayName,
+        hasUris: elementType.hasUris,
+    }) }}
+
+{% endblock %}
