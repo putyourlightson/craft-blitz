@@ -1,0 +1,59 @@
+{% import '_includes/forms' as forms %}
+
+{% if page is null %}
+    {% redirect 'utilities/blitz-diagnostics' %}
+{% endif %}
+
+<ul class="breadcrumb-list">
+    <li>
+        <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
+            {{ 'Tracked Pages'|t('blitz') }}
+        </a>
+    </li>
+    <li class="code">
+        <a href="{{ cpUrl('utilities/blitz-diagnostics', { id: page.id }) }}">
+            /{{ page.uri }}
+        </a>
+    </li>
+    <li class="code">
+        {{ elementQueryType }}
+    </li>
+</ul>
+
+<h1 style="margin-top: 40px;">
+    {{ elementQueries|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
+</h1>
+
+{% if elementQueries|length %}
+    <div class="elements" style="margin-top: 1rem;">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Params'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'SQL'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementQuery in elementQueries %}
+                    <tr>
+                        <td class="code">
+                            {{ elementQuery.params }}
+                        </td>
+                        <td class="code">
+                            {% include '_includes/forms/copytext' with {
+                                id: 'auth-header',
+                                buttonId: 'copy-btn',
+                                value: elementQuery.sql,
+                                size: 54,
+                            } %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}

@@ -4,7 +4,7 @@
 {% set limit = 50 %}
 {% set search = search ?? null %}
 
-{% set query = craft.blitz.diagnostics.getPagesQuery()
+{% set query = craft.blitz.getDiagnosticsPagesQuery()
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
@@ -52,7 +52,7 @@
                 {% for page in pages %}
                     <tr>
                         <td class="code">
-                            <a href="{{ cpUrl('utilities/blitz-diagnostics?id=' ~ page.id) }}">
+                            <a href="{{ cpUrl('utilities/blitz-diagnostics', { id: page.id }) }}">
                                 /{{ page.uri }}
                             </a>
                         </td>

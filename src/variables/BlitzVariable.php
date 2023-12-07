@@ -16,6 +16,7 @@ use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\utilities\DiagnosticsUtility;
 use Twig\Markup;
+use yii\db\Query;
 use yii\web\NotFoundHttpException;
 use yii\web\View as BaseView;
 
@@ -191,11 +192,11 @@ class BlitzVariable
     }
 
     /**
-     * Returns a diagnostics utility instance.
+     * Returns a diagnostics utility pages query.
      */
-    public static function getDiagnostics(): DiagnosticsUtility
+    public static function getDiagnosticsPagesQuery(): Query
     {
-        return new DiagnosticsUtility();
+        return DiagnosticsUtility::getPagesQuery();
     }
 
     /**

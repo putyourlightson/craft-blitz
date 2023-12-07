@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\utilities;
 
 use Craft;
+use craft\base\Element;
 use craft\base\Utility;
 use craft\db\Table;
 use putyourlightson\blitz\assets\BlitzAsset;
@@ -67,24 +68,35 @@ class DiagnosticsUtility extends Utility
         $id = Craft::$app->getRequest()->getParam('id');
 
         if ($id) {
+            $elementType = Craft::$app->getRequest()->getParam('elementType');
+            if ($elementType) {
+                return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elements', [
+                    'page' => self::getPage($id),
+                    'elementType' => $elementType,
+                    'elements' => self::getElements($id, $elementType),
+                ]);
+            }
+
+            $elementQueryType = Craft::$app->getRequest()->getParam('elementQueryType');
+            if ($elementQueryType) {
+                return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elementQueries', [
+                    'page' => self::getPage($id),
+                    'elementQueryType' => $elementQueryType,
+                    'elementQueries' => self::getElementQueries($id, $elementQueryType),
+                ]);
+            }
+
             return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/page', [
                 'page' => self::getPage($id),
+                'elementTypes' => self::getElementQueryTypes($id),
+                'elementQueryTypes' => self::getElementQueryTypes($id),
             ]);
         }
 
         return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index');
     }
 
-    public static function getPage(int $id): array|null
-    {
-        return CacheRecord::find()
-            ->select(['uri'])
-            ->where(['id' => $id])
-            ->asArray()
-            ->one();
-    }
-
-    public function getPagesQuery(): Query
+    public static function getPagesQuery(): Query
     {
         return CacheRecord::find()
             ->select(['id', 'uri', 'elementCount', 'elementQueryCount'])
@@ -100,21 +112,77 @@ class DiagnosticsUtility extends Utility
             ], 'id = elementQueries.cacheId');
     }
 
-    public function getElementsQuery(int $id): Query
+    public static function getPage(int $id): array|null
+    {
+        return CacheRecord::find()
+            ->select(['id', 'uri'])
+            ->where(['id' => $id])
+            ->asArray()
+            ->one();
+    }
+
+    public static function getElementTypes(int $id): array
     {
         return ElementCacheRecord::find()
             ->select(['cacheId', 'count(*) as count', 'type'])
             ->innerJoin(Table::ELEMENTS, 'id = elementId')
             ->where(['cacheId' => $id])
-            ->groupBy(['type']);
+            ->groupBy(['type'])
+            ->orderBy(['count' => SORT_DESC])
+            ->asArray()
+            ->all();
     }
 
-    public function getElementQueriesQuery(int $id): Query
+    public static function getElementQueryTypes(int $id): array
     {
         return ElementQueryCacheRecord::find()
             ->select(['cacheId', 'count(*) as count', 'type'])
             ->innerJoinWith('elementQuery')
             ->where(['cacheId' => $id])
-            ->groupBy(['type']);
+            ->groupBy(['type'])
+            ->orderBy(['count' => SORT_DESC])
+            ->asArray()
+            ->all();
+    }
+
+    public static function getElements(int $id, string $elementType): array
+    {
+        $elementIds = ElementCacheRecord::find()
+            ->select(['id'])
+            ->innerJoin(Table::ELEMENTS, 'id = elementId')
+            ->where([
+                'cacheId' => $id,
+                'type' => $elementType,
+            ])
+            ->asArray()
+            ->column();
+
+        /** @var Element $elementType */
+        return $elementType::find()
+            ->id($elementIds)
+            ->all();
+    }
+
+    public static function getElementQueries(int $id, string $elementQueryType): array
+    {
+        $elementQueries = ElementQueryCacheRecord::find()
+            ->select(['params'])
+            ->innerJoinWith('elementQuery')
+            ->where([
+                'cacheId' => $id,
+                'type' => $elementQueryType,
+            ])
+            ->asArray()
+            ->all();
+
+        foreach ($elementQueries as &$elementQuery) {
+            /** @var Element $elementQueryType */
+            $elementQuery['sql'] = $elementQueryType::find()
+                ->status(null)
+                ->createCommand()
+                ->getRawSql();
+        }
+
+        return $elementQueries;
     }
 }

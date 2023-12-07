@@ -90,7 +90,11 @@ table.editable th.code {
     font-size: inherit !important;
 }
 
-.breadcrumb-list li.title:after {
+.content-pane .breadcrumb-list {
+    margin: -15px 0;
+}
+
+.content-pane .breadcrumb-list li:last-of-type:after {
     border: none;
 }
 

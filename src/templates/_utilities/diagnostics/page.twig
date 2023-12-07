@@ -4,22 +4,89 @@
     {% redirect 'utilities/blitz-diagnostics' %}
 {% endif %}
 
-{% do sprig.setConfig({ requestClass: 'busy' }) %}
-{% set id = craft.app.request.getParam('id') %}
+<ul class="breadcrumb-list">
+    <li>
+        <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
+            {{ 'Tracked Pages'|t('blitz') }}
+        </a>
+    </li>
+    <li class="code">
+        /{{ page.uri }}
+    </li>
+</ul>
 
-<nav aria-label="Breadcrumbs" style="margin: -15px 0 -5px;">
-    <ul class="breadcrumb-list">
-        <li>
-            <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
-                {{ 'Tracked Pages'|t('blitz') }}
-            </a>
-        </li>
-        <li class="title">
-            <code>/{{ page.uri }}</code>
-        </li>
-    </ul>
-</nav>
+<h1 style="margin-top: 40px;">
+    {{ elementTypes|length ? 'Tracked Element Types'|t('blitz') : 'No Tracked Element Types'|t('blitz') }}
+</h1>
 
-{{ sprig('blitz/_utilities/diagnostics/components/elementTypes', { id: id }) }}
+{% if elementTypes|length %}
+    <div class="elements" style="margin-top: 1rem;">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Elements'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementType in elementTypes %}
+                    <tr>
+                        <td class="code">
+                            <a href="{{ cpUrl('utilities/blitz-diagnostics', {
+                                id: page.id,
+                                elementType: elementType.type
+                            }) }}">
+                                {{ elementType.type }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementType.count }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
 
-{{ sprig('blitz/_utilities/diagnostics/components/elementTypeQueries', { id: id }) }}
+<h1 style="margin-top: 40px;">
+    {{ elementQueryTypes|length ? 'Tracked Element Query Types'|t('blitz') : 'No Tracked Element Query Types'|t('blitz') }}
+</h1>
+
+{% if elementQueryTypes|length %}
+    <div class="elements" style="margin-top: 1rem;">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Query Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Element Queries'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementQueryType in elementQueryTypes %}
+                    <tr>
+                        <td class="code">
+                            <a href="{{ cpUrl('utilities/blitz-diagnostics', {
+                                id: page.id,
+                                elementQueryType: elementQueryType.type
+                            }) }}">
+                                {{ elementQueryType.type }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementQueryType.count }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endif %}
