@@ -140,7 +140,6 @@ class DiagnosticsUtility extends Utility
             ->asArray()
             ->all();
     }
-<<<<<<< Updated upstream
 
     public static function getElementsQuery(int $id, string $elementType): ElementQueryInterface
     {
@@ -187,6 +186,4 @@ class DiagnosticsUtility extends Utility
             ->createCommand()
             ->getRawSql();
     }
-=======
->>>>>>> Stashed changes
 }
