@@ -109,11 +109,17 @@ class DiagnosticsUtility extends Utility
 
     public static function getPage(int $id): array|null
     {
-        return CacheRecord::find()
+        $page = CacheRecord::find()
             ->select(['id', 'uri'])
             ->where(['id' => $id])
             ->asArray()
             ->one();
+
+        if ($page && $page['uri'] === '') {
+            $page['uri'] = '/';
+        }
+
+        return $page;
     }
 
     public static function getElementTypes(int $id): array

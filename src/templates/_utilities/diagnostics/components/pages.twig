@@ -53,7 +53,7 @@
                     <tr>
                         <td class="code">
                             <a href="{{ cpUrl('utilities/blitz-diagnostics', { id: page.id }) }}">
-                                /{{ page.uri }}
+                                {{ page.uri ?: '/' }}
                             </a>
                         </td>
                         <td>

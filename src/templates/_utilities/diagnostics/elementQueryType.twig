@@ -6,23 +6,9 @@
 
 {% block content %}
 
-    <div id="crumbs">
-        <ul class="breadcrumb-list">
-            <li>
-                <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
-                    {{ 'Tracked Pages'|t('blitz') }}
-                </a>
-            </li>
-            <li class="code">
-                <a href="{{ cpUrl('utilities/blitz-diagnostics', { id: page.id }) }}">
-                    /{{ page.uri }}
-                </a>
-            </li>
-            <li class="code">
-                {{ className(elementQueryType) }}
-            </li>
-        </ul>
-    </div>
+    {{ include('blitz/_utilities/diagnostics/includes/crumbs', {
+        thirdLevel: className(elementQueryType),
+    }) }}
 
     <h1>
         Tracked {{ elementQueryType.displayName }} Queries

@@ -6,18 +6,7 @@
 
 {% block content %}
 
-    <div id="crumbs">
-        <ul class="breadcrumb-list">
-            <li>
-                <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
-                    {{ 'Tracked Pages'|t('blitz') }}
-                </a>
-            </li>
-            <li class="code">
-                /{{ page.uri }}
-            </li>
-        </ul>
-    </div>
+    {{ include('blitz/_utilities/diagnostics/includes/crumbs') }}
 
     <h1>
         {{ elementTypes|length ? 'Tracked Element Types'|t('blitz') : 'No Tracked Element Types'|t('blitz') }}
