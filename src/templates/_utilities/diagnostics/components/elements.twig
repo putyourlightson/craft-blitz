@@ -50,7 +50,10 @@
                         </td>
                         {% if hasUris %}
                             <td data-title="Link" data-attr="link">
-                                <a href="{{ element.uri }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
+                                {% set url = element.url %}
+                                {% if url %}
+                                    <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
+                                {% endif %}
                             </td>
                         {% endif %}
                     </tr>
