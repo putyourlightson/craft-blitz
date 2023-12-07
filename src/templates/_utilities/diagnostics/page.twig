@@ -7,18 +7,18 @@
 {% do sprig.setConfig({ requestClass: 'busy' }) %}
 {% set id = craft.app.request.getParam('id') %}
 
-<nav aria-label="Breadcrumbs" style="margin: -15px 0 -10px;">
+<nav aria-label="Breadcrumbs" style="margin: -15px 0 -5px;">
     <ul class="breadcrumb-list">
         <li>
             <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
                 {{ 'Tracked Pages'|t('blitz') }}
             </a>
         </li>
-
+        <li class="title">
+            <code>/{{ page.uri }}</code>
+        </li>
     </ul>
 </nav>
-
-<code>/{{ page.uri }}</code>
 
 {{ sprig('blitz/_utilities/diagnostics/components/elementTypes', { id: id }) }}
 

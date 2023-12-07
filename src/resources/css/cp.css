@@ -90,6 +90,10 @@ table.editable th.code {
     font-size: inherit !important;
 }
 
+.breadcrumb-list li.title:after {
+    border: none;
+}
+
 #footer {
     margin: 1px;
     position: initial;
