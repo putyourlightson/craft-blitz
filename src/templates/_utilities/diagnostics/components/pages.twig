@@ -61,10 +61,10 @@
                             </a>
                         </td>
                         <td>
-                            {{ page.elementCount ?? 0 }}
+                            {{ (page.elementCount ?? 0)|number }}
                         </td>
                         <td>
-                            {{ page.elementQueryCount ?? 0 }}
+                            {{ (page.elementQueryCount ?? 0)|number }}
                         </td>
                     </tr>
                 {% endfor %}
