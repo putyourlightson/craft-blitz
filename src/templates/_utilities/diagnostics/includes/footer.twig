@@ -20,7 +20,7 @@
             </nav>
             <div class="page-info">
                 {% set maxVisible = results|length + offset %}
-                {{ maxVisible > 0 ? offset + 1 : 0 }}–{{ maxVisible }} of {{ total }} {{ displayNamePlural ?? 'pages' }}
+                {{ (maxVisible > 0 ? offset + 1 : 0)|number }}–{{ maxVisible|number }} of {{ total|number }} {{ displayNamePlural ?? 'pages' }}
             </div>
         </div>
     </div>
