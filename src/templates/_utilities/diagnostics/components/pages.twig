@@ -86,6 +86,7 @@
         {{ include('blitz/_utilities/diagnostics/includes/footer', {
             results: pages,
             itemName: 'pages'|t('blitz'),
+            exportActionUrl: actionUrl('blitz/diagnostics/export', { siteId: siteId }),
         }) }}
     </div>
 </div>

@@ -6,13 +6,13 @@
 namespace putyourlightson\blitz\helpers;
 
 use craft\base\Element;
+use craft\db\ActiveQuery;
 use craft\db\Table;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
-use yii\db\Query;
 
 /**
  * @since 4.10.0
@@ -58,7 +58,7 @@ class DiagnosticsHelper
             ->all();
     }
 
-    public static function getPagesQuery(int|string $siteId): Query
+    public static function getPagesQuery(int|string $siteId): ActiveQuery
     {
         return CacheRecord::find()
             ->select(['id', 'uri', 'elementCount', 'elementQueryCount'])
@@ -93,7 +93,7 @@ class DiagnosticsHelper
             ->status(null);
     }
 
-    public static function getElementQueriesQuery(int $id, string $elementQueryType): Query
+    public static function getElementQueriesQuery(int $id, string $elementQueryType): ActiveQuery
     {
         return ElementQueryCacheRecord::find()
             ->select(['params'])
