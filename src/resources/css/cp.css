@@ -103,7 +103,8 @@ table.editable th.code {
 }
 
 .blitz-diagnostics #header {
-    padding: 0;
+    padding-left: 0;
+    padding-right: 0;
     margin-bottom: 0.5rem;
     width: calc(100vw - 226px - 226px - 24px - 24px - 24px);
 }

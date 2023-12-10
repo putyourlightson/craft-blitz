@@ -100,12 +100,7 @@ class DiagnosticsUtility extends Utility
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;
         }
 
-        $template = 'index';
-        if (Craft::$app->getRequest()->getParam('pages')) {
-            $template = 'pages';
-        }
-
-        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/' . $template, [
+        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index', [
             'siteId' => $siteId,
         ]);
     }
