@@ -19,6 +19,45 @@ use yii\db\Query;
  */
 class DiagnosticsHelper
 {
+    public static function getPage(int $id): array|null
+    {
+        $page = CacheRecord::find()
+            ->select(['id', 'uri'])
+            ->where(['id' => $id])
+            ->asArray()
+            ->one();
+
+        if ($page && $page['uri'] === '') {
+            $page['uri'] = '/';
+        }
+
+        return $page;
+    }
+
+    public static function getElementTypes(int $id): array
+    {
+        return ElementCacheRecord::find()
+            ->select(['cacheId', 'count(*) as count', 'type'])
+            ->innerJoin(Table::ELEMENTS, 'id = elementId')
+            ->where(['cacheId' => $id])
+            ->groupBy(['type'])
+            ->orderBy(['count' => SORT_DESC])
+            ->asArray()
+            ->all();
+    }
+
+    public static function getElementQueryTypes(int $id): array
+    {
+        return ElementQueryCacheRecord::find()
+            ->select(['cacheId', 'count(*) as count', 'type'])
+            ->innerJoinWith('elementQuery')
+            ->where(['cacheId' => $id])
+            ->groupBy(['type'])
+            ->orderBy(['count' => SORT_DESC])
+            ->asArray()
+            ->all();
+    }
+
     public static function getPagesQuery(int|string $siteId): Query
     {
         return CacheRecord::find()

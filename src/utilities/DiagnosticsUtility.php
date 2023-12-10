@@ -8,11 +8,8 @@ namespace putyourlightson\blitz\utilities;
 use Craft;
 use craft\base\Element;
 use craft\base\Utility;
-use craft\db\Table;
 use putyourlightson\blitz\assets\BlitzAsset;
-use putyourlightson\blitz\records\CacheRecord;
-use putyourlightson\blitz\records\ElementCacheRecord;
-use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\sprig\Sprig;
 
 /**
@@ -72,7 +69,7 @@ class DiagnosticsUtility extends Utility
             if ($elementType) {
                 /** @var Element $elementType */
                 return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elementType', [
-                    'page' => self::getPage($id),
+                    'page' => DiagnosticsHelper::getPage($id),
                     'elementType' => new $elementType(),
                 ]);
             }
@@ -81,15 +78,15 @@ class DiagnosticsUtility extends Utility
             if ($elementQueryType) {
                 /** @var Element $elementQueryType */
                 return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elementQueryType', [
-                    'page' => self::getPage($id),
+                    'page' => DiagnosticsHelper::getPage($id),
                     'elementQueryType' => new $elementQueryType(),
                 ]);
             }
 
             return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/page', [
-                'page' => self::getPage($id),
-                'elementTypes' => self::getElementTypes($id),
-                'elementQueryTypes' => self::getElementQueryTypes($id),
+                'page' => DiagnosticsHelper::getPage($id),
+                'elementTypes' => DiagnosticsHelper::getElementTypes($id),
+                'elementQueryTypes' => DiagnosticsHelper::getElementQueryTypes($id),
             ]);
         }
 
@@ -103,47 +100,13 @@ class DiagnosticsUtility extends Utility
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;
         }
 
-        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index', [
-            'siteId' => $siteId,
-        ]);
-    }
-
-    public static function getPage(int $id): array|null
-    {
-        $page = CacheRecord::find()
-            ->select(['id', 'uri'])
-            ->where(['id' => $id])
-            ->asArray()
-            ->one();
-
-        if ($page && $page['uri'] === '') {
-            $page['uri'] = '/';
+        $template = 'index';
+        if (Craft::$app->getRequest()->getParam('pages')) {
+            $template = 'pages';
         }
 
-        return $page;
-    }
-
-    public static function getElementTypes(int $id): array
-    {
-        return ElementCacheRecord::find()
-            ->select(['cacheId', 'count(*) as count', 'type'])
-            ->innerJoin(Table::ELEMENTS, 'id = elementId')
-            ->where(['cacheId' => $id])
-            ->groupBy(['type'])
-            ->orderBy(['count' => SORT_DESC])
-            ->asArray()
-            ->all();
-    }
-
-    public static function getElementQueryTypes(int $id): array
-    {
-        return ElementQueryCacheRecord::find()
-            ->select(['cacheId', 'count(*) as count', 'type'])
-            ->innerJoinWith('elementQuery')
-            ->where(['cacheId' => $id])
-            ->groupBy(['type'])
-            ->orderBy(['count' => SORT_DESC])
-            ->asArray()
-            ->all();
+        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/' . $template, [
+            'siteId' => $siteId,
+        ]);
     }
 }
