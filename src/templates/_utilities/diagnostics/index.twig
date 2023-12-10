@@ -1,3 +1,22 @@
 <div class="blitz-diagnostics">
-    {{ sprig('blitz/_utilities/diagnostics/components/pages', { siteId: siteId }) }}
+    <h1>
+        <a href="{{ url('utilities/blitz-diagnostics?pages=1') }}" class="go">
+            {{ 'Tracked Pages'|t('blitz') }}
+        </a>
+    </h1>
+    <h1>
+        <a href="" class="go">
+            {{ 'Tracked Query Strings'|t('blitz') }}
+        </a>
+    </h1>
+    <h1>
+        <a href="" class="go">
+            {{ 'Tracked Elements'|t('blitz') }}
+        </a>
+    </h1>
+    <h1>
+        <a href="" class="go">
+            {{ 'Tracked Element Queries'|t('blitz') }}
+        </a>
+    </h1>
 </div>
