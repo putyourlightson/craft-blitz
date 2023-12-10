@@ -63,6 +63,7 @@ class DiagnosticsUtility extends Utility
     public static function contentHtml(): string
     {
         Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
+        Sprig::$core->components->setConfig(['requestClass' => 'busy']);
 
         $id = Craft::$app->getRequest()->getParam('id');
 

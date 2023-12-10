@@ -1,11 +1,8 @@
-{% extends 'blitz/_utilities/diagnostics/layout.twig' %}
-
 {% if page is null %}
     {% redirect 'utilities/blitz-diagnostics' %}
 {% endif %}
 
-{% block content %}
-
+<div class="blitz-diagnostics">
     {{ include('blitz/_utilities/diagnostics/includes/crumbs', {
         thirdLevel: className(elementQueryType),
     }) }}
@@ -19,5 +16,4 @@
         elementQueryType: className(elementQueryType),
         displayNamePlural: elementQueryType.lowerDisplayName ~ ' queries',
     }) }}
-
-{% endblock %}
+</div>

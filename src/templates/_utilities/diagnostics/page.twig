@@ -1,11 +1,8 @@
-{% extends 'blitz/_utilities/diagnostics/layout.twig' %}
-
 {% if page is null %}
     {% redirect 'utilities/blitz-diagnostics' %}
 {% endif %}
 
-{% block content %}
-
+<div class="blitz-diagnostics">
     {{ include('blitz/_utilities/diagnostics/includes/crumbs') }}
 
     <h1>
@@ -44,6 +41,7 @@
                 </tbody>
             </table>
         </div>
+        <br><br>
     {% endif %}
 
     <h1>
@@ -83,5 +81,4 @@
             </table>
         </div>
     {% endif %}
-
-{% endblock %}
+</div>

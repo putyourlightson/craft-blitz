@@ -18,48 +18,55 @@
 {{ hiddenInput('orderBy', orderBy) }}
 {{ hiddenInput('sortBy', sortBy) }}
 
-<div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements">
-    <div class="set-table flex">
-        <div class="search-container flex-grow texticon has-filter-btn">
-            <span class="texticon-icon search icon" aria-hidden="true"></span>
-            <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+<div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements .elements">
+    <header id="header">
+        <div class="page-title flex">
+            <h1>Tracked {{ pluralDisplayName }}</h1>
         </div>
-    </div>
-    <div id="elements" class="elements" style="margin-top: 1rem;">
-        <div class="update-spinner spinner spinner-absolute"></div>
-        <table class="data fullwidth">
-            <thead>
-                <tr>
-                    <th class="{{ orderBy == 'title' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                        <button type="button" sprig s-val:order-by="title" s-val:sort-by="{{ orderBy == 'title' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                            {{ displayName }}
-                        </button>
-                    </th>
-                    {% if hasUris %}
-                        <th>
-                            <span data-icon="world"></span>
-                        </th>
-                    {% endif %}
-                </tr>
-            </thead>
-            <tbody>
-                {% for element in elements %}
+        <div id="toolbar" class="flex">
+            <div class="search-container flex-grow texticon has-filter-btn">
+                <span class="texticon-icon search icon" aria-hidden="true"></span>
+                <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+            </div>
+        </div>
+    </header>
+    <div id="elements">
+        <div class="elements">
+            <table class="data fullwidth">
+                <thead>
                     <tr>
-                        <td>
-                            {{ include ('_elements/element') }}
-                        </td>
+                        <th class="{{ orderBy == 'title' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="title" s-val:sort-by="{{ orderBy == 'title' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ displayName }}
+                            </button>
+                        </th>
                         {% if hasUris %}
-                            <td data-title="Link" data-attr="link">
-                                {% set url = element.url %}
-                                {% if url %}
-                                    <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
-                                {% endif %}
-                            </td>
+                            <th>
+                                <span data-icon="world"></span>
+                            </th>
                         {% endif %}
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for element in elements %}
+                        <tr>
+                            <td>
+                                {{ include ('_elements/element') }}
+                            </td>
+                            {% if hasUris %}
+                                <td data-title="Link" data-attr="link">
+                                    {% set url = element.url %}
+                                    {% if url %}
+                                        <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="update-spinner spinner spinner-absolute"></div>
+        </div>
         {{ include('blitz/_utilities/diagnostics/includes/footer', { results: elements }) }}
     </div>
 </div>

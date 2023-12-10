@@ -95,7 +95,7 @@ table.editable th.code {
 }
 
 .blitz-diagnostics .breadcrumb-list {
-    margin: -15px 0;
+    margin: -15px 0 15px;
 }
 
 .blitz-diagnostics .breadcrumb-list li:last-of-type:after {
@@ -103,12 +103,19 @@ table.editable th.code {
 }
 
 .blitz-diagnostics #header {
-    padding-left: 0;
+    padding: 0;
     margin-bottom: 0.5rem;
+    width: calc(100vw - 226px - 226px - 24px - 24px - 24px);
 }
 
-.blitz-diagnostics h1 {
-    margin-top: 2rem;
+@media only screen and (max-width: 1199px) {
+    .blitz-diagnostics #header {
+        width: calc(100vw - 24px - 24px - 24px - 24px);
+    }
+}
+
+.blitz-diagnostics .elements {
+    margin-top: 1rem;
 }
 
 #footer {

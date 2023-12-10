@@ -18,46 +18,48 @@
 {{ hiddenInput('orderBy', orderBy) }}
 {{ hiddenInput('sortBy', sortBy) }}
 
-<div s-replace="#elementqueries" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries">
+<div s-replace="#elementqueries" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries .elements">
     <div class="set-table flex">
         <div class="search-container flex-grow texticon has-filter-btn">
             <span class="texticon-icon search icon" aria-hidden="true"></span>
             <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
         </div>
     </div>
-    <div id="elementqueries" class="elements" style="margin-top: 1rem;">
-        <div class="update-spinner spinner spinner-absolute"></div>
-        <table class="data fullwidth">
-            <thead>
-                <tr>
-                    <th class="{{ orderBy == 'params' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                        <button type="button" sprig s-val:order-by="params" s-val:sort-by="{{ orderBy == 'params' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                            {{ 'Params'|t('blitz') }}
-                        </button>
-                    </th>
-                    <th>
-                        {{ 'SQL'|t('blitz') }}
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for elementQuery in elementQueries %}
+    <div id="elementqueries">
+        <div class="elements">
+            <table class="data fullwidth">
+                <thead>
                     <tr>
-                        <td class="code">
-                            {{ elementQuery.params }}
-                        </td>
-                        <td class="code">
-                            {% set sql = 'test' %}
-                            {% include '_includes/forms/copytext' with {
-                                id: 'auth-header',
-                                buttonId: 'copy-btn',
-                                value: craft.blitz.diagnostics.getElementQuerySql(elementQueryType, elementQuery.params),
-                            } %}
-                        </td>
+                        <th class="{{ orderBy == 'params' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="params" s-val:sort-by="{{ orderBy == 'params' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Params'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th>
+                            {{ 'SQL'|t('blitz') }}
+                        </th>
                     </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    {% for elementQuery in elementQueries %}
+                        <tr>
+                            <td class="code">
+                                {{ elementQuery.params }}
+                            </td>
+                            <td class="code">
+                                {% set sql = 'test' %}
+                                {% include '_includes/forms/copytext' with {
+                                    id: 'auth-header',
+                                    buttonId: 'copy-btn',
+                                    value: craft.blitz.diagnostics.getElementQuerySql(elementQueryType, elementQuery.params),
+                                } %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="update-spinner spinner spinner-absolute"></div>
+        </div>
         {{ include('blitz/_utilities/diagnostics/includes/footer', { results: elementQueries }) }}
     </div>
 </div>

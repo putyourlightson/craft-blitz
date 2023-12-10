@@ -1,9 +1,4 @@
-<div class="centeralign hidden">
-    <div class="spinner loadingmore"></div>
-</div>
-
 <div id="footer" class="flex flex-justify">
-    <div id="count-spinner" class="spinner small hidden"></div>
     <div id="count-container" class="light">
         <div class="flex pagination">
             <nav class="flex">
@@ -20,7 +15,8 @@
             </nav>
             <div class="page-info">
                 {% set maxVisible = results|length + offset %}
-                {{ (maxVisible > 0 ? offset + 1 : 0)|number }}–{{ maxVisible|number }} of {{ total|number }} {{ displayNamePlural ?? 'pages' }}
+                {{ (maxVisible > 0 ? offset + 1 : 0)|number }}–{{ maxVisible|number }}
+                of {{ total|number }} {{ (pluralDisplayName ?? 'pages')|lower }}
             </div>
         </div>
     </div>
