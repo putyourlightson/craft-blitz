@@ -1,0 +1,9 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set crumbs = [] %}
+
+{% block content %}
+
+    {{ sprig('blitz/_utilities/diagnostics/components/queryStrings', { siteId: siteId }) }}
+
+{% endblock %}
