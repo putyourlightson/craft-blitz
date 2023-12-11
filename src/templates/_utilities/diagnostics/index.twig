@@ -1,22 +1,26 @@
-<div class="blitz-diagnostics">
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% block content %}
+
     <h1>
-        <a href="{{ url('utilities/blitz-diagnostics?pages=1') }}" class="go">
-            {{ 'Tracked Pages'|t('blitz') }}
+        <a href="{{ url('utilities/blitz-diagnostics/pages') }}" class="go">
+            {{- 'Tracked Pages'|t('blitz') -}}
+        </a>
+    </h1>
+    <h1>
+        <a href="{{ url('utilities/blitz-diagnostics/query-string-params') }}" class="go">
+            {{- 'Tracked Query String Params'|t('blitz') -}}
         </a>
     </h1>
     <h1>
         <a href="" class="go">
-            {{ 'Tracked Query Strings'|t('blitz') }}
+            {{- 'Tracked Elements'|t('blitz') -}}
         </a>
     </h1>
     <h1>
         <a href="" class="go">
-            {{ 'Tracked Elements'|t('blitz') }}
+            {{- 'Tracked Element Queries'|t('blitz') -}}
         </a>
     </h1>
-    <h1>
-        <a href="" class="go">
-            {{ 'Tracked Element Queries'|t('blitz') }}
-        </a>
-    </h1>
-</div>
+
+{% endblock %}

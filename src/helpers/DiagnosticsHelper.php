@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use Craft;
 use craft\base\Element;
 use craft\db\ActiveQuery;
 use craft\db\Table;
@@ -19,11 +20,12 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
  */
 class DiagnosticsHelper
 {
-    public static function getPage(int $id): array|null
+    public static function getPage(): array|null
     {
+        $pageId = Craft::$app->getRequest()->getRequiredParam('pageId');
         $page = CacheRecord::find()
             ->select(['id', 'uri'])
-            ->where(['id' => $id])
+            ->where(['id' => $pageId])
             ->asArray()
             ->one();
 
@@ -34,31 +36,42 @@ class DiagnosticsHelper
         return $page;
     }
 
-    public static function getElementTypes(int $id): array
+    public static function getPageElementTypes(): array
     {
+        $pageId = Craft::$app->getRequest()->getRequiredParam('pageId');
+
         return ElementCacheRecord::find()
             ->select(['cacheId', 'count(*) as count', 'type'])
             ->innerJoin(Table::ELEMENTS, 'id = elementId')
-            ->where(['cacheId' => $id])
+            ->where(['cacheId' => $pageId])
             ->groupBy(['type'])
             ->orderBy(['count' => SORT_DESC])
             ->asArray()
             ->all();
     }
 
-    public static function getElementQueryTypes(int $id): array
+    public static function getPageElementQueryTypes(): array
     {
+        $pageId = Craft::$app->getRequest()->getRequiredParam('pageId');
+
         return ElementQueryCacheRecord::find()
             ->select(['cacheId', 'count(*) as count', 'type'])
             ->innerJoinWith('elementQuery')
-            ->where(['cacheId' => $id])
+            ->where(['cacheId' => $pageId])
             ->groupBy(['type'])
             ->orderBy(['count' => SORT_DESC])
             ->asArray()
             ->all();
     }
 
-    public static function getPagesQuery(int|string $siteId): ActiveQuery
+    public static function getElementOfType(): Element
+    {
+        $elementType = Craft::$app->getRequest()->getParam('elementType');
+
+        return new $elementType;
+    }
+
+    public static function getPagesQuery(int $siteId): ActiveQuery
     {
         return CacheRecord::find()
             ->select(['id', 'uri', 'elementCount', 'elementQueryCount'])
@@ -119,5 +132,36 @@ class DiagnosticsHelper
             ->select(['elementId' => 'elements.id'])
             ->createCommand()
             ->getRawSql();
+    }
+
+    public static function getQueryStringParams(int $siteId): array
+    {
+        $rows = CacheRecord::find()
+            ->select(['REGEXP_SUBSTR(uri, "(?<=[?]).*") queryString', 'count(*) as pageCount'])
+            ->where(['siteId' => $siteId])
+            ->groupBy('queryString')
+            ->asArray()
+            ->all();
+
+        $queryStringParams = [];
+        foreach ($rows as $row) {
+            parse_str($row['queryString'], $params);
+            foreach ($params as $param => $value) {
+                $queryStringParams[$param] = $queryStringParams[$param] ?? 0;
+                $queryStringParams[$param] += $row['pageCount'];
+            }
+        }
+
+        arsort($queryStringParams);
+
+        return $queryStringParams;
+    }
+
+    public static function getQueryStringParamPagesQuery(int $siteId, string $param): ActiveQuery
+    {
+        return CacheRecord::find()
+            ->select(['uri'])
+            ->where(['siteId' => $siteId])
+            ->andWhere(['like', 'uri', $param]);
     }
 }

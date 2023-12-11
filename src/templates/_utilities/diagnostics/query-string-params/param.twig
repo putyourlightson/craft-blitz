@@ -1,0 +1,16 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/param' %}
+
+{% set isLeaf = true %}
+
+{% set param = craft.app.request.param('param') %}
+
+{% block content %}
+
+    {{ sprig('blitz/_utilities/diagnostics/components/queryStringParamPages', {
+        siteId: siteId,
+        param: param,
+        displayName: 'Page',
+        pluralDisplayName: 'Pages',
+    }) }}
+
+{% endblock %}

@@ -1,0 +1,59 @@
+{% set orderBy = orderBy ?? 'uri' %}
+{% set sortBy = sortBy ?? 'asc' %}
+{% set offset = offset ?? 0 %}
+{% set limit = 50 %}
+{% set search = search ?? null %}
+
+{% set query = craft.blitz.diagnostics.getQueryStringParamPagesQuery(siteId, param)
+    .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
+    .offset(offset)
+    .limit(limit) %}
+{% if search %}
+    {% do query.andWhere(['like', 'uri', search]) %}
+{% endif %}
+
+{% set total = query.count() %}
+{% set pages = query.all() %}
+
+{{ hiddenInput('orderBy', orderBy) }}
+{{ hiddenInput('sortBy', sortBy) }}
+
+<div s-replace="#pages" s-swap="outerHTML show:#main:top" s-indicator="#pages .elements">
+    <header id="header">
+        <div class="page-title flex">
+            <h1>Tracked {{ pluralDisplayName }}</h1>
+        </div>
+        <div id="toolbar" class="flex">
+            <div class="search-container flex-grow texticon has-filter-btn">
+                <span class="texticon-icon search icon" aria-hidden="true"></span>
+                <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+            </div>
+        </div>
+    </header>
+    <div id="pages">
+        <div class="elements">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th class="{{ orderBy == 'uri' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="uri" s-val:sort-by="{{ orderBy == 'uri' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ displayName }}
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for page in pages %}
+                        <tr>
+                            <td>
+                                {{ page.uri }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="update-spinner spinner spinner-absolute"></div>
+        </div>
+        {{ include('blitz/_utilities/diagnostics/includes/footer', { results: pages }) }}
+    </div>
+</div>

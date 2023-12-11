@@ -30,7 +30,7 @@
             {% if craft.app.getIsMultiSite() %}
                 {% include '_elements/sitemenu' with {
                     selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics?site={handle}',
+                    urlFormat: 'utilities/blitz-diagnostics/pages?site={handle}',
                 } only %}
             {% endif %}
         </div>
@@ -67,7 +67,7 @@
                     {% for page in pages %}
                         <tr>
                             <td class="code">
-                                <a href="{{ cpUrl('utilities/blitz-diagnostics', { id: page.id }) }}">
+                                <a href="{{ cpUrl('utilities/blitz-diagnostics/pages/page', { pageId: page.id }) }}">
                                     {{ page.uri ?: '/' }}
                                 </a>
                             </td>

@@ -98,7 +98,7 @@ table.editable th.code {
     margin: -15px 0 15px;
 }
 
-.blitz-diagnostics .breadcrumb-list li:last-of-type:after {
+.blitz-diagnostics .breadcrumb-list li.leaf:after {
     border: none;
 }
 

@@ -1,0 +1,14 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/page' %}
+
+{% set page = craft.blitz.diagnostics.getPage() %}
+{% set element = craft.blitz.diagnostics.getElementOfType() %}
+
+{% block content %}
+
+    {{ sprig('blitz/_utilities/diagnostics/components/elementQueries', {
+        id: page.id,
+        elementQueryType: className(element),
+        displayNamePlural: element.lowerDisplayName ~ ' queries',
+    }) }}
+
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set crumbs = [] %}
+{% set queryStringParams = craft.blitz.diagnostics.getQueryStringParams(siteId) %}
+
+{% block content %}
+
+    <header id="header">
+        <div class="page-title flex">
+            <h1>
+                {{ queryStringParams|length ? 'Tracked Query String Params'|t('blitz') : 'No Tracked Query String Params'|t('blitz') }}
+            </h1>
+            {% if craft.app.getIsMultiSite() %}
+                {% include '_elements/sitemenu' with {
+                    selectedSiteId: siteId,
+                    urlFormat: 'utilities/blitz-diagnostics/query-string-params?site={handle}',
+                } only %}
+            {% endif %}
+        </div>
+    </header>
+
+    {% if queryStringParams|length %}
+        <div class="elements">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>
+                            {{ 'Query String Param'|t('blitz') }}
+                        </th>
+                        <th>
+                            {{ 'Pages'|t('blitz') }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for param, count in queryStringParams %}
+                        <tr>
+                            <td class="code">
+                                <a href="{{ cpUrl('utilities/blitz-diagnostics/query-string-params/param', {
+                                    param: param,
+                                }) }}">
+                                    {{ param }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ count|number }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+{% endblock %}

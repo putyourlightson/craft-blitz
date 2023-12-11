@@ -6,10 +6,8 @@
 namespace putyourlightson\blitz\utilities;
 
 use Craft;
-use craft\base\Element;
 use craft\base\Utility;
 use putyourlightson\blitz\assets\BlitzAsset;
-use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\sprig\Sprig;
 
 /**
@@ -62,34 +60,6 @@ class DiagnosticsUtility extends Utility
         Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
         Sprig::$core->components->setConfig(['requestClass' => 'busy']);
 
-        $id = Craft::$app->getRequest()->getParam('id');
-
-        if ($id) {
-            $elementType = Craft::$app->getRequest()->getParam('elementType');
-            if ($elementType) {
-                /** @var Element $elementType */
-                return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elementType', [
-                    'page' => DiagnosticsHelper::getPage($id),
-                    'elementType' => new $elementType(),
-                ]);
-            }
-
-            $elementQueryType = Craft::$app->getRequest()->getParam('elementQueryType');
-            if ($elementQueryType) {
-                /** @var Element $elementQueryType */
-                return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/elementQueryType', [
-                    'page' => DiagnosticsHelper::getPage($id),
-                    'elementQueryType' => new $elementQueryType(),
-                ]);
-            }
-
-            return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/page', [
-                'page' => DiagnosticsHelper::getPage($id),
-                'elementTypes' => DiagnosticsHelper::getElementTypes($id),
-                'elementQueryTypes' => DiagnosticsHelper::getElementQueryTypes($id),
-            ]);
-        }
-
         $siteId = null;
         $site = Craft::$app->getRequest()->getParam('site');
         if ($site) {
@@ -100,7 +70,10 @@ class DiagnosticsUtility extends Utility
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;
         }
 
-        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/index', [
+        $templateSegments = array_slice(Craft::$app->getRequest()->getSegments(), 2);
+        $templatePath = 'blitz/_utilities/diagnostics/' . implode('/', $templateSegments);
+
+        return Craft::$app->getView()->renderTemplate($templatePath, [
             'siteId' => $siteId,
         ]);
     }
