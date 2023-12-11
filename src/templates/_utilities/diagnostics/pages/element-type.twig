@@ -1,0 +1,16 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/page' %}
+
+{% set page = craft.blitz.diagnostics.getPage() %}
+{% set element = craft.blitz.diagnostics.getElementOfType() %}
+
+{% block content %}
+
+    {{ sprig('blitz/_utilities/diagnostics/components/elements', {
+        id: page.id,
+        elementType: className(element),
+        displayName: element.displayName,
+        pluralDisplayName: element.pluralDisplayName,
+        hasUris: element.hasUris,
+    }) }}
+
+{% endblock %}

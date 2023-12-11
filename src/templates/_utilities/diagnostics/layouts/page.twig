@@ -1,0 +1,19 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set page = craft.blitz.diagnostics.getPage() %}
+{% if page is null %}
+    {% redirect 'utilities/blitz-diagnostics' %}
+{% endif %}
+
+{% set crumbs = [
+    {
+        label: 'Tracked Pages',
+        path: 'pages',
+    },
+    {
+        label: page.uri,
+        path: (isPage ?? false) ? null : 'pages/page?pageId=' ~ page.id,
+        class: (isPage ?? false) ? 'leaf code' : 'code',
+    },
+]|merge(crumbs ?? []) %}
+

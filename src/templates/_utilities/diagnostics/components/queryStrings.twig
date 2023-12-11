@@ -1,24 +1,20 @@
-{% set orderBy = orderBy ?? 'elementCount' %}
+{% set orderBy = orderBy ?? 'pageCount' %}
 {% set sortBy = sortBy ?? 'desc' %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
 
-{% set query = craft.blitz.diagnostics.getPagesQuery(siteId)
+{% set query = craft.blitz.diagnostics.getQueryStringsQuery(siteId)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
 {% if search %}
-    {% if search == '/' %}
-        {% do query.andWhere({ uri: ''} ) %}
-    {% else %}
-        {% do query.andWhere(['like', 'uri', search]) %}
-    {% endif %}
+    {% do query.andWhere(['like', 'uri', search]) %}
 {% endif %}
 
 {% set total = query.count() %}
-{% set pages = query.asArray().all() %}
-{% set maxVisible = pages|length + offset %}
+{% set queryStrings = query.asArray().all() %}
+{% set maxVisible = queryStrings|length + offset %}
 
 {{ hiddenInput('orderBy', orderBy) }}
 {{ hiddenInput('sortBy', sortBy) }}
@@ -26,11 +22,11 @@
 <div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
     <header id="header">
         <div class="page-title flex">
-            <h1>{{ 'Tracked Pages'|t('blitz') }}</h1>
+            <h1>{{ 'Tracked Query Strings'|t('blitz') }}</h1>
             {% if craft.app.getIsMultiSite() %}
                 {% include '_elements/sitemenu' with {
                     selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics/pages?site={handle}',
+                    urlFormat: 'utilities/blitz-diagnostics/query-strings?site={handle}',
                 } only %}
             {% endif %}
         </div>
@@ -48,34 +44,26 @@
                     <tr>
                         <th class="{{ orderBy == 'uri' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="uri" s-val:sort-by="{{ orderBy == 'uri' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                {{ 'Page'|t('blitz') }}
+                                {{ 'Query String'|t('blitz') }}
                             </button>
                         </th>
-                        <th class="{{ orderBy == 'elementCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="elementCount" s-val:sort-by="{{ orderBy == 'elementCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                {{ 'Elements'|t('blitz') }}
-                            </button>
-                        </th>
-                        <th class="{{ orderBy == 'elementQueryCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="elementQueryCount" s-val:sort-by="{{ orderBy == 'elementQueryCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                {{ 'Element Queries'|t('blitz') }}
+                        <th class="{{ orderBy == 'pageCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="pageCount" s-val:sort-by="{{ orderBy == 'pageCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Pages'|t('blitz') }}
                             </button>
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for page in pages %}
+                    {% for queryString in queryStrings %}
                         <tr>
                             <td class="code">
-                                <a href="{{ cpUrl('utilities/blitz-diagnostics/pages/page', { pageId: page.id }) }}">
-                                    {{ page.uri ?: '/' }}
+                                <a href="{{ cpUrl('utilities/blitz-diagnostics/query-strings/query-string', { queryString: queryString }) }}">
+                                    {{ queryString.uri }}
                                 </a>
                             </td>
                             <td>
-                                {{ (page.elementCount ?? 0)|number }}
-                            </td>
-                            <td>
-                                {{ (page.elementQueryCount ?? 0)|number }}
+                                {{ (queryString.pageCount ?? 0)|number }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -84,9 +72,8 @@
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
         {{ include('blitz/_utilities/diagnostics/includes/footer', {
-            results: pages,
-            itemName: 'pages'|t('blitz'),
-            exportActionUrl: actionUrl('blitz/diagnostics/export', { siteId: siteId }),
+            results: queryStrings,
+            itemName: 'query strings'|t('blitz'),
         }) }}
     </div>
 </div>

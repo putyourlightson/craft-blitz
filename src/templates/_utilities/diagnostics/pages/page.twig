@@ -1,16 +1,17 @@
-{% if page is null %}
-    {% redirect 'utilities/blitz-diagnostics' %}
-{% endif %}
+{% extends 'blitz/_utilities/diagnostics/layouts/page' %}
 
-<div class="blitz-diagnostics">
-    {{ include('blitz/_utilities/diagnostics/includes/crumbs') }}
+{% set elementTypes = craft.blitz.diagnostics.getPageElementTypes() %}
+{% set elementQueryTypes = craft.blitz.diagnostics.getPageElementQueryTypes() %}
+{% set isPage = true %}
+
+{% block content %}
 
     <h1>
         {{ elementTypes|length ? 'Tracked Element Types'|t('blitz') : 'No Tracked Element Types'|t('blitz') }}
     </h1>
 
     {% if elementTypes|length %}
-        <div class="elements" style="margin-top: 1rem;">
+        <div class="elements">
             <table class="data fullwidth">
                 <thead>
                     <tr>
@@ -26,8 +27,8 @@
                     {% for elementType in elementTypes %}
                         <tr>
                             <td class="code">
-                                <a href="{{ cpUrl('utilities/blitz-diagnostics', {
-                                    id: page.id,
+                                <a href="{{ cpUrl('utilities/blitz-diagnostics/pages/element-type', {
+                                    pageId: page.id,
                                     elementType: elementType.type
                                 }) }}">
                                     {{ elementType.type }}
@@ -49,7 +50,7 @@
     </h1>
 
     {% if elementQueryTypes|length %}
-        <div class="elements" style="margin-top: 1rem;">
+        <div class="elements">
             <table class="data fullwidth">
                 <thead>
                     <tr>
@@ -65,9 +66,9 @@
                     {% for elementQueryType in elementQueryTypes %}
                         <tr>
                             <td class="code">
-                                <a href="{{ cpUrl('utilities/blitz-diagnostics', {
-                                    id: page.id,
-                                    elementQueryType: elementQueryType.type
+                                <a href="{{ cpUrl('utilities/blitz-diagnostics/pages/element-query-type', {
+                                    pageId: page.id,
+                                    elementType: elementQueryType.type
                                 }) }}">
                                     {{ elementQueryType.type }}
                                 </a>
@@ -81,4 +82,5 @@
             </table>
         </div>
     {% endif %}
-</div>
+
+{% endblock %}
