@@ -1,0 +1,55 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set crumbs = [] %}
+{% set elements = craft.blitz.diagnostics.getElementTypes(siteId) %}
+
+{% block content %}
+
+    <header id="header">
+        <div class="page-title flex">
+            <h1>
+                {{ elements|length ? 'Tracked Elements'|t('blitz') : 'No Tracked Elements'|t('blitz') }}
+            </h1>
+            {% if craft.app.getIsMultiSite() %}
+                {% include '_elements/sitemenu' with {
+                    selectedSiteId: siteId,
+                    urlFormat: 'utilities/blitz-diagnostics/elements?site={handle}',
+                } only %}
+            {% endif %}
+        </div>
+    </header>
+
+    {% if elements|length %}
+        <div class="elements">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>
+                            {{ 'Element Type'|t('blitz') }}
+                        </th>
+                        <th>
+                            {{ 'Elements'|t('blitz') }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for element in elements %}
+                        <tr>
+                            <td class="code">
+                                <a href="{{ url('utilities/blitz-diagnostics/elements/element-type', {
+                                    elementType: element.type
+                                }) }}">
+                                    {{ element.type }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ element.pageCount|number }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+
+{% endblock %}

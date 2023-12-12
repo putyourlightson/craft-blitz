@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Element;
 use craft\db\ActiveQuery;
 use craft\db\Table;
-use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -36,30 +35,40 @@ class DiagnosticsHelper
         return $page;
     }
 
-    public static function getPageElementTypes(): array
+    public static function getElementTypes(int $siteId, ?int $pageId = null): array
     {
-        $pageId = Craft::$app->getRequest()->getRequiredParam('pageId');
+        $condition = ['siteId' => $siteId];
+
+        if ($pageId) {
+            $condition['cacheId'] = $pageId;
+        }
 
         return ElementCacheRecord::find()
-            ->select(['cacheId', 'count(*) as count', 'type'])
-            ->innerJoin(Table::ELEMENTS, 'id = elementId')
-            ->where(['cacheId' => $pageId])
+            ->select(['type', 'count(*) as pageCount'])
+            ->innerJoinWith('cache')
+            ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = elementId')
+            ->where($condition)
             ->groupBy(['type'])
-            ->orderBy(['count' => SORT_DESC])
+            ->orderBy(['pageCount' => SORT_DESC])
             ->asArray()
             ->all();
     }
 
-    public static function getPageElementQueryTypes(): array
+    public static function getElementQueryTypes(int $siteId, ?int $pageId = null): array
     {
-        $pageId = Craft::$app->getRequest()->getRequiredParam('pageId');
+        $condition = ['siteId' => $siteId];
+
+        if ($pageId) {
+            $condition['cacheId'] = $pageId;
+        }
 
         return ElementQueryCacheRecord::find()
-            ->select(['cacheId', 'count(*) as count', 'type'])
+            ->select(['type', 'count(*) as pageCount'])
+            ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
-            ->where(['cacheId' => $pageId])
+            ->where($condition)
             ->groupBy(['type'])
-            ->orderBy(['count' => SORT_DESC])
+            ->orderBy(['pageCount' => SORT_DESC])
             ->asArray()
             ->all();
     }
@@ -88,33 +97,57 @@ class DiagnosticsHelper
             ->where(['siteId' => $siteId]);
     }
 
-    public static function getElementsQuery(int $id, string $elementType): ElementQueryInterface
+    public static function getElementsQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
     {
-        $elementIds = ElementCacheRecord::find()
-            ->select(['id'])
-            ->innerJoin(Table::ELEMENTS, 'id = elementId')
-            ->where([
-                'cacheId' => $id,
-                'type' => $elementType,
-            ])
-            ->asArray()
-            ->column();
+        $condition = [
+            CacheRecord::tableName() . '.siteId' => $siteId,
+            Table::CONTENT . '.siteId' => $siteId,
+            'type' => $elementType,
+        ];
 
+        if ($pageId) {
+            $condition['cacheId'] = $pageId;
+        }
+
+        return ElementCacheRecord::find()
+            ->select([ElementCacheRecord::tableName() . '.elementId', 'count(*) as pageCount', 'title'])
+            ->innerJoinWith('cache')
+            ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = elementId')
+            ->innerJoin(Table::CONTENT, Table::CONTENT . '.elementId = ' . ElementCacheRecord::tableName() . '.elementId')
+            ->where($condition)
+            ->groupBy(['elementId', 'title'])
+            ->asArray();
+    }
+
+    public static function getElementsFromIds(int $siteId, string $elementType, array $elementIds): array
+    {
         /** @var Element $elementType */
         return $elementType::find()
             ->id($elementIds)
-            ->status(null);
+            ->siteId($siteId)
+            ->status(null)
+            ->indexBy('id')
+            ->fixedOrder()
+            ->all();
     }
 
-    public static function getElementQueriesQuery(int $id, string $elementQueryType): ActiveQuery
+    public static function getElementQueriesQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
     {
+        $condition = [
+            'siteId' => $siteId,
+            'type' => $elementType,
+        ];
+
+        if ($pageId) {
+            $condition['cacheId'] = $pageId;
+        }
+
         return ElementQueryCacheRecord::find()
-            ->select(['params'])
+            ->select(['params', 'count(*) as pageCount'])
+            ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
-            ->where([
-                'cacheId' => $id,
-                'type' => $elementQueryType,
-            ]);
+            ->where($condition)
+            ->groupBy('params');
     }
 
     public static function getElementQuerySql(string $elementQueryType, string $params): string
@@ -134,7 +167,7 @@ class DiagnosticsHelper
             ->getRawSql();
     }
 
-    public static function getQueryStringParams(int $siteId): array
+    public static function getParams(int $siteId): array
     {
         $rows = CacheRecord::find()
             ->select(['REGEXP_SUBSTR(uri, "(?<=[?]).*") queryString', 'count(*) as pageCount'])
@@ -157,7 +190,7 @@ class DiagnosticsHelper
         return $queryStringParams;
     }
 
-    public static function getQueryStringParamPagesQuery(int $siteId, string $param): ActiveQuery
+    public static function getParamPagesQuery(int $siteId, string $param): ActiveQuery
     {
         return CacheRecord::find()
             ->select(['uri'])

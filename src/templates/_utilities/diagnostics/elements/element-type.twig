@@ -1,13 +1,11 @@
-{% extends 'blitz/_utilities/diagnostics/layouts/page' %}
+{% extends 'blitz/_utilities/diagnostics/layouts/elements' %}
 
-{% set page = craft.blitz.diagnostics.getPage() %}
-{% set element = craft.blitz.diagnostics.getElementOfType(page.id) %}
+{% set element = craft.blitz.diagnostics.getElementOfType() %}
 
 {% block content %}
 
     {{ sprig('blitz/_utilities/diagnostics/components/elements', {
         siteId: siteId,
-        pageId: page.id,
         elementType: className(element),
         displayName: element.displayName,
         pluralDisplayName: element.pluralDisplayName,

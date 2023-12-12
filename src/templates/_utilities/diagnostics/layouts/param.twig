@@ -3,11 +3,11 @@
 {% set crumbs = [
     {
         label: 'Tracked Query String Params',
-        path: 'query-string-params',
+        path: 'params',
     },
     {
         label: param,
-        path: (isLeaf ?? false) ? null : 'query-string-params/param?param=' ~ param,
+        path: (isLeaf ?? false) ? null : 'params/param?param=' ~ param,
         class: (isLeaf ?? false) ? 'leaf code' : 'code',
     },
 ]|merge(crumbs ?? []) %}

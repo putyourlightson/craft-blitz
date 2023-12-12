@@ -7,14 +7,14 @@
                 {% else %}
                     <button type="button" class="page-link prev-page disabled" title="Previous Page"></button>
                 {% endif %}
-                {% if results|length < total %}
+                {% if rows|length < total %}
                     <button type="button" sprig s-val:offset="{{ offset + limit }}" class="page-link next-page" title="Next Page"></button>
                 {% else %}
                     <button type="button" role="button" class="page-link next-page disabled" title="Next Page"></button>
                 {% endif %}
             </nav>
             <div class="page-info">
-                {% set maxVisible = results|length + offset %}
+                {% set maxVisible = rows|length + offset %}
                 {{ (maxVisible > 0 ? offset + 1 : 0)|number }}–{{ maxVisible|number }}
                 of {{ total|number }} {{ (pluralDisplayName ?? 'pages')|lower }}
             </div>

@@ -1,10 +1,10 @@
-{% set orderBy = orderBy ?? 'title' %}
-{% set sortBy = sortBy ?? 'asc' %}
+{% set orderBy = orderBy ?? (pageId is defined ? 'title' : 'pageCount') %}
+{% set sortBy = sortBy ?? (pageId is defined ? 'asc' : 'desc') %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
 
-{% set query = craft.blitz.diagnostics.getElementsQuery(id, elementType)
+{% set query = craft.blitz.diagnostics.getElementsQuery(siteId, elementType, pageId ?? null)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
@@ -13,7 +13,9 @@
 {% endif %}
 
 {% set total = query.count() %}
-{% set elements = query.all() %}
+{% set rows = query.all() %}
+{% set elementIds = rows|map(row => row.elementId) %}
+{% set elements = craft.blitz.diagnostics.getElementsFromIds(siteId, elementType, elementIds) %}
 
 {{ hiddenInput('orderBy', orderBy) }}
 {{ hiddenInput('sortBy', sortBy) }}
@@ -21,7 +23,7 @@
 <div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements .elements">
     <header id="header">
         <div class="page-title flex">
-            <h1>Tracked {{ pluralDisplayName }}</h1>
+            <h1>{{ pluralDisplayName }}</h1>
         </div>
         <div id="toolbar" class="flex">
             <div class="search-container flex-grow texticon has-filter-btn">
@@ -40,6 +42,13 @@
                                 {{ displayName }}
                             </button>
                         </th>
+                        {% if pageId is not defined %}
+                            <th class="{{ orderBy == 'pageCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                                <button type="button" sprig s-val:order-by="pageCount" s-val:sort-by="{{ orderBy == 'pageCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                    {{ 'Pages'|t('blitz') }}
+                                </button>
+                            </th>
+                        {% endif %}
                         {% if hasUris %}
                             <th>
                                 <span data-icon="world"></span>
@@ -48,11 +57,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for element in elements %}
+                    {% for row in rows %}
+                        {% set element = elements[row.elementId] %}
                         <tr>
                             <td>
                                 {{ include ('_elements/element') }}
                             </td>
+                            {% if pageId is not defined %}
+                                <td>
+                                    {{ row.pageCount }}
+                                </td>
+                            {% endif %}
                             {% if hasUris %}
                                 <td data-title="Link" data-attr="link">
                                     {% set url = element.url %}

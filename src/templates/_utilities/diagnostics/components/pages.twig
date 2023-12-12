@@ -17,8 +17,8 @@
 {% endif %}
 
 {% set total = query.count() %}
-{% set pages = query.asArray().all() %}
-{% set maxVisible = pages|length + offset %}
+{% set rows = query.asArray().all() %}
+{% set maxVisible = rows|length + offset %}
 
 {{ hiddenInput('orderBy', orderBy) }}
 {{ hiddenInput('sortBy', sortBy) }}
@@ -64,18 +64,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for page in pages %}
+                    {% for row in rows %}
                         <tr>
                             <td class="code">
-                                <a href="{{ cpUrl('utilities/blitz-diagnostics/pages/page', { pageId: page.id }) }}">
-                                    {{ page.uri ?: '/' }}
+                                <a href="{{ url('utilities/blitz-diagnostics/pages/page', { pageId: row.id }) }}">
+                                    {{ row.uri ?: '/' }}
                                 </a>
                             </td>
                             <td>
-                                {{ (page.elementCount ?? 0)|number }}
+                                {{ (row.elementCount ?? 0)|number }}
                             </td>
                             <td>
-                                {{ (page.elementQueryCount ?? 0)|number }}
+                                {{ (row.elementQueryCount ?? 0)|number }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -84,8 +84,6 @@
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
         {{ include('blitz/_utilities/diagnostics/includes/footer', {
-            results: pages,
-            itemName: 'pages'|t('blitz'),
             exportActionUrl: actionUrl('blitz/diagnostics/export', { siteId: siteId }),
         }) }}
     </div>

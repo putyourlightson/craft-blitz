@@ -1,10 +1,10 @@
-{% set orderBy = orderBy ?? 'params' %}
-{% set sortBy = sortBy ?? 'asc' %}
+{% set orderBy = orderBy ?? 'pageCount' %}
+{% set sortBy = sortBy ?? 'desc' %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
 
-{% set query = craft.blitz.diagnostics.getElementQueriesQuery(id, elementQueryType)
+{% set query = craft.blitz.diagnostics.getElementQueriesQuery(siteId, elementType, pageId ?? null)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
@@ -13,18 +13,23 @@
 {% endif %}
 
 {% set total = query.count() %}
-{% set elementQueries = query.asArray().all() %}
+{% set rows = query.asArray().all() %}
 
 {{ hiddenInput('orderBy', orderBy) }}
 {{ hiddenInput('sortBy', sortBy) }}
 
 <div s-replace="#elementqueries" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries .elements">
-    <div class="set-table flex">
-        <div class="search-container flex-grow texticon has-filter-btn">
-            <span class="texticon-icon search icon" aria-hidden="true"></span>
-            <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+    <header id="header">
+        <div class="page-title flex">
+            <h1>{{ pluralDisplayName }}</h1>
         </div>
-    </div>
+        <div id="toolbar" class="flex">
+            <div class="search-container flex-grow texticon has-filter-btn">
+                <span class="texticon-icon search icon" aria-hidden="true"></span>
+                <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+            </div>
+        </div>
+    </header>
     <div id="elementqueries">
         <div class="elements">
             <table class="data fullwidth">
@@ -38,28 +43,41 @@
                         <th>
                             {{ 'SQL'|t('blitz') }}
                         </th>
+                        {% if pageId is not defined %}
+                            <th class="{{ orderBy == 'pageCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                                <button type="button" sprig s-val:order-by="pageCount" s-val:sort-by="{{ orderBy == 'pageCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                    {{ 'Pages'|t('blitz') }}
+                                </button>
+                            </th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
-                    {% for elementQuery in elementQueries %}
+                    {% for row in rows %}
                         <tr>
                             <td class="code">
-                                {{ elementQuery.params }}
+                                {{ row.params }}
                             </td>
                             <td class="code">
                                 {% set sql = 'test' %}
                                 {% include '_includes/forms/copytext' with {
                                     id: 'auth-header',
                                     buttonId: 'copy-btn',
-                                    value: craft.blitz.diagnostics.getElementQuerySql(elementQueryType, elementQuery.params),
+                                    value: craft.blitz.diagnostics.getElementQuerySql(elementType, row.params),
+                                    size: 40,
                                 } %}
                             </td>
+                            {% if pageId is not defined %}
+                                <td>
+                                    {{ row.pageCount }}
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
-        {{ include('blitz/_utilities/diagnostics/includes/footer', { results: elementQueries }) }}
+        {{ include('blitz/_utilities/diagnostics/includes/footer') }}
     </div>
 </div>

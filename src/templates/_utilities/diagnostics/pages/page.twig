@@ -1,13 +1,14 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/page' %}
 
-{% set elementTypes = craft.blitz.diagnostics.getPageElementTypes() %}
-{% set elementQueryTypes = craft.blitz.diagnostics.getPageElementQueryTypes() %}
+{% set page = craft.blitz.diagnostics.getPage() %}
+{% set elementTypes = craft.blitz.diagnostics.getElementTypes(siteId, page.id) %}
+{% set elementQueryTypes = craft.blitz.diagnostics.getElementQueryTypes(siteId, page.id) %}
 {% set isLeaf = true %}
 
 {% block content %}
 
     <h1>
-        {{ elementTypes|length ? 'Tracked Element Types'|t('blitz') : 'No Tracked Element Types'|t('blitz') }}
+        {{ elementTypes|length ? 'Tracked Elements'|t('blitz') : 'No Tracked Elements'|t('blitz') }}
     </h1>
 
     {% if elementTypes|length %}
@@ -27,7 +28,7 @@
                     {% for elementType in elementTypes %}
                         <tr>
                             <td class="code">
-                                <a href="{{ cpUrl('utilities/blitz-diagnostics/pages/element-type', {
+                                <a href="{{ url('utilities/blitz-diagnostics/pages/element-type', {
                                     pageId: page.id,
                                     elementType: elementType.type
                                 }) }}">
@@ -35,7 +36,7 @@
                                 </a>
                             </td>
                             <td>
-                                {{ elementType.count|number }}
+                                {{ elementType.pageCount|number }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -46,7 +47,7 @@
     {% endif %}
 
     <h1>
-        {{ elementQueryTypes|length ? 'Tracked Element Query Types'|t('blitz') : 'No Tracked Element Query Types'|t('blitz') }}
+        {{ elementQueryTypes|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
     </h1>
 
     {% if elementQueryTypes|length %}
@@ -66,7 +67,7 @@
                     {% for elementQueryType in elementQueryTypes %}
                         <tr>
                             <td class="code">
-                                <a href="{{ cpUrl('utilities/blitz-diagnostics/pages/element-query-type', {
+                                <a href="{{ url('utilities/blitz-diagnostics/pages/element-query-type', {
                                     pageId: page.id,
                                     elementType: elementQueryType.type
                                 }) }}">
@@ -74,7 +75,7 @@
                                 </a>
                             </td>
                             <td>
-                                {{ elementQueryType.count|number }}
+                                {{ elementQueryType.pageCount|number }}
                             </td>
                         </tr>
                     {% endfor %}

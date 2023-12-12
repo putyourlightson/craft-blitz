@@ -4,7 +4,7 @@
 {% set limit = 50 %}
 {% set search = search ?? null %}
 
-{% set query = craft.blitz.diagnostics.getQueryStringParamPagesQuery(siteId, param)
+{% set query = craft.blitz.diagnostics.getParamPagesQuery(siteId, param)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
@@ -13,7 +13,7 @@
 {% endif %}
 
 {% set total = query.count() %}
-{% set pages = query.all() %}
+{% set rows = query.all() %}
 
 {{ hiddenInput('orderBy', orderBy) }}
 {{ hiddenInput('sortBy', sortBy) }}
@@ -21,7 +21,7 @@
 <div s-replace="#pages" s-swap="outerHTML show:#main:top" s-indicator="#pages .elements">
     <header id="header">
         <div class="page-title flex">
-            <h1>Tracked {{ pluralDisplayName }}</h1>
+            <h1>{{ pluralDisplayName }}</h1>
         </div>
         <div id="toolbar" class="flex">
             <div class="search-container flex-grow texticon has-filter-btn">
@@ -43,10 +43,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for page in pages %}
+                    {% for row in rows %}
                         <tr>
-                            <td>
-                                {{ page.uri }}
+                            <td class="code">
+                                {{ row.uri }}
                             </td>
                         </tr>
                     {% endfor %}
@@ -54,6 +54,6 @@
             </table>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
-        {{ include('blitz/_utilities/diagnostics/includes/footer', { results: pages }) }}
+        {{ include('blitz/_utilities/diagnostics/includes/footer') }}
     </div>
 </div>

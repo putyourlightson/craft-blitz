@@ -1,0 +1,9 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set crumbs = [
+    {
+        label: 'Tracked Elements',
+        path: 'elements',
+    },
+]|merge(crumbs ?? []) %}
+

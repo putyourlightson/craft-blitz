@@ -4,14 +4,14 @@
         <div id="crumbs">
             <ul class="breadcrumb-list">
                 <li>
-                    <a href="{{ cpUrl('utilities/blitz-diagnostics') }}">
+                    <a href="{{ url('utilities/blitz-diagnostics') }}">
                         {{ 'Blitz Diagnostics'|t('blitz') }}
                     </a>
                 </li>
                 {% for crumb in crumbs %}
                     <li class="{{ crumb.class ?? '' }}">
                         {% if crumb.path ?? false %}
-                            <a href="{{ cpUrl('utilities/blitz-diagnostics/' ~ crumb.path) }}">
+                            <a href="{{ url('utilities/blitz-diagnostics/' ~ crumb.path) }}">
                                 {{ crumb.label|t('blitz') }}
                             </a>
                         {% else %}

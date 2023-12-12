@@ -1,49 +1,49 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/base' %}
 
 {% set crumbs = [] %}
-{% set queryStringParams = craft.blitz.diagnostics.getQueryStringParams(siteId) %}
+{% set elements = craft.blitz.diagnostics.getElementQueryTypes(siteId) %}
 
 {% block content %}
 
     <header id="header">
         <div class="page-title flex">
             <h1>
-                {{ queryStringParams|length ? 'Tracked Query String Params'|t('blitz') : 'No Tracked Query String Params'|t('blitz') }}
+                {{ elements|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
             </h1>
             {% if craft.app.getIsMultiSite() %}
                 {% include '_elements/sitemenu' with {
                     selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics/query-string-params?site={handle}',
+                    urlFormat: 'utilities/blitz-diagnostics/element-queries?site={handle}',
                 } only %}
             {% endif %}
         </div>
     </header>
 
-    {% if queryStringParams|length %}
+    {% if elements|length %}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>
                     <tr>
                         <th>
-                            {{ 'Query String Param'|t('blitz') }}
+                            {{ 'Element Type'|t('blitz') }}
                         </th>
                         <th>
-                            {{ 'Pages'|t('blitz') }}
+                            {{ 'Elements'|t('blitz') }}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for param, count in queryStringParams %}
+                    {% for element in elements %}
                         <tr>
                             <td class="code">
-                                <a href="{{ cpUrl('utilities/blitz-diagnostics/query-string-params/param', {
-                                    param: param,
+                                <a href="{{ url('utilities/blitz-diagnostics/element-queries/element-query-type', {
+                                    elementType: element.type
                                 }) }}">
-                                    {{ param }}
+                                    {{ element.type }}
                                 </a>
                             </td>
                             <td>
-                                {{ count|number }}
+                                {{ element.pageCount|number }}
                             </td>
                         </tr>
                     {% endfor %}
