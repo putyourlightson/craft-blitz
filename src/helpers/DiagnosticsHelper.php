@@ -77,7 +77,7 @@ class DiagnosticsHelper
     {
         $elementType = Craft::$app->getRequest()->getParam('elementType');
 
-        return new $elementType;
+        return new $elementType();
     }
 
     public static function getPagesQuery(int $siteId): ActiveQuery
