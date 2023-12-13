@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Element;
 use craft\db\ActiveQuery;
 use craft\db\Table;
-use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -125,7 +124,8 @@ class DiagnosticsHelper
                     ->select(['cacheId', 'count(*) as elementQueryCount'])
                     ->groupBy(['cacheId']),
             ], 'id = elementQueries.cacheId')
-            ->where(['siteId' => $siteId]);
+            ->where(['siteId' => $siteId])
+            ->asArray();
     }
 
     public static function getElementsQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
@@ -166,10 +166,11 @@ class DiagnosticsHelper
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
-            ->groupBy('params');
+            ->groupBy('params')
+            ->asArray();
     }
 
-    public static function getElementQueryWithIds(int $siteId, string $elementType, array $elementIds): ElementQuery
+    public static function getElementsFromIds(int $siteId, string $elementType, array $elementIds): array
     {
         /** @var Element $elementType */
         return $elementType::find()
@@ -177,7 +178,8 @@ class DiagnosticsHelper
             ->status(null)
             ->id($elementIds)
             ->fixedOrder()
-            ->indexBy('id');
+            ->indexBy('id')
+            ->all();
     }
 
     public static function getElementQuerySql(string $elementQueryType, string $params): string

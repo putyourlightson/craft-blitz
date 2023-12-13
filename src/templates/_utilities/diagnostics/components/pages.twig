@@ -17,7 +17,7 @@
 {% endif %}
 
 {% set total = query.count() %}
-{% set rows = query.asArray().all() %}
+{% set rows = query.all() %}
 {% set maxVisible = rows|length + offset %}
 
 <div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">

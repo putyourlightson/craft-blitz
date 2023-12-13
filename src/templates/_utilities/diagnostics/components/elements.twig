@@ -10,13 +10,14 @@
     {% do query.andWhere(['like', 'title', search]) %}
 {% endif %}
 
-{% set total = query.count() %}
-{% set rows = query.all() %}
-{% set elementIds = rows|map(row => row.elementId) %}
-{% set elements = craft.blitz.diagnostics.getElementQueryWithIds(siteId, elementType, elementIds)
+{# The count can only be correctly calculated without a limit. #}
+{% set total = clone(query).count() %}
+{% set rows = query
     .offset(offset)
     .limit(limit)
     .all() %}
+{% set elementIds = rows|map(row => row.elementId) %}
+{% set elements = craft.blitz.diagnostics.getElementsFromIds(siteId, elementType, elementIds) %}
 
 <div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements .elements">
     <header id="header">
