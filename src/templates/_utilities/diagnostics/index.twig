@@ -2,24 +2,44 @@
 
 {% block content %}
 
+    {% if craft.app.getIsMultiSite() %}
+        <header id="header">
+            <div class="page-title flex">
+                <h1>{{ 'Blitz Diagnostics'|t('blitz') }}</h1>
+                {% include '_elements/sitemenu' with {
+                    selectedSiteId: siteId,
+                    urlFormat: 'utilities/blitz-diagnostics?site={handle}',
+                } only %}
+            </div>
+        </header>
+        <br>
+    {% endif %}
     <h1>
         <a href="{{ url('utilities/blitz-diagnostics/pages') }}" class="go">
-            {{- 'Tracked Pages'|t('blitz') -}}
+            {% set count = craft.blitz.diagnostics.getPagesCount(siteId) %}
+            {{ count|number }}
+            {{ '{num, plural, =1{Tracked Page} other{Tracked Pages}}'|t('blitz', { num: count }) -}}
         </a>
     </h1>
     <h1>
         <a href="{{ url('utilities/blitz-diagnostics/params') }}" class="go">
-            {{- 'Tracked Query String Params'|t('blitz') -}}
+            {% set count = craft.blitz.diagnostics.getParamsCount(siteId) %}
+            {{ count|number }}
+            {{ '{num, plural, =1{Tracked Query String Param} other{Tracked Query String Params}}'|t('blitz', { num: count }) -}}
         </a>
     </h1>
     <h1>
         <a href="{{ url('utilities/blitz-diagnostics/elements') }}" class="go">
-            {{- 'Tracked Elements'|t('blitz') -}}
+            {% set count = craft.blitz.diagnostics.getElementsCount(siteId) %}
+            {{ count|number }}
+            {{ '{num, plural, =1{Tracked Element} other{Tracked Elements}}'|t('blitz', { num: count }) -}}
         </a>
     </h1>
     <h1>
         <a href="{{ url('utilities/blitz-diagnostics/element-queries') }}" class="go">
-            {{- 'Tracked Element Queries'|t('blitz') -}}
+            {% set count = craft.blitz.diagnostics.getElementQueriesCount(siteId) %}
+            {{ count|number }}
+            {{ '{num, plural, =1{Tracked Element Query} other{Tracked Element Queries}}'|t('blitz', { num: count }) -}}
         </a>
     </h1>
 

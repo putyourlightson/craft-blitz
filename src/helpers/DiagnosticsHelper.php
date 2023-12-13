@@ -21,6 +21,35 @@ use putyourlightson\blitz\services\CacheRequestService;
  */
 class DiagnosticsHelper
 {
+    public static function getPagesCount(int $siteId): int
+    {
+        return CacheRecord::find()
+            ->where(['siteId' => $siteId])
+            ->count();
+    }
+
+    public static function getParamsCount(int $siteId): int
+    {
+        return count(self::getParams($siteId));
+    }
+
+    public static function getElementsCount(int $siteId): int
+    {
+        return ElementCacheRecord::find()
+            ->innerJoinWith('cache')
+            ->where(['siteId' => $siteId])
+            ->count();
+    }
+
+    public static function getElementQueriesCount(int $siteId): int
+    {
+        return ElementQueryCacheRecord::find()
+            ->innerJoinWith('cache')
+            ->innerJoinWith('elementQuery')
+            ->where(['siteId' => $siteId])
+            ->count();
+    }
+
     public static function getPage(): array|null
     {
         $pageId = Craft::$app->getRequest()->getRequiredParam('pageId');
