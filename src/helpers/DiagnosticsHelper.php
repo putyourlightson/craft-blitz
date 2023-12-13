@@ -13,6 +13,7 @@ use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
 
 /**
  * @since 4.10.0
@@ -44,12 +45,12 @@ class DiagnosticsHelper
         }
 
         return ElementCacheRecord::find()
-            ->select(['type', 'count(*) as pageCount'])
+            ->select(['type', 'count(DISTINCT elementId) as count'])
             ->innerJoinWith('cache')
             ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = elementId')
             ->where($condition)
-            ->groupBy(['type'])
-            ->orderBy(['pageCount' => SORT_DESC])
+            ->groupBy(['type', 'elementId'])
+            ->orderBy(['count' => SORT_DESC])
             ->asArray()
             ->all();
     }
@@ -63,12 +64,12 @@ class DiagnosticsHelper
         }
 
         return ElementQueryCacheRecord::find()
-            ->select(['type', 'count(*) as pageCount'])
+            ->select(['type', 'count(DISTINCT ' . ElementQueryRecord::tableName() . '.id) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
             ->groupBy(['type'])
-            ->orderBy(['pageCount' => SORT_DESC])
+            ->orderBy(['count' => SORT_DESC])
             ->asArray()
             ->all();
     }
@@ -110,7 +111,7 @@ class DiagnosticsHelper
         }
 
         return ElementCacheRecord::find()
-            ->select([ElementCacheRecord::tableName() . '.elementId', 'count(*) as pageCount', 'title'])
+            ->select([ElementCacheRecord::tableName() . '.elementId', 'count(*) as count', 'title'])
             ->innerJoinWith('cache')
             ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = elementId')
             ->innerJoin(Table::CONTENT, Table::CONTENT . '.elementId = ' . ElementCacheRecord::tableName() . '.elementId')
@@ -143,7 +144,7 @@ class DiagnosticsHelper
         }
 
         return ElementQueryCacheRecord::find()
-            ->select(['params', 'count(*) as pageCount'])
+            ->select(['params', 'count(*) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
@@ -170,7 +171,7 @@ class DiagnosticsHelper
     public static function getParams(int $siteId): array
     {
         $rows = CacheRecord::find()
-            ->select(['REGEXP_SUBSTR(uri, "(?<=[?]).*") queryString', 'count(*) as pageCount'])
+            ->select(['REGEXP_SUBSTR(uri, "(?<=[?]).*") queryString', 'count(*) as count'])
             ->where(['siteId' => $siteId])
             ->groupBy('queryString')
             ->asArray()
@@ -181,7 +182,7 @@ class DiagnosticsHelper
             parse_str($row['queryString'], $params);
             foreach ($params as $param => $value) {
                 $queryStringParams[$param] = $queryStringParams[$param] ?? 0;
-                $queryStringParams[$param] += $row['pageCount'];
+                $queryStringParams[$param] += $row['count'];
             }
         }
 

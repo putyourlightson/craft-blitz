@@ -1,14 +1,14 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/base' %}
 
 {% set crumbs = [] %}
-{% set elements = craft.blitz.diagnostics.getElementTypes(siteId) %}
+{% set elementTypes = craft.blitz.diagnostics.getElementTypes(siteId) %}
 
 {% block content %}
 
     <header id="header">
         <div class="page-title flex">
             <h1>
-                {{ elements|length ? 'Tracked Elements'|t('blitz') : 'No Tracked Elements'|t('blitz') }}
+                {{ elementTypes|length ? 'Tracked Elements'|t('blitz') : 'No Tracked Elements'|t('blitz') }}
             </h1>
             {% if craft.app.getIsMultiSite() %}
                 {% include '_elements/sitemenu' with {
@@ -19,7 +19,7 @@
         </div>
     </header>
 
-    {% if elements|length %}
+    {% if elementTypes|length %}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>
@@ -33,17 +33,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for element in elements %}
+                    {% for elementType in elementTypes %}
                         <tr>
                             <td class="code">
                                 <a href="{{ url('utilities/blitz-diagnostics/elements/element-type', {
-                                    elementType: element.type
+                                    elementType: elementType.type
                                 }) }}">
-                                    {{ element.type }}
+                                    {{ elementType.type }}
                                 </a>
                             </td>
                             <td>
-                                {{ element.pageCount|number }}
+                                {{ elementType.count|number }}
                             </td>
                         </tr>
                     {% endfor %}

@@ -1,4 +1,4 @@
-{% set orderBy = orderBy ?? 'pageCount' %}
+{% set orderBy = orderBy ?? 'count' %}
 {% set sortBy = sortBy ?? 'desc' %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
@@ -44,8 +44,8 @@
                             {{ 'SQL'|t('blitz') }}
                         </th>
                         {% if pageId is not defined %}
-                            <th class="{{ orderBy == 'pageCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                                <button type="button" sprig s-val:order-by="pageCount" s-val:sort-by="{{ orderBy == 'pageCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                            <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                                <button type="button" sprig s-val:order-by="count" s-val:sort-by="{{ orderBy == 'count' and sortBy == 'asc' ? 'desc' : 'asc' }}">
                                     {{ 'Pages'|t('blitz') }}
                                 </button>
                             </th>
@@ -69,7 +69,7 @@
                             </td>
                             {% if pageId is not defined %}
                                 <td>
-                                    {{ row.pageCount }}
+                                    {{ row.count }}
                                 </td>
                             {% endif %}
                         </tr>

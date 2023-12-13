@@ -1,14 +1,14 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/base' %}
 
 {% set crumbs = [] %}
-{% set elements = craft.blitz.diagnostics.getElementQueryTypes(siteId) %}
+{% set elementQueryTypes = craft.blitz.diagnostics.getElementQueryTypes(siteId) %}
 
 {% block content %}
 
     <header id="header">
         <div class="page-title flex">
             <h1>
-                {{ elements|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
+                {{ elementQueryTypes|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
             </h1>
             {% if craft.app.getIsMultiSite() %}
                 {% include '_elements/sitemenu' with {
@@ -19,7 +19,7 @@
         </div>
     </header>
 
-    {% if elements|length %}
+    {% if elementQueryTypes|length %}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>
@@ -28,22 +28,22 @@
                             {{ 'Element Type'|t('blitz') }}
                         </th>
                         <th>
-                            {{ 'Elements'|t('blitz') }}
+                            {{ 'Element Queries'|t('blitz') }}
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for element in elements %}
+                    {% for elementQueryType in elementQueryTypes %}
                         <tr>
                             <td class="code">
                                 <a href="{{ url('utilities/blitz-diagnostics/element-queries/element-query-type', {
-                                    elementType: element.type
+                                    elementType: elementQueryType.type
                                 }) }}">
-                                    {{ element.type }}
+                                    {{ elementQueryType.type }}
                                 </a>
                             </td>
                             <td>
-                                {{ element.pageCount|number }}
+                                {{ elementQueryType.count|number }}
                             </td>
                         </tr>
                     {% endfor %}
