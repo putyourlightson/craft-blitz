@@ -184,13 +184,13 @@ class DiagnosticsHelper
             ->all();
     }
 
-    public static function getElementQuerySql(string $elementQueryType, string $params): string
+    public static function getElementQuerySql(string $elementQueryType, string $params): ?string
     {
         $params = Json::decodeIfJson($params);
 
         // Ensure JSON decode is successful
         if (!is_array($params)) {
-            return 'Invalid params.';
+            return null;
         }
 
         $elementQuery = RefreshCacheHelper::getElementQueryWithParams($elementQueryType, $params);
@@ -201,7 +201,7 @@ class DiagnosticsHelper
                 ->createCommand()
                 ->getRawSql();
         } catch (QueryAbortedException) {
-            return 'Invalid params.';
+            return null;
         }
     }
 

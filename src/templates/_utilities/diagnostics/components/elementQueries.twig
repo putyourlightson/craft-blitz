@@ -64,11 +64,16 @@
                                 }) }}
                             </td>
                             <td class="code">
-                                {{ include('blitz/_utilities/diagnostics/includes/copytext', {
-                                    id: 'sql-' ~ row.id,
-                                    buttonId: 'copy-btn-sql-' ~ row.id,
-                                    value: craft.blitz.diagnostics.getElementQuerySql(elementType, row.params),
-                                }) }}
+                                {% set value = craft.blitz.diagnostics.getElementQuerySql(elementType, row.params) %}
+                                {% if value %}
+                                    {{ include('blitz/_utilities/diagnostics/includes/copytext', {
+                                        id: 'sql-' ~ row.id,
+                                        buttonId: 'copy-btn-sql-' ~ row.id,
+                                        value: value,
+                                    }) }}
+                                {% else %}
+                                    {{ 'Invalid params'|t('blitz') }}
+                                {% endif %}
                             </td>
                             {% if pageId is not defined %}
                                 <td>
