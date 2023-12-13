@@ -57,16 +57,18 @@
                     {% for row in rows %}
                         <tr>
                             <td class="code">
-                                {{ row.params }}
+                                {{ include('blitz/_utilities/diagnostics/includes/copytext', {
+                                    id: 'params-' ~ row.id,
+                                    buttonId: 'copy-btn-params-' ~ row.id,
+                                    value: row.params,
+                                }) }}
                             </td>
                             <td class="code">
-                                {% set sql = 'test' %}
-                                {% include '_includes/forms/copytext' with {
-                                    id: 'auth-header',
-                                    buttonId: 'copy-btn',
+                                {{ include('blitz/_utilities/diagnostics/includes/copytext', {
+                                    id: 'sql-' ~ row.id,
+                                    buttonId: 'copy-btn-sql-' ~ row.id,
                                     value: craft.blitz.diagnostics.getElementQuerySql(elementType, row.params),
-                                    size: 40,
-                                } %}
+                                }) }}
                             </td>
                             {% if pageId is not defined %}
                                 <td>

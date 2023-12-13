@@ -13,6 +13,7 @@ use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\services\CacheRequestService;
 
 /**
@@ -162,11 +163,11 @@ class DiagnosticsHelper
         }
 
         return ElementQueryCacheRecord::find()
-            ->select(['params', 'count(*) as count'])
+            ->select([ElementQueryRecord::tableName() . '.id', 'params', 'count(*) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
-            ->groupBy('params')
+            ->groupBy(ElementQueryRecord::tableName() . '.id')
             ->asArray();
     }
 
@@ -186,7 +187,7 @@ class DiagnosticsHelper
     {
         $params = Json::decodeIfJson($params);
 
-        // If json decode failed
+        // Ensure JSON decode is successful
         if (!is_array($params)) {
             return 'Invalid params.';
         }

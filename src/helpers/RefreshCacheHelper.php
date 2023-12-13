@@ -135,7 +135,7 @@ class RefreshCacheHelper
 
         $params = Json::decodeIfJson($elementQueryRecord->params);
 
-        // If json decode failed
+        // Ensure JSON decode is successful
         if (!is_array($params)) {
             return [];
         }
