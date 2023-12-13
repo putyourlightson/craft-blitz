@@ -103,6 +103,10 @@ class GenerateDataModel extends BaseDataModel
 
     public function addElement(ElementInterface $element): void
     {
+        if ($element->id === null) {
+            return;
+        }
+
         $this->addElementId($element->id);
     }
 
