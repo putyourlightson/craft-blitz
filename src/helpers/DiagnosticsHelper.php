@@ -9,11 +9,11 @@ use Craft;
 use craft\base\Element;
 use craft\db\ActiveQuery;
 use craft\db\Table;
+use craft\elements\db\ElementQuery;
 use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
-use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\services\CacheRequestService;
 
 /**
@@ -38,7 +38,7 @@ class DiagnosticsHelper
         return ElementCacheRecord::find()
             ->innerJoinWith('cache')
             ->where(['siteId' => $siteId])
-            ->count();
+            ->count('DISTINCT elementId');
     }
 
     public static function getElementQueriesCount(int $siteId): int
@@ -47,7 +47,7 @@ class DiagnosticsHelper
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where(['siteId' => $siteId])
-            ->count();
+            ->count('DISTINCT queryId');
     }
 
     public static function getPage(): array|null
@@ -94,7 +94,7 @@ class DiagnosticsHelper
         }
 
         return ElementQueryCacheRecord::find()
-            ->select(['type', 'count(DISTINCT ' . ElementQueryRecord::tableName() . '.id) as count'])
+            ->select(['type', 'count(DISTINCT queryId) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
@@ -150,18 +150,6 @@ class DiagnosticsHelper
             ->asArray();
     }
 
-    public static function getElementsFromIds(int $siteId, string $elementType, array $elementIds): array
-    {
-        /** @var Element $elementType */
-        return $elementType::find()
-            ->id($elementIds)
-            ->siteId($siteId)
-            ->status(null)
-            ->indexBy('id')
-            ->fixedOrder()
-            ->all();
-    }
-
     public static function getElementQueriesQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
     {
         $condition = [
@@ -179,6 +167,17 @@ class DiagnosticsHelper
             ->innerJoinWith('elementQuery')
             ->where($condition)
             ->groupBy('params');
+    }
+
+    public static function getElementQueryWithIds(int $siteId, string $elementType, array $elementIds): ElementQuery
+    {
+        /** @var Element $elementType */
+        return $elementType::find()
+            ->siteId($siteId)
+            ->status(null)
+            ->id($elementIds)
+            ->fixedOrder()
+            ->indexBy('id');
     }
 
     public static function getElementQuerySql(string $elementQueryType, string $params): string

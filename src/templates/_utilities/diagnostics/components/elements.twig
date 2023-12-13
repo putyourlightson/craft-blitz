@@ -5,9 +5,7 @@
 {% set search = search ?? null %}
 
 {% set query = craft.blitz.diagnostics.getElementsQuery(siteId, elementType, pageId ?? null)
-    .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
-    .offset(offset)
-    .limit(limit) %}
+    .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) }) %}
 {% if search %}
     {% do query.andWhere(['like', 'title', search]) %}
 {% endif %}
@@ -15,7 +13,10 @@
 {% set total = query.count() %}
 {% set rows = query.all() %}
 {% set elementIds = rows|map(row => row.elementId) %}
-{% set elements = craft.blitz.diagnostics.getElementsFromIds(siteId, elementType, elementIds) %}
+{% set elements = craft.blitz.diagnostics.getElementQueryWithIds(siteId, elementType, elementIds)
+    .offset(offset)
+    .limit(limit)
+    .all() %}
 
 {{ hiddenInput('orderBy', orderBy) }}
 {{ hiddenInput('sortBy', sortBy) }}
@@ -82,6 +83,6 @@
             </table>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
-        {{ include('blitz/_utilities/diagnostics/includes/footer', { results: elements }) }}
+        {{ include('blitz/_utilities/diagnostics/includes/footer', { rows: elements }) }}
     </div>
 </div>
