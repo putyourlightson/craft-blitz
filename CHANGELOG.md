@@ -6,6 +6,12 @@
 
 - Added a diagnostics utility.
 
+## 4.9.4 - Unreleased
+
+### Fixed
+
+- Fixed a bug that could cause an error when an element’s ID is unset ([#594](https://github.com/putyourlightson/craft-blitz/issues/594)).
+
 ## 4.9.3 - 2023-11-28
 
 ### Changed
