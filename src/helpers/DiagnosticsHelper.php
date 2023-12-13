@@ -14,6 +14,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\services\CacheRequestService;
 
 /**
  * @since 4.10.0
@@ -49,7 +50,7 @@ class DiagnosticsHelper
             ->innerJoinWith('cache')
             ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = elementId')
             ->where($condition)
-            ->groupBy(['type', 'elementId'])
+            ->groupBy(['type'])
             ->orderBy(['count' => SORT_DESC])
             ->asArray()
             ->all();
@@ -173,6 +174,7 @@ class DiagnosticsHelper
         $rows = CacheRecord::find()
             ->select(['REGEXP_SUBSTR(uri, "(?<=[?]).*") queryString', 'count(*) as count'])
             ->where(['siteId' => $siteId])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=']])
             ->groupBy('queryString')
             ->asArray()
             ->all();
