@@ -18,9 +18,6 @@
     .limit(limit)
     .all() %}
 
-{{ hiddenInput('orderBy', orderBy) }}
-{{ hiddenInput('sortBy', sortBy) }}
-
 <div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements .elements">
     <header id="header">
         <div class="page-title flex">
@@ -34,6 +31,8 @@
         </div>
     </header>
     <div id="elements">
+        {{ hiddenInput('orderBy', orderBy) }}
+        {{ hiddenInput('sortBy', sortBy) }}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>

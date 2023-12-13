@@ -211,12 +211,12 @@ class DiagnosticsHelper
         foreach ($rows as $row) {
             parse_str($row['queryString'], $params);
             foreach ($params as $param => $value) {
-                $queryStringParams[$param] = $queryStringParams[$param] ?? 0;
-                $queryStringParams[$param] += $row['count'];
+                $queryStringParams[$param] = [
+                    'param' => $param,
+                    'count' => $row['count'] + ($queryStringParams[$param]['count'] ?? 0),
+                ];
             }
         }
-
-        arsort($queryStringParams);
 
         return $queryStringParams;
     }

@@ -20,9 +20,6 @@
 {% set rows = query.asArray().all() %}
 {% set maxVisible = rows|length + offset %}
 
-{{ hiddenInput('orderBy', orderBy) }}
-{{ hiddenInput('sortBy', sortBy) }}
-
 <div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
     <header id="header">
         <div class="page-title flex">
@@ -42,6 +39,8 @@
         </div>
     </header>
     <div id="results">
+        {{ hiddenInput('orderBy', orderBy) }}
+        {{ hiddenInput('sortBy', sortBy) }}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>

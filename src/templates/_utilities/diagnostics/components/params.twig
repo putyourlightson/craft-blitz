@@ -1,0 +1,79 @@
+{% set orderBy = orderBy ?? 'count' %}
+{% set sortBy = sortBy ?? 'desc' %}
+{% set offset = offset ?? 0 %}
+{% set limit = 50 %}
+{% set search = search ?? null %}
+
+{% set rows = craft.blitz.diagnostics.getParams(siteId, orderBy, sortBy) %}
+{% if search %}
+    {% set rows = rows|filter((count, param) => search in param) %}
+{% endif %}
+{% set rows = rows|multisort(orderBy) %}
+{% if sortBy == 'desc' %}
+    {% set rows = rows|reverse %}
+{% endif %}
+{% set total = rows|length %}
+{% set rows = rows|slice(offset, limit) %}
+{% set maxVisible = rows|length + offset %}
+
+<div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
+    <header id="header">
+        <div class="page-title flex">
+            <h1>
+                {{ rows|length ? 'Tracked Query String Params'|t('blitz') : 'No Tracked Query String Params'|t('blitz') }}
+            </h1>
+            {% if craft.app.getIsMultiSite() %}
+                {% include '_elements/sitemenu' with {
+                    selectedSiteId: siteId,
+                    urlFormat: 'utilities/blitz-diagnostics/params?site={handle}',
+                } only %}
+            {% endif %}
+        </div>
+        <div id="toolbar" class="flex">
+            <div class="search-container flex-grow texticon has-filter-btn">
+                <span class="texticon-icon search icon" aria-hidden="true"></span>
+                <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+            </div>
+        </div>
+    </header>
+    <div id="results">
+        {{ hiddenInput('orderBy', orderBy) }}
+        {{ hiddenInput('sortBy', sortBy) }}
+        <div class="elements">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th class="{{ orderBy == 'param' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="param" s-val:sort-by="{{ orderBy == 'param' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Query String Param'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="count" s-val:sort-by="{{ orderBy == 'count' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Pages'|t('blitz') }}
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td class="code">
+                                <a href="{{ url('utilities/blitz-diagnostics/params/param', {
+                                    param: row.param,
+                                }) }}">
+                                    {{ row.param }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ row.count|number }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="update-spinner spinner spinner-absolute"></div>
+        </div>
+        {{ include('blitz/_utilities/diagnostics/includes/footer') }}
+    </div>
+</div>

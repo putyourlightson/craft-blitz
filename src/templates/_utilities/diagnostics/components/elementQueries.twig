@@ -15,9 +15,6 @@
 {% set total = query.count() %}
 {% set rows = query.asArray().all() %}
 
-{{ hiddenInput('orderBy', orderBy) }}
-{{ hiddenInput('sortBy', sortBy) }}
-
 <div s-replace="#elementqueries" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries .elements">
     <header id="header">
         <div class="page-title flex">
@@ -31,6 +28,8 @@
         </div>
     </header>
     <div id="elementqueries">
+        {{ hiddenInput('orderBy', orderBy) }}
+        {{ hiddenInput('sortBy', sortBy) }}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>

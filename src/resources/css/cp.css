@@ -94,11 +94,7 @@ table.editable th.code {
     padding: 0;
 }
 
-.blitz-diagnostics .breadcrumb-list {
-    margin: -15px 0 15px;
-}
-
-.blitz-diagnostics .breadcrumb-list li.leaf:after {
+.breadcrumb-list li.leaf:after {
     border: none;
 }
 
