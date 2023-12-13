@@ -19,7 +19,8 @@
             <div class="page-info">
                 {% set maxVisible = rows|length + offset %}
                 {{ (maxVisible > 0 ? offset + 1 : 0)|number }}–{{ maxVisible|number }}
-                of {{ total|number }} {{ (pluralDisplayName ?? 'pages')|lower }}
+                of {{ total|number }}
+                {{ (total == 1 ? displayName ?? 'page' : pluralDisplayName ?? 'pages')|lower }}
             </div>
         </div>
     </div>
