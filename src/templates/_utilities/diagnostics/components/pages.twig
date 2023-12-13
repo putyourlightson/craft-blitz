@@ -52,12 +52,12 @@
                             </button>
                         </th>
                         <th class="{{ orderBy == 'elementCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="elementCount" s-val:sort-by="{{ orderBy == 'elementCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                            <button type="button" sprig s-val:order-by="elementCount" s-val:sort-by="{{ orderBy == 'elementCount' and sortBy == 'desc' ? 'asc' : 'desc' }}">
                                 {{ 'Elements'|t('blitz') }}
                             </button>
                         </th>
                         <th class="{{ orderBy == 'elementQueryCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="elementQueryCount" s-val:sort-by="{{ orderBy == 'elementQueryCount' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                            <button type="button" sprig s-val:order-by="elementQueryCount" s-val:sort-by="{{ orderBy == 'elementQueryCount' and sortBy == 'desc' ? 'asc' : 'desc' }}">
                                 {{ 'Element Queries'|t('blitz') }}
                             </button>
                         </th>
