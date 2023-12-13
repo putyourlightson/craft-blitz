@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\Element;
 use craft\db\ActiveQuery;
+use craft\db\QueryAbortedException;
 use craft\db\Table;
 use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
@@ -194,10 +195,14 @@ class DiagnosticsHelper
 
         $elementQuery = RefreshCacheHelper::getElementQueryWithParams($elementQueryType, $params);
 
-        return $elementQuery
-            ->select(['elementId' => 'elements.id'])
-            ->createCommand()
-            ->getRawSql();
+        try {
+            return $elementQuery
+                ->select(['elementId' => 'elements.id'])
+                ->createCommand()
+                ->getRawSql();
+        } catch (QueryAbortedException) {
+            return 'Invalid params.';
+        }
     }
 
     public static function getParams(int $siteId): array
