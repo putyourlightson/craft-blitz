@@ -29,13 +29,18 @@ class DiagnosticsController extends Controller
 
         $pages = DiagnosticsHelper::getPagesQuery($siteId)
             ->orderBy(['elementCount' => SORT_DESC])
-            ->asArray()
             ->all();
 
-        // Replaces an empty URI with a slash.
-        array_walk($pages, fn(&$page) => $page['uri'] = $page['uri'] ?: '/');
+        $values = [];
+        foreach ($pages as &$page) {
+            $values[] = [
+                'uri' => $page['uri'] ?: '/',
+                'elements' => $page['elementCount'] ?: 0,
+                'elementQueries' => $page['elementQueryCount'] ?: 0,
+            ];
+        }
 
-        $this->response->data = $pages;
+        $this->response->data = $values;
         $this->response->formatters['csv'] = new CsvResponseFormatter();
         $this->response->format = 'csv';
         $this->response->setDownloadHeaders('tracked-pages.csv');
