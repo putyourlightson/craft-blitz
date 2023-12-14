@@ -111,6 +111,11 @@ table.editable th.code {
     }
 }
 
+.blitz-diagnostics > h1 {
+    padding-top: var(--s);
+    line-height: 34px;
+}
+
 .blitz-diagnostics .elements {
     margin-top: 1rem;
 }

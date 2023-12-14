@@ -14,31 +14,31 @@
         </header>
     {% endif %}
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/pages') }}" class="go">
+        <a href="{{ url('utilities/blitz-diagnostics/pages') }}">
             {% set count = craft.blitz.diagnostics.getPagesCount(siteId) %}
             {{ count|number }}
-            {{ '{num, plural, =1{Tracked Page} other{Tracked Pages}}'|t('blitz', { num: count }) -}}
+            {{ '{num, plural, =1{Tracked Page} other{Tracked Pages}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/params') }}" class="go">
+        <a href="{{ url('utilities/blitz-diagnostics/params') }}">
             {% set count = craft.blitz.diagnostics.getParamsCount(siteId) %}
             {{ count|number }}
-            {{ '{num, plural, =1{Tracked Query String Param} other{Tracked Query String Params}}'|t('blitz', { num: count }) -}}
+            {{ '{num, plural, =1{Tracked Query String Param} other{Tracked Query String Params}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/elements') }}" class="go">
+        <a href="{{ url('utilities/blitz-diagnostics/elements') }}">
             {% set count = craft.blitz.diagnostics.getElementsCount(siteId) %}
             {{ count|number }}
-            {{ '{num, plural, =1{Tracked Element} other{Tracked Elements}}'|t('blitz', { num: count }) -}}
+            {{ '{num, plural, =1{Tracked Element} other{Tracked Elements}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/element-queries') }}" class="go">
+        <a href="{{ url('utilities/blitz-diagnostics/element-queries') }}">
             {% set count = craft.blitz.diagnostics.getElementQueriesCount(siteId) %}
             {{ count|number }}
-            {{ '{num, plural, =1{Tracked Element Query} other{Tracked Element Queries}}'|t('blitz', { num: count }) -}}
+            {{ '{num, plural, =1{Tracked Element Query} other{Tracked Element Queries}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
 
