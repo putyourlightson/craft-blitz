@@ -90,12 +90,12 @@ table.editable th.code {
     font-size: inherit !important;
 }
 
-.blitz-diagnostics #crumbs {
-    padding: 0;
-}
-
 .breadcrumb-list li.leaf:after {
     border: none;
+}
+
+.blitz-diagnostics {
+    margin-top: -10px;
 }
 
 .blitz-diagnostics #header {
