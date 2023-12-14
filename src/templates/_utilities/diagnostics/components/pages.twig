@@ -82,8 +82,13 @@
             </table>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
+        {% set exportButtons %}
+            <a href="{{ actionUrl('blitz/diagnostics/export-pages', { siteId: siteId }) }}" class="btn">
+                {{ 'Export'|t('blitz') }}
+            </a>
+        {% endset %}
         {{ include('blitz/_utilities/diagnostics/includes/footer', {
-            exportActionUrl: actionUrl('blitz/diagnostics/export', { siteId: siteId }),
+            exportButtons: exportButtons,
         }) }}
     </div>
 </div>

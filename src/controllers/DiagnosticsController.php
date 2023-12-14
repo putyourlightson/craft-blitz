@@ -23,7 +23,7 @@ class DiagnosticsController extends Controller
         return parent::beforeAction($action);
     }
 
-    public function actionExport(int $siteId): Response
+    public function actionExportPages(int $siteId): Response
     {
         App::maxPowerCaptain();
 

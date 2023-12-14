@@ -24,9 +24,9 @@
             </div>
         </div>
     </div>
-    {% if exportActionUrl ?? false %}
+    {% if exportButtons ?? false %}
         <div id="export-container">
-            <a href="{{ exportActionUrl }}" class="btn">Export</a>
+            {{ exportButtons }}
         </div>
     {% endif %}
 </div>
