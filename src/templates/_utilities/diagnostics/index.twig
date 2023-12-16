@@ -2,17 +2,17 @@
 
 {% block content %}
 
-    {% if craft.app.getIsMultiSite() %}
-        <header id="header">
-            <div class="page-title flex">
-                <h1>{{ 'Site Tracking'|t('blitz') }}</h1>
+    <header id="header">
+        <div class="page-title flex">
+            <h1>{{ 'Site Tracking'|t('blitz') }}</h1>
+            {% if craft.app.getIsMultiSite() %}
                 {% include '_elements/sitemenu' with {
                     selectedSiteId: siteId,
                     urlFormat: 'utilities/blitz-diagnostics?site={handle}',
                 } only %}
-            </div>
-        </header>
-    {% endif %}
+            {% endif %}
+        </div>
+    </header>
     <h2>
         <a href="{{ url('utilities/blitz-diagnostics/pages') }}">
             {% set count = craft.blitz.diagnostics.getPagesCount(siteId) %}
