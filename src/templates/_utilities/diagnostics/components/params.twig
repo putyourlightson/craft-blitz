@@ -20,7 +20,7 @@
     <header id="header">
         <div class="page-title flex">
             <h1>
-                {{ rows|length ? 'Tracked Query String Params'|t('blitz') : 'No Tracked Query String Params'|t('blitz') }}
+                {{ 'Tracked Query String Params'|t('blitz') }}
             </h1>
             {% if craft.app.getIsMultiSite() %}
                 {% include '_elements/sitemenu' with {
