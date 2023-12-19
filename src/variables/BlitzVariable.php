@@ -261,9 +261,13 @@ class BlitzVariable
 
     private function _getQueryString(array $params): string
     {
-        // Decode slashes to prevent Apache returning a 404 if `AllowEncodedSlashes` is off.
-        // https://github.com/putyourlightson/craft-blitz/issues/564
-        return str_replace('%2F', '/', http_build_query($params));
+        // Remove the path param if it exists.
+        $pathParam = Craft::$app->getConfig()->getGeneral()->pathParam;
+        if ($pathParam && isset($params[$pathParam])) {
+            unset($params[$pathParam]);
+        }
+
+        return http_build_query($params);
     }
 
     /**

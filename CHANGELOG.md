@@ -2,6 +2,11 @@
 
 ## 4.9.4 - Unreleased
 
+### Changed
+
+- The path param is now removed from query strings before being cached.
+- Slashes in cached include URLs are no longer decoded ([#595](https://github.com/putyourlightson/craft-blitz/issues/595)).
+
 ### Fixed
 
 - Fixed a bug that could cause an error when an element’s ID is unset ([#594](https://github.com/putyourlightson/craft-blitz/issues/594)).
