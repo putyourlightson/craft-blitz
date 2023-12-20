@@ -6,7 +6,12 @@
 
 - Added a diagnostics utility.
 
-## 4.9.4 - Unreleased
+## 4.9.4 - 2023-12-19
+
+### Changed
+
+- The path param is now removed from query strings before being cached.
+- Slashes in cached include URLs are no longer decoded ([#595](https://github.com/putyourlightson/craft-blitz/issues/595)).
 
 ### Fixed
 
