@@ -318,11 +318,14 @@ class SiteUriHelper
     /**
      * Returns cache IDs from the given site URIs.
      *
-     * @param SiteUriModel[] $siteUris
      * @return int[]
      */
     public static function getCacheIdsFromSiteUris(array $siteUris): array
     {
+        if (empty($siteUris)) {
+            return [];
+        }
+
         $condition = ['or'];
 
         foreach ($siteUris as $siteUri) {
