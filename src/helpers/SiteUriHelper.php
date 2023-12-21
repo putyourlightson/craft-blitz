@@ -319,6 +319,7 @@ class SiteUriHelper
      * Returns cache IDs from the given site URIs.
      *
      * @return int[]
+     * @since 4.8.0
      */
     public static function getCacheIdsFromSiteUris(array $siteUris): array
     {

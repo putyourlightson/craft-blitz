@@ -27,7 +27,6 @@ use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\web\Response;
 
-
 function getSiteId(): int
 {
     return Craft::$app->sites->getSiteByHandle(App::env('TEST_SITE_HANDLE'))->id;
