@@ -41,6 +41,7 @@
     <div id="results">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
+        {{ hiddenInput('utility', 1) }}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>
@@ -91,7 +92,7 @@
                             </td>
                             {% if currentUser.can('blitz:refresh-urls') %}
                                 <td class="thin">
-                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" s-val:utility="1" title="Refresh" data-icon="refresh"></a>
+                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" title="Refresh" data-icon="refresh"></a>
                                 </td>
                             {% endif %}
                         </tr>
@@ -108,5 +109,10 @@
         {{ include('blitz/_utilities/diagnostics/includes/footer', {
             exportButtons: exportButtons,
         }) }}
+        {% if flashes is defined %}
+            <script>
+                Craft.cp.displayNotice('{{ flashes|first|first }}');
+            </script>
+        {% endif %}
     </div>
 </div>

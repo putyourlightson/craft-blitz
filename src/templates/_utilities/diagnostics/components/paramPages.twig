@@ -30,6 +30,7 @@
     <div id="pages">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
+        {{ hiddenInput('utility', 1) }}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>
@@ -39,14 +40,32 @@
                                 {{ displayName }}
                             </button>
                         </th>
+                        <th class="thin">
+                            <span data-icon="world"></span>
+                        </th>
+                        {% if currentUser.can('blitz:refresh-urls') %}
+                            <th class="thin">
+                                <span data-icon="refresh"></span>
+                            </th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in rows %}
+                        {% set uri = row.uri ?: '/' %}
+                        {% set url = siteUrl(uri, null, null, siteId) %}
                         <tr>
                             <td class="code">
-                                {{ row.uri }}
+                                {{ uri }}
                             </td>
+                            <td class="thin">
+                                <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
+                            </td>
+                            {% if currentUser.can('blitz:refresh-urls') %}
+                                <td class="thin">
+                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" title="Refresh" data-icon="refresh"></a>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -54,5 +73,10 @@
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
         {{ include('blitz/_utilities/diagnostics/includes/footer') }}
+        {% if flashes is defined %}
+            <script>
+                Craft.cp.displayNotice('{{ flashes|first|first }}');
+            </script>
+        {% endif %}
     </div>
 </div>
