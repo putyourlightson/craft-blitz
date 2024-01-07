@@ -109,10 +109,6 @@
         {{ include('blitz/_utilities/diagnostics/includes/footer', {
             exportButtons: exportButtons,
         }) }}
-        {% if flashes is defined %}
-            <script>
-                Craft.cp.displayNotice('{{ flashes|first|first }}');
-            </script>
-        {% endif %}
+        {{ include('blitz/_utilities/diagnostics/includes/flashes') }}
     </div>
 </div>
