@@ -4,7 +4,11 @@
 
 ### Added
 
-- Added a diagnostics utility.
+- Added the Blitz diagnostics utility.
+
+### Fixed
+
+- Fixed a bug in which all cached pages were being marked as expired when no cacheable site URIs were refreshed ([#598](https://github.com/putyourlightson/craft-blitz/issues/598)).
 
 ## 4.9.4 - 2023-12-19
 
