@@ -60,14 +60,24 @@
                                 {{ 'Element Queries'|t('blitz') }}
                             </button>
                         </th>
+                        <th class="thin">
+                            <span data-icon="world"></span>
+                        </th>
+                        {% if currentUser.can('blitz:refresh-urls') %}
+                            <th class="thin">
+                                <span data-icon="refresh"></span>
+                            </th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in rows %}
+                        {% set uri = row.uri ?: '/' %}
+                        {% set url = siteUrl(uri) %}
                         <tr>
                             <td class="code">
                                 <a href="{{ url('utilities/blitz-diagnostics/pages/page', { pageId: row.id }) }}">
-                                    {{ row.uri ?: '/' }}
+                                    {{ uri }}
                                 </a>
                             </td>
                             <td>
@@ -76,6 +86,14 @@
                             <td>
                                 {{ (row.elementQueryCount ?? 0)|number }}
                             </td>
+                            <td class="thin">
+                                <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
+                            </td>
+                            {% if currentUser.can('blitz:refresh-urls') %}
+                                <td class="thin">
+                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" s-val:utility="1" title="Refresh" data-icon="refresh"></a>
+                                </td>
+                            {% endif %}
                         </tr>
                     {% endfor %}
                 </tbody>

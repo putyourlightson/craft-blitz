@@ -51,7 +51,7 @@
                             </th>
                         {% endif %}
                         {% if hasUris %}
-                            <th>
+                            <th class="thin">
                                 <span data-icon="world"></span>
                             </th>
                         {% endif %}
@@ -70,7 +70,7 @@
                                 </td>
                             {% endif %}
                             {% if hasUris %}
-                                <td data-title="Link" data-attr="link">
+                                <td>
                                     {% set url = element.url %}
                                     {% if url %}
                                         <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>

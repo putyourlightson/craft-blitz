@@ -1,6 +1,9 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/page' %}
 
 {% set page = craft.blitz.diagnostics.getPage() %}
+{% if page is null %}
+    {% redirect 'utilities/blitz-diagnostics/pages' with error 'The page no longer exists or may have been refreshed.' %}
+{% endif %}
 {% set elementTypes = craft.blitz.diagnostics.getElementTypes(siteId, page.id) %}
 {% set elementQueryTypes = craft.blitz.diagnostics.getElementQueryTypes(siteId, page.id) %}
 {% set isLeaf = true %}
