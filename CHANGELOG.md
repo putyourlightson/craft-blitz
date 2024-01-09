@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added the Blitz diagnostics utility.
+- Added the Blitz Diagnostics utility ([read the announcement](https://putyourlightson.com/articles/introducing-blitz-diagnostics)).
 
 ### Fixed
 
