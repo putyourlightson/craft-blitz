@@ -4,7 +4,7 @@
 {% set limit = 50 %}
 {% set search = search ?? null %}
 
-{% set rows = craft.blitz.diagnostics.getParams(siteId, orderBy, sortBy) %}
+{% set rows = craft.blitz.diagnostics.getParams(siteId) %}
 {% if search %}
     {% set rows = rows|filter((count, param) => search in param) %}
 {% endif %}

@@ -207,21 +207,21 @@ class DiagnosticsHelper
 
     public static function getParams(int $siteId): array
     {
-        $rows = CacheRecord::find()
-            ->select(['REGEXP_SUBSTR(uri, "(?<=[?]).*") queryString', 'count(*) as count'])
+        $uris = CacheRecord::find()
+            ->select('uri')
             ->where(['siteId' => $siteId])
+            ->andWhere(['like', 'uri', '?'])
             ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=']])
-            ->groupBy('queryString')
-            ->asArray()
-            ->all();
+            ->column();
 
         $queryStringParams = [];
-        foreach ($rows as $row) {
-            parse_str($row['queryString'], $params);
+        foreach ($uris as $uri) {
+            $queryString = substr($uri, strpos($uri, '?') + 1);
+            parse_str($queryString, $params);
             foreach ($params as $param => $value) {
                 $queryStringParams[$param] = [
                     'param' => $param,
-                    'count' => $row['count'] + ($queryStringParams[$param]['count'] ?? 0),
+                    'count' => ($queryStringParams[$param]['count'] ?? 0) + 1,
                 ];
             }
         }
