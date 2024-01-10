@@ -10,7 +10,7 @@
                 {% else %}
                     <button type="button" class="page-link prev-page disabled" title="Previous Page"></button>
                 {% endif %}
-                {% if rows|length < total %}
+                {% if offset + limit < total %}
                     <button type="button" sprig s-val:offset="{{ offset + limit }}" class="page-link next-page" title="Next Page"></button>
                 {% else %}
                     <button type="button" role="button" class="page-link next-page disabled" title="Next Page"></button>
