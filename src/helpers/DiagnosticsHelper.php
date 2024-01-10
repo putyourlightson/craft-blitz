@@ -75,7 +75,7 @@ class DiagnosticsHelper
             $condition['cacheId'] = $pageId;
         }
 
-        return ElementCacheRecord::find()
+        $elementTypes = ElementCacheRecord::find()
             ->select(['type', 'count(DISTINCT elementId) as count'])
             ->innerJoinWith('cache')
             ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = elementId')
@@ -84,6 +84,8 @@ class DiagnosticsHelper
             ->orderBy(['count' => SORT_DESC])
             ->asArray()
             ->all();
+
+        return $elementTypes;
     }
 
     public static function getElementQueryTypes(int $siteId, ?int $pageId = null): array

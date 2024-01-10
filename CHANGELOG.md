@@ -7,6 +7,7 @@
 - Fixed a bug in which SQL queries were executed in the Blitz Diagnostics utility that required minimum database versions above those required by Craft 4 ([#602](https://github.com/putyourlightson/craft-blitz/issues/602)).
 - Fixed a bug in which paginated pages could go beyond their maximum in the Blitz Diagnostics utility ([#603](https://github.com/putyourlightson/craft-blitz/issues/603)).
 - Fixed a bug in which Sprig Core was not being bootstrapped for all CP requests.
+- Fixed a bug in which legacy non-cacheable element types were causing errors in the Blitz Diagnostics utility.
 
 ## 4.10.0 - 2024-01-09
 
