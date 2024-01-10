@@ -53,6 +53,7 @@ use putyourlightson\blitz\utilities\DiagnosticsUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\blitz\widgets\CacheWidget;
 use putyourlightson\blitzhints\BlitzHints;
+use putyourlightson\sprig\Sprig;
 use yii\base\Controller;
 use yii\base\Event;
 use yii\di\Instance;
@@ -152,6 +153,8 @@ class Blitz extends Plugin
             if (Craft::$app->getEdition() === Craft::Pro) {
                 $this->_registerUserPermissions();
             }
+
+            Sprig::bootstrap();
         }
 
         // Register hints after utilities

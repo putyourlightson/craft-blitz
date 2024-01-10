@@ -15,13 +15,6 @@ use putyourlightson\sprig\Sprig;
  */
 class DiagnosticsUtility extends Utility
 {
-    public function init(): void
-    {
-        parent::init();
-
-        Sprig::getInstance()->init();
-    }
-
     /**
      * @inheritdoc
      */
