@@ -75,17 +75,15 @@ class DiagnosticsHelper
             $condition['cacheId'] = $pageId;
         }
 
-        $elementTypes = ElementCacheRecord::find()
+        return ElementCacheRecord::find()
             ->select(['type', 'count(DISTINCT elementId) as count'])
             ->innerJoinWith('cache')
-            ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = elementId')
+            ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = ' . ElementCacheRecord::tableName() . '.elementId')
             ->where($condition)
             ->groupBy(['type'])
             ->orderBy(['count' => SORT_DESC])
             ->asArray()
             ->all();
-
-        return $elementTypes;
     }
 
     public static function getElementQueryTypes(int $siteId, ?int $pageId = null): array
@@ -147,7 +145,7 @@ class DiagnosticsHelper
         return ElementCacheRecord::find()
             ->select([ElementCacheRecord::tableName() . '.elementId', 'count(*) as count', 'title'])
             ->innerJoinWith('cache')
-            ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = elementId')
+            ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = ' . ElementCacheRecord::tableName() . '.elementId')
             ->innerJoin(Table::CONTENT, Table::CONTENT . '.elementId = ' . ElementCacheRecord::tableName() . '.elementId')
             ->where($condition)
             ->groupBy(['elementId', 'title'])

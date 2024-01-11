@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.10.2 - Unreleased
+
+### Fixed
+
+- Fixed Postgres errors introduced in 4.10.0 ([#605](https://github.com/putyourlightson/craft-blitz/issues/605)).
+
 ## 4.10.1 - 2024-01-10
 
 ### Fixed
