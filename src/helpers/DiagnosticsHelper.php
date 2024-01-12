@@ -14,6 +14,7 @@ use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\services\CacheRequestService;
 
 /**
@@ -164,12 +165,11 @@ class DiagnosticsHelper
         }
 
         return ElementQueryCacheRecord::find()
-            ->from(['elementquerycaches' => ElementQueryCacheRecord::tableName()])
-            ->select(['elementquerycaches.id', 'params', 'count(*) as count'])
+            ->select([ElementQueryRecord::tableName() . '.id', 'params', 'count(*) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
-            ->groupBy('elementquerycaches.id')
+            ->groupBy(ElementQueryRecord::tableName() . '.id')
             ->asArray();
     }
 
