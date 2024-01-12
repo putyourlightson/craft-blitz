@@ -14,7 +14,6 @@ use craft\helpers\Json;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
-use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\services\CacheRequestService;
 
 /**
@@ -39,7 +38,7 @@ class DiagnosticsHelper
         return ElementCacheRecord::find()
             ->innerJoinWith('cache')
             ->where(['siteId' => $siteId])
-            ->count('DISTINCT elementId');
+            ->count('DISTINCT [[elementId]]');
     }
 
     public static function getElementQueriesCount(int $siteId): int
@@ -48,7 +47,7 @@ class DiagnosticsHelper
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where(['siteId' => $siteId])
-            ->count('DISTINCT queryId');
+            ->count('DISTINCT [[queryId]]');
     }
 
     public static function getPage(): array|null
@@ -95,7 +94,7 @@ class DiagnosticsHelper
         }
 
         return ElementQueryCacheRecord::find()
-            ->select(['type', 'count(DISTINCT queryId) as count'])
+            ->select(['type', 'count(DISTINCT [[queryId]]) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
@@ -143,12 +142,13 @@ class DiagnosticsHelper
         }
 
         return ElementCacheRecord::find()
-            ->select([ElementCacheRecord::tableName() . '.elementId', 'count(*) as count', 'title'])
+            ->from(['elementcaches' => ElementCacheRecord::tableName()])
+            ->select(['elementcaches.elementId', 'count(*) as count', 'title'])
             ->innerJoinWith('cache')
-            ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
-            ->innerJoin(['content' => Table::CONTENT], '[[content.elementId]] = [[elementId]]')
+            ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementcaches.elementId]]')
+            ->innerJoin(['content' => Table::CONTENT], '[[content.elementId]] = [[elementcaches.elementId]]')
             ->where($condition)
-            ->groupBy(['elementId', 'title'])
+            ->groupBy(['elementcaches.elementId', 'title'])
             ->asArray();
     }
 
@@ -164,11 +164,12 @@ class DiagnosticsHelper
         }
 
         return ElementQueryCacheRecord::find()
-            ->select([ElementQueryRecord::tableName() . '.id', 'params', 'count(*) as count'])
+            ->from(['elementquerycaches' => ElementQueryCacheRecord::tableName()])
+            ->select(['elementquerycaches.id', 'params', 'count(*) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
-            ->groupBy(ElementQueryRecord::tableName() . '.id')
+            ->groupBy('elementquerycaches.id')
             ->asArray();
     }
 
