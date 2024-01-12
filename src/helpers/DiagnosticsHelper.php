@@ -134,7 +134,7 @@ class DiagnosticsHelper
     {
         $condition = [
             CacheRecord::tableName() . '.siteId' => $siteId,
-            Table::CONTENT . '.siteId' => $siteId,
+            'content.siteId' => $siteId,
             'type' => $elementType,
         ];
 
