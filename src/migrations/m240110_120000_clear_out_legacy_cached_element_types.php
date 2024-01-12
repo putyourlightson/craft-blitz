@@ -18,7 +18,7 @@ class m240110_120000_clear_out_legacy_cached_element_types extends Migration
         // Element caches
         $elementTypes = ElementCacheRecord::find()
             ->select('type')
-            ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = ' . ElementCacheRecord::tableName() . '.elementId')
+            ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
             ->groupBy('type')
             ->column();
 
@@ -26,7 +26,7 @@ class m240110_120000_clear_out_legacy_cached_element_types extends Migration
             if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
                 $legacyElementIds = ElementCacheRecord::find()
                     ->select('elementId')
-                    ->innerJoin(Table::ELEMENTS, Table::ELEMENTS . '.id = ' . ElementCacheRecord::tableName() . '.elementId')
+                    ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
                     ->where(['type' => $elementType])
                     ->column();
 
