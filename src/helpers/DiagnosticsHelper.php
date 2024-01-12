@@ -75,7 +75,7 @@ class DiagnosticsHelper
         }
 
         return ElementCacheRecord::find()
-            ->select(['type', 'count(DISTINCT elementId) as count'])
+            ->select(['type', 'count(DISTINCT [[elementId]]) as count'])
             ->innerJoinWith('cache')
             ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
             ->where($condition)
@@ -119,12 +119,12 @@ class DiagnosticsHelper
                 'elements' => ElementCacheRecord::find()
                     ->select(['cacheId', 'count(*) as elementCount'])
                     ->groupBy(['cacheId']),
-            ], 'id = elements.cacheId')
+            ], 'id = [[elements.cacheId]]')
             ->leftJoin([
                 'elementQueries' => ElementQueryCacheRecord::find()
                     ->select(['cacheId', 'count(*) as elementQueryCount'])
                     ->groupBy(['cacheId']),
-            ], 'id = elementQueries.cacheId')
+            ], 'id = [[elementQueries.cacheId]]')
             ->where(['siteId' => $siteId])
             ->asArray();
     }
