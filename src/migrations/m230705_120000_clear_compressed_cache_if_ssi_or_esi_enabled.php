@@ -21,7 +21,7 @@ class m230705_120000_clear_compressed_cache_if_ssi_or_esi_enabled extends Migrat
             && Blitz::$plugin->cacheStorage->compressCachedValues === true
             && (Blitz::$plugin->settings->ssiEnabled || Blitz::$plugin->settings->esiEnabled)
         ) {
-            if (!empty($cacheStorage->folderPath)) {
+            if (!empty($cacheStorage->folderPath) && is_dir($cacheStorage->folderPath)) {
                 $cacheFolderPath = FileHelper::normalizePath(
                     App::parseEnv($cacheStorage->folderPath)
                 );

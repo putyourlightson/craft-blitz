@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.10.4 - Unreleased
+
+### Changed
+
+- Improved error handling in a previous migration.
+
 ## 4.10.3 - 2024-01-13
 
 ### Fixed
