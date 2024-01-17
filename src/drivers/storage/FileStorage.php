@@ -370,7 +370,7 @@ class FileStorage extends BaseCacheStorage
             if (!empty($sitePath)) {
                 $sites[$site->id] = [
                     'name' => $site->name,
-                    'path' => $sitePath,
+                    'path' => str_replace($this->_cacheFolderPath, $this->folderPath, $sitePath),
                     'pageCount' => $this->getCachedPageCount($sitePath),
                     'includeCount' => $this->getCachedIncludeCount($sitePath),
                 ];

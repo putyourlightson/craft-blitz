@@ -4,6 +4,7 @@
 
 ### Changed
 
+- The Cache Folder Path column now displays aliases in the cached file table in the File Storage utility.
 - Improved error handling in a previous migration.
 
 ## 4.10.3 - 2024-01-13
