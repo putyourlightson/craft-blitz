@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 3.14.0 - Unreleased
+### Changed
+- Increased the minimum Craft version requirement to 3.7.5.
+- The cache refresh process is now triggered when an asset’s file is replaced or its filename is changed ([#514](https://github.com/putyourlightson/craft-blitz/issues/514)).
+- Changed the refreshable status check to always consider elements with `live` and `active` statuses as refreshable ([#572](https://github.com/putyourlightson/craft-blitz/issues/572)).
+
 ## 3.13.0 - 2023-11-17
 ### Added
 - Added the ability to configure a custom queue component via `config/app.php` to use when running queue jobs in Craft 3.4.0 and above ([#577](https://github.com/putyourlightson/craft-blitz/issues/577)).

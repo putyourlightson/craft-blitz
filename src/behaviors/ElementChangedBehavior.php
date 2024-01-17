@@ -7,17 +7,20 @@ namespace putyourlightson\blitz\behaviors;
 
 use Craft;
 use craft\base\Element;
+use craft\elements\Asset;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
 
 /**
- * This class attaches behavior to detect whether an element has changed.
+ * Detects whether an element has changed.
  *
  * @since 3.6.0
  *
  * @property-read bool $hasChanged
+ * @property-read bool $hasBeenDeleted
  * @property-read bool $hasStatusChanged
- * @property-read bool $hasLiveOrExpiredStatus
+ * @property-read bool $hasAssetFileChanged
+ * @property-read bool $hasRefreshableStatus
  * @property Element $owner
  */
 class ElementChangedBehavior extends Behavior
@@ -34,9 +37,9 @@ class ElementChangedBehavior extends Behavior
     // =========================================================================
 
     /**
-     * @var string|null
+     * @var Element|null The original element.
      */
-    public $previousStatus;
+    public $originalElement = null;
 
     /**
      * @var bool
@@ -60,12 +63,7 @@ class ElementChangedBehavior extends Behavior
             return;
         }
 
-        /** @var Element|null $originalElement */
-        $originalElement = Craft::$app->getElements()->getElementById($element->id, get_class($element), $element->siteId);
-
-        if ($originalElement !== null) {
-            $this->previousStatus = $originalElement->getStatus();
-        }
+        $this->originalElement = Craft::$app->getElements()->getElementById($element->id, get_class($element), $element->siteId);
 
         $element->on(Element::EVENT_AFTER_DELETE, function() {
             $this->isDeleted = true;
@@ -80,65 +78,31 @@ class ElementChangedBehavior extends Behavior
     public function getHasChanged(): bool
     {
         $element = $this->owner;
-        $version = Craft::$app->getVersion();
 
         /**
-         * Detection of changes are not possible before Craft 3.4, therefore
-         * we always assume true.
-         * TODO: remove in 4.0.0
+         * Craft 3.7.5 introduced detection of first save.
          */
-        if (version_compare($version, '3.4', '<')) {
+        if ($element->firstSave) {
             return true;
         }
 
         /**
-         * Before Craft 3.7, it is sufficient to check whether the element being saved
-         * has any dirty attributes or fields.
-         * TODO: remove in 4.0.0
+         * Craft 3.7 can save canonical entries by duplicating a draft or revision, so we need to additionally check whether the original element has any modified
+         *  attributes or fields.
          */
-        if (version_compare($version, '3.7', '<')) {
-            if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
-                return true;
-            }
-        }
-
-        /**
-         * Detection of first save is not possible before Craft 3.7.5, therefore
-         * we always assume true.
-         * TODO: remove in 4.0.0
-         */
-        if (version_compare($version, '3.7.0', '>=')
-            && version_compare($version, '3.7.5', '<')
-        ) {
+        if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
             return true;
         }
 
-        /**
-         * Craft 3.7.5 introduced detection of first save. Craft 3.7 can save
-         * canonical entries by duplicating a draft or revision, so we need to
-         * additionally check whether the original element has any modified
-         * attributes or fields.
-         * TODO: remove in 4.0.0
-         */
-        if (version_compare($version, '3.7.5', '>=')) {
-            if ($element->firstSave) {
+        $original = $element->duplicateOf;
+
+        if ($original !== null) {
+            if (!empty($original->getModifiedAttributes()) || !empty($original->getModifiedFields())) {
                 return true;
-            }
-
-            if (!empty($element->getDirtyAttributes()) || !empty($element->getDirtyFields())) {
-                return true;
-            }
-
-            $original = $element->duplicateOf;
-
-            if ($original !== null) {
-                if (!empty($original->getModifiedAttributes()) || !empty($original->getModifiedFields())) {
-                    return true;
-                }
             }
         }
 
-        if ($this->isDeleted) {
+        if ($this->getHasBeenDeleted()) {
             return true;
         }
 
@@ -146,7 +110,19 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
+        if ($this->getHasAssetFileChanged()) {
+            return true;
+        }
+
         return false;
+    }
+
+    /**
+     * Returns whether the element has been deleted.
+     */
+    public function getHasBeenDeleted(): bool
+    {
+        return $this->isDeleted;
     }
 
     /**
@@ -156,7 +132,63 @@ class ElementChangedBehavior extends Behavior
      */
     public function getHasStatusChanged(): bool
     {
-        return $this->previousStatus === null || $this->previousStatus != $this->owner->getStatus();
+        $element = $this->owner;
+
+        if ($this->originalElement === null) {
+            return false;
+        }
+
+        return $element->getStatus() != $this->originalElement->getStatus();
+    }
+
+    /**
+     * Returns whether the element is an asset and its file has changed.
+     *
+     * @since 3.14.0
+     */
+    public function getHasAssetFileChanged(): bool
+    {
+        $element = $this->owner;
+
+        if (!($element instanceof Asset) || !($this->originalElement instanceof Asset)) {
+            return false;
+        }
+
+        if ($element->scenario == Asset::SCENARIO_REPLACE) {
+            return true;
+        }
+
+        if ($element->filename != $this->originalElement->filename) {
+            return true;
+        }
+
+        if ($element->kind === Asset::KIND_IMAGE) {
+            if ($element->getDimensions() != $this->originalElement->getDimensions()) {
+                return true;
+            }
+
+            if ($element->getDimensions() != $this->originalElement->getDimensions()) {
+                return true;
+            }
+
+            // Comparing floats is problematic, so convert to a fixed precision first.
+            // https://www.php.net/manual/en/language.types.float.php
+            $precision = 5;
+            $originalFocalPoint = $this->originalElement->getFocalPoint();
+            $originalFocalPoint = [
+                number_format($originalFocalPoint['x'], $precision),
+                number_format($originalFocalPoint['y'], $precision),
+            ];
+            $focalPoint = $element->getFocalPoint();
+            $focalPoint = [
+                number_format($focalPoint['x'], $precision),
+                number_format($focalPoint['y'], $precision),
+            ];
+
+            return $focalPoint != $originalFocalPoint;
+        }
+
+        return false;
     }
 
     /**
@@ -170,6 +202,8 @@ class ElementChangedBehavior extends Behavior
         $liveStatus = ElementTypeHelper::getLiveStatus(get_class($this->owner));
         $refreshableStatuses = [
             $liveStatus,
+            'live',
+            'active',
             'pending',
             'expired',
         ];
