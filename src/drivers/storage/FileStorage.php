@@ -272,8 +272,9 @@ class FileStorage extends BaseCacheStorage
          * Solution: https://www.drupal.org/files/issues/boost-n1398578-19.patch
          */
         $decodedUri = rawurldecode($siteUri->uri);
-        if ($decodedUri != $siteUri->uri) {
-            $filePaths[] = $this->_getNormalizedFilePath($sitePath, $decodedUri);
+        $decodedFilePath = $this->_getNormalizedFilePath($sitePath, $decodedUri);
+        if ($decodedFilePath != $filePath) {
+            $filePaths[] = $filePath;
         }
 
         return $filePaths;
