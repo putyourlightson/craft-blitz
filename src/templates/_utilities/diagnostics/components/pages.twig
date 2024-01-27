@@ -2,12 +2,16 @@
 {% set sortBy = sortBy ?? 'desc' %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
+{% set expired = expired ?? false %}
 {% set search = search ?? null %}
 
 {% set query = craft.blitz.diagnostics.getPagesQuery(siteId)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
+{% if expired %}
+    {% do query.andWhere(['not', { 'expiryDate': null }]) %}
+{% endif %}
 {% if search %}
     {% if search == '/' %}
         {% do query.andWhere({ uri: ''} ) %}
@@ -30,6 +34,12 @@
                     urlFormat: 'utilities/blitz-diagnostics/pages?site={handle}',
                 } only %}
             {% endif %}
+        </div>
+        <div class="select">
+            <select sprig name="expired">
+                <option value="0">All</option>
+                <option value="1">Expired</option>
+            </select>
         </div>
         <div id="toolbar" class="flex">
             <div class="search-container flex-grow texticon has-filter-btn">
@@ -61,6 +71,11 @@
                                 {{ 'Element Queries'|t('blitz') }}
                             </button>
                         </th>
+                        <th class="{{ orderBy == 'expiryDate' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="expiryDate" s-val:sort-by="{{ orderBy == 'expiryDate' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Expiry Date'|t('blitz') }}
+                            </button>
+                        </th>
                         <th class="thin">
                             <span data-icon="world"></span>
                         </th>
@@ -86,6 +101,9 @@
                             </td>
                             <td>
                                 {{ (row.elementQueryCount ?? 0)|number }}
+                            </td>
+                            <td>
+                                {{ row.expiryDate ? row.expiryDate|datetime('short') }}
                             </td>
                             <td class="thin">
                                 <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>

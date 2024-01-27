@@ -115,7 +115,7 @@ class DiagnosticsHelper
     public static function getPagesQuery(int $siteId): ActiveQuery
     {
         return CacheRecord::find()
-            ->select(['id', 'uri', 'elementCount', 'elementQueryCount'])
+            ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'expiryDate'])
             ->leftJoin([
                 'elements' => ElementCacheRecord::find()
                     ->select(['cacheId', 'count(*) as elementCount'])

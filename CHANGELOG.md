@@ -2,6 +2,10 @@
 
 ## 4.10.4 - Unreleased
 
+### Added
+
+- Added a dropdown to filter by expired pages and added an expiry date column in the Blitz Cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
+
 ### Changed
 
 - The Cache Folder Path column now displays aliases in the cached file table in the File Storage utility.
