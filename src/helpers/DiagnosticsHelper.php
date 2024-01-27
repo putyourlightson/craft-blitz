@@ -197,10 +197,13 @@ class DiagnosticsHelper
         $elementQuery = RefreshCacheHelper::getElementQueryWithParams($elementQueryType, $params);
 
         try {
-            return $elementQuery
+            $sql = $elementQuery
                 ->select(['elementId' => 'elements.id'])
                 ->createCommand()
                 ->getRawSql();
+
+            // Return raw SQL with line breaks replaced with spaces.
+            return str_replace(["\r\n", "\r", "\n"], ' ', $sql);
         } catch (QueryAbortedException) {
             return null;
         }

@@ -8,6 +8,10 @@
 - Improved error handling in a previous migration.
 - Made some minor optimisations to the file storage driver.
 
+### Fixed
+
+- Fixed a bug in which line breaks were not being replaced with spaces in raw SQL query output in the Blitz Diagnostics utility ([#611](https://github.com/putyourlightson/craft-blitz/issues/611)).
+
 ## 4.10.3 - 2024-01-13
 
 ### Fixed
