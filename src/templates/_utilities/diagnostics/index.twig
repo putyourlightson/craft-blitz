@@ -46,6 +46,24 @@
         {{ 'Recommendations'|t('blitz') }}
     </h2>
     <p>
+        {% set globalSetCount = craft.globalSets.count %}
+        {% if globalSetCount > 0 %}
+            {% if craft.app.plugins.plugin('blitz').settings.refreshCacheAutomaticallyForGlobals %}
+                <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+                {{ globalSetCount }} <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is set to <code>true</code>.
+            {% else %}
+                <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+                {{ globalSetCount }} <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is set to <code>false</code>.
+            {% endif %}
+        {% else %}
+            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+            No globals exist.
+        {% endif %}
+        <span class="info">
+            Globals should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is set to <code>false</code>. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>
+        </span>
+    </p>
+    <p>
         {% if craft.app.request.isWebAliasSetDynamically %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
             The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly overridden.
@@ -58,15 +76,15 @@
         </span>
     </p>
     <p>
-        {% if craft.app.config.general.runQueueAutomatically %}
+        {% if not craft.app.config.general.generateTransformsBeforePageLoad %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            Pending queue jobs are configured to run automatically via web requests.
+            The <a href="https://craftcms.com/docs/4.x/config/general.html#generatetransformsbeforepageload" target="_blank"><code>generateTransformsBeforePageLoad</code></a> general config setting is set to <code>false</code>.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank">@web alias</a> is being explicitly overridden.
+            The <a href="https://craftcms.com/docs/4.x/config/general.html#generatetransformsbeforepageload" target="_blank"><code>generateTransformsBeforePageLoad</code></a> general config setting is set to <code>true</code>.
         {% endif %}
         <span class="info">
-            Running queue jobs via web requests can negatively impact the performance of a site and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+            Blitz does not cache pages that contain asset transform generation URLs, as doing so can lead to cached pages that perform poorly. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-i-visit-it" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
@@ -79,6 +97,30 @@
         {% endif %}
         <span class="info">
             This plugin can be unreliable when used in certain web servers and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+        </span>
+    </p>
+    <p>
+        {% set hintsCount = craft.blitz.diagnostics.hintsCount %}
+        {% if hintsCount > 0 %}
+            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+        {% else %}
+            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+        {% endif %}
+        The <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is reporting <code>{{ hintsCount }}</code> eager-loading {{ '{num, plural, =1{opportunity} other{opportunities}}'|t('blitz', { num: hintsCount }) }}.
+        <span class="info">
+            Always use eager-loading in your templates. The Blitz Hints utility lists opportunities for eager-loading elements including the field name, the template and the line number. <a href="https://putyourlightson.com/plugins/blitz#hints-utility" target="_blank" class="go">Learn more</a>
+        </span>
+    </p>
+    <p>
+        {% if craft.app.config.general.runQueueAutomatically %}
+            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+            Pending queue jobs are configured to run automatically via web requests.
+        {% else %}
+            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+            Pending queue jobs are not configured to run automatically via web requests.
+        {% endif %}
+        <span class="info">
+            Running queue jobs via web requests can negatively impact the performance of a site and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>

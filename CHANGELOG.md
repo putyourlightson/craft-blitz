@@ -1,16 +1,17 @@
 # Release Notes for Blitz
 
-## 4.10.4 - Unreleased
+## 4.11.0 - Unreleased
 
 ### Added
 
+- Added recommendations to the Blitz Cache utility.
 - Added a status filter and an expiry date column in the Blitz Cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
 
 ### Changed
 
 - The Cache Folder Path column now displays aliases in the cached file table in the File Storage utility.
 - Improved error handling in a previous migration.
-- Made some minor optimisations to the file storage driver.
+- Made minor optimisations to the file storage driver.
 
 ### Fixed
 

@@ -20,6 +20,7 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\services\CacheRequestService;
+use putyourlightson\blitzhints\BlitzHints;
 
 /**
  * @since 4.10.0
@@ -257,6 +258,11 @@ class DiagnosticsHelper
     public static function getDateForDb(DateTime $dateTime): string
     {
         return Db::prepareDateForDb($dateTime);
+    }
+
+    public static function getHintsCount(): int
+    {
+        return BlitzHints::getInstance()->hints->getTotalWithoutRouteVariables();
     }
 
     public static function getDriverDataAction(string $action): ?string
