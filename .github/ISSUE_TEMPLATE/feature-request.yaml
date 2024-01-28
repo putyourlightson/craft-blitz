@@ -10,12 +10,11 @@ body:
 
         If you still believe that you have a new feature request, please provide a clear and concise description, including:
         - What problem you believe your feature request can solve.
-        - Any alternative solutions or features you have already considered.  
-
+        - Any alternative solutions or features you have already considered.
   - type: textarea
     id: body
     attributes:
-      label: 'Description'
+      label: 'Feature request'
     validations:
       required: true
   - type: input
