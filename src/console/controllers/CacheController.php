@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\console\controllers;
 use Craft;
 use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\utilities\CacheUtility;
@@ -272,6 +273,8 @@ class CacheController extends Controller
         if (!$this->queue) {
             Craft::$app->runAction('queue/run');
         }
+
+        DiagnosticsHelper::updateDriverDataAction('refresh-expired');
 
         $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.') . PHP_EOL, BaseConsole::FG_GREEN);
 

@@ -48,7 +48,10 @@
     <p>
         {% if craft.app.request.isWebAliasSetDynamically %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank">@web alias</a> should be explicitly overridden to ensure that URLs work correctly with console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
+        The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly overridden.
+            <span class="info">
+                Explicitly overriding the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly with console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
+            </span>
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
             The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank">@web alias</a> is explicitly overridden.
@@ -57,7 +60,10 @@
     <p>
         {% if craft.app.config.general.runQueueAutomatically %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            Pending queue jobs are configured to run automatically via web requests, which can cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+            Pending queue jobs are configured to run automatically via web requests.
+            <span class="info">
+                Running queue jobs via web requests can negatively impact the performance of a site and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+            </span>
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
             The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank">@web alias</a> is being explicitly overridden.
@@ -66,10 +72,26 @@
     <p>
         {% if craft.app.plugins.getPlugin('async-queue') is not null %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is enabled, which can be unreliable and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+            The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is enabled.
+            <span class="info">
+                This plugin can be unreliable when used in certain web servers and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+            </span>
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
             The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is not enabled.
+        {% endif %}
+    </p>
+    <p>
+        {% set refreshExpired = craft.blitz.diagnostics.driverDataAction('refresh-expired') %}
+        {% if refreshExpired is null or refreshExpired < craft.blitz.diagnostics.dateForDb(now|date_modify('-24 hours')) %}
+            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+            The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.
+            <span class="info">
+                This indicates that a scheduled cron job is not set up to refresh expired cache on a recurring interval. <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>
+            </span>
+        {% else %}
+            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+            The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.
         {% endif %}
     </p>
 

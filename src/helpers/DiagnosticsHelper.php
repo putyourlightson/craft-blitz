@@ -14,6 +14,7 @@ use craft\helpers\Db;
 use craft\helpers\Json;
 use DateTime;
 use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
@@ -256,5 +257,46 @@ class DiagnosticsHelper
     public static function getDateForDb(DateTime $dateTime): string
     {
         return Db::prepareDateForDb($dateTime);
+    }
+
+    public static function getDriverDataAction(string $action): ?string
+    {
+        $record = DriverDataRecord::find()
+            ->where(['driver' => 'diagnostics-utility'])
+            ->one();
+
+        if ($record === null) {
+            return null;
+        }
+
+        $data = Json::decodeIfJson($record->data);
+
+        if (!is_array($data)) {
+            return null;
+        }
+
+        return $data[$action] ?? null;
+    }
+
+    public static function updateDriverDataAction(string $action): void
+    {
+        $record = DriverDataRecord::find()
+            ->where(['driver' => 'diagnostics-utility'])
+            ->one();
+
+        if ($record === null) {
+            $record = new DriverDataRecord();
+            $record->driver = 'diagnostics-utility';
+        }
+
+        $data = Json::decodeIfJson($record->data);
+
+        if (!is_array($data)) {
+            $data = [];
+        }
+
+        $data[$action] = Db::prepareDateForDb(new DateTime());
+        $record->data = json_encode($data);
+        $record->save();
     }
 }
