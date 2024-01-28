@@ -10,9 +10,12 @@ use craft\base\Element;
 use craft\db\ActiveQuery;
 use craft\db\QueryAbortedException;
 use craft\db\Table;
+use craft\helpers\Db;
 use craft\helpers\Json;
+use DateTime;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
+use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -130,7 +133,7 @@ class DiagnosticsHelper
             ->asArray();
     }
 
-    public static function getElementsQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
+    public static function getElementsQuery(int $siteId, string $elementType, ?string $status, ?int $pageId = null): ActiveQuery
     {
         $condition = [
             CacheRecord::tableName() . '.siteId' => $siteId,
@@ -142,15 +145,24 @@ class DiagnosticsHelper
             $condition['cacheId'] = $pageId;
         }
 
-        return ElementCacheRecord::find()
+        $query = ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'count(*) as count', 'title'])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title'])
             ->innerJoinWith('cache')
+            ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
             ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementcaches.elementId]]')
             ->innerJoin(['content' => Table::CONTENT], '[[content.elementId]] = [[elementcaches.elementId]]')
             ->where($condition)
             ->groupBy(['elementcaches.elementId', 'title'])
             ->asArray();
+
+        if ($status === 'expiring') {
+            $query->andWhere(['>', 'elementexpirydates.expiryDate', Db::prepareDateForDb(new DateTime())]);
+        } elseif ($status === 'expired') {
+            $query->andWhere(['<=', 'elementexpirydates.expiryDate', Db::prepareDateForDb(new DateTime())]);
+        }
+
+        return $query;
     }
 
     public static function getElementQueriesQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
@@ -239,5 +251,10 @@ class DiagnosticsHelper
             ->select(['uri'])
             ->where(['siteId' => $siteId])
             ->andWhere(['like', 'uri', $param]);
+    }
+
+    public static function getDateForDb(DateTime $dateTime): string
+    {
+        return Db::prepareDateForDb($dateTime);
     }
 }

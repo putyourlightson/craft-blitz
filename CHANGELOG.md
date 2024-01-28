@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added a dropdown to filter by expired pages and added an expiry date column in the Blitz Cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
+- Added a status filter and an expiry date column in the Blitz Cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
 
 ### Changed
 

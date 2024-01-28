@@ -2,15 +2,17 @@
 {% set sortBy = sortBy ?? 'desc' %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
-{% set expired = expired ?? false %}
+{% set status = status ?? null %}
 {% set search = search ?? null %}
 
 {% set query = craft.blitz.diagnostics.getPagesQuery(siteId)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
-{% if expired %}
-    {% do query.andWhere(['not', { 'expiryDate': null }]) %}
+{% if status == 'expiring' %}
+    {% do query.andWhere(['>', 'expiryDate', craft.blitz.diagnostics.getDateForDb(now)]) %}
+{% elseif status == 'expired' %}
+    {% do query.andWhere(['<=', 'expiryDate', craft.blitz.diagnostics.getDateForDb(now)]) %}
 {% endif %}
 {% if search %}
     {% if search == '/' %}
@@ -36,9 +38,10 @@
             {% endif %}
         </div>
         <div class="select">
-            <select sprig name="expired">
-                <option value="0">All</option>
-                <option value="1">Expired</option>
+            <select sprig name="status">
+                <option value="">All</option>
+                <option value="expiring">Expiring</option>
+                <option value="expired">Expired</option>
             </select>
         </div>
         <div id="toolbar" class="flex">

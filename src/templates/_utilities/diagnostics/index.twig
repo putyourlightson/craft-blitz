@@ -21,13 +21,6 @@
         </a>
     </h2>
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/expired') }}">
-            {% set count = craft.blitz.diagnostics.getExpiredCount(siteId) %}
-            {{ count|number }}
-            {{ '{num, plural, =1{Expired Page} other{Expired Pages}}'|t('blitz', { num: count }) }}
-        </a>
-    </h2>
-    <h2>
         <a href="{{ url('utilities/blitz-diagnostics/params') }}">
             {% set count = craft.blitz.diagnostics.getParamsCount(siteId) %}
             {{ count|number }}
