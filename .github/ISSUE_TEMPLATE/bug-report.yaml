@@ -6,11 +6,11 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to submit a bug report! To ensure that this hasn’t already been reported, please first search the [existing issues](https://github.com/putyourlightson/craft-blitz/issues?q=is%3Aissue).
+        Thanks for taking the time to submit a bug report! To ensure this hasn’t already been reported, please first search [existing issues](https://github.com/putyourlightson/craft-blitz/issues?q=is%3Aissue).
 
-        Also, to rule out that this is a setup or configuration issue, please read the [Best Practices](https://putyourlightson.com/plugins/blitz#best-practices) and [Common Issues](https://putyourlightson.com/plugins/blitz#common-issues) sections of the docs.
+        To rule out that this isn’t a setup or configuration issue, please read the [Best Practices](https://putyourlightson.com/plugins/blitz#best-practices) and [Common Issues](https://putyourlightson.com/plugins/blitz#common-issues) sections of the docs.
         
-        If you still believe that you’ve found a bug, please provide a clear and concise description, including:
+        If you still believe you’ve found a bug, please provide a clear and concise description, including:
         - What is happening and what you expected to happen.
         - Steps to reproduce the issue.
         - Screenshots, if applicable.
