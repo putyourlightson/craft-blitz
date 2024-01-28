@@ -11,7 +11,8 @@ body:
         If your question is still unanswered, please provide a clear and concise description. Note that we are diligent about documentation, so please check whether your question is answered by the [plugin docs](https://putyourlightson.com/plugins/blitz) before submitting.
   - type: textarea
     id: body
-    label: 'Description'
+    attributes:
+      label: 'Description'
     validations:
       required: true
   - type: input

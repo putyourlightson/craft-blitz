@@ -13,7 +13,8 @@ body:
         - Any alternative solutions or features you have already considered.
   - type: textarea
     id: body
-    label: 'Description'
+    attributes:
+      label: 'Description'
     validations:
       required: true
   - type: input

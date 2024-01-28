@@ -17,7 +17,8 @@ body:
         - The plugin and Craft version numbers.
   - type: textarea
     id: body
-    label: 'Description'
+    attributes:
+      label: 'Description'
     validations:
       required: true
   - type: input
