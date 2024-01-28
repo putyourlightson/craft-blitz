@@ -12,12 +12,13 @@ body:
   - type: textarea
     id: body
     attributes:
-      label: 'Support request'
+      label: Support Request
+      description: Please provide a clear and concise question.
     validations:
       required: true
   - type: input
     id: pluginVersion
     attributes:
-      label: Plugin version
-    validations:
-      required: true
+      label: Plugin Version
+      description: Provide the plugin version that this relates to, ideally the [latest version](https://github.com/putyourlightson/craft-blitz/blob/develop/CHANGELOG.md).
+      placeholder: 4.10.0
