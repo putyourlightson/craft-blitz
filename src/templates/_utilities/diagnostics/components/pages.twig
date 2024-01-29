@@ -93,7 +93,7 @@
                                 {{ (row.elementQueryCount ?? 0)|number }}
                             </td>
                             <td>
-                                {{ row.expiryDate ? row.expiryDate|datetime('short') }}
+                                {{ row.expiryDate ? craft.blitz.diagnostics.getDateFromDb(row.expiryDate)|datetime('short') }}
                             </td>
                             <td class="thin">
                                 <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>

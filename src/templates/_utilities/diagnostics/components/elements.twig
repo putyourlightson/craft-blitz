@@ -75,7 +75,7 @@
                                 </td>
                             {% endif %}
                             <td>
-                                {{ row.expiryDate ? row.expiryDate|datetime('short') }}
+                                {{ row.expiryDate ? craft.blitz.diagnostics.getDateFromDb(row.expiryDate)|datetime('short') }}
                             </td>
                             {% if hasUris %}
                                 <td>

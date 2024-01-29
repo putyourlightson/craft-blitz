@@ -10,6 +10,7 @@ use craft\base\Element;
 use craft\db\ActiveQuery;
 use craft\db\QueryAbortedException;
 use craft\db\Table;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\Json;
 use DateTime;
@@ -250,6 +251,11 @@ class DiagnosticsHelper
     public static function getDateForDb(DateTime $dateTime): string
     {
         return Db::prepareDateForDb($dateTime);
+    }
+
+    public static function getDateFromDb(string $dateTime): DateTime|false
+    {
+        return DateTimeHelper::toDateTime($dateTime);
     }
 
     public static function getHintsCount(): int
