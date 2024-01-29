@@ -1,11 +1,11 @@
 # Release Notes for Blitz
 
-## 4.11.0 - Unreleased
+## 4.10.4 - Unreleased
 
 ### Added
 
 - Added recommendations to the Blitz Cache utility.
-- Added a status filter and an expiry date column in the Blitz Cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
+- Added an expiry date column to pages and elements in the Blitz Cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
 
 ### Changed
 

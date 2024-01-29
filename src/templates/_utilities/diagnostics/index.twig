@@ -96,7 +96,7 @@
             The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is not enabled.
         {% endif %}
         <span class="info">
-            This plugin can be unreliable when used in certain web servers and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+            The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin can be unreliable when used in certain web servers and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
@@ -114,10 +114,10 @@
     <p>
         {% if craft.app.config.general.runQueueAutomatically %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            Pending queue jobs are configured to run automatically via web requests.
+            Queue jobs are configured to run automatically via web requests.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            Pending queue jobs are not configured to run automatically via web requests.
+            Queue jobs are configured to not run automatically via web requests.
         {% endif %}
         <span class="info">
             Running queue jobs via web requests can negatively impact the performance of a site and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>

@@ -127,15 +127,15 @@ class DiagnosticsHelper
                     ->groupBy(['cacheId']),
             ], 'id = [[elements.cacheId]]')
             ->leftJoin([
-                'elementQueries' => ElementQueryCacheRecord::find()
+                'elementquerycaches' => ElementQueryCacheRecord::find()
                     ->select(['cacheId', 'count(*) as elementQueryCount'])
                     ->groupBy(['cacheId']),
-            ], 'id = [[elementQueries.cacheId]]')
+            ], 'id = [[elementquerycaches.cacheId]]')
             ->where(['siteId' => $siteId])
             ->asArray();
     }
 
-    public static function getElementsQuery(int $siteId, string $elementType, ?string $status, ?int $pageId = null): ActiveQuery
+    public static function getElementsQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
     {
         $condition = [
             CacheRecord::tableName() . '.siteId' => $siteId,
@@ -147,7 +147,7 @@ class DiagnosticsHelper
             $condition['cacheId'] = $pageId;
         }
 
-        $query = ElementCacheRecord::find()
+        return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
             ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title'])
             ->innerJoinWith('cache')
@@ -157,14 +157,6 @@ class DiagnosticsHelper
             ->where($condition)
             ->groupBy(['elementcaches.elementId', 'title'])
             ->asArray();
-
-        if ($status === 'expiring') {
-            $query->andWhere(['>', 'elementexpirydates.expiryDate', Db::prepareDateForDb(new DateTime())]);
-        } elseif ($status === 'expired') {
-            $query->andWhere(['<=', 'elementexpirydates.expiryDate', Db::prepareDateForDb(new DateTime())]);
-        }
-
-        return $query;
     }
 
     public static function getElementQueriesQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery

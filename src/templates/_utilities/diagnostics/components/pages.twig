@@ -2,18 +2,12 @@
 {% set sortBy = sortBy ?? 'desc' %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
-{% set status = status ?? null %}
 {% set search = search ?? null %}
 
 {% set query = craft.blitz.diagnostics.getPagesQuery(siteId)
     .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
     .offset(offset)
     .limit(limit) %}
-{% if status == 'expiring' %}
-    {% do query.andWhere(['>', 'expiryDate', craft.blitz.diagnostics.getDateForDb(now)]) %}
-{% elseif status == 'expired' %}
-    {% do query.andWhere(['<=', 'expiryDate', craft.blitz.diagnostics.getDateForDb(now)]) %}
-{% endif %}
 {% if search %}
     {% if search == '/' %}
         {% do query.andWhere({ uri: ''} ) %}
@@ -36,13 +30,6 @@
                     urlFormat: 'utilities/blitz-diagnostics/pages?site={handle}',
                 } only %}
             {% endif %}
-        </div>
-        <div class="select">
-            <select sprig name="status">
-                <option value="">All</option>
-                <option value="expiring">Expiring</option>
-                <option value="expired">Expired</option>
-            </select>
         </div>
         <div id="toolbar" class="flex">
             <div class="search-container flex-grow texticon has-filter-btn">
