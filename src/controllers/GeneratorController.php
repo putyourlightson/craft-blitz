@@ -13,6 +13,7 @@ use craft\web\Controller;
 use craft\web\twig\variables\Paginate;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\records\CacheRecord;
 use Throwable;
 use yii\base\Event;
 use yii\web\Response;
@@ -105,13 +106,15 @@ class GeneratorController extends Controller
             $response = null;
         }
 
-        // If the response failed, delete the cached value
+        // If the response failed, delete the cached value and cache record.
         // https://github.com/putyourlightson/craft-blitz/issues/483
         if ($response === null || !$response->getIsOk()) {
             $siteUri = SiteUriHelper::getSiteUriFromRequest($this->request);
             if ($siteUri !== null) {
                 Blitz::$plugin->cacheStorage->deleteUris([$siteUri]);
             }
+
+            CacheRecord::deleteAll($siteUri->toArray());
         }
 
         return $response;

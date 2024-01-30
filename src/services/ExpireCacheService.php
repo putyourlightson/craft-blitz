@@ -40,17 +40,28 @@ class ExpireCacheService extends Component
     public const EVENT_AFTER_EXPIRE_ALL_CACHE = 'afterExpireAllCache';
 
     /**
-     * Returns expired site URIs with the provided condition.
+     * Returns expired cache IDs with the provided condition.
      *
      * @return int[]
      */
-    public function getExpiredCacheIds(array $condition = []): array
+    public function getExpiredCacheIds(): array
     {
         return CacheRecord::find()
             ->select('id')
             ->where(['<=', 'expiryDate', Db::prepareDateForDb('now')])
-            ->andWhere($condition)
             ->column();
+    }
+
+    /**
+     * Returns an expired cache ID with the provided site URI.
+     */
+    public function getExpiredCacheId(SiteUriModel $siteUri): int|false
+    {
+        return CacheRecord::find()
+            ->select('id')
+            ->where(['<=', 'expiryDate', Db::prepareDateForDb('now')])
+            ->andWhere($siteUri->toArray())
+            ->scalar();
     }
 
     /**

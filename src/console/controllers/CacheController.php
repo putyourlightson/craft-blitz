@@ -274,7 +274,7 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        DiagnosticsHelper::updateDriverDataAction('refresh-expired');
+        DiagnosticsHelper::updateDriverDataAction('refresh-expired-cli');
 
         $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.') . PHP_EOL, BaseConsole::FG_GREEN);
 

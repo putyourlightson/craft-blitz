@@ -259,7 +259,7 @@ class CacheRequestService extends Component
      */
     public function getIsExpiredSiteUri(SiteUriModel $siteUri): bool
     {
-        return !empty(Blitz::$plugin->expireCache->getExpiredCacheIds($siteUri->toArray()));
+        return Blitz::$plugin->expireCache->getExpiredCacheId($siteUri) !== false;
     }
 
     /**

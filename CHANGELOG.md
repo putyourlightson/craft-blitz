@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.10.4 - Unreleased
+## 4.11.0 - Unreleased
 
 ### Added
 
@@ -12,6 +12,7 @@
 - The Cache Folder Path column now displays aliases in the cached file table in the File Storage utility.
 - Improved error handling in a previous migration.
 - Made minor optimisations to the file storage driver.
+- Expired URIs are now deleted from the database immediately when refreshing expired cache.
 
 ### Fixed
 

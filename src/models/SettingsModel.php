@@ -500,9 +500,9 @@ class SettingsModel extends Model
      *
      * @since 4.8.0
      */
-    public function expireOnRefresh(bool $forceClear = false): bool
+    public function expireOnRefresh(bool $forceClear = false, bool $forceGenerate = false): bool
     {
-        if ($forceClear) {
+        if ($forceClear || $forceGenerate) {
             return false;
         }
 

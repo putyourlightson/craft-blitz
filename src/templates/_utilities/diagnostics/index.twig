@@ -124,7 +124,7 @@
         </span>
     </p>
     <p>
-        {% set refreshExpired = craft.blitz.diagnostics.driverDataAction('refresh-expired') %}
+        {% set refreshExpired = craft.blitz.diagnostics.driverDataAction('refresh-expired-cli') %}
         {% if refreshExpired is null or refreshExpired < craft.blitz.diagnostics.dateForDb(now|date_modify('-24 hours')) %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
             The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.

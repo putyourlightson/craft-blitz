@@ -30,6 +30,7 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use yii\db\ActiveQuery;
@@ -455,8 +456,16 @@ class RefreshCacheService extends Component
      */
     public function refreshExpiredSiteUri(SiteUriModel $siteUri): void
     {
-        $cacheIds = Blitz::$plugin->expireCache->getExpiredCacheIds($siteUri->toArray());
-        $this->addCacheIds($cacheIds);
+        $cacheId = Blitz::$plugin->expireCache->getExpiredCacheId($siteUri);
+
+        if ($cacheId === false) {
+            return;
+        }
+
+        // Delete the cache record now, as it may not be deleted later.
+        CacheRecord::deleteAll(['id' => $cacheId]);
+
+        $this->addCacheIds([$cacheId]);
 
         // Forcibly generate the cache if it will not be cleared.
         $forceGenerate = !Blitz::$plugin->settings->clearOnRefresh();
@@ -470,12 +479,16 @@ class RefreshCacheService extends Component
     public function refreshExpiredCache(): void
     {
         $this->batchMode = true;
-        $this->addCacheIds(Blitz::$plugin->expireCache->getExpiredCacheIds());
+        $cacheIds = Blitz::$plugin->expireCache->getExpiredCacheIds();
+        $this->addCacheIds($cacheIds);
+
+        // Delete the cache records now, as they may not be deleted later.
+        CacheRecord::deleteAll(['id' => $cacheIds]);
 
         // Check for expired elements to invalidate
         /** @var ElementExpiryDateRecord[] $elementExpiryDates */
         $elementExpiryDates = ElementExpiryDateRecord::find()
-            ->where(['<', 'expiryDate', Db::prepareDateForDb('now')])
+            ->where(['<=', 'expiryDate', Db::prepareDateForDb('now')])
             ->all();
 
         $elementsService = Craft::$app->getElements();
@@ -568,7 +581,7 @@ class RefreshCacheService extends Component
             Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
         }
 
-        if (Blitz::$plugin->settings->expireOnRefresh($forceClear)) {
+        if (Blitz::$plugin->settings->expireOnRefresh($forceClear, $forceGenerate)) {
             Blitz::$plugin->expireCache->expireUris($siteUris);
         }
 
