@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 3.14.0 - Unreleased
+## 3.14.0 - 2024-01-31
 ### Changed
 - Increased the minimum Craft version requirement to 3.7.5.
 - The cache refresh process is now triggered when an asset’s file is replaced or its filename is changed ([#514](https://github.com/putyourlightson/craft-blitz/issues/514)).
