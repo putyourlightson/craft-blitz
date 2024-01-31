@@ -66,22 +66,22 @@
     <p>
         {% if craft.app.request.isWebAliasSetDynamically %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly overridden.
+            The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly defined.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly overridden.
+            The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
         {% endif %}
         <span class="info">
-            Explicitly overriding the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly with console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
+            Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly with console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
         {% if not craft.app.config.general.generateTransformsBeforePageLoad %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The <a href="https://craftcms.com/docs/4.x/config/general.html#generatetransformsbeforepageload" target="_blank"><code>generateTransformsBeforePageLoad</code></a> general config setting is set to <code>false</code>.
+            Image transforms are not configured to be generated before page load.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The <a href="https://craftcms.com/docs/4.x/config/general.html#generatetransformsbeforepageload" target="_blank"><code>generateTransformsBeforePageLoad</code></a> general config setting is set to <code>true</code>.
+            Image transforms are configured to be generated before page load.
         {% endif %}
         <span class="info">
             Blitz does not cache pages that contain asset transform generation URLs, as doing so can lead to cached pages that perform poorly. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-i-visit-it" target="_blank" class="go">Learn more</a>
@@ -127,13 +127,13 @@
         {% set refreshExpired = craft.blitz.diagnostics.driverDataAction('refresh-expired-cli') %}
         {% if refreshExpired is null or refreshExpired < craft.blitz.diagnostics.dateForDb(now|date_modify('-24 hours')) %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.
+            The refresh expired console command has not been executed within the past 24 hours.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.
+            The refresh expired console command has been executed within the past 24 hours.
         {% endif %}
         <span class="info">
-            The console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache on a recurring interval. <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>
+            The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache on a recurring interval. (You may have to wait for the cron job to run after an update). <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>
         </span>
     </p>
 
