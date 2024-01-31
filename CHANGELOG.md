@@ -13,6 +13,7 @@
 - Improved error handling in a previous migration.
 - Made minor optimisations to the file storage driver.
 - Expired URIs are now deleted from the database immediately when refreshing expired cache.
+- Invalid element query params no longer throw an error when applied ([#579](https://github.com/putyourlightson/craft-blitz/issues/579)).
 
 ### Fixed
 

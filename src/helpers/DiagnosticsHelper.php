@@ -203,6 +203,10 @@ class DiagnosticsHelper
 
         $elementQuery = RefreshCacheHelper::getElementQueryWithParams($elementQueryType, $params);
 
+        if ($elementQuery === null) {
+            return null;
+        }
+
         try {
             $sql = $elementQuery
                 ->select(['elementId' => 'elements.id'])

@@ -13,6 +13,7 @@ use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use Throwable;
+use TypeError;
 use yii\log\Logger;
 
 /**
@@ -143,6 +144,11 @@ class RefreshCacheHelper
         /** @var Element $elementType */
         $elementType = $elementQueryRecord->type;
         $elementQuery = self::getElementQueryWithParams($elementType, $params);
+
+        if ($elementQuery === null) {
+            return [];
+        }
+
         $elementQueryIds = [];
 
         // Execute the element query, ignoring any exceptions.
@@ -168,7 +174,7 @@ class RefreshCacheHelper
     /**
      * Returns an element query of the provided element type with the params applied.
      */
-    public static function getElementQueryWithParams(string $elementType, array $params): ElementQueryInterface
+    public static function getElementQueryWithParams(string $elementType, array $params): ?ElementQueryInterface
     {
         /** @var Element $elementType */
         $elementQuery = $elementType::find();
@@ -177,8 +183,16 @@ class RefreshCacheHelper
         // https://github.com/putyourlightson/craft-blitz/issues/527
         $elementQuery->status(null);
 
-        foreach ($params as $key => $val) {
-            $elementQuery->{$key} = $val;
+        // Assign params, catching any missing types.
+        // https://github.com/putyourlightson/craft-blitz/issues/579
+        try {
+            foreach ($params as $key => $val) {
+                $elementQuery->{$key} = $val;
+            }
+        } catch (TypeError $exception) {
+            Blitz::$plugin->log('Element query param `' . $key . '` could not be applied: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
+
+            return null;
         }
 
         // If the element query has an offset then add it to the limit and make it null
