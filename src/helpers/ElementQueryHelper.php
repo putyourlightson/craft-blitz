@@ -50,6 +50,14 @@ class ElementQueryHelper
             }
         }
 
+        // Exclude query and subquery params, in case they are set.
+        // https://github.com/putyourlightson/craft-blitz/issues/579
+        foreach (['query', 'subquery'] as $key) {
+            if (array_key_exists($key, $params)) {
+                unset($params[$key]);
+            }
+        }
+
         // Ignore specific empty params as they are redundant
         $ignoreEmptyParams = [
             'structureId',
