@@ -187,6 +187,7 @@ class RefreshCacheHelper
         // https://github.com/putyourlightson/craft-blitz/issues/579
         try {
             foreach ($params as $key => $val) {
+                /** @throws TypeError if the type does not exist. */
                 $elementQuery->{$key} = $val;
             }
         } catch (TypeError $exception) {

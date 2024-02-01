@@ -269,6 +269,7 @@ class DiagnosticsHelper
 
     public static function getDriverDataAction(string $action): ?string
     {
+        /** @var DriverDataRecord|null $record */
         $record = DriverDataRecord::find()
             ->where(['driver' => 'diagnostics-utility'])
             ->one();
@@ -288,6 +289,7 @@ class DiagnosticsHelper
 
     public static function updateDriverDataAction(string $action): void
     {
+        /** @var DriverDataRecord|null $record */
         $record = DriverDataRecord::find()
             ->where(['driver' => 'diagnostics-utility'])
             ->one();
