@@ -42,9 +42,9 @@
         </a>
     </h2>
     <br>
-    <h2>
+    <h1 style="margin-bottom: 0">
         {{ 'Recommendations'|t('blitz') }}
-    </h2>
+    </h1>
     <p>
         {% set globalSetCount = craft.globalSets.count %}
         {% if globalSetCount > 0 %}
@@ -132,10 +132,10 @@
         {% set refreshExpired = craft.blitz.diagnostics.driverDataAction('refresh-expired-cli') %}
         {% if refreshExpired is null or refreshExpired < craft.blitz.diagnostics.dateForDb(now|date_modify('-24 hours')) %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The refresh expired console command has not been executed within the past 24 hours.
+            The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The refresh expired console command has been executed within the past 24 hours.
+            The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.
         {% endif %}
         <span class="info">
             The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache at a recurring interval. (You may have to wait for the cron job to run after an update.) <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>
