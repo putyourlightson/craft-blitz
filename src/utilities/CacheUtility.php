@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Utility;
 use putyourlightson\blitz\assets\BlitzAsset;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\console\controllers\CacheController;
 
 class CacheUtility extends Utility
 {
@@ -58,6 +59,9 @@ class CacheUtility extends Utility
 
     /**
      * Returns available actions.
+     * Instruction text should match that of the cache console controller.
+     *
+     * @see CacheController
      */
     public static function getActions(bool $showAll = false): array
     {
@@ -78,7 +82,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'generate',
             'label' => Craft::t('blitz', 'Generate Cache'),
-            'instructions' => Craft::t('blitz', 'Generates all of the cacheable pages.'),
+            'instructions' => Craft::t('blitz', 'Generates all the cacheable pages.'),
         ];
 
         if ($showAll || Blitz::$plugin->cachePurger->isDummy === false) {
@@ -100,7 +104,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh',
             'label' => Craft::t('blitz', 'Refresh Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshes all of the pages according to the “Refresh Mode”.'),
+            'instructions' => Craft::t('blitz', 'Refreshes all the pages according to the “Refresh Mode”.'),
         ];
 
         $actions[] = [
@@ -120,7 +124,7 @@ class CacheUtility extends Utility
             $actions[] = [
                 'id' => 'refresh-site',
                 'label' => Craft::t('blitz', 'Refresh Site Cache'),
-                'instructions' => Craft::t('blitz', 'Refreshes all of the pages in the selected site.'),
+                'instructions' => Craft::t('blitz', 'Refreshes all the pages in the selected site.'),
                 'options' => $options,
             ];
         }
@@ -128,13 +132,13 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh-urls',
             'label' => Craft::t('blitz', 'Refresh Cached URLs'),
-            'instructions' => Craft::t('blitz', 'Refreshes pages with the provided URLs (the `*` wildcard is supported).'),
+            'instructions' => Craft::t('blitz', 'Refreshes cached pages with the provided URLs (the `*` wildcard is supported).'),
         ];
 
         $actions[] = [
             'id' => 'refresh-tagged',
             'label' => Craft::t('blitz', 'Refresh Tagged Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshes pages with the provided tags.'),
+            'instructions' => Craft::t('blitz', 'Refreshes cached pages with the provided tags.'),
         ];
 
         return $actions;

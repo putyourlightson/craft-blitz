@@ -11,7 +11,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\utilities\CacheUtility;
 use yii\console\Controller;
 use yii\console\ExitCode;
 use yii\helpers\BaseConsole;
@@ -22,29 +21,6 @@ class CacheController extends Controller
      * @var bool Whether jobs should be queued only and not run
      */
     public bool $queue = false;
-
-    /**
-     * @var array
-     */
-    private array $_actions = [];
-
-    /**
-     * @inheritdoc
-     */
-    public function init(): void
-    {
-        parent::init();
-
-        foreach (CacheUtility::getActions(true) as $action) {
-            $this->_actions[$action['id']] = $action;
-        }
-
-        $this->_actions['generate-expiry-dates'] = [
-            'id' => 'generate-expiry-dates',
-            'label' => Craft::t('blitz', 'Generate Expiry Dates'),
-            'instructions' => Craft::t('blitz', 'Generates and stores entry expiry dates.'),
-        ];
-    }
 
     /**
      * @inheritdoc
@@ -74,47 +50,7 @@ class CacheController extends Controller
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getActionHelp($action): string
-    {
-        return $this->_actions[$action->id]['instructions'] ?? parent::getActionHelp($action);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getActionHelpSummary($action): string
-    {
-        return $this->getActionHelp($action);
-    }
-
-    /**
-     * Lists the actions that can be taken.
-     */
-    public function actionIndex(): int
-    {
-        $this->stdout(Craft::t('blitz', 'The following actions can be taken:') . PHP_EOL . PHP_EOL, BaseConsole::FG_YELLOW);
-
-        $lengths = [];
-        foreach ($this->_actions as $action) {
-            $lengths[] = strlen($action['id']);
-        }
-        $maxLength = max($lengths);
-
-        foreach ($this->_actions as $action) {
-            $this->stdout('- ');
-            $this->stdout(str_pad($action['id'], $maxLength), BaseConsole::FG_YELLOW);
-            $this->stdout('  ' . $action['instructions'] . PHP_EOL);
-        }
-
-        $this->stdout(PHP_EOL);
-
-        return ExitCode::OK;
-    }
-
-    /**
-     * Clears the cache.
+     * Deletes all cached pages.
      */
     public function actionClear(): int
     {
@@ -124,7 +60,67 @@ class CacheController extends Controller
     }
 
     /**
-     * Flushes the cache.
+     * Deletes all the cached pages in the selected site.
+     *
+     * @since 4.11.0
+     */
+    public function actionClearSite(int $siteId = null): int
+    {
+        if (empty($siteId)) {
+            $this->stderr(Craft::t('blitz', 'A site ID must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        Blitz::$plugin->clearCache->clearSite($siteId);
+
+        $this->stdout(Craft::t('blitz', 'Site successfully cleared.') . PHP_EOL, BaseConsole::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deletes cached pages with the provided URLs (the `*` wildcard is supported).
+     *
+     * @since 4.11.0
+     */
+    public function actionClearUrls(array $urls = []): int
+    {
+        if (empty($urls)) {
+            $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        Blitz::$plugin->clearCache->clearCachedUrls($urls);
+
+        $this->stdout(Craft::t('blitz', 'Cached URLs successfully cleared.') . PHP_EOL, BaseConsole::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deletes cached pages with the provided tags.
+     *
+     * @since 4.11.0
+     */
+    public function actionClearTagged(array $tags = []): int
+    {
+        if (empty($tags)) {
+            $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        Blitz::$plugin->clearCache->clearCacheTags($tags);
+
+        $this->stdout(Craft::t('blitz', 'Tagged cache successfully cleared.') . PHP_EOL, BaseConsole::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deletes all cache records from the database.
      */
     public function actionFlush(): int
     {
@@ -134,17 +130,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Purges the cache.
-     */
-    public function actionPurge(): int
-    {
-        $this->_purgeCache();
-
-        return ExitCode::OK;
-    }
-
-    /**
-     * Generates the cache.
+     * Generates all the cacheable pages.
      */
     public function actionGenerate(): int
     {
@@ -160,7 +146,17 @@ class CacheController extends Controller
     }
 
     /**
-     * Deploys cached files.
+     * Deletes all cached pages in the reverse proxy.
+     */
+    public function actionPurge(): int
+    {
+        $this->_purgeCache();
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deploys all cached files to the remote location.
      */
     public function actionDeploy(): int
     {
@@ -176,7 +172,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes the entire cache, respecting the “Refresh Mode”.
+     * Refreshes all the pages according to the “Refresh Mode”.
      */
     public function actionRefresh(): int
     {
@@ -216,7 +212,25 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes the cache for a site, respecting the “Refresh Mode”.
+     * Refreshes pages that have expired since they were cached.
+     */
+    public function actionRefreshExpired(): int
+    {
+        Blitz::$plugin->refreshCache->refreshExpiredCache();
+
+        if (!$this->queue) {
+            Craft::$app->runAction('queue/run');
+        }
+
+        DiagnosticsHelper::updateDriverDataAction('refresh-expired-cli');
+
+        $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.') . PHP_EOL, BaseConsole::FG_GREEN);
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Refreshes all the pages in the selected site.
      */
     public function actionRefreshSite(int $siteId = null): int
     {
@@ -264,25 +278,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes expired cache, clearing it if necessary.
-     */
-    public function actionRefreshExpired(): int
-    {
-        Blitz::$plugin->refreshCache->refreshExpiredCache();
-
-        if (!$this->queue) {
-            Craft::$app->runAction('queue/run');
-        }
-
-        DiagnosticsHelper::updateDriverDataAction('refresh-expired-cli');
-
-        $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.') . PHP_EOL, BaseConsole::FG_GREEN);
-
-        return ExitCode::OK;
-    }
-
-    /**
-     * Refreshes cached URLs.
+     * Refreshes cached pages with the provided URLs (the `*` wildcard is supported).
      */
     public function actionRefreshUrls(array $urls = []): int
     {
@@ -304,7 +300,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes tagged cached pages.
+     * Refreshes cached pages with the provided tags.
      */
     public function actionRefreshTagged(array $tags = []): int
     {
@@ -326,7 +322,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Generates expiry dates.
+     * Generates and stores entry expiry dates.
      */
     public function actionGenerateExpiryDates(): int
     {

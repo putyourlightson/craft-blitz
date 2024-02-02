@@ -517,7 +517,6 @@ class RefreshCacheService extends Component
      */
     public function refreshCachedUrls(array $urls): void
     {
-        // Get site URIs from URLs
         $siteUris = SiteUriHelper::getSiteUrisFromUrls($urls);
 
         $this->refreshSiteUris($siteUris);
@@ -539,9 +538,7 @@ class RefreshCacheService extends Component
 
         $tags = $event->tags;
 
-        // Get cache IDs to invalidate
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
-
         $this->addCacheIds($cacheIds);
 
         $this->refresh(true);
