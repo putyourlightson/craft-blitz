@@ -50,17 +50,17 @@
         {% if globalSetCount > 0 %}
             {% if craft.app.plugins.plugin('blitz').settings.refreshCacheAutomaticallyForGlobals %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-                {{ globalSetCount }} <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is set to <code>true</code>.
+                {{ globalSetCount }} <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is enabled.
             {% else %}
                 <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-                {{ globalSetCount }} <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is set to <code>false</code>.
+                {{ globalSetCount }} <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is disabled.
             {% endif %}
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
             No globals exist.
         {% endif %}
         <span class="info">
-            Globals should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is set to <code>false</code>. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>
+            Globals should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
@@ -96,19 +96,24 @@
             The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is not enabled.
         {% endif %}
         <span class="info">
-            The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin can be unreliable when used in certain web servers and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+            The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin can be unreliable when used in some environments and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
-        {% set hintsCount = craft.blitz.diagnostics.hintsCount %}
-        {% if hintsCount > 0 %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+        {% if craft.blitz.diagnostics.hintsEnabled %}
+            {% set hintsCount = craft.blitz.diagnostics.hintsCount %}
+            {% if hintsCount > 0 %}
+                <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+            {% else %}
+                <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+            {% endif %}
+            The <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is reporting <code>{{ hintsCount }}</code> eager-loading {{ '{num, plural, =1{opportunity} other{opportunities}}'|t('blitz', { num: hintsCount }) }}.
         {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+            The Blitz Hints utility is disabled.
         {% endif %}
-        The <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is reporting <code>{{ hintsCount }}</code> eager-loading {{ '{num, plural, =1{opportunity} other{opportunities}}'|t('blitz', { num: hintsCount }) }}.
         <span class="info">
-            Always use eager-loading in your templates. The Blitz Hints utility lists opportunities for eager-loading elements including the field name, the template and the line number. <a href="https://putyourlightson.com/plugins/blitz#hints-utility" target="_blank" class="go">Learn more</a>
+            Eager-loading elements is highly recommended. The Blitz Hints utility lists opportunities for eager-loading elements including the field name, the template and the line number. <a href="https://putyourlightson.com/plugins/blitz#hints-utility" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
@@ -133,7 +138,7 @@
             The refresh expired console command has been executed within the past 24 hours.
         {% endif %}
         <span class="info">
-            The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache on a recurring interval. (You may have to wait for the cron job to run after an update). <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>
+            The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache at a recurring interval. (You may have to wait for the cron job to run after an update.) <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>
         </span>
     </p>
 

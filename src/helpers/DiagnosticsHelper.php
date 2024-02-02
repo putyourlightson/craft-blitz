@@ -14,6 +14,7 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\Json;
 use DateTime;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -260,6 +261,11 @@ class DiagnosticsHelper
     public static function getDateFromDb(string $dateTime): DateTime|false
     {
         return DateTimeHelper::toDateTime($dateTime);
+    }
+
+    public static function getHintsEnabled(): bool
+    {
+        return Blitz::$plugin->settings->hintsEnabled;
     }
 
     public static function getHintsCount(): int
