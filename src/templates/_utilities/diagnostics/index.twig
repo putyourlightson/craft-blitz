@@ -88,6 +88,18 @@
         </span>
     </p>
     <p>
+        {% if craft.app.config.general.runQueueAutomatically %}
+            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+            Queue jobs are configured to run automatically via web requests.
+        {% else %}
+            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+            Queue jobs are configured to not run automatically via web requests.
+        {% endif %}
+        <span class="info">
+            Running queue jobs via web requests can negatively impact the performance of a site and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
+        </span>
+    </p>
+    <p>
         {% if craft.app.plugins.getPlugin('async-queue') is not null %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
             The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is enabled.
@@ -104,28 +116,17 @@
             {% set hintsCount = craft.blitz.diagnostics.hintsCount %}
             {% if hintsCount > 0 %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+                The <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is reporting <code>{{ hintsCount }}</code> eager-loading {{ '{num, plural, =1{opportunity} other{opportunities}}'|t('blitz', { num: hintsCount }) }}.
             {% else %}
                 <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+                The <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is not reporting any eager-loading opportunities.
             {% endif %}
-            The <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is reporting <code>{{ hintsCount }}</code> eager-loading {{ '{num, plural, =1{opportunity} other{opportunities}}'|t('blitz', { num: hintsCount }) }}.
         {% else %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
             The Blitz Hints utility is disabled.
         {% endif %}
         <span class="info">
             Eager-loading elements is highly recommended. The Blitz Hints utility lists opportunities for eager-loading elements including the field name, the template and the line number. <a href="https://putyourlightson.com/plugins/blitz#hints-utility" target="_blank" class="go">Learn more</a>
-        </span>
-    </p>
-    <p>
-        {% if craft.app.config.general.runQueueAutomatically %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            Queue jobs are configured to run automatically via web requests.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            Queue jobs are configured to not run automatically via web requests.
-        {% endif %}
-        <span class="info">
-            Running queue jobs via web requests can negatively impact the performance of a site and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
