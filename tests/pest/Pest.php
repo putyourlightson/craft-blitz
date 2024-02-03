@@ -29,9 +29,9 @@ uses(TestCase::class)
     })
     ->afterAll(function() {
         cleanup();
-        Craft::$app->queue->releaseAll();
         Blitz::$plugin->cacheStorage->deleteAll();
         Blitz::$plugin->flushCache->flushAll();
+        Craft::$app->queue->releaseAll();
     })
     ->in('./');
 

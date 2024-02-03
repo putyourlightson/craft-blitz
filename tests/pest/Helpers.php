@@ -6,11 +6,13 @@ use craft\commerce\elements\Variant;
 use craft\commerce\models\LineItem;
 use craft\commerce\Plugin;
 use craft\commerce\records\Product as ProductRecord;
+use craft\db\Table;
 use craft\elements\Asset;
 use craft\elements\Entry;
 use craft\fs\Local;
 use craft\helpers\App;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Db;
 use craft\helpers\FileHelper;
 use craft\helpers\StringHelper;
 use craft\records\Asset as AssetRecord;
@@ -183,6 +185,9 @@ function cleanup(): void
     ElementRecord::deleteAll(['id' => array_merge($entryIds, $assetIds, $productIds)]);
 
     Craft::$app->elements->invalidateAllCaches();
+
+    Db::delete(Table::TOKENS, ['route' => 'blitz/test']);
+    Db::delete(Table::TOKENS, ['route' => 'blitz/generator/generate']);
 
     $volume = Craft::$app->volumes->getVolumeByHandle(App::env('TEST_VOLUME_HANDLE'));
     /** @var Local $fs */

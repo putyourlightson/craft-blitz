@@ -6,6 +6,7 @@
 /phpstan.neon export-ignore
 /tests/ export-ignore
 /tsconfig.json export-ignore
+/controllers/TestController.php export-ignore
 
 # Auto detect text files and perform LF normalization
 * text=auto

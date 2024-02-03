@@ -10,12 +10,6 @@ use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\RefreshCacheService;
 
 beforeEach(function() {
-    Blitz::$plugin->settings->includedUriPatterns = [
-        [
-            'siteId' => '',
-            'uriPattern' => '.*',
-        ],
-    ];
     Blitz::$plugin->cacheStorage->deleteAll();
     Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh]'));
 });
@@ -57,7 +51,7 @@ test('Response contains the expired cache control header and the cache is refres
         ->toEqual(Blitz::$plugin->settings->cacheControlHeaderExpired);
 });
 
-test('Response adds the “X-Powered-By” header once', function() {
+test('Response adds the `X-Powered-By` header once', function() {
     Craft::$app->config->general->sendPoweredByHeader = true;
     $response = sendRequest();
 
@@ -65,7 +59,7 @@ test('Response adds the “X-Powered-By” header once', function() {
         ->toContainOnce('Blitz', 'Craft CMS');
 });
 
-test('Response overwrites the “X-Powered-By” header', function() {
+test('Response overwrites the `X-Powered-By` header', function() {
     Craft::$app->config->general->sendPoweredByHeader = false;
     $response = sendRequest();
 
