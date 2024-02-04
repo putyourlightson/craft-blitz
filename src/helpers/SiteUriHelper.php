@@ -304,8 +304,8 @@ class SiteUriHelper
 
                 foreach ($indexes as $index) {
                     $urls[] = str_replace(
-                        $asset->filename,
-                        $index['transformString'] . '/' . $asset->filename,
+                        $asset->getFilename(),
+                        $index['transformString'] . '/' . $asset->getFilename(),
                         $url,
                     );
                 }
