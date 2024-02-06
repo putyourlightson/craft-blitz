@@ -26,11 +26,13 @@ class ClearCacheService extends Component
 
     /**
      * @event RefreshCacheTagsEvent
+     * @since 4.11.0
      */
     public const EVENT_BEFORE_CLEAR_CACHE_TAGS = 'beforeClearCacheTags';
 
     /**
      * @event RefreshCacheTagsEvent
+     * @since 4.11.0
      */
     public const EVENT_AFTER_CLEAR_CACHE_TAGS = 'afterClearCacheTags';
 

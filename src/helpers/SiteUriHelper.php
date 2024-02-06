@@ -18,6 +18,7 @@ use craft\web\twig\variables\Paginate;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\CacheTagRecord;
 
 class SiteUriHelper
 {
@@ -65,7 +66,7 @@ class SiteUriHelper
 
         // Use sets and the splat operator rather than array_merge for performance
         // https://goo.gl/9mntEV
-        $siteUriSets = [self::getSiteUrisForSite($primarySite->id, true)];
+        $siteUriSets = [self::getCacheableSiteUrisForSite($primarySite->id)];
 
         // Loop through all sites to ensure we generate all site element URLs
         $sites = $sitesService->getAllSites();
@@ -73,7 +74,7 @@ class SiteUriHelper
         foreach ($sites as $site) {
             // Ignore primary site as we have already added it
             if ($site->id != $primarySite->id) {
-                $siteUriSets[] = self::getSiteUrisForSite($site->id, true);
+                $siteUriSets[] = self::getCacheableSiteUrisForSite($site->id);
             }
         }
 
@@ -81,11 +82,26 @@ class SiteUriHelper
     }
 
     /**
+     * Returns all site URIs with custom site URIs.
+     *
+     * @return SiteUriModel[]
+     *
+     * @since 4.11.0
+     */
+    public static function getAllSiteUrisWithCustomSiteUris(): array
+    {
+        return array_merge(
+            self::getAllSiteUris(),
+            Blitz::$plugin->settings->getCustomSiteUris(),
+        );
+    }
+
+    /**
      * Returns site URIs for a given site.
      *
      * @return SiteUriModel[]
      */
-    public static function getSiteUrisForSite(int $siteId, bool $cacheableOnly = false): array
+    public static function getSiteUrisForSite(int $siteId): array
     {
         $siteUris = [];
 
@@ -120,23 +136,72 @@ class SiteUriHelper
         $uris = array_unique($uris);
 
         foreach ($uris as $uri) {
-            $siteUri = new SiteUriModel([
+            $siteUris[] = new SiteUriModel([
                 'siteId' => $siteId,
                 'uri' => $uri,
             ]);
-
-            if ($cacheableOnly) {
-                if (!Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
-                    || !Blitz::$plugin->settings->generatePageBasedOnQueryString($uri)
-                ) {
-                    continue;
-                }
-            }
-
-            $siteUris[] = $siteUri;
         }
 
         return $siteUris;
+    }
+
+    /**
+     * Returns cacheable site URIs for a given site.
+     *
+     * @return SiteUriModel[]
+     */
+    public static function getCacheableSiteUrisForSite(int $siteId): array
+    {
+        $cacheableSiteUris = [];
+        $siteUris = self::getSiteUrisForSite($siteId);
+
+        foreach ($siteUris as $siteUri) {
+            if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
+                && Blitz::$plugin->settings->generatePageBasedOnQueryString($siteUri->uri)
+            ) {
+                $cacheableSiteUris[] = $siteUri;
+            }
+        }
+
+        return $cacheableSiteUris;
+    }
+
+    /**
+     * Returns site URIs for a given site with custom site URIs.
+     *
+     * @return SiteUriModel[]
+     *
+     * @since 4.11.0
+     */
+    public static function getSiteUrisForSiteWithCustomSiteUris(int $siteId): array
+    {
+        return array_merge(
+            self::getSiteUrisForSite($siteId),
+            Blitz::$plugin->settings->getCustomSiteUris($siteId),
+        );
+    }
+
+    /**
+     * Returns cacheable site URIs for a given site with custom site URIs.
+     *
+     * @return SiteUriModel[]
+     *
+     * @since 4.11.0
+     */
+    public static function getCacheableSiteUrisForSiteWithCustomSiteUris(int $siteId): array
+    {
+        $cacheableSiteUris = self::getCacheableSiteUrisForSite($siteId);
+        $customSiteUris = Blitz::$plugin->settings->getCustomSiteUris($siteId);
+
+        foreach ($customSiteUris as $siteUri) {
+            if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
+                && Blitz::$plugin->settings->generatePageBasedOnQueryString($siteUri->uri)
+            ) {
+                $cacheableSiteUris[] = $siteUri;
+            }
+        }
+
+        return $cacheableSiteUris;
     }
 
     /**
@@ -362,6 +427,32 @@ class SiteUriHelper
         }
 
         return $urls;
+    }
+
+    /**
+     * Returns site URIs from the given tags.
+     *
+     * @param string[] $tags
+     * @return SiteUriModel[]
+     * @since 4.11.0
+     */
+    public static function getSiteUrisFromTags(array $tags): array
+    {
+        $siteUriModels = [];
+
+        /** @var array $siteUris */
+        $siteUris = CacheTagRecord::find()
+            ->select(['siteId', 'uri'])
+            ->joinWith('cache')
+            ->where(['tag' => $tags])
+            ->asArray()
+            ->all();
+
+        foreach ($siteUris as $siteUri) {
+            $siteUriModels[] = new SiteUriModel($siteUri);
+        }
+
+        return $siteUriModels;
     }
 
     /**

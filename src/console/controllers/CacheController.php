@@ -60,7 +60,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Deletes all the cached pages in the selected site.
+     * Deletes all cached pages in the provided site.
      *
      * @since 4.11.0
      */
@@ -72,9 +72,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        Blitz::$plugin->clearCache->clearSite($siteId);
-
-        $this->stdout(Craft::t('blitz', 'Site successfully cleared.') . PHP_EOL, BaseConsole::FG_GREEN);
+        $this->_clearCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
 
         return ExitCode::OK;
     }
@@ -92,9 +90,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        Blitz::$plugin->clearCache->clearCachedUrls($urls);
-
-        $this->stdout(Craft::t('blitz', 'Cached URLs successfully cleared.') . PHP_EOL, BaseConsole::FG_GREEN);
+        $this->_clearCache(SiteUriHelper::getSiteUrisFromUrls($urls));
 
         return ExitCode::OK;
     }
@@ -130,7 +126,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Generates all the cacheable pages.
+     * Generates all cacheable pages.
      */
     public function actionGenerate(): int
     {
@@ -140,17 +136,125 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_generateCache(SiteUriHelper::getAllSiteUris());
+        $this->_generateCache(SiteUriHelper::getAllSiteUrisWithCustomSiteUris());
 
         return ExitCode::OK;
     }
 
     /**
-     * Deletes all cached pages in the reverse proxy.
+     * Generates all cacheable pages in the provided site.
+     *
+     * @since 4.11.0
+     */
+    public function actionGenerateSite(int $siteId = null): int
+    {
+        if (empty($siteId)) {
+            $this->stderr(Craft::t('blitz', 'A site ID must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        $this->_generateCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Generates cacheable pages with the provided URLs (the `*` wildcard is supported).
+     *
+     * @since 4.11.0
+     */
+    public function actionGenerateUrls(array $urls = []): int
+    {
+        if (empty($urls)) {
+            $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        $this->_generateCache(SiteUriHelper::getSiteUrisFromUrls($urls));
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Generates cacheable pages with the provided tags.
+     *
+     * @since 4.11.0
+     */
+    public function actionGenerateTagged(array $tags = []): int
+    {
+        if (empty($tags)) {
+            $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        $this->_generateCache(SiteUriHelper::getSiteUrisFromTags($tags));
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deletes all cached pages from the reverse proxy.
      */
     public function actionPurge(): int
     {
         $this->_purgeCache();
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deletes all cached pages in the provided site from the reverse proxy.
+     *
+     * @since 4.11.0
+     */
+    public function actionPurgeSite(int $siteId = null): int
+    {
+        if (empty($siteId)) {
+            $this->stderr(Craft::t('blitz', 'A site ID must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        $this->_purgeCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deletes cacheable pages with the provided URLs (the `*` wildcard is supported) from the reverse proxy.
+     *
+     * @since 4.11.0
+     */
+    public function actionPurgeUrls(array $urls = []): int
+    {
+        if (empty($urls)) {
+            $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        $this->_purgeCache(SiteUriHelper::getSiteUrisFromUrls($urls));
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deletes cacheable pages with the provided tags from the reverse proxy.
+     *
+     * @since 4.11.0
+     */
+    public function actionPurgeTagged(array $tags = []): int
+    {
+        if (empty($tags)) {
+            $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::OK;
+        }
+
+        $this->_purgeCache(SiteUriHelper::getSiteUrisFromTags($tags));
 
         return ExitCode::OK;
     }
@@ -172,7 +276,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes all the pages according to the “Refresh Mode”.
+     * Refreshes all pages according to the “Refresh Mode”.
      */
     public function actionRefresh(): int
     {
@@ -180,10 +284,7 @@ class CacheController extends Controller
 
         // Get site URIs to generate before flushing the cache
         if ($generateOnRefresh) {
-            $siteUris = array_merge(
-                SiteUriHelper::getAllSiteUris(),
-                Blitz::$plugin->settings->getCustomSiteUris(),
-            );
+            $siteUris = SiteUriHelper::getAllSiteUrisWithCustomSiteUris();
         }
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
@@ -230,7 +331,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes all the pages in the selected site.
+     * Refreshes all pages in the provided site.
      */
     public function actionRefreshSite(int $siteId = null): int
     {
@@ -241,13 +342,7 @@ class CacheController extends Controller
         }
 
         // Get site URIs to generate before flushing the cache
-        $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
-
-        foreach (Blitz::$plugin->settings->getCustomSiteUris() as $customSiteUri) {
-            if ($customSiteUri['siteId'] == $siteId) {
-                $siteUris[] = $customSiteUri;
-            }
-        }
+        $siteUris = SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId);
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
             $this->_clearCache($siteUris);
@@ -412,8 +507,6 @@ class CacheController extends Controller
      */
     private function _generateCache(array $siteUris): void
     {
-        $siteUris = array_merge($siteUris, Blitz::$plugin->settings->getCustomSiteUris());
-
         if ($this->queue) {
             Blitz::$plugin->cacheGenerator->generateUris($siteUris, [$this, 'setProgressHandler']);
             $this->_output('Blitz cache queued for generation.');

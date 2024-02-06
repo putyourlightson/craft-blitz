@@ -82,14 +82,14 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'generate',
             'label' => Craft::t('blitz', 'Generate Cache'),
-            'instructions' => Craft::t('blitz', 'Generates all the cacheable pages.'),
+            'instructions' => Craft::t('blitz', 'Generates all cacheable pages.'),
         ];
 
         if ($showAll || Blitz::$plugin->cachePurger->isDummy === false) {
             $actions[] = [
                 'id' => 'purge',
                 'label' => Craft::t('blitz', 'Purge Cache'),
-                'instructions' => Craft::t('blitz', 'Deletes all cached pages in the reverse proxy.'),
+                'instructions' => Craft::t('blitz', 'Deletes all cached pages from the reverse proxy.'),
             ];
         }
 
@@ -104,7 +104,7 @@ class CacheUtility extends Utility
         $actions[] = [
             'id' => 'refresh',
             'label' => Craft::t('blitz', 'Refresh Cache'),
-            'instructions' => Craft::t('blitz', 'Refreshes all the pages according to the “Refresh Mode”.'),
+            'instructions' => Craft::t('blitz', 'Refreshes all pages according to the “Refresh Mode”.'),
         ];
 
         $actions[] = [
@@ -124,7 +124,7 @@ class CacheUtility extends Utility
             $actions[] = [
                 'id' => 'refresh-site',
                 'label' => Craft::t('blitz', 'Refresh Site Cache'),
-                'instructions' => Craft::t('blitz', 'Refreshes all the pages in the selected site.'),
+                'instructions' => Craft::t('blitz', 'Refreshes all pages in the provided site.'),
                 'options' => $options,
             ];
         }

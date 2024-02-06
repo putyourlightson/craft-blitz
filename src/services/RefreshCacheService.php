@@ -436,13 +436,7 @@ class RefreshCacheService extends Component
         }
 
         // Get site URIs to generate before flushing the cache
-        $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
-
-        foreach (Blitz::$plugin->settings->getCustomSiteUris() as $customSiteUri) {
-            if ($customSiteUri['siteId'] == $siteId) {
-                $siteUris[] = $customSiteUri;
-            }
-        }
+        $siteUris = SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId);
 
         $this->refreshSiteUris($siteUris);
 

@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added new console commands for clearing the cache: `blitz/cache/clear-site`, `blitz/cache/clear-tagged`, `blitz/cache/clear-urls`.
+- Added new console commands for clearing, generating and purging the cache.
 - Added recommendations to the Blitz Cache utility.
 - Added an expiry date column to pages and elements in the Blitz Cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
 

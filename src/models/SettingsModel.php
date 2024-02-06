@@ -579,12 +579,14 @@ class SettingsModel extends Model
      * @return SiteUriModel[]
      * @since 4.3.0
      */
-    public function getCustomSiteUris(): array
+    public function getCustomSiteUris(?int $siteId = null): array
     {
         $customSiteUris = [];
 
         foreach ($this->customSiteUris as $customSiteUri) {
-            $customSiteUris[] = new SiteUriModel($customSiteUri);
+            if ($siteId === null || $customSiteUri['siteId'] === $siteId) {
+                $customSiteUris[] = new SiteUriModel($customSiteUri);
+            }
         }
 
         return $customSiteUris;

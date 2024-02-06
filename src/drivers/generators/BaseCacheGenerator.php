@@ -115,7 +115,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         $customSiteUris = $groupedSiteUris[$siteId] ?? [];
 
         $siteUris = array_merge(
-            SiteUriHelper::getSiteUrisForSite($siteId, true),
+            SiteUriHelper::getCacheableSiteUrisForSite($siteId),
             $customSiteUris
         );
 

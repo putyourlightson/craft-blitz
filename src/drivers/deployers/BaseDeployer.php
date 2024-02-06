@@ -62,7 +62,7 @@ abstract class BaseDeployer extends SavableComponent implements DeployerInterfac
      */
     public function deploySite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
     {
-        $siteUris = SiteUriHelper::getSiteUrisForSite($siteId, true);
+        $siteUris = SiteUriHelper::getCacheableSiteUrisForSite($siteId);
         $this->deployUris($siteUris, $setProgressHandler, $queue);
     }
 
