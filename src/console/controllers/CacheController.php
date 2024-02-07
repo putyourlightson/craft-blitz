@@ -108,9 +108,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        Blitz::$plugin->clearCache->clearCacheTags($tags);
-
-        $this->stdout(Craft::t('blitz', 'Tagged cache successfully cleared.') . PHP_EOL, BaseConsole::FG_GREEN);
+        $this->_clearCache(SiteUriHelper::getSiteUrisFromTags($tags));
 
         return ExitCode::OK;
     }
@@ -325,7 +323,7 @@ class CacheController extends Controller
 
         DiagnosticsHelper::updateDriverDataAction('refresh-expired-cli');
 
-        $this->stdout(Craft::t('blitz', 'Expired Blitz cache successfully refreshed.') . PHP_EOL, BaseConsole::FG_GREEN);
+        $this->_output('Expired Blitz cache successfully refreshed.');
 
         return ExitCode::OK;
     }
@@ -367,7 +365,7 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->stdout(Craft::t('blitz', 'Site successfully refreshed.') . PHP_EOL, BaseConsole::FG_GREEN);
+        $this->_output('Site successfully refreshed.');
 
         return ExitCode::OK;
     }
@@ -389,7 +387,7 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->stdout(Craft::t('blitz', 'Cached URLs successfully refreshed.') . PHP_EOL, BaseConsole::FG_GREEN);
+        $this->_output('Cached URLs successfully refreshed.');
 
         return ExitCode::OK;
     }
@@ -411,7 +409,7 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->stdout(Craft::t('blitz', 'Tagged cache successfully refreshed.') . PHP_EOL, BaseConsole::FG_GREEN);
+        $this->_output('Tagged cache successfully refreshed.');
 
         return ExitCode::OK;
     }
@@ -423,7 +421,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->generateExpiryDates();
 
-        $this->stdout(Craft::t('blitz', 'Entry expiry dates successfully generated.') . PHP_EOL, BaseConsole::FG_GREEN);
+        $this->_output('Entry expiry dates successfully generated.');
 
         return ExitCode::OK;
     }
@@ -564,7 +562,7 @@ class CacheController extends Controller
      */
     private function _output(string $message): void
     {
-        Blitz::$plugin->log($message);
+        Blitz::$plugin->log($message . ' [via console command]');
 
         $this->stdout(Craft::t('blitz', $message) . PHP_EOL, BaseConsole::FG_GREEN);
     }
