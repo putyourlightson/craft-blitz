@@ -14,28 +14,28 @@
         </div>
     </header>
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/pages') }}">
+        <a href="{{ cpUrl('utilities/blitz-diagnostics/pages') }}">
             {% set count = craft.blitz.diagnostics.getPagesCount(siteId) %}
             {{ count|number }}
             {{ '{num, plural, =1{Tracked Page} other{Tracked Pages}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/params') }}">
+        <a href="{{ cpUrl('utilities/blitz-diagnostics/params') }}">
             {% set count = craft.blitz.diagnostics.getParamsCount(siteId) %}
             {{ count|number }}
             {{ '{num, plural, =1{Tracked Query String Param} other{Tracked Query String Params}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/elements') }}">
+        <a href="{{ cpUrl('utilities/blitz-diagnostics/elements') }}">
             {% set count = craft.blitz.diagnostics.getElementsCount(siteId) %}
             {{ count|number }}
             {{ '{num, plural, =1{Tracked Element} other{Tracked Elements}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ url('utilities/blitz-diagnostics/element-queries') }}">
+        <a href="{{ cpUrl('utilities/blitz-diagnostics/element-queries') }}">
             {% set count = craft.blitz.diagnostics.getElementQueriesCount(siteId) %}
             {{ count|number }}
             {{ '{num, plural, =1{Tracked Element Query} other{Tracked Element Queries}}'|t('blitz', { num: count }) }}
@@ -74,7 +74,7 @@
             The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
         {% endif %}
         <span class="info">
-            Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly with console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
+            Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
