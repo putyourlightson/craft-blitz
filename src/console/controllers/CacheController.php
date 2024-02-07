@@ -562,7 +562,9 @@ class CacheController extends Controller
      */
     private function _output(string $message): void
     {
-        Blitz::$plugin->log($message . ' [via console command]');
+        $processUser = posix_getpwuid(posix_geteuid());
+        $user = $processUser['name'] ?? 'unknown';
+        Blitz::$plugin->log($message . ' [via console command by "{user}"]', ['user' => $user]);
 
         $this->stdout(Craft::t('blitz', $message) . PHP_EOL, BaseConsole::FG_GREEN);
     }

@@ -77,10 +77,8 @@ class CacheController extends Controller
     public function actionClear(): Response
     {
         Blitz::$plugin->clearCache->clearAll();
-        $message = 'Blitz cache successfully cleared.';
-        $this->_log($message);
 
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse('Blitz cache successfully cleared.');
     }
 
     /**
@@ -89,10 +87,8 @@ class CacheController extends Controller
     public function actionFlush(): Response
     {
         Blitz::$plugin->flushCache->flushAll();
-        $message = 'Blitz cache successfully flushed.';
-        $this->_log($message);
 
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse('Blitz cache successfully flushed.');
     }
 
     /**
@@ -101,10 +97,8 @@ class CacheController extends Controller
     public function actionPurge(): Response
     {
         Blitz::$plugin->cachePurger->purgeAll();
-        $message = 'Blitz cache successfully purged.';
-        $this->_log($message);
 
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse('Blitz cache successfully purged.');
     }
 
     /**
@@ -113,14 +107,12 @@ class CacheController extends Controller
     public function actionGenerate(): Response
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            return $this->_getResponse('Blitz caching is disabled.', false);
+            return $this->_getFailureResponse('Blitz caching is disabled.');
         }
 
         Blitz::$plugin->cacheGenerator->generateAll();
-        $message = 'Blitz cache successfully queued for generation.';
-        $this->_log($message);
 
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse('Blitz cache successfully queued for generation.');
     }
 
     /**
@@ -129,14 +121,12 @@ class CacheController extends Controller
     public function actionDeploy(): Response
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            return $this->_getResponse('Blitz caching is disabled.', false);
+            return $this->_getFailureResponse('Blitz caching is disabled.');
         }
 
         Blitz::$plugin->deployer->deployAll();
-        $message = 'Blitz cache successfully queued for deployment.';
-        $this->_log($message);
 
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse('Blitz cache successfully queued for deployment.');
     }
 
     /**
@@ -151,9 +141,7 @@ class CacheController extends Controller
             $message = 'Blitz cache successfully refreshed and queued for generation.';
         }
 
-        $this->_log($message);
-
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse($message);
     }
 
     /**
@@ -162,10 +150,8 @@ class CacheController extends Controller
     public function actionRefreshExpired(): Response
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
-        $message = 'Expired cache successfully refreshed.';
-        $this->_log($message);
 
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse('Expired cache successfully refreshed.');
     }
 
     /**
@@ -176,7 +162,7 @@ class CacheController extends Controller
         $siteId = Craft::$app->getRequest()->getParam('siteId');
 
         if (empty($siteId)) {
-            return $this->_getResponse('A site ID must be provided.', false);
+            return $this->_getFailureResponse('A site ID must be provided.');
         }
 
         Blitz::$plugin->refreshCache->refreshSite($siteId);
@@ -186,9 +172,7 @@ class CacheController extends Controller
             $message = 'Site successfully refreshed and queued for generation.';
         }
 
-        $this->_log($message);
-
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse($message);
     }
 
     /**
@@ -200,14 +184,12 @@ class CacheController extends Controller
         $urls = $this->_normalizeArguments($urls);
 
         if (empty($urls)) {
-            return $this->_getResponse('At least one URL must be provided.', false);
+            return $this->_getFailureResponse('At least one URL must be provided.');
         }
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
-        $message = 'Cached URLs successfully refreshed.';
-        $this->_log($message);
 
-        return $this->_getResponse($message);
+        return $this->_getSuccessResponse('Cached URLs successfully refreshed.');
     }
 
     /**
@@ -219,27 +201,38 @@ class CacheController extends Controller
         $tags = $this->_normalizeArguments($tags);
 
         if (empty($tags)) {
-            return $this->_getResponse('At least one tag must be provided.', false);
+            return $this->_getFailureResponse('At least one tag must be provided.');
         }
 
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
-        $message = 'Tagged cache successfully refreshed.';
-        $this->_log($message);
+
+        return $this->_getSuccessResponse('Tagged cache successfully refreshed.');
+    }
+
+    /**
+     * Returns a success response.
+     */
+    private function _getSuccessResponse(string $message): Response
+    {
+        Blitz::$plugin->log($message . ' [via cache utility by "{username}"]');
+
+        Craft::$app->getSession()->setNotice(Craft::t('blitz', $message));
 
         return $this->_getResponse($message);
     }
 
     /**
-     * Logs a message.
+     * Returns a failure response.
      */
-    private function _log(string $message): void
+    private function _getFailureResponse(string $message): Response
     {
-        $message .= ' [via cache utility by "{username}"]';
-        Blitz::$plugin->log($message);
+        Craft::$app->getSession()->setError(Craft::t('blitz', $message));
+
+        return $this->_getResponse($message, false);
     }
 
     /**
-     * Returns a response.
+     * Returns a response with the provided message.
      */
     private function _getResponse(string $message, bool $success = true): Response
     {
@@ -251,12 +244,6 @@ class CacheController extends Controller
                 'success' => $success,
                 'message' => Craft::t('blitz', $message),
             ]);
-        }
-
-        if ($success) {
-            Craft::$app->getSession()->setNotice(Craft::t('blitz', $message));
-        } else {
-            Craft::$app->getSession()->setError(Craft::t('blitz', $message));
         }
 
         return $this->redirectToPostedUrl();
