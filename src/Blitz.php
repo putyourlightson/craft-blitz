@@ -9,6 +9,7 @@ use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
+use craft\elements\User;
 use craft\events\BatchElementActionEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
@@ -166,6 +167,13 @@ class Blitz extends Plugin
      */
     public function log(string $message, array $params = [], int $type = Logger::LEVEL_INFO): void
     {
+        /** @var User|null $user */
+        $user = Craft::$app->getUser()->getIdentity();
+
+        if ($user !== null) {
+            $params['username'] = $user->username;
+        }
+
         $message = Craft::t('blitz', $message, $params);
 
         Craft::getLogger()->log($message, $type, 'blitz');

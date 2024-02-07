@@ -78,7 +78,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->clearCache->clearAll();
         $message = 'Blitz cache successfully cleared.';
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -90,7 +90,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->flushCache->flushAll();
         $message = 'Blitz cache successfully flushed.';
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -102,7 +102,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->cachePurger->purgeAll();
         $message = 'Blitz cache successfully purged.';
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -118,7 +118,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->cacheGenerator->generateAll();
         $message = 'Blitz cache successfully queued for generation.';
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -134,7 +134,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->deployer->deployAll();
         $message = 'Blitz cache successfully queued for deployment.';
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -151,7 +151,7 @@ class CacheController extends Controller
             $message = 'Blitz cache successfully refreshed and queued for generation.';
         }
 
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -163,7 +163,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
         $message = 'Expired cache successfully refreshed.';
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -186,7 +186,7 @@ class CacheController extends Controller
             $message = 'Site successfully refreshed and queued for generation.';
         }
 
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -205,7 +205,7 @@ class CacheController extends Controller
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
         $message = 'Cached URLs successfully refreshed.';
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
     }
@@ -224,9 +224,18 @@ class CacheController extends Controller
 
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
         $message = 'Tagged cache successfully refreshed.';
-        Blitz::$plugin->log($message);
+        $this->_log($message);
 
         return $this->_getResponse($message);
+    }
+
+    /**
+     * Logs a message.
+     */
+    private function _log(string $message): void
+    {
+        $message .= ' [via cache utility by "{username}"]';
+        Blitz::$plugin->log($message);
     }
 
     /**
