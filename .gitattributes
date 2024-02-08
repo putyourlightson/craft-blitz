@@ -4,6 +4,7 @@
 /.gitignore export-ignore
 /ecs.php export-ignore
 /phpstan.neon export-ignore
+/lib/ export-ignore
 /tests/ export-ignore
 /tsconfig.json export-ignore
 /controllers/TestController.php export-ignore

@@ -1,5 +1,5 @@
 includes:
-    - vendor/craftcms/phpstan/phpstan.neon
+    - %currentWorkingDirectory%/vendor/craftcms/phpstan/phpstan.neon
 parameters:
     level: 5
     paths:
@@ -9,4 +9,4 @@ parameters:
         # https://github.com/craftcms/cms/blob/develop/lib/craft/behaviors/CustomFieldBehavior.php
         - lib/craft/behaviors/CustomFieldBehavior.php
     bootstrapFiles:
-        - bootstrap.php
+        - %currentWorkingDirectory%/bootstrap.php
