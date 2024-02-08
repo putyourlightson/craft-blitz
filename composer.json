@@ -23,12 +23,20 @@
     "putyourlightson/craft-sprig-core": "^2.6.4"
   },
   "require-dev": {
+    "craftcms/commerce": "^4.0.0",
     "craftcms/ecs": "dev-main",
+    "craftcms/feed-me": "^5.0.0",
     "craftcms/phpstan": "dev-main",
     "markhuot/craft-pest-core": "^2.0.0-rc2",
     "mockery/mockery": "^1.0",
+    "nystudio107/craft-seomatic": "^4.0.0",
     "putyourlightson/craft-generate-test-spec": "v2.x-dev",
     "yiisoft/yii2-redis": "^2.0"
+  },
+  "scripts": {
+    "phpstan": "phpstan --ansi --memory-limit=1G",
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --fix --ansi"
   },
   "autoload": {
     "psr-4": {
@@ -39,6 +47,15 @@
     "psr-4": {
       "putyourlightson\\blitztests\\": "tests/"
     }
+  },
+  "config": {
+    "allow-plugins": {
+      "craftcms/plugin-installer": true,
+      "pestphp/pest-plugin": true,
+      "yiisoft/yii2-composer": true
+    },
+    "optimize-autoloader": true,
+    "sort-packages": true
   },
   "support": {
     "docs": "https://putyourlightson.com/plugins/blitz",
