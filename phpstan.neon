@@ -9,4 +9,4 @@ parameters:
         # https://github.com/craftcms/cms/blob/develop/lib/craft/behaviors/CustomFieldBehavior.php
         - lib/craft/behaviors/CustomFieldBehavior.php
     bootstrapFiles:
-        - %currentWorkingDirectory%/bootstrap.php
+        - lib/craft/bootstrap.php
