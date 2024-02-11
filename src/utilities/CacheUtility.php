@@ -32,7 +32,7 @@ class CacheUtility extends Utility
     /**
      * @inheritdoc
      */
-    public static function iconPath(): ?string
+    public static function icon(): ?string
     {
         $iconPath = Craft::getAlias('@putyourlightson/blitz/icon-mask.svg');
 
