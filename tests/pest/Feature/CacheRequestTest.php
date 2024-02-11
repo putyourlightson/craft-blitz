@@ -65,7 +65,7 @@ test('Request starting with `_includes` is a cached include', function() {
 });
 
 test('Request with cached include action is a cached include', function() {
-    [, $index] = Blitz::$plugin->generateCache->saveInclude(1, '_includes/test', []);
+    [, $index] = Blitz::$plugin->generateCache->saveInclude(1, 'test/_include', []);
     sendRequest(UrlHelper::actionUrl('', [
         'action' => CacheRequestService::CACHED_INCLUDE_ACTION,
         'index' => $index,
@@ -81,7 +81,7 @@ test('Request starting with `_dynamic` is a dynamic include', function() {
 });
 
 test('Request with dynamic include action is a dynamic include', function() {
-    [, $index] = Blitz::$plugin->generateCache->saveInclude(1, '_includes/test', []);
+    [, $index] = Blitz::$plugin->generateCache->saveInclude(1, 'test/_include', []);
     sendRequest(UrlHelper::actionUrl('', [
         'action' => CacheRequestService::DYNAMIC_INCLUDE_ACTION,
         'index' => $index,

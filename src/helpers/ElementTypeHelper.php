@@ -5,8 +5,8 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use craft\base\BlockElementInterface;
 use craft\base\Element;
+use craft\base\NestedElementInterface;
 use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\GlobalSet;
@@ -93,7 +93,7 @@ class ElementTypeHelper
         }
 
         // Don't proceed if this is a block element type
-        if (is_subclass_of($elementType, BlockElementInterface::class)) {
+        if (is_subclass_of($elementType, NestedElementInterface::class)) {
             return false;
         }
 

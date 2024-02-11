@@ -173,7 +173,7 @@ class GenerateCacheService extends Component
                     $variables = $event->variables;
 
                     if (Craft::$app->getConfig()->getGeneral()->preloadSingles ?? false) {
-                        $singles = Craft::$app->getSections()->getSectionsByType(Section::TYPE_SINGLE);
+                        $singles = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
                         $handles = array_map(fn(Section $section) => $section->handle, $singles);
                         $variables += Craft::$app->getEntries()->getSingleEntriesByHandle($handles);
                     }

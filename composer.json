@@ -1,7 +1,7 @@
 {
   "name": "putyourlightson/craft-blitz",
   "description": "Intelligent static page caching for creating lightning-fast sites.",
-  "version": "4.11.0",
+  "version": "5.0.0-beta.1",
   "type": "craft-plugin",
   "homepage": "https://putyourlightson.com/plugins/blitz",
   "license": "proprietary",
@@ -14,25 +14,30 @@
     "static"
   ],
   "require": {
-    "php": "^8.0.2",
+    "php": "^8.2",
     "amphp/http-client": "^4.0",
     "amphp/parallel": "^1.0",
-    "craftcms/cms": "^4.0",
+    "craftcms/cms": "^5.0.0-beta.1",
     "cypresslab/gitelephant": "^4.0",
-    "putyourlightson/craft-blitz-hints": "^1.1.1",
-    "putyourlightson/craft-sprig-core": "^2.6.4"
+    "putyourlightson/craft-blitz-hints": "^2.0.0-beta.1",
+    "putyourlightson/craft-sprig-core": "^3.0.0-beta.1"
   },
   "require-dev": {
     "craftcms/commerce": "^4.0.0",
     "craftcms/ecs": "dev-main",
     "craftcms/feed-me": "^5.0.0",
     "craftcms/phpstan": "dev-main",
-    "markhuot/craft-pest-core": "^2.0.0-rc2",
-    "mockery/mockery": "^1.0",
-    "nystudio107/craft-seomatic": "^4.0.0",
+    "markhuot/craft-pest-core": "v3.x-dev",
+    "nystudio107/craft-seomatic": "^5.0.0-beta.1",
     "putyourlightson/craft-generate-test-spec": "v2.x-dev",
     "yiisoft/yii2-redis": "^2.0"
   },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/bencroker/craft-pest-core"
+    }
+  ],
   "scripts": {
     "phpstan": "phpstan --ansi --memory-limit=1G",
     "check-cs": "ecs check --ansi",

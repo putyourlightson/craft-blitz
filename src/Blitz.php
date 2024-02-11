@@ -10,10 +10,10 @@ use craft\base\Element;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
 use craft\elements\User;
-use craft\events\BatchElementActionEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
 use craft\events\MoveElementEvent;
+use craft\events\MultiElementActionEvent;
 use craft\events\PluginEvent;
 use craft\events\RegisterCacheOptionsEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -373,7 +373,7 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on(Elements::class, $event,
-                function(ElementEvent|BatchElementActionEvent $event) {
+                function(ElementEvent|MultiElementActionEvent $event) {
                     /** @var Element $element */
                     $element = $event->element;
                     $element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
@@ -392,7 +392,7 @@ class Blitz extends Plugin
 
         foreach ($events as $event) {
             Event::on(Elements::class, $event,
-                function(ElementEvent|BatchElementActionEvent $event) {
+                function(ElementEvent|MultiElementActionEvent $event) {
                     $this->refreshCache->addElement($event->element);
                 }
             );
@@ -501,7 +501,7 @@ class Blitz extends Plugin
      */
     private function _registerUtilities(): void
     {
-        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITY_TYPES,
+        Event::on(Utilities::class, Utilities::EVENT_REGISTER_UTILITIES,
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = CacheUtility::class;
                 $event->types[] = DiagnosticsUtility::class;
