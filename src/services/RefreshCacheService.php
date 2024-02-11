@@ -573,14 +573,4 @@ class RefreshCacheService extends Component
         DeployerHelper::releaseDeployerJobs();
         CachePurgerHelper::releasePurgerJobs();
     }
-
-    /**
-     * Refreshes site URIs.
-     *
-     * @param SiteUriModel[] $siteUris
-     * @param SiteUriModel[] $purgeSiteUris
-     */
-    private function _refreshSiteUris(array $siteUris, array $purgeSiteUris = [], bool $forceClear = false, bool $forceGenerate = false): void
-    {
-    }
 }
