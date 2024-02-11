@@ -39,18 +39,6 @@ class FileStorage extends BaseCacheStorage
     public string $folderPath = '@webroot/cache/blitz';
 
     /**
-     * @var bool Whether gzip files should be created.
-     * @deprecated in 4.5.0
-     */
-    public bool $createGzipFiles = false;
-
-    /**
-     * @var bool Whether Brotli files should be created.
-     * @deprecated in 4.5.0
-     */
-    public bool $createBrotliFiles = false;
-
-    /**
      * @var bool Whether cached files may be counted.
      */
     public bool $countCachedFiles = true;
@@ -76,12 +64,6 @@ class FileStorage extends BaseCacheStorage
             $this->_cacheFolderPath = FileHelper::normalizePath(
                 App::parseEnv($this->folderPath)
             );
-        }
-
-        // Transition the setting to the new name
-        /** @noinspection PhpDeprecationInspection */
-        if ($this->createGzipFiles === true) {
-            $this->compressCachedValues = true;
         }
     }
 

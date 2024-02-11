@@ -11,7 +11,6 @@ use craft\elements\Category;
 use craft\elements\Entry;
 use craft\elements\GlobalSet;
 use craft\elements\Tag;
-use craft\elements\User;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RegisterLiveStatusesEvent;
 use putyourlightson\blitz\events\RegisterNonCacheableElementTypesEvent;
@@ -55,17 +54,6 @@ class ElementTypeHelper
         'craft\commerce\elements\Product' => 'typeId',
         'putyourlightson\campaign\elements\CampaignElement' => 'campaignTypeId',
         'putyourlightson\campaign\elements\MailingListElement' => 'mailingListTypeId',
-    ];
-
-    /**
-     * @const string[]
-     *
-     * @deprecated in 4.6.1
-     */
-    public const LIVE_STATUSES = [
-        Entry::class => Entry::STATUS_LIVE,
-        User::class => User::STATUS_ACTIVE,
-        'craft\commerce\elements\Product' => 'live',
     ];
 
     /**

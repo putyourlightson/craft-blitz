@@ -590,12 +590,6 @@ class GenerateCacheService extends Component
             return false;
         }
 
-        // Don’t proceed if element caching is disabled
-        /** @noinspection PhpDeprecationInspection */
-        if (!Blitz::$plugin->settings->cacheElements || !$this->options->cacheElements) {
-            return false;
-        }
-
         // Don’t proceed if not a cacheable element type
         if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
             return false;
@@ -608,12 +602,6 @@ class GenerateCacheService extends Component
     {
         // Don’t proceed if element query tracking is disabled
         if (!Blitz::$plugin->settings->trackElementQueries || !$this->options->trackElementQueries) {
-            return false;
-        }
-
-        // Don’t proceed if element query caching is disabled
-        /** @noinspection PhpDeprecationInspection */
-        if (!Blitz::$plugin->settings->cacheElementQueries || !$this->options->cacheElementQueries) {
             return false;
         }
 

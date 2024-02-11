@@ -9,7 +9,6 @@ use Craft;
 use craft\helpers\Html;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
-use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
@@ -21,22 +20,6 @@ use yii\web\View as BaseView;
 
 class BlitzVariable
 {
-    /**
-     * Keep this around for backwards compatibility.
-     *
-     * @todo Remove in version 5.
-     * @const string
-     */
-    public const CACHED_INCLUDE_ACTION = 'blitz/include/cached';
-
-    /**
-     * Keep this around for backwards compatibility.
-     *
-     * @todo Remove in version 5.
-     * @const string
-     */
-    public const DYNAMIC_INCLUDE_ACTION = 'blitz/include/dynamic';
-
     /**
      * @var int
      */
@@ -83,51 +66,6 @@ class BlitzVariable
         $config->setAttributes($options);
 
         return $this->_getScript($uri, $params, $config);
-    }
-
-    /**
-     * Returns a script to get the output of a template.
-     *
-     * @deprecated in 4.3.0. Use [[includeCached()]] or [[includeDynamic()]] instead.
-     */
-    public function getTemplate(string $template, array $params = []): Markup
-    {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getTemplate()` has been deprecated. Use `craft.blitz.includeCached()` or `craft.blitz.includeDynamic()` instead.');
-
-        // Ensure the site template exists
-        if (!Craft::$app->getView()->resolveTemplate($template, View::TEMPLATE_MODE_SITE)) {
-            throw new NotFoundHttpException('Template not found: ' . $template);
-        }
-
-        $uri = $this->_getActionUrl('blitz/templates/get');
-
-        // Hash the template
-        $template = Craft::$app->getSecurity()->hashData($template);
-
-        // Add template and passed in params to the params
-        $params = [
-            'template' => $template,
-            'params' => $params,
-            'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
-        ];
-
-        $config = new VariableConfigModel();
-
-        return $this->_getScript($uri, $params, $config);
-    }
-
-    /**
-     * Returns a script to get the output of a URI.
-     *
-     * @deprecated in 4.3.0. Use [[fetchUri()]] instead.
-     */
-    public function getUri(string $uri, array $params = []): Markup
-    {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.getUri()` has been deprecated. Use `craft.blitz.fetchUri()` instead.');
-
-        $params['no-cache'] = 1;
-
-        return $this->fetchUri($uri, $params);
     }
 
     /**

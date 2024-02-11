@@ -328,20 +328,6 @@ class SettingsModel extends Model
     public bool $trackElementQueries = true;
 
     /**
-     * Whether elements should be cached in the database.
-     *
-     * @deprecated in 4.4.0. Use [[trackElements]] instead.
-     */
-    public bool $cacheElements = true;
-
-    /**
-     * Whether element queries should be cached in the database.
-     *
-     * @deprecated in 4.4.0. Use [[trackElementQueries]] instead.
-     */
-    public bool $cacheElementQueries = true;
-
-    /**
      * The amount of time after which the cache should expire (if not 0).
      *
      * @see ConfigHelper::durationInSeconds()

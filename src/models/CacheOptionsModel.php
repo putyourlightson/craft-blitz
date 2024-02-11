@@ -5,7 +5,6 @@
 
 namespace putyourlightson\blitz\models;
 
-use Craft;
 use craft\base\Model;
 use craft\helpers\ConfigHelper;
 use craft\validators\DateTimeValidator;
@@ -34,20 +33,6 @@ class CacheOptionsModel extends Model
      * @since 4.4.0
      */
     public bool $trackElementQueries = true;
-
-    /**
-     * Whether elements should be cached in the database.
-     *
-     * @deprecated in 4.4.0. Use [[trackElements]] instead.
-     */
-    public bool $cacheElements = true;
-
-    /**
-     * Whether element queries should be cached in the database.
-     *
-     * @deprecated in 4.4.0. Use [[trackElementQueries]] instead.
-     */
-    public bool $cacheElementQueries = true;
 
     /**
      * Whether the "cached on" and "served by" timestamp comments should be appended to the cached output.
@@ -145,30 +130,6 @@ class CacheOptionsModel extends Model
         $this->trackElementQueries = $value;
 
         return $this;
-    }
-
-    /**
-     * Sets the cache elements option.
-     *
-     * @deprecated in 4.4.0. Use [[trackElements()]] instead.
-     */
-    public function cacheElements(bool $value): self
-    {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.options.cacheElements()` has been deprecated. Use `craft.blitz.options.trackElements()` instead.');
-
-        return $this->trackElements($value);
-    }
-
-    /**
-     * Sets the cache element queries option.
-     *
-     * @deprecated in 4.4.0. Use [[trackElementQueries()]] instead.
-     */
-    public function cacheElementQueries(bool $value): self
-    {
-        Craft::$app->getDeprecator()->log(__METHOD__, '`craft.blitz.options.cacheElementQueries()` has been deprecated. Use `craft.blitz.options.trackElementQueries()` instead.');
-
-        return $this->trackElementQueries($value);
     }
 
     /**
