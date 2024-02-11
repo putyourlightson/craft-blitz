@@ -34,7 +34,7 @@ class DriverJob extends BaseJob implements RetryableJobInterface
     /**
      * @var Queue
      */
-    private Queue $_queue;
+    private Queue $queue;
 
     /**
      * @inheritdoc
@@ -59,7 +59,7 @@ class DriverJob extends BaseJob implements RetryableJobInterface
     {
         App::maxPowerCaptain();
 
-        $this->_queue = $queue;
+        $this->queue = $queue;
 
         // Get driver from ID
         $driver = Blitz::$plugin->get($this->driverId);
@@ -76,6 +76,6 @@ class DriverJob extends BaseJob implements RetryableJobInterface
     {
         $progress = $total > 0 ? ($count / $total) : 0;
 
-        $this->setProgress($this->_queue, $progress, $label);
+        $this->setProgress($this->queue, $progress, $label);
     }
 }

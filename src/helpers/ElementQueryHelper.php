@@ -22,12 +22,12 @@ class ElementQueryHelper
     /**
      * @var string[][]
      */
-    public static array $_filterableElementQueryParams = [];
+    public static array $filterableElementQueryParams = [];
 
     /**
      * @var array
      */
-    private static array $_defaultElementQueryParams = [];
+    private static array $defaultElementQueryParams = [];
 
     /**
      * Returns the element query's unique parameters.
@@ -150,8 +150,8 @@ class ElementQueryHelper
             return [];
         }
 
-        if (!empty(self::$_defaultElementQueryParams[$elementType])) {
-            return self::$_defaultElementQueryParams[$elementType];
+        if (!empty(self::$defaultElementQueryParams[$elementType])) {
+            return self::$defaultElementQueryParams[$elementType];
         }
 
         /** @var ElementInterface|string $elementType */
@@ -171,9 +171,9 @@ class ElementQueryHelper
             $values[$key] = $elementQuery->{$key};
         }
 
-        self::$_defaultElementQueryParams[$elementType] = $values;
+        self::$defaultElementQueryParams[$elementType] = $values;
 
-        return self::$_defaultElementQueryParams[$elementType];
+        return self::$defaultElementQueryParams[$elementType];
     }
 
     /**
@@ -359,8 +359,8 @@ class ElementQueryHelper
      */
     private static function _getFilterableElementQueryParams(ElementQuery $elementQuery): array
     {
-        if (!empty(self::$_filterableElementQueryParams[$elementQuery::class])) {
-            return self::$_filterableElementQueryParams[$elementQuery::class];
+        if (!empty(self::$filterableElementQueryParams[$elementQuery::class])) {
+            return self::$filterableElementQueryParams[$elementQuery::class];
         }
 
         $elementQueryParams = [];
@@ -385,7 +385,7 @@ class ElementQueryHelper
             'orderBy',
         ];
 
-        self::$_filterableElementQueryParams[$elementQuery::class] = array_diff(
+        self::$filterableElementQueryParams[$elementQuery::class] = array_diff(
             array_intersect(
                 $elementQueryParams,
                 $elementTypeParams,
@@ -393,7 +393,7 @@ class ElementQueryHelper
             $ignoreParams,
         );
 
-        return self::$_filterableElementQueryParams[$elementQuery::class];
+        return self::$filterableElementQueryParams[$elementQuery::class];
     }
 
     /**

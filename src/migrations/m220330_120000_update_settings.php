@@ -20,7 +20,7 @@ class m220330_120000_update_settings extends Migration
 
         if (version_compare($schemaVersion, '4.0.0-beta.3', '<')) {
             $warmerType = $projectConfig->get('plugins.blitz.settings.cacheWarmerType') ?? null;
-            $generatorType = $this->_getGeneratorType($warmerType);
+            $generatorType = $this->getGeneratorType($warmerType);
             $projectConfig->set('plugins.blitz.settings.cacheGeneratorType', $generatorType);
             $projectConfig->remove('plugins.blitz.settings.cacheWarmerType');
 
@@ -30,7 +30,7 @@ class m220330_120000_update_settings extends Migration
 
             $clear = $projectConfig->get('plugins.blitz.settings.clearCacheAutomatically') ?? true;
             $generate = $projectConfig->get('plugins.blitz.settings.warmCacheAutomatically') ?? true;
-            $refreshMode = $this->_getRefreshMode($clear, $generate);
+            $refreshMode = $this->getRefreshMode($clear, $generate);
             $projectConfig->set('plugins.blitz.settings.refreshMode', $refreshMode);
             $projectConfig->remove('plugins.blitz.settings.clearCacheAutomatically');
             $projectConfig->remove('plugins.blitz.settings.warmCacheAutomatically');
@@ -47,13 +47,13 @@ class m220330_120000_update_settings extends Migration
 
             $includedQueryStringParams = $projectConfig->get('plugins.blitz.settings.includedQueryStringParams');
             if ($includedQueryStringParams !== null) {
-                $this->_updateQueryStringParams($includedQueryStringParams);
+                $this->updateQueryStringParams($includedQueryStringParams);
                 $projectConfig->set('plugins.blitz.settings.includedQueryStringParams', $includedQueryStringParams);
             }
 
             $excludedQueryStringParams = $projectConfig->get('plugins.blitz.settings.excludedQueryStringParams');
             if ($excludedQueryStringParams !== null) {
-                $this->_updateQueryStringParams($excludedQueryStringParams);
+                $this->updateQueryStringParams($excludedQueryStringParams);
                 $projectConfig->set('plugins.blitz.settings.excludedQueryStringParams', $excludedQueryStringParams);
             }
         }
@@ -71,13 +71,13 @@ class m220330_120000_update_settings extends Migration
         return false;
     }
 
-    private function _getGeneratorType(?string $warmerType): string
+    private function getGeneratorType(?string $warmerType): string
     {
         return $warmerType === 'putyourlightson\\blitz\\drivers\\warmers\\LocalWarmer'
             ? LocalGenerator::class : HttpGenerator::class;
     }
 
-    private function _getRefreshMode(bool $clear, bool $generate): int
+    private function getRefreshMode(bool $clear, bool $generate): int
     {
         if ($clear) {
             return $generate ? 3 : 1;
@@ -86,7 +86,7 @@ class m220330_120000_update_settings extends Migration
         return $generate ? 2 : 0;
     }
 
-    private function _updateQueryStringParams(array &$queryStringParams): void
+    private function updateQueryStringParams(array &$queryStringParams): void
     {
         // Add keys to query string params
         foreach ($queryStringParams as $key => $queryStringParam) {

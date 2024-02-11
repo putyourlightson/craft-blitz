@@ -60,7 +60,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     {
         $refreshData = RefreshDataModel::createFromData($this->data);
 
-        $this->_populateCacheIdsFromElementCaches($refreshData);
+        $this->populateCacheIdsFromElementCaches($refreshData);
 
         $clearCache = Blitz::$plugin->settings->clearOnRefresh($this->forceClear);
 
@@ -70,8 +70,8 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
 
-        $this->_populateCacheIdsFromSourceTags($refreshData);
-        $this->_populateCacheIdsFromElementQueryCaches($refreshData, $queue);
+        $this->populateCacheIdsFromSourceTags($refreshData);
+        $this->populateCacheIdsFromElementQueryCaches($refreshData, $queue);
 
         $siteUris = SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds());
 
@@ -107,7 +107,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * Populates cache IDs from the element caches.
      */
-    private function _populateCacheIdsFromElementCaches(RefreshDataModel $refreshData): void
+    private function populateCacheIdsFromElementCaches(RefreshDataModel $refreshData): void
     {
         foreach ($refreshData->getElementTypes() as $elementType) {
             $cacheIds = RefreshCacheHelper::getElementCacheIds($elementType, $refreshData);
@@ -118,7 +118,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * Populates cache IDs from source tags.
      */
-    private function _populateCacheIdsFromSourceTags(RefreshDataModel $refreshData): void
+    private function populateCacheIdsFromSourceTags(RefreshDataModel $refreshData): void
     {
         foreach ($refreshData->getElementTypes() as $elementType) {
             $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
@@ -138,7 +138,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     /**
      * Populates cache IDs from element query caches.
      */
-    private function _populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, Queue|QueueInterface $queue): void
+    private function populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, Queue|QueueInterface $queue): void
     {
         foreach ($refreshData->getElementTypes() as $elementType) {
             /** @var ElementInterface $elementType */

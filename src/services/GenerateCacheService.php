@@ -203,7 +203,7 @@ class GenerateCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
-        if (!$this->_shouldTrackElementsOfType($element::class)) {
+        if (!$this->shouldTrackElementsOfType($element::class)) {
             return;
         }
 
@@ -231,7 +231,7 @@ class GenerateCacheService extends Component
      */
     public function addElementQuery(ElementQuery $elementQuery): void
     {
-        if (!$this->_shouldTrackElementQueriesOfType($elementQuery->elementType)) {
+        if (!$this->shouldTrackElementQueriesOfType($elementQuery->elementType)) {
             return;
         }
 
@@ -257,7 +257,7 @@ class GenerateCacheService extends Component
 
         // Don’t proceed if this is a relation field query
         if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
-            $this->_addRelatedElementIds($elementQuery);
+            $this->addRelatedElementIds($elementQuery);
 
             return;
         }
@@ -284,7 +284,7 @@ class GenerateCacheService extends Component
     public function saveElementQuery(ElementQuery $elementQuery): void
     {
         $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
-        $index = $this->_createUniqueIndex($elementQuery->elementType . $params);
+        $index = $this->createUniqueIndex($elementQuery->elementType . $params);
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
@@ -361,7 +361,7 @@ class GenerateCacheService extends Component
             }
         }
 
-        $this->_batchInsertQueries(
+        $this->batchInsertQueries(
             $queryId,
             $sourceIds,
             ElementQuerySourceRecord::tableName(),
@@ -376,7 +376,7 @@ class GenerateCacheService extends Component
     {
         $attributes = ElementQueryHelper::getElementQueryAttributes($elementQuery);
 
-        $this->_batchInsertQueries(
+        $this->batchInsertQueries(
             $queryId,
             $attributes,
             ElementQueryAttributeRecord::tableName(),
@@ -391,7 +391,7 @@ class GenerateCacheService extends Component
     {
         $fieldIds = ElementQueryHelper::getElementQueryFieldIds($elementQuery);
 
-        $this->_batchInsertQueries(
+        $this->batchInsertQueries(
             $queryId,
             $fieldIds,
             ElementQueryFieldRecord::tableName(),
@@ -405,7 +405,7 @@ class GenerateCacheService extends Component
     public function saveInclude(int $siteId, string $template, array $params): ?array
     {
         $params = json_encode($params);
-        $index = $this->_createUniqueIndex($siteId . $template . $params);
+        $index = $this->createUniqueIndex($siteId . $template . $params);
 
         // Require a mutex to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
@@ -502,9 +502,9 @@ class GenerateCacheService extends Component
 
         $cacheId = (int)$db->getLastInsertID();
 
-        $this->_batchInsertElementCaches($cacheId);
+        $this->batchInsertElementCaches($cacheId);
 
-        $this->_batchInsertCaches(
+        $this->batchInsertCaches(
             $cacheId,
             $this->generateData->getElementQueryIds(),
             ElementQueryRecord::tableName(),
@@ -512,7 +512,7 @@ class GenerateCacheService extends Component
             'queryId',
         );
 
-        $this->_batchInsertCaches(
+        $this->batchInsertCaches(
             $cacheId,
             $this->generateData->getSsiIncludeIds(),
             IncludeRecord::tableName(),
@@ -583,7 +583,7 @@ class GenerateCacheService extends Component
         }
     }
 
-    private function _shouldTrackElementsOfType(string $elementType): bool
+    private function shouldTrackElementsOfType(string $elementType): bool
     {
         // Don’t proceed if element tracking is disabled
         if (!Blitz::$plugin->settings->trackElements || !$this->options->trackElements) {
@@ -598,7 +598,7 @@ class GenerateCacheService extends Component
         return true;
     }
 
-    private function _shouldTrackElementQueriesOfType(string $elementType): bool
+    private function shouldTrackElementQueriesOfType(string $elementType): bool
     {
         // Don’t proceed if element query tracking is disabled
         if (!Blitz::$plugin->settings->trackElementQueries || !$this->options->trackElementQueries) {
@@ -618,9 +618,9 @@ class GenerateCacheService extends Component
      * trigger a refresh whenever enabled.
      * https://github.com/putyourlightson/craft-blitz/issues/555
      */
-    private function _addRelatedElementIds(ElementQuery $elementQuery): void
+    private function addRelatedElementIds(ElementQuery $elementQuery): void
     {
-        if (!$this->_shouldTrackElementsOfType($elementQuery->elementType)) {
+        if (!$this->shouldTrackElementsOfType($elementQuery->elementType)) {
             return;
         }
 
@@ -640,12 +640,12 @@ class GenerateCacheService extends Component
     /**
      * Batch inserts element caches into the database.
      */
-    private function _batchInsertElementCaches(int $cacheId): void
+    private function batchInsertElementCaches(int $cacheId): void
     {
         $elementIds = $this->generateData->getElementIds();
         $elementIndexedTrackFields = $this->generateData->getElementIndexedTrackFields();
 
-        $this->_batchInsertCaches(
+        $this->batchInsertCaches(
             $cacheId,
             $elementIds,
             ElementRecord::tableName(),
@@ -654,7 +654,7 @@ class GenerateCacheService extends Component
         );
 
         if (!empty($elementIndexedTrackFields)) {
-            $this->_batchInsertCaches(
+            $this->batchInsertCaches(
                 $cacheId,
                 $elementIds,
                 ElementRecord::tableName(),
@@ -669,7 +669,7 @@ class GenerateCacheService extends Component
     /**
      * Batch inserts cache values into the database.
      */
-    private function _batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraColumnValues = null, string $extraColumnName = null): void
+    private function batchInsertCaches(int $cacheId, array $ids, string $checkTable, string $insertTable, string $columnName, array $extraColumnValues = null, string $extraColumnName = null): void
     {
         if (empty($ids)) {
             return;
@@ -714,7 +714,7 @@ class GenerateCacheService extends Component
     /**
      * Batch inserts query values into the database.
      */
-    private function _batchInsertQueries(int $queryId, array $ids, string $insertTable, string $columnName): void
+    private function batchInsertQueries(int $queryId, array $ids, string $insertTable, string $columnName): void
     {
         $values = [];
         foreach ($ids as $id) {
@@ -739,7 +739,7 @@ class GenerateCacheService extends Component
     /**
      * Creates a unique index for quicker indexing and less storage.
      */
-    private function _createUniqueIndex(string $value): string
+    private function createUniqueIndex(string $value): string
     {
         return sprintf('%u', crc32($value));
     }

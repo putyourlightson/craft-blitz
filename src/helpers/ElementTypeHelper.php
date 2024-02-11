@@ -59,17 +59,17 @@ class ElementTypeHelper
     /**
      * @var string[]|null
      */
-    private static ?array $_nonCacheableElementTypes = null;
+    private static ?array $nonCacheableElementTypes = null;
 
     /**
      * @var string[]|null
      */
-    private static ?array $_sourceIdAttributes = null;
+    private static ?array $sourceIdAttributes = null;
 
     /**
      * @var string[]|null
      */
-    private static ?array $_liveStatuses = null;
+    private static ?array $liveStatuses = null;
 
     /**
      * Returns whether the element type is cacheable.
@@ -128,8 +128,8 @@ class ElementTypeHelper
      */
     public static function getNonCacheableElementTypes(): array
     {
-        if (self::$_nonCacheableElementTypes !== null) {
-            return self::$_nonCacheableElementTypes;
+        if (self::$nonCacheableElementTypes !== null) {
+            return self::$nonCacheableElementTypes;
         }
 
         $event = new RegisterNonCacheableElementTypesEvent([
@@ -137,12 +137,12 @@ class ElementTypeHelper
         ]);
         Event::trigger(self::class, self::EVENT_REGISTER_NON_CACHEABLE_ELEMENT_TYPES, $event);
 
-        self::$_nonCacheableElementTypes = array_merge(
+        self::$nonCacheableElementTypes = array_merge(
             self::NON_CACHEABLE_ELEMENT_TYPES,
             $event->elementTypes
         );
 
-        return self::$_nonCacheableElementTypes;
+        return self::$nonCacheableElementTypes;
     }
 
     /**
@@ -152,8 +152,8 @@ class ElementTypeHelper
      */
     public static function getSourceIdAttributes(): array
     {
-        if (self::$_sourceIdAttributes !== null) {
-            return self::$_sourceIdAttributes;
+        if (self::$sourceIdAttributes !== null) {
+            return self::$sourceIdAttributes;
         }
 
         $event = new RegisterSourceIdAttributesEvent([
@@ -161,12 +161,12 @@ class ElementTypeHelper
         ]);
         Event::trigger(self::class, self::EVENT_REGISTER_SOURCE_ID_ATTRIBUTES, $event);
 
-        self::$_sourceIdAttributes = array_merge(
+        self::$sourceIdAttributes = array_merge(
             self::SOURCE_ID_ATTRIBUTES,
             $event->sourceIdAttributes
         );
 
-        return self::$_sourceIdAttributes;
+        return self::$sourceIdAttributes;
     }
 
     /**
@@ -176,8 +176,8 @@ class ElementTypeHelper
      */
     public static function getLiveStatuses(): array
     {
-        if (self::$_liveStatuses !== null) {
-            return self::$_liveStatuses;
+        if (self::$liveStatuses !== null) {
+            return self::$liveStatuses;
         }
 
         $event = new RegisterLiveStatusesEvent([
@@ -185,10 +185,10 @@ class ElementTypeHelper
         ]);
         Event::trigger(self::class, self::EVENT_REGISTER_LIVE_STATUSES, $event);
 
-        self::$_liveStatuses = array_merge(
+        self::$liveStatuses = array_merge(
             $event->liveStatuses
         );
 
-        return self::$_liveStatuses;
+        return self::$liveStatuses;
     }
 }

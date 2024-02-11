@@ -364,8 +364,30 @@ class RefreshCacheService extends Component
         }
 
         $siteUris = $event->siteUris;
+        $purgeableSiteUris = array_merge($siteUris, $purgeSiteUris);
 
-        $this->_refreshSiteUris($siteUris, $purgeSiteUris, $forceClear, $forceGenerate);
+        // If SSI is enabled, merge site URIs from SSI includes into purgeable site URIs.
+        if (Blitz::$plugin->settings->ssiEnabled) {
+            $purgeableSiteUris = array_merge($purgeableSiteUris, $this->getSsiIncludeSiteUris($siteUris));
+        }
+
+        if (Blitz::$plugin->settings->clearOnRefresh($forceClear)) {
+            Blitz::$plugin->clearCache->clearUris($siteUris);
+            Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
+        }
+
+        if (Blitz::$plugin->settings->expireOnRefresh($forceClear, $forceGenerate)) {
+            Blitz::$plugin->expireCache->expireUris($siteUris);
+        }
+
+        if (Blitz::$plugin->settings->generateOnRefresh($forceGenerate)) {
+            Blitz::$plugin->cacheGenerator->generateUris($siteUris);
+            Blitz::$plugin->deployer->deployUris($siteUris);
+        }
+
+        if (Blitz::$plugin->settings->purgeAfterRefresh($forceClear)) {
+            Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
+        }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
@@ -560,29 +582,5 @@ class RefreshCacheService extends Component
      */
     private function _refreshSiteUris(array $siteUris, array $purgeSiteUris = [], bool $forceClear = false, bool $forceGenerate = false): void
     {
-        $purgeableSiteUris = array_merge($siteUris, $purgeSiteUris);
-
-        // If SSI is enabled, merge site URIs from SSI includes into purgeable site URIs.
-        if (Blitz::$plugin->settings->ssiEnabled) {
-            $purgeableSiteUris = array_merge($purgeableSiteUris, $this->getSsiIncludeSiteUris($siteUris));
-        }
-
-        if (Blitz::$plugin->settings->clearOnRefresh($forceClear)) {
-            Blitz::$plugin->clearCache->clearUris($siteUris);
-            Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
-        }
-
-        if (Blitz::$plugin->settings->expireOnRefresh($forceClear, $forceGenerate)) {
-            Blitz::$plugin->expireCache->expireUris($siteUris);
-        }
-
-        if (Blitz::$plugin->settings->generateOnRefresh($forceGenerate)) {
-            Blitz::$plugin->cacheGenerator->generateUris($siteUris);
-            Blitz::$plugin->deployer->deployUris($siteUris);
-        }
-
-        if (Blitz::$plugin->settings->purgeAfterRefresh($forceClear)) {
-            Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
-        }
     }
 }

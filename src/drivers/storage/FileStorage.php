@@ -46,12 +46,12 @@ class FileStorage extends BaseCacheStorage
     /**
      * @var string|null
      */
-    private ?string $_cacheFolderPath;
+    private ?string $cacheFolderPath;
 
     /**
      * @var array|null
      */
-    private ?array $_sitePaths;
+    private ?array $sitePaths;
 
     /**
      * @inheritdoc
@@ -61,7 +61,7 @@ class FileStorage extends BaseCacheStorage
         parent::init();
 
         if (!empty($this->folderPath)) {
-            $this->_cacheFolderPath = FileHelper::normalizePath(
+            $this->cacheFolderPath = FileHelper::normalizePath(
                 App::parseEnv($this->folderPath)
             );
         }
@@ -140,7 +140,7 @@ class FileStorage extends BaseCacheStorage
             $filePaths = $this->getFilePaths($siteUri);
 
             foreach ($filePaths as $filePath) {
-                $this->_delete($filePath);
+                $this->delete($filePath);
             }
         }
 
@@ -161,12 +161,12 @@ class FileStorage extends BaseCacheStorage
             return;
         }
 
-        if (empty($this->_cacheFolderPath)) {
+        if (empty($this->cacheFolderPath)) {
             return;
         }
 
         try {
-            FileHelper::removeDirectory($this->_cacheFolderPath);
+            FileHelper::removeDirectory($this->cacheFolderPath);
         } catch (ErrorException $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
@@ -186,7 +186,7 @@ class FileStorage extends BaseCacheStorage
         }
 
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/utility', [
-            'sites' => $this->_getSitePageCount(),
+            'sites' => $this->getSitePageCount(),
         ]);
     }
 
@@ -200,7 +200,7 @@ class FileStorage extends BaseCacheStorage
         }
 
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/file/widget', [
-            'sites' => $this->_getSitePageCount(),
+            'sites' => $this->getSitePageCount(),
         ]);
     }
 
@@ -228,11 +228,11 @@ class FileStorage extends BaseCacheStorage
             return [];
         }
 
-        if ($this->_hasInvalidQueryString($siteUri->uri)) {
+        if ($this->hasInvalidQueryString($siteUri->uri)) {
             return [];
         }
 
-        $filePath = $this->_getNormalizedFilePath($sitePath, $siteUri->uri);
+        $filePath = $this->getNormalizedFilePath($sitePath, $siteUri->uri);
 
         // Ensure that file path is a sub path of the site path
         if (!str_contains($filePath, $sitePath)) {
@@ -254,7 +254,7 @@ class FileStorage extends BaseCacheStorage
          * Solution: https://www.drupal.org/files/issues/boost-n1398578-19.patch
          */
         $decodedUri = rawurldecode($siteUri->uri);
-        $decodedFilePath = $this->_getNormalizedFilePath($sitePath, $decodedUri);
+        $decodedFilePath = $this->getNormalizedFilePath($sitePath, $decodedUri);
         if ($decodedFilePath != $filePath) {
             $filePaths[] = $filePath;
         }
@@ -267,11 +267,11 @@ class FileStorage extends BaseCacheStorage
      */
     public function getSitePath(int $siteId): ?string
     {
-        if (!empty($this->_sitePaths[$siteId])) {
-            return $this->_sitePaths[$siteId];
+        if (!empty($this->sitePaths[$siteId])) {
+            return $this->sitePaths[$siteId];
         }
 
-        if (empty($this->_cacheFolderPath)) {
+        if (empty($this->cacheFolderPath)) {
             return null;
         }
 
@@ -288,9 +288,9 @@ class FileStorage extends BaseCacheStorage
         // https://github.com/putyourlightson/craft-blitz/issues/369
         $siteHostPath = str_replace(':', '', $siteHostPath);
 
-        $this->_sitePaths[$siteId] = FileHelper::normalizePath($this->_cacheFolderPath . '/' . $siteHostPath);
+        $this->sitePaths[$siteId] = FileHelper::normalizePath($this->cacheFolderPath . '/' . $siteHostPath);
 
-        return $this->_sitePaths[$siteId];
+        return $this->sitePaths[$siteId];
     }
 
     /**
@@ -342,7 +342,7 @@ class FileStorage extends BaseCacheStorage
         ];
     }
 
-    private function _getSitePageCount(): array
+    private function getSitePageCount(): array
     {
         $sites = [];
 
@@ -353,7 +353,7 @@ class FileStorage extends BaseCacheStorage
             if (!empty($sitePath)) {
                 $sites[$site->id] = [
                     'name' => $site->name,
-                    'path' => str_replace($this->_cacheFolderPath, $this->folderPath, $sitePath),
+                    'path' => str_replace($this->cacheFolderPath, $this->folderPath, $sitePath),
                     'pageCount' => $this->getCachedPageCount($sitePath),
                     'includeCount' => $this->getCachedIncludeCount($sitePath),
                 ];
@@ -376,7 +376,7 @@ class FileStorage extends BaseCacheStorage
         return $sites;
     }
 
-    private function _getNormalizedFilePath(string $sitePath, string $uri): string
+    private function getNormalizedFilePath(string $sitePath, string $uri): string
     {
         $uriParts = explode('?', $uri);
         $queryString = $uriParts[1] ?? '';
@@ -389,7 +389,7 @@ class FileStorage extends BaseCacheStorage
         return FileHelper::normalizePath($sitePath . '/' . $uri . '/index.html');
     }
 
-    private function _hasInvalidQueryString(string $uri): bool
+    private function hasInvalidQueryString(string $uri): bool
     {
         if (!str_contains($uri, '?')) {
             return false;
@@ -411,7 +411,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * Deletes the cached values for a file path.
      */
-    private function _delete(string $filePath): void
+    private function delete(string $filePath): void
     {
         FileHelper::unlink($filePath);
         FileHelper::unlink($filePath . '.gz');

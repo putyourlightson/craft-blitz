@@ -84,8 +84,8 @@ class ElementChangedBehavior extends Behavior
     {
         $element = $this->owner;
 
-        $this->changedAttributes = $this->_getChangedAttributes();
-        $this->changedFields = $this->_getChangedFields();
+        $this->changedAttributes = $this->getChangedAttributes();
+        $this->changedFields = $this->getChangedFields();
 
         if ($element->firstSave) {
             return true;
@@ -214,7 +214,7 @@ class ElementChangedBehavior extends Behavior
     /**
      * Returns the attributes that have changed.
      */
-    private function _getChangedAttributes(): array
+    private function getChangedAttributes(): array
     {
         $element = $this->owner;
 
@@ -232,7 +232,7 @@ class ElementChangedBehavior extends Behavior
      *
      * @return string[]
      */
-    private function _getChangedFields(): array
+    private function getChangedFields(): array
     {
         $element = $this->owner;
 

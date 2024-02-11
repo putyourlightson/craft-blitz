@@ -78,7 +78,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->clearCache->clearAll();
 
-        return $this->_getSuccessResponse('Blitz cache successfully cleared.');
+        return $this->getSuccessResponse('Blitz cache successfully cleared.');
     }
 
     /**
@@ -88,7 +88,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->flushCache->flushAll();
 
-        return $this->_getSuccessResponse('Blitz cache successfully flushed.');
+        return $this->getSuccessResponse('Blitz cache successfully flushed.');
     }
 
     /**
@@ -98,7 +98,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->cachePurger->purgeAll();
 
-        return $this->_getSuccessResponse('Blitz cache successfully purged.');
+        return $this->getSuccessResponse('Blitz cache successfully purged.');
     }
 
     /**
@@ -107,12 +107,12 @@ class CacheController extends Controller
     public function actionGenerate(): Response
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            return $this->_getFailureResponse('Blitz caching is disabled.');
+            return $this->getFailureResponse('Blitz caching is disabled.');
         }
 
         Blitz::$plugin->cacheGenerator->generateAll();
 
-        return $this->_getSuccessResponse('Blitz cache successfully queued for generation.');
+        return $this->getSuccessResponse('Blitz cache successfully queued for generation.');
     }
 
     /**
@@ -121,12 +121,12 @@ class CacheController extends Controller
     public function actionDeploy(): Response
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            return $this->_getFailureResponse('Blitz caching is disabled.');
+            return $this->getFailureResponse('Blitz caching is disabled.');
         }
 
         Blitz::$plugin->deployer->deployAll();
 
-        return $this->_getSuccessResponse('Blitz cache successfully queued for deployment.');
+        return $this->getSuccessResponse('Blitz cache successfully queued for deployment.');
     }
 
     /**
@@ -141,7 +141,7 @@ class CacheController extends Controller
             $message = 'Blitz cache successfully refreshed and queued for generation.';
         }
 
-        return $this->_getSuccessResponse($message);
+        return $this->getSuccessResponse($message);
     }
 
     /**
@@ -151,7 +151,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
 
-        return $this->_getSuccessResponse('Expired cache successfully refreshed.');
+        return $this->getSuccessResponse('Expired cache successfully refreshed.');
     }
 
     /**
@@ -162,7 +162,7 @@ class CacheController extends Controller
         $siteId = Craft::$app->getRequest()->getParam('siteId');
 
         if (empty($siteId)) {
-            return $this->_getFailureResponse('A site ID must be provided.');
+            return $this->getFailureResponse('A site ID must be provided.');
         }
 
         Blitz::$plugin->refreshCache->refreshSite($siteId);
@@ -172,7 +172,7 @@ class CacheController extends Controller
             $message = 'Site successfully refreshed and queued for generation.';
         }
 
-        return $this->_getSuccessResponse($message);
+        return $this->getSuccessResponse($message);
     }
 
     /**
@@ -181,15 +181,15 @@ class CacheController extends Controller
     public function actionRefreshUrls(): Response
     {
         $urls = Craft::$app->getRequest()->getParam('urls');
-        $urls = $this->_normalizeArguments($urls);
+        $urls = $this->normalizeArguments($urls);
 
         if (empty($urls)) {
-            return $this->_getFailureResponse('At least one URL must be provided.');
+            return $this->getFailureResponse('At least one URL must be provided.');
         }
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
 
-        return $this->_getSuccessResponse('Cached URLs successfully refreshed.');
+        return $this->getSuccessResponse('Cached URLs successfully refreshed.');
     }
 
     /**
@@ -198,43 +198,43 @@ class CacheController extends Controller
     public function actionRefreshTagged(): Response
     {
         $tags = Craft::$app->getRequest()->getParam('tags');
-        $tags = $this->_normalizeArguments($tags);
+        $tags = $this->normalizeArguments($tags);
 
         if (empty($tags)) {
-            return $this->_getFailureResponse('At least one tag must be provided.');
+            return $this->getFailureResponse('At least one tag must be provided.');
         }
 
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
 
-        return $this->_getSuccessResponse('Tagged cache successfully refreshed.');
+        return $this->getSuccessResponse('Tagged cache successfully refreshed.');
     }
 
     /**
      * Returns a success response.
      */
-    private function _getSuccessResponse(string $message): Response
+    private function getSuccessResponse(string $message): Response
     {
         Blitz::$plugin->log($message . ' [via cache utility by "{username}"]');
 
         Craft::$app->getSession()->setNotice(Craft::t('blitz', $message));
 
-        return $this->_getResponse($message);
+        return $this->getResponse($message);
     }
 
     /**
      * Returns a failure response.
      */
-    private function _getFailureResponse(string $message): Response
+    private function getFailureResponse(string $message): Response
     {
         Craft::$app->getSession()->setError(Craft::t('blitz', $message));
 
-        return $this->_getResponse($message, false);
+        return $this->getResponse($message, false);
     }
 
     /**
      * Returns a response with the provided message.
      */
-    private function _getResponse(string $message, bool $success = true): Response
+    private function getResponse(string $message, bool $success = true): Response
     {
         $request = Craft::$app->getRequest();
 
@@ -254,7 +254,7 @@ class CacheController extends Controller
      *
      * @return string[]
      */
-    private function _normalizeArguments(array|string|null $values): array
+    private function normalizeArguments(array|string|null $values): array
     {
         if (is_string($values)) {
             $values = StringHelper::split($values);

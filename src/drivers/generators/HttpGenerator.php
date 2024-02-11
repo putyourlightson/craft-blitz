@@ -71,7 +71,7 @@ class HttpGenerator extends BaseCacheGenerator
                 }
 
                 try {
-                    $request = $this->_createRequest($url);
+                    $request = $this->createRequest($url);
                     $response = yield $client->request($request);
 
                     if ($response->getStatus() === 200) {
@@ -122,7 +122,7 @@ class HttpGenerator extends BaseCacheGenerator
         ];
     }
 
-    private function _createRequest(string $url): Request
+    private function createRequest(string $url): Request
     {
         $request = new Request($url);
 

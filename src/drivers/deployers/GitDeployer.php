@@ -108,7 +108,7 @@ class GitDeployer extends BaseDeployer
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
         foreach ($groupedSiteUris as $siteId => $siteUriGroup) {
-            if ($this->_hasRepository($siteId)) {
+            if ($this->hasRepository($siteId)) {
                 $deployGroupedSiteUris[$siteId] = $siteUriGroup;
                 $total += count($siteUriGroup);
             }
@@ -120,7 +120,7 @@ class GitDeployer extends BaseDeployer
         }
 
         foreach ($deployGroupedSiteUris as $siteId => $siteUriGroup) {
-            $repository = $this->_getRepository($siteId);
+            $repository = $this->getRepository($siteId);
 
             if ($repository === null) {
                 continue;
@@ -143,7 +143,7 @@ class GitDeployer extends BaseDeployer
                     $filePath .= '/index.html';
                 }
 
-                $this->_updateFile($value, $filePath);
+                $this->updateFile($value, $filePath);
             }
 
             if (is_callable($setProgressHandler)) {
@@ -151,7 +151,7 @@ class GitDeployer extends BaseDeployer
                 call_user_func($setProgressHandler, $count, $total, $progressLabel);
             }
 
-            $this->_deploy($siteId);
+            $this->deploy($siteId);
         }
     }
 
@@ -161,7 +161,7 @@ class GitDeployer extends BaseDeployer
     public function test(): bool
     {
         foreach ($this->gitRepositories as $siteUid => $gitRepository) {
-            $repository = $this->_getRepositoryBySiteUid($siteUid);
+            $repository = $this->getRepositoryBySiteUid($siteUid);
 
             if ($repository === null) {
                 continue;
@@ -188,7 +188,7 @@ class GitDeployer extends BaseDeployer
             }
 
             try {
-                $gitRepo = $this->_getGitRepository($repository['repositoryPath'], $repository['remote']);
+                $gitRepo = $this->getGitRepository($repository['repositoryPath'], $repository['remote']);
                 $gitRepo->fetch();
             } catch (Exception $exception) {
                 $this->addError('gitRepositories',
@@ -265,7 +265,7 @@ class GitDeployer extends BaseDeployer
     /**
      * Returns the repository for a given site UID.
      */
-    private function _getRepository(int $siteId): ?array
+    private function getRepository(int $siteId): ?array
     {
         $siteUid = Db::uidById(Table::SITES, $siteId);
 
@@ -273,13 +273,13 @@ class GitDeployer extends BaseDeployer
             return null;
         }
 
-        return $this->_getRepositoryBySiteUid($siteUid);
+        return $this->getRepositoryBySiteUid($siteUid);
     }
 
     /**
      * Returns the repository path for a given site UID.
      */
-    private function _getRepositoryBySiteUid(string $siteUid): ?array
+    private function getRepositoryBySiteUid(string $siteUid): ?array
     {
         $repository = $this->gitRepositories[$siteUid] ?? null;
 
@@ -307,9 +307,9 @@ class GitDeployer extends BaseDeployer
     /**
      * Returns whether the site has a writeable repository path.
      */
-    private function _hasRepository(int $siteId): bool
+    private function hasRepository(int $siteId): bool
     {
-        $repository = $this->_getRepository($siteId);
+        $repository = $this->getRepository($siteId);
 
         return $repository !== null;
     }
@@ -317,7 +317,7 @@ class GitDeployer extends BaseDeployer
     /**
      * Returns a git repository.
      */
-    private function _getGitRepository(string $repositoryPath, string $remote): Repository
+    private function getGitRepository(string $repositoryPath, string $remote): Repository
     {
         $gitCommand = Blitz::$plugin->settings->commands['git'] ?? null;
         $gitRepo = new Repository($repositoryPath, $gitCommand);
@@ -343,7 +343,7 @@ class GitDeployer extends BaseDeployer
     /**
      * Updates a file by saving the value or deleting the file if empty.
      */
-    private function _updateFile(string $value, string $filePath): void
+    private function updateFile(string $value, string $filePath): void
     {
         if (empty($value)) {
             if (file_exists($filePath)) {
@@ -363,7 +363,7 @@ class GitDeployer extends BaseDeployer
     /**
      * Deploys to the remote repository.
      */
-    private function _deploy(int $siteId): void
+    private function deploy(int $siteId): void
     {
         $event = new CancelableEvent();
         $this->trigger(self::EVENT_BEFORE_COMMIT, $event);
@@ -372,16 +372,16 @@ class GitDeployer extends BaseDeployer
             return;
         }
 
-        $this->_runCommands($this->commandsBefore);
+        $this->runCommands($this->commandsBefore);
 
-        $repository = $this->_getRepository($siteId);
+        $repository = $this->getRepository($siteId);
 
         if ($repository === null) {
             return;
         }
 
         try {
-            $gitRepo = $this->_getGitRepository($repository['repositoryPath'], $repository['remote']);
+            $gitRepo = $this->getGitRepository($repository['repositoryPath'], $repository['remote']);
 
             // Pull down any remote commits without rebasing
             $gitRepo->pull(null, null, false);
@@ -411,7 +411,7 @@ class GitDeployer extends BaseDeployer
             $this->trigger(self::EVENT_AFTER_COMMIT, new Event());
         }
 
-        $this->_runCommands($this->commandsAfter);
+        $this->runCommands($this->commandsAfter);
     }
 
     /**
@@ -419,7 +419,7 @@ class GitDeployer extends BaseDeployer
      *
      * @param string[]|string $commands
      */
-    private function _runCommands(array|string $commands): void
+    private function runCommands(array|string $commands): void
     {
         if (empty($commands)) {
             return;
