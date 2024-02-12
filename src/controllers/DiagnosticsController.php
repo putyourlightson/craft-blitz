@@ -28,23 +28,13 @@ class DiagnosticsController extends Controller
 
     public function actionIndex(string $path): Response
     {
-        Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
-
         Sprig::bootstrap();
         Sprig::$core->components->setConfig(['requestClass' => 'busy']);
 
-        $siteId = null;
-        $site = Craft::$app->getRequest()->getParam('site');
-        if ($site) {
-            $site = Craft::$app->getSites()->getSiteByHandle($site);
-            $siteId = $site ? $site->id : null;
-        }
-        if (empty($siteId)) {
-            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
-        }
+        Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
 
         return $this->renderTemplate('blitz/_utilities/diagnostics/' . $path, [
-            'siteId' => $siteId,
+            'siteId' => DiagnosticsHelper::getSiteId(),
         ]);
     }
 

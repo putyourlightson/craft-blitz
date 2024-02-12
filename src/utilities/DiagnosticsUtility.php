@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\utilities;
 use Craft;
 use craft\base\Utility;
 use putyourlightson\blitz\assets\BlitzAsset;
+use putyourlightson\blitz\helpers\DiagnosticsHelper;
 
 /**
  * @since 4.10.0
@@ -51,18 +52,8 @@ class DiagnosticsUtility extends Utility
     {
         Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
 
-        $siteId = null;
-        $site = Craft::$app->getRequest()->getParam('site');
-        if ($site) {
-            $site = Craft::$app->getSites()->getSiteByHandle($site);
-            $siteId = $site ? $site->id : null;
-        }
-        if (empty($siteId)) {
-            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
-        }
-
         return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/', [
-            'siteId' => $siteId,
+            'siteId' => DiagnosticsHelper::getSiteId(),
         ]);
     }
 }

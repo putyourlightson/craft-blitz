@@ -29,6 +29,21 @@ use putyourlightson\blitzhints\BlitzHints;
  */
 class DiagnosticsHelper
 {
+    public static function getSiteId(): ?int
+    {
+        $siteId = null;
+        $site = Craft::$app->getRequest()->getParam('site');
+        if ($site) {
+            $site = Craft::$app->getSites()->getSiteByHandle($site);
+            $siteId = $site ? $site->id : null;
+        }
+        if (empty($siteId)) {
+            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        }
+
+        return $siteId;
+    }
+
     public static function getPagesCount(int $siteId): int
     {
         return CacheRecord::find()
