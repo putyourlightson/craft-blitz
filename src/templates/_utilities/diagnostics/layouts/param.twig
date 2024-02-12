@@ -3,12 +3,7 @@
 {% set crumbs = [
     {
         label: 'Tracked Query String Params',
-        path: 'params',
-    },
-    {
-        label: param,
-        path: (isLeaf ?? false) ? null : 'params/param?param=' ~ param,
-        class: (isLeaf ?? false) ? 'leaf code' : 'code',
+        url: 'blitz/diagnostics/params',
     },
 ]|merge(crumbs ?? []) %}
 

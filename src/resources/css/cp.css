@@ -90,25 +90,8 @@ table.editable th.code {
     font-size: inherit !important;
 }
 
-.breadcrumb-list li.leaf:after {
-    border: none;
-}
-
-.blitz-diagnostics {
-    margin-top: -10px;
-}
-
 .blitz-diagnostics #header {
-    padding-left: 0;
-    padding-right: 0;
-    margin-bottom: 0.5rem;
-    width: calc(100vw - 226px - 226px - 24px - 24px - 24px);
-}
-
-@media only screen and (max-width: 1199px) {
-    .blitz-diagnostics #header {
-        width: calc(100vw - 24px - 24px - 24px - 24px);
-    }
+    padding: 0;
 }
 
 .blitz-diagnostics > h1 {
@@ -116,8 +99,12 @@ table.editable th.code {
     line-height: 34px;
 }
 
-.blitz-diagnostics .elements {
-    margin-top: 1rem;
+.blitz-diagnostics .search-container {
+    margin-bottom: 1rem;
+}
+
+.blitz-diagnostics .chip {
+    background-color: transparent;
 }
 
 #footer {

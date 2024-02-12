@@ -21,23 +21,10 @@
 {% set maxVisible = rows|length + offset %}
 
 <div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
-    <header id="header">
-        <div class="page-title flex">
-            <h1>{{ 'Tracked Pages'|t('blitz') }}</h1>
-            {% if craft.app.getIsMultiSite() %}
-                {% include '_elements/sitemenu' with {
-                    selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics/pages?site={handle}',
-                } only %}
-            {% endif %}
-        </div>
-        <div id="toolbar" class="flex">
-            <div class="search-container flex-grow texticon has-filter-btn">
-                <span class="texticon-icon search icon" aria-hidden="true"></span>
-                <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
-            </div>
-        </div>
-    </header>
+    <div class="search-container flex-grow texticon has-filter-btn">
+        <span class="texticon-icon search icon" aria-hidden="true"></span>
+        <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+    </div>
     <div id="results">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
@@ -82,7 +69,7 @@
                         {% set url = siteUrl(uri, null, null, siteId) %}
                         <tr>
                             <td class="code">
-                                <a href="{{ url('utilities/blitz-diagnostics/pages/page', { pageId: row.id }) }}">
+                                <a href="{{ url('blitz/diagnostics/pages/page', { pageId: row.id }) }}">
                                     {{ uri }}
                                 </a>
                             </td>

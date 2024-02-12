@@ -1,9 +1,9 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/elements' %}
 
 {% set element = craft.blitz.diagnostics.getElementOfType() %}
+{% set title = 'Tracked ' ~ element.pluralDisplayName %}
 
 {% block content %}
-
     {{ sprig('blitz/_utilities/diagnostics/components/elements', {
         siteId: siteId,
         elementType: className(element),
@@ -11,5 +11,4 @@
         pluralDisplayName: element.pluralDisplayName,
         hasUris: element.hasUris,
     }) }}
-
 {% endblock %}

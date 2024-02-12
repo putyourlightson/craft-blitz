@@ -1,28 +1,30 @@
-<div class="blitz-diagnostics">
+{% extends '_layouts/cp' %}
 
-    {% if crumbs is defined %}
-        <div id="crumbs" class="hidden">
-            <ul class="breadcrumb-list">
-                <li>
-                    <a href="{{ url('utilities/blitz-diagnostics') }}">
-                        {{ 'Blitz Diagnostics'|t('blitz') }}
-                    </a>
-                </li>
-                {% for crumb in crumbs %}
-                    <li class="{{ crumb.class ?? '' }}">
-                        {% if crumb.path ?? false %}
-                            <a href="{{ url('utilities/blitz-diagnostics/' ~ crumb.path) }}">
-                                {{ crumb.label|t('blitz') }}
-                            </a>
-                        {% else %}
-                            {{ crumb.label|t('blitz') }}
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+{% set crumbs = [
+    {
+        label: 'Blitz Diagnostics'|t('blitz'),
+        url: 'utilities/blitz-diagnostics',
+    }
+]|merge(crumbs ?? []) %}
+
+{% block pageTitle %}
+    <h1 class="screen-title" title="{{ title }}">
+        {% if codeTitle ?? false %}
+            <code>{{ title }}</code>
+        {% else %}
+            {{ title }}
+        {% endif %}
+    </h1>
+    {% if craft.app.getIsMultiSite() and showSiteSelector ?? false %}
+        {% include '_elements/sitemenu' with {
+            selectedSiteId: siteId,
+            urlFormat: 'blitz/diagnostics/element-queries?site={handle}',
+        } only %}
     {% endif %}
+{% endblock %}
 
-    {% block content %}{% endblock %}
-
-</div>
+{% block main %}
+    <div class="blitz-diagnostics">
+        {{ parent() }}
+    </div>
+{% endblock %}

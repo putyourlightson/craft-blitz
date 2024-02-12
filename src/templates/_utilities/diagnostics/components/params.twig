@@ -17,25 +17,10 @@
 {% set maxVisible = rows|length + offset %}
 
 <div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
-    <header id="header">
-        <div class="page-title flex">
-            <h1>
-                {{ 'Tracked Query String Params'|t('blitz') }}
-            </h1>
-            {% if craft.app.getIsMultiSite() %}
-                {% include '_elements/sitemenu' with {
-                    selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics/params?site={handle}',
-                } only %}
-            {% endif %}
-        </div>
-        <div id="toolbar" class="flex">
-            <div class="search-container flex-grow texticon has-filter-btn">
-                <span class="texticon-icon search icon" aria-hidden="true"></span>
-                <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
-            </div>
-        </div>
-    </header>
+    <div class="search-container flex-grow texticon has-filter-btn">
+        <span class="texticon-icon search icon" aria-hidden="true"></span>
+        <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+    </div>
     <div id="results">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
@@ -59,7 +44,7 @@
                     {% for row in rows %}
                         <tr>
                             <td class="code">
-                                <a href="{{ url('utilities/blitz-diagnostics/params/param', {
+                                <a href="{{ url('blitz/diagnostics/params/param', {
                                     param: row.param,
                                 }) }}">
                                     {{ row.param }}
