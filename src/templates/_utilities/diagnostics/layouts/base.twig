@@ -15,7 +15,7 @@
             {{ title }}
         {% endif %}
     </h1>
-    {% if craft.app.getIsMultiSite() and showSiteSelector ?? false %}
+    {% if craft.app.getIsMultiSite() and showSiteMenu ?? false %}
         {% include '_elements/sitemenu' with {
             selectedSiteId: siteId,
             urlFormat: 'blitz/diagnostics/element-queries?site={handle}',
