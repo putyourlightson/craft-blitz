@@ -10,6 +10,7 @@ use craft\db\ActiveRecord;
 
 /**
  * @property int $id
+ * @property int $index [bigint(20)]
  * @property int $siteId
  * @property string $template
  * @property string $params

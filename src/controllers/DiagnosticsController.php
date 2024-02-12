@@ -47,7 +47,7 @@ class DiagnosticsController extends Controller
             ->all();
 
         $values = [];
-        foreach ($pages as &$page) {
+        foreach ($pages as $page) {
             $values[] = [
                 'uri' => $page['uri'] ?: '/',
                 'elements' => $page['elementCount'] ?: 0,

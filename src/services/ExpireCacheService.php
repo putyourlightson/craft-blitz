@@ -15,6 +15,8 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 
 /**
+ * @property-read int[] $expiredCacheIds
+ *
  * @since 4.8.0
  */
 class ExpireCacheService extends Component

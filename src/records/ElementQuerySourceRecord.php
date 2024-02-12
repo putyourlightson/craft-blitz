@@ -9,7 +9,6 @@ use craft\db\ActiveQuery;
 use craft\db\ActiveRecord;
 
 /**
- * @property int $id
  * @property int $sourceId
  * @property int $queryId
  * @property-read ElementQueryRecord $elementQuery
