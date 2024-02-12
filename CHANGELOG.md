@@ -12,6 +12,7 @@
 ### Changed
 
 - The Cache Folder Path column now displays aliases in the cached file table in the File Storage utility.
+- Entry queries for “single” sections are no longer tracked.
 - Improved error handling in a previous migration.
 - Made minor optimisations to the file storage driver.
 - Expired URIs are now deleted from the database immediately when refreshing expired cache.

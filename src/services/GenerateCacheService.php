@@ -255,6 +255,11 @@ class GenerateCacheService extends Component
             return;
         }
 
+        // Don’t proceed if this is an entry query for “single” sections
+        if (ElementQueryHelper::isEntryQueryForSingleSections($elementQuery)) {
+            return;
+        }
+
         // Don’t proceed if this is a relation field query
         if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
             $this->_addRelatedElementIds($elementQuery);

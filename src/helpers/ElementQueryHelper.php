@@ -5,13 +5,16 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use Craft;
 use craft\base\ElementInterface;
 use craft\behaviors\CustomFieldBehavior;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
+use craft\elements\db\EntryQuery;
 use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
 use craft\helpers\ArrayHelper;
+use craft\models\Section;
 use DateTime;
 use ReflectionClass;
 use ReflectionProperty;
@@ -319,6 +322,33 @@ class ElementQueryHelper
         }
 
         return false;
+    }
+
+    /**
+     * Returns whether the element query is an entry query for “single” sections.
+     */
+    public static function isEntryQueryForSingleSections(ElementQuery $elementQuery): bool
+    {
+        if (!($elementQuery instanceof EntryQuery)) {
+            return false;
+        }
+
+        $sectionIds = $elementQuery->sectionId;
+
+        if (!is_array($sectionIds)) {
+            $sectionIds = [$sectionIds];
+        }
+
+        $singles = Craft::$app->getSections()->getSectionsByType(Section::TYPE_SINGLE);
+        $singlesIds = ArrayHelper::getColumn($singles, 'id');
+
+        foreach ($sectionIds as $sectionId) {
+            if (!is_numeric($sectionId) || !in_array($sectionId, $singlesIds)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

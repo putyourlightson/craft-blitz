@@ -303,6 +303,14 @@ test('Element query record with expression is not saved', function() {
         ->toHaveRecordCount(0);
 });
 
+test('Element query record for entry in single sections is not saved', function() {
+    $elementQuery = Entry::find()->section([App::env('TEST_SINGLE_SECTION_HANDLE')]);
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    expect(ElementQueryRecord::class)
+        ->toHaveRecordCount(0);
+});
+
 test('Element query record with option field data is converted to value', function() {
     $optionFieldData = new OptionData('One', 1, true);
     $elementQuery = Entry::find()->dropdown($optionFieldData);
