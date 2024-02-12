@@ -11,76 +11,72 @@
 
 {% block content %}
     <h1>
-        {{ elementTypes|length ? 'Tracked Elements'|t('blitz') : 'No Tracked Elements'|t('blitz') }}
+        {{ 'Tracked Elements'|t('blitz') }}
     </h1>
-    {% if elementTypes|length %}
-        <div class="elements">
-            <table class="data fullwidth">
-                <thead>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Elements'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementType in elementTypes %}
                     <tr>
-                        <th>
-                            {{ 'Element Type'|t('blitz') }}
-                        </th>
-                        <th>
-                            {{ 'Elements'|t('blitz') }}
-                        </th>
+                        <td class="code">
+                            <a href="{{ url('blitz/diagnostics/pages/element-type', {
+                                pageId: page.id,
+                                elementType: elementType.type
+                            }) }}">
+                                {{ elementType.type }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementType.count|number }}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for elementType in elementTypes %}
-                        <tr>
-                            <td class="code">
-                                <a href="{{ url('blitz/diagnostics/pages/element-type', {
-                                    pageId: page.id,
-                                    elementType: elementType.type
-                                }) }}">
-                                    {{ elementType.type }}
-                                </a>
-                            </td>
-                            <td>
-                                {{ elementType.count|number }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <br>
-    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
     <h1>
-        {{ elementQueryTypes|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
+        {{ 'Tracked Element Queries'|t('blitz') }}
     </h1>
-    {% if elementQueryTypes|length %}
-        <div class="elements">
-            <table class="data fullwidth">
-                <thead>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Query Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Element Queries'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementQueryType in elementQueryTypes %}
                     <tr>
-                        <th>
-                            {{ 'Element Query Type'|t('blitz') }}
-                        </th>
-                        <th>
-                            {{ 'Element Queries'|t('blitz') }}
-                        </th>
+                        <td class="code">
+                            <a href="{{ url('blitz/diagnostics/pages/element-query-type', {
+                                pageId: page.id,
+                                elementType: elementQueryType.type
+                            }) }}">
+                                {{ elementQueryType.type }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementQueryType.count|number }}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for elementQueryType in elementQueryTypes %}
-                        <tr>
-                            <td class="code">
-                                <a href="{{ url('blitz/diagnostics/pages/element-query-type', {
-                                    pageId: page.id,
-                                    elementType: elementQueryType.type
-                                }) }}">
-                                    {{ elementQueryType.type }}
-                                </a>
-                            </td>
-                            <td>
-                                {{ elementQueryType.count|number }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}
