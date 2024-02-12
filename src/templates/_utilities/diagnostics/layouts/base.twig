@@ -18,7 +18,7 @@
     {% if craft.app.getIsMultiSite() and showSiteMenu ?? false %}
         {% include '_elements/sitemenu' with {
             selectedSiteId: siteId,
-            urlFormat: 'blitz/diagnostics/element-queries?site={handle}',
+            urlFormat: craft.app.request.pathInfo ~ '?site={handle}',
         } only %}
     {% endif %}
 {% endblock %}
