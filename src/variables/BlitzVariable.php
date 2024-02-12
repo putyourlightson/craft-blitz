@@ -316,7 +316,7 @@ class BlitzVariable
         ];
 
         $output = Html::tag($config->wrapperElement, $config->placeholder, [
-            'class' => 'blitz-inject',
+            'class' => $config->wrapperClass . ' blitz-inject',
             'id' => 'blitz-inject-' . $id,
             'data' => $data,
         ]);

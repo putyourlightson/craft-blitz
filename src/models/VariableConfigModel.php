@@ -35,6 +35,11 @@ class VariableConfigModel extends Model
     public string $wrapperElement = 'span';
 
     /**
+     * @var string Specifies the class to add to the wrapper element.
+     */
+    public string $wrapperClass = '';
+
+    /**
      * @var string Specifies the placeholder content.
      */
     public string $placeholder = '';
@@ -50,7 +55,7 @@ class VariableConfigModel extends Model
     protected function defineRules(): array
     {
         return [
-            [['requestType', 'wrapperElement', 'placeholder', 'property'], 'string'],
+            [['requestType', 'wrapperElement', 'wrapperClass', 'placeholder', 'property'], 'string'],
             [['requestType'], 'in', 'range' => [self::AJAX_REQUEST_TYPE, self::INCLUDE_REQUEST_TYPE]],
         ];
     }
