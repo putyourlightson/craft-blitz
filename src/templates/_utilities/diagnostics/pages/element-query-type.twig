@@ -2,9 +2,15 @@
 
 {% set page = craft.blitz.diagnostics.getPage() %}
 {% set element = craft.blitz.diagnostics.getElementOfType(page.id) %}
+{% set title = 'Tracked ' ~ element.displayName ~ ' Queries' %}
+{% set crumbs = [
+    {
+        label: page.uri,
+        url: cpUrl('blitz/diagnostics/pages/page?pageId=' ~ page.id),
+    },
+] %}
 
 {% block content %}
-
     {{ sprig('blitz/_utilities/diagnostics/components/elementQueries', {
         siteId: siteId,
         pageId: page.id,
@@ -12,5 +18,4 @@
         displayName: element.displayName,
         pluralDisplayName: element.displayName ~ ' Queries',
     }) }}
-
 {% endblock %}

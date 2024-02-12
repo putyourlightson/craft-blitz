@@ -5,11 +5,14 @@
 
 namespace putyourlightson\blitz\controllers;
 
+use Craft;
 use craft\helpers\App;
 use craft\web\Controller;
 use craft\web\CsvResponseFormatter;
-use craft\web\Response;
+use putyourlightson\blitz\assets\BlitzAsset;
 use putyourlightson\blitz\helpers\DiagnosticsHelper;
+use putyourlightson\sprig\Sprig;
+use yii\web\Response;
 
 /**
  * @since 4.10.0
@@ -21,6 +24,28 @@ class DiagnosticsController extends Controller
         $this->requirePermission('utility:blitz-diagnostics');
 
         return parent::beforeAction($action);
+    }
+
+    public function actionIndex(string $path): Response
+    {
+        Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
+
+        Sprig::bootstrap();
+        Sprig::$core->components->setConfig(['requestClass' => 'busy']);
+
+        $siteId = null;
+        $site = Craft::$app->getRequest()->getParam('site');
+        if ($site) {
+            $site = Craft::$app->getSites()->getSiteByHandle($site);
+            $siteId = $site ? $site->id : null;
+        }
+        if (empty($siteId)) {
+            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        }
+
+        return $this->renderTemplate('blitz/_utilities/diagnostics/' . $path, [
+            'siteId' => $siteId,
+        ]);
     }
 
     public function actionExportPages(int $siteId): Response

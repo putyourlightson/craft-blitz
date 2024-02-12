@@ -1,55 +1,38 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/base' %}
 
-{% set crumbs = [] %}
+{% set title = 'Tracked Elements'|t('blitz') %}
+{% set showSiteMenu = true %}
 {% set elementTypes = craft.blitz.diagnostics.getElementTypes(siteId) %}
 
 {% block content %}
-
-    <header id="header">
-        <div class="page-title flex">
-            <h1>
-                {{ elementTypes|length ? 'Tracked Elements'|t('blitz') : 'No Tracked Elements'|t('blitz') }}
-            </h1>
-            {% if craft.app.getIsMultiSite() %}
-                {% include '_elements/sitemenu' with {
-                    selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics/elements?site={handle}',
-                } only %}
-            {% endif %}
-        </div>
-    </header>
-
-    {% if elementTypes|length %}
-        <div class="elements">
-            <table class="data fullwidth">
-                <thead>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Elements'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementType in elementTypes %}
                     <tr>
-                        <th>
-                            {{ 'Element Type'|t('blitz') }}
-                        </th>
-                        <th>
-                            {{ 'Elements'|t('blitz') }}
-                        </th>
+                        <td class="code">
+                            <a href="{{ url('blitz/diagnostics/elements/element-type', {
+                                elementType: elementType.type
+                            }) }}">
+                                {{ elementType.type }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementType.count|number }}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for elementType in elementTypes %}
-                        <tr>
-                            <td class="code">
-                                <a href="{{ url('utilities/blitz-diagnostics/elements/element-type', {
-                                    elementType: elementType.type
-                                }) }}">
-                                    {{ elementType.type }}
-                                </a>
-                            </td>
-                            <td>
-                                {{ elementType.count|number }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
-
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

@@ -2,18 +2,17 @@
 
 {% set page = craft.blitz.diagnostics.getPage() %}
 {% if page is null %}
-    {% redirect 'utilities/blitz-diagnostics/pages' with error 'The page no longer exists or may have been refreshed.' %}
+    {% redirect 'blitz/diagnostics/pages' with error 'The page no longer exists or may have been refreshed.' %}
 {% endif %}
 {% set elementTypes = craft.blitz.diagnostics.getElementTypes(siteId, page.id) %}
 {% set elementQueryTypes = craft.blitz.diagnostics.getElementQueryTypes(siteId, page.id) %}
-{% set isLeaf = true %}
+{% set title = page.uri %}
+{% set codeTitle = true %}
 
 {% block content %}
-
     <h1>
         {{ elementTypes|length ? 'Tracked Elements'|t('blitz') : 'No Tracked Elements'|t('blitz') }}
     </h1>
-
     {% if elementTypes|length %}
         <div class="elements">
             <table class="data fullwidth">
@@ -31,7 +30,7 @@
                     {% for elementType in elementTypes %}
                         <tr>
                             <td class="code">
-                                <a href="{{ url('utilities/blitz-diagnostics/pages/element-type', {
+                                <a href="{{ url('blitz/diagnostics/pages/element-type', {
                                     pageId: page.id,
                                     elementType: elementType.type
                                 }) }}">
@@ -48,11 +47,9 @@
         </div>
         <br>
     {% endif %}
-
     <h1>
         {{ elementQueryTypes|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
     </h1>
-
     {% if elementQueryTypes|length %}
         <div class="elements">
             <table class="data fullwidth">
@@ -70,7 +67,7 @@
                     {% for elementQueryType in elementQueryTypes %}
                         <tr>
                             <td class="code">
-                                <a href="{{ url('utilities/blitz-diagnostics/pages/element-query-type', {
+                                <a href="{{ url('blitz/diagnostics/pages/element-query-type', {
                                     pageId: page.id,
                                     elementType: elementQueryType.type
                                 }) }}">
@@ -86,5 +83,4 @@
             </table>
         </div>
     {% endif %}
-
 {% endblock %}
