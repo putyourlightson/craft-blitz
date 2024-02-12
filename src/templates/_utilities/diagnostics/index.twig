@@ -45,20 +45,58 @@
     <h1 style="margin-bottom: 0">
         {{ 'Recommendations'|t('blitz') }}
     </h1>
-    <p>
-        {% if craft.app.request.isWebAliasSetDynamically %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The
-            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly defined.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The
-            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
-        {% endif %}
+    {% set info %}
         <span class="info">
             Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
         </span>
-    </p>
+    {% endset %}
+    {% if craft.app.request.isWebAliasSetDynamically %}
+        <p>
+            {% set failedSites = 0 %}
+            {% for site in craft.app.sites.allSites %}
+                {% set baseUrl = site.getBaseUrl(false) %}
+                {% if '@web' in baseUrl %}
+                    {% set failedSites = failedSites + 1 %}
+                {% endif %}
+            {% endfor %}
+            {% if failedSites > 0 %}
+                <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+                The
+                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedSites }} <a href="{{ cpUrl('settings/sites') }}">{{ '{num, plural, =1{site} other{sites}}'|t('blitz', { num: failedSites }) }}</a> and is not explicitly defined.
+            {% else %}
+                <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+                The
+                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any <a href="{{ cpUrl('settings/sites') }}">sites</a>.
+            {% endif %}
+            {{ info }}
+        </p>
+        <p>
+            {% set failedVolumes = 0 %}
+            {% for volume in craft.app.volumes.allVolumes %}
+                {% set rootUrl = volume.rootUrl %}
+                {% if '@web' in rootUrl %}
+                    {% set failedVolumes = failedVolumes + 1 %}
+                {% endif %}
+            {% endfor %}
+            {% if failedVolumes > 0 %}
+                <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+                The
+                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedVolumes }} <a href="{{ cpUrl('settings/volumes') }}">{{ '{num, plural, =1{volume} other{volumes}}'|t('blitz', { num: failedVolumes }) }}</a> and is not explicitly defined.
+            {% else %}
+                <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+                The
+                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any <a href="{{ cpUrl('settings/volumes') }}">volumes</a>.
+            {% endif %}
+            {{ info }}
+        </p>
+    {% else %}
+        <p>
+            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+            The
+            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
+            {{ info }}
+        </p>
+    {% endif %}
     <p>
         {% set globalSetCount = craft.globalSets.count %}
         {% if globalSetCount > 0 %}
