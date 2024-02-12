@@ -339,7 +339,7 @@ class ElementQueryHelper
             $sectionIds = [$sectionIds];
         }
 
-        $singles = Craft::$app->getSections()->getSectionsByType(Section::TYPE_SINGLE);
+        $singles = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
         $singlesIds = ArrayHelper::getColumn($singles, 'id');
 
         foreach ($sectionIds as $sectionId) {
