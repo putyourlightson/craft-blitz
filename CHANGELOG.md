@@ -6,7 +6,7 @@
 
 - Added recommendations to the Blitz diagnostics utility.
 - Added the user that runs controller actions to log messages.
-- Added an expiry date column to pages and elements in the Blitz cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
+- Added an expiry date column to pages and elements in the Blitz diagnostics utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
 - Added a `wrapperClass` property to the `VariableConfigModel` class ([#620](https://github.com/putyourlightson/craft-blitz/issues/620)).
 - Added new console commands for clearing, generating and purging the cache: `blitz/cache/clear-site`, `blitz/cache/clear-tagged`, `blitz/cache/clear-urls`, `blitz/cache/generate-site`, `blitz/cache/generate-tagged`, `blitz/cache/generate-urls`, `blitz/cache/purge-site`, `blitz/cache/purge-tagged`, `blitz/cache/purge-urls`.
 
