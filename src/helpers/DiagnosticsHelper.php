@@ -231,7 +231,8 @@ class DiagnosticsHelper
 
             // Return raw SQL with line breaks replaced with spaces.
             return str_replace(["\r\n", "\r", "\n"], ' ', $sql);
-        } catch (QueryAbortedException) {
+        } /** @noinspection PhpRedundantCatchClauseInspection */
+        catch (QueryAbortedException) {
             return null;
         }
     }
