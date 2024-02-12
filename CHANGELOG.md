@@ -4,9 +4,9 @@
 
 ### Added
 
-- Added recommendations to the Blitz cache utility.
+- Added recommendations to the Blitz diagnostics utility.
 - Added the user that runs controller actions to log messages.
-- Added an expiry date column to pages and elements in the Blitz Cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
+- Added an expiry date column to pages and elements in the Blitz cache utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
 - Added a `wrapperClass` property to the `VariableConfigModel` class ([#620](https://github.com/putyourlightson/craft-blitz/issues/620)).
 - Added new console commands for clearing, generating and purging the cache: `blitz/cache/clear-site`, `blitz/cache/clear-tagged`, `blitz/cache/clear-urls`, `blitz/cache/generate-site`, `blitz/cache/generate-tagged`, `blitz/cache/generate-urls`, `blitz/cache/purge-site`, `blitz/cache/purge-tagged`, `blitz/cache/purge-urls`.
 
@@ -21,7 +21,7 @@
 
 ### Fixed
 
-- Fixed a bug in which line breaks were not being replaced with spaces in raw SQL query output in the Blitz Diagnostics utility ([#611](https://github.com/putyourlightson/craft-blitz/issues/611)).
+- Fixed a bug in which line breaks were not being replaced with spaces in raw SQL query output in the Blitz diagnostics utility ([#611](https://github.com/putyourlightson/craft-blitz/issues/611)).
 
 ## 4.10.3 - 2024-01-13
 
@@ -39,16 +39,16 @@
 
 ### Fixed
 
-- Fixed a bug in which SQL queries were executed in the Blitz Diagnostics utility that required minimum database versions above those required by Craft 4 ([#602](https://github.com/putyourlightson/craft-blitz/issues/602)).
-- Fixed a bug in which paginated pages could go beyond their maximum in the Blitz Diagnostics utility ([#603](https://github.com/putyourlightson/craft-blitz/issues/603)).
+- Fixed a bug in which SQL queries were executed in the Blitz diagnostics utility that required minimum database versions above those required by Craft 4 ([#602](https://github.com/putyourlightson/craft-blitz/issues/602)).
+- Fixed a bug in which paginated pages could go beyond their maximum in the Blitz diagnostics utility ([#603](https://github.com/putyourlightson/craft-blitz/issues/603)).
 - Fixed a bug in which Sprig Core was not being bootstrapped for all CP requests.
-- Fixed a bug in which legacy non-cacheable element types were causing errors in the Blitz Diagnostics utility.
+- Fixed a bug in which legacy non-cacheable element types were causing errors in the Blitz diagnostics utility.
 
 ## 4.10.0 - 2024-01-09
 
 ### Added
 
-- Added the Blitz Diagnostics utility ([read the announcement](https://putyourlightson.com/articles/introducing-blitz-diagnostics)).
+- Added the Blitz diagnostics utility ([read the announcement](https://putyourlightson.com/articles/introducing-blitz-diagnostics)).
 
 ### Fixed
 
