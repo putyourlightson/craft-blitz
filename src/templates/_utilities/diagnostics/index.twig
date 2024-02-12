@@ -1,3 +1,6 @@
+{# @var settings \putyourlightson\blitz\models\SettingsModel #}
+{% set settings = craft.app.plugins.plugin('blitz').settings %}
+
 <div class="blitz-diagnostics">
     <header id="header">
         <div class="page-title flex">
@@ -42,8 +45,20 @@
     <h1 style="margin-bottom: 0">
         {{ 'Recommendations'|t('blitz') }}
     </h1>
-    {# @var settings \putyourlightson\blitz\models\SettingsModel #}
-    {% set settings = craft.app.plugins.plugin('blitz').settings %}
+    <p>
+        {% if craft.app.request.isWebAliasSetDynamically %}
+            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
+            The
+            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly defined.
+        {% else %}
+            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+            The
+            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
+        {% endif %}
+        <span class="info">
+            Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
+        </span>
+    </p>
     <p>
         {% set globalSetCount = craft.globalSets.count %}
         {% if globalSetCount > 0 %}
@@ -64,20 +79,6 @@
         {% endif %}
         <span class="info">
             <a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>
-        </span>
-    </p>
-    <p>
-        {% if craft.app.request.isWebAliasSetDynamically %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The
-            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly defined.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The
-            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
-        {% endif %}
-        <span class="info">
-            Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
