@@ -1,16 +1,19 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/param' %}
 
-{% set isLeaf = true %}
-
 {% set param = craft.app.request.param('param') %}
+{% set title = param %}
+
+{% block pageTitle %}
+    <h1 class="screen-title" title="{{ title }}">
+        <code>{{ title }}</code>
+    </h1>
+{% endblock %}
 
 {% block content %}
-
     {{ sprig('blitz/_utilities/diagnostics/components/paramPages', {
         siteId: siteId,
         param: param,
         displayName: 'Page',
         pluralDisplayName: 'Pages',
     }) }}
-
 {% endblock %}

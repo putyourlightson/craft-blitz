@@ -1,55 +1,49 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/base' %}
 
-{% set crumbs = [] %}
+{% set title = 'Tracked Element Queries'|t('blitz') %}
 {% set elementQueryTypes = craft.blitz.diagnostics.getElementQueryTypes(siteId) %}
 
+{% block pageTitle %}
+    <div class="page-title flex">
+        <h1 class="screen-title" title="{{ title }}">{{ title }}</h1>
+        {% if craft.app.getIsMultiSite() %}
+            {% include '_elements/sitemenu' with {
+                selectedSiteId: siteId,
+                urlFormat: 'blitz/diagnostics/element-queries?site={handle}',
+            } only %}
+        {% endif %}
+    </div>
+{% endblock %}
+
 {% block content %}
-
-    <header id="header">
-        <div class="page-title flex">
-            <h1>
-                {{ elementQueryTypes|length ? 'Tracked Element Queries'|t('blitz') : 'No Tracked Element Queries'|t('blitz') }}
-            </h1>
-            {% if craft.app.getIsMultiSite() %}
-                {% include '_elements/sitemenu' with {
-                    selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics/element-queries?site={handle}',
-                } only %}
-            {% endif %}
-        </div>
-    </header>
-
-    {% if elementQueryTypes|length %}
-        <div class="elements">
-            <table class="data fullwidth">
-                <thead>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Element Queries'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementQueryType in elementQueryTypes %}
                     <tr>
-                        <th>
-                            {{ 'Element Type'|t('blitz') }}
-                        </th>
-                        <th>
-                            {{ 'Element Queries'|t('blitz') }}
-                        </th>
+                        <td class="code">
+                            <a href="{{ url('blitz/diagnostics/element-queries/element-query-type', {
+                                elementType: elementQueryType.type
+                            }) }}">
+                                {{ elementQueryType.type }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementQueryType.count|number }}
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    {% for elementQueryType in elementQueryTypes %}
-                        <tr>
-                            <td class="code">
-                                <a href="{{ url('utilities/blitz-diagnostics/element-queries/element-query-type', {
-                                    elementType: elementQueryType.type
-                                }) }}">
-                                    {{ elementQueryType.type }}
-                                </a>
-                            </td>
-                            <td>
-                                {{ elementQueryType.count|number }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% endif %}
-
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 {% endblock %}

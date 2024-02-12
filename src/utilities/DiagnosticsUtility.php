@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\utilities;
 use Craft;
 use craft\base\Utility;
 use putyourlightson\blitz\assets\BlitzAsset;
-use putyourlightson\sprig\Sprig;
 
 /**
  * @since 4.10.0
@@ -52,9 +51,6 @@ class DiagnosticsUtility extends Utility
     {
         Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
 
-        Sprig::bootstrap();
-        Sprig::$core->components->setConfig(['requestClass' => 'busy']);
-
         $siteId = null;
         $site = Craft::$app->getRequest()->getParam('site');
         if ($site) {
@@ -65,10 +61,7 @@ class DiagnosticsUtility extends Utility
             $siteId = Craft::$app->getSites()->getCurrentSite()->id;
         }
 
-        $templateSegments = array_slice(Craft::$app->getRequest()->getSegments(), 2);
-        $templatePath = 'blitz/_utilities/diagnostics/' . implode('/', $templateSegments);
-
-        return Craft::$app->getView()->renderTemplate($templatePath, [
+        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/', [
             'siteId' => $siteId,
         ]);
     }

@@ -8,12 +8,7 @@
 {% set crumbs = [
     {
         label: 'Tracked Pages',
-        path: 'pages',
-    },
-    {
-        label: page.uri,
-        path: (isLeaf ?? false) ? null : 'pages/page?pageId=' ~ page.id,
-        class: (isLeaf ?? false) ? 'leaf code' : 'code',
+        url: 'blitz/diagnostics/pages',
     },
 ]|merge(crumbs ?? []) %}
 

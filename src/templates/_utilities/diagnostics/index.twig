@@ -1,7 +1,4 @@
-{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
-
-{% block content %}
-
+<div class="blitz-diagnostics">
     <header id="header">
         <div class="page-title flex">
             <h1>{{ 'Site Tracking'|t('blitz') }}</h1>
@@ -14,28 +11,28 @@
         </div>
     </header>
     <h2>
-        <a href="{{ cpUrl('utilities/blitz-diagnostics/pages') }}">
+        <a href="{{ cpUrl('blitz/diagnostics/pages') }}">
             {% set count = craft.blitz.diagnostics.getPagesCount(siteId) %}
             {{ count|number }}
             {{ '{num, plural, =1{Tracked Page} other{Tracked Pages}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ cpUrl('utilities/blitz-diagnostics/params') }}">
+        <a href="{{ cpUrl('blitz/diagnostics/params') }}">
             {% set count = craft.blitz.diagnostics.getParamsCount(siteId) %}
             {{ count|number }}
             {{ '{num, plural, =1{Tracked Query String Param} other{Tracked Query String Params}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ cpUrl('utilities/blitz-diagnostics/elements') }}">
+        <a href="{{ cpUrl('blitz/diagnostics/elements') }}">
             {% set count = craft.blitz.diagnostics.getElementsCount(siteId) %}
             {{ count|number }}
             {{ '{num, plural, =1{Tracked Element} other{Tracked Elements}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
     <h2>
-        <a href="{{ cpUrl('utilities/blitz-diagnostics/element-queries') }}">
+        <a href="{{ cpUrl('blitz/diagnostics/element-queries') }}">
             {% set count = craft.blitz.diagnostics.getElementQueriesCount(siteId) %}
             {{ count|number }}
             {{ '{num, plural, =1{Tracked Element Query} other{Tracked Element Queries}}'|t('blitz', { num: count }) }}
@@ -52,10 +49,14 @@
         {% if globalSetCount > 0 %}
             {% if settings.refreshCacheAutomaticallyForGlobals %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-                {{ globalSetCount }} <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is enabled.
+                {{ globalSetCount }}
+                <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and
+                <code>refreshCacheAutomaticallyForGlobals</code> is enabled.
             {% else %}
                 <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-                {{ globalSetCount }} <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is disabled.
+                {{ globalSetCount }}
+                <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and
+                <code>refreshCacheAutomaticallyForGlobals</code> is disabled.
             {% endif %}
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
@@ -68,10 +69,12 @@
     <p>
         {% if craft.app.request.isWebAliasSetDynamically %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly defined.
+            The
+            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias should be explicitly defined.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
+            The
+            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
         {% endif %}
         <span class="info">
             Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
@@ -104,10 +107,12 @@
     <p>
         {% if craft.app.plugins.getPlugin('async-queue') is not null %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is enabled.
+            The
+            <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is enabled.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is not enabled.
+            The
+            <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is not enabled.
         {% endif %}
         <span class="info">
             The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin can be unreliable when used in some environments and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
@@ -118,10 +123,13 @@
             {% set hintsCount = craft.blitz.diagnostics.hintsCount %}
             {% if hintsCount > 0 %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-                The <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is reporting <code>{{ hintsCount }}</code> eager-loading {{ '{num, plural, =1{opportunity} other{opportunities}}'|t('blitz', { num: hintsCount }) }}.
+                The
+                <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is reporting
+                <code>{{ hintsCount }}</code> eager-loading {{ '{num, plural, =1{opportunity} other{opportunities}}'|t('blitz', { num: hintsCount }) }}.
             {% else %}
                 <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-                The <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is not reporting any eager-loading opportunities.
+                The
+                <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is not reporting any eager-loading opportunities.
             {% endif %}
         {% else %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
@@ -159,14 +167,15 @@
         {% set refreshExpired = craft.blitz.diagnostics.driverDataAction('refresh-expired-cli') %}
         {% if refreshExpired is null or refreshExpired < craft.blitz.diagnostics.dateForDb(now|date_modify('-24 hours')) %}
             <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.
+            The
+            <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.
         {% else %}
             <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.
+            The
+            <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.
         {% endif %}
         <span class="info">
             The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache at a recurring interval. (You may have to wait for the cron job to run after an update.) <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>
         </span>
     </p>
-
-{% endblock %}
+</div>

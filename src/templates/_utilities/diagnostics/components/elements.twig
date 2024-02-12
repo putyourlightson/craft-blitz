@@ -20,17 +20,10 @@
 {% set elements = craft.blitz.diagnostics.getElementsFromIds(siteId, elementType, elementIds) %}
 
 <div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements .elements">
-    <header id="header">
-        <div class="page-title flex">
-            <h1>{{ pluralDisplayName }}</h1>
-        </div>
-        <div id="toolbar" class="flex">
-            <div class="search-container flex-grow texticon has-filter-btn">
-                <span class="texticon-icon search icon" aria-hidden="true"></span>
-                <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
-            </div>
-        </div>
-    </header>
+    <div class="search-container flex-grow texticon has-filter-btn">
+        <span class="texticon-icon search icon" aria-hidden="true"></span>
+        <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+    </div>
     <div id="elements">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
@@ -67,7 +60,7 @@
                         {% set element = elements[row.elementId] %}
                         <tr>
                             <td>
-                                {{ include ('_elements/element') }}
+                                {{ elementChip(element) }}
                             </td>
                             {% if pageId is not defined %}
                                 <td>

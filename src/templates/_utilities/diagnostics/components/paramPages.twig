@@ -16,17 +16,10 @@
 {% set rows = query.all() %}
 
 <div s-replace="#pages" s-swap="outerHTML show:#main:top" s-indicator="#pages .elements">
-    <header id="header">
-        <div class="page-title flex">
-            <h1>{{ pluralDisplayName }}</h1>
-        </div>
-        <div id="toolbar" class="flex">
-            <div class="search-container flex-grow texticon has-filter-btn">
-                <span class="texticon-icon search icon" aria-hidden="true"></span>
-                <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
-            </div>
-        </div>
-    </header>
+    <div class="search-container flex-grow texticon has-filter-btn">
+        <span class="texticon-icon search icon" aria-hidden="true"></span>
+        <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+    </div>
     <div id="pages">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}

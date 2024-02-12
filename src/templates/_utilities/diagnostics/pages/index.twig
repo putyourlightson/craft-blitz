@@ -1,9 +1,8 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/base' %}
 
-{% set crumbs = [] %}
+{% set title = 'Tracked Pages'|t('blitz') %}
+{% set showSiteSelector = true %}
 
 {% block content %}
-
     {{ sprig('blitz/_utilities/diagnostics/components/pages', { siteId: siteId }) }}
-
 {% endblock %}
