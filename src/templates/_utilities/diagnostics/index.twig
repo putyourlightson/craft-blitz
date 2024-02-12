@@ -50,12 +50,12 @@
             {% if settings.refreshCacheAutomaticallyForGlobals %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
                 {{ globalSetCount }}
-                <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and
+                <a href="{{ cpUrl('globals') }}">{{ '{num, plural, =1{global exists} other{globals exist}}'|t('blitz', { num: globalSetCount }) }}</a> and
                 <code>refreshCacheAutomaticallyForGlobals</code> is enabled.
             {% else %}
                 <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
                 {{ globalSetCount }}
-                <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global} other{globals}}'|t('blitz', { num: globalSetCount }) }}</a> exist and
+                <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global exists} other{globals exist}}'|t('blitz', { num: globalSetCount }) }}</a> and
                 <code>refreshCacheAutomaticallyForGlobals</code> is disabled.
             {% endif %}
         {% else %}
@@ -63,7 +63,7 @@
             No globals exist.
         {% endif %}
         <span class="info">
-            Globals should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>
+            <a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>
         </span>
     </p>
     <p>
