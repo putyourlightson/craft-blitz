@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.11.1 - 2024-02-12
+
+### Fixed
+
+- Fixed the tracking of non-cacheable block elements when eager-loaded.
+
 ## 4.11.0 - 2024-02-12
 
 ### Added

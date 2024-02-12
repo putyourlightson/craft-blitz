@@ -152,9 +152,12 @@ class GenerateCacheService extends Component
                     /** @var ElementInterface|string $elementType */
                     $elementType = $event->elementType;
                     $map = $elementType::eagerLoadingMap($event->elements, $plan->handle);
-                    if (!empty($map['map'])) {
-                        foreach ($map['map'] as $mapping) {
-                            $this->generateData->addElementId($mapping['target']);
+
+                    if (is_array($map)) {
+                        if ($this->_shouldTrackElementsOfType($map['elementType'])) {
+                            foreach ($map['map'] as $mapping) {
+                                $this->generateData->addElementId($mapping['target']);
+                            }
                         }
                     }
                 }
