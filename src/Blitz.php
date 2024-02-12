@@ -109,12 +109,12 @@ class Blitz extends Plugin
     /**
      * @inheritdoc
      */
-    public string $schemaVersion = '4.10.1';
+    public string $schemaVersion = '4.11.1';
 
     /**
      * @inheritdoc
      */
-    public string $minVersionRequired = '3.10.0';
+    public string $minVersionRequired = '4.11.1';
 
     /**
      * The queue to use for running jobs.
