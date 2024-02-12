@@ -6,7 +6,26 @@
 
 use putyourlightson\blitz\variables\BlitzVariable;
 
-test('Include cached tag does not contain unencoded slashes in params', function() {
+test('Cached include tag contains provided options', function() {
+    $variable = new BlitzVariable();
+    $tagString = (string)$variable->includeCached('test', [], [
+        'requestType' => 'ajax',
+        'wrapperElement' => 'div',
+        'wrapperClass' => 'test',
+        'placeholder' => 'Loading...',
+        'property' => 'test',
+    ]);
+
+    expect($tagString)
+        ->toContain(
+            '<div',
+            'class="test blitz-inject"',
+            'data-blitz-property="test"',
+            'Loading...',
+        );
+});
+
+test('Cached include tag does not contain unencoded slashes in params', function() {
     $variable = new BlitzVariable();
     $tagString = (string)$variable->includeCached('test');
     preg_match('/_includes\?(.*)/', $tagString, $match);
@@ -16,7 +35,7 @@ test('Include cached tag does not contain unencoded slashes in params', function
         ->toContain('/');
 });
 
-test('Include cached tag does not contain path param', function() {
+test('Cached include tag does not contain path param', function() {
     $variable = new BlitzVariable();
     $tagString = (string)$variable->includeCached('test');
     preg_match('/\?(.*)/', $tagString, $match);
