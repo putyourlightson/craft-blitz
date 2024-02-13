@@ -625,7 +625,7 @@ class SettingsModel extends Model
             ],
             ],
             [['apiKey'], 'string', 'length' => [16]],
-            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
+            [['cachingEnabled', 'trackElements', 'trackElementQueries'], 'boolean'],
         ];
     }
 }

@@ -195,7 +195,7 @@ class CacheOptionsModel extends Model
     protected function defineRules(): array
     {
         return [
-            [['cachingEnabled', 'cacheElements', 'cacheElementQueries'], 'boolean'],
+            [['cachingEnabled', 'trackElements', 'trackElementQueries'], 'boolean'],
             [['paginate'], 'integer'],
             [['expiryDate'], DateTimeValidator::class],
         ];
