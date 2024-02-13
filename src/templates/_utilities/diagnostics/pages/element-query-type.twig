@@ -5,8 +5,11 @@
 {% set title = 'Tracked ' ~ element.displayName ~ ' Queries' %}
 {% set crumbs = [
     {
-        label: page.uri,
-        url: 'blitz/diagnostics/pages/page?pageId=' ~ page.id,
+        html: tag('a', {
+        class: 'crumb-link code',
+        href: cpUrl('blitz/diagnostics/pages/page?pageId=' ~ page.id),
+        text: page.uri,
+    })
     },
 ] %}
 
