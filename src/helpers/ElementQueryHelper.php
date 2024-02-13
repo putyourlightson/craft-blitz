@@ -352,6 +352,25 @@ class ElementQueryHelper
     }
 
     /**
+     * Returns whether the element query is a nested entry query.
+     */
+    public static function isNestedEntryQuery(ElementQuery $elementQuery): bool
+    {
+        if (!($elementQuery instanceof EntryQuery)) {
+            return false;
+        }
+
+        /**
+         * Evaluate whether the element query has an owner.
+         *
+         * @see EntryQuery::beforePrepare()
+         */
+        return !empty($elementQuery->fieldId)
+            || !empty($elementQuery->ownerId)
+            || !empty($elementQuery->primaryOwnerId);
+    }
+
+    /**
      * Returns whether the element query is a relation field query.
      * For example:
      *

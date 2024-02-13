@@ -79,12 +79,6 @@ class ElementTypeHelper
             return false;
         }
 
-        // TODO: review this.
-        // Don't proceed if this is a block element type
-        //        if (is_subclass_of($elementType, NestedElementInterface::class)) {
-        //            return false;
-        //        }
-
         // Don't proceed if this is a non cacheable element type
         if (in_array($elementType, self::getNonCacheableElementTypes())) {
             return false;
