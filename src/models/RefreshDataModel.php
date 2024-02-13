@@ -187,7 +187,10 @@ class RefreshDataModel extends BaseDataModel
 
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($element::class);
         if ($sourceIdAttribute !== null) {
-            $this->addSourceId($element::class, $element->{$sourceIdAttribute});
+            $sourceId = $element->{$sourceIdAttribute} ?? null;
+            if ($sourceId !== null) {
+                $this->addSourceId($element::class, $sourceId);
+            }
         }
 
         if ($elementChanged !== null) {
