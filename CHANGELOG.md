@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.0.0-beta.1 - Unreleased
+## 5.0.0-beta.1 - 2024-02-14
 
 ### Added
 
