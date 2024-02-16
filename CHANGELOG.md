@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.11.2 - Unreleased
+
+### Changed
+
+- Asset queries containing filenames are no longer tracked.
+
 ## 4.11.1 - 2024-02-12
 
 ### Fixed
