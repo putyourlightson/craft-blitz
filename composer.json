@@ -25,7 +25,7 @@
   "require-dev": {
     "craftcms/commerce": "^4.0.0",
     "craftcms/ecs": "dev-main",
-    "craftcms/feed-me": "^5.0.0",
+    "craftcms/feed-me": "^5.0.0-beta.1",
     "craftcms/phpstan": "dev-main",
     "markhuot/craft-pest-core": "v3.x-dev",
     "nystudio107/craft-seomatic": "^5.0.0-beta.1",
@@ -38,15 +38,15 @@
       "url": "https://github.com/bencroker/craft-pest-core"
     }
   ],
-  "scripts": {
-    "phpstan": "phpstan --ansi --memory-limit=1G",
-    "check-cs": "ecs check --ansi",
-    "fix-cs": "ecs check --fix --ansi"
-  },
   "autoload": {
     "psr-4": {
       "putyourlightson\\blitz\\": "src/"
     }
+  },
+  "scripts": {
+    "phpstan": "phpstan --ansi --memory-limit=1G",
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --fix --ansi"
   },
   "config": {
     "allow-plugins": {
@@ -68,7 +68,7 @@
     "developer": "PutYourLightsOn",
     "developerUrl": "https://putyourlightson.com/",
     "documentationUrl": "https://putyourlightson.com/plugins/blitz",
-    "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v4/CHANGELOG.md",
+    "changelogUrl": "https://raw.githubusercontent.com/putyourlightson/craft-blitz/v5/CHANGELOG.md",
     "class": "putyourlightson\\blitz\\Blitz"
   }
 }

@@ -268,6 +268,11 @@ class GenerateCacheService extends Component
             return;
         }
 
+        // Don’t proceed if this is an asset query with a filename
+        if (ElementQueryHelper::isAssetQueryWithFilename($elementQuery)) {
+            return;
+        }
+
         // Don’t proceed if this is a relation field query
         if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
             $this->addRelatedElementIds($elementQuery);

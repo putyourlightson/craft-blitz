@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\ElementInterface;
 use craft\behaviors\CustomFieldBehavior;
+use craft\elements\db\AssetQuery;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
@@ -326,6 +327,8 @@ class ElementQueryHelper
 
     /**
      * Returns whether the element query is an entry query for “single” sections.
+     *
+     * @since 4.11.0
      */
     public static function isEntryQueryForSingleSections(ElementQuery $elementQuery): bool
     {
@@ -349,6 +352,20 @@ class ElementQueryHelper
         }
 
         return true;
+    }
+
+    /**
+     * Returns whether the element query is an asset query with a filename.
+     *
+     * @since 4.11.2
+     */
+    public static function isAssetQueryWithFilename(ElementQuery $elementQuery): bool
+    {
+        if (!($elementQuery instanceof AssetQuery)) {
+            return false;
+        }
+
+        return $elementQuery->filename !== null;
     }
 
     /**
