@@ -75,11 +75,6 @@ class GenerateCacheService extends Component
     public const MUTEX_LOCK_NAME_INCLUDE_RECORDS = 'blitz:includeRecords';
 
     /**
-     * @const string
-     */
-    public const MUTEX_LOCK_NAME_SSI_INCLUDE_RECORDS = 'blitz:ssiIncludeRecords';
-
-    /**
      * @var GenerateDataModel
      */
     public GenerateDataModel $generateData;
