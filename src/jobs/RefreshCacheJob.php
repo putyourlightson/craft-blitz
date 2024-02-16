@@ -18,7 +18,7 @@ use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
 /**
- * @property-read int $ttr
+ * TODO: make this job batchable.
  */
 class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 {

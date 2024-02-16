@@ -12,7 +12,7 @@ use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
 /**
- * @property-read int $ttr
+ * TODO: make driver jobs batchable.
  */
 class DriverJob extends BaseJob implements RetryableJobInterface
 {
