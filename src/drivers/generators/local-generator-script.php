@@ -3,8 +3,8 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-use Amp\Parallel\Sync\Channel;
-use Amp\Parallel\Sync\ContextPanicError;
+use Amp\Parallel\Context\ContextPanicError;
+use Amp\Sync\Channel;
 use craft\services\Plugins;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
@@ -15,12 +15,12 @@ use yii\log\Logger;
  * This script bootstraps a web app and mocks a web request. It is called by the
  * Local Generator, which runs in a parent process, receiving a channel that is
  * used to send data between the parent and child processes.
- * https://amphp.org/parallel/processes#child-process-or-thread
+ * https://amphp.org/parallel#child-processes-or-threads
  *
  * @see putyourlightson\blitz\drivers\generators\LocalGenerator::generateUrisWithProgress()
  */
-return function(Channel $channel): Generator {
-    $config = yield $channel->receive();
+return function(Channel $channel): void {
+    $config = $channel->receive();
 
     $url = $config['url'];
     $root = $config['root'];
@@ -56,7 +56,6 @@ return function(Channel $channel): Generator {
     define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
 
     // Load Composer's autoloader
-    /** @noinspection PhpIncludeInspection */
     require_once CRAFT_VENDOR_PATH . '/autoload.php';
 
     // Load dotenv, depending on the available method and version.
@@ -111,5 +110,5 @@ return function(Channel $channel): Generator {
         $success = 1;
     }
 
-    yield $channel->send($success);
+    $channel->send($success);
 };

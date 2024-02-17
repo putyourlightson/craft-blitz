@@ -5,14 +5,10 @@
 
 namespace putyourlightson\blitz\drivers\generators;
 
-use Amp\Sync\LocalSemaphore;
+use Amp\Pipeline\Pipeline;
 use Craft;
-use putyourlightson\blitz\Blitz;
-use Throwable;
 
-use function Amp\Iterator\fromIterable;
-use function Amp\Parallel\Context\create;
-use function Amp\Promise\wait;
+use function Amp\Parallel\Context\startContext;
 
 /**
  * This generator runs concurrent PHP child processes or threads to generate
@@ -26,8 +22,7 @@ use function Amp\Promise\wait;
  *
  * The Amp PHP framework is used for running parallel processes and a concurrent
  * iterator is used to run the processes concurrently.
- * See https://amphp.org/parallel/processes
- * and https://amphp.org/sync/concurrent-iterator
+ * See https://amphp.org/parallel and https://amphp.org/pipeline
  *
  * @property-read null|string $settingsHtml
  */
@@ -53,7 +48,8 @@ class LocalGenerator extends BaseCacheGenerator
     }
 
     /**
-     * Generates site URIs with progress.
+     * Generates site URIs with progress using a Concurrent Iterator.
+     * See https://amphp.org/sync#approach-4-concurrentiterator
      */
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
@@ -67,41 +63,29 @@ class LocalGenerator extends BaseCacheGenerator
             'pathParam' => Craft::$app->getConfig()->getGeneral()->pathParam,
         ];
 
-        // Approach 4: Concurrent Iterator
-        // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
-        $promise = \Amp\Sync\ConcurrentIterator\each(
-            fromIterable($urls),
-            new LocalSemaphore($this->concurrency),
-            function(string $url) use ($setProgressHandler, &$count, $pages, $config) {
-                if ($this->isPageUrl($url)) {
-                    $count++;
-                }
+        $concurrentIterator = Pipeline::fromIterable($urls)
+            ->concurrent($this->concurrency);
 
-                $config['url'] = $url;
-
-                // Create a context to send data between the parent and child processes
-                // https://amphp.org/parallel/processes#parent-process
-                $context = create(__DIR__ . '/local-generator-script.php');
-                yield $context->start();
-                yield $context->send($config);
-                $result = yield $context->receive();
-
-                if ($result) {
-                    $this->generated++;
-                }
-
-                if (is_callable($setProgressHandler)) {
-                    $this->callProgressHandler($setProgressHandler, $count, $pages);
-                }
+        foreach ($concurrentIterator as $url) {
+            if ($this->isPageUrl($url)) {
+                $count++;
             }
-        );
 
-        // Exceptions are thrown only when the promise is resolved.
-        try {
-            wait($promise);
-        } // Catch all exceptions and errors to avoid interrupting progress.
-        catch (Throwable $exception) {
-            Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
+            $config['url'] = $url;
+
+            // Create a context to send data between parent and child processes.
+            // https://amphp.org/parallel#context-creation
+            $context = startContext(__DIR__ . '/local-generator-script.php');
+            $context->send($config);
+            $result = $context->receive();
+
+            if ($result) {
+                $this->generated++;
+            }
+
+            if (is_callable($setProgressHandler)) {
+                $this->callProgressHandler($setProgressHandler, $count, $pages);
+            }
         }
     }
 

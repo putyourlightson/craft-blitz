@@ -8,14 +8,10 @@ namespace putyourlightson\blitz\drivers\generators;
 use Amp\Http\Client\HttpClientBuilder;
 use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
-use Amp\Sync\LocalSemaphore;
+use Amp\Pipeline\Pipeline;
 use Craft;
 use putyourlightson\blitz\Blitz;
-use Throwable;
 use yii\log\Logger;
-
-use function Amp\Iterator\fromIterable;
-use function Amp\Promise\wait;
 
 /**
  * This generator makes concurrent HTTP requests to generate each individual
@@ -24,8 +20,7 @@ use function Amp\Promise\wait;
  *
  * The Amp PHP framework is used for making HTTP requests and a concurrent
  * iterator is used to send the requests concurrently.
- * See https://amphp.org/http-client/concurrent
- * and https://amphp.org/sync/concurrent-iterator
+ * See https://amphp.org/http-client/ and https://amphp.org/pipeline
  *
  * @property-read null|string $settingsHtml
  */
@@ -50,7 +45,8 @@ class HttpGenerator extends BaseCacheGenerator
     }
 
     /**
-     * Generates site URIs with progress.
+     * Generates site URIs with progress using a Concurrent Iterator.
+     * See https://amphp.org/sync#approach-4-concurrentiterator
      */
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
@@ -60,44 +56,33 @@ class HttpGenerator extends BaseCacheGenerator
 
         $client = HttpClientBuilder::buildDefault();
 
-        // Approach 4: Concurrent Iterator
-        // https://amphp.org/sync/concurrent-iterator#approach-4-concurrent-iterator
-        $promise = \Amp\Sync\ConcurrentIterator\each(
-            fromIterable($urls),
-            new LocalSemaphore($this->concurrency),
-            function(string $url) use ($setProgressHandler, &$count, $pages, $client) {
-                if ($this->isPageUrl($url)) {
-                    $count++;
-                }
+        $concurrentIterator = Pipeline::fromIterable($urls)
+            ->concurrent($this->concurrency);
 
-                try {
-                    $request = $this->createRequest($url);
-                    $response = yield $client->request($request);
-
-                    if ($response->getStatus() === 200) {
-                        $this->generated++;
-                    } else {
-                        Blitz::$plugin->debug('{status} error: {reason}', [
-                            'status' => $response->getStatus(),
-                            'reason' => $response->getReason(),
-                        ], $url);
-                    }
-
-                    if (is_callable($setProgressHandler)) {
-                        $this->callProgressHandler($setProgressHandler, $count, $pages);
-                    }
-                } catch (HttpException $exception) {
-                    Blitz::$plugin->log($exception->getMessage() . ' [' . $url . ']', [], Logger::LEVEL_ERROR);
-                }
+        foreach ($concurrentIterator as $url) {
+            if ($this->isPageUrl($url)) {
+                $count++;
             }
-        );
 
-        // Exceptions are thrown only when the promise is resolved.
-        try {
-            wait($promise);
-        } // Catch all possible exceptions to avoid interrupting progress.
-        catch (Throwable $exception) {
-            Blitz::$plugin->debug($this->getAllExceptionMessages($exception));
+            try {
+                $request = $this->createRequest($url);
+                $response = $client->request($request);
+
+                if ($response->getStatus() === 200) {
+                    $this->generated++;
+                } else {
+                    Blitz::$plugin->debug('{status} error: {reason}', [
+                        'status' => $response->getStatus(),
+                        'reason' => $response->getReason(),
+                    ], $url);
+                }
+
+                if (is_callable($setProgressHandler)) {
+                    $this->callProgressHandler($setProgressHandler, $count, $pages);
+                }
+            } catch (HttpException $exception) {
+                Blitz::$plugin->log($exception->getMessage() . ' [' . $url . ']', [], Logger::LEVEL_ERROR);
+            }
         }
     }
 

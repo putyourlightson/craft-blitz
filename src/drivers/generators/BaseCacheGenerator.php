@@ -5,7 +5,6 @@
 
 namespace putyourlightson\blitz\drivers\generators;
 
-use Amp\MultiReasonException;
 use Craft;
 use craft\base\SavableComponent;
 use putyourlightson\blitz\Blitz;
@@ -14,7 +13,6 @@ use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
-use Throwable;
 
 /**
  * @property-read array $siteOptions
@@ -197,42 +195,9 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     }
 
     /**
-     * Returns all messages for an exception, for easier debugging.
-     */
-    protected function getAllExceptionMessages(Throwable $exception): string
-    {
-        $messages = [
-            $exception->getMessage(),
-        ];
-
-        while ($exception = $exception->getPrevious()) {
-            if (!($exception instanceof MultiReasonException)) {
-                $messages[] = $exception->getMessage();
-            }
-        }
-
-        return implode('. ', $messages);
-    }
-
-    /**
-     * Returns site options.
-     */
-    protected function getSiteOptions(): array
-    {
-        $siteOptions = [];
-
-        foreach (Craft::$app->getSites()->getAllSites() as $site) {
-            $siteOptions[$site->id] = $site->name;
-        }
-
-        return $siteOptions;
-    }
-
-    /**
      * Returns the number of pages (not includes) in the provided site URIs.
      *
      * @param SiteUriModel[]|array[] $siteUris
-     * @return int
      */
     protected function getPageCount(array $siteUris): int
     {

@@ -15,8 +15,8 @@
   ],
   "require": {
     "php": "^8.2",
-    "amphp/http-client": "^4.0",
-    "amphp/parallel": "^1.0",
+    "amphp/http-client": "^5.0",
+    "amphp/parallel": "^2.0",
     "craftcms/cms": "^5.0.0-beta.1",
     "cypresslab/gitelephant": "^4.0",
     "putyourlightson/craft-blitz-hints": "^2.0.0-beta.1",
