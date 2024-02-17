@@ -18,7 +18,7 @@ use yii\log\Logger;
  * site URI, using a token with a generate action route to break through existing
  * cache storage and reverse proxy caches.
  *
- * The Amp PHP framework is used for making HTTP requests and a concurrent
+ * The AMPHP framework is used for making HTTP requests and a concurrent
  * iterator is used to send the requests concurrently.
  * See https://amphp.org/http-client/ and https://amphp.org/pipeline
  *

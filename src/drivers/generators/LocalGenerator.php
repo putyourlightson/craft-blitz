@@ -20,7 +20,7 @@ use function Amp\Parallel\Context\startContext;
  * mock a web request. The bootstrapping and mocking of the web request happen in
  * the `local-generator-script.php` file.
  *
- * The Amp PHP framework is used for running parallel processes and a concurrent
+ * The AMPHP framework is used for running parallel processes and a concurrent
  * iterator is used to run the processes concurrently.
  * See https://amphp.org/parallel and https://amphp.org/pipeline
  *
