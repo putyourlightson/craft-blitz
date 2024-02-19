@@ -172,7 +172,7 @@ class DiagnosticsHelper
             ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementcaches.elementId]]')
             ->innerJoin(['elements_sites' => Table::ELEMENTS_SITES], '[[elements_sites.elementId]] = [[elementcaches.elementId]]')
             ->where($condition)
-            ->groupBy(['elementcaches.elementId', 'title'])
+            ->groupBy(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'title'])
             ->asArray();
     }
 
@@ -192,7 +192,7 @@ class DiagnosticsHelper
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
-            ->groupBy(ElementQueryRecord::tableName() . '.id')
+            ->groupBy([ElementQueryRecord::tableName() . '.id', 'params'])
             ->asArray();
     }
 
