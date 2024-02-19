@@ -1,10 +1,14 @@
 # Release Notes for Blitz
 
-## 4.11.2 - Unreleased
+## 4.11.2 - 2024-02-19
 
 ### Changed
 
 - Asset queries containing filenames are no longer tracked.
+
+### Fixed
+
+- Fixed a bug in the diagnostics utility that only affected Postgres ([#621](https://github.com/putyourlightson/craft-blitz/issues/621)).
 
 ## 4.11.1 - 2024-02-12
 
