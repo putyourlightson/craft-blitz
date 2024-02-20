@@ -10,7 +10,7 @@ use craft\db\ActiveRecord;
 /**
  * @property int $id
  * @property string $driver
- * @property string $data
+ * @property string|array $data
  */
 class DriverDataRecord extends ActiveRecord
 {
