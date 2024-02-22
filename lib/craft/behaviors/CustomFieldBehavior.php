@@ -10,7 +10,7 @@ namespace craft\behaviors;
 use yii\base\Behavior;
 
 /**
- * This file is never loaded at runtime. It’s only here for PHPStan’n sake.
+ * Based on https://github.com/craftcms/cms/blob/develop/lib/craft/behaviors/CustomFieldBehavior.php
  *
  * @internal
  */
