@@ -3,15 +3,17 @@
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
-
 {% set rows = craft.blitz.diagnostics.getParams(siteId) %}
 {% if search %}
     {% set rows = rows|filter((count, param) => search in param) %}
 {% endif %}
-{% set rows = rows|multisort(orderBy) %}
-{% if sortBy == 'desc' %}
-    {% set rows = rows|reverse %}
+{% set order = [ (orderBy) ] %}
+{% set sort = [ sortBy == 'desc' ? SORT_DESC : SORT_ASC ] %}
+{% if orderBy != 'param' %}
+    {% set order = order|push('param') %}
+    {% set sort = sort|push(SORT_ASC) %}
 {% endif %}
+{% set rows = rows|multisort(order, sort) %}
 {% set total = rows|length %}
 {% set rows = rows|slice(offset, limit) %}
 {% set maxVisible = rows|length + offset %}

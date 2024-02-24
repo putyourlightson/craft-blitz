@@ -3,9 +3,9 @@
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
-
+{% set order = { (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) } %}
 {% set query = craft.blitz.diagnostics.getParamPagesQuery(siteId, param)
-    .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
+    .orderBy(order)
     .offset(offset)
     .limit(limit) %}
 {% if search %}

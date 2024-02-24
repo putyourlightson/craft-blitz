@@ -3,9 +3,12 @@
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
-
+{% set order = { (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) } %}
+{% if orderBy != 'uri' %}
+    {% set order = order|merge({ 'uri': SORT_ASC }) %}
+{% endif %}
 {% set query = craft.blitz.diagnostics.getPagesQuery(siteId)
-    .orderBy({ (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) })
+    .orderBy(order)
     .offset(offset)
     .limit(limit) %}
 {% if search %}
