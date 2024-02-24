@@ -6,6 +6,7 @@
 
 - Tracked element queries that have invalid params or that cannot be executed are now deleted when refreshing the cache.
 - Reverted deleting expired URIs from the database immediately when refreshing expired cache, as it can cause cached pages not to be refreshed ([#624](https://github.com/putyourlightson/craft-blitz/issues/624)).
+- Made the ordering of items displayed in the Blitz diagnostics utility deterministic.
 
 
 ## 4.11.2 - 2024-02-19

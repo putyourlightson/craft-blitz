@@ -103,7 +103,7 @@ class DiagnosticsHelper
             ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
             ->where($condition)
             ->groupBy(['type'])
-            ->orderBy(['count' => SORT_DESC])
+            ->orderBy(['count' => SORT_DESC, 'type' => SORT_ASC])
             ->asArray()
             ->all();
     }
@@ -122,7 +122,7 @@ class DiagnosticsHelper
             ->innerJoinWith('elementQuery')
             ->where($condition)
             ->groupBy(['type'])
-            ->orderBy(['count' => SORT_DESC])
+            ->orderBy(['count' => SORT_DESC, 'type' => SORT_ASC])
             ->asArray()
             ->all();
     }
