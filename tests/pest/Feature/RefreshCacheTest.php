@@ -306,7 +306,7 @@ test('Element query type records are returned when an entry is changed with the 
         ->toHaveCount(1);
 });
 
-test('Element query type records are deleted when executing them throws an exception', function() {
+test('Element query type records are deleted when executing them results in an exception', function() {
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->ancestorOf(999999999999999));
 
     // Disable tracking of element queries, so it doesn’t mess up our test!
