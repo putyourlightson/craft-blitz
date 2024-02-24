@@ -39,7 +39,7 @@ class SeomaticIntegration extends BaseIntegration
                 } elseif ($event->uri === null && $event->siteId !== null && $event->sourceId !== null && $event->sourceType !== null) {
                     // Refresh the cache for the provided source only.
                     /** @var ElementQuery $elementQuery */
-                    $elementQuery = self::_getElementQuery($event->siteId, $event->sourceId, $event->sourceType);
+                    $elementQuery = self::getElementQuery($event->siteId, $event->sourceId, $event->sourceType);
                     $elementIds = $elementQuery->ids();
 
                     if (!empty($elementIds)) {
@@ -58,7 +58,7 @@ class SeomaticIntegration extends BaseIntegration
     /**
      * Returns the element query for the given site, source and type.
      */
-    private static function _getElementQuery(int $siteId, int $sourceId, string $sourceType): ElementQueryInterface
+    private static function getElementQuery(int $siteId, int $sourceId, string $sourceType): ElementQueryInterface
     {
         $metaBundle = Seomatic::$plugin->metaBundles->getMetaBundleBySourceId($sourceType, $sourceId, $siteId);
 
