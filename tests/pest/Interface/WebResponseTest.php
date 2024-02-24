@@ -68,25 +68,27 @@ test('Response overwrites the `X-Powered-By` header', function() {
         ->not()->toContain('Craft CMS');
 });
 
-test('Response contains output comments when enabled', function() {
-    foreach ([true, SettingsModel::OUTPUT_COMMENTS_SERVED] as $value) {
-        Blitz::$plugin->settings->outputComments = $value;
-        $response = sendRequest();
+test('Response contains output comments when enabled', function(bool|int $value) {
+    Blitz::$plugin->settings->outputComments = $value;
+    $response = sendRequest();
 
-        expect($response->content)
-            ->toContain('Cached by Blitz');
-    }
-});
+    expect($response->content)
+        ->toContain('Cached by Blitz');
+})->with([
+    'true' => true,
+    'served' => SettingsModel::OUTPUT_COMMENTS_SERVED,
+]);
 
-test('Response does not contain output comments when disabled', function() {
-    foreach ([false, SettingsModel::OUTPUT_COMMENTS_CACHED] as $value) {
-        Blitz::$plugin->settings->outputComments = $value;
-        $response = sendRequest();
+test('Response does not contain output comments when disabled', function(bool|int $value) {
+    Blitz::$plugin->settings->outputComments = $value;
+    $response = sendRequest();
 
-        expect($response->content)
-            ->not()->toContain('Served by Blitz on');
-    }
-});
+    expect($response->content)
+        ->not()->toContain('Served by Blitz on');
+})->with([
+    'false' => false,
+    'cached' => SettingsModel::OUTPUT_COMMENTS_CACHED,
+]);
 
 test('Response with mime type has headers and does not contain output comments', function() {
     $output = createOutput();
