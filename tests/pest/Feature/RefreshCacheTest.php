@@ -14,7 +14,7 @@ use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
 beforeEach(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
-    Blitz::$plugin->flushCache->flushAll();
+    Blitz::$plugin->flushCache->flushAll(true);
     Blitz::$plugin->generateCache->options->cachingEnabled = true;
     Blitz::$plugin->refreshCache->batchMode = true;
     Blitz::$plugin->refreshCache->reset();
@@ -304,4 +304,17 @@ test('Element query type records are returned when an entry is changed with the 
 
     expect(RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $refreshData))
         ->toHaveCount(1);
+});
+
+test('Element query type records are deleted when executing them throws an exception', function() {
+    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->ancestorOf(999999999999999));
+
+    // Disable tracking of element queries, so it doesn’t mess up our test!
+    Blitz::$plugin->generateCache->options->trackElementQueries = false;
+
+    $elementQueryRecord = ElementQueryRecord::find()->one();
+    RefreshCacheHelper::getElementQueryCacheIds($elementQueryRecord, new RefreshDataModel());
+
+    expect(ElementQueryRecord::find()->count())
+        ->toBe(0);
 });

@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.11.3 - Unreleased
+
+### Changed
+
+- Tracked element queries that have invalid params or that cannot be executed are now deleted when refreshing the cache.
+
 ## 4.11.2 - 2024-02-19
 
 ### Changed

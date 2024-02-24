@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\helpers;
 
 use craft\base\Element;
+use craft\db\Query;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Json;
 use putyourlightson\blitz\Blitz;
@@ -89,14 +90,14 @@ class RefreshCacheHelper
         $query = ElementQueryRecord::find()
             ->where(['type' => $elementType]);
 
-        // Ignore element queries linked to cache IDs that we already have
+        // Ignore element queries linked to cache IDs that we already have, or not linked to any cache IDs.
         $query->innerJoinWith('elementQueryCaches', false)
             ->andWhere([
                 'not',
                 ['cacheId' => $ignoreCacheIds],
             ]);
 
-        // Limit to queries with no sources or sources in `sourceIds`
+        // Limit to queries without any sources or with sources in `sourceIds`.
         $query->joinWith('elementQuerySources', false)
             ->andWhere([
                 'or',
@@ -131,13 +132,17 @@ class RefreshCacheHelper
     {
         // Ensure class still exists as a plugin may have been removed since being saved
         if (!class_exists($elementQueryRecord->type)) {
+            $elementQueryRecord->delete();
+
             return [];
         }
 
         $params = Json::decodeIfJson($elementQueryRecord->params);
 
-        // Ensure JSON decode is successful
+        // If JSON decoding is unsuccessful then delete the record.
         if (!is_array($params)) {
+            $elementQueryRecord->delete();
+
             return [];
         }
 
@@ -146,16 +151,29 @@ class RefreshCacheHelper
         $elementQuery = self::getElementQueryWithParams($elementType, $params);
 
         if ($elementQuery === null) {
+            $elementQueryRecord->delete();
+
             return [];
         }
 
         $elementQueryIds = [];
-
-        // Execute the element query, ignoring any exceptions.
+        /**
+         * Execute the element query, deleting the record if any exception is thrown.
+         * Avoid calling the `ids()` method, as it catches exceptions.
+         *
+         * @see Query::column()
+         */
         try {
-            $elementQueryIds = $elementQuery->ids();
-        } catch (Throwable $exception) {
-            Blitz::$plugin->log('Element query with ID `' . $elementQueryRecord->id . '` could not be executed: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
+            $elementQueryIds = $elementQuery
+                ->select(['elements.id' => 'elements.id'])
+                ->createCommand()
+                ->queryColumn();
+        } catch (Throwable) {
+            $elementQueryRecord->delete();
+        }
+
+        if (empty($elementQueryIds)) {
+            return [];
         }
 
         $elementIds = $refreshData->getElementIds($elementType);
