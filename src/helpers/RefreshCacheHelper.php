@@ -217,7 +217,7 @@ class RefreshCacheHelper
         // If the element query has an offset then add it to the limit and make it null
         if ($elementQuery->offset) {
             if ($elementQuery->limit) {
-                // Cast values to integers before trying to add them, as they may have been set to strings
+                // Cast the values to integers before trying to add them, as they may have been set to strings.
                 $elementQuery->limit((int)$elementQuery->limit + (int)$elementQuery->offset);
             }
 
