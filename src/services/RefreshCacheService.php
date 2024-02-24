@@ -498,9 +498,6 @@ class RefreshCacheService extends Component
         $cacheIds = Blitz::$plugin->expireCache->getExpiredCacheIds();
         $this->addCacheIds($cacheIds);
 
-        // Delete the cache records now, as they may not be deleted later.
-        CacheRecord::deleteAll(['id' => $cacheIds]);
-
         // Check for expired elements to invalidate
         /** @var ElementExpiryDateRecord[] $elementExpiryDates */
         $elementExpiryDates = ElementExpiryDateRecord::find()
