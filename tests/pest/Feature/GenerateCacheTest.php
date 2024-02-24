@@ -341,8 +341,8 @@ test('Element query record with multi options field data is converted to array o
         ->toEqual([1, 2]);
 });
 
-test('Element query record keeps order by if a limit or offset is present', function() {
-    $elementQuery = Entry::find()->orderBy('title')->limit(10)->offset(10);
+test('Element query record keeps limit and offset params', function() {
+    $elementQuery = Entry::find()->limit(10)->offset(10);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
 
     /** @var ElementQueryRecord $record */
@@ -350,14 +350,36 @@ test('Element query record keeps order by if a limit or offset is present', func
     $params = Json::decodeIfJson($record->params);
 
     expect($params)
-        ->toHaveKey('orderBy')
-        ->and($params)
         ->toHaveKey('limit')
         ->and($params)
         ->toHaveKey('offset');
 });
 
-test('Element query record does not keep order by if no limit or offset is present', function() {
+test('Element query record keeps order by if a limit param is present', function() {
+    $elementQuery = Entry::find()->orderBy('title')->limit(10);
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    /** @var ElementQueryRecord $record */
+    $record = ElementQueryRecord::find()->one();
+    $params = Json::decodeIfJson($record->params);
+
+    expect($params)
+        ->toHaveKey('orderBy');
+});
+
+test('Element query record keeps order by if an offset param is present', function() {
+    $elementQuery = Entry::find()->orderBy('title')->offset(10);
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    /** @var ElementQueryRecord $record */
+    $record = ElementQueryRecord::find()->one();
+    $params = Json::decodeIfJson($record->params);
+
+    expect($params)
+        ->toHaveKey('orderBy');
+});
+
+test('Element query record does not keep order by if no limit or offset param is present', function() {
     $elementQuery = Entry::find()->orderBy('title');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
 
