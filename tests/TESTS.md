@@ -121,6 +121,8 @@ _Tests the saving of cached values, element cache records and element query reco
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query record for entry in single sections is not saved.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query record with option field data is converted to value.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query record with multi options field data is converted to array of values.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query record keeps order by if a limit or offset is present.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query record does not keep order by if no limit or offset is present.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query cache records are saved.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query source records with specific source identifiers are saved.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query source records without specific source identifiers are not saved.  
@@ -165,7 +167,7 @@ _Tests the tracking of changes to elements and the resulting element cache IDs a
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query type records are returned when an entry is changed by custom fields used in the query.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query type records are not returned when an entry is changed by custom fields not used in the query.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query type records are returned when an entry is changed with the date updated used in the query.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query type records are deleted when executing them throws an exception.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query type records are deleted when executing them results in an exception.  
 
 ### [SiteUri](pest/Feature/SiteUriTest.php)
 

@@ -39,7 +39,6 @@ class ElementQueryHelper
     public static function getUniqueElementQueryParams(ElementQuery $elementQuery): array
     {
         $params = [];
-
         $defaultValues = self::getDefaultElementQueryValues($elementQuery->elementType);
 
         foreach ($defaultValues as $key => $default) {
@@ -54,25 +53,30 @@ class ElementQueryHelper
             }
         }
 
-        // Exclude query and subquery params, in case they are set.
-        // https://github.com/putyourlightson/craft-blitz/issues/579
-        foreach (['query', 'subquery'] as $key) {
-            if (array_key_exists($key, $params)) {
+        // Add the `limit` and `offset` params if they are set on the element query.
+        foreach (['limit', 'offset'] as $key) {
+            if (!empty($elementQuery->{$key})) {
+                $params[$key] = $elementQuery->{$key};
+            }
+        }
+
+        // Exclude the `orderBy` param, if neither limit nor offset are set.
+        if (empty($params['limit']) && empty($params['offset'])) {
+            unset($params['orderBy']);
+        }
+
+        // Exclude specific empty params, as they are redundant.
+        foreach (['structureId', 'orderBy'] as $key) {
+            // Use `array_key_exists` rather than `isset` as it will return `true` for null results
+            if (array_key_exists($key, $params) && empty($params[$key])) {
                 unset($params[$key]);
             }
         }
 
-        // Ignore specific empty params as they are redundant
-        $ignoreEmptyParams = [
-            'structureId',
-            'orderBy',
-            'limit',
-            'offset',
-        ];
-
-        foreach ($ignoreEmptyParams as $key) {
-            // Use `array_key_exists` rather than `isset` as it will return `true` for null results
-            if (array_key_exists($key, $params) && empty($params[$key])) {
+        // Exclude the `query` and `subquery` params, in case they are set.
+        // https://github.com/putyourlightson/craft-blitz/issues/579
+        foreach (['query', 'subquery'] as $key) {
+            if (array_key_exists($key, $params)) {
                 unset($params[$key]);
             }
         }
@@ -154,28 +158,26 @@ class ElementQueryHelper
             return [];
         }
 
-        if (!empty(self::$_defaultElementQueryParams[$elementType])) {
-            return self::$_defaultElementQueryParams[$elementType];
+        if (empty(self::$_defaultElementQueryParams[$elementType])) {
+            /** @var ElementInterface|string $elementType */
+            $elementQuery = $elementType::find();
+
+            $ignoreKeys = [
+                'select',
+                'with',
+                'withStructure',
+                'descendantDist',
+            ];
+
+            $keys = array_diff($elementQuery->criteriaAttributes(), $ignoreKeys);
+
+            $values = [];
+            foreach ($keys as $key) {
+                $values[$key] = $elementQuery->{$key};
+            }
+
+            self::$_defaultElementQueryParams[$elementType] = $values;
         }
-
-        /** @var ElementInterface|string $elementType */
-        $elementQuery = $elementType::find();
-
-        $ignoreKeys = [
-            'select',
-            'with',
-            'withStructure',
-            'descendantDist',
-        ];
-
-        $keys = array_diff($elementQuery->criteriaAttributes(), $ignoreKeys);
-
-        $values = [];
-        foreach ($keys as $key) {
-            $values[$key] = $elementQuery->{$key};
-        }
-
-        self::$_defaultElementQueryParams[$elementType] = $values;
 
         return self::$_defaultElementQueryParams[$elementType];
     }
@@ -406,39 +408,37 @@ class ElementQueryHelper
      */
     private static function _getFilterableElementQueryParams(ElementQuery $elementQuery): array
     {
-        if (!empty(self::$_filterableElementQueryParams[$elementQuery::class])) {
-            return self::$_filterableElementQueryParams[$elementQuery::class];
+        if (empty(self::$_filterableElementQueryParams[$elementQuery::class])) {
+            $elementQueryParams = [];
+            foreach (self::_getPublicNonStaticProperties($elementQuery::class) as $property) {
+                $elementQueryParams[] = $property;
+            }
+
+            $elementTypeParams = [];
+            foreach (self::_getPublicNonStaticProperties($elementQuery->elementType) as $property) {
+                $elementTypeParams[] = $property;
+            }
+
+            // Ignore params that never change. The `orderBy` attribute is extracted separately later.
+            $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
+            $ignoreParams = [
+                $sourceIdAttribute,
+                'id',
+                'uid',
+                'siteId',
+                'structureId',
+                'level',
+                'orderBy',
+            ];
+
+            self::$_filterableElementQueryParams[$elementQuery::class] = array_diff(
+                array_intersect(
+                    $elementQueryParams,
+                    $elementTypeParams,
+                ),
+                $ignoreParams,
+            );
         }
-
-        $elementQueryParams = [];
-        foreach (self::_getPublicNonStaticProperties($elementQuery::class) as $property) {
-            $elementQueryParams[] = $property;
-        }
-
-        $elementTypeParams = [];
-        foreach (self::_getPublicNonStaticProperties($elementQuery->elementType) as $property) {
-            $elementTypeParams[] = $property;
-        }
-
-        // Ignore params that never change. The `orderBy` attribute is extracted separately later.
-        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementQuery->elementType);
-        $ignoreParams = [
-            $sourceIdAttribute,
-            'id',
-            'uid',
-            'siteId',
-            'structureId',
-            'level',
-            'orderBy',
-        ];
-
-        self::$_filterableElementQueryParams[$elementQuery::class] = array_diff(
-            array_intersect(
-                $elementQueryParams,
-                $elementTypeParams,
-            ),
-            $ignoreParams,
-        );
 
         return self::$_filterableElementQueryParams[$elementQuery::class];
     }
