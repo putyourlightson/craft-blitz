@@ -328,6 +328,16 @@ class SettingsModel extends Model
     public bool $trackElementQueries = true;
 
     /**
+     * The element query params to exclude when storing tracked element queries.
+     *
+     *  [
+     *      'limit',
+     *      'offset',
+     *  ]
+     */
+    public array $excludedTrackedElementQueryParams = [];
+
+    /**
      * The amount of time after which the cache should expire (if not 0).
      *
      * @see ConfigHelper::durationInSeconds()

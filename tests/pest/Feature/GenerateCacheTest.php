@@ -32,6 +32,7 @@ use putyourlightson\campaign\elements\MailingListElement;
 beforeEach(function() {
     Blitz::$plugin->settings->cachingEnabled = true;
     Blitz::$plugin->settings->outputComments = true;
+    Blitz::$plugin->settings->excludedTrackedElementQueryParams = [];
     Blitz::$plugin->generateCache->options->outputComments = null;
     Blitz::$plugin->cacheStorage->deleteAll();
     Blitz::$plugin->flushCache->flushAll(true);
@@ -389,6 +390,18 @@ test('Element query record does not keep order by if no limit or offset param is
 
     expect($params)
         ->not()->toHaveKey('orderBy');
+});
+
+test('Element query record respects excluded tracked element query params', function() {
+    Blitz::$plugin->settings->excludedTrackedElementQueryParams = ['limit'];
+    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->limit(10));
+
+    /** @var ElementQueryRecord $record */
+    $record = ElementQueryRecord::find()->one();
+    $params = Json::decodeIfJson($record->params);
+
+    expect($params)
+        ->not()->toHaveKey('limit');
 });
 
 test('Element query cache records are saved', function() {
