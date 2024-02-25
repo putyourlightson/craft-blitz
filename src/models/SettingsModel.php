@@ -328,6 +328,11 @@ class SettingsModel extends Model
     public bool $trackElementQueries = true;
 
     /**
+     * The element query params to exclude when storing tracked element queries.
+     */
+    public array $excludedTrackedElementQueryParams = [];
+
+    /**
      * Whether elements should be cached in the database.
      *
      * @deprecated in 4.4.0. Use [[trackElements]] instead.

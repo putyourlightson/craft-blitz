@@ -17,6 +17,7 @@ use craft\fields\data\OptionData;
 use craft\helpers\ArrayHelper;
 use craft\models\Section;
 use DateTime;
+use putyourlightson\blitz\Blitz;
 use ReflectionClass;
 use ReflectionProperty;
 use yii\db\Expression;
@@ -76,6 +77,13 @@ class ElementQueryHelper
         // Exclude the `query` and `subquery` params, in case they are set.
         // https://github.com/putyourlightson/craft-blitz/issues/579
         foreach (['query', 'subquery'] as $key) {
+            if (array_key_exists($key, $params)) {
+                unset($params[$key]);
+            }
+        }
+
+        // Exclude any params specified in the config setting.
+        foreach (Blitz::$plugin->settings->excludedTrackedElementQueryParams as $key) {
             if (array_key_exists($key, $params)) {
                 unset($params[$key]);
             }
