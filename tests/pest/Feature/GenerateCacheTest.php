@@ -155,8 +155,11 @@ test('Element cache record is saved for preloaded single', function() {
 
 test('Element cache record is saved with eager loaded custom fields for preloaded single', function() {
     Craft::$app->config->general->preloadSingles = true;
-    $entry = Entry::find()->section(App::env('TEST_SINGLE_SECTION_HANDLE'))->one();
-    Craft::$app->view->renderTemplate('test/_eager.twig');
+    $singleSectionHandle = App::env('TEST_SINGLE_SECTION_HANDLE');
+    $entry = Entry::find()->section($singleSectionHandle)->one();
+    Craft::$app->getView()->setTemplatesPath(Craft::getAlias('@putyourlightson/blitz/test/templates'));
+    Craft::$app->view->renderTemplate('_eager.twig');
+
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)

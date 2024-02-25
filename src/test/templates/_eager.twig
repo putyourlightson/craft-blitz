@@ -1,0 +1,7 @@
+{% do craft.app.elements.eagerLoadElements(
+    className(single),
+    [single],
+    ['relatedTo']
+) %}
+
+{% set relatedTo = single.relatedTo.all() %}
