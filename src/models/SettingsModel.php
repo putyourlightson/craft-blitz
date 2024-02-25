@@ -329,6 +329,11 @@ class SettingsModel extends Model
 
     /**
      * The element query params to exclude when storing tracked element queries.
+     *
+     *  [
+     *      'limit',
+     *      'offset',
+     *  ]
      */
     public array $excludedTrackedElementQueryParams = [];
 

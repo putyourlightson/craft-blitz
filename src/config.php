@@ -201,7 +201,10 @@ return [
         //'trackElementQueries' => true,
 
         // The element query params to exclude when storing tracked element queries.
-        //'excludedTrackedElementQueryParams' => [],
+        //'excludedTrackedElementQueryParams' => [
+        //    'limit',
+        //    'offset',
+        //],
 
         // The amount of time after which the cache should expire (if not 0). See [[ConfigHelper::durationInSeconds()]] for a list of supported value types.
         //'cacheDuration' => 0,

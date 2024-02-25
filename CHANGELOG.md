@@ -1,6 +1,10 @@
 # Release Notes for Blitz
 
-## 4.11.3 - Unreleased
+## 4.12.0 - Unreleased
+
+### Added
+
+- Added a new `excludedTrackedElementQueryParams` config setting that can be used to exclude params when storing tracked element queries.
 
 ### Changed
 
