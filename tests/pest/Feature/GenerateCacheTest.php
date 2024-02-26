@@ -466,7 +466,7 @@ test('Element query source records without specific source identifiers are not s
 });
 
 test('Entry query source records are saved when only a structure ID is set', function() {
-    $section = Craft::$app->getSections()->getSectionByHandle(App::env('TEST_STRUCTURE_SECTION_HANDLE'));
+    $section = Craft::$app->getEntries()->getSectionByHandle(App::env('TEST_STRUCTURE_SECTION_HANDLE'));
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->structureId($section->structureId));
 
     expect(ElementQuerySourceRecord::class)
