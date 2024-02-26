@@ -12,6 +12,7 @@ use craft\base\ElementInterface;
 use craft\behaviors\CustomFieldBehavior;
 use craft\db\ActiveRecord;
 use craft\elements\db\ElementQuery;
+use craft\elements\Entry;
 use craft\events\CancelableEvent;
 use craft\events\EagerLoadElementsEvent;
 use craft\events\PopulateElementEvent;
@@ -21,6 +22,7 @@ use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\models\Section;
 use craft\records\Element as ElementRecord;
+use craft\records\Section as SectionRecord;
 use craft\services\Elements;
 use craft\web\View;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
@@ -356,7 +358,14 @@ class GenerateCacheService extends Component
         $sourceIds = $sourceIdAttribute ? $elementQuery->{$sourceIdAttribute} : null;
 
         if (empty($sourceIds)) {
-            return;
+            // Get the source ID from the structure, if one is set.
+            if ($elementQuery->elementType === Entry::class && $elementQuery->structureId !== null) {
+                $sourceIds = $this->getSourceIdsFromStructureId($elementQuery->structureId);
+            }
+
+            if (empty($sourceIds)) {
+                return;
+            }
         }
 
         // Normalize source IDs
@@ -624,6 +633,17 @@ class GenerateCacheService extends Component
         }
 
         return true;
+    }
+
+    /**
+     * Returns the source IDs associated with a structure ID.
+     */
+    private function getSourceIdsFromStructureId(int $structureId): array
+    {
+        return SectionRecord::find()
+            ->select('id')
+            ->where(['structureId' => $structureId])
+            ->column();
     }
 
     /**
