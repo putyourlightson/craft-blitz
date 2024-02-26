@@ -120,7 +120,7 @@ test('Element cache record is saved with custom fields', function() {
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
 });
 
-test('Element cache record is saved with eager loaded custom fields', function() {
+test('Element cache record is saved with eager-loaded custom fields', function() {
     $entry = Entry::find()->with(['relatedTo'])->one();
     Blitz::$plugin->generateCache->addElement($entry);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -131,7 +131,7 @@ test('Element cache record is saved with eager loaded custom fields', function()
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
 });
 
-test('Element cache record is saved with eager loaded custom fields in variable', function() {
+test('Element cache record is saved with eager-loaded custom fields in variable', function() {
     $entry = createEntryWithRelationship();
     Craft::$app->elements->eagerLoadElements(Entry::class, [$entry], ['relatedTo']);
     Blitz::$plugin->generateCache->addElement($entry);
@@ -153,12 +153,12 @@ test('Element cache record is saved for preloaded single', function() {
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
 });
 
-test('Element cache record is saved with eager loaded custom fields for preloaded single', function() {
+test('Element cache record is saved with eager-loaded custom fields for preloaded single', function() {
     Craft::$app->config->general->preloadSingles = true;
     $singleSectionHandle = App::env('TEST_SINGLE_SECTION_HANDLE');
     $entry = Entry::find()->section($singleSectionHandle)->one();
     Craft::$app->getView()->setTemplatesPath(Craft::getAlias('@putyourlightson/blitz/test/templates'));
-    Craft::$app->view->renderTemplate('_eager.twig');
+    Craft::$app->view->renderTemplate('eager.twig');
 
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
@@ -181,7 +181,7 @@ test('Element cache records are saved with all statuses for relation field queri
         ->toContain($enabledEntry->id, $disabledEntry->id);
 });
 
-test('Element cache records are saved with all statuses for eager loaded relation field queries', function() {
+test('Element cache records are saved with all statuses for eager-loaded relation field queries', function() {
     $enabledEntry = createEntry();
     $disabledEntry = createEntry(enabled: false);
     $entry = createEntryWithRelationship([$enabledEntry, $disabledEntry]);
@@ -463,6 +463,16 @@ test('Element query source records without specific source identifiers are not s
 
     expect(ElementQuerySourceRecord::class)
         ->toHaveRecordCount(0);
+});
+
+test('Entry query source records are saved when only a structure ID is set', function() {
+    $section = Craft::$app->getSections()->getSectionByHandle(App::env('TEST_STRUCTURE_SECTION_HANDLE'));
+    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->structureId($section->structureId));
+
+    expect(ElementQuerySourceRecord::class)
+        ->toHaveRecordCount(1)
+        ->and(ElementQuerySourceRecord::find()->one()->sourceId)
+        ->toBe($section->id);
 });
 
 test('Element query attribute records are saved', function() {
