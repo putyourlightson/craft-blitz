@@ -3,7 +3,6 @@
 {% set refreshed = refreshed ?? false %}
 {% set hints = craft.blitz.hints.getAll() %}
 
-{% if hints|length %}
 <div class="blitz-hints" s-indicator="this">
     <div class="buttons first flex-justify">
         <div class="flex">
@@ -26,73 +25,74 @@
             }) }}
         {% endif %}
     </div>
-    {% endif %}
     <div class="readable">
+        <table id="hints" class="data fullwidth fixed-layout">
+            <thead>
+                <tr>
+                    <th>Hint</th>
+                    <th>Template</th>
+                    <th class="nowrap">Last Occurrence</th>
+                    <th style="width: 14px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for hint in hints %}
+                    <tr class="{{ hint.routeVariable ? 'routeVariableHint hidden' }}">
+                        <td>
+                            {% if hint.routeVariable %}
+                                Eager-load the
+                                <code>{{ hint.routeVariable }}</code> route variable.
+                                <span class="info" style="vertical-align: top;">
+                                    Eager-load elements of the <code>{{ hint.field.name }}</code> field on the auto-injected route variable <code>{{ hint.routeVariable }}</code>, for example:
+                                    <br>
+                                    <code>&#123;% do craft.app.elements.eagerLoadElements(className({{ hint.routeVariable }}), [{{ hint.routeVariable }}], ['{{ hint.field.handle }}']) %&#125;</code>
+                                    <br>
+                                    <a href="https://docs.craftcms.com/api/v4/craft-services-elements.html#method-eagerloadelements" class="go" target="_blank">Docs</a>
+                                </span>
+                            {% else %}
+                                Eager-load the
+                                <code>{{ hint.field.name }}</code> field.
+                                <span class="info" style="vertical-align: top;">
+                                    Eager-load the <code>{{ hint.field.name }}</code> field using <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" target="_blank">lazy-eager-loading</a>:
+                                    <pre><code>&#123;% set {{ hint.field.handle }} = entry.{{ hint.field.handle }}.eagerly().all() %&#125;</code></pre>
+                                    Or the <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#the-with-query-param" target="_blank"><code>with()</code></a> query param:
+                                    <pre><code>
+                                        {{- "{% set entries = craft.entries" -}}
+                                            {{- "\n    .with(['matrix'])" -}}
+                                            {{- "\n    .all()" -}}
+                                    </code></pre>
+                                    <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" class="go" target="_blank">Learn more</a>
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="code">
+                            {{ hint.template|e|replace('/', '/<wbr>')|raw }}
+                            {{- hint.line ? ':' ~ hint.line }}
+                        </td>
+                        <td>
+                            {{ hint.dateUpdated|timestamp }}
+                        </td>
+                        <td>
+                            <a sprig s-method="post" s-action="blitz/hints/clear" s-val:id="{{ hint.id }}" class="delete icon" title="{{ 'Delete'|t('app') }}" role="button"></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <p id="nohints" class="zilch {% if hints|length %}hidden{% endif %}">
             No hints to report!
         </p>
-        {% if hints|length %}
-            <table id="hints" class="data fullwidth fixed-layout">
-                <thead>
-                    <tr>
-                        <th>Hint</th>
-                        <th>Template</th>
-                        <th class="nowrap">Last Occurrence</th>
-                        <th style="width: 14px;"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for hint in hints %}
-                        <tr class="{{ hint.routeVariable ? 'routeVariableHint hidden' }}">
-                            <td>
-                                {% if hint.routeVariable %}
-                                    Eager-load the
-                                    <code>{{ hint.routeVariable }}</code> route variable.
-                                    <span class="info" style="vertical-align: top;">
-                                        Eager-load elements of the <code>{{ hint.field.name }}</code> field on the auto-injected route variable <code>{{ hint.routeVariable }}</code>, for example:
-                                        <br>
-                                        <code>&#123;% do craft.app.elements.eagerLoadElements(className({{ hint.routeVariable }}), [{{ hint.routeVariable }}], ['{{ hint.field.handle }}']) %&#125;</code>
-                                        <br>
-                                        <a href="https://docs.craftcms.com/api/v4/craft-services-elements.html#method-eagerloadelements" class="go" target="_blank">Docs</a>
-                                    </span>
-                                {% else %}
-                                    Eager-load the
-                                    <code>{{ hint.field.name }}</code> field.
-                                    <span class="info" style="vertical-align: top;">
-                                        Eager-load the <code>{{ hint.field.name }}</code> field using <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" target="_blank">lazy-eager-loading</a>:
-                                        <pre><code>&#123;% set {{ hint.field.handle }} = entry.{{ hint.field.handle }}.eagerly().all() %&#125;</code></pre>
-                                        Or the <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#the-with-query-param" target="_blank"><code>with()</code></a> query param:
-                                        <pre><code>
-                                            {{- "{% set entries = craft.entries" -}}
-                                                {{- "\n    .with(['matrix'])" -}}
-                                                {{- "\n    .all()" -}}
-                                        </code></pre>
-                                        <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" class="go" target="_blank">Learn more</a>
-                                    </span>
-                                {% endif %}
-                            </td>
-                            <td class="code">
-                                {{ hint.template|e|replace('/', '/<wbr>')|raw }}
-                                {{- hint.line ? ':' ~ hint.line }}
-                            </td>
-                            <td>
-                                {{ hint.dateUpdated|timestamp }}
-                            </td>
-                            <td>
-                                <a sprig s-method="post" s-action="blitz/hints/clear" s-val:id="{{ hint.id }}" class="delete icon" title="{{ 'Delete'|t('app') }}" role="button"></a>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
     </div>
 </div>
 
-{% if refreshed %}
+{% if sprig.isRequest %}
     <script>
+        Craft.initUiElements($('#hints'));
+
+        {% if refreshed %}
         setTimeout(() => {
             $('.checkmark-icon').fadeOut();
         }, 1500);
+        {% endif %}
     </script>
 {% endif %}
