@@ -30,7 +30,6 @@ use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use yii\db\ActiveQuery;
@@ -477,9 +476,6 @@ class RefreshCacheService extends Component
         if ($cacheId === false) {
             return;
         }
-
-        // Delete the cache record now, as it may not be deleted later.
-        CacheRecord::deleteAll(['id' => $cacheId]);
 
         $this->addCacheIds([$cacheId]);
 
