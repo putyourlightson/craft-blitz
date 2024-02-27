@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Fixed a bug introduced in version 4.12.0 in which the JS script was not registered.
+- Fixed a bug introduced in version 4.12.0 in which the Blitz inject script was not being registered.
 
 ## 4.12.0 - 2024-02-27
 
