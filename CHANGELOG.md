@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.12.1 - 2024-02-27
+
+### Fixed
+
+- Fixed a bug introduced in version 4.12.0 in which the JS script was not registered.
+
 ## 4.12.0 - 2024-02-27
 
 > {warning} Polyfills for IE have been removed from the Blitz inject script. If you need to support IE, you will need to add the polyfills yourself.
