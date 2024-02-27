@@ -1,20 +1,15 @@
 # Release Notes for Blitz
 
-## 5.0.0-beta.2 - Unreleased
+## 5.0.0 - Unreleased
 
 ### Added
 
+- Added compatibility with Craft 5.0.0.
 - Added suggesting the use of the `eagerly()` function to lazy-loaded element queries in the Blitz Hints utility.
 
 ### Changed
 
 - The Blitz Hints utility is now powered by Sprig and no longer requires an external package.
-
-## 5.0.0-beta.1 - 2024-02-14
-
-### Added
-
-- Added compatibility with Craft 5.0.0.
 
 ### Removed
 

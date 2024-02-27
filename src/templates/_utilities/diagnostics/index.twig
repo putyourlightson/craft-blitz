@@ -62,11 +62,13 @@
             {% if failedSites > 0 %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
                 The
-                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedSites }} <a href="{{ cpUrl('settings/sites') }}">{{ '{num, plural, =1{site} other{sites}}'|t('blitz', { num: failedSites }) }}</a> and is not explicitly defined.
+                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedSites }}
+                <a href="{{ cpUrl('settings/sites') }}">{{ '{num, plural, =1{site} other{sites}}'|t('blitz', { num: failedSites }) }}</a> and is not explicitly defined.
             {% else %}
                 <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
                 The
-                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any <a href="{{ cpUrl('settings/sites') }}">sites</a>.
+                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any
+                <a href="{{ cpUrl('settings/sites') }}">sites</a>.
             {% endif %}
             {{ info }}
         </p>
@@ -81,11 +83,13 @@
             {% if failedVolumes > 0 %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
                 The
-                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedVolumes }} <a href="{{ cpUrl('settings/volumes') }}">{{ '{num, plural, =1{volume} other{volumes}}'|t('blitz', { num: failedVolumes }) }}</a> and is not explicitly defined.
+                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedVolumes }}
+                <a href="{{ cpUrl('settings/volumes') }}">{{ '{num, plural, =1{volume} other{volumes}}'|t('blitz', { num: failedVolumes }) }}</a> and is not explicitly defined.
             {% else %}
                 <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
                 The
-                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any <a href="{{ cpUrl('settings/volumes') }}">volumes</a>.
+                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any
+                <a href="{{ cpUrl('settings/volumes') }}">volumes</a>.
             {% endif %}
             {{ info }}
         </p>
@@ -182,8 +186,8 @@
         </span>
     </p>
     <p>
-        {% if craft.blitz.diagnostics.hintsEnabled %}
-            {% set hintsCount = craft.blitz.diagnostics.hintsCount %}
+        {% if settings.hintsEnabled %}
+            {% set hintsCount = craft.blitz.hints.getTotalWithoutRouteVariables() %}
             {% if hintsCount > 0 %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
                 The

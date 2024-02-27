@@ -7,7 +7,7 @@ namespace putyourlightson\blitz\console\controllers;
 
 use Craft;
 use craft\console\Controller;
-use putyourlightson\blitzhints\BlitzHints;
+use putyourlightson\blitz\Blitz;
 use yii\console\ExitCode;
 use yii\helpers\BaseConsole;
 
@@ -24,8 +24,8 @@ class HintsController extends Controller
     public function actionClear(): int
     {
         $this->stdout(Craft::t('blitz', 'Clearing hints... '));
-        BlitzHints::getInstance()->hints->clearAll();
-        $this->stdout(Craft::t('blitz', 'done') . PHP_EOL, BaseConsole::FG_GREEN);
+        Blitz::$plugin->hints->clearAll();
+        $this->stdout(Craft::t('blitz', 'Done') . PHP_EOL, BaseConsole::FG_GREEN);
 
         return ExitCode::OK;
     }

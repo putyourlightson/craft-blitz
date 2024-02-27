@@ -75,6 +75,10 @@ table th.thin, table td.thin {
     margin: 2px 0;
 }
 
+.info-hud pre {
+    margin: 5px 0 10px;
+}
+
 .info-hud code {
     padding: 4px 5px;
     background: #ececec;
@@ -105,6 +109,14 @@ table.editable th.code {
 
 .blitz-diagnostics .chip {
     background-color: transparent;
+}
+
+.blitz-hints.loading .checkmark-icon {
+    display: none;
+}
+
+.blitz-hints.loading .spinner {
+    display: inline-flex !important;
 }
 
 #footer {

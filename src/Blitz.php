@@ -9,7 +9,9 @@ use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
+use craft\elements\db\ElementQuery;
 use craft\elements\User;
+use craft\events\CancelableEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
 use craft\events\MoveElementEvent;
@@ -48,12 +50,13 @@ use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\ExpireCacheService;
 use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
+use putyourlightson\blitz\services\HintsService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\utilities\DiagnosticsUtility;
+use putyourlightson\blitz\utilities\HintsUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\blitz\widgets\CacheWidget;
-use putyourlightson\blitzhints\BlitzHints;
 use putyourlightson\sprig\Sprig;
 use yii\base\Controller;
 use yii\base\Event;
@@ -69,6 +72,7 @@ use yii\web\Response;
  * @property-read ExpireCacheService $expireCache
  * @property-read FlushCacheService $flushCache
  * @property-read GenerateCacheService $generateCache
+ * @property-read HintsService $hints
  * @property-read RefreshCacheService $refreshCache
  * @property-read BaseCacheStorage $cacheStorage
  * @property-read BaseCacheGenerator $cacheGenerator
@@ -96,6 +100,7 @@ class Blitz extends Plugin
                 'expireCache' => ['class' => ExpireCacheService::class],
                 'flushCache' => ['class' => FlushCacheService::class],
                 'generateCache' => ['class' => GenerateCacheService::class],
+                'hints' => ['class' => HintsService::class],
                 'refreshCache' => ['class' => RefreshCacheService::class],
             ],
         ];
@@ -142,6 +147,7 @@ class Blitz extends Plugin
         $this->registerResaveElementEvents();
         $this->registerStructureEvents();
         $this->registerIntegrationEvents();
+        $this->registerHintsUtilityEvents();
         $this->registerClearCaches();
 
         // Register control panel events
@@ -157,9 +163,6 @@ class Blitz extends Plugin
 
             Sprig::bootstrap();
         }
-
-        // Register hints after utilities
-        $this->registerHints();
     }
 
     /**
@@ -285,18 +288,6 @@ class Blitz extends Plugin
                 dateFormat: 'Y-m-d H:i:s',
             ),
         ]);
-    }
-
-    /**
-     * Registers the Blitz hints module.
-     */
-    private function registerHints(): void
-    {
-        if (!$this->settings->hintsEnabled) {
-            return;
-        }
-
-        BlitzHints::bootstrap();
     }
 
     /**
@@ -464,6 +455,41 @@ class Blitz extends Plugin
     }
 
     /**
+     * Registers hints utility events
+     */
+    private function registerHintsUtilityEvents(): void
+    {
+        // Ignore CP requests.
+        if (Craft::$app->getRequest()->getIsCpRequest()) {
+            return;
+        }
+
+        if (!$this->settings->hintsEnabled) {
+            return;
+        }
+
+        // Add the event listener without “appending”, so it triggers as early as possible.
+        Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
+            function(CancelableEvent $event) {
+                /** @var ElementQuery $elementQuery */
+                $elementQuery = $event->sender;
+                $this->hints->checkElementQuery($elementQuery);
+            },
+            null,
+            false
+        );
+
+        // Add the event listener without “appending”, so it triggers as early as possible.
+        Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
+            function() {
+                $this->hints->save();
+            },
+            null,
+            false
+        );
+    }
+
+    /**
      * Registers clear caches
      */
     private function registerClearCaches(): void
@@ -506,6 +532,7 @@ class Blitz extends Plugin
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = CacheUtility::class;
                 $event->types[] = DiagnosticsUtility::class;
+                $event->types[] = HintsUtility::class;
             }
         );
     }

@@ -14,7 +14,6 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\Json;
 use DateTime;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -22,7 +21,6 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\services\CacheRequestService;
-use putyourlightson\blitzhints\BlitzHints;
 
 /**
  * @since 4.10.0
@@ -277,16 +275,6 @@ class DiagnosticsHelper
     public static function getDateFromDb(string $dateTime): DateTime|false
     {
         return DateTimeHelper::toDateTime($dateTime);
-    }
-
-    public static function getHintsEnabled(): bool
-    {
-        return Blitz::$plugin->settings->hintsEnabled;
-    }
-
-    public static function getHintsCount(): int
-    {
-        return BlitzHints::getInstance()->hints->getTotalWithoutRouteVariables();
     }
 
     public static function getDriverDataAction(string $action): ?string

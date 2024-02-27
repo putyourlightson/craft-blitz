@@ -8,6 +8,7 @@ use craft\commerce\Plugin;
 use craft\commerce\records\Product as ProductRecord;
 use craft\db\Table;
 use craft\elements\Asset;
+use craft\elements\db\ElementQuery;
 use craft\elements\Entry;
 use craft\fs\Local;
 use craft\helpers\App;
@@ -26,7 +27,9 @@ use markhuot\craftpest\web\TestableResponse;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\IntegrationHelper;
+use putyourlightson\blitz\models\HintModel;
 use putyourlightson\blitz\models\SiteUriModel;
+use putyourlightson\blitz\services\HintsService;
 use yii\web\Response;
 
 function getSiteId(): int
@@ -193,4 +196,25 @@ function cleanup(): void
     /** @var Local $fs */
     $fs = $volume->getFs();
     FileHelper::clearDirectory($fs->path);
+}
+
+function saveHint(?ElementQuery $elementQuery = null, ?string $template = null): void
+{
+    $elementQuery = $elementQuery ?? Entry::find()->section('single')->one()->relatedTo;
+    $template = $template ?? 'templates/test';
+
+    $fieldId = Craft::$app->getFields()->getFieldByHandle('relatedTo')->id;
+    $hint = new HintModel([
+        'fieldId' => $fieldId,
+        'template' => $template,
+    ]);
+    $hints = Mockery::mock(HintsService::class)
+        ->makePartial()
+        ->shouldAllowMockingProtectedMethods();
+    ;
+    $hints->shouldReceive('createHintWithTemplateLine')->andReturn($hint);
+    Blitz::$plugin->set('hints', $hints);
+
+    Blitz::$plugin->hints->checkElementQuery($elementQuery);
+    Blitz::$plugin->hints->save();
 }
