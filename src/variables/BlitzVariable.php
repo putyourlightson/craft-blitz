@@ -17,7 +17,6 @@ use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
-use yii\web\View as BaseView;
 
 class BlitzVariable
 {
@@ -242,15 +241,6 @@ class BlitzVariable
                 $js = str_replace('{injectScriptEvent}', Blitz::$plugin->settings->injectScriptEvent, $js);
             }
         }
-
-        // Create polyfills using https://polyfill.io/v3/url-builder/.
-        $polyfills = ['fetch', 'Promise', 'CustomEvent'];
-        $polyfillUrl = 'https://polyfill.io/v3/polyfill.min.js?features=' . implode('%2C', $polyfills);
-
-        // Register polyfills for IE11 only, using the `module/nomodule` pattern.
-        // https://3perf.com/blog/polyfills/#modulenomodule
-        $view->registerJsFile($polyfillUrl, ['nomodule' => true]);
-        $view->registerJs($js, BaseView::POS_END);
 
         $this->injected++;
         $id = $this->injected;
