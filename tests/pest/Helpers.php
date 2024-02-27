@@ -211,7 +211,7 @@ function saveHint(?ElementQuery $elementQuery = null, ?string $template = null):
     $hints = Mockery::mock(HintsService::class)
         ->makePartial()
         ->shouldAllowMockingProtectedMethods();
-    ;
+
     $hints->shouldReceive('createHintWithTemplateLine')->andReturn($hint);
     Blitz::$plugin->set('hints', $hints);
 

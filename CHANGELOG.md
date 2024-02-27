@@ -8,7 +8,7 @@
 
 ### Changed
 
-- The Blitz Hints utility is now powered by Sprig and no longer requires an external package.
+- The Blitz Hints utility is now powered by Sprig, no longer tracks route variable hints and no longer requires an external package.
 
 ## 5.0.0-beta.1 - 2024-02-14
 

@@ -17,13 +17,6 @@
         <button sprig s-method="post" s-action="blitz/hints/clear-all" class="btn submit">
             {{ 'Clear all'|t('app') }}
         </button>
-        {% if craft.blitz.hints.hasRouteVariables() %}
-            {{ forms.lightswitch({
-                label: 'Show Route Variable Hints',
-                on: false,
-                toggle: '.routeVariableHint',
-            }) }}
-        {% endif %}
     </div>
     <div class="readable">
         <table id="hints" class="data fullwidth fixed-layout">
@@ -37,33 +30,21 @@
             </thead>
             <tbody>
                 {% for hint in hints %}
-                    <tr class="{{ hint.routeVariable ? 'routeVariableHint hidden' }}">
+                    <tr>
                         <td>
-                            {% if hint.routeVariable %}
-                                Eager-load the
-                                <code>{{ hint.routeVariable }}</code> route variable.
-                                <span class="info" style="vertical-align: top;">
-                                    Eager-load elements of the <code>{{ hint.field.name }}</code> field on the auto-injected route variable <code>{{ hint.routeVariable }}</code>, for example:
-                                    <br>
-                                    <code>&#123;% do craft.app.elements.eagerLoadElements(className({{ hint.routeVariable }}), [{{ hint.routeVariable }}], ['{{ hint.field.handle }}']) %&#125;</code>
-                                    <br>
-                                    <a href="https://docs.craftcms.com/api/v4/craft-services-elements.html#method-eagerloadelements" class="go" target="_blank">Docs</a>
-                                </span>
-                            {% else %}
-                                Eager-load the
-                                <code>{{ hint.field.name }}</code> field.
-                                <span class="info" style="vertical-align: top;">
-                                    Eager-load the <code>{{ hint.field.name }}</code> field using <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" target="_blank">lazy-eager-loading</a>:
-                                    <pre><code>&#123;% set {{ hint.field.handle }} = entry.{{ hint.field.handle }}.eagerly().all() %&#125;</code></pre>
-                                    Or the <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#the-with-query-param" target="_blank"><code>with()</code></a> query param:
-                                    <pre><code>
-                                        {{- "{% set entries = craft.entries" -}}
-                                            {{- "\n    .with(['matrix'])" -}}
-                                            {{- "\n    .all()" -}}
-                                    </code></pre>
-                                    <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" class="go" target="_blank">Learn more</a>
-                                </span>
-                            {% endif %}
+                            Eager-load the
+                            <code>{{ hint.field.name }}</code> field.
+                            <span class="info" style="vertical-align: top;">
+                                Eager-load the <code>{{ hint.field.name }}</code> field using <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" target="_blank">lazy-eager-loading</a>:
+                                <pre><code>&#123;% set {{ hint.field.handle }} = entry.{{ hint.field.handle }}.eagerly().all() %&#125;</code></pre>
+                                Or the <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#the-with-query-param" target="_blank"><code>with()</code></a> query param:
+                                <pre><code>
+                                    {{- "{% set entries = craft.entries" -}}
+                                        {{- "\n    .with(['matrix'])" -}}
+                                        {{- "\n    .all()" -}}
+                                </code></pre>
+                                <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" class="go" target="_blank">Learn more</a>
+                            </span>
                         </td>
                         <td class="code">
                             {{ hint.template|e|replace('/', '/<wbr>')|raw }}

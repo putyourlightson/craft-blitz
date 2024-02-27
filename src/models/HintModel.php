@@ -32,11 +32,6 @@ class HintModel extends Model
     public string $template = '';
 
     /**
-     * @var string
-     */
-    public string $routeVariable = '';
-
-    /**
      * @var int|null
      */
     public ?int $line = null;

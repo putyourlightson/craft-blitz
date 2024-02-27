@@ -11,38 +11,17 @@ use putyourlightson\blitz\models\HintModel;
 use putyourlightson\blitz\records\HintRecord;
 
 /**
+ * @property-read int $count
  * @property-read HintModel[] $all
- * @property-read int $total
- * @property-read int $totalWithoutRouteVariables
  */
 class HintsHelper extends Component
 {
     /**
-     * Returns the total hints.
+     * Returns the total number of hints.
      */
-    public function getTotal(): int
+    public static function getCount(): int
     {
         return HintRecord::find()->count();
-    }
-
-    /**
-     * Returns the total hints without route variables.
-     */
-    public function getTotalWithoutRouteVariables(): int
-    {
-        return HintRecord::find()
-            ->where(['routeVariable' => ''])
-            ->count();
-    }
-
-    /**
-     * Returns whether there are hints with route variables.
-     */
-    public function hasRouteVariables(): bool
-    {
-        return HintRecord::find()
-            ->where(['not', ['routeVariable' => '']])
-            ->exists();
     }
 
     /**
@@ -50,7 +29,7 @@ class HintsHelper extends Component
      *
      * @return HintModel[]
      */
-    public function getAll(): array
+    public static function getAll(): array
     {
         $hints = [];
 

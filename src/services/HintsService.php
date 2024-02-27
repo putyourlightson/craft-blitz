@@ -19,11 +19,6 @@ use putyourlightson\blitz\records\HintRecord;
 use ReflectionClass as ReflectionClassAlias;
 use Twig\Template;
 
-/**
- * @property-read HintModel[] $all
- * @property-read int $total
- * @property-read int $totalWithoutRouteVariables
- */
 class HintsService extends Component
 {
     /**
@@ -35,62 +30,6 @@ class HintsService extends Component
      * @var string|null
      */
     private ?string $templateClassFilename = null;
-
-    /**
-     * Returns the total hints.
-     */
-    public function getTotal(): int
-    {
-        return HintRecord::find()->count();
-    }
-
-    /**
-     * Returns the total hints without route variables.
-     */
-    public function getTotalWithoutRouteVariables(): int
-    {
-        return HintRecord::find()
-            ->where(['routeVariable' => ''])
-            ->count();
-    }
-
-    /**
-     * Returns whether there are hints with route variables.
-     */
-    public function hasRouteVariables(): bool
-    {
-        return HintRecord::find()
-            ->where(['not', ['routeVariable' => '']])
-            ->exists();
-    }
-
-    /**
-     * Gets all hints.
-     *
-     * @return HintModel[]
-     */
-    public function getAll(): array
-    {
-        $hints = [];
-
-        /** @var HintRecord[] $hintRecords */
-        $hintRecords = HintRecord::find()
-            ->orderBy(['dateUpdated' => SORT_DESC])
-            ->all();
-
-        foreach ($hintRecords as $record) {
-            $hint = new HintModel();
-            $hint->setAttributes($record->getAttributes(), false);
-
-            $field = Craft::$app->getFields()->getFieldById($hint->fieldId);
-            if ($field) {
-                $hint->field = $field;
-                $hints[] = $hint;
-            }
-        }
-
-        return $hints;
-    }
 
     /**
      * Clears all hints.
@@ -147,7 +86,6 @@ class HintsService extends Component
                     [
                         'fieldId' => $hint->fieldId,
                         'template' => $hint->template,
-                        'routeVariable' => $hint->routeVariable,
                         'line' => $hint->line,
                     ],
                     [
@@ -181,7 +119,7 @@ class HintsService extends Component
             return;
         }
 
-        $key = implode('-', [$fieldId, $hint->template, $hint->routeVariable]);
+        $key = $fieldId . '-' . $hint->template;
 
         // Don’t continue if a hint with the key already exists.
         if (!empty($this->hints[$key])) {
@@ -207,24 +145,22 @@ class HintsService extends Component
                 $line = $this->findTemplateLine($template, $templateCodeLine);
 
                 if ($templatePath && $line) {
-                    $hint = new HintModel([
-                        'fieldId' => $field->id,
-                        'template' => $templatePath,
-                        'line' => $line,
-                    ]);
-
-                    // Read the contents of the template file, since the code cannot
-                    // be retrieved from the source context with `devMode` disabled.
+                    // Read the contents of the template file, since the code cannot be retrieved from the source context with `devMode` disabled.
                     $templateCode = file($path);
                     $code = $templateCode[$line - 1] ?? '';
                     preg_match('/(\w+?)\.' . $field->handle . '/', $code, $matches);
                     $routeVariable = $matches[1] ?? null;
 
+                    // Don’t continue if the route variable is set.
                     if ($routeVariable && !empty($trace['args'][0]['variables'][$routeVariable])) {
-                        $hint->routeVariable = $routeVariable;
+                        return null;
                     }
 
-                    return $hint;
+                    return new HintModel([
+                        'fieldId' => $field->id,
+                        'template' => $templatePath,
+                        'line' => $line,
+                    ]);
                 }
             }
         }

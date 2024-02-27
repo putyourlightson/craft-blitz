@@ -190,7 +190,6 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'fieldId' => $this->integer()->notNull(),
                 'template' => $this->string()->notNull(),
-                'routeVariable' => $this->string()->notNull(),
                 'line' => $this->integer(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
@@ -219,7 +218,6 @@ class Install extends Migration
         $this->createIndex(null, HintRecord::tableName(), [
             'fieldId',
             'template',
-            'routeVariable',
         ], true);
     }
 

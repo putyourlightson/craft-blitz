@@ -187,7 +187,7 @@
     </p>
     <p>
         {% if settings.hintsEnabled %}
-            {% set hintsCount = craft.blitz.hints.getTotalWithoutRouteVariables() %}
+            {% set hintsCount = craft.blitz.hints.getCount() %}
             {% if hintsCount > 0 %}
                 <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
                 The

@@ -12,7 +12,6 @@ use DateTime;
  * @property int $id
  * @property int $fieldId
  * @property string $template
- * @property string $routeVariable
  * @property int $line
  * @property DateTime $lastUpdated
  */
