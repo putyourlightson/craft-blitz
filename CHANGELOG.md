@@ -10,7 +10,7 @@
 
 ### Changed
 
-- Reverted deleting expired URIs from the database immediately when refreshing expired cache, as it can cause cached pages not to be refreshed ([#624](https://github.com/putyourlightson/craft-blitz/issues/624)).
+- Reverted deleting expired URIs from the database immediately when refreshing expired cache, as it could cause cached pages not to be refreshed ([#624](https://github.com/putyourlightson/craft-blitz/issues/624)).
 - Tracked element queries that have invalid params or that cannot be executed are now deleted when refreshing the cache.
 - Tracked entry queries can now determine source IDs from a structure ID.
 - Optimised the params that are stored on tracked element queries. 
