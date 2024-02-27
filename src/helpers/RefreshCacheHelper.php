@@ -214,6 +214,15 @@ class RefreshCacheHelper
             return null;
         }
 
+        // If the element query has an offset then add it to the limit and make it `null`. This is required to ensure that new elements are included in the query result when pagination is involved, for example.
+        if ($elementQuery->offset) {
+            if ($elementQuery->limit) {
+                $elementQuery->limit($elementQuery->limit + $elementQuery->offset);
+            }
+
+            $elementQuery->offset(null);
+        }
+
         return $elementQuery;
     }
 }
