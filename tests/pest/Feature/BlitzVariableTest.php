@@ -45,6 +45,16 @@ test('Cached include tag does not contain path param', function() {
         ->toContain(Craft::$app->getConfig()->getGeneral()->pathParam . '=');
 });
 
+test('Cached include tag with AJAX request type results in inject script being registered', function() {
+    $variable = new BlitzVariable();
+    $variable->includeDynamic('test', [], [
+        'requestType' => 'ajax',
+    ]);
+
+    expect(Craft::$app->getView()->js)
+        ->toHaveCount(1);
+});
+
 test('Fetch URI tag does not contain unencoded slashes in params', function() {
     $variable = new BlitzVariable();
     $tagString = (string)$variable->fetchUri('test', ['action' => 'x/y/z']);
