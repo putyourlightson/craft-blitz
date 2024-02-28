@@ -17,6 +17,7 @@ use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
+use yii\web\View;
 
 class BlitzVariable
 {
@@ -241,6 +242,8 @@ class BlitzVariable
                 $js = str_replace('{injectScriptEvent}', Blitz::$plugin->settings->injectScriptEvent, $js);
             }
         }
+
+        $view->registerJs($js, View::POS_END);
 
         $this->injected++;
         $id = $this->injected;
