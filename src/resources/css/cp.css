@@ -98,9 +98,17 @@ table.editable th.code {
     padding: 0;
 }
 
-.blitz-diagnostics > h1 {
+.blitz-diagnostics h1 {
     padding-top: var(--s);
     line-height: 34px;
+}
+
+.blitz-diagnostics .recommendations h1 {
+    margin-bottom: 0;
+}
+
+.blitz-diagnostics .recommendations p > span {
+    vertical-align: text-bottom;
 }
 
 .blitz-diagnostics .search-container {

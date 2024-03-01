@@ -41,184 +41,24 @@
             {{ '{num, plural, =1{Tracked Element Query} other{Tracked Element Queries}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
-    <br>
-    <h1 style="margin-bottom: 0">
-        {{ 'Recommendations'|t('blitz') }}
-    </h1>
-    {% set info %}
-        <span class="info">
-            Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>
-        </span>
-    {% endset %}
-    {% if craft.app.request.isWebAliasSetDynamically %}
-        <p>
-            {% set failedSites = 0 %}
-            {% for site in craft.app.sites.allSites %}
-                {% set baseUrl = site.getBaseUrl(false) %}
-                {% if '@web' in baseUrl %}
-                    {% set failedSites = failedSites + 1 %}
+    <div class="recommendations">
+        <h1>
+            {{ 'Recommendations'|t('blitz') }}
+        </h1>
+        {% for test in craft.blitz.diagnostics.getTests() %}
+            <p>
+                {% if test.pass %}
+                    <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
+                {% else %}
+                    <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
                 {% endif %}
-            {% endfor %}
-            {% if failedSites > 0 %}
-                <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-                The
-                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedSites }}
-                <a href="{{ cpUrl('settings/sites') }}">{{ '{num, plural, =1{site} other{sites}}'|t('blitz', { num: failedSites }) }}</a> and is not explicitly defined.
-            {% else %}
-                <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-                The
-                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any
-                <a href="{{ cpUrl('settings/sites') }}">sites</a>.
-            {% endif %}
-            {{ info }}
-        </p>
-        <p>
-            {% set failedVolumes = 0 %}
-            {% for volume in craft.app.volumes.allVolumes %}
-                {% set rootUrl = volume.rootUrl %}
-                {% if '@web' in rootUrl %}
-                    {% set failedVolumes = failedVolumes + 1 %}
+                {{ test.message|raw }}
+                {% if test.info ?? null %}
+                    <span class="info">
+                        {{ test.info|raw }}
+                    </span>
                 {% endif %}
-            {% endfor %}
-            {% if failedVolumes > 0 %}
-                <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-                The
-                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedVolumes }}
-                <a href="{{ cpUrl('settings/volumes') }}">{{ '{num, plural, =1{volume} other{volumes}}'|t('blitz', { num: failedVolumes }) }}</a> and is not explicitly defined.
-            {% else %}
-                <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-                The
-                <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any
-                <a href="{{ cpUrl('settings/volumes') }}">volumes</a>.
-            {% endif %}
-            {{ info }}
-        </p>
-    {% else %}
-        <p>
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The
-            <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.
-            {{ info }}
-        </p>
-    {% endif %}
-    <p>
-        {% set globalSetCount = craft.globalSets.count %}
-        {% if globalSetCount > 0 %}
-            {% if settings.refreshCacheAutomaticallyForGlobals %}
-                <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-                {{ globalSetCount }}
-                <a href="{{ cpUrl('globals') }}">{{ '{num, plural, =1{global exists} other{globals exist}}'|t('blitz', { num: globalSetCount }) }}</a> and
-                <code>refreshCacheAutomaticallyForGlobals</code> is enabled.
-            {% else %}
-                <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-                {{ globalSetCount }}
-                <a href="https://craftcms.com/docs/4.x/globals.html" target="">{{ '{num, plural, =1{global exists} other{globals exist}}'|t('blitz', { num: globalSetCount }) }}</a> and
-                <code>refreshCacheAutomaticallyForGlobals</code> is disabled.
-            {% endif %}
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            No globals exist.
-        {% endif %}
-        <span class="info">
-            <a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>
-        </span>
-    </p>
-    <p>
-        {% if not craft.app.config.general.generateTransformsBeforePageLoad %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            Image transforms are not configured to be generated before page load.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            Image transforms are configured to be generated before page load.
-        {% endif %}
-        <span class="info">
-            Blitz does not cache pages that contain asset transform generation URLs, as doing so can lead to cached pages that perform poorly. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-i-visit-it" target="_blank" class="go">Learn more</a>
-        </span>
-    </p>
-    <p>
-        {% if craft.app.config.general.runQueueAutomatically %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            Queue jobs are configured to run automatically via web requests.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            Queue jobs are configured to not run automatically via web requests.
-        {% endif %}
-        <span class="info">
-            Running queue jobs via web requests can negatively impact the performance of a site and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
-        </span>
-    </p>
-    <p>
-        {% if settings.refreshCacheWhenElementSavedUnchanged %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            Blitz is configured to refresh cached pages when an element is saved but remains unchanged.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            Blitz is configured not to refresh cached pages when an element is saved but unchanged.
-        {% endif %}
-        <span class="info">
-            With the <code>refreshCacheWhenElementSavedUnchanged</code> config setting disabled, cached pages are refreshed only when an element is saved and its content changed. This is recommended and should only be enabled with good reason, as it can cause more refresh cache jobs to be created than necessary.
-        </span>
-    </p>
-    <p>
-        {% if settings.refreshCacheWhenElementSavedNotLive %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            Blitz is configured to refresh cached pages when an element is saved but not live.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            Blitz is configured not to refresh cached pages when an element is saved but not live.
-        {% endif %}
-        <span class="info">
-            With the <code>refreshCacheWhenElementSavedNotLive</code> config setting disabled, cached pages are refreshed only when an element is saved and has a live status (live/active/enabled). This is recommended and should only be enabled with good reason, as it can cause more refresh cache jobs to be created than necessary.
-        </span>
-    </p>
-    <p>
-        {% if craft.app.plugins.getPlugin('async-queue') is not null %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The
-            <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is enabled.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The
-            <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is not enabled.
-        {% endif %}
-        <span class="info">
-            The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin can be unreliable when used in some environments and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>
-        </span>
-    </p>
-    <p>
-        {% if settings.hintsEnabled %}
-            {% set hintsCount = craft.blitz.hints.getCount() %}
-            {% if hintsCount > 0 %}
-                <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-                The
-                <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is reporting
-                <code>{{ hintsCount }}</code> eager-loading {{ '{num, plural, =1{opportunity} other{opportunities}}'|t('blitz', { num: hintsCount }) }}.
-            {% else %}
-                <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-                The
-                <a href="{{ cpUrl('utilities/blitz-hints') }}">Blitz Hints</a> utility is not reporting any eager-loading opportunities.
-            {% endif %}
-        {% else %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The Blitz Hints utility is disabled.
-        {% endif %}
-        <span class="info">
-            Eager-loading elements is highly recommended. The Blitz Hints utility lists opportunities for eager-loading elements including the field name, the template and the line number. <a href="https://putyourlightson.com/plugins/blitz#hints-utility" target="_blank" class="go">Learn more</a>
-        </span>
-    </p>
-    <p>
-        {% set refreshExpired = craft.blitz.diagnostics.driverDataAction('refresh-expired-cli') %}
-        {% if refreshExpired is null or refreshExpired < craft.blitz.diagnostics.dateForDb(now|date_modify('-24 hours')) %}
-            <span class="warning" title="Warning" aria-label="Warning" data-icon="alert"></span>
-            The
-            <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.
-        {% else %}
-            <span class="success" title="Passed" aria-label="Passed" data-icon="check"></span>
-            The
-            <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.
-        {% endif %}
-        <span class="info">
-            The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache at a recurring interval. (You may have to wait for the cron job to run after an update.) <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>
-        </span>
-    </p>
+            </p>
+        {% endfor %}
+    </div>
 </div>
