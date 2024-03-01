@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.12.2 - Unreleased
+
+### Changed
+
+- Diagnostics warnings are now listed before other passing recommendations. 
+
 ## 4.12.1 - 2024-02-27
 
 ### Fixed

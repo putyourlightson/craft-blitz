@@ -10,9 +10,11 @@ use craft\base\Element;
 use craft\db\ActiveQuery;
 use craft\db\QueryAbortedException;
 use craft\db\Table;
-use craft\helpers\DateTimeHelper;
+use craft\elements\GlobalSet;
+use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\Json;
+use craft\helpers\UrlHelper;
 use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
@@ -157,7 +159,6 @@ class DiagnosticsHelper
         $condition = [
             CacheRecord::tableName() . '.siteId' => $siteId,
             'content.siteId' => $siteId,
-            'type' => $elementType,
         ];
 
         if ($pageId) {
@@ -180,7 +181,6 @@ class DiagnosticsHelper
     {
         $condition = [
             'siteId' => $siteId,
-            'type' => $elementType,
         ];
 
         if ($pageId) {
@@ -269,26 +269,6 @@ class DiagnosticsHelper
             ->andWhere(['like', 'uri', $param]);
     }
 
-    public static function getDateForDb(DateTime $dateTime): string
-    {
-        return Db::prepareDateForDb($dateTime);
-    }
-
-    public static function getDateFromDb(string $dateTime): DateTime|false
-    {
-        return DateTimeHelper::toDateTime($dateTime);
-    }
-
-    public static function getHintsEnabled(): bool
-    {
-        return Blitz::$plugin->settings->hintsEnabled;
-    }
-
-    public static function getHintsCount(): int
-    {
-        return BlitzHints::getInstance()->hints->getTotalWithoutRouteVariables();
-    }
-
     public static function getDriverDataAction(string $action): ?string
     {
         /** @var DriverDataRecord|null $record */
@@ -330,5 +310,176 @@ class DiagnosticsHelper
         $data[$action] = Db::prepareDateForDb(new DateTime());
         $record->data = json_encode($data);
         $record->save();
+    }
+
+    public static function getTests(): array
+    {
+        $settings = Blitz::$plugin->settings;
+        $tests = [];
+
+        /**
+         * Refresh cache when element saved unchanged test.
+         */
+        $pass = $settings->refreshCacheWhenElementSavedUnchanged === false;
+        if ($pass) {
+            $message = 'Blitz is not configured to refresh cached pages when an element is saved but unchanged.';
+        } else {
+            $message = 'Blitz is configured to refresh cached pages when an element is saved but remains unchanged.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => '<a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>',
+        ];
+
+        /**
+         * Refresh cache when element saved not live test.
+         */
+        $pass = $settings->refreshCacheWhenElementSavedNotLive === false;
+        if ($pass) {
+            $message = 'Blitz is not configured to refresh cached pages when an element is saved but not live.';
+        } else {
+            $message = 'Blitz is configured to refresh cached pages when an element is saved but not live.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => 'With the <code>refreshCacheWhenElementSavedNotLive</code> config setting disabled, cached pages are refreshed only when an element is saved and has a live status (live/active/enabled). This is recommended and should only be enabled with good reason, as it can cause more refresh cache jobs to be created than necessary.',
+        ];
+
+        /**
+         * Generate transforms before page load test.
+         */
+        if (Craft::$app->getConfig()->getGeneral()->generateTransformsBeforePageLoad) {
+            $pass = true;
+            $message = 'Image transforms are configured to be generated before page load.';
+        } else {
+            $pass = false;
+            $message = 'Image transforms are not configured to be generated before page load.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => 'Blitz does not cache pages that contain asset transform generation URLs, as doing so can lead to cached pages that perform poorly. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-i-visit-it" target="_blank" class="go">Learn more</a>',
+        ];
+
+        /**
+         * Global sets test.
+         */
+        $globalSetCount = GlobalSet::find()->count();
+        if ($globalSetCount > 0) {
+            $pass = $settings->refreshCacheAutomaticallyForGlobals;
+            if ($pass) {
+                $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
+                <code>refreshCacheAutomaticallyForGlobals</code> is diabled.';
+            } else {
+                $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
+                <code>refreshCacheAutomaticallyForGlobals</code> is enabled.';
+            }
+        } else {
+            $pass = true;
+            $message = 'No globals exist.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => '<a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>',
+        ];
+
+        /**
+         * Web alias test.
+         */
+        if (Craft::$app->getRequest()->isWebAliasSetDynamically) {
+            $failedSites = 0;
+            foreach (Craft::$app->getSites()->getAllSites() as $site) {
+                if (str_contains($site->getBaseUrl(false), '@web')) {
+                    $failedSites++;
+                }
+            }
+
+            $pass = $failedSites === 0;
+            if ($pass) {
+                $message = 'The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any <a href="' . UrlHelper::cpUrl('settings/sites') . '">sites</a>.';
+            } else {
+                $message = '<a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedSites }} <a href="' . UrlHelper::cpUrl('settings/sites') . '">' . Craft::t('blitz', '{num, plural, =1{site} other{sites}}', ['num' => $failedSites]) . '</a> and is not explicitly defined.';
+            }
+        } else {
+            $pass = true;
+            $message = 'The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => 'Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>',
+        ];
+
+        /**
+         * Run queue automatically test.
+         */
+        $pass = Craft::$app->getConfig()->getGeneral()->runQueueAutomatically === false;
+        if ($pass) {
+            $message = 'Queue jobs are not configured to run automatically via web requests.';
+        } else {
+            $message = 'Queue jobs are configured to run automatically via web requests.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => 'Running queue jobs via web requests can negatively impact the performance of a site and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>',
+        ];
+
+        /**
+         * Blitz Hints test.
+         */
+        if (Blitz::$plugin->settings->hintsEnabled) {
+            $hintsCount = BlitzHints::getInstance()->hints->getTotalWithoutRouteVariables();
+            $pass = $hintsCount === 0;
+            if ($pass) {
+                $message = 'The <a href="' . UrlHelper::cpUrl('utilities/blitz-hints') . '">Blitz Hints</a> utility is not reporting any eager-loading opportunities.';
+            } else {
+                $message = 'The <a href="' . UrlHelper::cpUrl('utilities/blitz-hints') . '">Blitz Hints</a> utility is reporting ' . $hintsCount . ' eager-loading ' . Craft::t('blitz', '{num, plural, =1{opportunity} other{opportunities}}', ['num' => $hintsCount]) . '.';
+            }
+        } else {
+            $pass = true;
+            $message = 'The Blitz Hints utility is disabled.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => 'Eager-loading elements is highly recommended. The Blitz Hints utility lists opportunities for eager-loading elements including the field name, the template and the line number. <a href="https://putyourlightson.com/plugins/blitz#hints-utility" target="_blank" class="go">Learn more</a>',
+        ];
+
+        /**
+         * Async Queue plugin test.
+         */
+        $pass = Craft::$app->getPlugins()->getPlugin('async-queue') === null;
+        if ($pass) {
+            $message = 'The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is not installed or enabled.';
+        } else {
+            $message = 'The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin is installed and enabled.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => 'The <a href="https://plugins.craftcms.com/async-queue" target="_blank">Async Queue</a> plugin can be unreliable when used in some environments and cause queue jobs to stall. <a href="https://putyourlightson.com/plugins/blitz#the-refresh-cache-queue-job-is-stalling" target="_blank" class="go">Learn more</a>',
+        ];
+
+        $refreshExpired = self::getDriverDataAction('refresh-expired-cli');
+        $now = new DateTime();
+        $pass = $refreshExpired !== null && $refreshExpired > $now->modify('-24 hours');
+        if ($pass) {
+            $message = 'The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.';
+        } else {
+            $message = 'The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.';
+        }
+        $tests[] = [
+            'pass' => $pass,
+            'message' => $message,
+            'info' => 'The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache at a recurring interval. (You may have to wait for the cron job to run after an update.) <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>',
+        ];
+
+        ArrayHelper::multisort($tests, 'pass');
+
+        return $tests;
     }
 }
