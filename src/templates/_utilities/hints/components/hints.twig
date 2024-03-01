@@ -1,19 +1,16 @@
 {% import '_includes/forms' as forms %}
 
-{% set refreshed = refreshed ?? false %}
 {% set hints = craft.blitz.hints.getAll() %}
 
 <div class="blitz-hints" s-indicator="this">
-    <div class="buttons first flex-justify">
-        <div class="flex">
-            <button sprig s-val:refreshed="1" class="btn">
-                {{ 'Refresh'|t('app') }}
-            </button>
-            <div class="revision-spinner spinner hidden" title="Refreshing"></div>
-            {% if refreshed ?? false %}
-                <div class="checkmark-icon" title="Refreshed"></div>
-            {% endif %}
-        </div>
+    <div class="buttons first flex-justify-end">
+        <div class="revision-spinner spinner hidden" title="Refreshing"></div>
+        {% if sprig.isRequest %}
+            <div class="checkmark-icon" title="Refreshed"></div>
+        {% endif %}
+        <button sprig class="btn">
+            {{ 'Refresh'|t('app') }}
+        </button>
         <button sprig s-method="post" s-action="blitz/hints/clear-all" class="btn submit">
             {{ 'Clear all'|t('app') }}
         </button>
@@ -69,11 +66,8 @@
 {% if sprig.isRequest %}
     <script>
         Craft.initUiElements($('#hints'));
-
-        {% if refreshed %}
         setTimeout(() => {
             $('.checkmark-icon').fadeOut();
-        }, 1500);
-        {% endif %}
+        }, 1000);
     </script>
 {% endif %}
