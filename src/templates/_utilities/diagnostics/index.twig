@@ -41,6 +41,13 @@
             {{ '{num, plural, =1{Tracked Element Query} other{Tracked Element Queries}}'|t('blitz', { num: count }) }}
         </a>
     </h2>
+    <h2>
+        <a href="{{ cpUrl('blitz/diagnostics/tags') }}">
+            {% set count = craft.blitz.diagnostics.getTagsCount(siteId) %}
+            {{ count|number }}
+            {{ '{num, plural, =1{Tracked Tag} other{Tracked Tags}}'|t('blitz', { num: count }) }}
+        </a>
+    </h2>
     <div class="recommendations">
         <h1>
             {{ 'Recommendations'|t('blitz') }}

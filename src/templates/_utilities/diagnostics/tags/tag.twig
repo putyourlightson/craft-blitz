@@ -1,0 +1,19 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/tag' %}
+
+{% set tag = craft.app.request.param('tag') %}
+{% set title = tag %}
+
+{% block pageTitle %}
+    <h1 class="screen-title" title="{{ title }}">
+        <code>{{ title }}</code>
+    </h1>
+{% endblock %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/components/tagPages', {
+        siteId: siteId,
+        tag: tag,
+        displayName: 'Page',
+        pluralDisplayName: 'Pages',
+    }) }}
+{% endblock %}
