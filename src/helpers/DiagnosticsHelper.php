@@ -505,7 +505,7 @@ class DiagnosticsHelper
         $tests[] = [
             'pass' => $pass,
             'message' => $message,
-            'info' => 'The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache at a recurring interval. (You may have to wait for the cron job to run after an update.) <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>',
+            'info' => 'The <code>blitz/cache/refresh-expired</code> console command not having been executed within the past 24 hours can indicate that a scheduled cron job should be set up to refresh expired cache at a recurring interval. (You may have to wait for the cron job to run after an update, for this warning to disappear.) <a href="https://putyourlightson.com/plugins/blitz#cron-jobs" target="_blank" class="go">Learn more</a>',
         ];
 
         ArrayHelper::multisort($tests, 'pass');
