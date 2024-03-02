@@ -2,9 +2,13 @@
 
 ## 4.12.2 - Unreleased
 
+### Added
+
+- Added tracked tags to the Blitz diagnostics utility.
+
 ### Changed
 
-- Diagnostics warnings are now listed before other passing recommendations. 
+- Diagnostics warnings are now listed before recommendations that pass. 
 
 ## 4.12.1 - 2024-02-27
 
