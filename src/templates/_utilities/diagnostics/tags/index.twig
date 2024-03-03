@@ -1,0 +1,12 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set title = 'Tracked Tags'|t('blitz') %}
+{% set showSiteMenu = true %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/components/tags', {
+        siteId: siteId,
+        displayName: 'Tag',
+        pluralDisplayName: 'Tags',
+    }) }}
+{% endblock %}

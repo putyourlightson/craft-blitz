@@ -1,0 +1,67 @@
+{% set orderBy = orderBy ?? 'count' %}
+{% set sortBy = sortBy ?? 'desc' %}
+{% set offset = offset ?? 0 %}
+{% set limit = 50 %}
+{% set search = search ?? null %}
+{% set order = { (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) } %}
+{% if orderBy != 'tag' %}
+    {% set order = order|merge({ 'tag': SORT_ASC }) %}
+{% endif %}
+{% set query = craft.blitz.diagnostics.getTagsQuery(siteId)
+    .orderBy(order)
+    .offset(offset)
+    .limit(limit) %}
+{% if search %}
+    {% do query.andWhere(['like', 'tag', search]) %}
+{% endif %}
+
+{% set total = query.count() %}
+{% set rows = query.all() %}
+{% set maxVisible = rows|length + offset %}
+
+<div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
+    <div class="search-container flex-grow texticon has-filter-btn">
+        <span class="texticon-icon search icon" aria-hidden="true"></span>
+        <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+    </div>
+    <div id="results">
+        {{ hiddenInput('orderBy', orderBy) }}
+        {{ hiddenInput('sortBy', sortBy) }}
+        <div class="elements">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th class="{{ orderBy == 'tag' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="tag" s-val:sort-by="{{ orderBy == 'tag' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Tag'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="count" s-val:sort-by="{{ orderBy == 'count' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Pages'|t('blitz') }}
+                            </button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <tr>
+                            <td class="code">
+                                <a href="{{ url('blitz/diagnostics/tags/tag', {
+                                    tag: row.tag,
+                                }) }}">
+                                    {{ row.tag }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ row.count|number }}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="update-spinner spinner spinner-absolute"></div>
+        </div>
+        {{ include('blitz/_utilities/diagnostics/includes/footer') }}
+    </div>
+</div>

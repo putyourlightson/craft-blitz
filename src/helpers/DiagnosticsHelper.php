@@ -18,6 +18,7 @@ use craft\helpers\UrlHelper;
 use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
+use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
@@ -72,6 +73,14 @@ class DiagnosticsHelper
             ->innerJoinWith('elementQuery')
             ->where(['siteId' => $siteId])
             ->count('DISTINCT [[queryId]]');
+    }
+
+    public static function getTagsCount(int $siteId): int
+    {
+        return CacheTagRecord::find()
+            ->innerJoinWith('cache')
+            ->where(['siteId' => $siteId])
+            ->count('DISTINCT [[tag]]');
     }
 
     public static function getPage(): array|null
@@ -151,6 +160,38 @@ class DiagnosticsHelper
             ], 'id = [[elementquerycaches.cacheId]]')
             ->where(['siteId' => $siteId])
             ->asArray();
+    }
+
+    public static function getParams(int $siteId): array
+    {
+        $uris = CacheRecord::find()
+            ->select('uri')
+            ->where(['siteId' => $siteId])
+            ->andWhere(['like', 'uri', '?'])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=']])
+            ->column();
+
+        $queryStringParams = [];
+        foreach ($uris as $uri) {
+            $queryString = substr($uri, strpos($uri, '?') + 1);
+            parse_str($queryString, $params);
+            foreach ($params as $param => $value) {
+                $queryStringParams[$param] = [
+                    'param' => $param,
+                    'count' => ($queryStringParams[$param]['count'] ?? 0) + 1,
+                ];
+            }
+        }
+
+        return $queryStringParams;
+    }
+
+    public static function getParamPagesQuery(int $siteId, string $param): ActiveQuery
+    {
+        return CacheRecord::find()
+            ->select(['uri'])
+            ->where(['siteId' => $siteId])
+            ->andWhere(['like', 'uri', $param]);
     }
 
     public static function getElementsQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
@@ -238,36 +279,25 @@ class DiagnosticsHelper
         }
     }
 
-    public static function getParams(int $siteId): array
+    public static function getTagsQuery(int $siteId): ActiveQuery
     {
-        $uris = CacheRecord::find()
-            ->select('uri')
+        return CacheTagRecord::find()
+            ->select(['tag', 'count(DISTINCT [[uri]]) as count'])
+            ->innerJoinWith('cache')
             ->where(['siteId' => $siteId])
-            ->andWhere(['like', 'uri', '?'])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=']])
-            ->column();
-
-        $queryStringParams = [];
-        foreach ($uris as $uri) {
-            $queryString = substr($uri, strpos($uri, '?') + 1);
-            parse_str($queryString, $params);
-            foreach ($params as $param => $value) {
-                $queryStringParams[$param] = [
-                    'param' => $param,
-                    'count' => ($queryStringParams[$param]['count'] ?? 0) + 1,
-                ];
-            }
-        }
-
-        return $queryStringParams;
+            ->groupBy(['tag'])
+            ->orderBy(['count' => SORT_DESC, 'tag' => SORT_ASC])
+            ->asArray();
     }
 
-    public static function getParamPagesQuery(int $siteId, string $param): ActiveQuery
+    public static function getTagPagesQuery(int $siteId, string $tag): ActiveQuery
     {
-        return CacheRecord::find()
-            ->select(['uri'])
+        return CacheTagRecord::find()
+            ->select('uri')
+            ->innerJoinWith('cache')
             ->where(['siteId' => $siteId])
-            ->andWhere(['like', 'uri', $param]);
+            ->andWhere(['tag' => $tag])
+            ->asArray();
     }
 
     public static function getDriverDataAction(string $action): ?string

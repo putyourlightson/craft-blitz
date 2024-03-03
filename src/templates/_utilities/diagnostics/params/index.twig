@@ -2,7 +2,6 @@
 
 {% set title = 'Tracked Query String Params'|t('blitz') %}
 {% set showSiteMenu = true %}
-{% set params = craft.blitz.diagnostics.getParams(siteId) %}
 
 {% block content %}
     {{ sprig('blitz/_utilities/diagnostics/components/params', {
