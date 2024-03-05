@@ -8,7 +8,8 @@
 
 ### Changed
 
-- Diagnostics warnings are now listed before recommendations that pass. 
+- Diagnostics warnings are now listed before recommendations that pass.
+- A custom log target is now only registered if a dispatcher exists.
 
 ## 4.12.1 - 2024-02-27
 
