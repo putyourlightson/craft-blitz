@@ -29,16 +29,16 @@
                 {% for hint in hints %}
                     <tr>
                         <td>
-                            Eager-load the
-                            <code>{{ hint.field.name }}</code> field.
+                            Eager-load the “{{ hint.field.name }}” field.
                             <span class="info" style="vertical-align: top;">
-                                Eager-load the <code>{{ hint.field.name }}</code> field using <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" target="_blank">lazy-eager-loading</a>:
+                                Eager-load the <code>{{ hint.field.handle }}</code> field using <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" target="_blank">lazy-eager-loading</a>:
                                 <pre><code>&#123;% set {{ hint.field.handle }} = entry.{{ hint.field.handle }}.eagerly().all() %&#125;</code></pre>
                                 Or the <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#the-with-query-param" target="_blank"><code>with()</code></a> query param:
                                 <pre><code>
                                     {{- "{% set entries = craft.entries" -}}
-                                        {{- "\n    .with(['matrix'])" -}}
+                                        {{- "\n    .with('" ~ hint.field.handle ~ "')" -}}
                                         {{- "\n    .all()" -}}
+                                        {{- "\n%}" -}}
                                 </code></pre>
                                 <a href="https://craftcms.com/docs/5.x/development/eager-loading.html#lazy-eager-loading" class="go" target="_blank">Learn more</a>
                             </span>
