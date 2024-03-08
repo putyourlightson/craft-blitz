@@ -64,12 +64,12 @@ class HintsService extends Component
             $planHandle = explode(':', $planHandle, 2)[1];
         }
 
-        $fieldId = Craft::$app->getFields()->getFieldByHandle($planHandle)->id ?? null;
-        if ($fieldId === null) {
+        $field = Craft::$app->getFields()->getFieldByHandle($planHandle);
+        if ($field === null) {
             return;
         }
 
-        $this->addFieldHint($fieldId);
+        $this->addFieldHint($field->id);
     }
 
     /**
