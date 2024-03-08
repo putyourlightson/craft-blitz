@@ -200,6 +200,7 @@ class DiagnosticsHelper
         $condition = [
             CacheRecord::tableName() . '.siteId' => $siteId,
             'content.siteId' => $siteId,
+            'type' => $elementType,
         ];
 
         if ($pageId) {
@@ -222,6 +223,7 @@ class DiagnosticsHelper
     {
         $condition = [
             'siteId' => $siteId,
+            'type' => $elementType,
         ];
 
         if ($pageId) {

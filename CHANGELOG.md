@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.12.3 - Unreleased
+
+### Fixed
+
+- Fixed a bug in which blank rows were appearing in the Blitz diagnostics utility.
+
 ## 4.12.2 - 2024-03-05
 
 ### Added
