@@ -21,6 +21,7 @@ use yii\base\ErrorException;
 use yii\base\Event;
 use yii\base\InvalidArgumentException;
 use yii\log\Logger;
+use yii\queue\InvalidJobException;
 
 /**
  * @property-read null|string $settingsHtml
@@ -327,15 +328,8 @@ class GitDeployer extends BaseDeployer
         $gitRepo->addGlobalConfig('user.email', $this->email);
 
         $remote = $gitRepo->getRemote($remote);
-        $remoteUrl = $remote->getPushURL();
-
-        // Break the URL into parts and reconstruct with personal access token
-        $remoteUrl = (parse_url($remoteUrl, PHP_URL_SCHEME) ?: 'https') . '://'
-            . $this->username . ':' . $this->getPersonalAccessToken() . '@'
-            . parse_url($remoteUrl, PHP_URL_HOST)
-            . parse_url($remoteUrl, PHP_URL_PATH);
-
-        $remote->setPushURL($remoteUrl);
+        $remote->setFetchURL($this->_getUrlWithPersonalAccessToken($remote->getFetchURL()));
+        $remote->setPushURL($this->_getUrlWithPersonalAccessToken($remote->getPushURL()));
 
         return $gitRepo;
     }
@@ -404,7 +398,7 @@ class GitDeployer extends BaseDeployer
                 'error' => $exception->getMessage(),
             ], Logger::LEVEL_ERROR);
 
-            throw $exception;
+            throw new InvalidJobException($exception->getMessage());
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_COMMIT)) {
@@ -434,5 +428,13 @@ class GitDeployer extends BaseDeployer
             $process = Process::fromShellCommandline($command);
             $process->mustRun();
         }
+    }
+
+    private function _getUrlWithPersonalAccessToken(string $url): string
+    {
+        return (parse_url($url, PHP_URL_SCHEME) ?: 'https') . '://'
+            . $this->username . ':' . $this->getPersonalAccessToken() . '@'
+            . parse_url($url, PHP_URL_HOST)
+            . parse_url($url, PHP_URL_PATH);
     }
 }
