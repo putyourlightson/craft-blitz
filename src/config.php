@@ -113,7 +113,7 @@ return [
         //    'gitRepositories' => [
         //        'f64d4923-f64d4923-f64d4923' => [
         //            'repositoryPath' => '@root/path/to/repo',
-        //            'branch' => 'master',
+        //            'branch' => 'main',
         //            'remote' => 'origin',
         //        ],
         //    ],

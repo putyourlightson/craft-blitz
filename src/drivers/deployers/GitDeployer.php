@@ -88,7 +88,7 @@ class GitDeployer extends BaseDeployer
     /**
      * @var string The default branch to deploy.
      */
-    public string $defaultBranch = 'master';
+    public string $defaultBranch = 'main';
 
     /**
      * @var string The default remote to deploy.
