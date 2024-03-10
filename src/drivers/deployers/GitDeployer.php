@@ -328,8 +328,8 @@ class GitDeployer extends BaseDeployer
         $gitRepo->addGlobalConfig('user.email', $this->email);
 
         $remote = $gitRepo->getRemote($remote);
-        $remote->setFetchURL($this->_getUrlWithPersonalAccessToken($remote->getFetchURL()));
-        $remote->setPushURL($this->_getUrlWithPersonalAccessToken($remote->getPushURL()));
+        $remote->setFetchURL($this->getUrlWithPersonalAccessToken($remote->getFetchURL()));
+        $remote->setPushURL($this->getUrlWithPersonalAccessToken($remote->getPushURL()));
 
         return $gitRepo;
     }
@@ -430,7 +430,7 @@ class GitDeployer extends BaseDeployer
         }
     }
 
-    private function _getUrlWithPersonalAccessToken(string $url): string
+    private function getUrlWithPersonalAccessToken(string $url): string
     {
         return (parse_url($url, PHP_URL_SCHEME) ?: 'https') . '://'
             . $this->username . ':' . $this->getPersonalAccessToken() . '@'
