@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.12.4 - Unreleased
+
+### Changed
+
+- Improved the Git Deployer’s use of personal access tokens when working with a private remote repository.
+
 ## 4.12.3 - 2024-03-08
 
 ### Fixed
