@@ -1,16 +1,26 @@
 # Release Notes for Blitz
 
+## 4.13.0 - 2024-03-11
+
+### Added
+
+- Added a template stack trace to the Blitz Hints utility.
+
+### Changed
+
+- Changed the default branch in the Git Deployer to `main`.
+
 ## 4.12.3 - 2024-03-08
 
 ### Fixed
 
-- Fixed a bug in which blank rows were appearing in the Blitz diagnostics utility.
+- Fixed a bug in which blank rows were appearing in the Blitz Diagnostics utility.
 
 ## 4.12.2 - 2024-03-05
 
 ### Added
 
-- Added tracked tags to the Blitz diagnostics utility.
+- Added tracked tags to the Blitz Diagnostics utility.
 
 ### Changed
 
@@ -37,7 +47,7 @@
 - Tracked element queries that have invalid params or that cannot be executed are now deleted when refreshing the cache.
 - Tracked entry queries can now determine source IDs from a structure ID.
 - Optimised the params that are stored on tracked element queries. 
-- Made the ordering of items displayed in the Blitz diagnostics utility deterministic.
+- Made the ordering of items displayed in the Blitz Diagnostics utility deterministic.
 
 ### Removed
 
@@ -63,9 +73,9 @@
 
 ### Added
 
-- Added recommendations to the Blitz diagnostics utility.
+- Added recommendations to the Blitz Diagnostics utility.
 - Added the user that runs controller actions to log messages.
-- Added an expiry date column to pages and elements in the Blitz diagnostics utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
+- Added an expiry date column to pages and elements in the Blitz Diagnostics utility ([#615](https://github.com/putyourlightson/craft-blitz/issues/615)).
 - Added a `wrapperClass` property to the `VariableConfigModel` class ([#620](https://github.com/putyourlightson/craft-blitz/issues/620)).
 - Added new console commands for clearing, generating and purging the cache: `blitz/cache/clear-site`, `blitz/cache/clear-tagged`, `blitz/cache/clear-urls`, `blitz/cache/generate-site`, `blitz/cache/generate-tagged`, `blitz/cache/generate-urls`, `blitz/cache/purge-site`, `blitz/cache/purge-tagged`, `blitz/cache/purge-urls`.
 
@@ -80,7 +90,7 @@
 
 ### Fixed
 
-- Fixed a bug in which line breaks were not being replaced with spaces in raw SQL query output in the Blitz diagnostics utility ([#611](https://github.com/putyourlightson/craft-blitz/issues/611)).
+- Fixed a bug in which line breaks were not being replaced with spaces in raw SQL query output in the Blitz Diagnostics utility ([#611](https://github.com/putyourlightson/craft-blitz/issues/611)).
 
 ## 4.10.3 - 2024-01-13
 
@@ -98,16 +108,16 @@
 
 ### Fixed
 
-- Fixed a bug in which SQL queries were executed in the Blitz diagnostics utility that required minimum database versions above those required by Craft 4 ([#602](https://github.com/putyourlightson/craft-blitz/issues/602)).
-- Fixed a bug in which paginated pages could go beyond their maximum in the Blitz diagnostics utility ([#603](https://github.com/putyourlightson/craft-blitz/issues/603)).
+- Fixed a bug in which SQL queries were executed in the Blitz Diagnostics utility that required minimum database versions above those required by Craft 4 ([#602](https://github.com/putyourlightson/craft-blitz/issues/602)).
+- Fixed a bug in which paginated pages could go beyond their maximum in the Blitz Diagnostics utility ([#603](https://github.com/putyourlightson/craft-blitz/issues/603)).
 - Fixed a bug in which Sprig Core was not being bootstrapped for all CP requests.
-- Fixed a bug in which legacy non-cacheable element types were causing errors in the Blitz diagnostics utility.
+- Fixed a bug in which legacy non-cacheable element types were causing errors in the Blitz Diagnostics utility.
 
 ## 4.10.0 - 2024-01-09
 
 ### Added
 
-- Added the Blitz diagnostics utility ([read the announcement](https://putyourlightson.com/articles/introducing-blitz-diagnostics)).
+- Added the Blitz Diagnostics utility ([read the announcement](https://putyourlightson.com/articles/introducing-blitz-diagnostics)).
 
 ### Fixed
 
