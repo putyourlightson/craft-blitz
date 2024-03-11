@@ -185,11 +185,6 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // Don’t proceed if propagating
-        if ($element->propagating) {
-            return;
-        }
-
         // Refresh the entire cache if this is a global set since they are populated on every request
         if ($element instanceof GlobalSet) {
             if (Blitz::$plugin->settings->refreshCacheAutomaticallyForGlobals) {

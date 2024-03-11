@@ -8,6 +8,7 @@
 
 ### Changed
 
+- Elements that are propagating are no longer ignored from the cache refresh process ([#631](https://github.com/putyourlightson/craft-blitz/issues/631)).
 - Changed the default branch in the Git Deployer to `main`.
 
 ## 4.12.3 - 2024-03-08
