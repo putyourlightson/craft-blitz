@@ -13,6 +13,7 @@ use DateTime;
  * @property int $fieldId
  * @property string $template
  * @property int $line
+ * @property array $stackTrace
  * @property DateTime $lastUpdated
  */
 class HintRecord extends ActiveRecord

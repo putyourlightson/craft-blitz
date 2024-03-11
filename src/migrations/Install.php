@@ -191,6 +191,7 @@ class Install extends Migration
                 'fieldId' => $this->integer()->notNull(),
                 'template' => $this->string()->notNull(),
                 'line' => $this->integer(),
+                'stackTrace' => $this->text(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),

@@ -37,6 +37,11 @@ class HintModel extends Model
     public ?int $line = null;
 
     /**
+     * @var string[]
+     */
+    public array $stackTrace = [];
+
+    /**
      * @var DateTime|null
      */
     public ?DateTime $dateUpdated = null;

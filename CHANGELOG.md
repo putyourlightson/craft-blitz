@@ -5,10 +5,13 @@
 ### Added
 
 - Added suggesting the use of the `eagerly()` function to lazy-loaded element queries in the Blitz Hints utility.
+- Added a template stack trace to the Blitz Hints utility.
 
 ### Changed
 
 - The Blitz Hints utility is now powered by Sprig, no longer tracks route variable hints and no longer requires an external package.
+- Elements that are propagating are no longer ignored from the cache refresh process ([#631](https://github.com/putyourlightson/craft-blitz/issues/631)).
+- Changed the default branch in the Git Deployer to `main`.
 
 ## 5.0.0-beta.1 - 2024-02-14
 
