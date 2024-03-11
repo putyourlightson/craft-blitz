@@ -155,9 +155,7 @@ class HintsService extends Component
                             'stackTrace' => [$templatePath . ':' . $line],
                         ]);
                     } else {
-                        if ($template->getParent([]) !== null) {
-                            $hint->stackTrace[] = $templatePath . ':' . $line;
-                        }
+                        $hint->stackTrace[] = $templatePath . ':' . $line;
 
                         continue;
                     }
