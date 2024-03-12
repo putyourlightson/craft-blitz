@@ -1,5 +1,15 @@
 # Release Notes for Blitz
 
+## 4.13.1 - 2024-03-12
+
+### Changed
+
+- The template stack trace is now updated if different for the same field-template combination.
+
+### Fixed
+
+- Fixed a bug in the Blitz Hints utility that could throw an error when conditional variables were used in an `extends` tag ([#632](https://github.com/putyourlightson/craft-blitz/issues/632)).
+
 ## 4.13.0 - 2024-03-11
 
 ### Added
