@@ -4,7 +4,7 @@
 
 ### Changed
 
-- The template stack trace is now updated if different for the same field-template combination.
+- The template stack trace in the Blitz Hints utility is now updated if different for the same field-template combination.
 
 ### Fixed
 
