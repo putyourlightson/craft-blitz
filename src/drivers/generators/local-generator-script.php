@@ -50,33 +50,35 @@ return function(Channel $channel): Generator {
         $pathParam => trim(parse_url($url, PHP_URL_PATH), '/'),
     ]);
 
-    // Bootstrap the request manually, rather than depending on the file existing.
+    // We can’t assume the bootstrap file exists.
     // https://github.com/putyourlightson/craft-blitz/issues/404
-    define('CRAFT_BASE_PATH', $root);
-    define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
+    if (file_exists($root . '/bootstrap.php')) {
+        require_once $root . '/bootstrap.php';
+    } else {
+        // Based on variations of https://github.com/craftcms/craft/blob/4.x/bootstrap.php
+        define('CRAFT_BASE_PATH', $root);
+        define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
 
-    // Load Composer's autoloader
-    /** @noinspection PhpIncludeInspection */
-    require_once CRAFT_VENDOR_PATH . '/autoload.php';
+        /** @noinspection PhpIncludeInspection */
+        require_once CRAFT_VENDOR_PATH . '/autoload.php';
 
-    // Load dotenv, depending on the available method and version.
-    // https://github.com/vlucas/phpdotenv/blob/master/UPGRADING.md
-    if (class_exists(Dotenv\Dotenv::class) && file_exists(CRAFT_BASE_PATH . '/.env')) {
-        // Dotenv v5
-        if (method_exists('Dotenv\Dotenv', 'createUnsafeMutable')) {
-            // By default, this will allow .env file values to override environment variables
-            // with matching names. Use `createUnsafeImmutable` to disable this.
-            Dotenv\Dotenv::createUnsafeMutable(CRAFT_BASE_PATH)->safeLoad();
-        } // Dotenv v3
-        elseif (method_exists('Dotenv\Dotenv', 'create')) {
-            /** @noinspection PhpParamsInspection */
-            /** @phpstan-ignore-next-line */
-            Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();
-        } // Dotenv v2
-        else {
-            /** @noinspection PhpParamsInspection */
-            /** @phpstan-ignore-next-line */
-            (new Dotenv\Dotenv(CRAFT_BASE_PATH))->load();
+        // Load dotenv, depending on the available method and version.
+        // https://github.com/vlucas/phpdotenv/blob/master/UPGRADING.md
+        if (class_exists(Dotenv\Dotenv::class) && file_exists(CRAFT_BASE_PATH . '/.env')) {
+            // Dotenv v5
+            if (method_exists('Dotenv\Dotenv', 'createUnsafeMutable')) {
+                Dotenv\Dotenv::createUnsafeMutable(CRAFT_BASE_PATH)->safeLoad();
+            } // Dotenv v3
+            elseif (method_exists('Dotenv\Dotenv', 'create')) {
+                /** @noinspection PhpParamsInspection */
+                /** @phpstan-ignore-next-line */
+                Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();
+            } // Dotenv v2
+            else {
+                /** @noinspection PhpParamsInspection */
+                /** @phpstan-ignore-next-line */
+                (new Dotenv\Dotenv(CRAFT_BASE_PATH))->load();
+            }
         }
     }
 
