@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
+use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
@@ -476,6 +477,11 @@ class SettingsModel extends Model
      * The name of the JavaScript event that will trigger a script inject.
      */
     public string $injectScriptEvent = 'DOMContentLoaded';
+
+    /**
+     * The position in the HTML of the script inject.
+     */
+    public string $injectScriptPosition = View::POS_END;
 
     /**
      * @inheritdoc
