@@ -28,7 +28,7 @@ class IncludeController extends Controller
      */
     public function actionCached(): Response
     {
-        return $this->_getRenderedTemplate();
+        return $this->getRenderedTemplate();
     }
 
     /**
@@ -36,13 +36,13 @@ class IncludeController extends Controller
      */
     public function actionDynamic(): Response
     {
-        return $this->_getRenderedTemplate();
+        return $this->getRenderedTemplate();
     }
 
     /**
      * Returns a rendered template.
      */
-    public function _getRenderedTemplate(): Response
+    public function getRenderedTemplate(): Response
     {
         $index = Craft::$app->getRequest()->getRequiredParam('index');
         $include = Blitz::$plugin->cacheRequest->getIncludeByIndex($index);

@@ -54,7 +54,7 @@ class CacheController extends Controller
      */
     public function actionClear(): int
     {
-        $this->_clearCache();
+        $this->clearCache();
 
         return ExitCode::OK;
     }
@@ -72,7 +72,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_clearCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
+        $this->clearCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
 
         return ExitCode::OK;
     }
@@ -90,7 +90,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_clearCache(SiteUriHelper::getSiteUrisFromUrls($urls));
+        $this->clearCache(SiteUriHelper::getSiteUrisFromUrls($urls));
 
         return ExitCode::OK;
     }
@@ -108,7 +108,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_clearCache(SiteUriHelper::getSiteUrisFromTags($tags));
+        $this->clearCache(SiteUriHelper::getSiteUrisFromTags($tags));
 
         return ExitCode::OK;
     }
@@ -118,7 +118,7 @@ class CacheController extends Controller
      */
     public function actionFlush(): int
     {
-        $this->_flushCache();
+        $this->flushCache();
 
         return ExitCode::OK;
     }
@@ -134,7 +134,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_generateCache(SiteUriHelper::getAllSiteUrisWithCustomSiteUris());
+        $this->generateCache(SiteUriHelper::getAllSiteUrisWithCustomSiteUris());
 
         return ExitCode::OK;
     }
@@ -152,7 +152,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_generateCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
+        $this->generateCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
 
         return ExitCode::OK;
     }
@@ -170,7 +170,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_generateCache(SiteUriHelper::getSiteUrisFromUrls($urls));
+        $this->generateCache(SiteUriHelper::getSiteUrisFromUrls($urls));
 
         return ExitCode::OK;
     }
@@ -188,7 +188,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_generateCache(SiteUriHelper::getSiteUrisFromTags($tags));
+        $this->generateCache(SiteUriHelper::getSiteUrisFromTags($tags));
 
         return ExitCode::OK;
     }
@@ -198,7 +198,7 @@ class CacheController extends Controller
      */
     public function actionPurge(): int
     {
-        $this->_purgeCache();
+        $this->purgeCache();
 
         return ExitCode::OK;
     }
@@ -216,7 +216,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_purgeCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
+        $this->purgeCache(SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId));
 
         return ExitCode::OK;
     }
@@ -234,7 +234,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_purgeCache(SiteUriHelper::getSiteUrisFromUrls($urls));
+        $this->purgeCache(SiteUriHelper::getSiteUrisFromUrls($urls));
 
         return ExitCode::OK;
     }
@@ -252,7 +252,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_purgeCache(SiteUriHelper::getSiteUrisFromTags($tags));
+        $this->purgeCache(SiteUriHelper::getSiteUrisFromTags($tags));
 
         return ExitCode::OK;
     }
@@ -268,7 +268,7 @@ class CacheController extends Controller
             return ExitCode::OK;
         }
 
-        $this->_deploy(SiteUriHelper::getAllSiteUris());
+        $this->deploy(SiteUriHelper::getAllSiteUris());
 
         return ExitCode::OK;
     }
@@ -289,22 +289,22 @@ class CacheController extends Controller
             // Release jobs, since we’re anyway clearing the cache.
             Blitz::$plugin->refreshCache->releaseJobs();
 
-            $this->_clearCache();
-            $this->_flushCache(null, true);
-            $this->_purgeCache();
+            $this->clearCache();
+            $this->flushCache(null, true);
+            $this->purgeCache();
         }
 
         if (Blitz::$plugin->settings->expireOnRefresh()) {
-            $this->_expireCache();
+            $this->expireCache();
         }
 
         if ($generateOnRefresh) {
-            $this->_generateCache($siteUris);
-            $this->_deploy($siteUris);
+            $this->generateCache($siteUris);
+            $this->deploy($siteUris);
         }
 
         if (Blitz::$plugin->settings->purgeAfterRefresh()) {
-            $this->_purgeCache();
+            $this->purgeCache();
         }
 
         return ExitCode::OK;
@@ -323,7 +323,7 @@ class CacheController extends Controller
 
         DiagnosticsHelper::updateDriverDataAction('refresh-expired-cli');
 
-        $this->_output('Expired Blitz cache successfully refreshed.');
+        $this->output('Expired Blitz cache successfully refreshed.');
 
         return ExitCode::OK;
     }
@@ -343,29 +343,29 @@ class CacheController extends Controller
         $siteUris = SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId);
 
         if (Blitz::$plugin->settings->clearOnRefresh()) {
-            $this->_clearCache($siteUris);
-            $this->_flushCache($siteUris, true);
-            $this->_purgeCache($siteUris);
+            $this->clearCache($siteUris);
+            $this->flushCache($siteUris, true);
+            $this->purgeCache($siteUris);
         }
 
         if (Blitz::$plugin->settings->expireOnRefresh()) {
-            $this->_expireCache($siteUris);
+            $this->expireCache($siteUris);
         }
 
         if (Blitz::$plugin->settings->generateOnRefresh()) {
-            $this->_generateCache($siteUris);
-            $this->_deploy($siteUris);
+            $this->generateCache($siteUris);
+            $this->deploy($siteUris);
         }
 
         if (Blitz::$plugin->settings->purgeAfterRefresh()) {
-            $this->_purgeCache($siteUris);
+            $this->purgeCache($siteUris);
         }
 
         if (!$this->queue) {
             Craft::$app->runAction('queue/run');
         }
 
-        $this->_output('Site successfully refreshed.');
+        $this->output('Site successfully refreshed.');
 
         return ExitCode::OK;
     }
@@ -387,7 +387,7 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->_output('Cached URLs successfully refreshed.');
+        $this->output('Cached URLs successfully refreshed.');
 
         return ExitCode::OK;
     }
@@ -409,7 +409,7 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
-        $this->_output('Tagged cache successfully refreshed.');
+        $this->output('Tagged cache successfully refreshed.');
 
         return ExitCode::OK;
     }
@@ -421,7 +421,7 @@ class CacheController extends Controller
     {
         Blitz::$plugin->refreshCache->generateExpiryDates();
 
-        $this->_output('Entry expiry dates successfully generated.');
+        $this->output('Entry expiry dates successfully generated.');
 
         return ExitCode::OK;
     }
@@ -434,7 +434,7 @@ class CacheController extends Controller
         Console::updateProgress($count, $total);
     }
 
-    private function _clearCache(array $siteUris = null): void
+    private function clearCache(array $siteUris = null): void
     {
         if ($siteUris !== null) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
@@ -442,10 +442,10 @@ class CacheController extends Controller
             Blitz::$plugin->clearCache->clearAll();
         }
 
-        $this->_output('Blitz cache successfully cleared.');
+        $this->output('Blitz cache successfully cleared.');
     }
 
-    private function _expireCache(array $siteUris = null): void
+    private function expireCache(array $siteUris = null): void
     {
         if ($siteUris !== null) {
             Blitz::$plugin->expireCache->expireUris($siteUris);
@@ -453,10 +453,10 @@ class CacheController extends Controller
             Blitz::$plugin->expireCache->expireAll();
         }
 
-        $this->_output('Blitz cache successfully marked as expired.');
+        $this->output('Blitz cache successfully marked as expired.');
     }
 
-    private function _flushCache(array $siteUris = null, bool $afterClear = false): void
+    private function flushCache(array $siteUris = null, bool $afterClear = false): void
     {
         if ($siteUris !== null) {
             Blitz::$plugin->flushCache->flushUris($siteUris);
@@ -464,10 +464,10 @@ class CacheController extends Controller
             Blitz::$plugin->flushCache->flushAll($afterClear);
         }
 
-        $this->_output('Blitz cache successfully flushed.');
+        $this->output('Blitz cache successfully flushed.');
     }
 
-    private function _purgeCache(array $siteUris = null): void
+    private function purgeCache(array $siteUris = null): void
     {
         if (Blitz::$plugin->cachePurger->isDummy) {
             $this->stderr(Craft::t('blitz', 'Cache purging is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
@@ -482,7 +482,7 @@ class CacheController extends Controller
                 Blitz::$plugin->cachePurger->purgeAll([$this, 'setProgressHandler']);
             }
 
-            $this->_output('Blitz cache queued for purging.');
+            $this->output('Blitz cache queued for purging.');
 
             return;
         }
@@ -497,17 +497,17 @@ class CacheController extends Controller
             Blitz::$plugin->cachePurger->purgeAll([$this, 'setProgressHandler'], false);
         }
 
-        $this->_output('Purging complete.');
+        $this->output('Purging complete.');
     }
 
     /**
      * @param SiteUriModel[] $siteUris
      */
-    private function _generateCache(array $siteUris): void
+    private function generateCache(array $siteUris): void
     {
         if ($this->queue) {
             Blitz::$plugin->cacheGenerator->generateUris($siteUris, [$this, 'setProgressHandler']);
-            $this->_output('Blitz cache queued for generation.');
+            $this->output('Blitz cache queued for generation.');
 
             return;
         }
@@ -525,13 +525,13 @@ class CacheController extends Controller
             $this->stdout(Craft::t('blitz', 'Generated {generated} of {total} total possible pages and includes. To see why some pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['generated' => $generated, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
         }
 
-        $this->_output('Blitz cache generation complete.');
+        $this->output('Blitz cache generation complete.');
     }
 
     /**
      * @param SiteUriModel[] $siteUris
      */
-    private function _deploy(array $siteUris): void
+    private function deploy(array $siteUris): void
     {
         if (Blitz::$plugin->deployer->isDummy) {
             $this->stderr(Craft::t('blitz', 'Deploying is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
@@ -543,7 +543,7 @@ class CacheController extends Controller
 
         if ($this->queue) {
             Blitz::$plugin->deployer->deployUris($siteUris, [$this, 'setProgressHandler']);
-            $this->_output('Blitz cache queued for deploying.');
+            $this->output('Blitz cache queued for deploying.');
 
             return;
         }
@@ -554,21 +554,21 @@ class CacheController extends Controller
         Blitz::$plugin->deployer->deployUris($siteUris, [$this, 'setProgressHandler'], false);
         Console::endProgress();
 
-        $this->_output('Deploying complete.');
+        $this->output('Deploying complete.');
     }
 
     /**
      * Logs and outputs a message to the console.
      */
-    private function _output(string $message): void
+    private function output(string $message): void
     {
         $user = 'unknown';
-        
+
         if (function_exists('posix_getpwuid')) {
             $processUser = posix_getpwuid(posix_geteuid());
             $user = $processUser['name'] ?? $user;
         }
-        
+
         Blitz::$plugin->log($message . ' [via console command by "{user}"]', ['user' => $user]);
 
         $this->stdout(Craft::t('blitz', $message) . PHP_EOL, BaseConsole::FG_GREEN);

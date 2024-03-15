@@ -39,7 +39,7 @@ class BlitzVariable
     /**
      * @var int
      */
-    private int $_injected = 0;
+    private int $injected = 0;
 
     /**
      * Returns the markup to include a cached template.
@@ -53,7 +53,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->_includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PATH, CacheRequestService::CACHED_INCLUDE_ACTION, $params, $config);
+        return $this->includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PATH, CacheRequestService::CACHED_INCLUDE_ACTION, $params, $config);
     }
 
     /**
@@ -68,7 +68,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->_includeTemplate($template, CacheRequestService::DYNAMIC_INCLUDE_PATH, CacheRequestService::DYNAMIC_INCLUDE_ACTION, $params, $config);
+        return $this->includeTemplate($template, CacheRequestService::DYNAMIC_INCLUDE_PATH, CacheRequestService::DYNAMIC_INCLUDE_ACTION, $params, $config);
     }
 
     /**
@@ -81,7 +81,7 @@ class BlitzVariable
         $config = new VariableConfigModel();
         $config->setAttributes($options);
 
-        return $this->_getScript($uri, $params, $config);
+        return $this->getScript($uri, $params, $config);
     }
 
     /**
@@ -98,7 +98,7 @@ class BlitzVariable
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
-        $uri = $this->_getActionUrl('blitz/templates/get');
+        $uri = $this->getActionUrl('blitz/templates/get');
 
         // Hash the template
         $template = Craft::$app->getSecurity()->hashData($template);
@@ -112,7 +112,7 @@ class BlitzVariable
 
         $config = new VariableConfigModel();
 
-        return $this->_getScript($uri, $params, $config);
+        return $this->getScript($uri, $params, $config);
     }
 
     /**
@@ -134,7 +134,7 @@ class BlitzVariable
      */
     public function csrfInput(): Markup
     {
-        return $this->_getCsrfScript('input');
+        return $this->getCsrfScript('input');
     }
 
     /**
@@ -142,7 +142,7 @@ class BlitzVariable
      */
     public function csrfParam(): Markup
     {
-        return $this->_getCsrfScript('param');
+        return $this->getCsrfScript('param');
     }
 
     /**
@@ -150,7 +150,7 @@ class BlitzVariable
      */
     public function csrfToken(): Markup
     {
-        return $this->_getCsrfScript('token');
+        return $this->getCsrfScript('token');
     }
 
     /**
@@ -200,7 +200,7 @@ class BlitzVariable
     /**
      * Returns the code to inject the output of a template.
      */
-    private function _includeTemplate(string $template, string $uriPrefix, string $action, array $params, VariableConfigModel $config): Markup
+    private function includeTemplate(string $template, string $uriPrefix, string $action, array $params, VariableConfigModel $config): Markup
     {
         if (!Craft::$app->getView()->resolveTemplate($template)) {
             throw new NotFoundHttpException('Template not found: ' . $template);
@@ -220,26 +220,26 @@ class BlitzVariable
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
             if (Blitz::$plugin->settings->ssiEnabled) {
-                return $this->_getSsiTag($uri, $includeParams, $includeId);
+                return $this->getSsiTag($uri, $includeParams, $includeId);
             }
 
             if (Blitz::$plugin->settings->esiEnabled) {
-                return $this->_getEsiTag($uri, $includeParams);
+                return $this->getEsiTag($uri, $includeParams);
             }
         }
 
-        return $this->_getScript($uri, $includeParams, $config);
+        return $this->getScript($uri, $includeParams, $config);
     }
 
     /**
      * Returns an SSI tag to inject the output of a URI.
      */
-    private function _getSsiTag(string $uri, array $params, int $includeId): Markup
+    private function getSsiTag(string $uri, array $params, int $includeId): Markup
     {
         // Add an SSI include, so we can purge it whenever necessary
         Blitz::$plugin->generateCache->addSsiInclude($includeId);
 
-        $uri = $this->_getUriWithParams($uri, $params);
+        $uri = $this->getUriWithParams($uri, $params);
         $ssiTag = Blitz::$plugin->settings->getSsiTag($uri);
 
         return Template::raw($ssiTag);
@@ -248,10 +248,10 @@ class BlitzVariable
     /**
      * Returns an ESI tag to inject the output of a URI.
      */
-    private function _getEsiTag(string $uri, array $params): Markup
+    private function getEsiTag(string $uri, array $params): Markup
     {
         Blitz::$plugin->generateCache->generateData->setHasIncludes();
-        $uri = $this->_getUriWithParams($uri, $params);
+        $uri = $this->getUriWithParams($uri, $params);
 
         // Add surrogate control header
         Craft::$app->getResponse()->getHeaders()->add('Surrogate-Control', 'content="ESI/1.0"');
@@ -259,15 +259,15 @@ class BlitzVariable
         return Template::raw('<esi:include src="' . $uri . '" />');
     }
 
-    private function _getUriWithParams(string $uri, array $params): string
+    private function getUriWithParams(string $uri, array $params): string
     {
         // Get the URL path only
         $uri = parse_url(UrlHelper::siteUrl($uri), PHP_URL_PATH);
 
-        return $uri . '?' . $this->_getQueryString($params);
+        return $uri . '?' . $this->getQueryString($params);
     }
 
-    private function _getQueryString(array $params): string
+    private function getQueryString(array $params): string
     {
         // Remove the path param if it exists.
         $pathParam = Craft::$app->getConfig()->getGeneral()->pathParam;
@@ -281,12 +281,12 @@ class BlitzVariable
     /**
      * Returns a script to inject the output of a URI.
      */
-    private function _getScript(string $uri, array $params, VariableConfigModel $config): Markup
+    private function getScript(string $uri, array $params, VariableConfigModel $config): Markup
     {
         $view = Craft::$app->getView();
         $js = '';
 
-        if ($this->_injected === 0) {
+        if ($this->injected === 0) {
             $blitzInjectScript = Craft::getAlias('@putyourlightson/blitz/resources/js/blitzInjectScript.js');
 
             if (file_exists($blitzInjectScript)) {
@@ -297,13 +297,13 @@ class BlitzVariable
 
         $view->registerJs($js, Blitz::$plugin->settings->injectScriptPosition);
 
-        $this->_injected++;
-        $id = $this->_injected;
+        $this->injected++;
+        $id = $this->injected;
 
         $data = [
             'blitz-id' => $id,
             'blitz-uri' => $uri,
-            'blitz-params' => $this->_getQueryString($params),
+            'blitz-params' => $this->getQueryString($params),
             'blitz-property' => $config->property,
         ];
 
@@ -319,7 +319,7 @@ class BlitzVariable
     /**
      * Returns an absolute action URL for a URI.
      */
-    private function _getActionUrl(string $uri): string
+    private function getActionUrl(string $uri): string
     {
         return UrlHelper::actionUrl($uri, null, null, false);
     }
@@ -327,11 +327,11 @@ class BlitzVariable
     /**
      * Returns a script to inject the output of a CSRF property.
      */
-    private function _getCsrfScript(string $property): Markup
+    private function getCsrfScript(string $property): Markup
     {
-        $uri = $this->_getActionUrl('blitz/csrf/json');
+        $uri = $this->getActionUrl('blitz/csrf/json');
         $config = new VariableConfigModel(['property' => $property]);
 
-        return $this->_getScript($uri, [], $config);
+        return $this->getScript($uri, [], $config);
     }
 }

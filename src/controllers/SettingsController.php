@@ -112,16 +112,16 @@ class SettingsController extends Controller
             'siteOptions' => $siteOptions,
             'storageDriver' => $storageDriver,
             'storageDrivers' => $storageDrivers,
-            'storageTypeOptions' => array_map([$this, '_getSelectOption'], $storageDrivers),
+            'storageTypeOptions' => array_map([$this, 'getSelectOption'], $storageDrivers),
             'generatorDriver' => $generatorDriver,
             'generatorDrivers' => $generatorDrivers,
-            'generatorTypeOptions' => array_map([$this, '_getSelectOption'], $generatorDrivers),
+            'generatorTypeOptions' => array_map([$this, 'getSelectOption'], $generatorDrivers),
             'purgerDriver' => $purgerDriver,
             'purgerDrivers' => $purgerDrivers,
-            'purgerTypeOptions' => array_map([$this, '_getSelectOption'], $purgerDrivers),
+            'purgerTypeOptions' => array_map([$this, 'getSelectOption'], $purgerDrivers),
             'deployerDriver' => $deployerDriver,
             'deployerDrivers' => $deployerDrivers,
-            'deployerTypeOptions' => array_map([$this, '_getSelectOption'], $deployerDrivers),
+            'deployerTypeOptions' => array_map([$this, 'getSelectOption'], $deployerDrivers),
             'detectSsiTag' => $detectSsiTag,
         ]);
     }
@@ -237,7 +237,7 @@ class SettingsController extends Controller
     /**
      * Gets select option from a component.
      */
-    private function _getSelectOption(ComponentInterface $component): array
+    private function getSelectOption(ComponentInterface $component): array
     {
         return [
             'value' => $component::class,

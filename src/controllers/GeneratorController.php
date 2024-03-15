@@ -44,7 +44,7 @@ class GeneratorController extends Controller
      */
     public function actionGenerate(): ?Response
     {
-        $response = $this->_generateResponse();
+        $response = $this->generateResponse();
 
         // Suppress the output using a dummy stream
         Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
@@ -64,7 +64,7 @@ class GeneratorController extends Controller
      *
      * @see PreviewController::actionPreview()
      */
-    private function _generateResponse(): ?Response
+    private function generateResponse(): ?Response
     {
         // Remove the token query param.
         $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;

@@ -136,20 +136,20 @@ class FlushCacheService extends Component
 
         // Check if auto increment values should be reset
         if (CacheRecord::find()->count() == 0) {
-            $this->_resetAutoIncrement(CacheRecord::tableName());
+            $this->resetAutoIncrement(CacheRecord::tableName());
         }
         if (ElementQueryRecord::find()->count() == 0) {
-            $this->_resetAutoIncrement(ElementQueryRecord::tableName());
+            $this->resetAutoIncrement(ElementQueryRecord::tableName());
         }
         if (IncludeRecord::find()->count() == 0) {
-            $this->_resetAutoIncrement(IncludeRecord::tableName());
+            $this->resetAutoIncrement(IncludeRecord::tableName());
         }
     }
 
     /**
      * Resets auto increment values of the given table.
      */
-    private function _resetAutoIncrement(string $table): void
+    private function resetAutoIncrement(string $table): void
     {
         $db = Craft::$app->getDb();
         $dbDriver = $db->getDriverName();

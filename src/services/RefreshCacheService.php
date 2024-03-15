@@ -359,7 +359,7 @@ class RefreshCacheService extends Component
 
         $siteUris = $event->siteUris;
 
-        $this->_refreshSiteUris($siteUris, $purgeSiteUris, $forceClear, $forceGenerate);
+        $this->refreshSiteUrisInternal($siteUris, $purgeSiteUris, $forceClear, $forceGenerate);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE, $event);
@@ -546,7 +546,7 @@ class RefreshCacheService extends Component
      * @param SiteUriModel[] $siteUris
      * @param SiteUriModel[] $purgeSiteUris
      */
-    private function _refreshSiteUris(array $siteUris, array $purgeSiteUris = [], bool $forceClear = false, bool $forceGenerate = false): void
+    private function refreshSiteUrisInternal(array $siteUris, array $purgeSiteUris = [], bool $forceClear = false, bool $forceGenerate = false): void
     {
         $purgeableSiteUris = array_merge($siteUris, $purgeSiteUris);
 

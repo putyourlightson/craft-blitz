@@ -24,18 +24,18 @@ abstract class BaseDataModel extends Model
     /**
      * @var array
      */
-    private array $_initialData = [];
+    private array $initialData = [];
 
     public function init(): void
     {
         parent::init();
 
-        $this->_initialData = $this->data;
+        $this->initialData = $this->data;
     }
 
     public function isEmpty(): bool
     {
-        return $this->data === $this->_initialData;
+        return $this->data === $this->initialData;
     }
 
     protected function getKeysAsValues(array $indexes): array

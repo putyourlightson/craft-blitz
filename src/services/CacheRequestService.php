@@ -26,7 +26,6 @@ use yii\web\Response;
 
 /**
  * @property-read bool $isCacheableRequest
- * @property-read bool $isGeneratorRequest
  * @property-read null|SiteUriModel $requestedCacheableSiteUri
  * @property-read string $allowedQueryString
  * @property-read string[] $acceptedRequestEncodings
@@ -71,12 +70,12 @@ class CacheRequestService extends Component
     /**
      * @var bool|null
      */
-    private ?bool $_isGeneratorRequest = null;
+    private ?bool $isGeneratorRequest = null;
 
     /**
      * @var array|null
      */
-    private ?array $_allowedQueryStrings = [];
+    private ?array $allowedQueryStrings = [];
 
     /**
      * Sets the default cache control header.
@@ -319,14 +318,14 @@ class CacheRequestService extends Component
      */
     public function getIsGeneratorRequest(): bool
     {
-        if ($this->_isGeneratorRequest !== null) {
-            return $this->_isGeneratorRequest;
+        if ($this->isGeneratorRequest !== null) {
+            return $this->isGeneratorRequest;
         }
 
         $token = Craft::$app->getRequest()->getToken();
 
         if ($token == null) {
-            $this->_isGeneratorRequest = false;
+            $this->isGeneratorRequest = false;
         } else {
             // Don't use Tokens::getTokenRoute, as that can result in the token being deleted.
             // https://github.com/putyourlightson/craft-blitz/issues/448
@@ -336,10 +335,10 @@ class CacheRequestService extends Component
                 ->where(['token' => $token])
                 ->column();
             $route = (array)Json::decodeIfJson($route);
-            $this->_isGeneratorRequest = in_array(BaseCacheGenerator::GENERATE_ACTION_ROUTE, $route);
+            $this->isGeneratorRequest = in_array(BaseCacheGenerator::GENERATE_ACTION_ROUTE, $route);
         }
 
-        return $this->_isGeneratorRequest;
+        return $this->isGeneratorRequest;
     }
 
     /**
@@ -405,7 +404,7 @@ class CacheRequestService extends Component
         $baseSitePath = parse_url($site->getBaseUrl(), PHP_URL_PATH);
 
         if ($baseSitePath !== null) {
-            $baseSitePath = $this->_normalizePath($baseSitePath);
+            $baseSitePath = $this->normalizePath($baseSitePath);
 
             if (str_starts_with($uri . '/', $baseSitePath . '/')) {
                 $uri = ltrim(substr($uri, strlen($baseSitePath)), '/');
@@ -468,9 +467,9 @@ class CacheRequestService extends Component
         }
 
         $response = $event->response;
-        $this->_addCraftHeaders($response);
-        $this->_prepareResponse($response, $siteUri, $content, $encoded);
-        $this->_appendServedByComment($response, $siteUri, $encoded);
+        $this->addCraftHeaders($response);
+        $this->prepareResponse($response, $siteUri, $content, $encoded);
+        $this->appendServedByComment($response, $siteUri, $encoded);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_GET_RESPONSE)) {
             $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
@@ -502,7 +501,7 @@ class CacheRequestService extends Component
         $content = Blitz::$plugin->generateCache->save($response->content, $siteUri);
 
         if ($content) {
-            $this->_prepareResponse($response, $siteUri, $content);
+            $this->prepareResponse($response, $siteUri, $content);
         }
     }
 
@@ -570,8 +569,8 @@ class CacheRequestService extends Component
      */
     public function getAllowedQueryString(int $siteId, string $uri): string
     {
-        if (!empty($this->_allowedQueryStrings[$siteId][$uri])) {
-            return $this->_allowedQueryStrings[$siteId][$uri];
+        if (!empty($this->allowedQueryStrings[$siteId][$uri])) {
+            return $this->allowedQueryStrings[$siteId][$uri];
         }
 
         $queryString = parse_url($uri, PHP_URL_QUERY) ?: '';
@@ -583,9 +582,9 @@ class CacheRequestService extends Component
             }
         }
 
-        $this->_allowedQueryStrings[$siteId][$uri] = http_build_query($queryStringParams);
+        $this->allowedQueryStrings[$siteId][$uri] = http_build_query($queryStringParams);
 
-        return $this->_allowedQueryStrings[$siteId][$uri];
+        return $this->allowedQueryStrings[$siteId][$uri];
     }
 
     /**
@@ -634,7 +633,7 @@ class CacheRequestService extends Component
      * @see Application::handleRequest()
      * @since 3.12.0
      */
-    private function _addCraftHeaders(Response $response): void
+    private function addCraftHeaders(Response $response): void
     {
         $headers = $response->getHeaders();
         $generalConfig = Craft::$app->getConfig()->getGeneral();
@@ -668,7 +667,7 @@ class CacheRequestService extends Component
      *
      * @since 3.12.0
      */
-    private function _prepareResponse(Response $response, SiteUriModel $siteUri, string $content, bool $encoded = false): void
+    private function prepareResponse(Response $response, SiteUriModel $siteUri, string $content, bool $encoded = false): void
     {
         $response->content = $content;
 
@@ -728,7 +727,7 @@ class CacheRequestService extends Component
     /**
      * Appends the served by comment to the response content.
      */
-    private function _appendServedByComment(Response $response, SiteUriModel $siteUri, bool $encoded): void
+    private function appendServedByComment(Response $response, SiteUriModel $siteUri, bool $encoded): void
     {
         // Appending onto encoded content is not possible
         if ($encoded) {
@@ -761,7 +760,7 @@ class CacheRequestService extends Component
      * @see Request::_normalizePath()
      * @since 3.10.6
      */
-    private function _normalizePath(string $path): string
+    private function normalizePath(string $path): string
     {
         return preg_replace('/\/\/+/', '/', trim($path, '/'));
     }

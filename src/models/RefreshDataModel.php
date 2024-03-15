@@ -101,7 +101,7 @@ class RefreshDataModel extends BaseDataModel
      */
     public function getCombinedChangedAttributes(string $elementType): array
     {
-        return $this->_getCombinedChanged($elementType, 'changedAttributes');
+        return $this->getCombinedChanged($elementType, 'changedAttributes');
     }
 
     public function getIsChangedByAttributes(string $elementType, int $elementId): bool
@@ -111,7 +111,7 @@ class RefreshDataModel extends BaseDataModel
 
     public function getCombinedIsChangedByAttributes(string $elementType): bool
     {
-        return $this->_getCombinedIsChangedBy($elementType, 'isChangedByAttributes');
+        return $this->getCombinedIsChangedBy($elementType, 'isChangedByAttributes');
     }
 
     /**
@@ -129,7 +129,7 @@ class RefreshDataModel extends BaseDataModel
      */
     public function getCombinedChangedFields(string $elementType): array
     {
-        $fieldHandles = $this->_getCombinedChanged($elementType, 'changedFields');
+        $fieldHandles = $this->getCombinedChanged($elementType, 'changedFields');
 
         return FieldHelper::getFieldIdsFromHandles($fieldHandles);
     }
@@ -141,7 +141,7 @@ class RefreshDataModel extends BaseDataModel
 
     public function getCombinedIsChangedByFields(string $elementType): bool
     {
-        return $this->_getCombinedIsChangedBy($elementType, 'isChangedByFields');
+        return $this->getCombinedIsChangedBy($elementType, 'isChangedByFields');
     }
 
     /**
@@ -251,7 +251,7 @@ class RefreshDataModel extends BaseDataModel
         }
     }
 
-    private function _getCombinedChanged(string $elementType, string $key): array
+    private function getCombinedChanged(string $elementType, string $key): array
     {
         $combined = [];
         $valuesArray = $this->data['elements'][$elementType][$key] ?? [];
@@ -266,7 +266,7 @@ class RefreshDataModel extends BaseDataModel
         return array_keys($combined);
     }
 
-    private function _getCombinedIsChangedBy(string $elementType, string $key): bool
+    private function getCombinedIsChangedBy(string $elementType, string $key): bool
     {
         $values = $this->data['elements'][$elementType][$key] ?? [];
 

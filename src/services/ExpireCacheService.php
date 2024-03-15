@@ -81,7 +81,7 @@ class ExpireCacheService extends Component
         }
 
         $cacheIds = SiteUriHelper::getCacheIdsFromSiteUris($siteUris);
-        $this->_expireCache(['id' => $cacheIds], $expiryDate);
+        $this->expireCache(['id' => $cacheIds], $expiryDate);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_EXPIRE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_EXPIRE_CACHE, $event);
@@ -110,7 +110,7 @@ class ExpireCacheService extends Component
             return;
         }
 
-        $this->_expireCache([], $expiryDate);
+        $this->expireCache([], $expiryDate);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_EXPIRE_ALL_CACHE)) {
             $this->trigger(self::EVENT_AFTER_EXPIRE_ALL_CACHE, $event);
@@ -120,7 +120,7 @@ class ExpireCacheService extends Component
     /**
      * Adds an expiry date to the cache based on the given condition.
      */
-    private function _expireCache(array $condition, DateTime $expiryDate = null): void
+    private function expireCache(array $condition, DateTime $expiryDate = null): void
     {
         if ($expiryDate === null) {
             $expiryDate = new DateTime();

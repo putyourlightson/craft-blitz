@@ -83,7 +83,7 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function purgeSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
     {
-        $this->_sendRequest('delete', 'purge_cache', $siteId, [
+        $this->sendRequest('delete', 'purge_cache', $siteId, [
             'purge_everything' => true,
         ]);
     }
@@ -105,7 +105,7 @@ class CloudflarePurger extends BaseCachePurger
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite($siteUris);
 
         foreach ($groupedSiteUris as $siteId => $siteUriGroup) {
-            $this->_sendRequest('delete', 'purge_cache', $siteId, [
+            $this->sendRequest('delete', 'purge_cache', $siteId, [
                 'files' => SiteUriHelper::getUrlsFromSiteUris($siteUriGroup),
             ]);
 
@@ -133,7 +133,7 @@ class CloudflarePurger extends BaseCachePurger
                     continue;
                 }
 
-                $response = $this->_sendRequest('get', '', $site->id);
+                $response = $this->sendRequest('get', '', $site->id);
 
                 if ($response === false) {
                     $error = Craft::t('blitz', 'Error connecting to Cloudflare using zone ID for “{site}”.', ['site' => $site->name]);
@@ -181,18 +181,18 @@ class CloudflarePurger extends BaseCachePurger
         return [
             [
                 ['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiToken';
-                },
+                return $purger->authenticationMethod == 'apiToken';
+            },
             ],
             [
                 ['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiKey';
-                },
+                return $purger->authenticationMethod == 'apiKey';
+            },
             ],
             [
                 ['email'], 'email', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiKey';
-                },
+                return $purger->authenticationMethod == 'apiKey';
+            },
             ],
         ];
     }
@@ -200,7 +200,7 @@ class CloudflarePurger extends BaseCachePurger
     /**
      * Sends a request to the API.
      */
-    private function _sendRequest(string $method, string $action, int $siteId, array $params = []): bool
+    private function sendRequest(string $method, string $action, int $siteId, array $params = []): bool
     {
         $response = false;
 

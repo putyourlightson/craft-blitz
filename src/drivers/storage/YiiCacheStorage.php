@@ -37,7 +37,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @var CacheInterface|null
      */
-    private ?CacheInterface $_cache;
+    private ?CacheInterface $cache;
 
     /**
      * @inheritdoc
@@ -54,7 +54,7 @@ class YiiCacheStorage extends BaseCacheStorage
     {
         parent::init();
 
-        $this->_cache = Craft::$app->get($this->cacheComponent, false);
+        $this->cache = Craft::$app->get($this->cacheComponent, false);
     }
 
     /**
@@ -74,9 +74,9 @@ class YiiCacheStorage extends BaseCacheStorage
             }
         }
 
-        $key = $this->_getKey($siteUri);
+        $key = $this->getKey($siteUri);
 
-        return $this->_getFromCache($key);
+        return $this->getFromCache($key);
     }
 
     /**
@@ -84,9 +84,9 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function getCompressed(SiteUriModel $siteUri): string
     {
-        $key = $this->_getKey($siteUri, true);
+        $key = $this->getKey($siteUri, true);
 
-        return $this->_getFromCache($key);
+        return $this->getFromCache($key);
     }
 
     /**
@@ -94,18 +94,18 @@ class YiiCacheStorage extends BaseCacheStorage
      */
     public function save(string $value, SiteUriModel $siteUri, int $duration = null, bool $allowEncoding = true): void
     {
-        if ($this->_cache === null) {
+        if ($this->cache === null) {
             return;
         }
 
-        $key = $this->_getKey($siteUri);
+        $key = $this->getKey($siteUri);
 
         if ($allowEncoding && $this->canCompressCachedValues()) {
-            $key = $this->_getKey($siteUri, true);
+            $key = $this->getKey($siteUri, true);
             $value = gzencode($value);
         }
 
-        $this->_cache->set($key, $value, $duration);
+        $this->cache->set($key, $value, $duration);
     }
 
     /**
@@ -120,12 +120,12 @@ class YiiCacheStorage extends BaseCacheStorage
             return;
         }
 
-        if ($this->_cache === null) {
+        if ($this->cache === null) {
             return;
         }
 
         foreach ($siteUris as $siteUri) {
-            $this->_delete($siteUri);
+            $this->delete($siteUri);
         }
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_URIS)) {
@@ -145,11 +145,11 @@ class YiiCacheStorage extends BaseCacheStorage
             return;
         }
 
-        if ($this->_cache === null) {
+        if ($this->cache === null) {
             return;
         }
 
-        $this->_cache->flush();
+        $this->cache->flush();
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_DELETE_ALL)) {
             $this->trigger(self::EVENT_AFTER_DELETE_ALL, $event);
@@ -170,7 +170,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * Returns a key from the site URI and an encoded boolean.
      */
-    private function _getKey(SiteUriModel $siteUri, bool $encoded = false): array
+    private function getKey(SiteUriModel $siteUri, bool $encoded = false): array
     {
         // Cast the site ID to an integer to avoid an incorrect key
         // https://github.com/putyourlightson/craft-blitz/issues/257
@@ -186,15 +186,15 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * Returns a key’s value from the cache.
      */
-    private function _getFromCache(array $key): string
+    private function getFromCache(array $key): string
     {
-        if ($this->_cache === null) {
+        if ($this->cache === null) {
             return '';
         }
 
         // Redis cache can throw an exception if the connection is broken
         try {
-            $value = $this->_cache->get($key);
+            $value = $this->cache->get($key);
 
             if ($value) {
                 return $value;
@@ -209,9 +209,9 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * Deletes the cached values for a site URI.
      */
-    private function _delete(SiteUriModel $siteUri): void
+    private function delete(SiteUriModel $siteUri): void
     {
-        $this->_cache->delete($this->_getKey($siteUri));
-        $this->_cache->delete($this->_getKey($siteUri, true));
+        $this->cache->delete($this->getKey($siteUri));
+        $this->cache->delete($this->getKey($siteUri, true));
     }
 }

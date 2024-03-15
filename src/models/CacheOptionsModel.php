@@ -11,9 +11,6 @@ use craft\helpers\ConfigHelper;
 use craft\validators\DateTimeValidator;
 use DateTime;
 
-/**
- * @property-read null|int $cacheDuration
- */
 class CacheOptionsModel extends Model
 {
     /**
@@ -76,7 +73,7 @@ class CacheOptionsModel extends Model
     /**
      * @var int|null
      */
-    private ?int $_cacheDuration = null;
+    private ?int $cacheDuration = null;
 
     /**
      * @inheritdoc
@@ -110,7 +107,7 @@ class CacheOptionsModel extends Model
      */
     public function getCacheDuration(): ?int
     {
-        return $this->_cacheDuration;
+        return $this->cacheDuration;
     }
 
     /**
@@ -190,7 +187,7 @@ class CacheOptionsModel extends Model
         $cacheDuration = ConfigHelper::durationInSeconds($value);
 
         if ($cacheDuration > 0) {
-            $this->_cacheDuration = $cacheDuration;
+            $this->cacheDuration = $cacheDuration;
 
             $timestamp = $cacheDuration + time();
 
