@@ -481,7 +481,7 @@ class SettingsModel extends Model
     /**
      * The position in the HTML of the script inject.
      */
-    public string $injectScriptPosition = View::POS_END;
+    public int $injectScriptPosition = View::POS_END;
 
     /**
      * @inheritdoc
