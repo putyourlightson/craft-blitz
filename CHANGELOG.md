@@ -6,6 +6,10 @@
 
 - Added a new `injectScriptPosition` config setting that determines the position in the HTML in which to output the injected script ([#636](https://github.com/putyourlightson/craft-blitz/issues/636)).
 
+### Changed
+
+- The Local Generator now uses the `bootstrap.php` file in the project root, if it exists.
+
 ## 4.13.1 - 2024-03-12
 
 ### Changed
