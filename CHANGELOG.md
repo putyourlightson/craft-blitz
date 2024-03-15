@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.13.2 - Unreleased
+
+### Added
+
+- Added a new `injectScriptPosition` config setting that determines the position in the HTML in which to output the injected script ([#636](https://github.com/putyourlightson/craft-blitz/issues/636)).
+
 ## 4.13.1 - 2024-03-12
 
 ### Changed

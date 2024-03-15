@@ -8,7 +8,6 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
-use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
@@ -17,6 +16,7 @@ use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
+use yii\web\View;
 
 class SettingsModel extends Model
 {
@@ -479,7 +479,7 @@ class SettingsModel extends Model
     public string $injectScriptEvent = 'DOMContentLoaded';
 
     /**
-     * The position in the HTML of the script inject.
+     * The position in the HTML of the injected script.
      */
     public int $injectScriptPosition = View::POS_END;
 
