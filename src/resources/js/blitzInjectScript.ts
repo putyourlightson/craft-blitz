@@ -1,5 +1,5 @@
 // The event name will be replaced with the `injectScriptEvent` config setting.
-document.addEventListener('{injectScriptEvent}', injectElements);
+document.addEventListener('{injectScriptEvent}', injectElements, { once: true });
 
 interface InjectElement {
     element: Element;
