@@ -6,12 +6,19 @@
 
 - Added suggesting the use of the `eagerly()` function to lazy-loaded element queries in the Blitz Hints utility.
 - Added a template stack trace to the Blitz Hints utility.
+- Added a new `injectScriptPosition` config setting that determines the position in the HTML in which to output the injected script ([#636](https://github.com/putyourlightson/craft-blitz/issues/636)).
 
 ### Changed
 
 - The Blitz Hints utility is now powered by Sprig, no longer tracks route variable hints and no longer requires an external package.
 - Elements that are propagating are no longer ignored from the cache refresh process ([#631](https://github.com/putyourlightson/craft-blitz/issues/631)).
 - Changed the default branch in the Git Deployer to `main`.
+- The template stack trace in the Blitz Hints utility is now updated if different for the same field-template combination.
+- The Local Generator now uses the `bootstrap.php` file in the project root, if it exists.
+
+### Fixed
+
+- Fixed a bug in the Blitz Hints utility that could throw an error when conditional variables were used in an `extends` tag ([#632](https://github.com/putyourlightson/craft-blitz/issues/632)).
 
 ## 5.0.0-beta.1 - 2024-02-14
 
