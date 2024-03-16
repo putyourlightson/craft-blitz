@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-document.addEventListener('{injectScriptEvent}', injectElements);
+document.addEventListener('{injectScriptEvent}', injectElements, { once: true });
 function injectElements() {
     return __awaiter(this, void 0, void 0, function* () {
         if (!document.dispatchEvent(new CustomEvent('beforeBlitzInjectAll', {

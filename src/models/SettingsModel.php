@@ -16,6 +16,7 @@ use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
+use yii\web\View;
 
 class SettingsModel extends Model
 {
@@ -462,6 +463,11 @@ class SettingsModel extends Model
      * The name of the JavaScript event that will trigger a script inject.
      */
     public string $injectScriptEvent = 'DOMContentLoaded';
+
+    /**
+     * The position in the HTML of the injected script.
+     */
+    public int $injectScriptPosition = View::POS_END;
 
     /**
      * @inheritdoc

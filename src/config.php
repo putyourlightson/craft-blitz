@@ -273,5 +273,8 @@ return [
 
         // The name of the JavaScript event that will trigger a script inject.
         //'injectScriptEvent' => 'DOMContentLoaded',
+
+        // The position in the HTML of the injected script.
+        //'injectScriptPosition' => yii\web\View::POS_END,
     ],
 ];
