@@ -10,6 +10,10 @@
 
 - The Local Generator now uses the `bootstrap.php` file in the project root, if it exists.
 
+### Fixed
+
+- Fixed an SQL error that could occur when too many site URIs were being expired at once during the refresh cache process ([#639](https://github.com/putyourlightson/craft-blitz/issues/639)).
+
 ## 4.13.1 - 2024-03-12
 
 ### Changed

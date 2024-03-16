@@ -392,16 +392,25 @@ class SiteUriHelper
             return [];
         }
 
-        $condition = ['or'];
+        $cacheIdSets = [];
 
-        foreach ($siteUris as $siteUri) {
-            $condition[] = $siteUri->toArray();
+        // Chunk the site URIs to avoid exceeding the maximum parameter limit.
+        // https://github.com/putyourlightson/craft-blitz/issues/639
+        $siteUriChunks = array_chunk($siteUris, 10000);
+        foreach ($siteUriChunks as $siteUris) {
+            $condition = ['or'];
+
+            foreach ($siteUris as $siteUri) {
+                $condition[] = $siteUri->toArray();
+            }
+
+            $cacheIdSets[] = CacheRecord::find()
+                ->select('id')
+                ->where($condition)
+                ->column();
         }
 
-        return CacheRecord::find()
-            ->select('id')
-            ->where($condition)
-            ->column();
+        return array_merge(...$cacheIdSets);
     }
 
     /**
