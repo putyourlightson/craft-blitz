@@ -63,23 +63,11 @@ class ElementTypeHelper
     /**
      * @var string[]|null
      */
-<<<<<<< HEAD
-    private static ?array $sourceIdAttributes = null;
-=======
-    private static ?array $nonCacheableElementTypes = null;
->>>>>>> develop-v4
-
-    /**
-     * @var string[]|null
-     */
-<<<<<<< HEAD
-=======
     private static ?array $sourceIdAttributes = null;
 
     /**
      * @var string[]|null
      */
->>>>>>> develop-v4
     private static ?array $liveStatuses = null;
 
     /**
