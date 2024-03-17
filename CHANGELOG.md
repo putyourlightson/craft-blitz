@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added batching to generate cache jobs.
+- Added batchable generate cache jobs ([#537](https://github.com/putyourlightson/craft-blitz/issues/537)).
 - Added a new `injectScriptPosition` config setting that determines the position in the HTML in which to output the injected script ([#636](https://github.com/putyourlightson/craft-blitz/issues/636)).
 
 ### Changed
