@@ -58,7 +58,7 @@ class LocalGenerator extends BaseCacheGenerator
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
         $urls = $this->getUrlsToGenerate($siteUris);
-        $pages = $this->getPageCount($siteUris);
+        $total = count($siteUris);
         $count = 0;
 
         $config = [
@@ -72,7 +72,7 @@ class LocalGenerator extends BaseCacheGenerator
         $promise = \Amp\Sync\ConcurrentIterator\each(
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
-            function(string $url) use ($setProgressHandler, &$count, $pages, $config) {
+            function(string $url) use ($setProgressHandler, &$count, $total, $config) {
                 if ($this->isPageUrl($url)) {
                     $count++;
                 }
@@ -91,7 +91,7 @@ class LocalGenerator extends BaseCacheGenerator
                 }
 
                 if (is_callable($setProgressHandler)) {
-                    $this->callProgressHandler($setProgressHandler, $count, $pages);
+                    $this->callProgressHandler($setProgressHandler, $count, $total);
                 }
             }
         );

@@ -86,7 +86,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         $siteUris = $event->siteUris;
 
         if ($queue) {
-            CacheGeneratorHelper::addGeneratorJob($siteUris, 'generateUrisWithProgress');
+            CacheGeneratorHelper::addGeneratorJob($siteUris);
         } else {
             $this->generateUrisWithProgress($siteUris, $setProgressHandler);
         }
@@ -226,26 +226,6 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         }
 
         return $siteOptions;
-    }
-
-    /**
-     * Returns the number of pages (not includes) in the provided site URIs.
-     *
-     * @param SiteUriModel[]|array[] $siteUris
-     * @return int
-     */
-    protected function getPageCount(array $siteUris): int
-    {
-        $count = 0;
-
-        foreach ($siteUris as $siteUri) {
-            $uri = is_array($siteUri) ? $siteUri['uri'] : $siteUri->uri;
-            if (!str_starts_with($uri, CacheRequestService::CACHED_INCLUDE_PATH)) {
-                $count++;
-            }
-        }
-
-        return $count;
     }
 
     /**

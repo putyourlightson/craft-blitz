@@ -8,9 +8,11 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\SavableComponent;
 use craft\events\RegisterComponentTypesEvent;
+use craft\helpers\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
 use putyourlightson\blitz\drivers\generators\LocalGenerator;
+use putyourlightson\blitz\jobs\GenerateCacheJob;
 use yii\base\Event;
 
 class CacheGeneratorHelper extends BaseDriverHelper
@@ -63,11 +65,21 @@ class CacheGeneratorHelper extends BaseDriverHelper
     /**
      * Adds a generator job to the queue.
      */
-    public static function addGeneratorJob(array $siteUris, string $driverMethod, int $priority = null): void
+    public static function addGeneratorJob(array $siteUris, int $priority = null): void
     {
         $description = Craft::t('blitz', 'Generating Blitz cache');
+        $siteUris = SiteUriHelper::getSiteUrisFlattenedToArrays($siteUris);
+        $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
 
-        self::addDriverJob($siteUris, self::DRIVER_ID, $driverMethod, $description, $priority);
+        $job = new GenerateCacheJob([
+            'siteUris' => $siteUris,
+            'description' => $description,
+        ]);
+        Queue::push(
+            job: $job,
+            priority: $priority,
+            queue: Blitz::$plugin->queue,
+        );
     }
 
     /**
