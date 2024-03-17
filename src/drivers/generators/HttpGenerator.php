@@ -55,7 +55,7 @@ class HttpGenerator extends BaseCacheGenerator
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
         $urls = $this->getUrlsToGenerate($siteUris);
-        $pages = $this->getPageCount($siteUris);
+        $total = count($siteUris);
         $count = 0;
 
         $client = HttpClientBuilder::buildDefault();
@@ -65,7 +65,7 @@ class HttpGenerator extends BaseCacheGenerator
         $promise = \Amp\Sync\ConcurrentIterator\each(
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
-            function(string $url) use ($setProgressHandler, &$count, $pages, $client) {
+            function(string $url) use ($setProgressHandler, &$count, $total, $client) {
                 if ($this->isPageUrl($url)) {
                     $count++;
                 }
@@ -84,7 +84,7 @@ class HttpGenerator extends BaseCacheGenerator
                     }
 
                     if (is_callable($setProgressHandler)) {
-                        $this->callProgressHandler($setProgressHandler, $count, $pages);
+                        $this->callProgressHandler($setProgressHandler, $count, $total);
                     }
                 } catch (HttpException $exception) {
                     Blitz::$plugin->log($exception->getMessage() . ' [' . $url . ']', [], Logger::LEVEL_ERROR);

@@ -572,4 +572,22 @@ class SiteUriHelper
 
         return $groupedSiteUris;
     }
+
+    /**
+     * Returns site URIs flattened to arrays.
+     *
+     * @since 4.14.0
+     */
+    public static function getSiteUrisFlattenedToArrays(array $siteUris): array
+    {
+        $flatennedSiteUris = [];
+
+        foreach ($siteUris as $siteUri) {
+            if ($siteUri instanceof SiteUriModel) {
+                $flatennedSiteUris[] = $siteUri->toArray();
+            }
+        }
+
+        return $flatennedSiteUris;
+    }
 }

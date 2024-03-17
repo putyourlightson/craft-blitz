@@ -1,13 +1,15 @@
 # Release Notes for Blitz
 
-## 4.13.2 - Unreleased
+## 4.14.0 - Unreleased
 
 ### Added
 
+- Added batching to generate cache jobs.
 - Added a new `injectScriptPosition` config setting that determines the position in the HTML in which to output the injected script ([#636](https://github.com/putyourlightson/craft-blitz/issues/636)).
 
 ### Changed
 
+- Campaign now requires Craft CMS 4.4.0 or later.
 - The Local Generator now uses the `bootstrap.php` file in the project root, if it exists.
 
 ### Fixed
