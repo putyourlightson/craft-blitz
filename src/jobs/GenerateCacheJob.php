@@ -27,8 +27,6 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
      */
     private Queue $queue;
 
-    public int $batchSize = 1;
-
     /**
      * @inheritdoc
      */
