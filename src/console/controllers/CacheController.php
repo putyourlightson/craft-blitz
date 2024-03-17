@@ -278,14 +278,14 @@ class CacheController extends Controller
      */
     public function actionRefresh(): int
     {
-        $generateOnRefresh = Blitz::$plugin->settings->generateOnRefresh();
+        $generateOnRefresh = Blitz::$plugin->settings->shouldGenerateOnRefresh();
 
         // Get site URIs to generate before flushing the cache
         if ($generateOnRefresh) {
             $siteUris = SiteUriHelper::getAllSiteUrisWithCustomSiteUris();
         }
 
-        if (Blitz::$plugin->settings->clearOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
             // Release jobs, since we’re anyway clearing the cache.
             Blitz::$plugin->refreshCache->releaseJobs();
 
@@ -294,7 +294,7 @@ class CacheController extends Controller
             $this->purgeCache();
         }
 
-        if (Blitz::$plugin->settings->expireOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldExpireOnRefresh()) {
             $this->expireCache();
         }
 
@@ -303,7 +303,7 @@ class CacheController extends Controller
             $this->deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeAfterRefresh()) {
+        if (Blitz::$plugin->settings->shouldPurgeAfterRefresh()) {
             $this->purgeCache();
         }
 
@@ -342,22 +342,22 @@ class CacheController extends Controller
         // Get site URIs to generate before flushing the cache
         $siteUris = SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId);
 
-        if (Blitz::$plugin->settings->clearOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
             $this->clearCache($siteUris);
             $this->flushCache($siteUris, true);
             $this->purgeCache($siteUris);
         }
 
-        if (Blitz::$plugin->settings->expireOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldExpireOnRefresh()) {
             $this->expireCache($siteUris);
         }
 
-        if (Blitz::$plugin->settings->generateOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
             $this->generateCache($siteUris);
             $this->deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeAfterRefresh()) {
+        if (Blitz::$plugin->settings->shouldPurgeAfterRefresh()) {
             $this->purgeCache($siteUris);
         }
 

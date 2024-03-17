@@ -157,7 +157,7 @@ class SiteUriHelper
 
         foreach ($siteUris as $siteUri) {
             if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
-                && Blitz::$plugin->settings->generatePageBasedOnQueryString($siteUri->uri)
+                && Blitz::$plugin->settings->shouldGeneratePageBasedOnQueryString($siteUri->uri)
             ) {
                 $cacheableSiteUris[] = $siteUri;
             }
@@ -195,7 +195,7 @@ class SiteUriHelper
 
         foreach ($customSiteUris as $siteUri) {
             if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
-                && Blitz::$plugin->settings->generatePageBasedOnQueryString($siteUri->uri)
+                && Blitz::$plugin->settings->shouldGeneratePageBasedOnQueryString($siteUri->uri)
             ) {
                 $cacheableSiteUris[] = $siteUri;
             }

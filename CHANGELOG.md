@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.13.2 - Unreleased
+## 4.14.0 - Unreleased
 
 ### Added
 
@@ -13,6 +13,15 @@
 ### Fixed
 
 - Fixed an SQL error that could occur when too many site URIs were being expired at once during the refresh cache process ([#639](https://github.com/putyourlightson/craft-blitz/issues/639)).
+
+### Deprecated
+
+- Deprecated the `SettingsModel::clearOnRefresh` method. Use `SettingsModel::shouldClearOnRefresh` instead.
+- Deprecated the `SettingsModel::expireOnRefresh` method. Use `SettingsModel::shouldExpireOnRefresh` instead.
+- Deprecated the `SettingsModel::generateOnRefresh` method. Use `SettingsModel::shouldGenerateOnRefresh` instead.
+- Deprecated the `SettingsModel::purgeAfterRefresh` method. Use `SettingsModel::shouldPurgeAfterRefresh` instead.
+- Deprecated the `SettingsModel::generatePageBasedOnQueryString` method. Use `SettingsModel::shouldGeneratePageBasedOnQueryString` instead.
+- Deprecated the `SettingsModel::purgeAssetImages` method. Use `SettingsModel::shouldPurgeAssetImages` instead.
 
 ## 4.13.1 - 2024-03-12
 

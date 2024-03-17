@@ -62,7 +62,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         $this->populateCacheIdsFromElementCaches($refreshData);
 
-        $clearCache = Blitz::$plugin->settings->clearOnRefresh($this->forceClear);
+        $clearCache = Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear);
 
         // If clear cache is enabled then clear the site URIs early
         if ($clearCache) {
@@ -87,7 +87,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         $siteUris = array_unique($siteUris, SORT_REGULAR);
         $purgeSiteUris = [];
 
-        if (Blitz::$plugin->settings->purgeAssetImages()) {
+        if (Blitz::$plugin->settings->shouldPurgeAssetImages()) {
             // Purge assets whose image has changed
             $assetIds = $refreshData->getAssetsChangedByFile();
             $purgeSiteUris = SiteUriHelper::getAssetSiteUris($assetIds);
