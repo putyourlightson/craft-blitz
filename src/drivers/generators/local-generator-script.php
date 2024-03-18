@@ -27,10 +27,9 @@ return function(Channel $channel): Generator {
     $webroot = $config['webroot'];
     $pathParam = $config['pathParam'];
 
+    $https = parse_url($url, PHP_URL_SCHEME) === 'https';
     $queryString = parse_url($url, PHP_URL_QUERY);
     parse_str($queryString, $queryStringParams);
-
-    $https = parse_url($url, PHP_URL_SCHEME) === 'https';
 
     /**
      * Mock a web server request

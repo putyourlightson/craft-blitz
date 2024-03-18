@@ -11,6 +11,7 @@
 
 - Campaign now requires Craft CMS 4.4.0 or later.
 - The Local Generator now uses the `bootstrap.php` file in the project root, if it exists.
+- The Local Generator now sets the server port according to the HTTP protocol.
 
 ### Fixed
 
