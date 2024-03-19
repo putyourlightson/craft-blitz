@@ -361,7 +361,7 @@ class DiagnosticsHelper
         $tests[] = [
             'pass' => $pass,
             'message' => $message,
-            'info' => '<a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>',
+            'info' => 'With the <code>refreshCacheWhenElementSavedUnchanged</code> config setting disabled, cached pages are refreshed only when an element is saved and its content changed. This is recommended and should only be enabled with good reason, as it can cause more refresh cache jobs to be created than necessary.',
         ];
 
         /**
