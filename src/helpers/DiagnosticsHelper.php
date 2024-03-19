@@ -400,7 +400,7 @@ class DiagnosticsHelper
          */
         $globalSetCount = GlobalSet::find()->count();
         if ($globalSetCount > 0) {
-            $pass = $settings->refreshCacheAutomaticallyForGlobals;
+            $pass = (false === $settings->refreshCacheAutomaticallyForGlobals);
             if ($pass) {
                 $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
                 <code>refreshCacheAutomaticallyForGlobals</code> is disabled.';
