@@ -12,7 +12,6 @@ use Amp\Sync\LocalSemaphore;
 use Craft;
 use putyourlightson\blitz\Blitz;
 use Throwable;
-use yii\log\Logger;
 
 use function Amp\Iterator\fromIterable;
 use function Amp\Promise\wait;
@@ -39,7 +38,7 @@ class HttpGenerator extends BaseCacheGenerator
     /**
      * @var int The timeout for requests in milliseconds.
      */
-    public int $timeout = 120000;
+    public int $timeout = 60000;
 
     /**
      * @inheritdoc
@@ -76,18 +75,21 @@ class HttpGenerator extends BaseCacheGenerator
 
                     if ($response->getStatus() === 200) {
                         $this->generated++;
+                        $this->outputVerbose($url);
                     } else {
                         Blitz::$plugin->debug('{status} error: {reason}', [
                             'status' => $response->getStatus(),
                             'reason' => $response->getReason(),
                         ], $url);
+                        $this->outputVerbose($url, false);
                     }
 
                     if (is_callable($setProgressHandler)) {
                         $this->callProgressHandler($setProgressHandler, $count, $total);
                     }
                 } catch (HttpException $exception) {
-                    Blitz::$plugin->log($exception->getMessage() . ' [' . $url . ']', [], Logger::LEVEL_ERROR);
+                    Blitz::$plugin->debug($exception->getMessage());
+                    $this->outputVerbose($url, false);
                 }
             }
         );

@@ -4,12 +4,9 @@
  */
 
 use Amp\Parallel\Sync\Channel;
-use Amp\Parallel\Sync\ContextPanicError;
 use craft\services\Plugins;
 use craft\web\View;
-use putyourlightson\blitz\Blitz;
 use yii\base\Event;
-use yii\log\Logger;
 
 /**
  * This script bootstraps a web app and mocks a web request. It is called by the
@@ -102,17 +99,7 @@ return function(Channel $channel): Generator {
      */
     $app = require $root . '/vendor/craftcms/cms/bootstrap/web.php';
 
-    try {
-        $success = $app->run() == 0;
-    } catch (ContextPanicError $error) {
-        Blitz::$plugin->log($error->getMessage());
-        Blitz::$plugin->log($error->getTraceAsString());
-        Blitz::$plugin->log($error->getOriginalTraceAsString());
-        $success = 1;
-    } catch (Throwable $exception) {
-        Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
-        $success = 1;
-    }
+    $success = $app->run() === 0;
 
     yield $channel->send($success);
 };

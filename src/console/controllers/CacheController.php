@@ -18,9 +18,14 @@ use yii\helpers\BaseConsole;
 class CacheController extends Controller
 {
     /**
-     * @var bool Whether jobs should be queued only and not run
+     * @var bool Whether jobs should be only queued and not run.
      */
     public bool $queue = false;
+
+    /**
+     * @var bool Whether verbose output should be enabled.
+     */
+    public bool $verbose = false;
 
     /**
      * @inheritdoc
@@ -29,6 +34,7 @@ class CacheController extends Controller
     {
         $options = parent::options($actionID);
         $options[] = 'queue';
+        $options[] = 'verbose';
 
         return $options;
     }
@@ -431,7 +437,9 @@ class CacheController extends Controller
      */
     public function setProgressHandler(int $count, int $total): void
     {
-        Console::updateProgress($count, $total);
+        if ($this->verbose === false) {
+            Console::updateProgress($count, $total);
+        }
     }
 
     private function clearCache(array $siteUris = null): void
@@ -514,15 +522,22 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Generating Blitz cache...') . PHP_EOL, BaseConsole::FG_YELLOW);
 
-        Console::startProgress(0, count($siteUris), '', 0.8);
+        if ($this->verbose === false) {
+            Console::startProgress(0, count($siteUris), '', 0.8);
+        }
+
+        Blitz::$plugin->cacheGenerator->verbose = $this->verbose;
         Blitz::$plugin->cacheGenerator->generateUris($siteUris, [$this, 'setProgressHandler'], false);
-        Console::endProgress();
+
+        if ($this->verbose === false) {
+            Console::endProgress();
+        }
 
         $generated = Blitz::$plugin->cacheGenerator->generated;
         $total = count($siteUris);
 
         if ($generated < $total) {
-            $this->stdout(Craft::t('blitz', 'Generated {generated} of {total} total possible pages and includes. To see why some pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['generated' => $generated, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
+            $this->stdout(Craft::t('blitz', 'Generated {generated} of {total} total possible pages and includes. To see why some pages were not cached, enable the `debug` config setting or use the `debug` flag and then open the Blitz log (in `storage/logs/blitz-****.log`, for example).', ['generated' => $generated, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
         }
 
         $this->output('Blitz cache generation complete.');

@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\drivers\generators;
 
 use Amp\Sync\LocalSemaphore;
+use Amp\TimeoutCancellationToken;
 use Craft;
 use putyourlightson\blitz\Blitz;
 use Throwable;
@@ -39,10 +40,9 @@ class LocalGenerator extends BaseCacheGenerator
     public int $concurrency = 3;
 
     /**
-     * @var int The timeout for requests in milliseconds. This has no effect
-     * except to prevent errors when the cache generator config setting exists.
+     * @var int The timeout for requests in milliseconds.
      */
-    public int $timeout = 0;
+    public int $timeout = 60000;
 
     /**
      * @inheritdoc
@@ -82,12 +82,35 @@ class LocalGenerator extends BaseCacheGenerator
                 // Create a context to send data between the parent and child processes
                 // https://amphp.org/parallel/processes#parent-process
                 $context = create(__DIR__ . '/local-generator-script.php');
+
+                // Create and subscribe a timeout.
+                $canceller = new TimeoutCancellationToken($this->timeout);
+                $cancellerId = $canceller->subscribe(function() use ($url, $context) {
+                    $message = 'Local generator request timed out.';
+                    Blitz::$plugin->debug($message, [], $url);
+                    $this->outputVerbose($url, false);
+
+                    $context->kill();
+                });
+
                 yield $context->start();
                 yield $context->send($config);
-                $result = yield $context->receive();
+
+                try {
+                    $result = yield $context->receive();
+                } catch (Throwable $exception) {
+                    Blitz::$plugin->debug($this->getAllExceptionMessages($exception), [], $url);
+                    $result = false;
+                }
+
+                // Unsubscribe the timeout.
+                $canceller->unsubscribe($cancellerId);
 
                 if ($result) {
                     $this->generated++;
+                    $this->outputVerbose($url);
+                } else {
+                    $this->outputVerbose($url, false);
                 }
 
                 if (is_callable($setProgressHandler)) {

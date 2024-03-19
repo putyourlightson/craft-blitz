@@ -6,12 +6,15 @@
 
 - Added batchable generate cache jobs ([#537](https://github.com/putyourlightson/craft-blitz/issues/537)).
 - Added a new `injectScriptPosition` config setting that determines the position in the HTML in which to output the injected script ([#636](https://github.com/putyourlightson/craft-blitz/issues/636)).
+- Added a verbose output mode to `blitz/cache` console commands that can be activated by adding a `--verbose` flag ([#642](https://github.com/putyourlightson/craft-blitz/issues/642)).
+- Added a default timeout of 60 seconds to the Local Generator.
 
 ### Changed
 
 - Campaign now requires Craft CMS 4.4.0 or later.
 - The Local Generator now uses the `bootstrap.php` file in the project root, if it exists.
 - The Local Generator now sets the server port according to the HTTP protocol.
+- Changed the default timeout of the HTTP Generator to 60 seconds.
 
 ### Fixed
 

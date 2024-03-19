@@ -195,6 +195,8 @@ class Blitz extends Plugin
         $message = Craft::t('blitz', $message, $params);
 
         if ($url) {
+            $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
+            $url = preg_replace('/[?&]' . $tokenParam . '.*/', '', $url);
             $message .= ' [' . $url . ']';
         }
 
