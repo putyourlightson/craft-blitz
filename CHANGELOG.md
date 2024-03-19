@@ -5,6 +5,7 @@
 ### Added
 
 - Added batchable generate cache jobs ([#537](https://github.com/putyourlightson/craft-blitz/issues/537)).
+- Added a new `refreshCacheEnabled` config setting that determines whether cached pages are refreshed whenever content changes or an integration triggers it.
 - Added a new `injectScriptPosition` config setting that determines the position in the HTML in which to output the injected script ([#636](https://github.com/putyourlightson/craft-blitz/issues/636)).
 - Added a verbose output mode to `blitz/cache` console commands that can be activated by adding a `--verbose` flag ([#642](https://github.com/putyourlightson/craft-blitz/issues/642)).
 - Added a default timeout of 60 seconds to the Local Generator.

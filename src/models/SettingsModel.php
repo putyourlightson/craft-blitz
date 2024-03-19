@@ -81,6 +81,11 @@ class SettingsModel extends Model
     public bool $cachingEnabled = false;
 
     /**
+     * With this setting enabled, Blitz will refresh cached pages whenever content changes or an integration triggers it. Disable this setting to prevent Blitz from refreshing cached pages.
+     */
+    public bool $refreshCacheEnabled = true;
+
+    /**
      * Determines when and how the cache should be refreshed.
      *
      * - `self::REFRESH_MODE_CLEAR_AND_GENERATE`: Clear the cache and regenerate in a queue job

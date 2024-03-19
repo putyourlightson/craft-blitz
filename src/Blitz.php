@@ -139,11 +139,13 @@ class Blitz extends Plugin
 
         // Register events
         $this->registerCacheableRequestEvents();
-        $this->registerElementEvents();
-        $this->registerResaveElementEvents();
-        $this->registerStructureEvents();
-        $this->registerIntegrationEvents();
         $this->registerClearCaches();
+        if ($this->settings->refreshCacheEnabled) {
+            $this->registerElementEvents();
+            $this->registerResaveElementEvents();
+            $this->registerStructureEvents();
+            $this->registerIntegrationEvents();
+        }
 
         // Register control panel events
         if (Craft::$app->getRequest()->getIsCpRequest()) {
