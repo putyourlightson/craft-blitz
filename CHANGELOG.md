@@ -16,6 +16,7 @@
 ### Fixed
 
 - Fixed an SQL error that could occur when too many site URIs were being expired at once during the refresh cache process ([#639](https://github.com/putyourlightson/craft-blitz/issues/639)).
+- Fixed minor bugs and typos in the recommendations provided in the Blitz Diagnostics utility ([#641](https://github.com/putyourlightson/craft-blitz/issues/641)).
 
 ### Deprecated
 

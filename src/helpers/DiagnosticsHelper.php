@@ -361,7 +361,7 @@ class DiagnosticsHelper
         $tests[] = [
             'pass' => $pass,
             'message' => $message,
-            'info' => 'With the <code>refreshCacheWhenElementSavedUnchanged</code> config setting disabled, cached pages are refreshed only when an element is saved and its content changed. This is recommended and should only be enabled with good reason, as it can cause more refresh cache jobs to be created than necessary.',
+            'info' => 'With the <code>refreshCacheWhenElementSavedUnchanged</code> config setting disabled, cached pages are refreshed only when an element is saved and its content has changed. This is recommended and should only be enabled with good reason, as it can cause more refresh cache jobs to be created than necessary.',
         ];
 
         /**
@@ -400,7 +400,7 @@ class DiagnosticsHelper
          */
         $globalSetCount = GlobalSet::find()->count();
         if ($globalSetCount > 0) {
-            $pass = (false === $settings->refreshCacheAutomaticallyForGlobals);
+            $pass = $settings->refreshCacheAutomaticallyForGlobals === false;
             if ($pass) {
                 $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
                 <code>refreshCacheAutomaticallyForGlobals</code> is disabled.';
