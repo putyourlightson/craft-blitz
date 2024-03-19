@@ -500,9 +500,9 @@ class DiagnosticsHelper
         $now = new DateTime();
         $pass = $refreshExpired !== null && $refreshExpired > $now->modify('-24 hours');
         if ($pass) {
-            $message = 'The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.';
-        } else {
             $message = 'The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.';
+        } else {
+            $message = 'The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.';
         }
         $tests[] = [
             'pass' => $pass,
