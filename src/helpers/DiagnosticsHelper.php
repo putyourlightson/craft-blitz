@@ -361,7 +361,7 @@ class DiagnosticsHelper
         $tests[] = [
             'pass' => $pass,
             'message' => $message,
-            'info' => '<a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>',
+            'info' => 'With the <code>refreshCacheWhenElementSavedUnchanged</code> config setting disabled, cached pages are refreshed only when an element is saved and its content changed. This is recommended and should only be enabled with good reason, as it can cause more refresh cache jobs to be created than necessary.',
         ];
 
         /**
@@ -400,10 +400,10 @@ class DiagnosticsHelper
          */
         $globalSetCount = GlobalSet::find()->count();
         if ($globalSetCount > 0) {
-            $pass = $settings->refreshCacheAutomaticallyForGlobals;
+            $pass = (false === $settings->refreshCacheAutomaticallyForGlobals);
             if ($pass) {
                 $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
-                <code>refreshCacheAutomaticallyForGlobals</code> is diabled.';
+                <code>refreshCacheAutomaticallyForGlobals</code> is disabled.';
             } else {
                 $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
                 <code>refreshCacheAutomaticallyForGlobals</code> is enabled.';
@@ -500,9 +500,9 @@ class DiagnosticsHelper
         $now = new DateTime();
         $pass = $refreshExpired !== null && $refreshExpired > $now->modify('-24 hours');
         if ($pass) {
-            $message = 'The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.';
-        } else {
             $message = 'The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.';
+        } else {
+            $message = 'The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.';
         }
         $tests[] = [
             'pass' => $pass,
