@@ -403,7 +403,7 @@ class DiagnosticsHelper
             $pass = $settings->refreshCacheAutomaticallyForGlobals;
             if ($pass) {
                 $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
-                <code>refreshCacheAutomaticallyForGlobals</code> is diabled.';
+                <code>refreshCacheAutomaticallyForGlobals</code> is disabled.';
             } else {
                 $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
                 <code>refreshCacheAutomaticallyForGlobals</code> is enabled.';
