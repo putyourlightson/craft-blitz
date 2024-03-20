@@ -439,6 +439,11 @@ class SettingsModel extends Model
     public int $refreshCacheJobPriority = 10;
 
     /**
+     * The batch size to use for driver jobs that support batching.
+     */
+    public int $driverJobBatchSize = 100;
+
+    /**
      * The priority to give driver jobs (the lower the number, the higher the priority).
      */
     public int $driverJobPriority = 100;

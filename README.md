@@ -15,7 +15,7 @@ Blitz provides intelligent static page caching for creating lightning-fast sites
 
 ## Documentation
 
-Learn more and read the documentation at [putyourlightson.com/plugins/blitz →](https://putyourlightson.com/plugins/blitz)
+Learn more and read the documentation at [putyourlightson.com/plugins/blitz »](https://putyourlightson.com/plugins/blitz)
 
 ## License
 

@@ -251,6 +251,9 @@ return [
         // The priority to give the refresh cache job (the lower the number, the higher the priority). Set to `null` to inherit the default priority.
         //'refreshCacheJobPriority' => 10,
 
+        //The batch size to use for driver jobs that support batching.
+        //'driverJobBatchSize' => 100,
+
         // The priority to give driver jobs (the lower the number, the higher the priority). Set to `null` to inherit the default priority.
         //'driverJobPriority' => 100,
 

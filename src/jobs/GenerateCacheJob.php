@@ -30,6 +30,16 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
     /**
      * @inheritdoc
      */
+    public function init(): void
+    {
+        parent::init();
+
+        $this->batchSize = Blitz::$plugin->settings->driverJobBatchSize;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getTtr(): int
     {
         return Blitz::$plugin->settings->queueJobTtr;
