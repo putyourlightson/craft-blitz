@@ -354,7 +354,7 @@ class DiagnosticsHelper
          */
         $pass = $settings->refreshCacheWhenElementSavedUnchanged === false;
         if ($pass) {
-            $message = 'Blitz is not configured to refresh cached pages when an element is saved but unchanged.';
+            $message = 'Blitz is configured not to refresh cached pages when an element is saved but unchanged.';
         } else {
             $message = 'Blitz is configured to refresh cached pages when an element is saved but remains unchanged.';
         }
@@ -369,7 +369,7 @@ class DiagnosticsHelper
          */
         $pass = $settings->refreshCacheWhenElementSavedNotLive === false;
         if ($pass) {
-            $message = 'Blitz is not configured to refresh cached pages when an element is saved but not live.';
+            $message = 'Blitz is configured not to refresh cached pages when an element is saved but not live.';
         } else {
             $message = 'Blitz is configured to refresh cached pages when an element is saved but not live.';
         }
@@ -387,7 +387,7 @@ class DiagnosticsHelper
             $message = 'Image transforms are configured to be generated before page load.';
         } else {
             $pass = false;
-            $message = 'Image transforms are not configured to be generated before page load.';
+            $message = 'Image transforms are configured not to be generated before page load.';
         }
         $tests[] = [
             'pass' => $pass,
@@ -448,7 +448,7 @@ class DiagnosticsHelper
          */
         $pass = Craft::$app->getConfig()->getGeneral()->runQueueAutomatically === false;
         if ($pass) {
-            $message = 'Queue jobs are not configured to run automatically via web requests.';
+            $message = 'Queue jobs are configured not to run automatically via web requests.';
         } else {
             $message = 'Queue jobs are configured to run automatically via web requests.';
         }
