@@ -81,6 +81,11 @@ class SettingsModel extends Model
     public bool $cachingEnabled = false;
 
     /**
+     * With this setting enabled, Blitz will refresh cached pages whenever content changes or an integration triggers it. Disable this setting to prevent Blitz from refreshing cached pages.
+     */
+    public bool $refreshCacheEnabled = true;
+
+    /**
      * Determines when and how the cache should be refreshed.
      *
      * - `self::REFRESH_MODE_CLEAR_AND_GENERATE`: Clear the cache and regenerate in a queue job
@@ -420,6 +425,11 @@ class SettingsModel extends Model
     public int $refreshCacheJobPriority = 10;
 
     /**
+     * The batch size to use for driver jobs that support batching.
+     */
+    public int $driverJobBatchSize = 100;
+
+    /**
      * The priority to give driver jobs (the lower the number, the higher the priority).
      */
     public int $driverJobPriority = 100;
@@ -485,9 +495,9 @@ class SettingsModel extends Model
     /**
      * Returns whether the cache should be cleared on refresh.
      *
-     * @since 4.0.0
+     * @since 4.14.0
      */
-    public function clearOnRefresh(bool $force = false): bool
+    public function shouldClearOnRefresh(bool $force = false): bool
     {
         if ($force) {
             return true;
@@ -498,11 +508,22 @@ class SettingsModel extends Model
     }
 
     /**
+     * Returns whether the cache should be cleared on refresh.
+     *
+     * @since 4.0.0
+     * @deprecated in 4.14.0. Use [[shouldClearOnRefresh()]] instead.
+     */
+    public function clearOnRefresh(bool $force = false): bool
+    {
+        return $this->shouldClearOnRefresh($force);
+    }
+
+    /**
      * Returns whether the cache should be expired on refresh.
      *
-     * @since 4.8.0
+     * @since 4.14.0
      */
-    public function expireOnRefresh(bool $forceClear = false, bool $forceGenerate = false): bool
+    public function shouldExpireOnRefresh(bool $forceClear = false, bool $forceGenerate = false): bool
     {
         if ($forceClear || $forceGenerate) {
             return false;
@@ -517,11 +538,22 @@ class SettingsModel extends Model
     }
 
     /**
+     * Returns whether the cache should be expired on refresh.
+     *
+     * @since 4.8.0
+     * @deprecated in 4.14.0. Use [[shouldExpireOnRefresh()]] instead.
+     */
+    public function expireOnRefresh(bool $forceClear = false, bool $forceGenerate = false): bool
+    {
+        return $this->shouldExpireOnRefresh($forceClear, $forceGenerate);
+    }
+
+    /**
      * Returns whether the cache should be generated on refresh.
      *
-     * @since 4.0.0
+     * @since 4.14.0
      */
-    public function generateOnRefresh(bool $force = false): bool
+    public function shouldGenerateOnRefresh(bool $force = false): bool
     {
         if ($force) {
             return true;
@@ -536,22 +568,44 @@ class SettingsModel extends Model
     }
 
     /**
+     * Returns whether the cache should be generated on refresh.
+     *
+     * @since 4.0.0
+     * @deprecated in 4.14.0. Use [[shouldGenerateOnRefresh()]] instead.
+     */
+    public function generateOnRefresh(bool $force = false): bool
+    {
+        return $this->shouldGenerateOnRefresh($force);
+    }
+
+    /**
      * Returns whether the cache should be purged after being refreshed.
      *
      * @since 4.8.0
      */
+    public function shouldPurgeAfterRefresh(bool $forceClear = false): bool
+    {
+        return $this->shouldExpireOnRefresh($forceClear);
+    }
+
+    /**
+     * Returns whether the cache should be purged after being refreshed.
+     *
+     * @since 4.8.0
+     * @deprecated in 4.14.0. Use [[shouldPurgeAfterRefresh()]] instead.
+     */
     public function purgeAfterRefresh(bool $forceClear = false): bool
     {
-        return $this->expireOnRefresh($forceClear);
+        return $this->shouldPurgeAfterRefresh($forceClear);
     }
 
     /**
      * Returns whether the page should be generated based on whether a query
      * string exists in the URI.
      *
-     * @since 4.4.0
+     * @since 4.14.0
      */
-    public function generatePageBasedOnQueryString(string $uri): bool
+    public function shouldGeneratePageBasedOnQueryString(string $uri): bool
     {
         if ($this->generatePagesWithQueryStringParams === true) {
             return true;
@@ -566,13 +620,36 @@ class SettingsModel extends Model
     }
 
     /**
+     * Returns whether the page should be generated based on whether a query
+     * string exists in the URI.
+     *
+     * @since 4.4.0
+     * @deprecated in 4.14.0. Use [[shouldGeneratePageBasedOnQueryString()]] instead.
+     */
+    public function generatePageBasedOnQueryString(string $uri): bool
+    {
+        return $this->shouldGeneratePageBasedOnQueryString($uri);
+    }
+
+    /**
+     * Returns whether the cache should be purged after being generated.
+     *
+     * @since 4.14.0
+     */
+    public function shouldPurgeAssetImages(): bool
+    {
+        return $this->purgeAssetImagesWhenChanged && $this->cachePurgerType !== DummyPurger::class;
+    }
+
+    /**
      * Returns whether the cache should be purged after being generated.
      *
      * @since 4.4.0
+     * @deprecated in 4.14.0. Use [[shouldPurgeAssetImages()]] instead.
      */
     public function purgeAssetImages(): bool
     {
-        return $this->purgeAssetImagesWhenChanged && $this->cachePurgerType !== DummyPurger::class;
+        return $this->shouldPurgeAssetImages();
     }
 
     /**

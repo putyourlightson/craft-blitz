@@ -157,7 +157,7 @@ class SiteUriHelper
 
         foreach ($siteUris as $siteUri) {
             if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
-                && Blitz::$plugin->settings->generatePageBasedOnQueryString($siteUri->uri)
+                && Blitz::$plugin->settings->shouldGeneratePageBasedOnQueryString($siteUri->uri)
             ) {
                 $cacheableSiteUris[] = $siteUri;
             }
@@ -195,7 +195,7 @@ class SiteUriHelper
 
         foreach ($customSiteUris as $siteUri) {
             if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)
-                && Blitz::$plugin->settings->generatePageBasedOnQueryString($siteUri->uri)
+                && Blitz::$plugin->settings->shouldGeneratePageBasedOnQueryString($siteUri->uri)
             ) {
                 $cacheableSiteUris[] = $siteUri;
             }
@@ -279,19 +279,22 @@ class SiteUriHelper
 
         $siteUriModels = [];
 
-        /** @var array $siteUris */
-        $siteUris = CacheRecord::find()
-            ->select(['siteId', 'uri'])
-            ->where(['id' => $cacheIds])
-            ->orderBy([
-                'siteId' => SORT_ASC,
-                'uri' => SORT_ASC,
-            ])
-            ->asArray()
-            ->all();
+        $cacheIdChunks = self::getChunkedQueryParams($cacheIds);
+        foreach ($cacheIdChunks as $cacheIds) {
+            /** @var array $siteUris */
+            $siteUris = CacheRecord::find()
+                ->select(['siteId', 'uri'])
+                ->where(['id' => $cacheIds])
+                ->orderBy([
+                    'siteId' => SORT_ASC,
+                    'uri' => SORT_ASC,
+                ])
+                ->asArray()
+                ->all();
 
-        foreach ($siteUris as $siteUri) {
-            $siteUriModels[] = new SiteUriModel($siteUri);
+            foreach ($siteUris as $siteUri) {
+                $siteUriModels[] = new SiteUriModel($siteUri);
+            }
         }
 
         return $siteUriModels;
@@ -311,20 +314,23 @@ class SiteUriHelper
 
         $siteUriModels = [];
 
-        // Get the site URIs of the elements themselves
-        /** @var array $siteUris */
-        $siteUris = Element_SiteSettings::find()
-            ->select(['siteId', 'uri'])
-            ->where(['elementId' => $elementIds])
-            ->andWhere([
-                'not',
-                ['uri' => null],
-            ])
-            ->asArray()
-            ->all();
+        $elementIdChunks = self::getChunkedQueryParams($elementIds);
+        foreach ($elementIdChunks as $elementIds) {
+            // Get the site URIs of the elements themselves
+            /** @var array $siteUris */
+            $siteUris = Element_SiteSettings::find()
+                ->select(['siteId', 'uri'])
+                ->where(['elementId' => $elementIds])
+                ->andWhere([
+                    'not',
+                    ['uri' => null],
+                ])
+                ->asArray()
+                ->all();
 
-        foreach ($siteUris as $siteUri) {
-            $siteUriModels[] = new SiteUriModel($siteUri);
+            foreach ($siteUris as $siteUri) {
+                $siteUriModels[] = new SiteUriModel($siteUri);
+            }
         }
 
         return $siteUriModels;
@@ -345,34 +351,38 @@ class SiteUriHelper
         }
 
         $urls = [];
-        $assets = Asset::find()
-            ->id($elementIds)
-            ->all();
 
-        foreach ($assets as $asset) {
-            $url = $asset->getUrl();
-            $urls[] = $url;
+        $elementIdChunks = self::getChunkedQueryParams($elementIds);
+        foreach ($elementIdChunks as $elementIds) {
+            $assets = Asset::find()
+                ->id($elementIds)
+                ->all();
 
-            // Get all existing image transform URLs
-            if ($asset->kind === Asset::KIND_IMAGE) {
-                $indexes = (new Query())
-                    ->select([
-                        'filename',
-                        'transformString',
-                    ])
-                    ->from([Table::IMAGETRANSFORMINDEX])
-                    ->where([
-                        'assetId' => $asset->id,
-                        'fileExists' => true,
-                    ])
-                    ->all();
+            foreach ($assets as $asset) {
+                $url = $asset->getUrl();
+                $urls[] = $url;
 
-                foreach ($indexes as $index) {
-                    $urls[] = str_replace(
-                        $asset->getFilename(),
-                        $index['transformString'] . '/' . $asset->getFilename(),
-                        $url,
-                    );
+                // Get all existing image transform URLs
+                if ($asset->kind === Asset::KIND_IMAGE) {
+                    $indexes = (new Query())
+                        ->select([
+                            'filename',
+                            'transformString',
+                        ])
+                        ->from([Table::IMAGETRANSFORMINDEX])
+                        ->where([
+                            'assetId' => $asset->id,
+                            'fileExists' => true,
+                        ])
+                        ->all();
+
+                    foreach ($indexes as $index) {
+                        $urls[] = str_replace(
+                            $asset->getFilename(),
+                            $index['transformString'] . '/' . $asset->getFilename(),
+                            $url,
+                        );
+                    }
                 }
             }
         }
@@ -394,9 +404,7 @@ class SiteUriHelper
 
         $cacheIdSets = [];
 
-        // Chunk the site URIs to avoid exceeding the maximum parameter limit.
-        // https://github.com/putyourlightson/craft-blitz/issues/639
-        $siteUriChunks = array_chunk($siteUris, 10000);
+        $siteUriChunks = self::getChunkedQueryParams($siteUris, 2);
         foreach ($siteUriChunks as $siteUris) {
             $condition = ['or'];
 
@@ -571,5 +579,37 @@ class SiteUriHelper
         }
 
         return $groupedSiteUris;
+    }
+
+    /**
+     * Returns site URIs flattened to arrays.
+     *
+     * @since 4.14.0
+     */
+    public static function getSiteUrisFlattenedToArrays(array $siteUris): array
+    {
+        $flatennedSiteUris = [];
+
+        foreach ($siteUris as $siteUri) {
+            if ($siteUri instanceof SiteUriModel) {
+                $flatennedSiteUris[] = $siteUri->toArray();
+            }
+        }
+
+        return $flatennedSiteUris;
+    }
+
+    /**
+     * Returns a chunked array of query params, to avoid exceeding the maximum parameter limit.
+     * https://github.com/putyourlightson/craft-blitz/issues/639
+     *
+     * @since 4.14.0
+     */
+    private static function getChunkedQueryParams(array $items, int $paramsPerItem = 1): array
+    {
+        // Divide 65000 by the number of parameters per item to ensure we never go over the hard maximum parameter limit of 65535.
+        $chunkLength = (int)ceil(65000 / $paramsPerItem);
+
+        return array_chunk($items, $chunkLength);
     }
 }

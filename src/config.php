@@ -28,12 +28,15 @@ return [
         // With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.
         //'cachingEnabled' => false,
 
+        //With this setting enabled, Blitz will refresh cached pages whenever content changes or an integration triggers it. Disable this setting to prevent Blitz from refreshing cached pages.
+        //'refreshCacheEnabled' => true,
+
         // Determines when and how the cache should be refreshed.
-        // - `3`: Clear the cache and regenerate in a queue job
-        // - `2`: Expire the cache and regenerate in a queue job
-        // - `1`: Clear the cache, regenerate manually or organically
-        // - `0`: Expire the cache, regenerate manually or organically*
-        //'refreshMode' => 3,
+        // `\putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE`: Clear the cache and regenerate in a queue job
+        // `\putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE`: Expire the cache and regenerate in a queue job
+        // `\putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_CLEAR`: Clear the cache, regenerate manually or organically
+        // `\putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_EXPIRE`: Expire the cache, regenerate manually or organically*
+        //'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE,
 
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
         //'includedUriPatterns' => [
@@ -247,6 +250,9 @@ return [
 
         // The priority to give the refresh cache job (the lower the number, the higher the priority). Set to `null` to inherit the default priority.
         //'refreshCacheJobPriority' => 10,
+
+        //The batch size to use for driver jobs that support batching.
+        //'driverJobBatchSize' => 100,
 
         // The priority to give driver jobs (the lower the number, the higher the priority). Set to `null` to inherit the default priority.
         //'driverJobPriority' => 100,

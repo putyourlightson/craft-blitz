@@ -365,21 +365,21 @@ class RefreshCacheService extends Component
             $purgeableSiteUris = array_merge($purgeableSiteUris, $this->getSsiIncludeSiteUris($siteUris));
         }
 
-        if (Blitz::$plugin->settings->clearOnRefresh($forceClear)) {
+        if (Blitz::$plugin->settings->shouldClearOnRefresh($forceClear)) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
             Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
         }
 
-        if (Blitz::$plugin->settings->expireOnRefresh($forceClear, $forceGenerate)) {
+        if (Blitz::$plugin->settings->shouldExpireOnRefresh($forceClear, $forceGenerate)) {
             Blitz::$plugin->expireCache->expireUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->generateOnRefresh($forceGenerate)) {
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh($forceGenerate)) {
             Blitz::$plugin->cacheGenerator->generateUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeAfterRefresh($forceClear)) {
+        if (Blitz::$plugin->settings->shouldPurgeAfterRefresh($forceClear)) {
             Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
         }
 
@@ -403,7 +403,7 @@ class RefreshCacheService extends Component
         $siteUris = [];
 
         // Get site URIs to generate before flushing the cache
-        if (Blitz::$plugin->settings->generateOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
             $siteUris = array_merge(
                 SiteUriHelper::getAllSiteUris(),
                 Blitz::$plugin->settings->getCustomSiteUris(),
@@ -412,7 +412,7 @@ class RefreshCacheService extends Component
             $event->siteUris = $siteUris;
         }
 
-        if (Blitz::$plugin->settings->clearOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
             // Release jobs, since we're anyway clearing the cache
             $this->releaseJobs();
 
@@ -421,16 +421,16 @@ class RefreshCacheService extends Component
             Blitz::$plugin->cachePurger->purgeAll();
         }
 
-        if (Blitz::$plugin->settings->expireOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldExpireOnRefresh()) {
             Blitz::$plugin->expireCache->expireAll();
         }
 
-        if (Blitz::$plugin->settings->generateOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
             Blitz::$plugin->cacheGenerator->generateUris($siteUris);
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeAfterRefresh()) {
+        if (Blitz::$plugin->settings->shouldPurgeAfterRefresh()) {
             Blitz::$plugin->cachePurger->purgeAll();
         }
 
@@ -475,7 +475,7 @@ class RefreshCacheService extends Component
         $this->addCacheIds([$cacheId]);
 
         // Forcibly generate the cache if it will not be cleared.
-        $forceGenerate = !Blitz::$plugin->settings->clearOnRefresh();
+        $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
 
         $this->refresh(false, $forceGenerate);
     }
@@ -509,7 +509,7 @@ class RefreshCacheService extends Component
         }
 
         // Forcibly generate the cache if it will not be cleared.
-        $forceGenerate = !Blitz::$plugin->settings->clearOnRefresh();
+        $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
 
         $this->refresh(false, $forceGenerate);
     }

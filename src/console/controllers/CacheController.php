@@ -18,9 +18,14 @@ use yii\helpers\BaseConsole;
 class CacheController extends Controller
 {
     /**
-     * @var bool Whether jobs should be queued only and not run
+     * @var bool Whether jobs should be only queued and not run.
      */
     public bool $queue = false;
+
+    /**
+     * @var bool Whether verbose output should be enabled.
+     */
+    public bool $verbose = false;
 
     /**
      * @inheritdoc
@@ -29,6 +34,7 @@ class CacheController extends Controller
     {
         $options = parent::options($actionID);
         $options[] = 'queue';
+        $options[] = 'verbose';
 
         return $options;
     }
@@ -278,14 +284,14 @@ class CacheController extends Controller
      */
     public function actionRefresh(): int
     {
-        $generateOnRefresh = Blitz::$plugin->settings->generateOnRefresh();
+        $generateOnRefresh = Blitz::$plugin->settings->shouldGenerateOnRefresh();
 
         // Get site URIs to generate before flushing the cache
         if ($generateOnRefresh) {
             $siteUris = SiteUriHelper::getAllSiteUrisWithCustomSiteUris();
         }
 
-        if (Blitz::$plugin->settings->clearOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
             // Release jobs, since we’re anyway clearing the cache.
             Blitz::$plugin->refreshCache->releaseJobs();
 
@@ -294,7 +300,7 @@ class CacheController extends Controller
             $this->purgeCache();
         }
 
-        if (Blitz::$plugin->settings->expireOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldExpireOnRefresh()) {
             $this->expireCache();
         }
 
@@ -303,7 +309,7 @@ class CacheController extends Controller
             $this->deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeAfterRefresh()) {
+        if (Blitz::$plugin->settings->shouldPurgeAfterRefresh()) {
             $this->purgeCache();
         }
 
@@ -342,22 +348,22 @@ class CacheController extends Controller
         // Get site URIs to generate before flushing the cache
         $siteUris = SiteUriHelper::getSiteUrisForSiteWithCustomSiteUris($siteId);
 
-        if (Blitz::$plugin->settings->clearOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldClearOnRefresh()) {
             $this->clearCache($siteUris);
             $this->flushCache($siteUris, true);
             $this->purgeCache($siteUris);
         }
 
-        if (Blitz::$plugin->settings->expireOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldExpireOnRefresh()) {
             $this->expireCache($siteUris);
         }
 
-        if (Blitz::$plugin->settings->generateOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
             $this->generateCache($siteUris);
             $this->deploy($siteUris);
         }
 
-        if (Blitz::$plugin->settings->purgeAfterRefresh()) {
+        if (Blitz::$plugin->settings->shouldPurgeAfterRefresh()) {
             $this->purgeCache($siteUris);
         }
 
@@ -431,7 +437,9 @@ class CacheController extends Controller
      */
     public function setProgressHandler(int $count, int $total): void
     {
-        Console::updateProgress($count, $total);
+        if ($this->verbose === false) {
+            Console::updateProgress($count, $total);
+        }
     }
 
     private function clearCache(array $siteUris = null): void
@@ -514,15 +522,22 @@ class CacheController extends Controller
 
         $this->stdout(Craft::t('blitz', 'Generating Blitz cache...') . PHP_EOL, BaseConsole::FG_YELLOW);
 
-        Console::startProgress(0, count($siteUris), '', 0.8);
+        if ($this->verbose === false) {
+            Console::startProgress(0, count($siteUris), '', 0.8);
+        }
+
+        Blitz::$plugin->cacheGenerator->verbose = $this->verbose;
         Blitz::$plugin->cacheGenerator->generateUris($siteUris, [$this, 'setProgressHandler'], false);
-        Console::endProgress();
+
+        if ($this->verbose === false) {
+            Console::endProgress();
+        }
 
         $generated = Blitz::$plugin->cacheGenerator->generated;
         $total = count($siteUris);
 
         if ($generated < $total) {
-            $this->stdout(Craft::t('blitz', 'Generated {generated} of {total} total possible pages and includes. To see why some pages were not cached, enable the `debug` config setting and then open the `storage/logs/blitz.log` file.', ['generated' => $generated, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
+            $this->stdout(Craft::t('blitz', 'Generated {generated} of {total} total possible pages and includes. To see why some pages were not cached, enable the `debug` config setting or use the `debug` flag and then open the Blitz log (in `storage/logs/blitz-****.log`, for example).', ['generated' => $generated, 'total' => $total]) . PHP_EOL, BaseConsole::FG_CYAN);
         }
 
         $this->output('Blitz cache generation complete.');

@@ -137,7 +137,7 @@ class CacheController extends Controller
         Blitz::$plugin->refreshCache->refreshAll();
         $message = 'Blitz cache successfully refreshed.';
 
-        if (Blitz::$plugin->settings->generateOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
             $message = 'Blitz cache successfully refreshed and queued for generation.';
         }
 
@@ -168,7 +168,7 @@ class CacheController extends Controller
         Blitz::$plugin->refreshCache->refreshSite($siteId);
         $message = 'Site successfully refreshed.';
 
-        if (Blitz::$plugin->settings->generateOnRefresh()) {
+        if (Blitz::$plugin->settings->shouldGenerateOnRefresh()) {
             $message = 'Site successfully refreshed and queued for generation.';
         }
 

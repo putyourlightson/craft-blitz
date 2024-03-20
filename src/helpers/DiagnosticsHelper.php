@@ -353,14 +353,14 @@ class DiagnosticsHelper
          */
         $pass = $settings->refreshCacheWhenElementSavedUnchanged === false;
         if ($pass) {
-            $message = 'Blitz is not configured to refresh cached pages when an element is saved but unchanged.';
+            $message = 'Blitz is configured not to refresh cached pages when an element is saved but unchanged.';
         } else {
             $message = 'Blitz is configured to refresh cached pages when an element is saved but remains unchanged.';
         }
         $tests[] = [
             'pass' => $pass,
             'message' => $message,
-            'info' => '<a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>',
+            'info' => 'With the <code>refreshCacheWhenElementSavedUnchanged</code> config setting disabled, cached pages are refreshed only when an element is saved and its content has changed. This is recommended and should only be enabled with good reason, as it can cause more refresh cache jobs to be created than necessary.',
         ];
 
         /**
@@ -368,7 +368,7 @@ class DiagnosticsHelper
          */
         $pass = $settings->refreshCacheWhenElementSavedNotLive === false;
         if ($pass) {
-            $message = 'Blitz is not configured to refresh cached pages when an element is saved but not live.';
+            $message = 'Blitz is configured not to refresh cached pages when an element is saved but not live.';
         } else {
             $message = 'Blitz is configured to refresh cached pages when an element is saved but not live.';
         }
@@ -386,7 +386,7 @@ class DiagnosticsHelper
             $message = 'Image transforms are configured to be generated before page load.';
         } else {
             $pass = false;
-            $message = 'Image transforms are not configured to be generated before page load.';
+            $message = 'Image transforms are configured not to be generated before page load.';
         }
         $tests[] = [
             'pass' => $pass,
@@ -399,13 +399,11 @@ class DiagnosticsHelper
          */
         $globalSetCount = GlobalSet::find()->count();
         if ($globalSetCount > 0) {
-            $pass = $settings->refreshCacheAutomaticallyForGlobals;
+            $pass = $settings->refreshCacheAutomaticallyForGlobals === false;
             if ($pass) {
-                $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
-                <code>refreshCacheAutomaticallyForGlobals</code> is diabled.';
+                $message = 'One or more <a href="' . UrlHelper::cpUrl('globals') . '">globals</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is disabled.';
             } else {
-                $message = '<a href="' . UrlHelper::cpUrl('globals') . '">' . Craft::t('blitz', '{num, plural, =1{global exists} other{globals exist}}', ['num' => $globalSetCount]) . '</a> and
-                <code>refreshCacheAutomaticallyForGlobals</code> is enabled.';
+                $message = 'One or more <a href="' . UrlHelper::cpUrl('globals') . '">globals</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is enabled.';
             }
         } else {
             $pass = true;
@@ -449,7 +447,7 @@ class DiagnosticsHelper
          */
         $pass = Craft::$app->getConfig()->getGeneral()->runQueueAutomatically === false;
         if ($pass) {
-            $message = 'Queue jobs are not configured to run automatically via web requests.';
+            $message = 'Queue jobs are configured not to run automatically via web requests.';
         } else {
             $message = 'Queue jobs are configured to run automatically via web requests.';
         }
@@ -499,9 +497,9 @@ class DiagnosticsHelper
         $now = new DateTime();
         $pass = $refreshExpired !== null && $refreshExpired > $now->modify('-24 hours');
         if ($pass) {
-            $message = 'The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.';
-        } else {
             $message = 'The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.';
+        } else {
+            $message = 'The <code>blitz/cache/refresh-expired</code> console command has not been executed within the past 24 hours.';
         }
         $tests[] = [
             'pass' => $pass,

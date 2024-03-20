@@ -12,7 +12,6 @@ use craft\helpers\Component;
 use craft\helpers\Queue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
-use putyourlightson\blitz\models\SiteUriModel;
 
 class BaseDriverHelper
 {
@@ -53,14 +52,8 @@ class BaseDriverHelper
      */
     public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $priority = null): void
     {
+        $siteUris = SiteUriHelper::getSiteUrisFlattenedToArrays($siteUris);
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
-
-        // Convert SiteUriModels to arrays to keep the job data minimal
-        foreach ($siteUris as &$siteUri) {
-            if ($siteUri instanceof SiteUriModel) {
-                $siteUri = $siteUri->toArray();
-            }
-        }
 
         $job = new DriverJob([
             'siteUris' => $siteUris,
