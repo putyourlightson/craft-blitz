@@ -81,7 +81,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     /**
      * @inheritdoc
      */
-    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true, bool $verbose = false): void
+    public function generateUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
         $this->trigger(self::EVENT_BEFORE_GENERATE_CACHE, $event);
@@ -115,7 +115,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     /**
      * @inheritdoc
      */
-    public function generateSite(int $siteId, callable $setProgressHandler = null, bool $queue = true, bool $verbose = false): void
+    public function generateSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
     {
         // Get custom site URIs for the provided site only
         $groupedSiteUris = SiteUriHelper::getSiteUrisGroupedBySite(Blitz::$plugin->settings->getCustomSiteUris());
@@ -126,13 +126,13 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
             $customSiteUris
         );
 
-        $this->generateUris($siteUris, $setProgressHandler, $queue, $verbose);
+        $this->generateUris($siteUris, $setProgressHandler, $queue);
     }
 
     /**
      * @inheritdoc
      */
-    public function generateAll(callable $setProgressHandler = null, bool $queue = true, bool $verbose = false): void
+    public function generateAll(callable $setProgressHandler = null, bool $queue = true): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_GENERATE_ALL_CACHE, $event);
@@ -146,7 +146,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
             Blitz::$plugin->settings->getCustomSiteUris()
         );
 
-        $this->generateUris($siteUris, $setProgressHandler, $queue, $verbose);
+        $this->generateUris($siteUris, $setProgressHandler, $queue);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_GENERATE_ALL_CACHE)) {
             $this->trigger(self::EVENT_AFTER_GENERATE_ALL_CACHE, $event);
