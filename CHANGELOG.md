@@ -1,10 +1,10 @@
 # Release Notes for Blitz
 
-## 4.14.0 - Unreleased
+## 4.14.0 - 2024-03-20
 
 ### Added
 
-- Added batchable generate cache jobs ([#537](https://github.com/putyourlightson/craft-blitz/issues/537)).
+- Added batched generate cache jobs ([#537](https://github.com/putyourlightson/craft-blitz/issues/537)).
 - Added a new `driverJobBatchSize` config setting that sets the batch size to use for driver jobs that support batching.
 - Added a new `refreshCacheEnabled` config setting that determines whether cached pages are refreshed whenever content changes or an integration triggers it.
 - Added a new `injectScriptPosition` config setting that determines the position in the HTML in which to output the injected script ([#636](https://github.com/putyourlightson/craft-blitz/issues/636)).

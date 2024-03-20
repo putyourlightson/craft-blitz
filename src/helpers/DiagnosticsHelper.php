@@ -402,9 +402,9 @@ class DiagnosticsHelper
         if ($globalSetCount > 0) {
             $pass = $settings->refreshCacheAutomaticallyForGlobals === false;
             if ($pass) {
-                $message = 'One or more <a href="' . UrlHelper::cpUrl('globals') . '">globals exist</a> and <code>refreshCacheAutomaticallyForGlobals</code> is disabled.';
+                $message = 'One or more <a href="' . UrlHelper::cpUrl('globals') . '">globals</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is disabled.';
             } else {
-                $message = 'One or more <a href="' . UrlHelper::cpUrl('globals') . '">globals exist</a> and <code>refreshCacheAutomaticallyForGlobals</code> is enabled.';
+                $message = 'One or more <a href="' . UrlHelper::cpUrl('globals') . '">globals</a> exist and <code>refreshCacheAutomaticallyForGlobals</code> is enabled.';
             }
         } else {
             $pass = true;
