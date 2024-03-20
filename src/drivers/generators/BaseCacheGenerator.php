@@ -91,7 +91,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         $siteUris = $event->siteUris;
 
         if ($queue) {
-            CacheGeneratorHelper::addGeneratorJob($siteUris, 'generateUrisWithProgress');
+            CacheGeneratorHelper::addGeneratorJob($siteUris);
         } else {
             $this->generateUrisWithProgress($siteUris, $setProgressHandler);
         }

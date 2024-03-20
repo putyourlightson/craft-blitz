@@ -13,7 +13,6 @@ use Craft;
 use craft\base\Component;
 use craft\base\FieldInterface;
 use craft\elements\db\ElementQuery;
-use craft\services\Deprecator;
 use putyourlightson\blitz\models\HintModel;
 use putyourlightson\blitz\records\HintRecord;
 use ReflectionClass as ReflectionClassAlias;
@@ -237,7 +236,7 @@ class HintsService extends Component
     /**
      * Returns the template line number.
      *
-     * @see Deprecator::_findTemplateLine()
+     * @see craft\services\Deprecator::_findTemplateLine()
      */
     private function findTemplateLine(Template $template, int $actualCodeLine = null): ?int
     {
