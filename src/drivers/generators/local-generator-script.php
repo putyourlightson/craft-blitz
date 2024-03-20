@@ -3,13 +3,10 @@
  * @copyright Copyright (c) PutYourLightsOn
  */
 
-use Amp\Parallel\Context\ContextPanicError;
 use Amp\Sync\Channel;
 use craft\services\Plugins;
 use craft\web\View;
-use putyourlightson\blitz\Blitz;
 use yii\base\Event;
-use yii\log\Logger;
 
 /**
  * This script bootstraps a web app and mocks a web request. It is called by the
@@ -27,6 +24,7 @@ return function(Channel $channel): void {
     $webroot = $config['webroot'];
     $pathParam = $config['pathParam'];
 
+    $https = parse_url($url, PHP_URL_SCHEME) === 'https';
     $queryString = parse_url($url, PHP_URL_QUERY);
     parse_str($queryString, $queryStringParams);
 
@@ -39,8 +37,8 @@ return function(Channel $channel): void {
         'SCRIPT_FILENAME' => $webroot . '/index.php',
         'SCRIPT_NAME' => '/index.php',
         'SERVER_NAME' => parse_url($url, PHP_URL_HOST),
-        'SERVER_PORT' => parse_url($url, PHP_URL_PORT) ?: '80',
-        'HTTPS' => parse_url($url, PHP_URL_SCHEME) === 'https' ? 1 : 0,
+        'SERVER_PORT' => parse_url($url, PHP_URL_PORT) ?: ($https ? '443' : '80'),
+        'HTTPS' => $https ? 1 : 0,
         'REQUEST_URI' => parse_url($url, PHP_URL_PATH),
         'QUERY_STRING' => $queryString,
     ]);
@@ -101,17 +99,7 @@ return function(Channel $channel): void {
      */
     $app = require $root . '/vendor/craftcms/cms/bootstrap/web.php';
 
-    try {
-        $success = $app->run() == 0;
-    } catch (ContextPanicError $error) {
-        Blitz::$plugin->log($error->getMessage());
-        Blitz::$plugin->log($error->getTraceAsString());
-        Blitz::$plugin->log($error->getOriginalTraceAsString());
-        $success = 1;
-    } catch (Throwable $exception) {
-        Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
-        $success = 1;
-    }
+    $success = $app->run() == 0;
 
     $channel->send($success);
 };

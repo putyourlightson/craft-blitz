@@ -7,12 +7,14 @@ namespace putyourlightson\blitz\drivers\generators;
 
 use Craft;
 use craft\base\SavableComponent;
+use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
+use yii\helpers\BaseConsole;
 
 /**
  * @property-read array $siteOptions
@@ -68,6 +70,11 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      * @const string
      */
     public const GENERATE_ACTION_ROUTE = 'blitz/generator/generate';
+
+    /**
+     * @var bool Whether to output verbose messages.
+     */
+    public bool $verbose = false;
 
     /**
      * @inheritdoc
@@ -219,5 +226,19 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     protected function isPageUrl(string $url): bool
     {
         return !str_contains($url, CacheRequestService::CACHED_INCLUDE_PATH . '?action=' . CacheRequestService::CACHED_INCLUDE_ACTION);
+    }
+
+    protected function outputVerbose(string $url, bool $success = true): void
+    {
+        if (Craft::$app->getRequest()->getIsConsoleRequest() && $this->verbose) {
+            $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
+            $url = preg_replace('/[?&]' . $tokenParam . '.*/', '', $url);
+
+            if ($success) {
+                Console::stdout($url . PHP_EOL);
+            } else {
+                Console::stdout($url . PHP_EOL, BaseConsole::FG_RED);
+            }
+        }
     }
 }

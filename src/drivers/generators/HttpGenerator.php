@@ -11,7 +11,6 @@ use Amp\Http\Client\Request;
 use Amp\Pipeline\Pipeline;
 use Craft;
 use putyourlightson\blitz\Blitz;
-use yii\log\Logger;
 
 /**
  * This generator makes concurrent HTTP requests to generate each individual
@@ -32,9 +31,9 @@ class HttpGenerator extends BaseCacheGenerator
     public int $concurrency = 3;
 
     /**
-     * @var int The timeout for requests in milliseconds.
+     * @var int The timeout for requests in seconds.
      */
-    public int $timeout = 120000;
+    public int $timeout = 60;
 
     /**
      * @inheritdoc
@@ -70,18 +69,21 @@ class HttpGenerator extends BaseCacheGenerator
 
                 if ($response->getStatus() === 200) {
                     $this->generated++;
+                    $this->outputVerbose($url);
                 } else {
                     Blitz::$plugin->debug('{status} error: {reason}', [
                         'status' => $response->getStatus(),
                         'reason' => $response->getReason(),
                     ], $url);
+                    $this->outputVerbose($url, false);
                 }
 
                 if (is_callable($setProgressHandler)) {
                     $this->callProgressHandler($setProgressHandler, $count, $pages);
                 }
             } catch (HttpException $exception) {
-                Blitz::$plugin->log($exception->getMessage() . ' [' . $url . ']', [], Logger::LEVEL_ERROR);
+                Blitz::$plugin->debug($exception->getMessage());
+                $this->outputVerbose($url, false);
             }
         }
     }
