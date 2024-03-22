@@ -49,11 +49,14 @@ class HintsService extends Component
     }
 
     /**
-     * Checks for opportunities to eager-loading elements.
+     * Checks for opportunities to eager-load elements.
      */
     public function checkElementQuery(ElementQuery $elementQuery): void
     {
-        if ($elementQuery->wasEagerLoaded() || $elementQuery->eagerLoadHandle === null) {
+        if ($elementQuery->wasEagerLoaded()
+            || $elementQuery->eagerLoadHandle === null
+            || $elementQuery->id !== null
+        ) {
             return;
         }
 
@@ -94,6 +97,8 @@ class HintsService extends Component
                     ])
                 ->execute();
         }
+
+        $this->hints = [];
     }
 
     /**
@@ -133,7 +138,7 @@ class HintsService extends Component
     /**
      * Returns a new hint with the template and line number of the rendered template.
      */
-    public function createHintWithTemplateLine(FieldInterface $field): ?HintModel
+    protected function createHintWithTemplateLine(FieldInterface $field): ?HintModel
     {
         $hint = null;
         $traces = debug_backtrace();

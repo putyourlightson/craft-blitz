@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.0.0-beta.3 - Unreleased
+
+### Fixed
+
+- Fixed the Blitz Hints logic for detecting lazy-loaded element queries.
+
 ## 5.0.0-beta.2 - 2024-03-20
 
 ### Added
