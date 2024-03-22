@@ -60,28 +60,30 @@
                 </thead>
                 <tbody>
                     {% for row in rows %}
-                        {% set element = elements[row.elementId] %}
-                        <tr>
-                            <td>
-                                {{ elementChip(element) }}
-                            </td>
-                            {% if pageId is not defined %}
+                        {% set element = elements[row.elementId] ?? null %}
+                        {% if element %}
+                            <tr>
                                 <td>
-                                    {{ row.count }}
+                                    {{ include ('_elements/element') }}
                                 </td>
-                            {% endif %}
-                            <td>
-                                {{ row.expiryDate ? craft.blitz.diagnostics.getDateFromDb(row.expiryDate)|datetime('short') }}
-                            </td>
-                            {% if hasUris %}
+                                {% if pageId is not defined %}
+                                    <td>
+                                        {{ row.count }}
+                                    </td>
+                                {% endif %}
                                 <td>
-                                    {% set url = element.url %}
-                                    {% if url %}
-                                        <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
-                                    {% endif %}
+                                    {{ row.expiryDate ? craft.blitz.diagnostics.getDateFromDb(row.expiryDate)|datetime('short') }}
                                 </td>
-                            {% endif %}
-                        </tr>
+                                {% if hasUris %}
+                                    <td>
+                                        {% set url = element.url %}
+                                        {% if url %}
+                                            <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endif %}
                     {% endfor %}
                 </tbody>
             </table>
