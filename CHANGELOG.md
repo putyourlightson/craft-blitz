@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.0.0-beta.4 - Unreleased
+
+### Fixed
+
+- Fixed an error that could be thrown when returning to a page via the breadcrumbs in the Blitz Diagnostics utility ([#645](https://github.com/putyourlightson/craft-blitz/issues/645)).
+
 ## 5.0.0-beta.3 - 2024-03-21
 
 ### Fixed
