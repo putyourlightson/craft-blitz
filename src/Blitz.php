@@ -11,6 +11,7 @@ use craft\base\Plugin;
 use craft\console\controllers\ResaveController;
 use craft\elements\db\ElementQuery;
 use craft\elements\User;
+use craft\enums\CmsEdition;
 use craft\events\CancelableEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
@@ -158,7 +159,7 @@ class Blitz extends Plugin
             $this->registerWidgets();
             $this->registerRedirectAfterInstall();
 
-            if (Craft::$app->getEdition() === Craft::Pro) {
+            if (Craft::$app->edition === CmsEdition::Pro) {
                 $this->registerUserPermissions();
             }
 
