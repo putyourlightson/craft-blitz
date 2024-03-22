@@ -82,7 +82,7 @@ class LocalGenerator extends BaseCacheGenerator
             // Create a timeout to apply to the context.
             // https://amphp.org/amp#cancellation
             $canceller = new TimeoutCancellation($this->timeout);
-            $cancellerId = $canceller->subscribe(function() use ($url, $context) {
+            $cancellerId = $canceller->subscribe(function() use ($url) {
                 $message = 'Local generator request timed out.';
                 Blitz::$plugin->debug($message, [], $url);
                 $this->outputVerbose($url, false);
