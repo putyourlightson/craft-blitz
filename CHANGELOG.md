@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.14.1 - Unreleased
+
+### Fixed
+
+- Fixed an error that could be thrown when returning to a page via the breadcrumbs in the Blitz Diagnostics utility ([#645](https://github.com/putyourlightson/craft-blitz/issues/645)).
+
 ## 4.14.0 - 2024-03-20
 
 ### Added
