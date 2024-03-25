@@ -15,7 +15,17 @@ class m240226_120000_drop_route_variable_hints_and_column extends Migration
         if ($this->db->columnExists(HintRecord::tableName(), 'routeVariable')) {
             HintRecord::deleteAll(['not', ['routeVariable' => '']]);
 
+            $this->dropIndexIfExists(HintRecord::tableName(), [
+                'fieldId',
+                'template',
+                'routeVariable',
+            ], true);
             $this->dropColumn(HintRecord::tableName(), 'routeVariable');
+
+            $this->createIndex(null, HintRecord::tableName(), [
+                'fieldId',
+                'template',
+            ], true);
         }
 
         return true;
