@@ -2,6 +2,10 @@
 
 ## 4.14.1 - 2024-03-25
 
+### Changed
+
+- Cached and dynamic includes are now resolved as regular includes when previewing an element ([#646](https://github.com/putyourlightson/craft-blitz/issues/646)).
+
 ### Fixed
 
 - Fixed an error that could be thrown when returning to a page via the breadcrumbs in the Blitz Diagnostics utility ([#645](https://github.com/putyourlightson/craft-blitz/issues/645)).
