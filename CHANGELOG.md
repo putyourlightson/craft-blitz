@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.0.0-beta.5 - Unreleased
+
+### Changed
+
+- Cached and dynamic includes are now resolved as regular includes when previewing an element ([#646](https://github.com/putyourlightson/craft-blitz/issues/646)).
+
 ## 5.0.0-beta.4 - 2024-03-25
 
 ### Fixed

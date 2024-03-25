@@ -153,6 +153,10 @@ class BlitzVariable
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
+        if (Craft::$app->getRequest()->getIsPreview() || Craft::$app->getRequest()->getIsLivePreview()) {
+            return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
+        }
+
         $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 
         [$includeId, $index] = Blitz::$plugin->generateCache->saveInclude($siteId, $template, $params);
