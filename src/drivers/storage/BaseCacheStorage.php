@@ -14,6 +14,8 @@ use putyourlightson\blitz\models\SiteUriModel;
  */
 abstract class BaseCacheStorage extends SavableComponent implements CacheStorageInterface
 {
+    use CacheStorageTrait;
+
     /**
      * @event RefreshCacheEvent The event that is triggered before URIs are deleted.
      */

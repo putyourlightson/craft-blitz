@@ -13,6 +13,7 @@ use putyourlightson\blitz\models\SiteUriModel;
  */
 class DummyStorage extends BaseCacheStorage
 {
+
     /**
      * @inheritdoc
      */
@@ -20,6 +21,11 @@ class DummyStorage extends BaseCacheStorage
     {
         return Craft::t('blitz', 'None');
     }
+
+    /**
+     * @inerhitdoc
+     */
+    public bool $isDummy = true;
 
     public function get(SiteUriModel $siteUri): string
     {

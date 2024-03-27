@@ -62,7 +62,7 @@ class SettingsController extends Controller
         // Validate the driver so that any errors will be displayed
         $storageDriver->validate();
 
-        $storageDrivers = CacheStorageHelper::getAllDrivers();
+        $storageDrivers = $this->sortDriversByDisplayName(CacheStorageHelper::getAllDrivers());
 
         /** @var BaseCacheGenerator $generatorDriver */
         $generatorDriver = BaseDriverHelper::createDriver(
