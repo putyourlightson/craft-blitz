@@ -330,6 +330,7 @@ class Blitz extends Plugin
                 if ($cachedResponse) {
                     // Send the cached response and exit early, without allowing the full application life cycle to complete.
                     $cachedResponse->send();
+                    return;
                     exit();
                 }
 
