@@ -30,7 +30,7 @@ class FileStorage extends BaseCacheStorage
      */
     public static function displayName(): string
     {
-        return Craft::t('blitz', 'Blitz File Storage (recommended)');
+        return Craft::t('blitz', 'Blitz File Storage');
     }
 
     /**
