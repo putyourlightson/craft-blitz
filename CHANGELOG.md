@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.14.2 - Unreleased
+
+### Changed
+
+- Drivers are now listed in alphabetical order, with “None” first.
+
 ## 4.14.1 - 2024-03-25
 
 ### Changed
