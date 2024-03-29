@@ -1,10 +1,15 @@
 # Release Notes for Blitz
 
-## 4.14.2 - Unreleased
+## 4.15.0 - Unreleased
+
+### Added
+
+- Added the `shouldPurgeAfterRefresh()` method to cache purgers.
 
 ### Changed
 
 - Drivers are now listed in alphabetical order, with “None” first.
+- Improved the progress indicator during the generate cache process.
 
 ## 4.14.1 - 2024-03-25
 

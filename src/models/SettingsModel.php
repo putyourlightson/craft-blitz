@@ -599,6 +599,10 @@ class SettingsModel extends Model
      */
     public function shouldPurgeAfterRefresh(bool $forceClear = false): bool
     {
+        if (Blitz::$plugin->cachePurger->shouldPurgeAfterRefresh() === false) {
+            return false;
+        }
+
         return $this->shouldExpireOnRefresh($forceClear);
     }
 

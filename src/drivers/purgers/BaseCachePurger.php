@@ -103,6 +103,14 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     /**
      * @inheritdoc
      */
+    public function shouldPurgeAfterRefresh(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function test(): bool
     {
         return true;

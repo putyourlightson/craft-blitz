@@ -14,7 +14,6 @@ use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
-use putyourlightson\blitz\services\CacheRequestService;
 use Throwable;
 use yii\helpers\BaseConsole;
 
@@ -172,13 +171,15 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      * @param SiteUriModel[]|array[] $siteUris
      * @return array
      */
-    protected function getUrlsToGenerate(array $siteUris): array
+    protected function getUrlsToGenerate(array $siteUris, bool $withToken = true): array
     {
         $urls = [];
         $nonCacheableSiteUris = [];
-        $params = [
-            'token' => Craft::$app->getTokens()->createToken(self::GENERATE_ACTION_ROUTE),
-        ];
+        $params = [];
+
+        if ($withToken) {
+            $params['token'] = Craft::$app->getTokens()->createToken(self::GENERATE_ACTION_ROUTE);
+        }
 
         foreach ($siteUris as $siteUri) {
             // Convert to a site URI model if it is an array
@@ -233,14 +234,6 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         }
 
         return $siteOptions;
-    }
-
-    /**
-     * Returns whether the provided URL is a page (not an include).
-     */
-    protected function isPageUrl(string $url): bool
-    {
-        return !str_contains($url, CacheRequestService::CACHED_INCLUDE_PATH . '?action=' . CacheRequestService::CACHED_INCLUDE_ACTION);
     }
 
     protected function outputVerbose(string $url, bool $success = true): void

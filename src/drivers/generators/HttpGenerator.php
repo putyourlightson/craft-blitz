@@ -54,9 +54,33 @@ class HttpGenerator extends BaseCacheGenerator
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
         $urls = $this->getUrlsToGenerate($siteUris);
-        $total = count($siteUris);
-        $count = 0;
 
+        $this->generateUrlsWithProgress($urls, $setProgressHandler, 0, count($urls));
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSettingsHtml(): ?string
+    {
+        return Craft::$app->getView()->renderTemplate('blitz/_drivers/generators/http/settings', [
+            'generator' => $this,
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function defineRules(): array
+    {
+        return [
+            [['concurrency'], 'required'],
+            [['concurrency'], 'integer', 'min' => 1, 'max' => 100],
+        ];
+    }
+
+    protected function generateUrlsWithProgress(array $urls, callable $setProgressHandler, int $count, int $total): void
+    {
         $client = HttpClientBuilder::buildDefault();
 
         // Approach 4: Concurrent Iterator
@@ -65,9 +89,7 @@ class HttpGenerator extends BaseCacheGenerator
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
             function(string $url) use ($setProgressHandler, &$count, $total, $client) {
-                if ($this->isPageUrl($url)) {
-                    $count++;
-                }
+                $count++;
 
                 try {
                     $request = $this->createRequest($url);
@@ -103,28 +125,7 @@ class HttpGenerator extends BaseCacheGenerator
         }
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function getSettingsHtml(): ?string
-    {
-        return Craft::$app->getView()->renderTemplate('blitz/_drivers/generators/http/settings', [
-            'generator' => $this,
-        ]);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function defineRules(): array
-    {
-        return [
-            [['concurrency'], 'required'],
-            [['concurrency'], 'integer', 'min' => 1, 'max' => 100],
-        ];
-    }
-
-    private function createRequest(string $url): Request
+    protected function createRequest(string $url): Request
     {
         $request = new Request($url);
 

@@ -28,6 +28,13 @@ interface CachePurgerInterface extends SavableComponentInterface
     public function purgeAll(callable $setProgressHandler = null, bool $queue = true): void;
 
     /**
+     * Returns whether the cache should be purged after a refresh.
+     *
+     * @since 4.15.0
+     */
+    public function shouldPurgeAfterRefresh(): bool;
+
+    /**
      * Tests the purger settings.
      */
     public function test(): bool;
