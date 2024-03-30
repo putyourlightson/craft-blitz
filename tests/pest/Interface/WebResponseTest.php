@@ -12,6 +12,7 @@ use putyourlightson\blitz\services\RefreshCacheService;
 
 beforeEach(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
+    Blitz::$plugin->generateCache->options->outputComments = null;
     Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh]'));
 });
 
@@ -60,25 +61,27 @@ test('Response adds the powered by header', function() {
         ->toContainEqual('Blitz');
 });
 
-test('Response contains output comments when enabled', function() {
-    foreach ([true, SettingsModel::OUTPUT_COMMENTS_SERVED] as $value) {
-        Blitz::$plugin->settings->outputComments = $value;
-        $response = sendRequest();
+test('Response contains output comments when enabled', function(bool|int $value) {
+    Blitz::$plugin->settings->outputComments = $value;
+    $response = sendRequest();
 
-        expect($response->content)
-            ->toContain('Cached by Blitz');
-    }
-});
+    expect($response->content)
+        ->toContain('Cached by Blitz');
+})->with([
+    'true' => true,
+    'SettingsModel::OUTPUT_COMMENTS_CACHED' => SettingsModel::OUTPUT_COMMENTS_CACHED,
+]);
 
-test('Response does not contain output comments when disabled', function() {
-    foreach ([false, SettingsModel::OUTPUT_COMMENTS_CACHED] as $value) {
-        Blitz::$plugin->settings->outputComments = $value;
-        $response = sendRequest();
+test('Response does not contain output comments when disabled', function(bool|int $value) {
+    Blitz::$plugin->settings->outputComments = $value;
+    $response = sendRequest();
 
-        expect($response->content)
-            ->not()->toContain('Served by Blitz on');
-    }
-});
+    expect($response->content)
+        ->not()->toContain('Cached by Blitz');
+})->with([
+    'false' => false,
+    'SettingsModel::OUTPUT_COMMENTS_SERVED' => SettingsModel::OUTPUT_COMMENTS_SERVED,
+]);
 
 test('Response with mime type has headers and does not contain output comments', function() {
     $output = createOutput();

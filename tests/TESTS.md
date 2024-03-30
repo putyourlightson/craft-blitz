@@ -4,17 +4,21 @@ This document outlines the test specification for the Blitz plugin.
 
 ---
 
+## Feature Tests
+
+### [GenerateCache](pest/Feature/GenerateCacheTest.php)
+
+_Tests the saving of cached values, element cache records and element query records._
+
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved with output comments.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved without output comments.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved with output comments when file extension is ".html".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved without output comments when file extension is not `.html`.  
+
 ## Interface Tests
 
 ### [WebResponse](pest/Interface/WebResponseTest.php)
 
 _Tests that cached web responses contain the correct headers and comments._
 
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the default cache control header when the page is not cacheable.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the cache control header when the page is cacheable.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the expired cache control header and the cache is refreshed when the page is expired.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response adds the powered by header.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains output comments when enabled.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response does not contain output comments when disabled.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response with mime type has headers and does not contain output comments.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response is encoded when compression is enabled.  
