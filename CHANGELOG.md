@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added the `shouldPurgeAfterRefresh()` method to cache purgers.
+- Added the `BaseCachePurger::shouldPurgeAfterRefresh()` method.
 
 ### Changed
 

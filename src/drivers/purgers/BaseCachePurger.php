@@ -39,6 +39,14 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
     /**
      * @inheritdoc
      */
+    public function shouldPurgeAfterRefresh(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function purgeUris(array $siteUris, callable $setProgressHandler = null, bool $queue = true): void
     {
         $event = new RefreshCacheEvent(['siteUris' => $siteUris]);
@@ -98,14 +106,6 @@ abstract class BaseCachePurger extends SavableComponent implements CachePurgerIn
      */
     public function purgeUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function shouldPurgeAfterRefresh(): bool
-    {
-        return true;
     }
 
     /**
