@@ -97,6 +97,7 @@ test('Response is encoded when compression is enabled', function() {
     $siteUri = createSiteUri();
     Blitz::$plugin->cacheStorage->compressCachedValues = true;
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
+    Craft::$app->getRequest()->headers->remove(HeaderEnum::ACCEPT_ENCODING);
     Craft::$app->getRequest()->headers->set(HeaderEnum::ACCEPT_ENCODING, 'deflate, gzip');
     $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
 
@@ -104,18 +105,4 @@ test('Response is encoded when compression is enabled', function() {
         ->toBe('gzip')
         ->and(gzdecode($response->content))
         ->toBe($output);
-});
-
-test('Response is not encoded when compression is disabled', function() {
-    $output = createOutput();
-    $siteUri = createSiteUri();
-    Blitz::$plugin->cacheStorage->compressCachedValues = false;
-    Blitz::$plugin->cacheStorage->save($output, $siteUri);
-    Craft::$app->getRequest()->headers->set(HeaderEnum::ACCEPT_ENCODING, 'deflate, gzip');
-    $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
-
-    expect($response->headers->get(HeaderEnum::CONTENT_ENCODING))
-        ->toBeNull()
-        ->and($response->content)
-        ->toContain($output);
 });

@@ -450,10 +450,10 @@ class CacheRequestService extends Component
 
         $cacheStorage = Blitz::$plugin->cacheStorage;
         $siteUri = $event->siteUri;
-        $encoded = $this->requestAcceptsEncoding();
+        $encoded = $this->requestAcceptsEncoding() && $cacheStorage->canCompressCachedValues();
         $content = '';
 
-        if ($encoded && $cacheStorage->canCompressCachedValues()) {
+        if ($encoded) {
             $content = $cacheStorage->getCompressed($siteUri);
         }
 
