@@ -17,6 +17,7 @@ use craft\web\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
+use putyourlightson\blitz\enums\HeaderEnum;
 use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
@@ -83,7 +84,7 @@ class CacheRequestService extends Component
     public function setDefaultCacheControlHeader(): void
     {
         if (Blitz::$plugin->settings->defaultCacheControlHeader !== null) {
-            Craft::$app->getResponse()->getHeaders()->set('Cache-Control', Blitz::$plugin->settings->defaultCacheControlHeader);
+            Craft::$app->getResponse()->getHeaders()->set(HeaderEnum::CACHE_CONTROL, Blitz::$plugin->settings->defaultCacheControlHeader);
         }
     }
 
@@ -616,7 +617,7 @@ class CacheRequestService extends Component
      */
     public function requestAcceptsEncoding(): bool
     {
-        $encoding = Craft::$app->getRequest()->getHeaders()->get('Accept-Encoding');
+        $encoding = Craft::$app->getRequest()->getHeaders()->get(HeaderEnum::ACCEPT_ENCODING);
 
         if (empty($encoding)) {
             return false;
@@ -639,26 +640,26 @@ class CacheRequestService extends Component
         $generalConfig = Craft::$app->getConfig()->getGeneral();
 
         if ($generalConfig->permissionsPolicyHeader) {
-            $headers->set('Permissions-Policy', $generalConfig->permissionsPolicyHeader);
+            $headers->set(HeaderEnum::PERMISSIONS_POLICY, $generalConfig->permissionsPolicyHeader);
         }
 
         // Tell bots not to index/follow CP and tokenized pages
         if ($generalConfig->disallowRobots) {
-            $headers->set('X-Robots-Tag', 'none');
+            $headers->set(HeaderEnum::X_ROBOTS_TAG, 'none');
         }
 
-        // Send the X-Powered-By header?
+        // Send or remove the powered by header
         if ($generalConfig->sendPoweredByHeader) {
-            $original = $headers->get('X-Powered-By');
+            $poweredByHeader = $headers->get(HeaderEnum::X_POWERED_BY, first: false);
 
-            if (!str_contains($original, Craft::$app->name)) {
-                $headers->set('X-Powered-By', $original . ($original ? ',' : '') . Craft::$app->name);
+            if (!in_array(Craft::$app->name, $poweredByHeader)) {
+                $headers->add(HeaderEnum::X_POWERED_BY, Craft::$app->name);
             }
         } else {
-            $headers->remove('X-Powered-By');
+            $headers->remove(HeaderEnum::X_POWERED_BY);
 
             // In case PHP is already setting one
-            header_remove('X-Powered-By');
+            header_remove(HeaderEnum::X_POWERED_BY);
         }
     }
 
@@ -679,28 +680,24 @@ class CacheRequestService extends Component
         }
 
         $headers = $response->getHeaders();
-        $headers->set('Cache-Control', $cacheControlHeader);
+        $headers->set(HeaderEnum::CACHE_CONTROL, $cacheControlHeader);
 
         if ($encoded) {
-            $headers->set('Content-Encoding', BaseCacheStorage::ENCODING);
-        } else {
-            $headers->remove('Content-Encoding');
+            $headers->set(HeaderEnum::CONTENT_ENCODING, BaseCacheStorage::ENCODING);
         }
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $original = $headers->get('X-Powered-By') ?? '';
-
-            if (!str_contains($original, 'Blitz')) {
-                $headers->set('X-Powered-By', $original . ($original ? ',' : '') . 'Blitz');
-            }
+            $headers->add(HeaderEnum::X_POWERED_BY, 'Blitz');
         }
 
         // Add cache tag header if set
         $tags = Blitz::$plugin->cacheTags->getSiteUriTags($siteUri);
-
-        if (!empty($tags) && Blitz::$plugin->cachePurger->tagHeaderName) {
-            $tagsHeader = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
-            $headers->set(Blitz::$plugin->cachePurger->tagHeaderName, $tagsHeader);
+        if (!empty($tags)) {
+            $tagHeaderName = Blitz::$plugin->cachePurger->tagHeaderName;
+            if ($tagHeaderName) {
+                $tagsHeader = implode(Blitz::$plugin->cachePurger->tagHeaderDelimiter, $tags);
+                $headers->set($tagHeaderName, $tagsHeader);
+            }
         }
 
         // Add headers if ESI is enabled for pages only
@@ -716,7 +713,7 @@ class CacheRequestService extends Component
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
         if ($mimeType != SiteUriHelper::MIME_TYPE_HTML) {
-            $headers->set('Content-Type', $mimeType);
+            $headers->set(HeaderEnum::CONTENT_TYPE, $mimeType);
 
             if ($response->format == Response::FORMAT_HTML) {
                 $response->format = Response::FORMAT_RAW;

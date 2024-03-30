@@ -238,7 +238,7 @@ return [
         // The value to send in the cache control header when a page is expired.
         //'cacheControlHeaderExpired' => 'public, s-maxage=5, max-age=0',
 
-        // Whether an `X-Powered-By: Blitz` header should be sent.
+        // Whether an `X-Powered-By: Blitz` header should be added to the response.
         //'sendPoweredByHeader' => true,
 
         // Whether the "cached on" and "served by" timestamp comments should be appended to the cached output.

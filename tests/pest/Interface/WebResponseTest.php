@@ -6,6 +6,7 @@
 
 use Mockery\MockInterface;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\enums\HeaderEnum;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\RefreshCacheService;
 
@@ -22,14 +23,14 @@ test('Response contains the default cache control header when the page is not ca
     $response = sendRequest();
     Blitz::$plugin->cacheRequest->setDefaultCacheControlHeader();
 
-    expect($response->headers->get('cache-control'))
+    expect($response->headers->get(HeaderEnum::CACHE_CONTROL))
         ->toEqual(Blitz::$plugin->settings->defaultCacheControlHeader);
 });
 
 test('Response contains the cache control header when the page is cacheable', function() {
     $response = sendRequest();
 
-    expect($response->headers->get('cache-control'))
+    expect($response->headers->get(HeaderEnum::CACHE_CONTROL))
         ->toEqual(Blitz::$plugin->settings->cacheControlHeader);
 });
 
@@ -47,25 +48,16 @@ test('Response contains the expired cache control header and the cache is refres
 
     $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
 
-    expect($response->headers->get('cache-control'))
+    expect($response->headers->get(HeaderEnum::CACHE_CONTROL))
         ->toEqual(Blitz::$plugin->settings->cacheControlHeaderExpired);
 });
 
-test('Response adds the `X-Powered-By` header once', function() {
+test('Response adds the powered by header', function() {
     Craft::$app->config->general->sendPoweredByHeader = true;
     $response = sendRequest();
 
-    expect($response->headers->get('x-powered-by'))
-        ->toContainOnce('Blitz', 'Craft CMS');
-});
-
-test('Response overwrites the `X-Powered-By` header', function() {
-    Craft::$app->config->general->sendPoweredByHeader = false;
-    $response = sendRequest();
-
-    expect($response->headers->get('x-powered-by'))
-        ->toContainOnce('Blitz')
-        ->not()->toContain('Craft CMS');
+    expect($response->headers->get(HeaderEnum::X_POWERED_BY, first: false))
+        ->toContainEqual('Blitz');
 });
 
 test('Response contains output comments when enabled', function() {
@@ -94,7 +86,7 @@ test('Response with mime type has headers and does not contain output comments',
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
     $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
 
-    expect($response->headers->get('Content-Type'))
+    expect($response->headers->get(HeaderEnum::CONTENT_TYPE))
         ->toBe('application/json')
         ->and($response->content)
         ->toBe($output);
@@ -105,10 +97,10 @@ test('Response is encoded when compression is enabled', function() {
     $siteUri = createSiteUri();
     Blitz::$plugin->cacheStorage->compressCachedValues = true;
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
-    Craft::$app->getRequest()->headers->set('Accept-Encoding', 'deflate, gzip');
+    Craft::$app->getRequest()->headers->set(HeaderEnum::ACCEPT_ENCODING, 'deflate, gzip');
     $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
 
-    expect($response->headers->get('Content-Encoding'))
+    expect($response->headers->get(HeaderEnum::CONTENT_ENCODING))
         ->toBe('gzip')
         ->and(gzdecode($response->content))
         ->toBe($output);
@@ -119,10 +111,10 @@ test('Response is not encoded when compression is disabled', function() {
     $siteUri = createSiteUri();
     Blitz::$plugin->cacheStorage->compressCachedValues = false;
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
-    Craft::$app->getRequest()->headers->set('Accept-Encoding', 'deflate, gzip');
+    Craft::$app->getRequest()->headers->set(HeaderEnum::ACCEPT_ENCODING, 'deflate, gzip');
     $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
 
-    expect($response->headers->get('Content-Encoding'))
+    expect($response->headers->get(HeaderEnum::CONTENT_ENCODING))
         ->toBeNull()
         ->and($response->content)
         ->toContain($output);

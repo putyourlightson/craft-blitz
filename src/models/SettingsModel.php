@@ -417,7 +417,7 @@ class SettingsModel extends Model
     public string $cacheControlHeaderExpired = 'public, s-maxage=5, max-age=0';
 
     /**
-     * Whether an `X-Powered-By: Blitz` header should be sent.
+     * Whether an `X-Powered-By: Blitz` header should be added to the response.
      */
     public bool $sendPoweredByHeader = true;
 

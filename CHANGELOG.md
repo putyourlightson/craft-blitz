@@ -10,6 +10,7 @@
 
 - Drivers are now listed in alphabetical order, with “None” first.
 - Improved the progress indicator during the generate cache process.
+- The `Content-Encoding` header is no longer removed from responses.
 
 ## 4.14.1 - 2024-03-25
 
