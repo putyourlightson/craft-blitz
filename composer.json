@@ -17,7 +17,7 @@
     "php": "^8.2",
     "amphp/http-client": "^5.0",
     "amphp/parallel": "^2.0",
-    "craftcms/cms": "^5.0.0-beta.1",
+    "craftcms/cms": "^5.0.0",
     "cypresslab/gitelephant": "^4.0",
     "putyourlightson/craft-sprig-core": "^3.0.0-beta.1"
   },

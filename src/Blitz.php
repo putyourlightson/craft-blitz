@@ -146,7 +146,7 @@ class Blitz extends Plugin
         // Register events
         $this->registerCacheableRequestEvents();
         $this->registerElementEvents();
-        $this->registerResaveElementEvents();
+        $this->registerBulkElementEvents();
         $this->registerStructureEvents();
         $this->registerIntegrationEvents();
         $this->registerHintsUtilityEvents();
@@ -397,14 +397,14 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers resave element events
+     * Registers bulk element events.
+     * https://craftcms.com/docs/5.x/extend/events.html#bulk-operations
      */
-    private function registerResaveElementEvents(): void
+    private function registerBulkElementEvents(): void
     {
         // Enable batch mode
         $events = [
-            [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
-            [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
+            [Elements::class, Elements::EVENT_BEFORE_BULK_OP],
             [ResaveController::class, Controller::EVENT_BEFORE_ACTION],
         ];
 
@@ -418,8 +418,7 @@ class Blitz extends Plugin
 
         // Refresh the cache
         $events = [
-            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
-            [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
+            [Elements::class, Elements::EVENT_BEFORE_BULK_OP],
             [ResaveController::class, Controller::EVENT_AFTER_ACTION],
         ];
 
