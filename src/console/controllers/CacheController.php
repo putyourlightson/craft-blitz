@@ -30,9 +30,9 @@ class CacheController extends Controller
     /**
      * @inheritdoc
      */
-    public function options($actionID): array
+    public function options($actionId): array
     {
-        $options = parent::options($actionID);
+        $options = parent::options($actionId);
         $options[] = 'queue';
         $options[] = 'verbose';
 

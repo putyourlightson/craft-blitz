@@ -2,8 +2,16 @@
 
 ## 5.0.0-beta.5 - Unreleased
 
+### Added
+
+- Added the `BaseCachePurger::shouldPurgeAfterRefresh()` method.
+
 ### Changed
 
+- Drivers are now listed in alphabetical order, with “None” first.
+- Improved the progress indicator during the generate cache process.
+- The `Content-Encoding` header is no longer removed from responses.
+- Simplified the default cache control header settings.
 - Cached and dynamic includes are now resolved as regular includes when previewing an element ([#646](https://github.com/putyourlightson/craft-blitz/issues/646)).
 
 ## 5.0.0-beta.4 - 2024-03-25

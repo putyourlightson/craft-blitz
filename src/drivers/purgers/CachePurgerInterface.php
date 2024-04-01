@@ -11,6 +11,13 @@ use putyourlightson\blitz\models\SiteUriModel;
 interface CachePurgerInterface extends SavableComponentInterface
 {
     /**
+     * Returns whether the cache should be purged after a refresh.
+     *
+     * @since 4.15.0
+     */
+    public function shouldPurgeAfterRefresh(): bool;
+
+    /**
      * Purges the cache given an array of site URIs.
      *
      * @param SiteUriModel[] $siteUris

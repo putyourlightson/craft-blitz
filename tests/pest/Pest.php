@@ -46,15 +46,6 @@ uses(TestCase::class)
 |
 */
 
-expect()->extend('toContainOnce', function(...$needles) {
-    foreach ($needles as $needle) {
-        expect($this->value)
-            ->toContain($needle);
-    }
-
-    return $this;
-});
-
 expect()->extend('toBeTracked', function(string $changedBy = '', array $changedAttributes = [], array $changedFields = []) {
     /** @var Element|ElementChangedBehavior|null $element */
     $element = $this->value;

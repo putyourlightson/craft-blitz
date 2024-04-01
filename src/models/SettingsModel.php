@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
+use craft\web\Response;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
@@ -384,26 +385,33 @@ class SettingsModel extends Model
 
     /**
      * The value to send in the cache control header by default, if not null.
+     *
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#no-store
+     * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#preventing_storing
+     *
+     * @see Response::setNoCacheHeaders()
      */
-    public ?string $defaultCacheControlHeader = 'no-cache, no-store, must-revalidate';
+    public ?string $defaultCacheControlHeader = 'no-store';
 
     /**
      * The value to send in the cache control header.
      *
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
      * https://developers.cloudflare.com/cache/concepts/cache-control/
+     *
+     * @see Response::setCacheHeaders
      */
-    public string $cacheControlHeader = 'public, s-maxage=31536000, max-age=0';
+    public string $cacheControlHeader = 'public, max-age=31536000';
 
     /**
      * The value to send in the cache control header when a page’s cache is expired.
      *
      * https://developers.cloudflare.com/cache/concepts/cache-control/#revalidation
      */
-    public string $cacheControlHeaderExpired = 'public, s-maxage=5, max-age=0';
+    public string $cacheControlHeaderExpired = 'public, max-age=5';
 
     /**
-     * Whether an `X-Powered-By: Blitz` header should be sent.
+     * Whether an `X-Powered-By: Blitz` header should be added to the response.
      */
     public bool $sendPoweredByHeader = true;
 
@@ -552,6 +560,10 @@ class SettingsModel extends Model
      */
     public function shouldPurgeAfterRefresh(bool $forceClear = false): bool
     {
+        if (Blitz::$plugin->cachePurger->shouldPurgeAfterRefresh() === false) {
+            return false;
+        }
+
         return $this->shouldExpireOnRefresh($forceClear);
     }
 

@@ -50,42 +50,8 @@ class HttpGenerator extends BaseCacheGenerator
     public function generateUrisWithProgress(array $siteUris, callable $setProgressHandler = null): void
     {
         $urls = $this->getUrlsToGenerate($siteUris);
-        $pages = $this->getPageCount($siteUris);
-        $count = 0;
 
-        $client = HttpClientBuilder::buildDefault();
-
-        $concurrentIterator = Pipeline::fromIterable($urls)
-            ->concurrent($this->concurrency);
-
-        foreach ($concurrentIterator as $url) {
-            if ($this->isPageUrl($url)) {
-                $count++;
-            }
-
-            try {
-                $request = $this->createRequest($url);
-                $response = $client->request($request);
-
-                if ($response->getStatus() === 200) {
-                    $this->generated++;
-                    $this->outputVerbose($url);
-                } else {
-                    Blitz::$plugin->debug('{status} error: {reason}', [
-                        'status' => $response->getStatus(),
-                        'reason' => $response->getReason(),
-                    ], $url);
-                    $this->outputVerbose($url, false);
-                }
-
-                if (is_callable($setProgressHandler)) {
-                    $this->callProgressHandler($setProgressHandler, $count, $pages);
-                }
-            } catch (HttpException $exception) {
-                Blitz::$plugin->debug($exception->getMessage());
-                $this->outputVerbose($url, false);
-            }
-        }
+        $this->generateUrlsWithProgress($urls, $setProgressHandler, 0, count($urls));
     }
 
     /**
@@ -109,7 +75,42 @@ class HttpGenerator extends BaseCacheGenerator
         ];
     }
 
-    private function createRequest(string $url): Request
+    protected function generateUrlsWithProgress(array $urls, callable $setProgressHandler, int $count, int $total): void
+    {
+        $client = HttpClientBuilder::buildDefault();
+
+        $concurrentIterator = Pipeline::fromIterable($urls)
+            ->concurrent($this->concurrency);
+
+        foreach ($concurrentIterator as $url) {
+            $count++;
+
+            try {
+                $request = $this->createRequest($url);
+                $response = $client->request($request);
+
+                if ($response->getStatus() === 200) {
+                    $this->generated++;
+                    $this->outputVerbose($url);
+                } else {
+                    Blitz::$plugin->debug('{status} error: {reason}', [
+                        'status' => $response->getStatus(),
+                        'reason' => $response->getReason(),
+                    ], $url);
+                    $this->outputVerbose($url, false);
+                }
+
+                if (is_callable($setProgressHandler)) {
+                    $this->callProgressHandler($setProgressHandler, $count, $total);
+                }
+            } catch (HttpException $exception) {
+                Blitz::$plugin->debug($exception->getMessage());
+                $this->outputVerbose($url, false);
+            }
+        }
+    }
+
+    protected function createRequest(string $url): Request
     {
         $request = new Request($url);
 

@@ -6,9 +6,19 @@ This document outlines the test specification for the Blitz plugin.
 
 ## Feature Tests
 
-### [Hints](pest/Feature/HintsTest.php)
+### [GenerateCache](pest/Feature/GenerateCacheTest.php)
 
-_Tests hints functionality._
+_Tests the saving of cached values, element cache records and element query records._
 
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Hint is recorded for a related element query that is lazy-loaded.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Hint is not recorded for a related element query that is lazy eager-loaded.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved with output comments.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved without output comments.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved with output comments when file extension is ".html".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cached value is saved without output comments when file extension is not `.html`.  
+
+## Interface Tests
+
+### [WebResponse](pest/Interface/WebResponseTest.php)
+
+_Tests that cached web responses contain the correct headers and comments._
+
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response with mime type has headers and does not contain output comments.  

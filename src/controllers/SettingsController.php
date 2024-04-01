@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\base\ComponentInterface;
+use craft\base\SavableComponent;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
@@ -20,6 +21,7 @@ use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\CacheStorageHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
+use yii\helpers\ArrayHelper;
 use yii\web\Response;
 
 class SettingsController extends Controller
@@ -60,7 +62,7 @@ class SettingsController extends Controller
         // Validate the driver so that any errors will be displayed
         $storageDriver->validate();
 
-        $storageDrivers = CacheStorageHelper::getAllDrivers();
+        $storageDrivers = $this->sortDriversByDisplayName(CacheStorageHelper::getAllDrivers());
 
         /** @var BaseCacheGenerator $generatorDriver */
         $generatorDriver = BaseDriverHelper::createDriver(
@@ -71,7 +73,7 @@ class SettingsController extends Controller
         // Validate the generator so that any errors will be displayed
         $generatorDriver->validate();
 
-        $generatorDrivers = CacheGeneratorHelper::getAllDrivers();
+        $generatorDrivers = $this->sortDriversByDisplayName(CacheGeneratorHelper::getAllDrivers());
 
         /** @var BaseCachePurger $purgerDriver */
         $purgerDriver = BaseDriverHelper::createDriver(
@@ -83,7 +85,7 @@ class SettingsController extends Controller
         $purgerDriver->validate();
         $purgerDriver->test();
 
-        $purgerDrivers = CachePurgerHelper::getAllDrivers();
+        $purgerDrivers = $this->sortDriversByDisplayName(CachePurgerHelper::getAllDrivers());
 
         /** @var BaseDeployer $deployerDriver */
         $deployerDriver = BaseDriverHelper::createDriver(
@@ -95,7 +97,7 @@ class SettingsController extends Controller
         $deployerDriver->validate();
         $deployerDriver->test();
 
-        $deployerDrivers = DeployerHelper::getAllDrivers();
+        $deployerDrivers = $this->sortDriversByDisplayName(DeployerHelper::getAllDrivers());
 
         $detectSsiTag = null;
         if (Blitz::$plugin->settings->detectSsiEnabled) {
@@ -243,5 +245,24 @@ class SettingsController extends Controller
             'value' => $component::class,
             'label' => $component::displayName(),
         ];
+    }
+
+    /**
+     * Sorts drivers by display name.
+     *
+     * @param SavableComponent[] $drivers
+     * @return SavableComponent[]
+     */
+    private function sortDriversByDisplayName(array $drivers): array
+    {
+        ArrayHelper::multisort($drivers, function(SavableComponent $purger) {
+            if ($purger->isDummy ?? false) {
+                return 1;
+            }
+
+            return $purger->displayName();
+        });
+
+        return $drivers;
     }
 }

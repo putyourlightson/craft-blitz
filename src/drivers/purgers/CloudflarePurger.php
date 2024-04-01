@@ -109,7 +109,7 @@ class CloudflarePurger extends BaseCachePurger
                 'files' => SiteUriHelper::getUrlsFromSiteUris($siteUriGroup),
             ]);
 
-            $count = $count + count($groupedSiteUris);
+            $count = $count + count($siteUriGroup);
 
             if (is_callable($setProgressHandler)) {
                 $progressLabel = Craft::t('blitz', $label, ['total' => $total]);
@@ -181,18 +181,18 @@ class CloudflarePurger extends BaseCachePurger
         return [
             [
                 ['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiToken';
-                },
+                return $purger->authenticationMethod == 'apiToken';
+            },
             ],
             [
                 ['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiKey';
-                },
+                return $purger->authenticationMethod == 'apiKey';
+            },
             ],
             [
                 ['email'], 'email', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiKey';
-                },
+                return $purger->authenticationMethod == 'apiKey';
+            },
             ],
         ];
     }
