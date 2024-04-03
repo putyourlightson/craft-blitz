@@ -351,7 +351,7 @@ class CacheRequestService extends Component
      *
      * @since 4.3.0
      */
-    public function getIncludeByIndex(?int $index): ?IncludeRecord
+    public function getIncludeByIndex(int|string|null $index): ?IncludeRecord
     {
         if ($index === null) {
             return null;
@@ -583,9 +583,11 @@ class CacheRequestService extends Component
         $queryString = parse_url($uri, PHP_URL_QUERY) ?: '';
         parse_str($queryString, $queryStringParams);
 
-        foreach ($queryStringParams as $key => $value) {
-            if (!$this->getIsAllowedQueryStringParam($siteId, $key)) {
-                unset($queryStringParams[$key]);
+        if (!$this->getIsCachedInclude($uri)) {
+            foreach ($queryStringParams as $key => $value) {
+                if (!$this->getIsAllowedQueryStringParam($siteId, $key)) {
+                    unset($queryStringParams[$key]);
+                }
             }
         }
 
