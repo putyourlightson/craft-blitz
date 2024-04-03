@@ -13,6 +13,10 @@
 - The `Content-Encoding` header is no longer removed from responses.
 - Simplified the default cache control header settings.
 
+### Fixed
+
+- Fixed a bug in which expiry dates were always being output using the current timestamp in the Blitz Diagnostics utility.
+
 ## 4.14.1 - 2024-03-25
 
 ### Changed
