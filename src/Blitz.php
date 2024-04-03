@@ -322,7 +322,7 @@ class Blitz extends Plugin
 
                 $siteUri = $this->cacheRequest->getRequestedCacheableSiteUri();
 
-                if ($siteUri === null || !$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
+                if (!$this->cacheRequest->getIsCacheableSiteUri($siteUri)) {
                     return;
                 }
 
@@ -341,10 +341,12 @@ class Blitz extends Plugin
 
                 Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
                     function(Event $event) use ($siteUri) {
-                        /** @var Response|null $response */
+                        /** @var Response $response */
                         $response = $event->sender;
                         $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
-                    }
+                    },
+                    // Prepend the event, so it is triggered as early as possible.
+                    append: false,
                 );
             }
         );
