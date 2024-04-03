@@ -4,6 +4,7 @@
 
 ### Added
 
+- Added a new `blitz/cache/refresh-expired-elements` console command for refreshing cached pages that track expired elements.
 - Added the `BaseCachePurger::shouldPurgeAfterRefresh()` method.
 
 ### Changed

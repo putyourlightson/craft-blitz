@@ -335,6 +335,22 @@ class CacheController extends Controller
     }
 
     /**
+     * Refreshes cached pages that track expired elements.
+     */
+    public function actionRefreshExpiredElements(): int
+    {
+        Blitz::$plugin->refreshCache->refreshExpiredElements();
+
+        if (!$this->queue) {
+            Craft::$app->runAction('queue/run');
+        }
+
+        $this->output('Expired elements successfully refreshed.');
+
+        return ExitCode::OK;
+    }
+
+    /**
      * Refreshes all pages in the provided site.
      */
     public function actionRefreshSite(int $siteId = null): int

@@ -13,7 +13,6 @@ use putyourlightson\blitz\models\SiteUriModel;
  */
 class DummyStorage extends BaseCacheStorage
 {
-
     /**
      * @inheritdoc
      */

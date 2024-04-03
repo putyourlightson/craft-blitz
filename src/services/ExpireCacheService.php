@@ -42,7 +42,7 @@ class ExpireCacheService extends Component
     public const EVENT_AFTER_EXPIRE_ALL_CACHE = 'afterExpireAllCache';
 
     /**
-     * Returns expired cache IDs with the provided condition.
+     * Returns expired cache IDs.
      *
      * @return int[]
      */
