@@ -239,7 +239,7 @@ class SettingsModel extends Model
     public int $queryStringCaching = self::QUERY_STRINGS_DO_NOT_CACHE_URLS;
 
     /**
-     * The query string parameters to include when determining if and how a page should be cached (regular expressions may be used).
+     * The query string parameters to include (retain) when caching a URL (regular expressions may be used).
      *
      * [
      *     [
@@ -258,7 +258,7 @@ class SettingsModel extends Model
     ];
 
     /**
-     * The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used).
+     * The query string parameters to exclude (disregard) when caching a URL (regular expressions may be used).
      *
      * [
      *     [

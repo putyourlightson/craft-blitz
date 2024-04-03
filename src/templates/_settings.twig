@@ -73,7 +73,7 @@
                 {% endset %}
                 {{ forms.lightswitchField({
                     label: "Caching Enabled"|t('blitz'),
-                    instructions: instructions("Whether caching should be enabled."|t('blitz'), info),
+                    instructions: instructions("Whether caching should be enabled.", info),
                     warning: config.cachingEnabled is defined ? configWarning('cachingEnabled'),
                     name: 'settings[cachingEnabled]',
                     on: settings.cachingEnabled,
@@ -114,7 +114,7 @@
                 {% endset %}
                 {{ forms.selectField({
                     label: "Refresh Mode"|t('blitz'),
-                    instructions: instructions("Determines when and how the cache should be refreshed."|t('blitz'), info),
+                    instructions: instructions("Determines when and how the cache should be refreshed.", info),
                     warning: config.refreshMode is defined ? configWarning('refreshMode'),
                     name: 'settings[refreshMode]',
                     options: {
@@ -151,7 +151,7 @@
                 {% endset %}
                 {{ forms.editableTableField({
                     label: "Included URI Patterns"|t('blitz'),
-                    instructions: instructions("The URI patterns to include in caching."|t('blitz'), info),
+                    instructions: instructions("The URI patterns to include in caching.", info),
                     warning: (config.includedUriPatterns is defined ? configWarning('includedUriPatterns')),
                     name: 'settings[includedUriPatterns]',
                     id: 'includedUriPatterns',
@@ -168,7 +168,7 @@
                 {% endset %}
                 {{ forms.editableTableField({
                     label: "Exclude URI Patterns"|t('blitz'),
-                    instructions: instructions("The URI patterns to exclude from caching."|t('blitz'), info),
+                    instructions: instructions("The URI patterns to exclude from caching.", info),
                     warning: (config.excludedUriPatterns is defined ? configWarning('excludedUriPatterns')),
                     name: 'settings[excludedUriPatterns]',
                     id: 'excludedUriPatterns',
@@ -192,7 +192,7 @@
         {% endset %}
         {{ forms.selectField({
             label: "Cache Storage"|t('blitz'),
-            instructions: instructions("The storage type to use for storing cached pages."|t('blitz'), info),
+            instructions: instructions("The storage type to use for storing cached pages.", info),
             warning: (config.cacheStorageType is defined ? configWarning('cacheStorageType')),
             name: 'settings[cacheStorageType]',
             options: storageTypeOptions,
@@ -219,7 +219,7 @@
         {% endset %}
         {{ forms.selectField({
             label: "Cache Generator"|t('blitz'),
-            instructions: instructions("The generator type to use for generating the cache."|t('blitz'), info),
+            instructions: instructions("The generator type to use for generating the cache.", info),
             warning: (config.cacheGeneratorType is defined ? configWarning('cacheGeneratorType')),
             name: 'settings[cacheGeneratorType]',
             options: generatorTypeOptions,
@@ -259,7 +259,7 @@
         {% endset %}
         {{ forms.editableTableField({
             label: "Custom Site URIs"|t('blitz'),
-            instructions: instructions("Custom site URIs to include when generating the cache."|t('blitz'), info),
+            instructions: instructions("Custom site URIs to include when generating the cache.", info),
             warning: (config.customSiteUris is defined ? configWarning('customSiteUris')),
             name: 'settings[customSiteUris]',
             id: 'customSiteUris',
@@ -279,7 +279,7 @@
         {% endset %}
         {{ forms.selectField({
             label: "Reverse Proxy Purger"|t('blitz'),
-            instructions: instructions("A purger to use for clearing cache in a reverse proxy."|t('blitz'), info),
+            instructions: instructions("A purger to use for clearing cache in a reverse proxy.", info),
             tip: 'When using a reverse proxy or CDN, the <a href="{url}" target="_blank">Cache Igniter</a> plugin can be used to keep your site’s cache warm around the globe and around the clock.'|t('blitz', { url: 'https://putyourlightson.com/plugins/cache-igniter' }),
             warning: (config.cachePurgerType is defined ? configWarning('cachePurgerType')),
             name: 'settings[cachePurgerType]',
@@ -307,7 +307,7 @@
         {% endset %}
         {{ forms.selectField({
             label: "Remote Deployer"|t('blitz'),
-            instructions: instructions("A deployer to use for remotely deploying cached files."|t('blitz'), info),
+            instructions: instructions("A deployer to use for remotely deploying cached files.", info),
             warning: (config.deployerType is defined ? configWarning('deployerType')),
             name: 'settings[deployerType]',
             options: deployerTypeOptions,
@@ -335,7 +335,7 @@
         {{ forms.lightswitchField({
             id: 'ssiEnabled',
             label: "SSI Enabled"|t('blitz'),
-            instructions: instructions("Whether SSI is enabled on the server."|t('blitz'), info),
+            instructions: instructions("Whether SSI is enabled on the server.", info),
             tip: '...',
             warning: config.ssiEnabled is defined ? configWarning('ssiEnabled'),
             name: 'settings[ssiEnabled]',
@@ -362,7 +362,7 @@
         {% endset %}
         {{ forms.lightswitchField({
             label: "ESI Enabled"|t('blitz'),
-            instructions: instructions("Whether ESI is enabled on the server."|t('blitz'), info),
+            instructions: instructions("Whether ESI is enabled on the server.", info),
             warning: config.esiEnabled is defined ? configWarning('esiEnabled'),
             name: 'settings[esiEnabled]',
             on: settings.esiEnabled,
@@ -396,7 +396,7 @@
         {% endset %}
         {{ forms.selectField({
             label: "Query String Caching"|t('blitz'),
-            instructions: instructions("Whether URLs with query strings should cached and how."|t('blitz'), info),
+            instructions: instructions("Whether URLs with query strings should cached and how.", info),
             warning: (config.queryStringCaching is defined ? configWarning('queryStringCaching')),
             name: 'settings[queryStringCaching]',
             options: {
@@ -412,12 +412,21 @@
                 type: 'singleline',
                 heading: 'Query String Parameter'|t('blitz'),
                 code: true,
+                info: 'The name of the query string parameter. Regular expressions can be used for pattern matching.'|t('blitz'),
             }
         }) %}
 
+        {% set info %}
+            <p>
+                Query string parameters to include when caching a URL. This setting does <em>not</em> determine which pages are cached based on the query string. Instead, it can be used control which query string parameters are retained in the URL.
+            </p>
+            <a href="{{ docs ~ 'included-excluded-query-string-parameters' }}" class="go" target="_blank">
+                {{- 'Learn more'|t('blitz') -}}
+            </a>
+        {% endset %}
         {{ forms.editableTableField({
             label: "Included Query String Parameters"|t('blitz'),
-            instructions: "The query string parameters to include when determining if and how a page should be cached (regular expressions may be used)."|t('blitz'),
+            instructions: instructions("The query string parameters to include (retain) when caching a URL.", info),
             warning: (config.includedQueryStringParams is defined ? configWarning('includedQueryStringParams')),
             name: 'settings[includedQueryStringParams]',
             id: 'includedQueryStringParams',
@@ -429,9 +438,17 @@
             allowReorder: true,
         }) }}
 
+        {% set info %}
+            <p>
+                Query string parameters to exclude when caching a URL. This setting does <em>not</em> determine which pages are cached based on the query string. Instead, it can be used control which query string parameters are disregarded in the URL.
+            </p>
+            <a href="{{ docs ~ 'included-excluded-query-string-parameters' }}" class="go" target="_blank">
+                {{- 'Learn more'|t('blitz') -}}
+            </a>
+        {% endset %}
         {{ forms.editableTableField({
             label: "Excluded Query String Parameters"|t('blitz'),
-            instructions: "The query string parameters to exclude when determining if and how a page should be cached (regular expressions may be used)."|t('blitz'),
+            instructions: instructions("The query string parameters to exclude (disregard) when caching a URL.", info),
             warning: (config.excludedQueryStringParams is defined ? configWarning('excludedQueryStringParams')),
             name: 'settings[excludedQueryStringParams]',
             id: 'excludedQueryStringParams',
