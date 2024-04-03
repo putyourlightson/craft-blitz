@@ -468,7 +468,7 @@ class RefreshCacheService extends Component
     {
         $cacheId = Blitz::$plugin->expireCache->getExpiredCacheId($siteUri);
 
-        if ($cacheId === false) {
+        if (empty($cacheId)) {
             return;
         }
 

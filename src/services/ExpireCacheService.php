@@ -57,7 +57,7 @@ class ExpireCacheService extends Component
     /**
      * Returns an expired cache ID with the provided site URI.
      */
-    public function getExpiredCacheId(SiteUriModel $siteUri): int|false
+    public function getExpiredCacheId(SiteUriModel $siteUri): int|false|null
     {
         return CacheRecord::find()
             ->select('id')
