@@ -180,8 +180,12 @@ class CacheRequestService extends Component
     /**
      * Returns whether the site URI is cacheable.
      */
-    public function getIsCacheableSiteUri(SiteUriModel $siteUri): bool
+    public function getIsCacheableSiteUri(?SiteUriModel $siteUri): bool
     {
+        if ($siteUri === null) {
+            return false;
+        }
+
         $uri = strtolower($siteUri->uri);
 
         // Ignore URIs that are longer than the max URI length
@@ -261,8 +265,8 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns whether this is a cached include.
-     * Doesn’t memoize the result, which would disrupt the local cache generator.
+     * Returns whether this is a cached include without memoizing the result,
+     * which would disrupt the local cache generator.
      *
      * @since 4.3.0
      */
