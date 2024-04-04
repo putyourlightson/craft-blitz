@@ -452,12 +452,12 @@ class CacheRequestService extends Component
         }
 
         // Fall back to unencoded, in case of cached includes or SSI includes
-        if (empty($content)) {
+        if ($content === null) {
             $encoded = false;
             $content = $cacheStorage->get($siteUri);
         }
 
-        if (empty($content)) {
+        if ($content === null) {
             return null;
         }
 

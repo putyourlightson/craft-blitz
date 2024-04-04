@@ -50,9 +50,9 @@ abstract class BaseCacheStorage extends SavableComponent implements CacheStorage
     /**
      * @inheritdoc
      */
-    public function getCompressed(SiteUriModel $siteUri): string
+    public function getCompressed(SiteUriModel $siteUri): ?string
     {
-        return '';
+        return null;
     }
 
     /**
