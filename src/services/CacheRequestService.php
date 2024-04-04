@@ -648,7 +648,7 @@ class CacheRequestService extends Component
 
         // Send or remove the powered by header
         if ($generalConfig->sendPoweredByHeader) {
-            $poweredByHeader = $headers->get(HeaderEnum::X_POWERED_BY, first: false);
+            $poweredByHeader = $headers->get(HeaderEnum::X_POWERED_BY, [], false);
 
             if (!in_array(Craft::$app->name, $poweredByHeader)) {
                 $headers->add(HeaderEnum::X_POWERED_BY, Craft::$app->name);
