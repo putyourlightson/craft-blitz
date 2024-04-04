@@ -26,9 +26,9 @@ class DummyStorage extends BaseCacheStorage
      */
     public bool $isDummy = true;
 
-    public function get(SiteUriModel $siteUri): string
+    public function get(SiteUriModel $siteUri): ?string
     {
-        return '';
+        return null;
     }
 
     public function save(string $value, SiteUriModel $siteUri, int $duration = null, bool $allowEncoding = true): void

@@ -81,7 +81,7 @@ test('Request with a dynamic include prefix is a dynamic include', function() {
     expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamic/xyz'))
         ->toBeFalse()
         ->and(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamic?action=' . CacheRequestService::DYNAMIC_INCLUDE_ACTION))
-        ->toBeTrue();;
+        ->toBeTrue();
 });
 
 test('Request with dynamic include action is a dynamic include', function() {
