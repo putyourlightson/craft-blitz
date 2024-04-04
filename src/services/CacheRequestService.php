@@ -264,11 +264,11 @@ class CacheRequestService extends Component
      */
     public function getIsCachedInclude(string $uri = null): bool
     {
-        // Includes based on the provided URI takes preference
+        // Includes based on the provided URI takes preference.
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::CACHED_INCLUDE_PATH);
+            return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
@@ -279,7 +279,7 @@ class CacheRequestService extends Component
 
         $uri = Craft::$app->getRequest()->getFullUri();
 
-        return str_starts_with($uri, self::CACHED_INCLUDE_PATH);
+        return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
     }
 
     /**
@@ -294,7 +294,7 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::DYNAMIC_INCLUDE_PATH);
+            return str_starts_with($uri, self::DYNAMIC_INCLUDE_PATH . '?action=' . self::DYNAMIC_INCLUDE_ACTION);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {

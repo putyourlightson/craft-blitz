@@ -12,6 +12,7 @@ use craft\db\QueryAbortedException;
 use craft\db\Table;
 use craft\elements\GlobalSet;
 use craft\helpers\ArrayHelper;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
@@ -511,5 +512,10 @@ class DiagnosticsHelper
         ArrayHelper::multisort($tests, 'pass');
 
         return $tests;
+    }
+
+    public static function toDateTime(string $value): DateTime|null
+    {
+        return DateTimeHelper::toDateTime($value);
     }
 }

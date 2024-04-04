@@ -336,6 +336,8 @@ class CacheController extends Controller
 
     /**
      * Refreshes cached pages that track expired elements.
+     *
+     * @since 4.15.0
      */
     public function actionRefreshExpiredElements(): int
     {

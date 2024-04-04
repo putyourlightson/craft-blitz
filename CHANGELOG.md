@@ -9,14 +9,16 @@
 
 ### Changed
 
-- Drivers are now listed in alphabetical order, with “None” first.
+- Drivers are now listed in alphabetical order, with “None” always listed first.
 - Improved the progress indicator during the generate cache process.
-- The `Content-Encoding` header is no longer removed from responses.
 - Simplified the default cache control header settings.
+- Pages that return empty content are no longer ignored from being cached. 
+- The `Content-Encoding` header is no longer removed from responses.
 
 ### Fixed
 
 - Fixed a bug in which expiry dates were always being output using the current timestamp in the Blitz Diagnostics utility.
+- Fixed an edge-case bug in which cached includes were not being refreshed when expired.
 
 ## 4.14.1 - 2024-03-25
 

@@ -488,6 +488,8 @@ class RefreshCacheService extends Component
 
     /**
      * Refreshes all expired elements.
+     *
+     * @since 4.15.0
      */
     public function refreshExpiredElements(): void
     {
