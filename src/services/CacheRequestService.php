@@ -277,7 +277,7 @@ class CacheRequestService extends Component
             return $action == self::CACHED_INCLUDE_ACTION;
         }
 
-        $uri = Craft::$app->getRequest()->getFullUri();
+        $uri = Craft::$app->getRequest()->getFullUri() . '?' . Craft::$app->getRequest()->getQueryString();
 
         return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
     }
