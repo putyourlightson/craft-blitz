@@ -55,15 +55,16 @@ class ExpireCacheService extends Component
     }
 
     /**
-     * Returns an expired cache ID with the provided site URI.
+     * Returns whether the site URI is expired.
+     *
+     * @since 4.15.0
      */
-    public function getExpiredCacheId(SiteUriModel $siteUri): int|false|null
+    public function getIsExpiredSiteUri(SiteUriModel $siteUri): bool
     {
         return CacheRecord::find()
-            ->select('id')
             ->where(['<=', 'expiryDate', Db::prepareDateForDb('now')])
             ->andWhere($siteUri->toArray())
-            ->scalar();
+            ->exists();
     }
 
     /**

@@ -462,17 +462,13 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes an expired site URI.
+     * Refreshes expired site URIs.
      */
-    public function refreshExpiredSiteUri(SiteUriModel $siteUri): void
+    public function refreshExpiredSiteUris(array $siteUris): void
     {
-        $cacheId = Blitz::$plugin->expireCache->getExpiredCacheId($siteUri);
+        $cacheIds = SiteUriHelper::getCacheIdsFromSiteUris($siteUris);
+        $this->addCacheIds($cacheIds);
 
-        if (empty($cacheId)) {
-            return;
-        }
-
-        $this->addCacheIds([$cacheId]);
         $this->refreshExpired();
     }
 
@@ -482,9 +478,11 @@ class RefreshCacheService extends Component
     public function refreshExpiredCache(): void
     {
         $this->batchMode = true;
+
         $cacheIds = Blitz::$plugin->expireCache->getExpiredCacheIds();
         $this->addCacheIds($cacheIds);
         $this->addExpiredElements();
+
         $this->refreshExpired();
     }
 
@@ -494,7 +492,9 @@ class RefreshCacheService extends Component
     public function refreshExpiredElements(): void
     {
         $this->batchMode = true;
+
         $this->addExpiredElements();
+
         $this->refreshExpired();
     }
 
