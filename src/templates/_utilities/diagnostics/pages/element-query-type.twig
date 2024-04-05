@@ -1,6 +1,9 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/page' %}
 
 {% set page = craft.blitz.diagnostics.getPage() %}
+{% if page is null %}
+    {% redirect 'blitz/diagnostics/pages' with error 'The page no longer exists or may have been refreshed.' %}
+{% endif %}
 {% set element = craft.blitz.diagnostics.getElementOfType(page.id) %}
 {% set title = 'Tracked ' ~ element.displayName ~ ' Queries' %}
 {% set crumbs = [
