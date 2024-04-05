@@ -91,7 +91,7 @@ class ElementQueryHelper
 
         // Convert ID parameters to arrays
         foreach ($params as $key => $value) {
-            if ($key == 'id' || str_ends_with($key, 'Id')) {
+            if ($key === 'id' || str_ends_with($key, 'Id')) {
                 $params[$key] = self::getNormalizedElementQueryIdParam($value);
             }
         }
