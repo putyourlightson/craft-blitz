@@ -414,26 +414,14 @@ class ElementQueryHelper
      */
     public static function isRelationFieldQuery(ElementQuery $elementQuery): bool
     {
-        if (empty($elementQuery->join)) {
+        if ($elementQuery->wasEagerLoaded()
+            || $elementQuery->eagerLoadHandle === null
+            || $elementQuery->id !== null
+        ) {
             return false;
         }
 
-        $join = $elementQuery->join[0] ?? null;
-
-        if ($join === null) {
-            return false;
-        }
-
-        $relationTypes = [
-            ['relations' => '{{%relations}}'],
-            '{{%relations}} relations',
-        ];
-
-        if ($join[0] == 'INNER JOIN' && in_array($join[1], $relationTypes)) {
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**
