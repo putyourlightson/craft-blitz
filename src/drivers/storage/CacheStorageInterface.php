@@ -12,14 +12,14 @@ interface CacheStorageInterface
     /**
      * Returns the cached value for the provided site URI.
      */
-    public function get(SiteUriModel $siteUri): string;
+    public function get(SiteUriModel $siteUri): ?string;
 
     /**
      * Returns the compressed cached value for the provided site URI.
      *
      * @since 4.5.0
      */
-    public function getCompressed(SiteUriModel $siteUri): string;
+    public function getCompressed(SiteUriModel $siteUri): ?string;
 
     /**
      * Saves the cache value for the provided site URI.

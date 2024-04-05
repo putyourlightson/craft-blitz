@@ -255,16 +255,6 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns whether the site URI is expired.
-     *
-     * @since 4.8.0
-     */
-    public function getIsExpiredSiteUri(SiteUriModel $siteUri): bool
-    {
-        return Blitz::$plugin->expireCache->getExpiredCacheId($siteUri) !== false;
-    }
-
-    /**
      * Returns whether this is a cached include without memoizing the result,
      * which would disrupt the local cache generator.
      *
@@ -272,11 +262,11 @@ class CacheRequestService extends Component
      */
     public function getIsCachedInclude(string $uri = null): bool
     {
-        // Includes based on the provided URI takes preference
+        // Includes based on the provided URI takes preference.
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::CACHED_INCLUDE_PATH);
+            return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
@@ -285,9 +275,9 @@ class CacheRequestService extends Component
             return $action == self::CACHED_INCLUDE_ACTION;
         }
 
-        $uri = Craft::$app->getRequest()->getFullUri();
+        $uri = Craft::$app->getRequest()->getFullUri() . '?' . Craft::$app->getRequest()->getQueryString();
 
-        return str_starts_with($uri, self::CACHED_INCLUDE_PATH);
+        return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
     }
 
     /**
@@ -302,7 +292,7 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::DYNAMIC_INCLUDE_PATH);
+            return str_starts_with($uri, self::DYNAMIC_INCLUDE_PATH . '?action=' . self::DYNAMIC_INCLUDE_ACTION);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
@@ -349,7 +339,7 @@ class CacheRequestService extends Component
      *
      * @since 4.3.0
      */
-    public function getIncludeByIndex(?int $index): ?IncludeRecord
+    public function getIncludeByIndex(int|string|null $index): ?IncludeRecord
     {
         if ($index === null) {
             return null;
@@ -453,19 +443,19 @@ class CacheRequestService extends Component
         $cacheStorage = Blitz::$plugin->cacheStorage;
         $siteUri = $event->siteUri;
         $encoded = $this->requestAcceptsEncoding() && $cacheStorage->canCompressCachedValues();
-        $content = '';
+        $content = null;
 
         if ($encoded) {
             $content = $cacheStorage->getCompressed($siteUri);
         }
 
         // Fall back to unencoded, in case of cached includes or SSI includes
-        if (empty($content)) {
+        if ($content === null) {
             $encoded = false;
             $content = $cacheStorage->get($siteUri);
         }
 
-        if (empty($content)) {
+        if ($content === null) {
             return null;
         }
 
@@ -504,7 +494,7 @@ class CacheRequestService extends Component
         // Save the content and prepare the response
         $content = Blitz::$plugin->generateCache->save($response->content, $siteUri);
 
-        if ($content) {
+        if ($content !== null) {
             $response->content = $content;
             $this->prepareResponse($response, $siteUri);
         }
@@ -581,9 +571,11 @@ class CacheRequestService extends Component
         $queryString = parse_url($uri, PHP_URL_QUERY) ?: '';
         parse_str($queryString, $queryStringParams);
 
-        foreach ($queryStringParams as $key => $value) {
-            if (!$this->getIsAllowedQueryStringParam($siteId, $key)) {
-                unset($queryStringParams[$key]);
+        if (!$this->getIsCachedInclude($uri)) {
+            foreach ($queryStringParams as $key => $value) {
+                if (!$this->getIsAllowedQueryStringParam($siteId, $key)) {
+                    unset($queryStringParams[$key]);
+                }
             }
         }
 
@@ -654,7 +646,7 @@ class CacheRequestService extends Component
 
         // Send or remove the powered by header
         if ($generalConfig->sendPoweredByHeader) {
-            $poweredByHeader = $headers->get(HeaderEnum::X_POWERED_BY, first: false);
+            $poweredByHeader = $headers->get(HeaderEnum::X_POWERED_BY, [], false);
 
             if (!in_array(Craft::$app->name, $poweredByHeader)) {
                 $headers->add(HeaderEnum::X_POWERED_BY, Craft::$app->name);
@@ -676,9 +668,9 @@ class CacheRequestService extends Component
     {
         $cacheControlHeader = Blitz::$plugin->settings->cacheControlHeader;
 
-        if ($this->getIsExpiredSiteUri($siteUri)) {
+        if (Blitz::$plugin->expireCache->getIsExpiredSiteUri($siteUri)) {
             $cacheControlHeader = Blitz::$plugin->settings->cacheControlHeaderExpired;
-            Blitz::$plugin->refreshCache->refreshExpiredSiteUri($siteUri);
+            Blitz::$plugin->refreshCache->refreshExpiredSiteUris([$siteUri]);
         }
 
         $headers = $response->getHeaders();

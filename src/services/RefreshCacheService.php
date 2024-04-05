@@ -462,22 +462,14 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes an expired site URI.
+     * Refreshes expired site URIs.
      */
-    public function refreshExpiredSiteUri(SiteUriModel $siteUri): void
+    public function refreshExpiredSiteUris(array $siteUris): void
     {
-        $cacheId = Blitz::$plugin->expireCache->getExpiredCacheId($siteUri);
+        $cacheIds = SiteUriHelper::getCacheIdsFromSiteUris($siteUris);
+        $this->addCacheIds($cacheIds);
 
-        if ($cacheId === false) {
-            return;
-        }
-
-        $this->addCacheIds([$cacheId]);
-
-        // Forcibly generate the cache if it will not be cleared.
-        $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
-
-        $this->refresh(false, $forceGenerate);
+        $this->refreshExpired();
     }
 
     /**
@@ -486,32 +478,26 @@ class RefreshCacheService extends Component
     public function refreshExpiredCache(): void
     {
         $this->batchMode = true;
+
         $cacheIds = Blitz::$plugin->expireCache->getExpiredCacheIds();
         $this->addCacheIds($cacheIds);
+        $this->addExpiredElements();
 
-        // Check for expired elements to invalidate
-        /** @var ElementExpiryDateRecord[] $elementExpiryDates */
-        $elementExpiryDates = ElementExpiryDateRecord::find()
-            ->where(['<=', 'expiryDate', Db::prepareDateForDb('now')])
-            ->all();
+        $this->refreshExpired();
+    }
 
-        $elementsService = Craft::$app->getElements();
+    /**
+     * Refreshes all expired elements.
+     *
+     * @since 4.15.0
+     */
+    public function refreshExpiredElements(): void
+    {
+        $this->batchMode = true;
 
-        foreach ($elementExpiryDates as $elementExpiryDate) {
-            $element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
+        $this->addExpiredElements();
 
-            // Do this before invalidating the element so that other expiry dates will be saved
-            $elementExpiryDate->delete();
-
-            if ($element !== null) {
-                $this->addElement($element);
-            }
-        }
-
-        // Forcibly generate the cache if it will not be cleared.
-        $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
-
-        $this->refresh(false, $forceGenerate);
+        $this->refreshExpired();
     }
 
     /**
@@ -560,5 +546,37 @@ class RefreshCacheService extends Component
         CacheGeneratorHelper::releaseGeneratorJobs();
         DeployerHelper::releaseDeployerJobs();
         CachePurgerHelper::releasePurgerJobs();
+    }
+
+    /**
+     * Adds expired elements to invalidate.
+     */
+    private function addExpiredElements(): void
+    {
+        /** @var ElementExpiryDateRecord[] $elementExpiryDates */
+        $elementExpiryDates = ElementExpiryDateRecord::find()
+            ->where(['<=', 'expiryDate', Db::prepareDateForDb('now')])
+            ->all();
+
+        $elementsService = Craft::$app->getElements();
+
+        foreach ($elementExpiryDates as $elementExpiryDate) {
+            $element = $elementsService->getElementById($elementExpiryDate->elementId, null, '*');
+
+            // Do this before invalidating the element so that other expiry dates will be saved
+            $elementExpiryDate->delete();
+
+            if ($element !== null) {
+                $this->addElement($element);
+            }
+        }
+    }
+
+    private function refreshExpired(): void
+    {
+        // Forcibly generate the cache if it will not be cleared.
+        $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
+
+        $this->refresh(false, $forceGenerate);
     }
 }

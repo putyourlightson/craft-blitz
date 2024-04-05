@@ -32,6 +32,7 @@ use craft\services\UserPermissions;
 use craft\services\Utilities;
 use craft\utilities\ClearCaches;
 use craft\web\Application;
+use craft\web\Response;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use Monolog\Formatter\LineFormatter;
@@ -65,7 +66,6 @@ use yii\di\Instance;
 use yii\log\Dispatcher;
 use yii\log\Logger;
 use yii\queue\Queue;
-use yii\web\Response;
 
 /**
  * @property-read CacheRequestService $cacheRequest
@@ -335,7 +335,7 @@ class Blitz extends Plugin
                         $response = $event->sender;
                         $this->cacheRequest->saveAndPrepareResponse($response, $siteUri);
                     },
-                    // Prepend the event, so it is triggered as early as possible.
+                    // Prepend the event, so it is triggered as early as possible (before Craft Cloud gzips the response content, for example).
                     append: false,
                 );
             }

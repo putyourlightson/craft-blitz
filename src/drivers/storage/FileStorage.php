@@ -70,7 +70,7 @@ class FileStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function get(SiteUriModel $siteUri): string
+    public function get(SiteUriModel $siteUri): ?string
     {
         $filePaths = $this->getFilePaths($siteUri);
 
@@ -80,13 +80,13 @@ class FileStorage extends BaseCacheStorage
             }
         }
 
-        return '';
+        return null;
     }
 
     /**
      * @inheritdoc
      */
-    public function getCompressed(SiteUriModel $siteUri): string
+    public function getCompressed(SiteUriModel $siteUri): ?string
     {
         $filePaths = $this->getFilePaths($siteUri);
 
@@ -97,7 +97,7 @@ class FileStorage extends BaseCacheStorage
             }
         }
 
-        return '';
+        return null;
     }
 
     /**

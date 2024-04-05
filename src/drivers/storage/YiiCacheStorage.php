@@ -60,7 +60,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function get(SiteUriModel $siteUri): string
+    public function get(SiteUriModel $siteUri): ?string
     {
         if ($this->canCompressCachedValues()) {
             $value = $this->getCompressed($siteUri);
@@ -82,7 +82,7 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * @inheritdoc
      */
-    public function getCompressed(SiteUriModel $siteUri): string
+    public function getCompressed(SiteUriModel $siteUri): ?string
     {
         $key = $this->getKey($siteUri, true);
 
@@ -186,24 +186,24 @@ class YiiCacheStorage extends BaseCacheStorage
     /**
      * Returns a key’s value from the cache.
      */
-    private function getFromCache(array $key): string
+    private function getFromCache(array $key): ?string
     {
         if ($this->cache === null) {
-            return '';
+            return null;
         }
 
         // Redis cache can throw an exception if the connection is broken
         try {
             $value = $this->cache->get($key);
 
-            if ($value) {
+            if ($value !== false) {
                 return $value;
             }
         } /** @noinspection PhpRedundantCatchClauseInspection */
         catch (Exception) {
         }
 
-        return '';
+        return null;
     }
 
     /**

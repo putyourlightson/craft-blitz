@@ -59,12 +59,14 @@ test('Request with token is not cacheable', function() {
         ->toBeFalse();
 });
 
-test('Request starting with `_includes` is a cached include', function() {
+test('Request with a cached include prefix is a cached include', function() {
     expect(Blitz::$plugin->cacheRequest->getIsCachedInclude('/_includes/xyz'))
+        ->toBeFalse()
+        ->and(Blitz::$plugin->cacheRequest->getIsCachedInclude('/_includes?action=' . CacheRequestService::CACHED_INCLUDE_ACTION))
         ->toBeTrue();
 });
 
-test('Request with cached include action is a cached include', function() {
+test('Request with a cached include action is a cached include', function() {
     [, $index] = Blitz::$plugin->generateCache->saveInclude(1, 'test/_include', []);
     sendRequest(UrlHelper::actionUrl('', [
         'action' => CacheRequestService::CACHED_INCLUDE_ACTION,
@@ -75,8 +77,10 @@ test('Request with cached include action is a cached include', function() {
         ->toBeTrue();
 });
 
-test('Request starting with `_dynamic` is a dynamic include', function() {
+test('Request with a dynamic include prefix is a dynamic include', function() {
     expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamic/xyz'))
+        ->toBeFalse()
+        ->and(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamic?action=' . CacheRequestService::DYNAMIC_INCLUDE_ACTION))
         ->toBeTrue();
 });
 
