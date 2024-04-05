@@ -74,13 +74,6 @@ class ElementQueryHelper
             }
         }
 
-        // Exclude eager-loading params, as they are redundant.
-        foreach (['eagerLoadSourceElement', 'eagerLoadHandle'] as $key) {
-            if (array_key_exists($key, $params)) {
-                unset($params[$key]);
-            }
-        }
-
         // Exclude the `query` and `subquery` params, in case they are set.
         // https://github.com/putyourlightson/craft-blitz/issues/579
         foreach (['query', 'subquery'] as $key) {
