@@ -91,7 +91,7 @@ class ElementQueryHelper
 
         // Convert ID parameters to arrays
         foreach ($params as $key => $value) {
-            if ($key == 'id' || str_ends_with($key, 'Id')) {
+            if ($key === 'id' || str_ends_with($key, 'Id')) {
                 $params[$key] = self::getNormalizedElementQueryIdParam($value);
             }
         }
@@ -403,7 +403,7 @@ class ElementQueryHelper
             '{{%relations}} relations',
         ];
 
-        if ($join[0] == 'INNER JOIN' && in_array($join[1], $relationTypes)) {
+        if ($join[0] === 'INNER JOIN' && in_array($join[1], $relationTypes)) {
             return true;
         }
 
