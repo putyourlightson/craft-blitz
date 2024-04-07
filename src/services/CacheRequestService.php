@@ -648,10 +648,10 @@ class CacheRequestService extends Component
 
         // Send or remove the powered by header
         if ($generalConfig->sendPoweredByHeader) {
-            $poweredByHeader = $headers->get(HeaderEnum::X_POWERED_BY, [], false);
+            $original = $headers->get(HeaderEnum::X_POWERED_BY);
 
-            if (!in_array(Craft::$app->name, $poweredByHeader)) {
-                $headers->add(HeaderEnum::X_POWERED_BY, Craft::$app->name);
+            if (!str_contains($original, Craft::$app->name)) {
+                $headers->set(HeaderEnum::X_POWERED_BY, $original . ($original ? ',' : '') . Craft::$app->name);
             }
         } else {
             $headers->remove(HeaderEnum::X_POWERED_BY);
@@ -683,7 +683,11 @@ class CacheRequestService extends Component
         }
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $headers->add(HeaderEnum::X_POWERED_BY, 'Blitz');
+            $original = $headers->get(HeaderEnum::X_POWERED_BY) ?? '';
+
+            if (!str_contains($original, 'Blitz')) {
+                $headers->set(HeaderEnum::X_POWERED_BY, $original . ($original ? ',' : '') . 'Blitz');
+            }
         }
 
         // Add cache tag header if set
