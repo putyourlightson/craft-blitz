@@ -24,14 +24,14 @@ test('Response contains the default cache control header when the page is not ca
     $response = sendRequest();
     Blitz::$plugin->cacheRequest->setDefaultCacheControlHeader();
 
-    expect($response->headers->get(HeaderEnum::CACHE_CONTROL))
+    expect($response->headers->get(HeaderEnum::CACHE_CONTROL->value))
         ->toEqual(Blitz::$plugin->settings->defaultCacheControlHeader);
 });
 
 test('Response contains the cache control header when the page is cacheable', function() {
     $response = sendRequest();
 
-    expect($response->headers->get(HeaderEnum::CACHE_CONTROL))
+    expect($response->headers->get(HeaderEnum::CACHE_CONTROL->value))
         ->toEqual(Blitz::$plugin->settings->cacheControlHeader);
 });
 
@@ -49,7 +49,7 @@ test('Response contains the expired cache control header and the cache is refres
 
     $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
 
-    expect($response->headers->get(HeaderEnum::CACHE_CONTROL))
+    expect($response->headers->get(HeaderEnum::CACHE_CONTROL->value))
         ->toEqual(Blitz::$plugin->settings->cacheControlHeaderExpired);
 });
 
@@ -57,7 +57,7 @@ test('Response adds the powered by header', function() {
     Craft::$app->config->general->sendPoweredByHeader = true;
     $response = sendRequest();
 
-    expect($response->headers->get(HeaderEnum::X_POWERED_BY, first: false))
+    expect($response->headers->get(HeaderEnum::X_POWERED_BY->value, first: false))
         ->toContainEqual('Blitz');
 });
 
@@ -89,7 +89,7 @@ test('Response with mime type has headers and does not contain output comments',
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
     $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
 
-    expect($response->headers->get(HeaderEnum::CONTENT_TYPE))
+    expect($response->headers->get(HeaderEnum::CONTENT_TYPE->value))
         ->toBe('application/json')
         ->and($response->content)
         ->toBe($output);
@@ -100,11 +100,11 @@ test('Response is encoded when compression is enabled', function() {
     $siteUri = createSiteUri();
     Blitz::$plugin->cacheStorage->compressCachedValues = true;
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
-    Craft::$app->getRequest()->headers->remove(HeaderEnum::ACCEPT_ENCODING);
-    Craft::$app->getRequest()->headers->set(HeaderEnum::ACCEPT_ENCODING, 'deflate, gzip');
+    Craft::$app->getRequest()->headers->remove(HeaderEnum::ACCEPT_ENCODING->value);
+    Craft::$app->getRequest()->headers->set(HeaderEnum::ACCEPT_ENCODING->value, 'deflate, gzip');
     $response = Blitz::$plugin->cacheRequest->getCachedResponse($siteUri);
 
-    expect($response->headers->get(HeaderEnum::CONTENT_ENCODING))
+    expect($response->headers->get(HeaderEnum::CONTENT_ENCODING->value))
         ->toBe('gzip')
         ->and(gzdecode($response->content))
         ->toBe($output);

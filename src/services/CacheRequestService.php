@@ -82,7 +82,7 @@ class CacheRequestService extends Component
     public function setDefaultCacheControlHeader(): void
     {
         if (Blitz::$plugin->settings->defaultCacheControlHeader !== null) {
-            Craft::$app->getResponse()->getHeaders()->set(HeaderEnum::CACHE_CONTROL, Blitz::$plugin->settings->defaultCacheControlHeader);
+            Craft::$app->getResponse()->getHeaders()->set(HeaderEnum::CACHE_CONTROL->value, Blitz::$plugin->settings->defaultCacheControlHeader);
         }
     }
 
@@ -613,7 +613,7 @@ class CacheRequestService extends Component
      */
     public function requestAcceptsEncoding(): bool
     {
-        $encoding = Craft::$app->getRequest()->getHeaders()->get(HeaderEnum::ACCEPT_ENCODING);
+        $encoding = Craft::$app->getRequest()->getHeaders()->get(HeaderEnum::ACCEPT_ENCODING->value);
 
         if (empty($encoding)) {
             return false;
@@ -636,26 +636,26 @@ class CacheRequestService extends Component
         $generalConfig = Craft::$app->getConfig()->getGeneral();
 
         if ($generalConfig->permissionsPolicyHeader) {
-            $headers->set(HeaderEnum::PERMISSIONS_POLICY, $generalConfig->permissionsPolicyHeader);
+            $headers->set(HeaderEnum::PERMISSIONS_POLICY->value, $generalConfig->permissionsPolicyHeader);
         }
 
         // Tell bots not to index/follow CP and tokenized pages
         if ($generalConfig->disallowRobots) {
-            $headers->set(HeaderEnum::X_ROBOTS_TAG, 'none');
+            $headers->set(HeaderEnum::X_ROBOTS_TAG->value, 'none');
         }
 
         // Send or remove the powered by header
         if ($generalConfig->sendPoweredByHeader) {
-            $original = $headers->get(HeaderEnum::X_POWERED_BY);
+            $original = $headers->get(HeaderEnum::X_POWERED_BY->value);
 
             if (!str_contains($original, Craft::$app->name)) {
-                $headers->set(HeaderEnum::X_POWERED_BY, $original . ($original ? ',' : '') . Craft::$app->name);
+                $headers->set(HeaderEnum::X_POWERED_BY->value, $original . ($original ? ',' : '') . Craft::$app->name);
             }
         } else {
-            $headers->remove(HeaderEnum::X_POWERED_BY);
+            $headers->remove(HeaderEnum::X_POWERED_BY->value);
 
             // In case PHP is already setting one
-            header_remove(HeaderEnum::X_POWERED_BY);
+            header_remove(HeaderEnum::X_POWERED_BY->value);
         }
     }
 
@@ -674,17 +674,17 @@ class CacheRequestService extends Component
         }
 
         $headers = $response->getHeaders();
-        $headers->set(HeaderEnum::CACHE_CONTROL, $cacheControlHeader);
+        $headers->set(HeaderEnum::CACHE_CONTROL->value, $cacheControlHeader);
 
         if ($encoded) {
-            $headers->set(HeaderEnum::CONTENT_ENCODING, BaseCacheStorage::ENCODING);
+            $headers->set(HeaderEnum::CONTENT_ENCODING->value, BaseCacheStorage::ENCODING);
         }
 
         if (Blitz::$plugin->settings->sendPoweredByHeader) {
-            $original = $headers->get(HeaderEnum::X_POWERED_BY) ?? '';
+            $original = $headers->get(HeaderEnum::X_POWERED_BY->value) ?? '';
 
             if (!str_contains($original, 'Blitz')) {
-                $headers->set(HeaderEnum::X_POWERED_BY, $original . ($original ? ',' : '') . 'Blitz');
+                $headers->set(HeaderEnum::X_POWERED_BY->value, $original . ($original ? ',' : '') . 'Blitz');
             }
         }
 
@@ -711,7 +711,7 @@ class CacheRequestService extends Component
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
         if ($mimeType != SiteUriHelper::MIME_TYPE_HTML) {
-            $headers->set(HeaderEnum::CONTENT_TYPE, $mimeType);
+            $headers->set(HeaderEnum::CONTENT_TYPE->value, $mimeType);
 
             if ($response->format == Response::FORMAT_HTML) {
                 $response->format = Response::FORMAT_RAW;
