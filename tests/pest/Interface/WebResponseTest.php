@@ -57,8 +57,8 @@ test('Response adds the powered by header', function() {
     Craft::$app->config->general->sendPoweredByHeader = true;
     $response = sendRequest();
 
-    expect($response->headers->get(HeaderEnum::X_POWERED_BY, first: false))
-        ->toContainEqual('Blitz');
+    expect($response->headers->get(HeaderEnum::X_POWERED_BY))
+        ->toContain('Blitz');
 });
 
 test('Response contains output comments when enabled', function(bool|int $value) {
