@@ -27,7 +27,6 @@
     "craftcms/feed-me": "^6.0",
     "craftcms/phpstan": "dev-main",
     "nystudio107/craft-seomatic": "^5.0.0-beta.1",
-    "putyourlightson/craft-generate-test-spec": "v2.x-dev",
     "yiisoft/yii2-redis": "^2.0"
   },
   "autoload": {
