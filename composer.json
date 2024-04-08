@@ -1,7 +1,7 @@
 {
   "name": "putyourlightson/craft-blitz",
   "description": "Intelligent static page caching for creating lightning-fast sites.",
-  "version": "5.0.0-beta.4",
+  "version": "5.0.0",
   "type": "craft-plugin",
   "homepage": "https://putyourlightson.com/plugins/blitz",
   "license": "proprietary",
@@ -17,17 +17,17 @@
     "php": "^8.2",
     "amphp/http-client": "^5.0",
     "amphp/parallel": "^2.0",
-    "craftcms/cms": "^5.0.0",
+    "craftcms/cms": "^5.0",
     "cypresslab/gitelephant": "^4.0",
-    "putyourlightson/craft-sprig-core": "^3.0.0-beta.1"
+    "putyourlightson/craft-sprig-core": "^3.0"
   },
   "require-dev": {
-    "craftcms/commerce": "^4.0.0",
+    "craftcms/commerce": "^5.0.0-beta.1",
     "craftcms/ecs": "dev-main",
-    "craftcms/feed-me": "^5.0.0-beta.1",
+    "craftcms/feed-me": "^6.0",
     "craftcms/phpstan": "dev-main",
     "markhuot/craft-pest-core": "v3.x-dev",
-    "nystudio107/craft-seomatic": "^5.0.0-beta.1",
+    "nystudio107/craft-seomatic": "^5.0",
     "putyourlightson/craft-generate-test-spec": "v2.x-dev",
     "yiisoft/yii2-redis": "^2.0"
   },
