@@ -24,23 +24,12 @@
   "require-dev": {
     "craftcms/commerce": "^5.0.0-beta.1",
     "craftcms/ecs": "dev-main",
-    "craftcms/feed-me": "dev-patch-2",
+    "craftcms/feed-me": "^6.0",
     "craftcms/phpstan": "dev-main",
-    "markhuot/craft-pest-core": "dev-craft5",
     "nystudio107/craft-seomatic": "^5.0.0-beta.1",
     "putyourlightson/craft-generate-test-spec": "v2.x-dev",
     "yiisoft/yii2-redis": "^2.0"
   },
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "https://github.com/bencroker/craft-pest-core"
-    },
-    {
-      "type": "vcs",
-      "url": "https://github.com/bencroker/feed-me"
-    }
-  ],
   "autoload": {
     "psr-4": {
       "putyourlightson\\blitz\\": "src/"
