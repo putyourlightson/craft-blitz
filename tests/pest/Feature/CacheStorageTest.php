@@ -27,7 +27,7 @@ test('Long site URI can be saved except for by file storage driver', function(st
     $siteUri = createSiteUri(uri: StringHelper::randomString(1000));
     Blitz::$plugin->set('cacheStorage', $driver);
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
-    $expectedValue = $driver === FileStorage::class ? '' : $output;
+    $expectedValue = $driver === FileStorage::class ? null : $output;
 
     expect(Blitz::$plugin->cacheStorage->get($siteUri))
         ->toBe($expectedValue);

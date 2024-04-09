@@ -25,6 +25,11 @@ use yii\log\Logger;
  */
 class FileStorage extends BaseCacheStorage
 {
+    /*
+     * @const int
+     */
+    public const MAX_FILE_PATH_SEGMENT_LENGTH = 255;
+
     /**
      * @inheritdoc
      */
@@ -129,16 +134,12 @@ class FileStorage extends BaseCacheStorage
             return;
         }
 
-        try {
-            foreach ($filePaths as $filePath) {
-                FileHelper::writeToFile($filePath, $value);
+        foreach ($filePaths as $filePath) {
+            $this->saveToFile($filePath, $value);
 
-                if ($allowEncoding && $this->canCompressCachedValues()) {
-                    FileHelper::writeToFile($filePath . '.gz', gzencode($value));
-                }
+            if ($allowEncoding && $this->canCompressCachedValues()) {
+                $this->saveToFile($filePath . '.gz', gzencode($value));
             }
-        } catch (Exception|ErrorException|InvalidArgumentException $exception) {
-            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }
 
@@ -424,6 +425,30 @@ class FileStorage extends BaseCacheStorage
         }
 
         return false;
+    }
+
+    /**
+     * Saves the cached value to a file path.
+     */
+    private function saveToFile(string $filePath, string $value): void
+    {
+        $segments = explode('/', $filePath);
+        foreach ($segments as $segment) {
+            if (strlen($segment) > self::MAX_FILE_PATH_SEGMENT_LENGTH) {
+                Blitz::$plugin->log('File cache storage could not save cached value due a file path segment greater than the max length of {length} characters in "{filePath}".', [
+                    'length' => self::MAX_FILE_PATH_SEGMENT_LENGTH,
+                    'filePath' => $filePath,
+                ], Logger::LEVEL_ERROR);
+
+                return;
+            }
+        }
+
+        try {
+            FileHelper::writeToFile($filePath, $value);
+        } catch (Exception|ErrorException|InvalidArgumentException $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
+        }
     }
 
     /**
