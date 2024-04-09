@@ -6,6 +6,10 @@
 
 - Added tracked includes to the Blitz Diagnostics utility.
 
+### Fixed
+
+- Fixed an edge-case bug in which cached includes were not being refreshed when expired.
+
 ## 4.15.0 - 2024-04-08
 
 ### Added

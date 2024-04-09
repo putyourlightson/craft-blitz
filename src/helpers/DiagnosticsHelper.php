@@ -53,7 +53,7 @@ class DiagnosticsHelper
     {
         return CacheRecord::find()
             ->where(['siteId' => $siteId])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false]])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX]])
             ->count();
     }
 
@@ -61,7 +61,7 @@ class DiagnosticsHelper
     {
         return CacheRecord::find()
             ->where(['siteId' => $siteId])
-            ->andWhere(['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false])
+            ->andWhere(['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX])
             ->count();
     }
 
@@ -182,7 +182,7 @@ class DiagnosticsHelper
                     ->groupBy(['cacheId']),
             ], 'id = [[elementquerycaches.cacheId]]')
             ->where(['siteId' => $siteId])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false]])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX]])
             ->asArray();
     }
 
@@ -206,7 +206,7 @@ class DiagnosticsHelper
                     ->groupBy(['cacheId']),
             ], '[[caches.id]] = [[elementquerycaches.cacheId]]')
             ->where(['caches.siteId' => $siteId])
-            ->andWhere(['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false])
+            ->andWhere(['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX])
             ->asArray();
     }
 
@@ -216,7 +216,7 @@ class DiagnosticsHelper
             ->select('uri')
             ->where(['siteId' => $siteId])
             ->andWhere(['like', 'uri', '?'])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false]])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX]])
             ->column();
 
         $queryStringParams = [];
