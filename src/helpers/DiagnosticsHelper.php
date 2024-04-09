@@ -170,7 +170,7 @@ class DiagnosticsHelper
             ->select('uri')
             ->where(['siteId' => $siteId])
             ->andWhere(['like', 'uri', '?'])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=']])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX]])
             ->column();
 
         $queryStringParams = [];

@@ -69,6 +69,16 @@ class CacheRequestService extends Component
     public const DYNAMIC_INCLUDE_PATH = '_dynamic';
 
     /**
+     * @const string
+     */
+    public const CACHED_INCLUDE_URI_PREFIX = self::CACHED_INCLUDE_PATH . '?action=';
+
+    /**
+     * @const string
+     */
+    public const DYNAMIC_INCLUDE_URI_PREFIX = self::DYNAMIC_INCLUDE_PATH . '?action=';
+
+    /**
      * @var bool|null
      */
     private ?bool $isGeneratorRequest = null;
@@ -268,18 +278,18 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
+            return str_starts_with($uri, self::CACHED_INCLUDE_URI_PREFIX);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             $action = implode('/', Craft::$app->getRequest()->getActionSegments());
 
-            return $action == self::CACHED_INCLUDE_ACTION;
+            return $action === self::CACHED_INCLUDE_ACTION;
         }
 
         $uri = Craft::$app->getRequest()->getFullUri() . '?' . Craft::$app->getRequest()->getQueryString();
 
-        return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
+        return str_starts_with($uri, self::CACHED_INCLUDE_URI_PREFIX);
     }
 
     /**
@@ -294,13 +304,13 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::DYNAMIC_INCLUDE_PATH . '?action=' . self::DYNAMIC_INCLUDE_ACTION);
+            return str_starts_with($uri, self::DYNAMIC_INCLUDE_URI_PREFIX);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             $action = implode('/', Craft::$app->getRequest()->getActionSegments());
 
-            return $action == self::DYNAMIC_INCLUDE_ACTION;
+            return $action === self::DYNAMIC_INCLUDE_ACTION;
         }
 
         return false;
