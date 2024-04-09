@@ -4,5 +4,9 @@
 {% set showSiteMenu = true %}
 
 {% block content %}
-    {{ sprig('blitz/_utilities/diagnostics/components/includes', { siteId: siteId }) }}
+    {{ sprig('blitz/_utilities/diagnostics/components/includes', {
+        siteId: siteId,
+        displayName: 'Include',
+        pluralDisplayName: 'Includes',
+    }) }}
 {% endblock %}
