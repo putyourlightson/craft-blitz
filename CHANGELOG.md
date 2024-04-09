@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.16.0 - Unreleased
+
+### Added
+
+- Added tracked includes to the Blitz Diagnostics utility.
+
 ## 4.15.0 - 2024-04-08
 
 ### Added

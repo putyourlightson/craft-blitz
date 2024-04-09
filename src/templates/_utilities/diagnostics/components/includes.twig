@@ -7,16 +7,16 @@
 {% if orderBy != 'uri' %}
     {% set order = order|merge({ 'uri': SORT_ASC }) %}
 {% endif %}
-{% set query = craft.blitz.diagnostics.getPagesQuery(siteId)
+{% set query = craft.blitz.diagnostics.getIncludesQuery(siteId)
     .orderBy(order)
     .offset(offset)
     .limit(limit) %}
 {% if search %}
-    {% if search == '/' %}
-        {% do query.andWhere({ uri: ''} ) %}
-    {% else %}
-        {% do query.andWhere(['like', 'uri', search]) %}
-    {% endif %}
+    {% do query.andWhere(['or',
+        ['like', 'uri', search],
+        ['like', 'template', search],
+        ['like', 'params', search],
+    ]) %}
 {% endif %}
 
 {% set total = query.count() %}
@@ -38,7 +38,17 @@
                     <tr>
                         <th class="{{ orderBy == 'uri' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="uri" s-val:sort-by="{{ orderBy == 'uri' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                {{ 'Page'|t('blitz') }}
+                                {{ 'Index'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'template' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="template" s-val:sort-by="{{ orderBy == 'template' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Template'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'params' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="params" s-val:sort-by="{{ orderBy == 'params' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Params'|t('blitz') }}
                             </button>
                         </th>
                         <th class="{{ orderBy == 'elementCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
@@ -72,9 +82,19 @@
                         {% set url = siteUrl(uri, null, null, siteId) %}
                         <tr>
                             <td class="code">
-                                <a href="{{ url('blitz/diagnostics/pages/page', { pageId: row.id }) }}">
-                                    {{ uri }}
+                                <a href="{{ url('blitz/diagnostics/includes/include', { includeId: row.id }) }}">
+                                    {{ row.index }}
                                 </a>
+                            </td>
+                            <td class="code">
+                                {{ row.template }}
+                            </td>
+                            <td class="code">
+                                {{ include('blitz/_utilities/diagnostics/_includes/copytext', {
+                                    id: 'params-' ~ row.id,
+                                    buttonId: 'copy-btn-params-' ~ row.id,
+                                    value: row.params,
+                                }) }}
                             </td>
                             <td>
                                 {{ (row.elementCount ?? 0)|number }}

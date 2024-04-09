@@ -21,6 +21,13 @@
         </a>
     </h2>
     <h2>
+        <a href="{{ cpUrl('blitz/diagnostics/includes') }}">
+            {% set count = craft.blitz.diagnostics.getIncludesCount(siteId) %}
+            {{ count|number }}
+            {{ '{num, plural, =1{Tracked Include} other{Tracked Includes}}'|t('blitz', { num: count }) }}
+        </a>
+    </h2>
+    <h2>
         <a href="{{ cpUrl('blitz/diagnostics/params') }}">
             {% set count = craft.blitz.diagnostics.getParamsCount(siteId) %}
             {{ count|number }}

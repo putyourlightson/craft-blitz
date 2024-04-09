@@ -1,5 +1,5 @@
-{% set orderBy = orderBy ?? (pageId is defined ? 'title' : 'count') %}
-{% set sortBy = sortBy ?? (pageId is defined ? 'asc' : 'desc') %}
+{% set orderBy = orderBy ?? (cacheId is defined ? 'title' : 'count') %}
+{% set sortBy = sortBy ?? (cacheId is defined ? 'asc' : 'desc') %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
@@ -7,7 +7,7 @@
 {% if orderBy != 'title' %}
     {% set order = order|merge({ 'title': SORT_ASC }) %}
 {% endif %}
-{% set query = craft.blitz.diagnostics.getElementsQuery(siteId, elementType, pageId ?? null)
+{% set query = craft.blitz.diagnostics.getElementsQuery(siteId, elementType, cacheId ?? null)
     .orderBy(order) %}
 {% if search %}
     {% do query.andWhere(['like', 'title', search]) %}
@@ -39,10 +39,10 @@
                                 {{ displayName }}
                             </button>
                         </th>
-                        {% if pageId is not defined %}
+                        {% if cacheId is not defined %}
                             <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                                 <button type="button" sprig s-val:order-by="count" s-val:sort-by="{{ orderBy == 'count' and sortBy == 'desc' ? 'asc' : 'desc' }}">
-                                    {{ 'Pages'|t('blitz') }}
+                                    {{ 'Pages/Includes'|t('blitz') }}
                                 </button>
                             </th>
                         {% endif %}
@@ -66,7 +66,7 @@
                                 <td>
                                     {{ include ('_elements/element') }}
                                 </td>
-                                {% if pageId is not defined %}
+                                {% if cacheId is not defined %}
                                     <td>
                                         {{ row.count }}
                                     </td>
@@ -89,6 +89,6 @@
             </table>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
-        {{ include('blitz/_utilities/diagnostics/includes/footer', { rows: elements }) }}
+        {{ include('blitz/_utilities/diagnostics/_includes/footer', { rows: elements }) }}
     </div>
 </div>

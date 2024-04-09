@@ -1,0 +1,14 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set include = craft.blitz.diagnostics.getInclude() %}
+{% if include is null %}
+    {% redirect 'utilities/blitz-diagnostics' %}
+{% endif %}
+
+{% set crumbs = [
+    {
+        label: 'Tracked Includes',
+        url: cpUrl('blitz/diagnostics/includes'),
+    },
+]|merge(crumbs ?? []) %}
+

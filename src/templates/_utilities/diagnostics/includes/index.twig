@@ -1,0 +1,8 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set title = 'Tracked Includes'|t('blitz') %}
+{% set showSiteMenu = true %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/components/includes', { siteId: siteId }) }}
+{% endblock %}

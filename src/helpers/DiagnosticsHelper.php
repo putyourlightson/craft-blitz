@@ -25,6 +25,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitzhints\BlitzHints;
 
@@ -52,6 +53,15 @@ class DiagnosticsHelper
     {
         return CacheRecord::find()
             ->where(['siteId' => $siteId])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false]])
+            ->count();
+    }
+
+    public static function getIncludesCount(int $siteId): int
+    {
+        return CacheRecord::find()
+            ->where(['siteId' => $siteId])
+            ->andWhere(['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false])
             ->count();
     }
 
@@ -101,12 +111,23 @@ class DiagnosticsHelper
         return $page;
     }
 
-    public static function getElementTypes(int $siteId, ?int $pageId = null): array
+    public static function getInclude(): array|null
+    {
+        $includeId = Craft::$app->getRequest()->getRequiredParam('includeId');
+
+        return CacheRecord::find()
+            ->select(['id', 'uri'])
+            ->where(['id' => $includeId])
+            ->asArray()
+            ->one();
+    }
+
+    public static function getElementTypes(int $siteId, ?int $cacheId = null): array
     {
         $condition = ['siteId' => $siteId];
 
-        if ($pageId) {
-            $condition['cacheId'] = $pageId;
+        if ($cacheId) {
+            $condition['cacheId'] = $cacheId;
         }
 
         return ElementCacheRecord::find()
@@ -120,12 +141,12 @@ class DiagnosticsHelper
             ->all();
     }
 
-    public static function getElementQueryTypes(int $siteId, ?int $pageId = null): array
+    public static function getElementQueryTypes(int $siteId, ?int $cacheId = null): array
     {
         $condition = ['siteId' => $siteId];
 
-        if ($pageId) {
-            $condition['cacheId'] = $pageId;
+        if ($cacheId) {
+            $condition['cacheId'] = $cacheId;
         }
 
         return ElementQueryCacheRecord::find()
@@ -161,6 +182,31 @@ class DiagnosticsHelper
                     ->groupBy(['cacheId']),
             ], 'id = [[elementquerycaches.cacheId]]')
             ->where(['siteId' => $siteId])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false]])
+            ->asArray();
+    }
+
+    public static function getIncludesQuery(int $siteId): ActiveQuery
+    {
+        return CacheRecord::find()
+            ->from(['caches' => CacheRecord::tableName()])
+            ->select(['[[caches.id]]', 'uri', 'SUBSTR(uri, 49) AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'expiryDate'])
+            ->innerJoin([
+                'indexes' => IncludeRecord::find()
+                    ->where(['siteId' => $siteId]),
+            ], 'SUBSTR(uri, 49) = [[indexes.index]]')
+            ->leftJoin([
+                'elements' => ElementCacheRecord::find()
+                    ->select(['cacheId', 'count(*) as elementCount'])
+                    ->groupBy(['cacheId']),
+            ], '[[caches.id]] = [[elements.cacheId]]')
+            ->leftJoin([
+                'elementquerycaches' => ElementQueryCacheRecord::find()
+                    ->select(['cacheId', 'count(*) as elementQueryCount'])
+                    ->groupBy(['cacheId']),
+            ], '[[caches.id]] = [[elementquerycaches.cacheId]]')
+            ->where(['caches.siteId' => $siteId])
+            ->andWhere(['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false])
             ->asArray();
     }
 
@@ -170,7 +216,7 @@ class DiagnosticsHelper
             ->select('uri')
             ->where(['siteId' => $siteId])
             ->andWhere(['like', 'uri', '?'])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=']])
+            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PATH . '?action=%', false]])
             ->column();
 
         $queryStringParams = [];
@@ -196,7 +242,7 @@ class DiagnosticsHelper
             ->andWhere(['like', 'uri', $param]);
     }
 
-    public static function getElementsQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
+    public static function getElementsQuery(int $siteId, string $elementType, ?int $cacheId = null): ActiveQuery
     {
         $condition = [
             CacheRecord::tableName() . '.siteId' => $siteId,
@@ -204,8 +250,8 @@ class DiagnosticsHelper
             'type' => $elementType,
         ];
 
-        if ($pageId) {
-            $condition['cacheId'] = $pageId;
+        if ($cacheId) {
+            $condition['cacheId'] = $cacheId;
         }
 
         return ElementCacheRecord::find()
@@ -220,15 +266,15 @@ class DiagnosticsHelper
             ->asArray();
     }
 
-    public static function getElementQueriesQuery(int $siteId, string $elementType, ?int $pageId = null): ActiveQuery
+    public static function getElementQueriesQuery(int $siteId, string $elementType, ?int $cacheId = null): ActiveQuery
     {
         $condition = [
             'siteId' => $siteId,
             'type' => $elementType,
         ];
 
-        if ($pageId) {
-            $condition['cacheId'] = $pageId;
+        if ($cacheId) {
+            $condition['cacheId'] = $cacheId;
         }
 
         return ElementQueryCacheRecord::find()
