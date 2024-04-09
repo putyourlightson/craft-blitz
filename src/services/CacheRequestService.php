@@ -69,14 +69,14 @@ class CacheRequestService extends Component
     public const DYNAMIC_INCLUDE_PATH = '_dynamic';
 
     /**
-     * @const string
+     * @const string The URI prefix, excluding anything after a slash that can be URL encoded.
      */
-    public const CACHED_INCLUDE_URI_PREFIX = self::CACHED_INCLUDE_PATH . '?action=';
+    public const CACHED_INCLUDE_URI_PREFIX = self::CACHED_INCLUDE_PATH . '?action=blitz';
 
     /**
-     * @const string
+     * @const string The URI prefix, excluding anything after a slash that can be URL encoded.
      */
-    public const DYNAMIC_INCLUDE_URI_PREFIX = self::DYNAMIC_INCLUDE_PATH . '?action=';
+    public const DYNAMIC_INCLUDE_URI_PREFIX = self::DYNAMIC_INCLUDE_PATH . '?action=blitz';
 
     /**
      * @var bool|null

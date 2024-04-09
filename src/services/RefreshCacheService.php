@@ -574,7 +574,7 @@ class RefreshCacheService extends Component
 
     private function refreshExpired(): void
     {
-        // Forcibly generate the cache if it will not be cleared.
+        // Forcibly generate the cache if it will not be cleared on refresh.
         $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
 
         $this->refresh(false, $forceGenerate);
