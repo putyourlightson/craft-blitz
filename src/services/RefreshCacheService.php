@@ -575,7 +575,7 @@ class RefreshCacheService extends Component
     private function refreshWithForce(): void
     {
         // Forcibly generate the cache if it will not be cleared on refresh.
-        $forceGenerate = Blitz::$plugin->settings->shouldClearOnRefresh() === false;
+        $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
 
         $this->refresh(false, $forceGenerate);
     }
