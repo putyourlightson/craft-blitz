@@ -10,6 +10,7 @@ use craft\helpers\App;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use yii\base\ErrorException;
@@ -397,15 +398,10 @@ class FileStorage extends BaseCacheStorage
 
     private function getNormalizedFilePath(string $sitePath, string $uri): string
     {
-        $uriParts = explode('?', $uri);
-        $queryString = $uriParts[1] ?? '';
+        $uri = SiteUriHelper::encodeQueryString($uri);
+        $uriPath = str_replace('?', '/', $uri);
 
-        // Encode forward slashes and square brackets in query string
-        $queryString = str_replace(['/', '[', ']'], ['%2F', '%5B', '%5D'], $queryString);
-
-        $uri = $uriParts[0] . '/' . $queryString;
-
-        return FileHelper::normalizePath($sitePath . '/' . $uri . '/index.html');
+        return FileHelper::normalizePath($sitePath . '/' . $uriPath . '/index.html');
     }
 
     private function hasInvalidQueryString(string $uri): bool

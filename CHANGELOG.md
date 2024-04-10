@@ -8,6 +8,7 @@
 
 ### Fixed
 
+- Fixed a bug in which cached includes were not being refreshed when a URL was provided.
 - Fixed an edge-case bug in which cached includes were not being refreshed when expired.
 
 ## 4.15.0 - 2024-04-08

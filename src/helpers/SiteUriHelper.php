@@ -536,12 +536,24 @@ class SiteUriHelper
 
                 $siteUri = new SiteUriModel([
                     'siteId' => $site->id,
-                    'uri' => $uri,
+                    'uri' => self::encodeQueryString($uri),
                 ]);
             }
         }
 
         return $siteUri;
+    }
+
+    /**
+     * Encodes forward slashes and square brackets in a URI’s query string.
+     */
+    public static function encodeQueryString(string $uri): string
+    {
+        $uriParts = explode('?', $uri);
+        $queryString = $uriParts[1] ?? '';
+        $queryString = str_replace(['/', '[', ']'], ['%2F', '%5B', '%5D'], $queryString);
+
+        return $uriParts[0] . ($queryString ? '?' . $queryString : '');
     }
 
     /**
