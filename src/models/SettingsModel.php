@@ -602,6 +602,7 @@ class SettingsModel extends Model
 
     /**
      * Returns whether the cache should be purged after being refreshed.
+     * Purging after refresh should only happen when the cache is expired.
      *
      * @since 4.8.0
      */

@@ -6,7 +6,7 @@ use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use yii\redis\Cache;
 use yii\redis\Connection;
 
-dataset('cacheStorageDrivers', [
+dataset('cache storage drivers', [
     'FileStorage' => FileStorage::class,
     'YiiCacheStorage' => function() {
         // Set cache component to Craft’s default
