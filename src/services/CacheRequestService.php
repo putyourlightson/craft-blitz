@@ -329,10 +329,10 @@ class CacheRequestService extends Component
 
         $token = Craft::$app->getRequest()->getToken();
 
-        if ($token == null) {
+        if ($token === null) {
             $this->isGeneratorRequest = false;
         } else {
-            // Don't use Tokens::getTokenRoute, as that can result in the token being deleted.
+            // Don’t use `Tokens::getTokenRoute`, as that can result in the token being deleted.
             // https://github.com/putyourlightson/craft-blitz/issues/448
             $route = (new Query())
                 ->select('route')
