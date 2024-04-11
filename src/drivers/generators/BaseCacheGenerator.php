@@ -168,6 +168,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
      * Returns URLs to generate, deleting and purging any that are not cacheable.
      *
      * @param SiteUriModel[]|array[] $siteUris
+     * @param bool $withToken
      * @return array
      */
     protected function getUrlsToGenerate(array $siteUris, bool $withToken = true): array

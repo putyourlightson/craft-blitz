@@ -4,7 +4,7 @@
 {% set limit = 50 %}
 {% set search = search ?? null %}
 {% set order = { (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) } %}
-{% set query = craft.blitz.diagnostics.getTagPagesQuery(siteId, tag)
+{% set query = craft.blitz.diagnostics.getParamPagesQuery(siteId, param)
     .orderBy(order)
     .offset(offset)
     .limit(limit) %}
@@ -28,8 +28,8 @@
             <table class="data fullwidth">
                 <thead>
                     <tr>
-                        <th class="{{ orderBy == 'tag' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="tag" s-val:sort-by="{{ orderBy == 'tag' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                        <th class="{{ orderBy == 'uri' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="uri" s-val:sort-by="{{ orderBy == 'uri' and sortBy == 'asc' ? 'desc' : 'asc' }}">
                                 {{ displayName }}
                             </button>
                         </th>
@@ -56,7 +56,7 @@
                             </td>
                             {% if currentUser.can('blitz:refresh-urls') %}
                                 <td class="thin">
-                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" title="Refresh" data-icon="refresh"></a>
+                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" href="#" title="Refresh" data-icon="refresh"></a>
                                 </td>
                             {% endif %}
                         </tr>
@@ -65,7 +65,7 @@
             </table>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
-        {{ include('blitz/_utilities/diagnostics/includes/footer') }}
-        {{ include('blitz/_utilities/diagnostics/includes/flashes') }}
+        {{ include('blitz/_utilities/diagnostics/_includes/footer') }}
+        {{ include('blitz/_utilities/diagnostics/_includes/flashes') }}
     </div>
 </div>

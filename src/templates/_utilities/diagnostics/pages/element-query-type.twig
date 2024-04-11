@@ -17,9 +17,9 @@
 ] %}
 
 {% block content %}
-    {{ sprig('blitz/_utilities/diagnostics/components/elementQueries', {
+    {{ sprig('blitz/_utilities/diagnostics/_components/elementQueries', {
         siteId: siteId,
-        pageId: page.id,
+        cacheId: page.id,
         elementType: className(element),
         displayName: element.displayName,
         pluralDisplayName: element.displayName ~ ' Queries',

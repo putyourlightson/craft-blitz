@@ -10,6 +10,7 @@ use craft\helpers\App;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
 use yii\base\ErrorException;
@@ -25,6 +26,11 @@ use yii\log\Logger;
  */
 class FileStorage extends BaseCacheStorage
 {
+    /*
+     * @const int
+     */
+    public const MAX_FILE_PATH_SEGMENT_LENGTH = 255;
+
     /**
      * @inheritdoc
      */
@@ -111,16 +117,12 @@ class FileStorage extends BaseCacheStorage
             return;
         }
 
-        try {
-            foreach ($filePaths as $filePath) {
-                FileHelper::writeToFile($filePath, $value);
+        foreach ($filePaths as $filePath) {
+            $this->saveToFile($filePath, $value);
 
-                if ($allowEncoding && $this->canCompressCachedValues()) {
-                    FileHelper::writeToFile($filePath . '.gz', gzencode($value));
-                }
+            if ($allowEncoding && $this->canCompressCachedValues()) {
+                $this->saveToFile($filePath . '.gz', gzencode($value));
             }
-        } catch (Exception|ErrorException|InvalidArgumentException $exception) {
-            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }
 
@@ -378,15 +380,10 @@ class FileStorage extends BaseCacheStorage
 
     private function getNormalizedFilePath(string $sitePath, string $uri): string
     {
-        $uriParts = explode('?', $uri);
-        $queryString = $uriParts[1] ?? '';
+        $uri = SiteUriHelper::encodeQueryString($uri);
+        $uriPath = str_replace('?', '/', $uri);
 
-        // Encode forward slashes and square brackets in query string
-        $queryString = str_replace(['/', '[', ']'], ['%2F', '%5B', '%5D'], $queryString);
-
-        $uri = $uriParts[0] . '/' . $queryString;
-
-        return FileHelper::normalizePath($sitePath . '/' . $uri . '/index.html');
+        return FileHelper::normalizePath($sitePath . '/' . $uriPath . '/index.html');
     }
 
     private function hasInvalidQueryString(string $uri): bool
@@ -406,6 +403,30 @@ class FileStorage extends BaseCacheStorage
         }
 
         return false;
+    }
+
+    /**
+     * Saves the cached value to a file path.
+     */
+    private function saveToFile(string $filePath, string $value): void
+    {
+        $segments = explode('/', $filePath);
+        foreach ($segments as $segment) {
+            if (strlen($segment) > self::MAX_FILE_PATH_SEGMENT_LENGTH) {
+                Blitz::$plugin->log('File cache storage could not save cached value due a file path segment greater than the max length of {length} characters in "{filePath}".', [
+                    'length' => self::MAX_FILE_PATH_SEGMENT_LENGTH,
+                    'filePath' => $filePath,
+                ], Logger::LEVEL_ERROR);
+
+                return;
+            }
+        }
+
+        try {
+            FileHelper::writeToFile($filePath, $value);
+        } catch (Exception|ErrorException|InvalidArgumentException $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
+        }
     }
 
     /**

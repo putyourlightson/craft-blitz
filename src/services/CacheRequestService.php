@@ -67,6 +67,16 @@ class CacheRequestService extends Component
     public const DYNAMIC_INCLUDE_PATH = '_dynamic';
 
     /**
+     * @const string
+     */
+    public const CACHED_INCLUDE_URI_PREFIX = self::CACHED_INCLUDE_PATH . '?action=';
+
+    /**
+     * @const string
+     */
+    public const DYNAMIC_INCLUDE_URI_PREFIX = self::DYNAMIC_INCLUDE_PATH . '?action=';
+
+    /**
      * @var bool|null
      */
     private ?bool $isGeneratorRequest = null;
@@ -266,18 +276,18 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
+            return str_starts_with($uri, self::CACHED_INCLUDE_URI_PREFIX);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             $action = implode('/', Craft::$app->getRequest()->getActionSegments());
 
-            return $action == self::CACHED_INCLUDE_ACTION;
+            return $action === self::CACHED_INCLUDE_ACTION;
         }
 
         $uri = Craft::$app->getRequest()->getFullUri() . '?' . Craft::$app->getRequest()->getQueryString();
 
-        return str_starts_with($uri, self::CACHED_INCLUDE_PATH . '?action=' . self::CACHED_INCLUDE_ACTION);
+        return str_starts_with($uri, self::CACHED_INCLUDE_URI_PREFIX);
     }
 
     /**
@@ -292,13 +302,13 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::DYNAMIC_INCLUDE_PATH . '?action=' . self::DYNAMIC_INCLUDE_ACTION);
+            return str_starts_with($uri, self::DYNAMIC_INCLUDE_URI_PREFIX);
         }
 
         if (Craft::$app->getRequest()->getIsActionRequest()) {
             $action = implode('/', Craft::$app->getRequest()->getActionSegments());
 
-            return $action == self::DYNAMIC_INCLUDE_ACTION;
+            return $action === self::DYNAMIC_INCLUDE_ACTION;
         }
 
         return false;
@@ -317,10 +327,10 @@ class CacheRequestService extends Component
 
         $token = Craft::$app->getRequest()->getToken();
 
-        if ($token == null) {
+        if ($token === null) {
             $this->isGeneratorRequest = false;
         } else {
-            // Don't use Tokens::getTokenRoute, as that can result in the token being deleted.
+            // Don’t use `Tokens::getTokenRoute`, as that can result in the token being deleted.
             // https://github.com/putyourlightson/craft-blitz/issues/448
             $route = (new Query())
                 ->select('route')
@@ -359,21 +369,21 @@ class CacheRequestService extends Component
     public function getRequestedCacheableSiteUri(): ?SiteUriModel
     {
         if ($this->getIsCachedInclude()) {
-            $index = Craft::$app->getRequest()->getParam('index');
+            $index = $this->getCachedIncludeIndexFromQueryString();
             $include = $this->getIncludeByIndex($index);
 
             if ($include === null) {
                 return null;
             }
 
-            $queryParams = [
-                'action' => Craft::$app->getRequest()->getParam('action'),
+            $queryString = http_build_query([
+                'action' => self::CACHED_INCLUDE_ACTION,
                 'index' => $index,
-            ];
+            ]);
 
             return new SiteUriModel([
                 'siteId' => $include->siteId,
-                'uri' => self::CACHED_INCLUDE_PATH . '?' . http_build_query($queryParams),
+                'uri' => self::CACHED_INCLUDE_PATH . '?' . $queryString,
             ]);
         }
 
@@ -405,7 +415,7 @@ class CacheRequestService extends Component
         }
 
         // Add the allowed query string if unique query strings should not be cached as the same page
-        if (Blitz::$plugin->settings->queryStringCaching != SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE) {
+        if (Blitz::$plugin->settings->queryStringCaching !== SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE) {
             $allowedQueryString = $this->getAllowedQueryString($site->id, '?' . $queryString);
 
             if ($allowedQueryString) {
@@ -758,5 +768,15 @@ class CacheRequestService extends Component
     private function normalizePath(string $path): string
     {
         return preg_replace('/\/\/+/', '/', trim($path, '/'));
+    }
+
+    /**
+     * Returns a cached include index from the query string. This is necessary since query params do not reliably come through with SSI requests.
+     */
+    private function getCachedIncludeIndexFromQueryString(): ?string
+    {
+        parse_str(Craft::$app->getRequest()->getQueryString(), $queryStringParams);
+
+        return $queryStringParams['index'] ?? null;
     }
 }

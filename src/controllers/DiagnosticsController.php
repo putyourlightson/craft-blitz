@@ -52,6 +52,7 @@ class DiagnosticsController extends Controller
                 'uri' => $page['uri'] ?: '/',
                 'elements' => $page['elementCount'] ?: 0,
                 'elementQueries' => $page['elementQueryCount'] ?: 0,
+                'expiryDate' => $page['expiryDate'],
             ];
         }
 
@@ -59,6 +60,34 @@ class DiagnosticsController extends Controller
         $this->response->formatters['csv'] = new CsvResponseFormatter();
         $this->response->format = 'csv';
         $this->response->setDownloadHeaders('tracked-pages.csv');
+
+        return $this->response;
+    }
+
+    public function actionExportIncludes(int $siteId): Response
+    {
+        App::maxPowerCaptain();
+
+        $includes = DiagnosticsHelper::getIncludesQuery($siteId)
+            ->orderBy(['elementCount' => SORT_DESC])
+            ->all();
+
+        $values = [];
+        foreach ($includes as $include) {
+            $values[] = [
+                'index' => $include['index'],
+                'template' => $include['template'],
+                'params' => $include['params'],
+                'elements' => $include['elementCount'] ?: 0,
+                'elementQueries' => $include['elementQueryCount'] ?: 0,
+                'expiryDate' => $include['expiryDate'],
+            ];
+        }
+
+        $this->response->data = $values;
+        $this->response->formatters['csv'] = new CsvResponseFormatter();
+        $this->response->format = 'csv';
+        $this->response->setDownloadHeaders('tracked-includes.csv');
 
         return $this->response;
     }

@@ -1,0 +1,112 @@
+{% set orderBy = orderBy ?? 'elementCount' %}
+{% set sortBy = sortBy ?? 'desc' %}
+{% set offset = offset ?? 0 %}
+{% set limit = 50 %}
+{% set search = search ?? null %}
+{% set order = { (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) } %}
+{% if orderBy != 'uri' %}
+    {% set order = order|merge({ 'uri': SORT_ASC }) %}
+{% endif %}
+{% set query = craft.blitz.diagnostics.getPagesQuery(siteId)
+    .orderBy(order)
+    .offset(offset)
+    .limit(limit) %}
+{% if search %}
+    {% if search == '/' %}
+        {% do query.andWhere({ uri: ''} ) %}
+    {% else %}
+        {% do query.andWhere(['like', 'uri', search]) %}
+    {% endif %}
+{% endif %}
+
+{% set total = query.count() %}
+{% set rows = query.all() %}
+{% set maxVisible = rows|length + offset %}
+
+<div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
+    <div class="search-container flex-grow texticon has-filter-btn">
+        <span class="texticon-icon search icon" aria-hidden="true"></span>
+        <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
+    </div>
+    <div id="results">
+        {{ hiddenInput('orderBy', orderBy) }}
+        {{ hiddenInput('sortBy', sortBy) }}
+        {{ hiddenInput('utility', 1) }}
+        <div class="elements">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th class="{{ orderBy == 'uri' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="uri" s-val:sort-by="{{ orderBy == 'uri' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Page'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'elementCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="elementCount" s-val:sort-by="{{ orderBy == 'elementCount' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Elements'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'elementQueryCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="elementQueryCount" s-val:sort-by="{{ orderBy == 'elementQueryCount' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Element Queries'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'expiryDate' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="expiryDate" s-val:sort-by="{{ orderBy == 'expiryDate' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Expiry Date'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="thin">
+                            <span data-icon="world"></span>
+                        </th>
+                        {% if currentUser.can('blitz:refresh-urls') %}
+                            <th class="thin">
+                                <span data-icon="refresh"></span>
+                            </th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        {% set uri = row.uri ?: '/' %}
+                        {% set url = siteUrl(uri, null, null, siteId) %}
+                        <tr>
+                            <td class="code">
+                                <a href="{{ url('blitz/diagnostics/pages/page', { pageId: row.id }) }}">
+                                    {{ uri }}
+                                </a>
+                            </td>
+                            <td>
+                                {{ (row.elementCount ?? 0)|number }}
+                            </td>
+                            <td>
+                                {{ (row.elementQueryCount ?? 0)|number }}
+                            </td>
+                            <td>
+                                {{ row.expiryDate ? craft.blitz.diagnostics.toDateTime(row.expiryDate)|datetime('short') }}
+                            </td>
+                            <td class="thin">
+                                <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
+                            </td>
+                            {% if currentUser.can('blitz:refresh-urls') %}
+                                <td class="thin">
+                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" href="#" title="Refresh" data-icon="refresh"></a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="update-spinner spinner spinner-absolute"></div>
+        </div>
+        {% set exportButtons %}
+            <a href="{{ actionUrl('blitz/diagnostics/export-pages', { siteId: siteId }) }}" class="btn">
+                {{ 'Export'|t('blitz') }}
+            </a>
+        {% endset %}
+        {{ include('blitz/_utilities/diagnostics/_includes/footer', {
+            exportButtons: exportButtons,
+        }) }}
+        {{ include('blitz/_utilities/diagnostics/_includes/flashes') }}
+    </div>
+</div>

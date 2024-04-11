@@ -1,0 +1,82 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/include' %}
+
+{% set include = craft.blitz.diagnostics.getInclude() %}
+{% if include is null %}
+    {% redirect 'blitz/diagnostics/includes' with error 'The include no longer exists or may have been refreshed.' %}
+{% endif %}
+{% set elementTypes = craft.blitz.diagnostics.getElementTypes(siteId, include.id) %}
+{% set elementQueryTypes = craft.blitz.diagnostics.getElementQueryTypes(siteId, include.id) %}
+{% set title = include.uri %}
+{% set codeTitle = true %}
+
+{% block content %}
+    <h1>
+        {{ 'Tracked Elements'|t('blitz') }}
+    </h1>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Elements'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementType in elementTypes %}
+                    <tr>
+                        <td class="code">
+                            <a href="{{ url('blitz/diagnostics/includes/element-type', {
+                                includeId: include.id,
+                                elementType: elementType.type
+                            }) }}">
+                                {{ elementType.type }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementType.count|number }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <h1>
+        {{ 'Tracked Element Queries'|t('blitz') }}
+    </h1>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Query Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Element Queries'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementQueryType in elementQueryTypes %}
+                    <tr>
+                        <td class="code">
+                            <a href="{{ url('blitz/diagnostics/includes/element-query-type', {
+                                includeId: include.id,
+                                elementType: elementQueryType.type
+                            }) }}">
+                                {{ elementQueryType.type }}
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementQueryType.count|number }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

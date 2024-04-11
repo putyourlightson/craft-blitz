@@ -4,7 +4,7 @@
 {% set title = 'Tracked ' ~ element.displayName ~ ' Queries' %}
 
 {% block content %}
-    {{ sprig('blitz/_utilities/diagnostics/components/elementQueries', {
+    {{ sprig('blitz/_utilities/diagnostics/_components/elementQueries', {
         siteId: siteId,
         elementType: className(element),
         displayName: element.displayName,

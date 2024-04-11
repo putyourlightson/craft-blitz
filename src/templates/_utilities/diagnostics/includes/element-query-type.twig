@@ -1,0 +1,24 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/include' %}
+
+{% set include = craft.blitz.diagnostics.getInclude() %}
+{% if include is null %}
+    {% redirect 'blitz/diagnostics/includes' with error 'The include no longer exists or may have been refreshed.' %}
+{% endif %}
+{% set element = craft.blitz.diagnostics.getElementOfType(include.id) %}
+{% set title = 'Tracked ' ~ element.displayName ~ ' Queries' %}
+{% set crumbs = [
+    {
+        label: include.uri,
+        url: cpUrl('blitz/diagnostics/includes/include?includeId=' ~ include.id),
+    },
+] %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/_components/elementQueries', {
+        siteId: siteId,
+        cacheId: include.id,
+        elementType: className(element),
+        displayName: element.displayName,
+        pluralDisplayName: element.displayName ~ ' Queries',
+    }) }}
+{% endblock %}

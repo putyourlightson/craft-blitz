@@ -469,7 +469,7 @@ class RefreshCacheService extends Component
         $cacheIds = SiteUriHelper::getCacheIdsFromSiteUris($siteUris);
         $this->addCacheIds($cacheIds);
 
-        $this->refreshExpired();
+        $this->refreshWithForce();
     }
 
     /**
@@ -483,7 +483,7 @@ class RefreshCacheService extends Component
         $this->addCacheIds($cacheIds);
         $this->addExpiredElements();
 
-        $this->refreshExpired();
+        $this->refreshWithForce();
     }
 
     /**
@@ -497,7 +497,7 @@ class RefreshCacheService extends Component
 
         $this->addExpiredElements();
 
-        $this->refreshExpired();
+        $this->refreshWithForce();
     }
 
     /**
@@ -531,7 +531,7 @@ class RefreshCacheService extends Component
         $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
         $this->addCacheIds($cacheIds);
 
-        $this->refresh(true);
+        $this->refreshWithForce();
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_REFRESH_CACHE_TAGS)) {
             $this->trigger(self::EVENT_AFTER_REFRESH_CACHE_TAGS, $event);
@@ -572,9 +572,9 @@ class RefreshCacheService extends Component
         }
     }
 
-    private function refreshExpired(): void
+    private function refreshWithForce(): void
     {
-        // Forcibly generate the cache if it will not be cleared.
+        // Forcibly generate the cache if it will not be cleared on refresh.
         $forceGenerate = !Blitz::$plugin->settings->shouldClearOnRefresh();
 
         $this->refresh(false, $forceGenerate);

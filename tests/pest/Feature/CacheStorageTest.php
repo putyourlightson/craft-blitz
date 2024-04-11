@@ -20,18 +20,18 @@ test('255 character site URI can be saved', function(string $driver) {
 
     expect(Blitz::$plugin->cacheStorage->get($siteUri))
         ->toBe($output);
-})->with('cacheStorageDrivers');
+})->with('cache storage drivers');
 
 test('Long site URI can be saved except for by file storage driver', function(string $driver) {
     $output = createOutput();
     $siteUri = createSiteUri(uri: StringHelper::randomString(1000));
     Blitz::$plugin->set('cacheStorage', $driver);
     Blitz::$plugin->cacheStorage->save($output, $siteUri);
-    $expectedValue = $driver === FileStorage::class ? '' : $output;
+    $expectedValue = $driver === FileStorage::class ? null : $output;
 
     expect(Blitz::$plugin->cacheStorage->get($siteUri))
         ->toBe($expectedValue);
-})->with('cacheStorageDrivers');
+})->with('cache storage drivers');
 
 test('Site URI is decoded before being saved', function(string $driver) {
     $output = createOutput();
@@ -42,7 +42,7 @@ test('Site URI is decoded before being saved', function(string $driver) {
 
     expect(Blitz::$plugin->cacheStorage->get($siteUri))
         ->toBe($output);
-})->with('cacheStorageDrivers');
+})->with('cache storage drivers');
 
 test('Compressed cached value can be fetched compressed and uncompressed', function(string $driver) {
     $output = createOutput();
@@ -55,7 +55,7 @@ test('Compressed cached value can be fetched compressed and uncompressed', funct
         ->toBe($output)
         ->and(Blitz::$plugin->cacheStorage->get($siteUri))
         ->toBe($output);
-})->with('cacheStorageDrivers');
+})->with('cache storage drivers');
 
 test('Cached value of site URI is deleted', function(string $driver) {
     $siteUri = createSiteUri();
@@ -65,7 +65,7 @@ test('Cached value of site URI is deleted', function(string $driver) {
 
     expect(Blitz::$plugin->cacheStorage->get($siteUri))
         ->toBeEmpty();
-})->with('cacheStorageDrivers');
+})->with('cache storage drivers');
 
 test('Compressed cached value of site URI is deleted', function(string $driver) {
     $siteUri = createSiteUri();
@@ -76,7 +76,7 @@ test('Compressed cached value of site URI is deleted', function(string $driver) 
 
     expect(Blitz::$plugin->cacheStorage->getCompressed($siteUri))
         ->toBeEmpty();
-})->with('cacheStorageDrivers');
+})->with('cache storage drivers');
 
 test('Cached value of decoded site URI is deleted', function(string $driver) {
     $siteUri = createSiteUri(uri: 'möbelträgerfüße');
@@ -87,7 +87,7 @@ test('Cached value of decoded site URI is deleted', function(string $driver) {
 
     expect(Blitz::$plugin->cacheStorage->get($siteUri))
         ->toBeEmpty();
-})->with('cacheStorageDrivers');
+})->with('cache storage drivers');
 
 test('All cached values are deleted', function(string $driver) {
     $siteUri = createSiteUri();
@@ -97,4 +97,4 @@ test('All cached values are deleted', function(string $driver) {
 
     expect(Blitz::$plugin->cacheStorage->get($siteUri))
         ->toBeEmpty();
-})->with('cacheStorageDrivers');
+})->with('cache storage drivers');

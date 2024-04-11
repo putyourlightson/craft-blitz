@@ -3,20 +3,19 @@
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
-{% set order = { (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) } %}
-{% if orderBy != 'tag' %}
-    {% set order = order|merge({ 'tag': SORT_ASC }) %}
-{% endif %}
-{% set query = craft.blitz.diagnostics.getTagsQuery(siteId)
-    .orderBy(order)
-    .offset(offset)
-    .limit(limit) %}
+{% set rows = craft.blitz.diagnostics.getParams(siteId) %}
 {% if search %}
-    {% do query.andWhere(['like', 'tag', search]) %}
+    {% set rows = rows|filter((count, param) => search in param) %}
 {% endif %}
-
-{% set total = query.count() %}
-{% set rows = query.all() %}
+{% set order = [ (orderBy) ] %}
+{% set sort = [ sortBy == 'desc' ? SORT_DESC : SORT_ASC ] %}
+{% if orderBy != 'param' %}
+    {% set order = order|push('param') %}
+    {% set sort = sort|push(SORT_ASC) %}
+{% endif %}
+{% set rows = rows|multisort(order, sort) %}
+{% set total = rows|length %}
+{% set rows = rows|slice(offset, limit) %}
 {% set maxVisible = rows|length + offset %}
 
 <div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
@@ -31,9 +30,9 @@
             <table class="data fullwidth">
                 <thead>
                     <tr>
-                        <th class="{{ orderBy == 'tag' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="tag" s-val:sort-by="{{ orderBy == 'tag' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                {{ 'Tag'|t('blitz') }}
+                        <th class="{{ orderBy == 'param' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="param" s-val:sort-by="{{ orderBy == 'param' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Query String Param'|t('blitz') }}
                             </button>
                         </th>
                         <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
@@ -47,10 +46,10 @@
                     {% for row in rows %}
                         <tr>
                             <td class="code">
-                                <a href="{{ url('blitz/diagnostics/tags/tag', {
-                                    tag: row.tag,
+                                <a href="{{ url('blitz/diagnostics/params/param', {
+                                    param: row.param,
                                 }) }}">
-                                    {{ row.tag }}
+                                    {{ row.param }}
                                 </a>
                             </td>
                             <td>
@@ -62,6 +61,6 @@
             </table>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
-        {{ include('blitz/_utilities/diagnostics/includes/footer') }}
+        {{ include('blitz/_utilities/diagnostics/_includes/footer') }}
     </div>
 </div>
