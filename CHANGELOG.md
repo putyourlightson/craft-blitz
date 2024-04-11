@@ -1,5 +1,16 @@
 # Release Notes for Blitz
 
+## 5.1.0 - 2024-04-10
+
+### Added
+
+- Added tracked includes to the Blitz Diagnostics utility.
+
+### Fixed
+
+- Fixed a bug in which cached includes were not being refreshed when a URL was provided.
+- Fixed an edge-case bug in which cached includes were not being refreshed when expired.
+
 ## 5.0.0 - 2024-04-07
 
 ### Added
