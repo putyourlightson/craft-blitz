@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.16.1 - Unreleased
+
+### Fixed
+
+- Fixed a bug in which the Blitz Diagnostic utility could throw an error when viewing tracked includes on sites using Postgres.
+
 ## 4.16.0 - 2024-04-10
 
 ### Added
