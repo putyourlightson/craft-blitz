@@ -33,6 +33,11 @@ use putyourlightson\blitz\services\CacheRequestService;
  */
 class DiagnosticsHelper
 {
+    /**
+     * @const array
+     */
+    public const IS_CACHED_INCLUDE_CONDITION = ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX . '%', false];
+
     public static function getSiteId(): ?int
     {
         $siteId = null;
@@ -52,7 +57,7 @@ class DiagnosticsHelper
     {
         return CacheRecord::find()
             ->where(['siteId' => $siteId])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX]])
+            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
             ->count();
     }
 
@@ -60,7 +65,7 @@ class DiagnosticsHelper
     {
         return CacheRecord::find()
             ->where(['siteId' => $siteId])
-            ->andWhere(['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX])
+            ->andWhere(self::IS_CACHED_INCLUDE_CONDITION)
             ->count();
     }
 
@@ -181,19 +186,26 @@ class DiagnosticsHelper
                     ->groupBy(['cacheId']),
             ], 'id = [[elementquerycaches.cacheId]]')
             ->where(['siteId' => $siteId])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX]])
+            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
             ->asArray();
     }
 
     public static function getIncludesQuery(int $siteId): ActiveQuery
     {
+        // Cast the string to a BIGINT for Postgres.
+        // https://github.com/putyourlightson/craft-blitz/issues/653
+        $index = 'SUBSTRING([[uri]], 49)';
+        if (Craft::$app->getDb()->getIsPgsql()) {
+            $index = 'CAST(' . $index . ' AS BIGINT)';
+        }
+
         return CacheRecord::find()
             ->from(['caches' => CacheRecord::tableName()])
-            ->select(['[[caches.id]]', 'uri', 'SUBSTR(uri, 49) AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'expiryDate'])
+            ->select(['[[caches.id]]', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'expiryDate'])
             ->innerJoin([
                 'indexes' => IncludeRecord::find()
                     ->where(['siteId' => $siteId]),
-            ], 'SUBSTR(uri, 49) = [[indexes.index]]')
+            ], $index . ' = [[indexes.index]]')
             ->leftJoin([
                 'elements' => ElementCacheRecord::find()
                     ->select(['cacheId', 'count(*) as elementCount'])
@@ -205,7 +217,7 @@ class DiagnosticsHelper
                     ->groupBy(['cacheId']),
             ], '[[caches.id]] = [[elementquerycaches.cacheId]]')
             ->where(['caches.siteId' => $siteId])
-            ->andWhere(['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX])
+            ->andWhere(self::IS_CACHED_INCLUDE_CONDITION)
             ->asArray();
     }
 
@@ -215,7 +227,7 @@ class DiagnosticsHelper
             ->select('uri')
             ->where(['siteId' => $siteId])
             ->andWhere(['like', 'uri', '?'])
-            ->andWhere(['not', ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX]])
+            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
             ->column();
 
         $queryStringParams = [];

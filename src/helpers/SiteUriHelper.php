@@ -557,10 +557,11 @@ class SiteUriHelper
     }
 
     /**
-     * Returns site URI from a given request.
+     * Returns a site URI from a given request.
      */
-    public static function getSiteUriFromRequest(Request $request): ?SiteUriModel
+    public static function getSiteUriFromRequest(?Request $request = null): ?SiteUriModel
     {
+        $request = $request ?? Craft::$app->getRequest();
         $params = $request->getQueryParams();
 
         // Ensure the path param is removed from query params
