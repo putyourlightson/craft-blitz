@@ -406,7 +406,12 @@ class Blitz extends Plugin
     {
         // Enable batch mode
         $events = [
-            [Elements::class, Elements::EVENT_BEFORE_BULK_OP],
+            /**
+             * TODO: revisit for the next version.
+             * https://github.com/putyourlightson/craft-blitz/issues/654
+             * https://craftcms.com/docs/5.x/extend/events.html#bulk-operations
+             */
+            //[Elements::class, Elements::EVENT_BEFORE_BULK_OP],
             [ResaveController::class, Controller::EVENT_BEFORE_ACTION],
         ];
 
@@ -420,7 +425,12 @@ class Blitz extends Plugin
 
         // Refresh the cache
         $events = [
-            [Elements::class, Elements::EVENT_BEFORE_BULK_OP],
+            /**
+             * TODO: revisit for the next version.
+             * https://github.com/putyourlightson/craft-blitz/issues/654
+             * https://craftcms.com/docs/5.x/extend/events.html#bulk-operations
+             */
+            //[Elements::class, Elements::EVENT_AFTER_BULK_OP],
             [ResaveController::class, Controller::EVENT_AFTER_ACTION],
         ];
 

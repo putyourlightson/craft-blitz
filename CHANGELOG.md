@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.1.2 - 2024-04-12
+
+### Fixed
+
+- Fixed a bug in which propagated saves were not triggering refresh cache jobs ([#654](https://github.com/putyourlightson/craft-blitz/issues/654)).
+
 ## 5.1.1 - 2024-04-12
 
 ### Fixed
