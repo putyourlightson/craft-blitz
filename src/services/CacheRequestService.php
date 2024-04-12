@@ -337,7 +337,7 @@ class CacheRequestService extends Component
             // Don’t use `Tokens::getTokenRoute`, as that can result in the token being deleted.
             // https://github.com/putyourlightson/craft-blitz/issues/448
             $route = (new Query())
-                ->select('route')
+                ->select(['route'])
                 ->from(Table::TOKENS)
                 ->where(['token' => $token])
                 ->column();

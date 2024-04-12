@@ -308,7 +308,7 @@ class GenerateCacheService extends Component
 
         // Use the primary connection when fetching the record
         $queryId = $db->usePrimary(fn() => ElementQueryRecord::find()
-            ->select('id')
+            ->select(['id'])
             ->where(['index' => $index])
             ->scalar()
         );
@@ -436,7 +436,7 @@ class GenerateCacheService extends Component
 
         // Use the primary connection when fetching the record
         $includeId = $db->usePrimary(fn() => IncludeRecord::find()
-            ->select('id')
+            ->select(['id'])
             ->where(['index' => $index])
             ->scalar()
         );
@@ -648,7 +648,7 @@ class GenerateCacheService extends Component
     private function getSourceIdsFromStructureId(int $structureId): array
     {
         return SectionRecord::find()
-            ->select('id')
+            ->select(['id'])
             ->where(['structureId' => $structureId])
             ->column();
     }
@@ -717,7 +717,7 @@ class GenerateCacheService extends Component
 
         // Get valid IDs by selecting only records with existing IDs
         $validIds = ActiveRecord::find()
-            ->select('id')
+            ->select(['id'])
             ->from($checkTable)
             ->where(['id' => $ids])
             ->column();

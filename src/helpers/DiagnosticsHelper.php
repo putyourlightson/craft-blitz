@@ -202,7 +202,7 @@ class DiagnosticsHelper
 
         return CacheRecord::find()
             ->from(['caches' => CacheRecord::tableName()])
-            ->select(['[[caches.id]]', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'expiryDate'])
+            ->select(['caches.id', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'expiryDate'])
             ->innerJoin([
                 'indexes' => IncludeRecord::find()
                     ->where(['siteId' => $siteId]),
@@ -225,7 +225,7 @@ class DiagnosticsHelper
     public static function getParams(int $siteId): array
     {
         $uris = CacheRecord::find()
-            ->select('uri')
+            ->select(['uri'])
             ->where(['siteId' => $siteId])
             ->andWhere(['like', 'uri', '?'])
             ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
@@ -353,7 +353,7 @@ class DiagnosticsHelper
     public static function getTagPagesQuery(int $siteId, string $tag): ActiveQuery
     {
         return CacheTagRecord::find()
-            ->select('uri')
+            ->select(['uri'])
             ->innerJoinWith('cache')
             ->where(['siteId' => $siteId])
             ->andWhere(['tag' => $tag])

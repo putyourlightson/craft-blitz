@@ -27,8 +27,8 @@ class CacheTagsService extends Component
     public function getAllTags(): array
     {
         return CacheTagRecord::find()
-            ->select('tag')
-            ->groupBy('tag')
+            ->select(['tag'])
+            ->groupBy(['tag'])
             ->column();
     }
 
@@ -40,10 +40,10 @@ class CacheTagsService extends Component
     public function getSiteUriTags(SiteUriModel $siteUri): array
     {
         return CacheTagRecord::find()
-            ->select('tag')
+            ->select(['tag'])
             ->joinWith('cache')
             ->where($siteUri->toArray())
-            ->groupBy('tag')
+            ->groupBy(['tag'])
             ->column();
     }
 
@@ -60,9 +60,9 @@ class CacheTagsService extends Component
         }
 
         return CacheTagRecord::find()
-            ->select('cacheId')
+            ->select(['cacheId'])
             ->where(['tag' => $tags])
-            ->groupBy('cacheId')
+            ->groupBy(['cacheId'])
             ->column();
     }
 

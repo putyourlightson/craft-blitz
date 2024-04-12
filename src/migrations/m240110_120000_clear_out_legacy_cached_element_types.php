@@ -17,15 +17,15 @@ class m240110_120000_clear_out_legacy_cached_element_types extends Migration
     {
         // Element caches
         $elementTypes = ElementCacheRecord::find()
-            ->select('type')
+            ->select(['type'])
             ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
-            ->groupBy('type')
+            ->groupBy(['type'])
             ->column();
 
         foreach ($elementTypes as $elementType) {
             if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
                 $legacyElementIds = ElementCacheRecord::find()
-                    ->select('elementId')
+                    ->select(['elementId'])
                     ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
                     ->where(['type' => $elementType])
                     ->column();
@@ -36,8 +36,8 @@ class m240110_120000_clear_out_legacy_cached_element_types extends Migration
 
         // Element query caches
         $elementTypes = ElementQueryRecord::find()
-            ->select('type')
-            ->groupBy('type')
+            ->select(['type'])
+            ->groupBy(['type'])
             ->column();
 
         foreach ($elementTypes as $elementType) {

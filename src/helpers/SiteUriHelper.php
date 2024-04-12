@@ -106,7 +106,7 @@ class SiteUriHelper
         $siteUris = [];
 
         $cachedUris = CacheRecord::find()
-            ->select('uri')
+            ->select(['uri'])
             ->where(['siteId' => $siteId])
             ->orderBy(['uri' => SORT_ASC])
             ->column();
@@ -115,7 +115,7 @@ class SiteUriHelper
 
         // Get URIs from all elements in the site
         $elementUris = Element_SiteSettings::find()
-            ->select('uri')
+            ->select(['uri'])
             ->where([
                 'siteId' => $siteId,
                 'draftId' => null,
@@ -413,7 +413,7 @@ class SiteUriHelper
             }
 
             $cacheIdSets[] = CacheRecord::find()
-                ->select('id')
+                ->select(['id'])
                 ->where($condition)
                 ->column();
         }
@@ -492,7 +492,7 @@ class SiteUriHelper
             // Deal with wildcard in URL
             if (str_contains($url, '*')) {
                 $wildcardUris = CacheRecord::find()
-                    ->select('uri')
+                    ->select(['uri'])
                     ->where(['siteId' => $siteUri->siteId])
                     ->andWhere(['like', 'uri', str_replace('*', '%', $siteUri->uri), false])
                     ->orderBy(['uri' => SORT_ASC])

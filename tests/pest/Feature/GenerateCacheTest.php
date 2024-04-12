@@ -441,7 +441,7 @@ test('Element query source records with specific source identifiers are saved', 
         ->toEqual(7);
 
     $sourceIds = ElementQuerySourceRecord::find()
-        ->select('sourceId')
+        ->select(['sourceId'])
         ->column();
 
     expect($sourceIds)
@@ -479,7 +479,7 @@ test('Element query attribute records are saved', function() {
     $elementQuery = Entry::find()->title('x');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $attributes = ElementQueryAttributeRecord::find()
-        ->select('attribute')
+        ->select(['attribute'])
         ->column();
 
     expect($attributes)
@@ -490,7 +490,7 @@ test('Element query attribute records are saved with order by', function() {
     $elementQuery = Entry::find()->orderBy('title');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $attributes = ElementQueryAttributeRecord::find()
-        ->select('attribute')
+        ->select(['attribute'])
         ->column();
 
     expect($attributes)
@@ -501,7 +501,7 @@ test('Element query attribute records are saved with order by parts array', func
     $elementQuery = Entry::find()->orderBy(['entries.title' => SORT_DESC]);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $attributes = ElementQueryAttributeRecord::find()
-        ->select('attribute')
+        ->select(['attribute'])
         ->column();
 
     expect($attributes)
@@ -514,7 +514,7 @@ test('Element query attribute records are saved with before', function() {
         ->orderBy('title');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $attributes = ElementQueryAttributeRecord::find()
-        ->select('attribute')
+        ->select(['attribute'])
         ->column();
 
     expect($attributes)
@@ -525,7 +525,7 @@ test('Element query field records are saved with order by', function() {
     $elementQuery = Entry::find()->orderBy('plainText');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $fieldIds = ElementQueryFieldRecord::find()
-        ->select('fieldId')
+        ->select(['fieldId'])
         ->column();
 
     expect($fieldIds)
@@ -536,7 +536,7 @@ test('Element query field records are saved with order by array', function() {
     $elementQuery = Entry::find()->orderBy(['plainText' => SORT_ASC]);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     $fieldIds = ElementQueryFieldRecord::find()
-        ->select('fieldId')
+        ->select(['fieldId'])
         ->column();
 
     expect($fieldIds)
