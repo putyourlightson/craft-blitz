@@ -77,8 +77,8 @@ class BaseDriverHelper
         $queue = Craft::$app->getQueue();
 
         $jobIds = (new Query())
+            ->from([$queue->tableName])
             ->select(['id'])
-            ->from($queue->tableName)
             ->where(['like', 'job', '"putyourlightson\blitz\jobs\DriverJob"'])
             ->andWhere(['like', 'job', '"' . $driverId . '"'])
             ->column();

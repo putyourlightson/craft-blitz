@@ -717,8 +717,8 @@ class GenerateCacheService extends Component
 
         // Get valid IDs by selecting only records with existing IDs
         $validIds = ActiveRecord::find()
+            ->from([$checkTable])
             ->select(['id'])
-            ->from($checkTable)
             ->where(['id' => $ids])
             ->column();
 
