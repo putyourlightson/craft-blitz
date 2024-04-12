@@ -287,7 +287,9 @@ class CacheRequestService extends Component
             return $action === self::CACHED_INCLUDE_ACTION;
         }
 
-        $uri = Craft::$app->getRequest()->getFullUri() . '?' . Craft::$app->getRequest()->getQueryString();
+        // Fall back to checking the URI, in case this came through an SSI request.
+        $siteUri = SiteUriHelper::getSiteUriFromRequest();
+        $uri = $siteUri->uri ?? '';
 
         return str_starts_with($uri, self::CACHED_INCLUDE_URI_PREFIX);
     }

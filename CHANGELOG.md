@@ -1,10 +1,11 @@
 # Release Notes for Blitz
 
-## 4.16.1 - Unreleased
+## 4.16.1 - 2024-04-12
 
 ### Fixed
 
-- Fixed a bug in which the Blitz Diagnostic utility could throw an error when viewing tracked includes on sites using Postgres.
+- Fixed a bug in which the Blitz Diagnostic utility could throw an error when viewing tracked includes and when using Postgres ([#653](https://github.com/putyourlightson/craft-blitz/issues/653)).
+- Fixed an edge-case bug in which cached includes were not being refreshed when expired in a multi-site setup using subfolders.
 
 ## 4.16.0 - 2024-04-10
 
