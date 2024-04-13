@@ -166,19 +166,19 @@ function cleanup(): void
 {
     $section = Craft::$app->entries->getSectionByHandle(App::env('TEST_CHANNEL_SECTION_HANDLE'));
     $entryIds = EntryRecord::find()
-        ->select('id')
+        ->select(['id'])
         ->where(['sectionId' => $section->id])
         ->column();
 
     $volume = Craft::$app->volumes->getVolumeByHandle(App::env('TEST_VOLUME_HANDLE'));
     $assetIds = AssetRecord::find()
-        ->select('id')
+        ->select(['id'])
         ->where(['volumeId' => $volume->id])
         ->column();
 
     $type = Plugin::getInstance()->productTypes->getProductTypeByHandle(App::env('TEST_PRODUCT_TYPE_HANDLE'));
     $productIds = ProductRecord::find()
-        ->select('id')
+        ->select(['id'])
         ->where(['typeId' => $type->id])
         ->column();
 

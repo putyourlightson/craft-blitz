@@ -143,7 +143,7 @@ class RefreshCacheService extends Component
         }
 
         $cacheIds = SsiIncludeCacheRecord::find()
-            ->select('cacheId')
+            ->select(['cacheId'])
             ->innerJoinWith([
                 'include' => function(ActiveQuery $query) use ($indexes) {
                     $query->where(['index' => $indexes]);

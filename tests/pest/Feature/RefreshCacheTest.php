@@ -210,7 +210,7 @@ test('Element query cache IDs are returned when a disabled entry is changed', fu
     Blitz::$plugin->generateCache->addElementQuery(Entry::find());
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
     $refreshData = RefreshDataModel::createFromElement($entry);
-    $elementQueryRecord = ElementQueryRecord::find()->orderBy('id DESC')->one();
+    $elementQueryRecord = ElementQueryRecord::find()->orderBy(['id' => SORT_DESC])->one();
 
     expect(RefreshCacheHelper::getElementQueryCacheIds($elementQueryRecord, $refreshData))
         ->toHaveCount(1);
@@ -274,7 +274,7 @@ test('Element query type records are not returned when an entry is changed by at
 
 test('Element query type records are returned when an entry is changed by custom fields used in the query', function() {
     $entry = createEntry();
-    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy('plainText'));
+    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy(['plainText' => SORT_ASC]));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
     $refreshData = RefreshDataModel::createFromElement($entry);
     $refreshData->addChangedField($entry, 'plainText');
@@ -286,7 +286,7 @@ test('Element query type records are returned when an entry is changed by custom
 
 test('Element query type records are not returned when an entry is changed by custom fields not used in the query', function() {
     $entry = createEntry();
-    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy('plainText'));
+    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy(['plainText' => SORT_ASC]));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
     $refreshData = RefreshDataModel::createFromElement($entry);
     $refreshData->addIsChangedByFields($entry, true);
@@ -297,7 +297,7 @@ test('Element query type records are not returned when an entry is changed by cu
 
 test('Element query type records are returned when an entry is changed with the date updated used in the query', function() {
     $entry = createEntry();
-    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy('dateUpdated'));
+    Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy(['dateUpdated' => SORT_ASC]));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
     $refreshData = RefreshDataModel::createFromElement($entry);
     $refreshData->addIsChangedByFields($entry, true);

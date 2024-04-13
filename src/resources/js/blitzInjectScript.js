@@ -31,7 +31,7 @@ function injectElements() {
                 cancelable: true,
                 detail: injectElement,
             }))) {
-                const url = injectElement.uri + (injectElement.params && '?' + injectElement.params);
+                const url = injectElement.uri + (injectElement.params ? (injectElement.uri.indexOf('?') !== -1 ? '&' : '?') + injectElement.params : '');
                 injectElements[url] = (_a = injectElements[url]) !== null && _a !== void 0 ? _a : [];
                 injectElements[url].push(injectElement);
             }

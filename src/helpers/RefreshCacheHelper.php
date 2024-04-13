@@ -185,7 +185,7 @@ class RefreshCacheHelper
 
         // Return related element query cache IDs
         return $elementQueryRecord->getElementQueryCaches()
-            ->select('cacheId')
+            ->select(['cacheId'])
             ->column();
     }
 

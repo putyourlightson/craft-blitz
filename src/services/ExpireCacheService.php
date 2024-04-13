@@ -49,7 +49,7 @@ class ExpireCacheService extends Component
     public function getExpiredCacheIds(): array
     {
         return CacheRecord::find()
-            ->select('id')
+            ->select(['id'])
             ->where(['<=', 'expiryDate', Db::prepareDateForDb('now')])
             ->column();
     }
