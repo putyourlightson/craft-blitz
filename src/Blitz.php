@@ -146,7 +146,7 @@ class Blitz extends Plugin
         // Register events
         $this->registerCacheableRequestEvents();
         $this->registerElementEvents();
-        $this->registerBulkElementEvents();
+        $this->registerResaveElementEvents();
         $this->registerStructureEvents();
         $this->registerIntegrationEvents();
         $this->registerHintsUtilityEvents();
@@ -399,19 +399,17 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers bulk element events.
+     * Registers resave element events.
+     *
+     * Using Craft’s bulk operations events is not possible, since we need to track changes and the bulk operation can span multiple requests.
      * https://craftcms.com/docs/5.x/extend/events.html#bulk-operations
      */
-    private function registerBulkElementEvents(): void
+    private function registerResaveElementEvents(): void
     {
         // Enable batch mode
         $events = [
-            /**
-             * TODO: revisit for the next version.
-             * https://github.com/putyourlightson/craft-blitz/issues/654
-             * https://craftcms.com/docs/5.x/extend/events.html#bulk-operations
-             */
-            //[Elements::class, Elements::EVENT_BEFORE_BULK_OP],
+            [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
+            [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
             [ResaveController::class, Controller::EVENT_BEFORE_ACTION],
         ];
 
@@ -425,12 +423,8 @@ class Blitz extends Plugin
 
         // Refresh the cache
         $events = [
-            /**
-             * TODO: revisit for the next version.
-             * https://github.com/putyourlightson/craft-blitz/issues/654
-             * https://craftcms.com/docs/5.x/extend/events.html#bulk-operations
-             */
-            //[Elements::class, Elements::EVENT_AFTER_BULK_OP],
+            [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
+            [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
             [ResaveController::class, Controller::EVENT_AFTER_ACTION],
         ];
 

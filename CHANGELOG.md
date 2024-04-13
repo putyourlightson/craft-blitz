@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.1.3 - 2024-04-13
+
+### Changed
+
+- Reverted back to listening for resave and propagate element events.
+
 ## 5.1.2 - 2024-04-12
 
 ### Changed
