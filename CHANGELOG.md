@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.16.2 - 2024-04-12
+
+### Changed
+
+- Dynamic includes in preview requests are now also sent via AJAX, passing through the token param ([#653](https://github.com/putyourlightson/craft-blitz/issues/653)).
+
 ## 4.16.1 - 2024-04-12
 
 ### Fixed

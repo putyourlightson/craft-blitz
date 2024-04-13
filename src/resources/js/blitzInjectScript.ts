@@ -37,7 +37,7 @@ async function injectElements() {
                 detail: injectElement,
             })
         )) {
-            const url = injectElement.uri + (injectElement.params && '?' + injectElement.params);
+            const url = injectElement.uri + (injectElement.params ? (injectElement.uri.indexOf('?') !== -1 ? '&' : '?') + injectElement.params : '') ;
             injectElements[url] = injectElements[url] ?? [];
             injectElements[url].push(injectElement);
         }

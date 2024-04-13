@@ -206,10 +206,6 @@ class BlitzVariable
             throw new NotFoundHttpException('Template not found: ' . $template);
         }
 
-        if (Craft::$app->getRequest()->getIsPreview() || Craft::$app->getRequest()->getIsLivePreview()) {
-            return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
-        }
-
         $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 
         [$includeId, $index] = Blitz::$plugin->generateCache->saveInclude($siteId, $template, $params);
@@ -223,6 +219,10 @@ class BlitzVariable
         ];
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
+            if (Craft::$app->getRequest()->getIsPreview() || Craft::$app->getRequest()->getIsLivePreview()) {
+                return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
+            }
+
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->getSsiTag($uri, $includeParams, $includeId);
             }
