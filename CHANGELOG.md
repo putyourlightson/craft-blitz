@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.16.3 - Unreleased
+## 4.16.3 - 2024-04-22
 
 ### Changed
 
