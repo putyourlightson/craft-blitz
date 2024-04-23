@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.1.4 - 2024-04-22
+
+### Changed
+
+The `blitz/cache/refresh-cache-tags` and `blitz/cache/refresh-expired-elements` no longer forcibly generate the cache.
+
 ## 5.1.3 - 2024-04-13
 
 ### Changed
