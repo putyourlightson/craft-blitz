@@ -462,7 +462,7 @@ class RefreshCacheService extends Component
     }
 
     /**
-     * Refreshes an expired site URI.
+     * Refreshes expired site URIs.
      */
     public function refreshExpiredSiteUris(array $siteUris): void
     {
