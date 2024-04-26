@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.1.6 - 2024-04-26
+
+### Fixed
+
+- Fixed bug in the SQL statement introduced in 5.1.5 when using a Postgres database.
+
 ## 5.1.5 - 2024-04-26
 
 ### Changed
