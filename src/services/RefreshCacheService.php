@@ -581,5 +581,4 @@ class RefreshCacheService extends Component
 
         $this->refresh(false, $forceGenerate);
     }
-
 }
