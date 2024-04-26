@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.1.5 - 2024-04-26
+
+### Changed
+
+- Improved the deletion of cache records during the refresh cache process to help avoid database memory issues.
+
 ## 5.1.4 - 2024-04-22
 
 ### Changed
