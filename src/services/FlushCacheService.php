@@ -104,10 +104,8 @@ class FlushCacheService extends Component
             return;
         }
 
-        CacheRecord::deleteAll();
-
+        $this->deleteAllCacheRecords();
         $this->runGarbageCollection($afterClear);
-
         $mutex->release($lockName);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_ALL_CACHE)) {
@@ -166,6 +164,30 @@ class FlushCacheService extends Component
                 $db->createCommand($sql)->execute();
             } catch (Exception $exception) {
                 Blitz::$plugin->log('Failed to reset auto increment: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
+            }
+        }
+    }
+
+    /**
+     * Deletes the cache records in batches, to avoid database memory issues.
+     *
+     * The reason this is important is due to foreign keys and transactions. Deleting cache records causes a cascade of deletes to other Blitz tables, potentially resulting in huge numbers of rows being deleted. Because it’s the result of a single query, it’s wrapped in a single DB transaction, so the database attempts to keep a rollback checkpoint for the whole thing (resulting in a copy of every deleted row in memory so that it can roll back if the transaction fails). If this uses more than the total memory allocated to the database then it may roll back and restart.
+     *
+     * @since 5.1.5
+     */
+    private function deleteAllCacheRecords(): void
+    {
+        $batchSize = 10000;
+        $totalCount = CacheRecord::find()->count();
+        $maxIterations = ceil($totalCount / $batchSize);
+
+        for ($i = 0; $i < $maxIterations; $i++) {
+            $deleteCount = Craft::$app->db
+                ->createCommand('DELETE FROM ' . CacheRecord::tableName() . ' LIMIT ' . $batchSize)
+                ->execute();
+
+            if ($deleteCount === 0) {
+                return;
             }
         }
     }
