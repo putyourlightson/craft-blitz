@@ -181,10 +181,15 @@ class FlushCacheService extends Component
         $totalCount = CacheRecord::find()->count();
         $maxIterations = ceil($totalCount / $batchSize);
 
+        $sql = 'DELETE FROM ' . CacheRecord::tableName() . ' LIMIT ' . $batchSize;
+
+        // Postgres does not support LIMIT in DELETE queries.
+        if (Craft::$app->getDb()->getIsPgsql()) {
+            $sql = 'DELETE FROM ' . CacheRecord::tableName() . ' WHERE id IN (SELECT id FROM ' . CacheRecord::tableName() . ' LIMIT ' . $batchSize . ')';
+        }
+
         for ($i = 0; $i < $maxIterations; $i++) {
-            $deleteCount = Craft::$app->db
-                ->createCommand('DELETE FROM ' . CacheRecord::tableName() . ' LIMIT ' . $batchSize)
-                ->execute();
+            $deleteCount = Craft::$app->db->createCommand($sql)->execute();
 
             if ($deleteCount === 0) {
                 return;
