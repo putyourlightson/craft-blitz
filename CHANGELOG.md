@@ -1,10 +1,16 @@
 # Release Notes for Blitz
 
+## 4.16.4 - 2024-04-26
+
+### Changed
+
+- Improved the deletion of cache records during the refresh cache process to help avoid database memory issues.
+
 ## 4.16.3 - 2024-04-22
 
 ### Changed
 
-The `blitz/cache/refresh-cache-tags` and `blitz/cache/refresh-expired-elements` no longer forcibly generate the cache.
+- The `blitz/cache/refresh-cache-tags` and `blitz/cache/refresh-expired-elements` no longer forcibly generate the cache.
 
 ## 4.16.2 - 2024-04-12
 
