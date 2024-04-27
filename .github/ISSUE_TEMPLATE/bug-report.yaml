@@ -25,6 +25,6 @@ body:
     id: report
     attributes:
       label: Diagnostics Report
-      description: Provide the diagnostics report that can be generated in the Blitz Diagnostics utility in versions 4.17.0 and 5.2.0 and above. If this is not available then provide, at the very least, the versions of Blitz, Craft and PHP.
+      description: Provide a diagnostics report that can be generated in the Blitz Diagnostics utility in versions 4.17.0 and 5.2.0 and above. If this is not available then provide, at the very least, the versions of Blitz, Craft and PHP.
     validations:
       required: true
