@@ -94,11 +94,11 @@ table.editable th.code {
     font-size: inherit !important;
 }
 
-.blitz-diagnostics #header {
-    padding: 0;
+.blitz-diagnostics h1 {
+    margin-bottom: 20px;
 }
 
-.blitz-diagnostics h1 {
+.blitz-diagnostics .flex h1 {
     margin-bottom: 0;
 }
 
