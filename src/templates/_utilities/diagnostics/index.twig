@@ -8,7 +8,7 @@
 </div>
 
 <div class="blitz-diagnostics">
-    {% if not craft.app.getIsMultiSite() %}
+    {% if craft.app.getIsMultiSite() %}
         <div class="flex">
             <h1>{{ 'Site Tracking'|t('blitz') }}</h1>
             {% include '_elements/sitemenu' with {
