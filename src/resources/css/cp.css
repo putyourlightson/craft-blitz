@@ -119,7 +119,7 @@ table.editable th.code {
     height: 60vh;
 }
 
-.blitz-diagnostics textarea {
+.blitz-diagnostics .copytextarea textarea {
     height: 100%;
 }
 
