@@ -119,6 +119,15 @@ table.editable th.code {
     background-color: transparent;
 }
 
+.blitz-diagnostics .copytextarea {
+    align-items: start;
+    height: 60vh;
+}
+
+.blitz-diagnostics .copytextarea textarea {
+    height: 100%;
+}
+
 .blitz-hints.loading .checkmark-icon {
     display: none;
 }

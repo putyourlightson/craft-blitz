@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to submit a bug report! To ensure this hasn’t already been reported, please first search [existing issues](https://github.com/putyourlightson/craft-blitz/issues?q=is%3Aissue).
+        Thanks for taking the time to submit a bug report! To ensure this hasn’t already been reported, please first search [existing issues](https://github.com/putyourlightson/craft-blitz/issues?q=is%3Aissue) and ensure you’re running the latest version.
 
         To rule out that this isn’t a setup or configuration issue, please read the [Best Practices](https://putyourlightson.com/plugins/blitz#best-practices) and [Common Issues](https://putyourlightson.com/plugins/blitz#common-issues) sections of the docs.
         
