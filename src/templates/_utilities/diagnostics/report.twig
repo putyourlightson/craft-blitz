@@ -1,0 +1,64 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set title = 'Diagnostics Report'|t('blitz') %}
+
+{% block content %}
+    <p class="warning">
+        <span title="Warning" aria-label="Warning" data-icon="alert"></span>
+        This report may be shared when requesting support. Sensitive data has been redacted, but should be double-checked before sharing publicly.
+    </p>
+    {{ include('blitz/_utilities/diagnostics/_includes/copytextarea', {
+        value: report,
+        class: 'code',
+    }) }}
+{% endblock %}
+
+
+{% set report -%}
+### Application Info
+
+- PHP version: {{ phpVersion }}
+- Craft edition & version: {{ craft.app.editionName }} {{ craft.app.version }}
+- Database driver & version: {{ dbDriver }}
+
+### Installed Plugins
+
+{# @var plugin \craft\base\Plugin #}
+{% for plugin in craft.app.plugins.allPlugins %}
+- {{ plugin.name }}: {{ plugin.version }}
+{% endfor %}
+
+### Loaded Modules
+
+{# @var module \yii\base\Module #}
+{% for module in craft.app.modules %}
+{% if module is not instance of('\\craft\\base\\Plugin') %}
+- {{ module.id }}: {{ className(module) }}
+{% endif %}
+{% endfor %}
+
+### Blitz Plugin Settings
+
+```json
+{{ blitzPluginSettings|raw }}
+```
+
+### Recommendations
+
+{% for test in craft.blitz.diagnostics.getTests() %}
+- {{ test.pass ? '✅' : '❌' }} {{ test.message|striptags }}
+{% endfor -%}
+
+{# @var site \craft\models\Site #}
+{%- for site in craft.app.sites.allSites %}
+
+### Site Tracking – {{ site.name }}
+
+- Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(site.id) }}
+- Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(site.id) }}
+- Tracked Query String Params: {{ craft.blitz.diagnostics.getParamsCount(site.id) }}
+- Tracked Elements: {{ craft.blitz.diagnostics.getElementsCount(site.id) }}
+- Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(site.id) }}
+- Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(site.id) }}
+{% endfor %}
+{%- endset %}

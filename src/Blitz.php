@@ -526,6 +526,7 @@ class Blitz extends Plugin
                 // Merge so that settings controller action comes first (important!)
                 $event->rules = array_merge([
                     'settings/plugins/blitz' => 'blitz/settings/edit',
+                    'blitz/diagnostics/report' => 'blitz/diagnostics/report',
                     'blitz/diagnostics/<path:(.*)?>' => 'blitz/diagnostics/index',
                 ],
                     $event->rules
