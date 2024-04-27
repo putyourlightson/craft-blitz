@@ -21,8 +21,8 @@ body:
       description: Please provide a clear and concise description of the bug.
     validations:
       required: true
-  - type: input
-    id: pluginVersion
+  - type: textarea
+    id: report
     attributes:
       label: Diagnostics Report
       description: Provide the diagnostics report that can be generated in the Blitz Diagnostics utility in versions 4.17.0 and 5.2.0 and above. If this is not available then provide, at the very least, the versions of Blitz, Craft and PHP.
