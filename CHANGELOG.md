@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.17.0 - 2024-04-27
+
+### Added
+
+- Added the ability to generate a diagnostics report in the Blitz Diagnostics utility, that can be shared when requesting support. 
+
 ## 4.16.5 - 2024-04-26
 
 ### Fixed

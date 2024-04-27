@@ -24,22 +24,7 @@ body:
   - type: input
     id: pluginVersion
     attributes:
-      label: Plugin Version
-      description: Provide the plugin version that this relates to, ideally the [latest version](https://github.com/putyourlightson/craft-blitz/blob/develop/CHANGELOG.md).
-      placeholder: 4.10.0
+      label: Diagnostics Report
+      description: Provide the diagnostics report that can be generated in the Blitz Diagnostics utility in versions 4.17.0 and 5.2.0 and above. If this is not available then provide, at the very least, the versions of Blitz, Craft and PHP.
     validations:
       required: true
-  - type: input
-    id: craftVersion
-    attributes:
-      label: Craft CMS Version
-      description: Provide the version of Craft that is installed.
-      placeholder: 4.7.0
-    validations:
-      required: true
-  - type: input
-    id: phpVersion
-    attributes:
-      label: PHP Version
-      description: Provide the PHP version, if applicable.
-      placeholder: 8.2.0

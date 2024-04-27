@@ -95,12 +95,11 @@ table.editable th.code {
 }
 
 .blitz-diagnostics h1 {
-    padding-top: var(--s);
-    line-height: 34px;
+    margin-bottom: 0;
 }
 
 .blitz-diagnostics .recommendations h1 {
-    margin-bottom: 0;
+    padding-top: var(--xl);
 }
 
 .blitz-diagnostics .recommendations p > span {
@@ -113,6 +112,15 @@ table.editable th.code {
 
 .blitz-diagnostics .chip {
     background-color: transparent;
+}
+
+.blitz-diagnostics .copytextarea {
+    align-items: start;
+    height: 60vh;
+}
+
+.blitz-diagnostics textarea {
+    height: 100%;
 }
 
 #footer {

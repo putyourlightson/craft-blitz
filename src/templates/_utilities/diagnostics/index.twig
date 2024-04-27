@@ -1,18 +1,22 @@
 {# @var settings \putyourlightson\blitz\models\SettingsModel #}
 {% set settings = craft.app.plugins.plugin('blitz').settings %}
 
+<div class="right">
+    <a href="{{ url('blitz/diagnostics/report') }}" class="btn submit">
+        Generate Diagnostics Report
+    </a>
+</div>
+
 <div class="blitz-diagnostics">
-    <header id="header">
-        <div class="page-title flex">
-            <h1>{{ 'Site Tracking'|t('blitz') }}</h1>
-            {% if craft.app.getIsMultiSite() %}
-                {% include '_elements/sitemenu' with {
-                    selectedSiteId: siteId,
-                    urlFormat: 'utilities/blitz-diagnostics?site={handle}',
-                } only %}
-            {% endif %}
-        </div>
-    </header>
+    <div class="flex">
+        <h1>{{ 'Site Tracking'|t('blitz') }}</h1>
+        {% if craft.app.getIsMultiSite() %}
+            {% include '_elements/sitemenu' with {
+                selectedSiteId: siteId,
+                urlFormat: 'utilities/blitz-diagnostics?site={handle}',
+            } only %}
+        {% endif %}
+    </div>
     <h2>
         <a href="{{ cpUrl('blitz/diagnostics/pages') }}">
             {% set count = craft.blitz.diagnostics.getPagesCount(siteId) %}

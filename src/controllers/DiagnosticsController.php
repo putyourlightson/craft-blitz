@@ -7,9 +7,11 @@ namespace putyourlightson\blitz\controllers;
 
 use Craft;
 use craft\helpers\App;
+use craft\helpers\Json;
 use craft\web\Controller;
 use craft\web\CsvResponseFormatter;
 use putyourlightson\blitz\assets\BlitzAsset;
+use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\sprig\Sprig;
 use yii\web\Response;
@@ -36,6 +38,20 @@ class DiagnosticsController extends Controller
         return $this->renderTemplate('blitz/_utilities/diagnostics/' . $path, [
             'siteId' => DiagnosticsHelper::getSiteId(),
         ]);
+    }
+
+    public function actionReport(): Response
+    {
+        Craft::$app->getView()->registerAssetBundle(BlitzAsset::class);
+
+        return $this->renderTemplate(
+            'blitz/_utilities/diagnostics/report',
+            [
+                'phpVersion' => App::phpVersion(),
+                'dbDriver' => $this->dbDriver(),
+                'blitzPluginSettings' => $this->getRedacted(Blitz::$plugin->getSettings()->getAttributes()),
+            ]
+        );
     }
 
     public function actionExportPages(int $siteId): Response
@@ -90,5 +106,30 @@ class DiagnosticsController extends Controller
         $this->response->setDownloadHeaders('tracked-includes.csv');
 
         return $this->response;
+    }
+
+    /**
+     * Returns redacted values as a JSON encoded string.
+     */
+    private function getRedacted(array $values): string
+    {
+        $redacted = Craft::$app->getSecurity()->redactIfSensitive('', $values);
+        $encoded = Json::encode($redacted, JSON_PRETTY_PRINT);
+
+        // Replace unicode character with asterisk
+        return str_replace('\u2022', '*', $encoded);
+    }
+
+    /**
+     * Returns the DB driver name and version
+     *
+     * @see SystemReport::_dbDriver()
+     */
+    private function dbDriver(): string
+    {
+        $db = Craft::$app->getDb();
+        $label = $db->getDriverLabel();
+        $version = App::normalizeVersion($db->getSchema()->getServerVersion());
+        return "$label $version";
     }
 }
