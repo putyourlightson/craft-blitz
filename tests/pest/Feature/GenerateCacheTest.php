@@ -7,6 +7,7 @@
 use craft\commerce\elements\Product;
 use craft\db\FixedOrderExpression;
 use craft\db\Query;
+use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
 use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
@@ -294,8 +295,8 @@ test('Element query record with query param is saved without the param', functio
     $record = ElementQueryRecord::find()->one();
     $params = Json::decodeIfJson($record->params);
 
-    expect($params['query'] ?? null)
-        ->toBeNull();
+    expect($params)
+        ->not()->toHaveKey('query');
 });
 
 test('Element query record with expression is not saved', function() {
@@ -324,7 +325,7 @@ test('Element query record with option field data is converted to value', functi
     $record = ElementQueryRecord::find()->one();
     $params = Json::decodeIfJson($record->params);
 
-    expect($params['dropdown'])
+    expect($params['dropdown'] ?? null)
         ->toEqual(1);
 });
 
@@ -341,22 +342,22 @@ test('Element query record with multi options field data is converted to array o
     $record = ElementQueryRecord::find()->one();
     $params = Json::decodeIfJson($record->params);
 
-    expect($params['multiSelect'])
+    expect($params['multiSelect'] ?? null)
         ->toEqual([1, 2]);
 });
 
 test('Element query record keeps limit and offset params', function() {
-    $elementQuery = Entry::find()->limit(10)->offset(10);
+    $elementQuery = Entry::find()->limit(10)->offset(5);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
 
     /** @var ElementQueryRecord $record */
     $record = ElementQueryRecord::find()->one();
     $params = Json::decodeIfJson($record->params);
 
-    expect($params)
-        ->toHaveKey('limit')
-        ->and($params)
-        ->toHaveKey('offset');
+    expect($params['limit'] ?? null)
+        ->toBe(10)
+        ->and($params['offset'] ?? null)
+        ->toBe(5);
 });
 
 test('Element query record keeps order by if a limit param is present', function() {
@@ -367,8 +368,8 @@ test('Element query record keeps order by if a limit param is present', function
     $record = ElementQueryRecord::find()->one();
     $params = Json::decodeIfJson($record->params);
 
-    expect($params)
-        ->toHaveKey('orderBy');
+    expect($params['orderBy'] ?? null)
+        ->toBe(['title' => SORT_ASC]);
 });
 
 test('Element query record keeps order by if an offset param is present', function() {
@@ -379,8 +380,8 @@ test('Element query record keeps order by if an offset param is present', functi
     $record = ElementQueryRecord::find()->one();
     $params = Json::decodeIfJson($record->params);
 
-    expect($params)
-        ->toHaveKey('orderBy');
+    expect($params['orderBy'] ?? null)
+        ->toBe(['title' => SORT_ASC]);
 });
 
 test('Element query record does not keep order by if no limit or offset param is present', function() {
@@ -417,6 +418,29 @@ test('Element query cache records are saved', function() {
     expect(ElementQueryCacheRecord::class)
         ->toHaveRecordCount(2);
 });
+
+test('Element query cache records with matching params and a higher limit and offset sum are the only ones saved', function(array $firstParams, array $secondParams) {
+    $elementQuery = new EntryQuery(Entry::class, $firstParams);
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+    $elementQuery = new EntryQuery(Entry::class, $secondParams);
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+
+    /** @var ElementQueryRecord $elementQueryRecords [] */
+    $elementQueryRecords = ElementQueryRecord::find()
+        ->innerJoinWith('elementQueryCaches')
+        ->all();
+
+    expect($elementQueryRecords)
+        ->toHaveCount(1)
+        ->and(Json::decodeIfJson($elementQueryRecords[0]->params))
+        ->toBe($secondParams);
+})->with([
+    [['limit' => 1], ['limit' => 10]],
+    [['limit' => 1, 'offset' => 1], ['limit' => 10, 'offset' => 10]],
+    [['limit' => 1, 'offset' => 10], ['limit' => 10, 'offset' => 1]],
+    [['limit' => 10, 'offset' => 1], ['limit' => 1, 'offset' => 20]],
+]);
 
 test('Element query source records with specific source identifiers are saved', function() {
     $elementQueries = [

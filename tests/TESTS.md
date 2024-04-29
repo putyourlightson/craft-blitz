@@ -4,15 +4,21 @@ This document outlines the test specification for the Blitz plugin.
 
 ---
 
-## Interface Tests
+## Feature Tests
 
-### [WebResponse](pest/Interface/WebResponseTest.php)
+### [CacheRequest](pest/Feature/CacheRequestTest.php)
 
-_Tests that cached web responses contain the correct headers and comments._
+_Tests whether requests are cacheable and under what circumstances._
 
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the default cache control header when the page is not cacheable.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the cache control header when the page is cacheable.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response contains the expired cache control header and the cache is refreshed when the page is expired.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response adds the powered by header.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response with mime type has headers and does not contain output comments.  
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Response is encoded when compression is enabled.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Request matching included URI pattern is cacheable.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) URI patterns with matching regular expressions are matched.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) URI patterns without matching regular expressions are not matched.  
+
+### [GenerateCache](pest/Feature/GenerateCacheTest.php)
+
+_Tests the saving of cached values, element cache records and element query records._
+
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query cache records with matching params and a higher limit and offset sum are the only ones saved with data set "([1], [10])".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query cache records with matching params and a higher limit and offset sum are the only ones saved with data set "([1, 1], [10, 10])".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query cache records with matching params and a higher limit and offset sum are the only ones saved with data set "([1, 10], [10, 1])".  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query cache records with matching params and a higher limit and offset sum are the only ones saved with data set "([10, 1], [1, 20])".  
