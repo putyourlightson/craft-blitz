@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.2.1 - Unreleased
+
+### Changed
+
+- Optimised the refresh cache process by excluding redundantly tracked element queries based on their limit and offset values.
+
 ## 5.2.0 - 2024-04-27
 
 ### Added
