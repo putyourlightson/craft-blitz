@@ -419,10 +419,10 @@ test('Element query cache records are saved', function() {
         ->toHaveRecordCount(2);
 });
 
-test('Element query cache records with matching params and a higher limit and offset sum are the only ones saved', function(array $firstParams, array $secondParams) {
-    $elementQuery = new EntryQuery(Entry::class, $firstParams);
+test('Element query cache records with matching params and a higher limit and offset sum are the only ones saved', function(array $params1, array $params2) {
+    $elementQuery = new EntryQuery(Entry::class, $params1);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-    $elementQuery = new EntryQuery(Entry::class, $secondParams);
+    $elementQuery = new EntryQuery(Entry::class, $params2);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
@@ -434,7 +434,7 @@ test('Element query cache records with matching params and a higher limit and of
     expect($elementQueryRecords)
         ->toHaveCount(1)
         ->and(Json::decodeIfJson($elementQueryRecords[0]->params))
-        ->toBe($secondParams);
+        ->toBe($params2);
 })->with([
     [['limit' => 1], ['limit' => 10]],
     [['limit' => 1, 'offset' => 1], ['limit' => 10, 'offset' => 10]],

@@ -147,13 +147,13 @@ class GenerateDataModel extends BaseDataModel
     /**
      * Returns whether one or more element queries with the same params and a higher limit exist.
      */
-    private function elementQueriesWithHigherLimitExist(array $params, array $otherElementQueries): bool
+    private function elementQueriesWithHigherLimitExist(array $params, array $otherElementQueriesParams): bool
     {
         if (!isset($params['limit'])) {
             return false;
         }
 
-        foreach ($otherElementQueries as $otherParams) {
+        foreach ($otherElementQueriesParams as $otherParams) {
             if ($this->elementQueryWithHigherLimitExists($params, $otherParams)) {
                 return true;
             }
