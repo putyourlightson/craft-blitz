@@ -298,8 +298,9 @@ class GenerateCacheService extends Component
      */
     public function saveElementQuery(ElementQuery $elementQuery): void
     {
-        $params = json_encode(ElementQueryHelper::getUniqueElementQueryParams($elementQuery));
-        $index = $this->createUniqueIndex($elementQuery->elementType . $params);
+        $params = ElementQueryHelper::getUniqueElementQueryParams($elementQuery);
+        $encodedParams = json_encode($params);
+        $index = $this->createUniqueIndex($elementQuery->elementType . $encodedParams);
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
         $mutex = Craft::$app->getMutex();
@@ -327,7 +328,7 @@ class GenerateCacheService extends Component
                         [
                             'index' => $index,
                             'type' => $elementQuery->elementType,
-                            'params' => $params,
+                            'params' => $encodedParams,
                         ],
                     )
                     ->execute();
@@ -343,7 +344,7 @@ class GenerateCacheService extends Component
         }
 
         if ($queryId) {
-            $this->generateData->addElementQueryId($queryId);
+            $this->generateData->addElementQuery($queryId, $elementQuery->elementType, $params);
         }
 
         $mutex->release($lockName);
