@@ -202,7 +202,7 @@ test('Element cache IDs are not returned when an entry is changed by custom fiel
     $refreshData->addIsChangedByFields($entry, true);
 
     expect(RefreshCacheHelper::getElementCacheIds(Entry::class, $refreshData))
-        ->toHaveCount(0);
+        ->toBeEmpty();
 });
 
 test('Element query cache IDs are returned when a disabled entry is changed', function() {
@@ -246,7 +246,7 @@ test('Element query type records without a cache ID are not returned when an ent
     ])->execute();
 
     expect(RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $refreshData))
-        ->toHaveCount(0);
+        ->toBeEmpty();
 });
 
 test('Element query type records are returned when an entry is changed by attributes used in the query', function() {
@@ -269,7 +269,7 @@ test('Element query type records are not returned when an entry is changed by at
     $refreshData->addIsChangedByAttributes($entry, true);
 
     expect(RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $refreshData))
-        ->toHaveCount(0);
+        ->toBeEmpty();
 });
 
 test('Element query type records are returned when an entry is changed by custom fields used in the query', function() {
@@ -292,7 +292,7 @@ test('Element query type records are not returned when an entry is changed by cu
     $refreshData->addIsChangedByFields($entry, true);
 
     expect(RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $refreshData))
-        ->toHaveCount(0);
+        ->toBeEmpty();
 });
 
 test('Element query type records are returned when an entry is changed with the date updated used in the query', function() {
