@@ -46,7 +46,7 @@
 {% endfor -%}
 - Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(site.id) }}
 {% for elementQueryType in craft.blitz.diagnostics.getElementQueryTypes(site.id) %}
-    - {{ elementQueryType.type }}: {{ elementQueryType.count|number -}}
+    - {{ elementQueryType.type }}: {{ elementQueryType.count|number }}
 {% endfor -%}
 - Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(site.id) }}
 {% endfor %}
