@@ -47,11 +47,17 @@ class DiagnosticsController extends Controller
         return $this->renderTemplate(
             'blitz/_utilities/diagnostics/report',
             [
-                'phpVersion' => App::phpVersion(),
-                'dbDriver' => $this->dbDriver(),
-                'blitzPluginSettings' => $this->getRedacted(Blitz::$plugin->getSettings()->getAttributes()),
+                'report' => $this->getReport(),
             ]
         );
+    }
+
+    public function actionDownloadReport(): Response
+    {
+        $this->response->data = $this->getReport();
+        $this->response->setDownloadHeaders('diagnostics-report.md');
+
+        return $this->response;
     }
 
     public function actionExportPages(int $siteId): Response
@@ -131,5 +137,16 @@ class DiagnosticsController extends Controller
         $label = $db->getDriverLabel();
         $version = App::normalizeVersion($db->getSchema()->getServerVersion());
         return "$label $version";
+    }
+
+    private function getReport(): string
+    {
+        return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/_includes/report',
+            [
+                'phpVersion' => App::phpVersion(),
+                'dbDriver' => $this->dbDriver(),
+                'blitzPluginSettings' => $this->getRedacted(Blitz::$plugin->getSettings()->getAttributes()),
+            ]
+        );
     }
 }
