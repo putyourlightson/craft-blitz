@@ -13,6 +13,7 @@ use Craft;
 use craft\base\Component;
 use craft\base\FieldInterface;
 use craft\elements\db\ElementQuery;
+use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\models\HintModel;
 use putyourlightson\blitz\records\HintRecord;
 use ReflectionClass as ReflectionClassAlias;
@@ -53,10 +54,7 @@ class HintsService extends Component
      */
     public function checkElementQuery(ElementQuery $elementQuery): void
     {
-        if ($elementQuery->wasEagerLoaded()
-            || $elementQuery->eagerLoadHandle === null
-            || $elementQuery->id !== null
-        ) {
+        if (!ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
             return;
         }
 

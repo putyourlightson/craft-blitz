@@ -399,6 +399,7 @@ class ElementQueryHelper
 
     /**
      * Returns whether the element query is a relation field query.
+     *
      * For example:
      *
      * ```twig
