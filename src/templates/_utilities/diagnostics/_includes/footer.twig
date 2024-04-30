@@ -30,3 +30,13 @@
         </div>
     {% endif %}
 </div>
+
+{% if sprig.isSuccess %}
+    <script>
+        Craft.cp.displayNotice('{{ sprig.message|e('js') }}');
+    </script>
+{% elseif sprig.isError %}
+    <script>
+        Craft.cp.displayError('{{ sprig.message|e('js') }}');
+    </script>
+{% endif %}

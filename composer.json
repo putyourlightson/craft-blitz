@@ -20,7 +20,7 @@
     "craftcms/cms": "^4.4",
     "cypresslab/gitelephant": "^4.0",
     "putyourlightson/craft-blitz-hints": "^1.2.2",
-    "putyourlightson/craft-sprig-core": "^2.6.4"
+    "putyourlightson/craft-sprig-core": "^2.7.3"
   },
   "require-dev": {
     "craftcms/commerce": "^4.0.0",
