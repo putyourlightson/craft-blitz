@@ -6,6 +6,10 @@
 
 - Optimised the refresh cache process by excluding redundantly tracked element queries based on their limit and offset values.
 
+### Fixed
+
+- Fixed diagnostics notifications in the control panel.
+
 ## 5.2.0 - 2024-04-27
 
 ### Added
