@@ -1,0 +1,52 @@
+### Application Info
+
+- PHP version: {{ phpVersion }}
+- Craft edition & version: {{ craft.app.editionName }} {{ craft.app.version }}
+- Database driver & version: {{ dbDriver }}
+
+### Installed Plugins
+
+{# @var plugin \craft\base\Plugin #}
+{% for plugin in craft.app.plugins.allPlugins %}
+- {{ plugin.name }}: {{ plugin.version }}
+{% endfor %}
+
+### Loaded Modules
+
+{# @var module \yii\base\Module #}
+{% for module in craft.app.modules %}
+{% if module is not instance of('\\craft\\base\\Plugin') %}
+- {{ module.id }}: {{ className(module) }}
+{% endif %}
+{% endfor %}
+
+### Blitz Plugin Settings
+
+```json
+{{ blitzPluginSettings|raw }}
+```
+
+### Recommendations
+
+{% for test in craft.blitz.diagnostics.getTests() %}
+- {{ test.pass ? '✅' : '❌' }} {{ test.message|striptags }}
+{% endfor -%}
+
+{# @var site \craft\models\Site #}
+{%- for site in craft.app.sites.allSites %}
+
+### Site Tracking {{ craft.app.isMultiSite ? '[' ~ site.id ~ ']' }}
+
+- Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(site.id) }}
+- Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(site.id) }}
+- Tracked Query String Params: {{ craft.blitz.diagnostics.getParamsCount(site.id) }}
+- Tracked Elements: {{ craft.blitz.diagnostics.getElementsCount(site.id) }}
+{% for elementType in craft.blitz.diagnostics.getElementTypes(site.id) %}
+    - {{ elementType.type }}: {{ elementType.count|number }}
+{% endfor -%}
+- Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(site.id) }}
+{% for elementQueryType in craft.blitz.diagnostics.getElementQueryTypes(site.id) %}
+    - {{ elementQueryType.type }}: {{ elementQueryType.count|number -}}
+{% endfor -%}
+- Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(site.id) }}
+{% endfor %}

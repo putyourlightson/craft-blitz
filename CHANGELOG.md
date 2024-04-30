@@ -5,6 +5,9 @@
 ### Changed
 
 - Optimised the refresh cache process by excluding redundantly tracked element queries based on their limit and offset values. 
+- The Blitz diagnostics report now anonymises site names.
+- The Blitz diagnostics report now includes a detailed breakdown of element types.
+- The Blitz diagnostics report now includes the ability to download as a markdown file.
 
 ### Fixed
 
