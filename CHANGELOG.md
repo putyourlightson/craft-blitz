@@ -11,6 +11,7 @@
 
 ### Fixed
 
+- Fixed the check for whether the `blitz/cache/refresh-expired` console command was executed within the past 24 hours.
 - Fixed diagnostics notifications in the control panel.
 
 ## 4.17.0 - 2024-04-27
