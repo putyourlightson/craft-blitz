@@ -553,8 +553,8 @@ class DiagnosticsHelper
         ];
 
         $refreshExpired = self::getDriverDataAction('refresh-expired-cli');
-        $now = new DateTime();
-        $pass = $refreshExpired !== null && $refreshExpired > $now->modify('-24 hours');
+        $yesterday = Db::prepareDateForDb(DateTimeHelper::toDateTime('-24 hours'));
+        $pass = $refreshExpired !== null && $refreshExpired > $yesterday;
         if ($pass) {
             $message = 'The <code>blitz/cache/refresh-expired</code> console command has been executed within the past 24 hours.';
         } else {
