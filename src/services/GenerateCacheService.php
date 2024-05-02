@@ -26,6 +26,7 @@ use craft\records\Section as SectionRecord;
 use craft\services\Elements;
 use craft\web\View;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
+use putyourlightson\blitz\behaviors\CloneBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -232,6 +233,11 @@ class GenerateCacheService extends Component
     public function addElementQuery(ElementQuery $elementQuery): void
     {
         if (!$this->shouldTrackElementQueriesOfType($elementQuery->elementType)) {
+            return;
+        }
+
+        // Don’t proceed if the element query is a clone
+        if ($elementQuery->getBehavior(CloneBehavior::class) !== null) {
             return;
         }
 
@@ -661,21 +667,14 @@ class GenerateCacheService extends Component
      */
     private function addRelatedElementIds(ElementQuery $elementQuery): void
     {
-        if (!$this->shouldTrackElementsOfType($elementQuery->elementType)) {
-            return;
-        }
-
-        // Temporarily disable element query tracking to prevent an endless loop.
-        $originalTrackElementQueries = $this->options->trackElementQueries;
-        $this->options->trackElementQueries = false;
-
         // Clone the original element query rather than manipulating it directly.
         $elementQueryClone = clone $elementQuery;
         $elementQueryClone->status(null);
-        $elementIds = $elementQueryClone->ids();
-        $this->generateData->addElementIds($elementIds);
 
-        $this->options->trackElementQueries = $originalTrackElementQueries;
+        // Attach a behavior, so we can check against it later to prevent an endless loop.
+        $elementQueryClone->attachBehavior(CloneBehavior::class, CloneBehavior::class);
+
+        $this->generateData->addElementIds($elementQueryClone->ids());
     }
 
     /**
