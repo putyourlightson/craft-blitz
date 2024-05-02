@@ -17,6 +17,7 @@ use craft\fields\data\OptionData;
 use craft\helpers\ArrayHelper;
 use craft\models\Section;
 use DateTime;
+use putyourlightson\blitz\behaviors\CloneBehavior;
 use putyourlightson\blitz\Blitz;
 use ReflectionClass;
 use ReflectionProperty;
@@ -300,6 +301,25 @@ class ElementQueryHelper
         }
 
         return false;
+    }
+
+    /**
+     * Creates and returns a clone of the provided element query.
+     */
+    public static function clone(ElementQuery $elementQuery): ElementQuery
+    {
+        $elementQueryClone = clone $elementQuery;
+        $elementQueryClone->attachBehavior(CloneBehavior::class, CloneBehavior::class);
+
+        return $elementQueryClone;
+    }
+
+    /**
+     * Returns whether the element query is a clone.
+     */
+    public static function isClone(ElementQuery $elementQuery): bool
+    {
+        return $elementQuery->getBehavior(CloneBehavior::class) !== null;
     }
 
     /**
