@@ -22,7 +22,7 @@ use putyourlightson\blitz\behaviors\CloneBehavior;
 use putyourlightson\blitz\Blitz;
 use ReflectionClass;
 use ReflectionProperty;
-use yii\db\Expression;
+use yii\db\ExpressionInterface;
 
 class ElementQueryHelper
 {
@@ -288,13 +288,13 @@ class ElementQueryHelper
     public static function containsExpressionCriteria(ElementQuery $elementQuery): bool
     {
         foreach ($elementQuery->getCriteria() as $criteria) {
-            if ($criteria instanceof Expression) {
+            if ($criteria instanceof ExpressionInterface) {
                 return true;
             }
 
             if (is_array($criteria)) {
                 foreach ($criteria as $criterion) {
-                    if ($criterion instanceof Expression) {
+                    if ($criterion instanceof ExpressionInterface) {
                         return true;
                     }
                 }
