@@ -5,7 +5,6 @@
  */
 
 use craft\commerce\elements\Product;
-use craft\db\FixedOrderExpression;
 use craft\db\Query;
 use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
@@ -29,6 +28,7 @@ use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use putyourlightson\campaign\elements\CampaignElement;
 use putyourlightson\campaign\elements\MailingListElement;
+use yii\db\Expression;
 
 beforeEach(function() {
     Blitz::$plugin->settings->cachingEnabled = true;
@@ -300,8 +300,7 @@ test('Element query record with query param is saved without the param', functio
 });
 
 test('Element query record with expression is not saved', function() {
-    $expression = new FixedOrderExpression('elements.id', [], Craft::$app->db);
-    $elementQuery = Entry::find()->orderBy($expression);
+    $elementQuery = Entry::find()->title(new Expression(1));
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
 
     expect(ElementQueryRecord::class)
