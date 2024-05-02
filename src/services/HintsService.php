@@ -62,7 +62,7 @@ class HintsService extends Component
             return;
         }
 
-        if ($elementQuery->wasEagerLoaded()) {
+        if ($elementQuery->eagerly || $elementQuery->wasEagerLoaded()) {
             return;
         }
 

@@ -13,6 +13,7 @@
 
 - Fixed the check for whether the `blitz/cache/refresh-expired` console command was executed within the past 24 hours.
 - Fixed diagnostics notifications in the control panel.
+- Fixed the detection of lazy eager-loaded queries.
 
 ## 5.2.0 - 2024-04-27
 
