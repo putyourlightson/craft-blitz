@@ -54,7 +54,15 @@ class HintsService extends Component
      */
     public function checkElementQuery(ElementQuery $elementQuery): void
     {
+        if (ElementQueryHelper::isClone($elementQuery)) {
+            return;
+        }
+
         if (!ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
+            return;
+        }
+
+        if ($elementQuery->wasEagerLoaded()) {
             return;
         }
 

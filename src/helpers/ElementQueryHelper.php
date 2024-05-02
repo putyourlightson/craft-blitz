@@ -12,6 +12,7 @@ use craft\elements\db\AssetQuery;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
+use craft\fields\BaseRelationField;
 use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
 use craft\helpers\ArrayHelper;
@@ -428,14 +429,7 @@ class ElementQueryHelper
      */
     public static function isRelationFieldQuery(ElementQuery $elementQuery): bool
     {
-        if ($elementQuery->wasEagerLoaded()
-            || $elementQuery->eagerLoadHandle === null
-            || $elementQuery->id !== null
-        ) {
-            return false;
-        }
-
-        return true;
+        return $elementQuery->getBehavior(BaseRelationField::class) !== null;
     }
 
     /**
