@@ -200,8 +200,8 @@ test('Element query records without specific identifiers are saved', function() 
     $elementQuerySets = [
         [
             Entry::find(),
-            Entry::find()->limit(''),
-            Entry::find()->offset(0),
+            Entry::find()->limit(null),
+            Entry::find()->offset(null),
         ],
         [
             Entry::find()->id('not 1'),

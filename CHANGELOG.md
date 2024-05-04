@@ -1,19 +1,23 @@
 # Release Notes for Blitz
 
-## 5.2.1 - Unreleased
+## 5.3.0 - Unreleased
+
+### Added
+
+- Added anonymised site names to the Blitz diagnostics report.
+- Added a detailed breakdown of element types to the Blitz diagnostics report.
+- Added the ability to download the Blitz diagnostics report as a markdown file.
 
 ### Changed
 
 - Optimised the refresh cache process by excluding redundantly tracked element queries based on their limit and offset values.
-- The Blitz diagnostics report now anonymises site names.
-- The Blitz diagnostics report now includes a detailed breakdown of element types.
-- The Blitz diagnostics report now includes the ability to download as a markdown file.
 
 ### Fixed
 
 - Fixed the check for whether the `blitz/cache/refresh-expired` console command was executed within the past 24 hours.
 - Fixed diagnostics notifications in the control panel.
 - Fixed the detection of lazy eager-loaded queries.
+- Fixed tracking of some element query attributes.
 
 ## 5.2.0 - 2024-04-27
 

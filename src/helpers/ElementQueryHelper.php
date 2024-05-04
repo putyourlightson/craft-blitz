@@ -12,6 +12,7 @@ use craft\elements\db\AssetQuery;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\elements\db\EntryQuery;
+use craft\elements\db\OrderByPlaceholderExpression;
 use craft\fields\BaseRelationField;
 use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
@@ -60,12 +61,12 @@ class ElementQueryHelper
         foreach (['limit', 'offset'] as $key) {
             if (!empty($elementQuery->{$key})) {
                 $params[$key] = $elementQuery->{$key};
-            }
-        }
 
-        // Exclude the `orderBy` param, if neither limit nor offset are set.
-        if (empty($params['limit']) && empty($params['offset'])) {
-            unset($params['orderBy']);
+                // Add the `order` param if not empty.
+                if (!self::hasEmptyOrderByValue($elementQuery)) {
+                    $params['orderBy'] = $elementQuery->orderBy;
+                }
+            }
         }
 
         // Exclude specific empty params, as they are redundant.
@@ -116,23 +117,8 @@ class ElementQueryHelper
         $attributes = self::getUsedElementQueryParams($elementQuery, $params);
 
         // Manually add the default order by if no order is set
-        if (empty($elementQuery->orderBy)) {
-            // Use reflection to extract the protected property value
-            $property = (new ReflectionClass($elementQuery))->getProperty('defaultOrderBy');
-            $property->setAccessible(true);
-            $defaultOrderBy = $property->getValue($elementQuery);
-
-            if (!empty($defaultOrderBy)) {
-                if (is_array($defaultOrderBy)) {
-                    $defaultOrderBy = array_key_first($defaultOrderBy);
-
-                    // Get the column name without the table
-                    $parts = explode('.', $defaultOrderBy);
-                    $attributes[] = end($parts);
-                } else {
-                    $attributes[] = $defaultOrderBy;
-                }
-            }
+        if (self::hasEmptyOrderByValue($elementQuery)) {
+            $attributes[] = self::getDefaultOrderByValue($elementQuery);
         }
 
         // Add `postDate` attribute if either `before` or `after` params exist
@@ -474,7 +460,7 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns a class’ public, non-static properties.
+     * Returns a class’ public, non-static properties using reflection.
      *
      * @see ElementQuery::criteriaAttributes()
      */
@@ -490,6 +476,36 @@ class ElementQueryHelper
         }
 
         return $properties;
+    }
+
+    /**
+     * Returns whether the order by value has an empty or placeholder value.
+     */
+    private static function hasEmptyOrderByValue(ElementQuery $elementQuery): bool
+    {
+        $orderBy = $elementQuery->orderBy[0] ?? $elementQuery->orderBy;
+
+        return $orderBy === null || $orderBy instanceof OrderByPlaceholderExpression;
+    }
+
+    /**
+     * Returns the default order by value for the element query using reflection.
+     */
+    private static function getDefaultOrderByValue(ElementQuery $elementQuery): string
+    {
+        // Use reflection to extract the protected property value
+        $property = (new ReflectionClass($elementQuery))->getProperty('defaultOrderBy');
+        $defaultOrderBy = $property->getValue($elementQuery);
+
+        if (is_array($defaultOrderBy)) {
+            $defaultOrderBy = array_key_first($defaultOrderBy);
+
+            // Get the column name without the table
+            $parts = explode('.', $defaultOrderBy);
+            $defaultOrderBy = end($parts);
+        }
+
+        return $defaultOrderBy;
     }
 
     /**
