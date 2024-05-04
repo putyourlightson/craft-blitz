@@ -12,7 +12,6 @@ test('Included URI patterns include the home and `page` URI', function() {
             'siteId' => '',
             'uriPattern' => '',
         ])
-        ->and(Blitz::$plugin->settings->includedUriPatterns)
         ->toContain([
             'siteId' => '',
             'uriPattern' => 'page',
