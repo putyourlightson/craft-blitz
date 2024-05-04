@@ -1,13 +1,16 @@
 # Release Notes for Blitz
 
-## 4.17.1 - Unreleased
+## 4.18.0 - Unreleased
+
+### Added
+
+- Added anonymised site names to the Blitz diagnostics report.
+- Added a detailed breakdown of element types to the Blitz diagnostics report.
+- Added the ability to download the Blitz diagnostics report as a markdown file.
 
 ### Changed
 
-- Optimised the refresh cache process by excluding redundantly tracked element queries based on their limit and offset values. 
-- The Blitz diagnostics report now anonymises site names.
-- The Blitz diagnostics report now includes a detailed breakdown of element types.
-- The Blitz diagnostics report now includes the ability to download as a markdown file.
+- Optimised the refresh cache process by excluding redundantly tracked element queries based on their limit and offset values.
 
 ### Fixed
 
