@@ -128,11 +128,12 @@ function createProductVariantOrder(bool $batchMode = false): array
     Craft::$app->elements->saveElement($product);
 
     $variant = new Variant([
+        'title' => $faker->sentence(),
         'sku' => 'test-sku',
         'price' => 10,
-        'stock' => 100,
         'productId' => $product->id,
     ]);
+
     Craft::$app->elements->saveElement($variant);
 
     $variant->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
