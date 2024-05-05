@@ -1,17 +1,17 @@
-### Application Info
+#### Application Info
 
 - PHP version: {{ phpVersion }}
 - Craft edition & version: {{ craft.app.editionName }} {{ craft.app.version }}
 - Database driver & version: {{ dbDriver }}
 
-### Installed Plugins
+#### Installed Plugins
 
 {# @var plugin \craft\base\Plugin #}
 {% for plugin in craft.app.plugins.allPlugins %}
 - {{ plugin.name }}: {{ plugin.version }}
 {% endfor %}
 
-### Loaded Modules
+#### Loaded Modules
 
 {# @var module \yii\base\Module #}
 {% for module in craft.app.modules %}
@@ -20,13 +20,13 @@
 {% endif %}
 {% endfor %}
 
-### Blitz Plugin Settings
+#### Blitz Plugin Settings
 
 ```json
 {{ blitzPluginSettings|raw }}
 ```
 
-### Recommendations
+#### Recommendations
 
 {% for test in craft.blitz.diagnostics.getTests() %}
 - {{ test.pass ? '✅' : '❌' }} {{ test.message|striptags }}
@@ -35,7 +35,7 @@
 {# @var site \craft\models\Site #}
 {%- for site in craft.app.sites.allSites %}
 
-### Site Tracking {{ craft.app.isMultiSite ? '[' ~ site.id ~ ']' }}
+#### Site Tracking {{ craft.app.isMultiSite ? '[' ~ site.id ~ ']' }}
 
 - Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(site.id) }}
 - Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(site.id) }}
