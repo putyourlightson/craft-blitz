@@ -88,7 +88,7 @@ class FlushCacheService extends Component
     /**
      * Flushes the entire cache.
      */
-    public function flushAll(bool $afterClear = false): void
+    public function flushAll(bool $isAfterFullClear = false): void
     {
         $event = new RefreshCacheEvent();
         $this->trigger(self::EVENT_BEFORE_FLUSH_ALL_CACHE, $event);
@@ -105,7 +105,7 @@ class FlushCacheService extends Component
         }
 
         $this->deleteAllCacheRecords();
-        $this->runGarbageCollection($afterClear);
+        $this->runGarbageCollection($isAfterFullClear);
         $mutex->release($lockName);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_FLUSH_ALL_CACHE)) {
@@ -116,7 +116,7 @@ class FlushCacheService extends Component
     /**
      * Runs garbage collection.
      */
-    public function runGarbageCollection(bool $afterClear = false): void
+    public function runGarbageCollection(bool $isAfterFullClear = false): void
     {
         // Get and delete element query records without an associated element query cache
         $elementQueryRecordIds = ElementQueryRecord::find()
@@ -128,7 +128,7 @@ class FlushCacheService extends Component
         ElementQueryRecord::deleteAll(['id' => $elementQueryRecordIds]);
 
         // Delete includes only after a cache clear
-        if ($afterClear === true) {
+        if ($isAfterFullClear === true) {
             IncludeRecord::deleteAll();
         }
 
