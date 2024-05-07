@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.18.0 - Unreleased
+## 4.18.0 - 2024-05-07
 
 ### Added
 
