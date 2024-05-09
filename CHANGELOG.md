@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.18.1 - Unreleased
+
+### Added
+
+- Added a tracked fields column to the tracked elements page in the Blitz Diagnostics utility.
+
 ## 4.18.0 - 2024-05-07
 
 ### Added

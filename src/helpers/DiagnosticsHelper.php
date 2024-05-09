@@ -23,6 +23,7 @@ use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
+use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\IncludeRecord;
@@ -38,6 +39,11 @@ class DiagnosticsHelper
      * @const array
      */
     public const IS_CACHED_INCLUDE_CONDITION = ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX . '%', false];
+
+    /**
+     * @var string[]|null
+     */
+    private static ?array $fields = null;
 
     public static function getSiteId(): ?int
     {
@@ -263,13 +269,14 @@ class DiagnosticsHelper
         ];
 
         if ($cacheId) {
-            $condition['cacheId'] = $cacheId;
+            $condition['elementcaches.cacheId'] = $cacheId;
         }
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title'])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title', 'count([[fieldId]]) as fieldCount'])
             ->innerJoinWith('cache')
+            ->leftJoin(['elementfieldcaches' => ElementFieldCacheRecord::tableName()], '[[elementfieldcaches.cacheId]] = [[elementcaches.cacheId]] AND [[elementfieldcaches.elementId]] = [[elementcaches.elementId]]')
             ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
             ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementcaches.elementId]]')
             ->innerJoin(['content' => Table::CONTENT], '[[content.elementId]] = [[elementcaches.elementId]]')
@@ -308,6 +315,28 @@ class DiagnosticsHelper
             ->fixedOrder()
             ->indexBy('id')
             ->all();
+    }
+
+    public static function getPageElementFields(int $cacheId, int $elementId): array
+    {
+        $fields = [];
+        $fieldIds = ElementFieldCacheRecord::find()
+            ->select(['fieldId'])
+            ->where([
+                'cacheId' => $cacheId,
+                'elementId' => $elementId,
+            ])
+            ->distinct()
+            ->column();
+
+        // It’s safe to call this in a for loop, since the fields are memoized.
+        foreach ($fieldIds as $fieldId) {
+            $fields[] = Craft::$app->getFields()->getFieldById($fieldId);
+        }
+
+        ArrayHelper::multisort($fields, 'name');
+
+        return $fields;
     }
 
     public static function getElementQuerySql(string $elementQueryType, string $params): ?string
