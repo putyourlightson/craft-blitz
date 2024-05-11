@@ -77,16 +77,25 @@
                                         {{ row.fieldCount }}
                                         {% if row.fieldCount > 0 %}
                                             <span class="info">
+                                                <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
                                                 <table class="data fullwidth">
+                                                    <thead>
+                                                        <th>{{ 'Name'|t('app') }}</th>
+                                                        <th>{{ 'Handle'|t('app') }}</th>
+                                                        <th>{{ 'Type'|t('app') }}</th>
+                                                    </thead>
                                                     <tbody>
                                                         {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
                                                         {% for field in fields %}
                                                             <tr>
-                                                                <td>
+                                                                <td class="thin">
                                                                     <a href="{{ url('settings/fields/edit/' ~ field.id) }}">{{ field.name }}</a>
                                                                 </td>
-                                                                <td class="code">
+                                                                <td class="thin code">
                                                                     {{ field.handle }}
+                                                                </td>
+                                                                <td class="thin">
+                                                                    {{ field.displayName }}
                                                                 </td>
                                                             </tr>
                                                         {% endfor %}
