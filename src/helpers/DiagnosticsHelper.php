@@ -40,11 +40,6 @@ class DiagnosticsHelper
      */
     public const IS_CACHED_INCLUDE_CONDITION = ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX . '%', false];
 
-    /**
-     * @var string[]|null
-     */
-    private static ?array $fields = null;
-
     public static function getSiteId(): ?int
     {
         $siteId = null;
