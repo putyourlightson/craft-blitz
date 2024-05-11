@@ -77,11 +77,21 @@
                                         {{ row.fieldCount }}
                                         {% if row.fieldCount > 0 %}
                                             <span class="info">
-                                                {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
-                                                {% for field in fields %}
-                                                    {{ field.name }} <code>{{ field.handle }}</code>
-                                                    {{ not loop.last ? '<br>' }}
-                                                {% endfor %}
+                                                <table class="data fullwidth">
+                                                    <tbody>
+                                                        {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
+                                                        {% for field in fields %}
+                                                            <tr>
+                                                                <td>
+                                                                    <a href="{{ url('settings/fields/edit/' ~ field.id) }}">{{ field.name }}</a>
+                                                                </td>
+                                                                <td class="code">
+                                                                    {{ field.handle }}
+                                                                </td>
+                                                            </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
                                             </span>
                                         {% endif %}
                                     </td>
