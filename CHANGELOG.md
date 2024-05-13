@@ -6,6 +6,10 @@
 
 - Added a tracked fields column to the tracked elements page in the Blitz Diagnostics utility.
 
+### Changed
+
+- Sites in the Blitz diagnostics report are now sorted by ID in ascending order.
+
 ## 4.18.0 - 2024-05-07
 
 ### Added
