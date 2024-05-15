@@ -41,7 +41,7 @@
 
 ### Fixed
 
-- Fixed bug in the SQL statement introduced in 4.16.4 when using a Postgres database. 
+- Fixed a bug in the SQL statement introduced in 4.16.4 when using a Postgres database. 
 
 ## 4.16.4 - 2024-04-26
 
