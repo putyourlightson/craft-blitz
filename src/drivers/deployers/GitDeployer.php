@@ -144,7 +144,7 @@ class GitDeployer extends BaseDeployer
                     $filePath .= '/index.html';
                 }
 
-                $this->updateFile($value, $filePath);
+                $this->updateFile($filePath, $value);
             }
 
             if (is_callable($setProgressHandler)) {
@@ -337,7 +337,7 @@ class GitDeployer extends BaseDeployer
     /**
      * Updates a file by saving the value or deleting the file if empty.
      */
-    private function updateFile(string $value, string $filePath): void
+    private function updateFile(string $filePath, ?string $value): void
     {
         if (empty($value)) {
             if (file_exists($filePath)) {

@@ -32,21 +32,20 @@
 - {{ test.pass ? '✅' : '❌' }} {{ test.message|striptags }}
 {% endfor -%}
 
-{# @var site \craft\models\Site #}
-{%- for site in craft.app.sites.allSites %}
+{%- for siteId in craft.app.sites.getAllSiteIds|sort %}
 
-#### Site Tracking {{ craft.app.isMultiSite ? '[' ~ site.id ~ ']' }}
+#### Site Tracking {{ craft.app.isMultiSite ? '[#' ~ siteId ~ ']' }}
 
-- Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(site.id) }}
-- Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(site.id) }}
-- Tracked Query String Params: {{ craft.blitz.diagnostics.getParamsCount(site.id) }}
-- Tracked Elements: {{ craft.blitz.diagnostics.getElementsCount(site.id) }}
-{% for elementType in craft.blitz.diagnostics.getElementTypes(site.id) %}
+- Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(siteId) }}
+- Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(siteId) }}
+- Tracked Query String Params: {{ craft.blitz.diagnostics.getParamsCount(siteId) }}
+- Tracked Elements: {{ craft.blitz.diagnostics.getElementsCount(siteId) }}
+{% for elementType in craft.blitz.diagnostics.getElementTypes(siteId) %}
     - {{ elementType.type }}: {{ elementType.count|number }}
 {% endfor -%}
-- Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(site.id) }}
-{% for elementQueryType in craft.blitz.diagnostics.getElementQueryTypes(site.id) %}
+- Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(siteId) }}
+{% for elementQueryType in craft.blitz.diagnostics.getElementQueryTypes(siteId) %}
     - {{ elementQueryType.type }}: {{ elementQueryType.count|number }}
 {% endfor -%}
-- Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(site.id) }}
+- Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(siteId) }}
 {% endfor %}
