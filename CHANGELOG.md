@@ -1,5 +1,19 @@
 # Release Notes for Blitz
 
+## 5.3.1 - 2024-05-16
+
+### Added
+
+- Added a tracked fields column to the tracked elements page in the Blitz Diagnostics utility.
+
+### Changed
+
+- Sites in the Blitz diagnostics report are now sorted by ID in ascending order.
+
+### Fixed
+
+- Fixed a bug in the Git Deployer that was throwing an error when a cached page no longer existed ([#664](https://github.com/putyourlightson/craft-blitz/issues/664)). 
+
 ## 5.3.0 - 2024-05-07
 
 ### Added
