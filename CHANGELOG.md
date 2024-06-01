@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.3.2 - Unreleased
+
+### Fixed
+
+- Fixed a bug in which modules that were not bootstrapped were throwing an error when generating a report in the Blitz Diagnostics utility ([#668](https://github.com/putyourlightson/craft-blitz/issues/668)).
+
 ## 5.3.1 - 2024-05-16
 
 ### Added
@@ -12,7 +18,7 @@
 
 ### Fixed
 
-- Fixed a bug in the Git Deployer that was throwing an error when a cached page no longer existed ([#664](https://github.com/putyourlightson/craft-blitz/issues/664)). 
+- Fixed a bug in the Git Deployer that was throwing an error when a cached page no longer existed ([#664](https://github.com/putyourlightson/craft-blitz/issues/664)).
 
 ## 5.3.0 - 2024-05-07
 

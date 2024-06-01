@@ -7,18 +7,19 @@
 #### Installed Plugins
 
 {# @var plugin \craft\base\Plugin #}
-{% for plugin in craft.app.plugins.allPlugins %}
-- {{ plugin.name }}: {{ plugin.version }}
+{% for plugin in craft.app.plugins.allPlugins -%}
+    - {{ plugin.name }}: {{ plugin.version }}
 {% endfor %}
 
 #### Loaded Modules
 
 {# @var module \yii\base\Module #}
-{% for module in craft.app.modules %}
-{% if module is not instance of('\\craft\\base\\Plugin') %}
-- {{ module.id }}: {{ className(module) }}
-{% endif %}
-{% endfor %}
+{% for module in craft.app.modules(true) -%}
+    {% if module is not instance of('\\craft\\base\\Plugin') -%}
+        - {{ module.id }}: {{ className(module) }}
+        {{- '\n' -}}
+    {% endif %}
+{%- endfor %}
 
 #### Blitz Plugin Settings
 
@@ -28,24 +29,36 @@
 
 #### Recommendations
 
-{% for test in craft.blitz.diagnostics.getTests() %}
-- {{ test.pass ? '✅' : '❌' }} {{ test.message|striptags }}
-{% endfor -%}
+{% for test in craft.blitz.diagnostics.getTests() -%}
+    - {{ test.pass ? '✅' : '❌' }} {{ test.message|striptags }}
+    {{- '\n' -}}
+{% endfor %}
 
-{%- for siteId in craft.app.sites.getAllSiteIds|sort %}
-
-#### Site Tracking {{ craft.app.isMultiSite ? '[#' ~ siteId ~ ']' }}
-
-- Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(siteId) }}
-- Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(siteId) }}
-- Tracked Query String Params: {{ craft.blitz.diagnostics.getParamsCount(siteId) }}
-- Tracked Elements: {{ craft.blitz.diagnostics.getElementsCount(siteId) }}
-{% for elementType in craft.blitz.diagnostics.getElementTypes(siteId) %}
-    - {{ elementType.type }}: {{ elementType.count|number }}
-{% endfor -%}
-- Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(siteId) }}
-{% for elementQueryType in craft.blitz.diagnostics.getElementQueryTypes(siteId) %}
-    - {{ elementQueryType.type }}: {{ elementQueryType.count|number }}
-{% endfor -%}
-- Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(siteId) }}
+{% for siteId in craft.app.sites.getAllSiteIds|sort -%}
+    #### Site Tracking {{ craft.app.isMultiSite ? '[#' ~ siteId ~ ']' }}
+    {{- '\n' -}}
+    {{- '\n' -}}
+    - Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(siteId) }}
+    {{- '\n' -}}
+    - Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(siteId) }}
+    {{- '\n' -}}
+    - Tracked Query String Params: {{ craft.blitz.diagnostics.getParamsCount(siteId) }}
+    {{- '\n' -}}
+    - Tracked Elements: {{ craft.blitz.diagnostics.getElementsCount(siteId) }}
+    {{- '\n' -}}
+    {% for elementType in craft.blitz.diagnostics.getElementTypes(siteId) %}
+        {{- '\t' -}}- {{ elementType.type }}: {{ elementType.count|number }}
+        {{- '\n' -}}
+    {% endfor -%}
+    - Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(siteId) }}
+    {{- '\n' -}}
+    {% for elementQueryType in craft.blitz.diagnostics.getElementQueryTypes(siteId) %}
+        {{- '\t' -}}- {{ elementQueryType.type }}: {{ elementQueryType.count|number }}
+        {{- '\n' -}}
+    {%- endfor -%}
+    - Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(siteId) }}
+    {%- if not loop.last %}
+        {{- '\n' -}}
+        {{- '\n' -}}
+    {% endif -%}
 {% endfor %}
