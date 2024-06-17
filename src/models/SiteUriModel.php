@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\models;
 
+use craft\base\Element;
 use craft\base\Model;
 use craft\helpers\UrlHelper;
 
@@ -28,6 +29,10 @@ class SiteUriModel extends Model
      */
     public function getUrl(array $params = []): string
     {
+        if ($this->uri === Element::HOMEPAGE_URI) {
+            return UrlHelper::siteUrl('', $params, null, $this->siteId);
+        }
+
         return UrlHelper::siteUrl($this->uri, $params, null, $this->siteId);
     }
 }
