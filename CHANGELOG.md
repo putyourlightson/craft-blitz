@@ -1,10 +1,11 @@
 # Release Notes for Blitz
 
-## 4.18.2 - Unreleased
+## 4.18.2 - 2024-06-18
 
 ### Fixed
 
 - Fixed a bug in which modules that were not bootstrapped were throwing an error when generating a report in the Blitz Diagnostics utility ([#668](https://github.com/putyourlightson/craft-blitz/issues/668)). 
+- Fixed a bug in which incorrect purge requests were being sent to CloudFront for the homepage ([#673](https://github.com/putyourlightson/craft-blitz/issues/673)).
 
 ## 4.18.1 - 2024-05-16
 
