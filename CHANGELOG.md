@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.18.3 - Unreleased
+
+### Fixed
+
+- Fixed an issue in which the priority of batch jobs could end up being a negative number.
+
 ## 4.18.2 - 2024-06-18
 
 ### Fixed
