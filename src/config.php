@@ -248,13 +248,13 @@ return [
         // - `3`: Append "served by" comment only
         //'outputComments' => true,
 
-        // The priority to give the refresh cache job (the lower the number, the higher the priority). Set to `null` to inherit the default priority.
+        // The priority to give the refresh cache job (the lower the number, the higher the priority).
         //'refreshCacheJobPriority' => 10,
 
         //The batch size to use for driver jobs that support batching.
         //'driverJobBatchSize' => 100,
 
-        // The priority to give driver jobs (the lower the number, the higher the priority). Set to `null` to inherit the default priority.
+        // The priority to give driver jobs (the lower the number, the higher the priority).
         //'driverJobPriority' => 100,
 
         // The time to reserve for queue jobs in seconds.
