@@ -188,9 +188,9 @@ class BlitzVariable
             }
         }
 
-        // Create polyfills using https://polyfill.io/v3/url-builder/.
+        // Create polyfills using Cloudflare mirror of polyfill.io: https://blog.cloudflare.com/polyfill-io-now-available-on-cdnjs-reduce-your-supply-chain-risk
         $polyfills = ['fetch', 'Promise', 'CustomEvent'];
-        $polyfillUrl = 'https://polyfill.io/v3/polyfill.min.js?features='.implode('%2C', $polyfills);
+        $polyfillUrl = 'https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features='.implode('%2C', $polyfills);
 
         // Register polyfills for IE11 only, using the `module/nomodule` pattern.
         // https://3perf.com/blog/polyfills/#modulenomodule
