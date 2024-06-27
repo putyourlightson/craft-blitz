@@ -442,9 +442,9 @@ class SettingsModel extends Model
     public int|bool $outputComments = true;
 
     /**
-     * The priority to give the refresh cache job (the lower the number, the higher the priority).
+     * The priority to give the refresh cache job (the lower the number, the higher the priority). If set to `null`, the default job priority will be used.
      */
-    public int $refreshCacheJobPriority = 10;
+    public ?int $refreshCacheJobPriority = 10;
 
     /**
      * The batch size to use for driver jobs that support batching.
@@ -452,9 +452,9 @@ class SettingsModel extends Model
     public int $driverJobBatchSize = 100;
 
     /**
-     * The priority to give driver jobs (the lower the number, the higher the priority).
+     * The priority to give driver jobs (the lower the number, the higher the priority). If set to `null`, the default job priority will be used.
      */
-    public int $driverJobPriority = 100;
+    public ?int $driverJobPriority = 100;
 
     /**
      * The time to reserve for queue jobs in seconds.

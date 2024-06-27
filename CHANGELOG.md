@@ -1,10 +1,11 @@
 # Release Notes for Blitz
 
-## 4.18.3 - Unreleased
+## 4.18.3 - 2024-06-27
 
 ### Fixed
 
-- Fixed an issue in which the priority of batch jobs could end up being a negative number.
+- Fixed a bug in which the priority of refresh cache and driver jobs was interpreted as `0` when set to `null`.
+- Fixed an issue in which the priority of batch jobs could be a negative number and therefore jobs would never complete.
 
 ## 4.18.2 - 2024-06-18
 
