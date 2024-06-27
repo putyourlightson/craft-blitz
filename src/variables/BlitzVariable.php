@@ -8,11 +8,11 @@ namespace putyourlightson\blitz\variables;
 use Craft;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
-use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use Twig\Markup;
 use yii\web\NotFoundHttpException;
+use yii\web\View;
 
 class BlitzVariable
 {
@@ -188,13 +188,6 @@ class BlitzVariable
             }
         }
 
-        // Create polyfills using https://polyfill.io/v3/url-builder/.
-        $polyfills = ['fetch', 'Promise', 'CustomEvent'];
-        $polyfillUrl = 'https://polyfill.io/v3/polyfill.min.js?features='.implode('%2C', $polyfills);
-
-        // Register polyfills for IE11 only, using the `module/nomodule` pattern.
-        // https://3perf.com/blog/polyfills/#modulenomodule
-        $view->registerJsFile($polyfillUrl, ['nomodule' => true]);
         $view->registerJs($js, View::POS_END);
 
         $this->_injected++;

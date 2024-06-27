@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 3.15.0 - 2024-06-27 [CRITICAL]
+> {warning} Polyfills for IE have been removed from the Blitz inject script. If you need to support IE, you will need to add the polyfills yourself.
+
+### Removed
+- Removed the `fetch`, `Promise` and `CustomEvent` polyfills for IE from the Blitz inject script, as they were pulling from `polyfill.io` which has been compromised ([#677](https://github.com/putyourlightson/craft-blitz/issues/677)).
+
 ## 3.14.0 - 2024-01-31
 ### Changed
 - Increased the minimum Craft version requirement to 3.7.5.
