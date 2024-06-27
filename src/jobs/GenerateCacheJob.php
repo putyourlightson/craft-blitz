@@ -61,7 +61,7 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
     public function execute($queue): void
     {
         // Decrement (increase) priority so that subsequent batches are prioritised.
-        if ($this->itemOffset === 0) {
+        if ($this->itemOffset === 0 && $this->priority > 0) {
             $this->priority--;
         }
 
