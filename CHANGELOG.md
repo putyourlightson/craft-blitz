@@ -198,9 +198,9 @@
 
 - Fixed a bug introduced in version 4.12.0 in which the Blitz inject script was not being registered.
 
-## 4.12.0 - 2024-02-27
+## 4.12.0 - 2024-02-27 [CRITICAL]
 
-> {warning} Polyfills for IE have been removed from the Blitz inject script. If you need to support IE, you will need to add the polyfills yourself.
+> {warning} Polyfills for IE have been removed from the Blitz inject script due to `polyfill.io` having been compromised.
 
 ### Added
 
@@ -216,7 +216,7 @@
 
 ### Removed
 
-- Removed the `fetch`, `Promise` and `CustomEvent` polyfills for IE from the Blitz inject script, as they were pulling from `polyfill.io`. If you need to support IE, you will need to add the polyfills to your templates yourself.
+- Removed the `fetch`, `Promise` and `CustomEvent` polyfills for IE from the Blitz inject script – if you need to support IE, you will need to add the polyfills yourself.
 
 ## 4.11.2 - 2024-02-19
 
