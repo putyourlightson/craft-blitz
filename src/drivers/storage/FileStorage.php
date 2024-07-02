@@ -370,7 +370,7 @@ class FileStorage extends BaseCacheStorage
                 }
 
                 if (str_starts_with($otherSite['path'], $site['path'] . '/')) {
-                    $site['pageCount'] -= is_dir($otherSite['path']) ? $otherSite['pageCount'] : 0;
+                    $site['pageCount'] -= $otherSite['pageCount'];
                 }
             }
         }
