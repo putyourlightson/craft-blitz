@@ -33,8 +33,12 @@ uses(TestCase::class)
         Blitz::$plugin->flushCache->flushAll();
         Craft::$app->queue->releaseAll();
     })
-    ->in('./');
+    ->group('all')
+    ->in('Architecture', 'Drivers', 'Feature', 'Integration');
 
+uses(TestCase::class)
+    ->group('interface')
+    ->in('Interface');
 /*
 |--------------------------------------------------------------------------
 | Expectations
