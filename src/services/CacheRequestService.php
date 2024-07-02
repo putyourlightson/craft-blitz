@@ -487,6 +487,8 @@ class CacheRequestService extends Component
     /**
      * Saves and prepares the response for a given site URI.
      *
+     * The “served by” comment is intentionally not added to prevent reverse proxy caches from storing it.
+     *
      * @since 3.12.0
      */
     public function saveAndPrepareResponse(?Response $response, SiteUriModel $siteUri): void
