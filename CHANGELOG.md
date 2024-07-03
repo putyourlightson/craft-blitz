@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.3.4 - 2024-07-03
+
+### Fixed
+
+- Fixed a bug in which the cached page count of sites that contained the paths of other sites could be inaccurately displayed in the Blitz Cache utility.
+
 ## 5.3.3 - 2024-06-27
 
 ### Fixed
