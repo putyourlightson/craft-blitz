@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\behaviors;
 use Craft;
 use craft\base\Element;
 use craft\elements\Asset;
+use craft\helpers\ElementHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
 
@@ -34,6 +35,11 @@ class ElementChangedBehavior extends Behavior
      * @var Element|null The original element.
      */
     public ?Element $originalElement = null;
+
+    /**
+     * @var array<int,bool> The original element’s site statuses.
+     */
+    public array $originalElementSiteStatuses = [];
 
     /**
      * @var string[] The attributes that changed.
@@ -75,6 +81,10 @@ class ElementChangedBehavior extends Behavior
         }
 
         $this->originalElement = Craft::$app->getElements()->getElementById($element->id, $element::class, $element->siteId);
+
+        if ($this->originalElement !== null) {
+            $this->originalElementSiteStatuses = ElementHelper::siteStatusesForElement($this->originalElement);
+        }
     }
 
     /**
@@ -131,7 +141,7 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns whether the element’s status has changed.
+     * Returns whether the element’s status or any site statuses have changed.
      */
     public function getHasStatusChanged(): bool
     {
@@ -141,7 +151,27 @@ class ElementChangedBehavior extends Behavior
             return false;
         }
 
-        return $element->getStatus() != $this->originalElement->getStatus();
+        if ($element->getStatus() != $this->originalElement->getStatus()) {
+            return true;
+        }
+
+        $supportedSites = ElementHelper::supportedSitesForElement($element);
+
+        foreach ($supportedSites as $supportedSite) {
+            $siteId = $supportedSite['siteId'];
+            $siteStatus = $element->getEnabledForSite($siteId);
+            $originalSiteStatus = $this->originalElementSiteStatuses[$siteId] ?? null;
+
+            if (
+                $siteStatus !== null
+                && $originalSiteStatus !== null
+                && $siteStatus !== $originalSiteStatus
+            ) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

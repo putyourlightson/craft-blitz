@@ -385,7 +385,9 @@ class Blitz extends Plugin
                 function(ElementEvent|BatchElementActionEvent $event) {
                     /** @var Element $element */
                     $element = $event->element;
-                    $element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+                    if ($this->refreshCache->isRefreshableElement($element)) {
+                        $element->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
+                    }
                 }
             );
         }

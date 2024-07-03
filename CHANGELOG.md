@@ -1,5 +1,12 @@
 # Release Notes for Blitz
 
+## 4.19.0 - Unreleased
+
+### Changed
+
+- Blitz now requires Craft CMS 4.4.7 or later.
+- Elements that are propagating are now ignored from the cache refresh process unless their status has changed (https://github.com/putyourlightson/craft-blitz/issues/631)
+
 ## 4.18.4 - 2024-07-03
 
 ### Fixed
@@ -142,7 +149,7 @@
 
 ### Changed
 
-- Campaign now requires Craft CMS 4.4.0 or later.
+- Blitz now requires Craft CMS 4.4.0 or later.
 - The Local Generator now uses the `bootstrap.php` file in the project root, if it exists.
 - The Local Generator now sets the server port according to the HTTP protocol.
 - Changed the default timeout of the HTTP Generator to 60 seconds.

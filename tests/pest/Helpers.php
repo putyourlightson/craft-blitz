@@ -67,6 +67,8 @@ function createEntry(bool $enabled = true, bool $batchMode = false): Entry
         ->enabled($enabled)
         ->create();
 
+    $entry->setEnabledForSite($enabled);
+
     $entry->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
     Blitz::$plugin->generateCache->reset();
