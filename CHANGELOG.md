@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.4.0 - 2024-07-04
+
+### Added
+
+- Added the ability for element site status changes to be tracked while not refreshing propagating elements ([#631](https://github.com/putyourlightson/craft-blitz/issues/631)).
+
 ## 5.3.4 - 2024-07-03
 
 ### Fixed
