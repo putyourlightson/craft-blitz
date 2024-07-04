@@ -175,34 +175,7 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
-        // Don’t proceed if not an actual element
-        if (!($element instanceof Element)) {
-            return;
-        }
-
-        // Don’t proceed if the element is an asset that is being indexed
-        if ($element instanceof Asset && $element->getScenario() === Asset::SCENARIO_INDEX) {
-            return;
-        }
-
-        // Refresh the entire cache if this is a global set since they are populated on every request
-        if ($element instanceof GlobalSet) {
-            if (Blitz::$plugin->settings->refreshCacheAutomaticallyForGlobals) {
-                $this->refreshAll();
-            }
-
-            return;
-        }
-
-        $elementType = $element::class;
-
-        // Don’t proceed if not a cacheable element type
-        if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
-            return;
-        }
-
-        // Don’t proceed if element is a draft or revision
-        if (ElementHelper::isDraftOrRevision($element)) {
+        if (!$this->isRefreshableElement($element)) {
             return;
         }
 
@@ -290,6 +263,52 @@ class RefreshCacheService extends Component
                 false
             )
             ->execute();
+    }
+
+    /**
+     * Returns whether an element is refreshable.
+     *
+     * @since 4.19.0
+     */
+    public function isRefreshableElement(ElementInterface $element): bool
+    {
+        // Don’t proceed if not an actual element
+        if (!($element instanceof Element)) {
+            return false;
+        }
+
+        // Don’t proceed if element is a draft or revision
+        if (ElementHelper::isDraftOrRevision($element)) {
+            return false;
+        }
+
+        // Don’t proceed if propagating
+        if ($element->propagating) {
+            return false;
+        }
+
+        // Don’t proceed if the element is an asset that is being indexed
+        if ($element instanceof Asset && $element->getScenario() === Asset::SCENARIO_INDEX) {
+            return false;
+        }
+
+        // Refresh the entire cache if this is a global set since they are populated on every request
+        if ($element instanceof GlobalSet) {
+            if (Blitz::$plugin->settings->refreshCacheAutomaticallyForGlobals) {
+                $this->refreshAll();
+            }
+
+            return false;
+        }
+
+        $elementType = $element::class;
+
+        // Don’t proceed if not a cacheable element type
+        if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

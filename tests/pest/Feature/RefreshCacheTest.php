@@ -67,6 +67,17 @@ test('Element is tracked when its status is changed', function() {
         ->toBeTracked();
 });
 
+test('Element is tracked when its status for another site is changed', function() {
+    $entry = createEntry();
+    $entry->setEnabledForSite([
+        2 => false,
+    ]);
+    Blitz::$plugin->refreshCache->addElement($entry);
+
+    expect($entry)
+        ->toBeTracked();
+});
+
 test('Element is tracked when it expires', function() {
     $entry = createEntry();
     $entry->expiryDate = new DateTime('20010101');
