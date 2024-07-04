@@ -226,7 +226,7 @@ class RefreshCacheService extends Component
     /**
      * Adds expiry dates for a given element.
      */
-    public function addElementExpiryDates(Element $element): void
+    public function addElementExpiryDates(ElementInterface $element): void
     {
         $expiryDate = null;
         $now = new DateTime();
@@ -245,7 +245,7 @@ class RefreshCacheService extends Component
     /**
      * Adds or updates an expiry date for a given element.
      */
-    public function addElementExpiryDate(Element $element, DateTime $expiryDate): void
+    public function addElementExpiryDate(ElementInterface $element, DateTime $expiryDate): void
     {
         $expiryDate = Db::prepareDateForDb($expiryDate);
 
