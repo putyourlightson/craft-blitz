@@ -1,11 +1,14 @@
 # Release Notes for Blitz
 
-## 4.19.0 - Unreleased
+## 4.19.0 - 2024-07-03
+
+### Added
+
+- Added the ability for element site status changes to be tracked while not refreshing propagating elements ([#631](https://github.com/putyourlightson/craft-blitz/issues/631)).
 
 ### Changed
 
 - Blitz now requires Craft CMS 4.4.7 or later.
-- Elements that are propagating are now ignored from the cache refresh process unless their status has changed (https://github.com/putyourlightson/craft-blitz/issues/631)
 
 ## 4.18.4 - 2024-07-03
 
