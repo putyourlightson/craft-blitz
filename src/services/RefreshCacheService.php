@@ -267,6 +267,8 @@ class RefreshCacheService extends Component
 
     /**
      * Returns whether an element is refreshable.
+     *
+     * @since 4.19.0
      */
     public function isRefreshableElement(ElementInterface $element): bool
     {
