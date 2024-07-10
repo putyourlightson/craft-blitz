@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.5.0 - Unreleased
+
+### Changed
+
+- The “Served by Blitz” comment is now also output when the cached output is initially created and served.
+
 ## 5.4.0 - 2024-07-04
 
 ### Added

@@ -35,7 +35,7 @@
 {% endfor %}
 
 {% for siteId in craft.app.sites.getAllSiteIds|sort -%}
-    #### Site Tracking {{ craft.app.isMultiSite ? '[#' ~ siteId ~ ']' }}
+    #### Site Tracking {{ craft.app.isMultiSite ? '[' ~ siteId ~ ']' }}
     {{- '\n' -}}
     {{- '\n' -}}
     - Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(siteId) }}
