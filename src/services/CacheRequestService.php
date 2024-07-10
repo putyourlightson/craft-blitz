@@ -477,7 +477,6 @@ class CacheRequestService extends Component
         $response->content = $content;
         $this->addCraftHeaders($response);
         $this->prepareResponse($response, $siteUri, $encoded);
-        $this->appendServedByComment($response, $siteUri, $encoded);
 
         if ($this->hasEventHandlers(self::EVENT_AFTER_GET_RESPONSE)) {
             $this->trigger(self::EVENT_AFTER_GET_RESPONSE, $event);
@@ -682,6 +681,8 @@ class CacheRequestService extends Component
      */
     private function prepareResponse(Response $response, SiteUriModel $siteUri, bool $encoded = false): void
     {
+        $this->appendServedByComment($response, $siteUri, $encoded);
+
         $cacheControlHeader = Blitz::$plugin->settings->cacheControlHeader;
 
         if (Blitz::$plugin->expireCache->getIsExpiredSiteUri($siteUri)) {
