@@ -3,7 +3,7 @@
 ## 5.5.0 - Unreleased
 
 > [!IMPORTANT]
-> To ensure the fix is applied, the cache should be cleared or refreshed after this update completes.
+> To ensure the changes are applied, the cache should be cleared or refreshed after this update completes.
 
 ### Added
 

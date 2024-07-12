@@ -21,6 +21,7 @@
     .all() %}
 {% set elementIds = rows|map(row => row.elementId) %}
 {% set elements = craft.blitz.diagnostics.getElementsFromIds(siteId, elementType, elementIds) %}
+{% set isEntryElementType = elementType == 'craft\\elements\\Entry' %}
 
 <div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements .elements">
     <div class="search-container flex-grow texticon has-filter-btn">
@@ -76,36 +77,50 @@
                                     <td>
                                         {{ row.fieldCount }}
                                         {% if row.fieldCount > 0 %}
-                                            <span class="info">
-                                                <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
-                                                <table class="data fullwidth">
-                                                    <thead>
-                                                        <th>{{ 'Name'|t('app') }}</th>
-                                                        <th>{{ 'Handle'|t('app') }}</th>
-                                                        <th>{{ 'Type'|t('app') }}</th>
-                                                    </thead>
-                                                    <tbody>
-                                                        {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
-                                                        {% for field in fields %}
-                                                            <tr>
-                                                                <td class="thin">
-                                                                    <a href="{{ url('settings/fields/edit/' ~ field.id) }}">{{ field.name }}</a>
-                                                                </td>
-                                                                <td class="thin code">
-                                                                    {{ field.handle }}
-                                                                </td>
-                                                                <td class="thin">
-                                                                    <div class="flex flex-nowrap gap-s">
-                                                                        <div class="cp-icon small">{{ iconSvg(field.icon) }}</div>
-                                                                        <span>{{ field.displayName }}</span>
+                                        <a class="info">
+                                            <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
+                                            <table class="data fullwidth">
+                                                <thead>
+                                                    <th>{{ 'Name'|t('app') }}</th>
+                                                    <th>{{ 'Handle'|t('app') }}</th>
+                                                    <th>{{ 'Type'|t('app') }}</th>
+                                                    {% if isEntryElementType %}
+                                                        <th>{{ 'Entry Type'|t('app') }}</th>
+                                                    {% endif %}
+                                                </thead>
+                                                <tbody>
+                                                    {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
+                                                    {% for field in fields %}
+                                                        <tr>
+                                                            <td class="thin">
+                                                                {{ field.name }}
+                                                            </td>
+                                                            <td class="thin code">
+                                                                {{ field.handle }}
+                                                            </td>
+                                                            <td class="thin">
+                                                                <div class="flex flex-nowrap gap-s">
+                                                                    <div class="cp-icon small">
+                                                                        {{ iconSvg(field.icon) }}
                                                                     </div>
+                                                                    <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
+                                                                        {{ field.displayName }}
+                                                                    </a>
+                                                                </div>
+                                                            </td>
+                                                            {% if isEntryElementType %}
+                                                                <td class="thin">
+                                                                    <a href="{{ url('settings/entry-types/' ~ element.typeId) }}">
+                                                                        {{ element.type.name }}
+                                                                    </a>
                                                                 </td>
-                                                            </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
+                                                            {% endif %}
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
                                             </span>
-                                        {% endif %}
+                                            {% endif %}
                                     </td>
                                 {% else %}
                                     <td>
