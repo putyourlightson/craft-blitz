@@ -10,7 +10,7 @@ use craft\db\ActiveRecord;
 /**
  * @property int $cacheId
  * @property int $elementId
- * @property int $fieldId
+ * @property string $fieldInstanceUid
  *
  * @since 4.4.0
  */

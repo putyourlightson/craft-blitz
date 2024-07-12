@@ -101,37 +101,50 @@ test('Element is tracked when its attribute is changed', function() {
     Blitz::$plugin->refreshCache->addElement($entry);
 
     expect($entry)
-        ->toBeTracked('attributes', ['title']);
+        ->toBeTracked(
+            changedBy: 'attributes',
+            changedAttributes: ['title'],
+        );
 });
 
 test('Element is tracked when its field is changed', function() {
     $entry = createEntry();
-    $entry->plainText = 'Text123';
+    $entry->setFieldValue('plainText', 'Text123');
     Blitz::$plugin->refreshCache->addElement($entry);
 
     expect($entry)
-        ->toBeTracked('fields', [], ['plainText']);
+        ->toBeTracked(
+            changedBy: 'fields',
+            changedFields: ['plainText'],
+        );
 });
 
 test('Element is tracked when its attribute and field are changed', function() {
     $entry = createEntry();
     $entry->title = 'Title123';
-    $entry->plainText = 'Text123';
+    $entry->setFieldValue('plainText', 'Text123');
     Blitz::$plugin->refreshCache->addElement($entry);
 
     expect($entry)
-        ->toBeTracked('attributes', ['title'], ['plainText']);
+        ->toBeTracked(
+            changedBy: 'attributes',
+            changedAttributes: ['title'],
+            changedFields: ['plainText'],
+        );
 });
 
 test('Element is tracked when its status and attribute and field are changed', function() {
     $entry = createEntry();
     $entry->enabled = false;
     $entry->title = 'Title123';
-    $entry->plainText = 'Text123';
+    $entry->setFieldValue('plainText', 'Text123');
     Blitz::$plugin->refreshCache->addElement($entry);
 
     expect($entry)
-        ->toBeTracked('', ['title'], ['plainText']);
+        ->toBeTracked(
+            changedAttributes: ['title'],
+            changedFields: ['plainText'],
+        );
 });
 
 test('Asset is tracked when its file is replaced', function() {
@@ -209,7 +222,7 @@ test('Element cache IDs are not returned when an entry is changed by custom fiel
     Blitz::$plugin->generateCache->addElement($entry);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
     $refreshData = RefreshDataModel::createFromElement($entry);
-    $refreshData->addChangedField($entry, 'plainText');
+    $refreshData->addChangedFieldHandle($entry, 'plainText');
     $refreshData->addIsChangedByFields($entry, true);
 
     expect(RefreshCacheHelper::getElementCacheIds(Entry::class, $refreshData))
@@ -288,7 +301,7 @@ test('Element query type records are returned when an entry is changed by custom
     Blitz::$plugin->generateCache->addElementQuery(Entry::find()->orderBy(['plainText' => SORT_ASC]));
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
     $refreshData = RefreshDataModel::createFromElement($entry);
-    $refreshData->addChangedField($entry, 'plainText');
+    $refreshData->addChangedFieldHandle($entry, 'plainText');
     $refreshData->addIsChangedByFields($entry, true);
 
     expect(RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $refreshData))

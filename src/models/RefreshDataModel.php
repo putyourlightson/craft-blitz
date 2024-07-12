@@ -31,7 +31,7 @@ class RefreshDataModel extends BaseDataModel
      *              sourceIds: array<int, bool>,
      *              elementIds: array<int, bool>,
      *              changedAttributes: array<int, array<string, bool>>,
-     *              changedFields: array<int, array<int, bool>>,
+     *              changedFields: array<int, array<string, bool>>,
      *              isChangedByAttributes: array<int, bool>,
      *              isChangedByFields: array<int, bool>,
      *              isChangedByAssetFile: array<int, bool>,
@@ -115,13 +115,11 @@ class RefreshDataModel extends BaseDataModel
     }
 
     /**
-     * @return int[]
+     * @return string[]
      */
     public function getChangedFields(string $elementType, int $elementId): array
     {
-        $fieldHandles = $this->getKeysAsValues(['elements', $elementType, 'changedFields', $elementId]);
-
-        return FieldHelper::getFieldIdsFromHandles($fieldHandles);
+        return $this->getKeysAsValues(['elements', $elementType, 'changedFields', $elementId]);
     }
 
     /**
@@ -129,9 +127,7 @@ class RefreshDataModel extends BaseDataModel
      */
     public function getCombinedChangedFields(string $elementType): array
     {
-        $fieldHandles = $this->getCombinedChanged($elementType, 'changedFields');
-
-        return FieldHelper::getFieldIdsFromHandles($fieldHandles);
+        return $this->getCombinedChanged($elementType, 'changedFields');
     }
 
     public function getIsChangedByFields(string $elementType, int $elementId): bool
@@ -195,7 +191,7 @@ class RefreshDataModel extends BaseDataModel
 
         if ($elementChanged !== null) {
             $this->addChangedAttributes($element, $elementChanged->changedAttributes);
-            $this->addChangedFields($element, $elementChanged->changedFields);
+            $this->addChangedFieldHandles($element, $elementChanged->changedFieldsHandles);
             $this->addIsChangedByAttributes($element, $elementChanged->isChangedByAttributes);
             $this->addIsChangedByFields($element, $elementChanged->isChangedByFields);
             $this->addIsChangedByAssetFile($element, $elementChanged->isChangedByAssetFile);
@@ -228,15 +224,17 @@ class RefreshDataModel extends BaseDataModel
         $this->data['elements'][$element::class]['isChangedByAttributes'][$element->id] = $previousValue && $isChangedByAttributes;
     }
 
-    public function addChangedField(ElementInterface $element, string $field): void
+    public function addChangedFieldHandle(ElementInterface $element, string $handle): void
     {
-        $this->data['elements'][$element::class]['changedFields'][$element->id][$field] = true;
+        $fieldInstanceUid = FieldHelper::getFieldInstanceUidForElement($element, $handle);
+
+        $this->data['elements'][$element::class]['changedFields'][$element->id][$fieldInstanceUid] = true;
     }
 
-    public function addChangedFields(ElementInterface $element, array $fields): void
+    public function addChangedFieldHandles(ElementInterface $element, array $handles): void
     {
-        foreach ($fields as $field) {
-            $this->addChangedField($element, $field);
+        foreach ($handles as $handle) {
+            $this->addChangedFieldHandle($element, $handle);
         }
     }
 

@@ -47,9 +47,9 @@ class ElementChangedBehavior extends Behavior
     public array $changedAttributes = [];
 
     /**
-     * @var string[] The field handles that changed.
+     * @var string[] The field handles of the custom fields that changed.
      */
-    public array $changedFields = [];
+    public array $changedFieldsHandles = [];
 
     /**
      * @var bool Whether the element was caused to change specifically by attributes.
@@ -95,7 +95,7 @@ class ElementChangedBehavior extends Behavior
         $element = $this->owner;
 
         $this->changedAttributes = $this->getChangedAttributes();
-        $this->changedFields = $this->getChangedFields();
+        $this->changedFieldsHandles = $this->getChangedFieldHandles();
 
         if ($element->firstSave) {
             return true;
@@ -121,7 +121,7 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        if (!empty($this->changedFields)) {
+        if (!empty($this->changedFieldsHandles)) {
             $this->isChangedByFields = true;
 
             return true;
@@ -258,11 +258,11 @@ class ElementChangedBehavior extends Behavior
     }
 
     /**
-     * Returns the handles of the custom fields that have changed.
+     * Returns the field handles of the custom fields that have changed.
      *
      * @return string[]
      */
-    private function getChangedFields(): array
+    private function getChangedFieldHandles(): array
     {
         $element = $this->owner;
 

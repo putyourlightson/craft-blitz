@@ -51,7 +51,7 @@ class RefreshCacheHelper
                     $condition[] = [
                         'and',
                         [$tableColumn => $elementId],
-                        ['fieldId' => $changedFields],
+                        ['fieldInstanceUid' => $changedFields],
                     ];
                 } else {
                     $elementIdsNotChangedByFields[] = $elementId;
@@ -115,7 +115,7 @@ class RefreshCacheHelper
                     // Any date updated attributes should always be included
                     ['attribute' => ['dateUpdated']],
                     ['attribute' => $changedAttributes],
-                    ['fieldId' => $changedFields],
+                    ['fieldInstanceUid' => $changedFields],
                 ]);
         }
 

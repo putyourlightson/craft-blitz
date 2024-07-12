@@ -8,6 +8,8 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\ElementInterface;
 use craft\behaviors\CustomFieldBehavior;
+use craft\db\Query;
+use craft\db\Table;
 use craft\elements\db\AssetQuery;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
@@ -17,6 +19,8 @@ use craft\fields\BaseRelationField;
 use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Db;
+use craft\models\FieldLayout;
 use craft\models\Section;
 use DateTime;
 use putyourlightson\blitz\behaviors\CloneBehavior;
@@ -133,16 +137,57 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns the field IDs that the element query is filtered or ordered by.
+     * Returns the field instance UIDs that the element query is filtered or ordered by.
      *
-     * @return int[]
+     * @return string[]
      */
-    public static function getElementQueryFieldIds(ElementQuery $elementQuery): array
+    public static function getElementQueryFieldInstanceUids(ElementQuery $elementQuery): array
     {
         $fieldHandles = CustomFieldBehavior::$fieldHandles;
         $fieldHandles = self::getUsedElementQueryParams($elementQuery, $fieldHandles);
 
-        return FieldHelper::getFieldIdsFromHandles($fieldHandles);
+        return FieldHelper::getFieldInstanceUidsForElementQuery($elementQuery, $fieldHandles);
+    }
+
+    /**
+     * Returns the field layouts for the element query.
+     *
+     * @param ElementQuery $elementQuery
+     * @return FieldLayout[]
+     */
+    public static function getElementQueryFieldLayouts(ElementQuery $elementQuery): array
+    {
+        $fieldLayouts = [];
+
+        if ($elementQuery instanceof EntryQuery) {
+            $entryTypeIds = self::normalizeEntryTypeId($elementQuery->typeId);
+            if (!empty($entryTypeIds)) {
+                foreach ($entryTypeIds as $entryTypeId) {
+                    $entryType = Craft::$app->getEntries()->getEntryTypeById($entryTypeId);
+                    if ($entryType !== null) {
+                        $fieldLayouts[] = $entryType->getFieldLayout();
+                    }
+                }
+            } else {
+                $sectionIds = self::normalizeSectionId($elementQuery->sectionId);
+                if (!empty($sectionIds)) {
+                    foreach ($sectionIds as $sectionId) {
+                        $section = Craft::$app->getEntries()->getSectionById($sectionId);
+                        if ($section !== null) {
+                            foreach ($section->getEntryTypes() as $entryType) {
+                                $fieldLayouts[] = $entryType->getFieldLayout();
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (empty($fieldLayouts)) {
+            $fieldLayouts = Craft::$app->getFields()->getLayoutsByType($elementQuery->elementType);
+        }
+
+        return $fieldLayouts;
     }
 
     /**
@@ -573,5 +618,49 @@ class ElementQueryHelper
                 $value[] = $option->value;
             }
         }
+    }
+
+    /**
+     * Normalizes the section ID to an array of IDs or null.
+     *
+     * @see EntryQuery::_normalizeSectionId()
+     */
+    private static function normalizeSectionId(mixed $sectionId): ?array
+    {
+        if (empty($sectionId)) {
+            $sectionId = is_array($sectionId) ? [] : null;
+        } elseif (is_numeric($sectionId)) {
+            $sectionId = [$sectionId];
+        } elseif (!is_array($sectionId) || !ArrayHelper::isNumeric($sectionId)) {
+            $sectionId = (new Query())
+                ->select(['id'])
+                ->from([Table::SECTIONS])
+                ->where(Db::parseNumericParam('id', $sectionId))
+                ->column();
+        }
+
+        return $sectionId;
+    }
+
+    /**
+     * Normalizes the type ID to an array of IDs or null.
+     *
+     * @see EntryQuery::_normalizeTypeId()
+     */
+    private static function normalizeEntryTypeId(mixed $typeId): ?array
+    {
+        if (empty($typeId)) {
+            $typeId = is_array($typeId) ? [] : null;
+        } elseif (is_numeric($typeId)) {
+            $typeId = [$typeId];
+        } elseif (!is_array($typeId) || !ArrayHelper::isNumeric($typeId)) {
+            $typeId = (new Query())
+                ->select(['id'])
+                ->from([Table::ENTRYTYPES])
+                ->where(Db::parseNumericParam('id', $typeId))
+                ->column();
+        }
+
+        return $typeId;
     }
 }

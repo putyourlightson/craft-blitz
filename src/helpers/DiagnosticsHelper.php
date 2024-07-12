@@ -268,7 +268,7 @@ class DiagnosticsHelper
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title', 'count([[fieldId]]) as fieldCount'])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title', 'count([[fieldInstanceUid]]) as fieldCount'])
             ->innerJoinWith('cache')
             ->leftJoin(['elementfieldcaches' => ElementFieldCacheRecord::tableName()], '[[elementfieldcaches.cacheId]] = [[elementcaches.cacheId]] AND [[elementfieldcaches.elementId]] = [[elementcaches.elementId]]')
             ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
@@ -313,9 +313,8 @@ class DiagnosticsHelper
 
     public static function getPageElementFields(int $cacheId, int $elementId): array
     {
-        $fields = [];
-        $fieldIds = ElementFieldCacheRecord::find()
-            ->select(['fieldId'])
+        $fieldInstanceUids = ElementFieldCacheRecord::find()
+            ->select(['fieldInstanceUid'])
             ->where([
                 'cacheId' => $cacheId,
                 'elementId' => $elementId,
@@ -323,10 +322,7 @@ class DiagnosticsHelper
             ->distinct()
             ->column();
 
-        // It’s safe to call this in a for loop, since the fields are memoized.
-        foreach ($fieldIds as $fieldId) {
-            $fields[] = Craft::$app->getFields()->getFieldById($fieldId);
-        }
+        $fields = FieldHelper::getFieldInstancesFromUids($fieldInstanceUids);
 
         ArrayHelper::multisort($fields, 'name');
 

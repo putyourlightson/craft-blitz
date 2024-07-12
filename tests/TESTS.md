@@ -106,6 +106,7 @@ _Tests the saving of cached values, element cache records and element query reco
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cache record with max URI length exceeded throws exception.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element cache record is saved without custom fields.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element cache record is saved with custom fields.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element cache record is saved with custom fields with renamed handles.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element cache record is saved with eager-loaded custom fields.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element cache record is saved with eager-loaded custom fields in variable.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element cache record is saved for preloaded single.  
@@ -137,6 +138,8 @@ _Tests the saving of cached values, element cache records and element query reco
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query attribute records are saved with before.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query field records are saved with order by.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query field records are saved with order by array.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query field records with renamed handles are saved with order by.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Element query field records with section are saved with order by only for fields in layouts.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cache tags are saved.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Include record is saved.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) SSI include cache record is saved.  

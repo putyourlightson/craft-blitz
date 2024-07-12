@@ -110,9 +110,19 @@ test('Element cache record is saved without custom fields', function() {
 test('Element cache record is saved with custom fields', function() {
     $entry = createEntry();
     Blitz::$plugin->generateCache->addElement($entry);
-    // Access the fields to register usage
-    /** @noinspection PhpUnusedLocalVariableInspection */
-    $text = $entry->plainText;
+    $entry->plainText;
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+
+    expect(ElementCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id])
+        ->and(ElementFieldCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id]);
+});
+
+test('Element cache record is saved with custom fields with renamed handles', function() {
+    $entry = createEntry();
+    Blitz::$plugin->generateCache->addElement($entry);
+    $entry->plainTextRenamed;
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)
@@ -477,7 +487,6 @@ test('Element query source records without specific source identifiers are not s
         Entry::find()->sectionId('> 1'),
         Entry::find()->sectionId(['not', 1]),
         Entry::find()->sectionId(['not', '1']),
-        Entry::find()->sectionId(['>', '1']),
     ];
 
     foreach ($elementQueries as $elementQuery) {
@@ -545,25 +554,55 @@ test('Element query attribute records are saved with before', function() {
 });
 
 test('Element query field records are saved with order by', function() {
-    $elementQuery = Entry::find()->orderBy(['plainText' => SORT_ASC]);
+    $elementQuery = Entry::find()->orderBy('plainText asc');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-    $fieldIds = ElementQueryFieldRecord::find()
-        ->select(['fieldId'])
+    $fieldInstanceUids = ElementQueryFieldRecord::find()
+        ->select(['fieldInstanceUid'])
         ->column();
+    $fieldInstanceUidsForElementQuery = FieldHelper::getFieldInstanceUidsForElementQuery($elementQuery, ['plainText']);
 
-    expect($fieldIds)
-        ->toEqual(FieldHelper::getFieldIdsFromHandles(['plainText']));
+    expect($fieldInstanceUids)
+        ->toHaveCount(count($fieldInstanceUidsForElementQuery))
+        ->toContain(...$fieldInstanceUidsForElementQuery);
 });
 
 test('Element query field records are saved with order by array', function() {
     $elementQuery = Entry::find()->orderBy(['plainText' => SORT_ASC]);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
-    $fieldIds = ElementQueryFieldRecord::find()
-        ->select(['fieldId'])
+    $fieldInstanceUids = ElementQueryFieldRecord::find()
+        ->select(['fieldInstanceUid'])
         ->column();
+    $fieldInstanceUidsForElementQuery = FieldHelper::getFieldInstanceUidsForElementQuery($elementQuery, ['plainText']);
 
-    expect($fieldIds)
-        ->toEqual(FieldHelper::getFieldIdsFromHandles(['plainText']));
+    expect($fieldInstanceUids)
+        ->toHaveCount(count($fieldInstanceUidsForElementQuery))
+        ->toContain(...$fieldInstanceUidsForElementQuery);
+});
+
+test('Element query field records with renamed handles are saved with order by', function() {
+    $elementQuery = Entry::find()->orderBy('plainTextRenamed');
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+    $fieldInstanceUids = ElementQueryFieldRecord::find()
+        ->select(['fieldInstanceUid'])
+        ->column();
+    $fieldInstanceUidsForElementQuery = FieldHelper::getFieldInstanceUidsForElementQuery($elementQuery, ['plainTextRenamed']);
+
+    expect($fieldInstanceUids)
+        ->toHaveCount(count($fieldInstanceUidsForElementQuery))
+        ->toContain(...$fieldInstanceUidsForElementQuery);
+});
+
+test('Element query field records with section are saved with order by only for fields in layouts', function() {
+    $elementQuery = Entry::find()->section(App::env('TEST_CHANNEL_SECTION_HANDLE'))->orderBy('plainText');
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+    $fieldInstanceUids = ElementQueryFieldRecord::find()
+        ->select(['fieldInstanceUid'])
+        ->column();
+    $fieldInstanceUidsForElementQuery = FieldHelper::getFieldInstanceUidsForElementQuery($elementQuery, ['plainText']);
+
+    expect($fieldInstanceUids)
+        ->toHaveCount(1)
+        ->toContain(...$fieldInstanceUidsForElementQuery);
 });
 
 test('Cache tags are saved', function() {

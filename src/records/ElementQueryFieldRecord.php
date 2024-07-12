@@ -10,7 +10,7 @@ use craft\db\ActiveRecord;
 
 /**
  * @property int $queryId
- * @property int $fieldId
+ * @property string $fieldInstanceUid
  * @property-read ElementQueryRecord $elementQuery
  *
  * @since 4.4.0

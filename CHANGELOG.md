@@ -2,6 +2,13 @@
 
 ## 5.5.0 - Unreleased
 
+> [!IMPORTANT]
+> To ensure the fix is applied, the cache should be cleared or refreshed after this update completes.
+
+### Added
+
+- Added the ability for Blitz to track custom field instances with renamed handles ([#682](https://github.com/putyourlightson/craft-blitz/issues/682)).
+
 ### Changed
 
 - The “Served by Blitz” comment is now also output when the cached output is initially created and served.

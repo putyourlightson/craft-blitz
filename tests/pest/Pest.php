@@ -54,12 +54,13 @@ expect()->extend('toBeTracked', function(string $changedBy = '', array $changedA
     /** @var Element|ElementChangedBehavior|null $element */
     $element = $this->value;
     $refreshData = Blitz::$plugin->refreshCache->refreshData;
-    $changedFieldIds = FieldHelper::getFieldIdsFromHandles($changedFields);
 
     if ($element === null) {
         return expect($refreshData->isEmpty())
             ->toBeTrue();
     }
+
+    $changedFieldInstanceUids = FieldHelper::getFieldInstanceUidsForElement($element, $changedFields);
 
     expect($refreshData->getElementIds($element::class))
         ->toEqual([$element->id])
@@ -68,7 +69,7 @@ expect()->extend('toBeTracked', function(string $changedBy = '', array $changedA
         ->and($refreshData->getChangedAttributes($element::class, $element->id))
         ->toEqual($changedAttributes)
         ->and($refreshData->getChangedFields($element::class, $element->id))
-        ->toEqual($changedFieldIds);
+        ->toEqual($changedFieldInstanceUids);
 
     if ($changedBy === 'attributes') {
         expect($refreshData->getIsChangedByAttributes(Entry::class, $element->id))

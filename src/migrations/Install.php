@@ -94,8 +94,8 @@ class Install extends Migration
             $this->createTable(ElementFieldCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
-                'fieldId' => $this->integer()->notNull(),
-                'PRIMARY KEY([[cacheId]], [[elementId]], [[fieldId]])',
+                'fieldInstanceUid' => $this->uid(),
+                'PRIMARY KEY([[cacheId]], [[elementId]], [[fieldInstanceUid]])',
             ]);
         }
 
@@ -134,8 +134,8 @@ class Install extends Migration
         if (!$this->db->tableExists(ElementQueryFieldRecord::tableName())) {
             $this->createTable(ElementQueryFieldRecord::tableName(), [
                 'queryId' => $this->integer()->notNull(),
-                'fieldId' => $this->integer()->notNull(),
-                'PRIMARY KEY([[queryId]], [[fieldId]])',
+                'fieldInstanceUid' => $this->uid(),
+                'PRIMARY KEY([[queryId]], [[fieldInstanceUid]])',
             ]);
         }
 

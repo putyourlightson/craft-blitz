@@ -413,17 +413,17 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Saves an element query's fields.
+     * Saves an element query’s fields.
      */
     public function saveElementQueryFields(ElementQuery $elementQuery, int $queryId): void
     {
-        $fieldIds = ElementQueryHelper::getElementQueryFieldIds($elementQuery);
+        $fieldInstanceUids = ElementQueryHelper::getElementQueryFieldInstanceUids($elementQuery);
 
         $this->batchInsertQueries(
             $queryId,
-            $fieldIds,
+            $fieldInstanceUids,
             ElementQueryFieldRecord::tableName(),
-            'fieldId',
+            'fieldInstanceUid',
         );
     }
 
@@ -672,7 +672,7 @@ class GenerateCacheService extends Component
     private function batchInsertElementCaches(int $cacheId): void
     {
         $elementIds = $this->generateData->getElementIds();
-        $elementIndexedTrackFields = $this->generateData->getElementIndexedTrackFields();
+        $elementTrackFields = $this->generateData->getElementTrackFields();
 
         $this->batchInsertCaches(
             $cacheId,
@@ -682,15 +682,15 @@ class GenerateCacheService extends Component
             'elementId',
         );
 
-        if (!empty($elementIndexedTrackFields)) {
+        if (!empty($elementTrackFields)) {
             $this->batchInsertCaches(
                 $cacheId,
                 $elementIds,
                 ElementRecord::tableName(),
                 ElementFieldCacheRecord::tableName(),
                 'elementId',
-                $elementIndexedTrackFields,
-                'fieldId',
+                $elementTrackFields,
+                'fieldInstanceUid',
             );
         }
     }

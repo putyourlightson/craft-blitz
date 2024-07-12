@@ -52,20 +52,17 @@ class GenerateDataModel extends BaseDataModel
     }
 
     /**
-     * @return int[][]
+     * @return string[][]
      */
-    public function getElementIndexedTrackFields(): array
+    public function getElementTrackFields(): array
     {
-        $indexedFields = [];
-        $trackFields = $this->data['elements']['trackFields'];
+        $trackFields = [];
 
-        foreach ($trackFields as $elementId => $fields) {
-            $fieldHandles = array_keys($fields);
-            $fieldIds = FieldHelper::getFieldIdsFromHandles($fieldHandles);
-            $indexedFields[$elementId] = $fieldIds;
+        foreach ($this->data['elements']['trackFields'] as $elementId => $fields) {
+            $trackFields[$elementId] = array_keys($fields);
         }
 
-        return $indexedFields;
+        return $trackFields;
     }
 
     /**
@@ -125,7 +122,9 @@ class GenerateDataModel extends BaseDataModel
 
     public function addElementTrackField(ElementInterface $element, $field): void
     {
-        $this->data['elements']['trackFields'][$element->id][$field] = true;
+        $fieldInstanceUid = FieldHelper::getFieldInstanceUidForElement($element, $field);
+
+        $this->data['elements']['trackFields'][$element->id][$fieldInstanceUid] = true;
     }
 
     public function addElementQuery(int $elementQueryId, string $elementType, array $params): void
