@@ -142,7 +142,7 @@ class DiagnosticsHelper
             ->one();
     }
 
-    public static function getElementQuery(): ?ElementQueryRecord
+    public static function getElementQuery(): ?ActiveQuery
     {
         $queryId = Craft::$app->getRequest()->getRequiredParam('queryId');
 
