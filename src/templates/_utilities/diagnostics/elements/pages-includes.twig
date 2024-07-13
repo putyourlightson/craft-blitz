@@ -1,0 +1,22 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/elements' %}
+
+{% set element = craft.blitz.diagnostics.getElement() %}
+{% if element is null %}
+    {% redirect 'blitz/diagnostics/elements' with error 'The element no longer exists.' %}
+{% endif %}
+{% set title = 'Pages/Includes tracking “' ~ element.title ~ '”' %}
+{% set crumbs = [
+    {
+        label: 'Tracked ' ~ element.pluralDisplayName,
+        url: cpUrl('blitz/diagnostics/elements/element-type', { 'elementType': className(element) }),
+    },
+] %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/_components/pages', {
+        siteId: siteId,
+        elementId: element.id,
+        displayName: 'Page/Include',
+        pluralDisplayName: 'Pages/Includes',
+    }) }}
+{% endblock %}

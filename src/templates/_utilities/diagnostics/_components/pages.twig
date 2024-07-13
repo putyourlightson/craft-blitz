@@ -7,13 +7,21 @@
 {% if orderBy != 'uri' %}
     {% set order = order|merge({ 'uri': SORT_ASC }) %}
 {% endif %}
-{% set query = craft.blitz.diagnostics.getPagesQuery(siteId)
-    .orderBy(order)
+
+{% set elementId = elementId ?? null %}
+{% set param = param ?? null %}
+{% set query = craft.blitz.diagnostics.getPagesQuery(siteId) %}
+{% if elementId %}
+    {% set query = craft.blitz.diagnostics.getElementPagesIncludesQuery(siteId, elementId) %}
+{% elseif param %}
+    {% set query = craft.blitz.diagnostics.getParamPagesQuery(siteId, param) %}
+{% endif %}
+{% do query.orderBy(order)
     .offset(offset)
     .limit(limit) %}
 {% if search %}
     {% if search == '/' %}
-        {% do query.andWhere({ uri: ''} ) %}
+        {% do query.andWhere({ uri: '' } ) %}
     {% else %}
         {% do query.andWhere(['like', 'uri', search]) %}
     {% endif %}
@@ -38,7 +46,7 @@
                     <tr>
                         <th class="{{ orderBy == 'uri' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="uri" s-val:sort-by="{{ orderBy == 'uri' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                {{ 'Page'|t('blitz') }}
+                                {{ displayName }}
                             </button>
                         </th>
                         <th class="{{ orderBy == 'elementCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
@@ -72,9 +80,15 @@
                         {% set url = siteUrl(uri, null, null, siteId) %}
                         <tr>
                             <td class="code">
-                                <a href="{{ url('blitz/diagnostics/pages/page', { pageId: row.id }) }}">
-                                    {{ uri }}
-                                </a>
+                                {% if uri starts with '_includes?' %}
+                                    <a href="{{ url('blitz/diagnostics/includes/include', { includeId: row.id }) }}">
+                                        {{ uri }}
+                                    </a>
+                                {% else %}
+                                    <a href="{{ url('blitz/diagnostics/pages/page', { pageId: row.id }) }}">
+                                        {{ uri }}
+                                    </a>
+                                {% endif %}
                             </td>
                             <td>
                                 {{ (row.elementCount ?? 0)|number }}

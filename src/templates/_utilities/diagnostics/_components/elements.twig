@@ -21,6 +21,7 @@
     .all() %}
 {% set elementIds = rows|map(row => row.elementId) %}
 {% set elements = craft.blitz.diagnostics.getElementsFromIds(siteId, elementType, elementIds) %}
+{% set isEntryElementType = elementType == 'craft\\elements\\Entry' %}
 
 <div s-replace="#elements" s-swap="outerHTML show:#main:top" s-indicator="#elements .elements">
     <div class="search-container flex-grow texticon has-filter-btn">
@@ -70,7 +71,13 @@
                         {% if element %}
                             <tr>
                                 <td>
-                                    {{ include ('_elements/element') }}
+                                    <a href="{{ url('blitz/diagnostics/elements/pages-includes', {
+                                        siteId: siteId,
+                                        elementId: element.id,
+                                        elementType: elementType,
+                                    }) }}">
+                                        {{ element.title }}
+                                    </a>
                                 </td>
                                 {% if cacheId is defined %}
                                     <td>
@@ -82,7 +89,7 @@
                                                     <thead>
                                                         <th>{{ 'Name'|t('app') }}</th>
                                                         <th>{{ 'Handle'|t('app') }}</th>
-                                                        <th>{{ 'Type'|t('app') }}</th>
+                                                        <th>{{ 'Field Type'|t('app') }}</th>
                                                     </thead>
                                                     <tbody>
                                                         {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}

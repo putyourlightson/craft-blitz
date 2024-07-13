@@ -1,6 +1,10 @@
 # Release Notes for Blitz
 
-## 4.19.1 - Unreleased
+## 4.20.0 - Unreleased
+
+### Added
+
+- Added the ability to view which pages/includes are tracking each element in the Blitz Diagnostics utility.
 
 ### Changed
 

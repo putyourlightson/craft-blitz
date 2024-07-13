@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\helpers;
 
 use Craft;
 use craft\base\Element;
+use craft\base\ElementInterface;
 use craft\db\ActiveQuery;
 use craft\db\QueryAbortedException;
 use craft\db\Table;
@@ -101,7 +102,7 @@ class DiagnosticsHelper
             ->count('DISTINCT [[tag]]');
     }
 
-    public static function getPage(): array|null
+    public static function getPage(): ?array
     {
         $pageId = Craft::$app->getRequest()->getRequiredParam('pageId');
         $page = CacheRecord::find()
@@ -117,7 +118,7 @@ class DiagnosticsHelper
         return $page;
     }
 
-    public static function getInclude(): array|null
+    public static function getInclude(): ?array
     {
         $includeId = Craft::$app->getRequest()->getRequiredParam('includeId');
 
@@ -125,6 +126,18 @@ class DiagnosticsHelper
             ->select(['id', 'uri'])
             ->where(['id' => $includeId])
             ->asArray()
+            ->one();
+    }
+
+    public static function getElement(): ?ElementInterface
+    {
+        $siteId = Craft::$app->getRequest()->getRequiredParam('siteId');
+        $elementId = Craft::$app->getRequest()->getRequiredParam('elementId');
+        $elementType = Craft::$app->getRequest()->getRequiredParam('elementType');
+
+        return $elementType::find()
+            ->siteId($siteId)
+            ->id($elementId)
             ->one();
     }
 
@@ -175,21 +188,8 @@ class DiagnosticsHelper
 
     public static function getPagesQuery(int $siteId): ActiveQuery
     {
-        return CacheRecord::find()
-            ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'expiryDate'])
-            ->leftJoin([
-                'elements' => ElementCacheRecord::find()
-                    ->select(['cacheId', 'count(*) as elementCount'])
-                    ->groupBy(['cacheId']),
-            ], 'id = [[elements.cacheId]]')
-            ->leftJoin([
-                'elementquerycaches' => ElementQueryCacheRecord::find()
-                    ->select(['cacheId', 'count(*) as elementQueryCount'])
-                    ->groupBy(['cacheId']),
-            ], 'id = [[elementquerycaches.cacheId]]')
-            ->where(['siteId' => $siteId])
-            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
-            ->asArray();
+        return self::getBasePagesQuery($siteId)
+            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
     }
 
     public static function getIncludesQuery(int $siteId): ActiveQuery
@@ -201,26 +201,25 @@ class DiagnosticsHelper
             $index = 'CAST(' . $index . ' AS BIGINT)';
         }
 
-        return CacheRecord::find()
-            ->from(['caches' => CacheRecord::tableName()])
+        return self::getBasePagesQuery($siteId)
             ->select(['caches.id', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'expiryDate'])
             ->innerJoin([
                 'indexes' => IncludeRecord::find()
                     ->where(['siteId' => $siteId]),
             ], $index . ' = [[indexes.index]]')
-            ->leftJoin([
-                'elements' => ElementCacheRecord::find()
-                    ->select(['cacheId', 'count(*) as elementCount'])
-                    ->groupBy(['cacheId']),
-            ], '[[caches.id]] = [[elements.cacheId]]')
-            ->leftJoin([
-                'elementquerycaches' => ElementQueryCacheRecord::find()
-                    ->select(['cacheId', 'count(*) as elementQueryCount'])
-                    ->groupBy(['cacheId']),
-            ], '[[caches.id]] = [[elementquerycaches.cacheId]]')
-            ->where(['caches.siteId' => $siteId])
-            ->andWhere(self::IS_CACHED_INCLUDE_CONDITION)
-            ->asArray();
+            ->andWhere(self::IS_CACHED_INCLUDE_CONDITION);
+    }
+
+    public static function getElementPagesIncludesQuery(int $siteId, int $elementId): ActiveQuery
+    {
+        return self::getBasePagesQuery($siteId, true)
+            ->andWhere(['elementId' => $elementId]);
+    }
+
+    public static function getParamPagesQuery(int $siteId, string $param): ActiveQuery
+    {
+        return self::getBasePagesQuery($siteId)
+            ->andWhere(['like', 'uri', $param]);
     }
 
     public static function getParams(int $siteId): array
@@ -245,14 +244,6 @@ class DiagnosticsHelper
         }
 
         return $queryStringParams;
-    }
-
-    public static function getParamPagesQuery(int $siteId, string $param): ActiveQuery
-    {
-        return CacheRecord::find()
-            ->select(['uri'])
-            ->where(['siteId' => $siteId])
-            ->andWhere(['like', 'uri', $param]);
     }
 
     public static function getElementsQuery(int $siteId, string $elementType, ?int $cacheId = null): ActiveQuery
@@ -599,5 +590,35 @@ class DiagnosticsHelper
     public static function toDateTime(string $value): DateTime|null
     {
         return DateTimeHelper::toDateTime($value);
+    }
+
+    private static function getBasePagesQuery(int $siteId, bool $withElement = false): ActiveQuery
+    {
+        $query = CacheRecord::find()
+            ->from(['caches' => CacheRecord::tableName()])
+            ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'expiryDate'])
+            ->leftJoin([
+                'elementquerycaches' => ElementQueryCacheRecord::find()
+                    ->select(['cacheId', 'count(*) as elementQueryCount'])
+                    ->groupBy(['cacheId']),
+            ], 'id = [[elementquerycaches.cacheId]]')
+            ->where(['caches.siteId' => $siteId])
+            ->asArray();
+
+        if ($withElement) {
+            $query->leftJoin([
+                'elements' => ElementCacheRecord::find()
+                    ->select(['cacheId', 'elementId', 'count(*) as elementCount'])
+                    ->groupBy(['cacheId', 'elementId']),
+            ], 'id = [[elements.cacheId]]');
+        } else {
+            $query->leftJoin([
+                'elements' => ElementCacheRecord::find()
+                    ->select(['cacheId', 'count(*) as elementCount'])
+                    ->groupBy(['cacheId']),
+            ], 'id = [[elements.cacheId]]');
+        }
+
+        return $query;
     }
 }
