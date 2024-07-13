@@ -4,7 +4,7 @@
 {% if element is null %}
     {% redirect 'blitz/diagnostics/elements' with error 'The element no longer exists.' %}
 {% endif %}
-{% set title = 'Pages/Includes tracking “' ~ element.title ~ '”' %}
+{% set title = element.title %}
 {% set crumbs = [
     {
         label: 'Tracked ' ~ element.pluralDisplayName,
