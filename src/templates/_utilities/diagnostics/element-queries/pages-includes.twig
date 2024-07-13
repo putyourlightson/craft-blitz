@@ -5,7 +5,8 @@
     {% redirect 'blitz/diagnostics/element-queries' with error 'The element query no longer exists.' %}
 {% endif %}
 {% set element = craft.app.elements.createElement(elementQuery.type) %}
-{% set title = 'Pages/Includes tracking “' ~ elementQuery.index ~ '”' %}
+{% set title = elementQuery.index %}
+{% set codeTitle = true %}
 {% set crumbs = [
     {
         label: 'Tracked ' ~ element.displayName ~ ' Queries',
