@@ -30,6 +30,7 @@ use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\services\CacheRequestService;
+use yii\db\ActiveRecordInterface;
 
 /**
  * @since 4.10.0
@@ -141,7 +142,7 @@ class DiagnosticsHelper
             ->one();
     }
 
-    public static function getElementQuery(): ?ActiveQuery
+    public static function getElementQueryRecord(): ?ActiveRecordInterface
     {
         $queryId = Craft::$app->getRequest()->getRequiredParam('queryId');
 
