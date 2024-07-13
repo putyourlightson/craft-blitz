@@ -26,9 +26,11 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
+use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\services\CacheRequestService;
+use putyourlightson\blitzhints\BlitzHints;
 
 /**
  * @since 4.10.0
@@ -140,6 +142,15 @@ class DiagnosticsHelper
             ->one();
     }
 
+    public static function getElementQuery(): ?ElementQueryRecord
+    {
+        $queryId = Craft::$app->getRequest()->getRequiredParam('queryId');
+
+        return ElementQueryRecord::find()
+            ->where(['id' => $queryId])
+            ->one();
+    }
+
     public static function getElementTypes(int $siteId, ?int $cacheId = null): array
     {
         $condition = ['siteId' => $siteId];
@@ -211,14 +222,21 @@ class DiagnosticsHelper
 
     public static function getElementPagesIncludesQuery(int $siteId, int $elementId): ActiveQuery
     {
-        return self::getBasePagesQuery($siteId, true)
+        return self::getBasePagesQuery($siteId, withElement: true)
             ->andWhere(['elementId' => $elementId]);
+    }
+
+    public static function getElementQueryPagesIncludesQuery(int $siteId, int $queryId): ActiveQuery
+    {
+        return self::getBasePagesQuery($siteId, withElementQuery: true)
+            ->andWhere(['queryId' => $queryId]);
     }
 
     public static function getParamPagesQuery(int $siteId, string $param): ActiveQuery
     {
         return self::getBasePagesQuery($siteId)
-            ->andWhere(['like', 'uri', $param]);
+            ->andWhere(['like', 'uri', $param])
+            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
     }
 
     public static function getParams(int $siteId): array
@@ -259,9 +277,8 @@ class DiagnosticsHelper
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title', 'count([[fieldInstanceUid]]) as fieldCount'])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title'])
             ->innerJoinWith('cache')
-            ->leftJoin(['elementfieldcaches' => ElementFieldCacheRecord::tableName()], '[[elementfieldcaches.cacheId]] = [[elementcaches.cacheId]] AND [[elementfieldcaches.elementId]] = [[elementcaches.elementId]]')
             ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
             ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementcaches.elementId]]')
             ->innerJoin(['elements_sites' => Table::ELEMENTS_SITES], '[[elements_sites.elementId]] = [[elementcaches.elementId]]')
@@ -282,7 +299,8 @@ class DiagnosticsHelper
         }
 
         return ElementQueryCacheRecord::find()
-            ->select([ElementQueryRecord::tableName() . '.id', 'params', 'count(*) as count'])
+            ->from(['elementquerycaches' => ElementQueryCacheRecord::tableName()])
+            ->select([ElementQueryRecord::tableName() . '.id', 'index', 'params', 'count(*) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)
@@ -304,8 +322,9 @@ class DiagnosticsHelper
 
     public static function getPageElementFields(int $cacheId, int $elementId): array
     {
-        $fieldInstanceUids = ElementFieldCacheRecord::find()
-            ->select(['fieldInstanceUid'])
+        $fields = [];
+        $fieldIds = ElementFieldCacheRecord::find()
+            ->select(['fieldId'])
             ->where([
                 'cacheId' => $cacheId,
                 'elementId' => $elementId,
@@ -313,7 +332,31 @@ class DiagnosticsHelper
             ->distinct()
             ->column();
 
-        $fields = FieldHelper::getFieldInstancesFromUids($fieldInstanceUids);
+        // It’s safe to call this in a for loop, since the fields are memoized.
+        foreach ($fieldIds as $fieldId) {
+            $fields[] = Craft::$app->getFields()->getFieldById($fieldId);
+        }
+
+        ArrayHelper::multisort($fields, 'name');
+
+        return $fields;
+    }
+
+    public static function getElementQueryFields(int $queryId): array
+    {
+        $fields = [];
+        $fieldIds = ElementQueryFieldRecord::find()
+            ->select(['fieldId'])
+            ->where([
+                'queryId' => $queryId,
+            ])
+            ->distinct()
+            ->column();
+
+        // It’s safe to call this in a for loop, since the fields are memoized.
+        foreach ($fieldIds as $fieldId) {
+            $fields[] = Craft::$app->getFields()->getFieldById($fieldId);
+        }
 
         ArrayHelper::multisort($fields, 'name');
 
@@ -587,16 +630,11 @@ class DiagnosticsHelper
         return DateTimeHelper::toDateTime($value);
     }
 
-    private static function getBasePagesQuery(int $siteId, bool $withElement = false): ActiveQuery
+    private static function getBasePagesQuery(int $siteId, bool $withElement = false, bool $withElementQuery = false): ActiveQuery
     {
         $query = CacheRecord::find()
             ->from(['caches' => CacheRecord::tableName()])
             ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'expiryDate'])
-            ->leftJoin([
-                'elementquerycaches' => ElementQueryCacheRecord::find()
-                    ->select(['cacheId', 'count(*) as elementQueryCount'])
-                    ->groupBy(['cacheId']),
-            ], 'id = [[elementquerycaches.cacheId]]')
             ->where(['caches.siteId' => $siteId])
             ->asArray();
 
@@ -612,6 +650,22 @@ class DiagnosticsHelper
                     ->select(['cacheId', 'count(*) as elementCount'])
                     ->groupBy(['cacheId']),
             ], 'id = [[elements.cacheId]]');
+        }
+
+        if ($withElementQuery) {
+            $query
+                ->leftJoin([
+                    'elementquerycaches' => ElementQueryCacheRecord::find()
+                        ->select(['cacheId', 'queryId', 'count(*) as elementQueryCount'])
+                        ->groupBy(['cacheId', 'queryId']),
+                ], 'id = [[elementquerycaches.cacheId]]');
+        } else {
+            $query
+                ->leftJoin([
+                    'elementquerycaches' => ElementQueryCacheRecord::find()
+                        ->select(['cacheId', 'count(*) as elementQueryCount'])
+                        ->groupBy(['cacheId']),
+                ], 'id = [[elementquerycaches.cacheId]]');
         }
 
         return $query;

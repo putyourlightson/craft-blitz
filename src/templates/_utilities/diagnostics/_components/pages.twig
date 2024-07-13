@@ -9,10 +9,13 @@
 {% endif %}
 
 {% set elementId = elementId ?? null %}
+{% set elementQueryId = elementQueryId ?? null %}
 {% set param = param ?? null %}
 {% set query = craft.blitz.diagnostics.getPagesQuery(siteId) %}
 {% if elementId %}
     {% set query = craft.blitz.diagnostics.getElementPagesIncludesQuery(siteId, elementId) %}
+{% elseif elementQueryId %}
+    {% set query = craft.blitz.diagnostics.getElementQueryPagesIncludesQuery(siteId, elementQueryId) %}
 {% elseif param %}
     {% set query = craft.blitz.diagnostics.getParamPagesQuery(siteId, param) %}
 {% endif %}
