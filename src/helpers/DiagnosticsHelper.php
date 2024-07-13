@@ -219,7 +219,8 @@ class DiagnosticsHelper
     public static function getParamPagesQuery(int $siteId, string $param): ActiveQuery
     {
         return self::getBasePagesQuery($siteId)
-            ->andWhere(['like', 'uri', $param]);
+            ->andWhere(['like', 'uri', $param])
+            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
     }
 
     public static function getParams(int $siteId): array
