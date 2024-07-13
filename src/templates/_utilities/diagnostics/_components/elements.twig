@@ -41,10 +41,8 @@
                             </button>
                         </th>
                         {% if cacheId is defined %}
-                            <th class="{{ orderBy == 'fieldCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                                <button type="button" sprig s-val:order-by="fieldCount" s-val:sort-by="{{ orderBy == 'fieldCount' and sortBy == 'desc' ? 'asc' : 'desc' }}">
-                                    {{ 'Tracked Fields'|t('blitz') }}
-                                </button>
+                            <th>
+                                {{ 'Tracked Fields'|t('blitz') }}
                             </th>
                         {% else %}
                             <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
@@ -81,8 +79,9 @@
                                 </td>
                                 {% if cacheId is defined %}
                                     <td>
-                                        {{ row.fieldCount }}
-                                        {% if row.fieldCount > 0 %}
+                                        {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
+                                        {{ fields|length }}
+                                        {% if fields|length > 0 %}
                                             <span class="info">
                                                 <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
                                                 <table class="data fullwidth">
@@ -92,7 +91,6 @@
                                                         <th>{{ 'Field Type'|t('app') }}</th>
                                                     </thead>
                                                     <tbody>
-                                                        {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
                                                         {% for field in fields %}
                                                             <tr>
                                                                 <td class="thin">

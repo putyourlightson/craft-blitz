@@ -1,0 +1,23 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/element-queries' %}
+
+{% set elementQuery = craft.blitz.diagnostics.getElementQuery() %}
+{% if elementQuery is null %}
+    {% redirect 'blitz/diagnostics/element-queries' with error 'The element query no longer exists.' %}
+{% endif %}
+{% set element = craft.app.elements.createElement(elementQuery.type) %}
+{% set title = 'Pages/Includes tracking “' ~ elementQuery.index ~ '”' %}
+{% set crumbs = [
+    {
+        label: 'Tracked ' ~ element.displayName ~ ' Queries',
+        url: cpUrl('blitz/diagnostics/element-queries/element-query-type', { 'elementType': className(element) }),
+    },
+] %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/_components/pages', {
+        siteId: siteId,
+        elementQueryId: elementQuery.id,
+        displayName: 'Page/Include',
+        pluralDisplayName: 'Pages/Includes',
+    }) }}
+{% endblock %}
