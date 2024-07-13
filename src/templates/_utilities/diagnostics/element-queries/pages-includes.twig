@@ -1,6 +1,6 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/element-queries' %}
 
-{% set elementQuery = craft.blitz.diagnostics.getElementQuery() %}
+{% set elementQuery = craft.blitz.diagnostics.getElementQueryRecord() %}
 {% if elementQuery is null %}
     {% redirect 'blitz/diagnostics/element-queries' with error 'The element query no longer exists.' %}
 {% endif %}
