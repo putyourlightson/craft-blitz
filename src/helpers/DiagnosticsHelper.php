@@ -30,7 +30,6 @@ use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\services\CacheRequestService;
-use putyourlightson\blitzhints\BlitzHints;
 
 /**
  * @since 4.10.0
@@ -322,9 +321,8 @@ class DiagnosticsHelper
 
     public static function getPageElementFields(int $cacheId, int $elementId): array
     {
-        $fields = [];
-        $fieldIds = ElementFieldCacheRecord::find()
-            ->select(['fieldId'])
+        $fieldInstanceUids = ElementFieldCacheRecord::find()
+            ->select(['fieldInstanceUid'])
             ->where([
                 'cacheId' => $cacheId,
                 'elementId' => $elementId,
@@ -332,10 +330,7 @@ class DiagnosticsHelper
             ->distinct()
             ->column();
 
-        // It’s safe to call this in a for loop, since the fields are memoized.
-        foreach ($fieldIds as $fieldId) {
-            $fields[] = Craft::$app->getFields()->getFieldById($fieldId);
-        }
+        $fields = FieldHelper::getFieldInstancesFromUids($fieldInstanceUids);
 
         ArrayHelper::multisort($fields, 'name');
 
@@ -344,19 +339,15 @@ class DiagnosticsHelper
 
     public static function getElementQueryFields(int $queryId): array
     {
-        $fields = [];
-        $fieldIds = ElementQueryFieldRecord::find()
-            ->select(['fieldId'])
+        $fieldInstanceUids = ElementQueryFieldRecord::find()
+            ->select(['fieldInstanceUid'])
             ->where([
                 'queryId' => $queryId,
             ])
             ->distinct()
             ->column();
 
-        // It’s safe to call this in a for loop, since the fields are memoized.
-        foreach ($fieldIds as $fieldId) {
-            $fields[] = Craft::$app->getFields()->getFieldById($fieldId);
-        }
+        $fields = FieldHelper::getFieldInstancesFromUids($fieldInstanceUids);
 
         ArrayHelper::multisort($fields, 'name');
 

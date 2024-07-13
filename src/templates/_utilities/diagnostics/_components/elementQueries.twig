@@ -101,13 +101,20 @@
                                                 {% for field in fields %}
                                                     <tr>
                                                         <td class="thin">
-                                                            <a href="{{ url('settings/fields/edit/' ~ field.id) }}">{{ field.name }}</a>
+                                                            {{ field.name }}
                                                         </td>
                                                         <td class="thin code">
                                                             {{ field.handle }}
                                                         </td>
                                                         <td class="thin">
-                                                            {{ field.displayName }}
+                                                            <div class="flex flex-nowrap gap-s">
+                                                                <div class="cp-icon small">
+                                                                    {{ iconSvg(field.icon) }}
+                                                                </div>
+                                                                <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
+                                                                    {{ field.displayName }}
+                                                                </a>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
