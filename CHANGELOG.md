@@ -8,6 +8,7 @@
 ### Added
 
 - Added the ability for Blitz to track custom field instances with renamed handles ([#682](https://github.com/putyourlightson/craft-blitz/issues/682)).
+- Added the ability to view which tags are being tracked by each page in the Blitz Diagnostics utility.
 - Added the ability to view which pages/includes are tracking each element in the Blitz Diagnostics utility.
 
 ### Changed

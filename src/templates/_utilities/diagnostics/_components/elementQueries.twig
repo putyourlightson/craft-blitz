@@ -86,15 +86,20 @@
                                                 {% for field in fields %}
                                                     <tr>
                                                         <td class="thin">
-                                                            <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
-                                                                {{ field.name }}
-                                                            </a>
+                                                            {{ field.name }}
                                                         </td>
                                                         <td class="thin code">
                                                             {{ field.handle }}
                                                         </td>
                                                         <td class="thin">
-                                                            {{ field.displayName }}
+                                                            <div class="flex flex-nowrap gap-s">
+                                                                <div class="cp-icon small">
+                                                                    {{ iconSvg(field.icon) }}
+                                                                </div>
+                                                                <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
+                                                                    {{ field.displayName }}
+                                                                </a>
+                                                            </div>
                                                         </td>
                                                     </tr>
                                                 {% endfor %}
@@ -120,47 +125,6 @@
                                     }) }}
                                 {% else %}
                                     {{ 'Invalid params'|t('blitz') }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {{ row.count }}
-                            </td>
-                            <td>
-                                {% set fields = craft.blitz.diagnostics.getElementQueryFields(row.id) %}
-                                {{ fields|length }}
-                                {% if fields|length > 0 %}
-                                    <span class="info">
-                                        <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
-                                        <table class="data fullwidth">
-                                            <thead>
-                                                <th>{{ 'Name'|t('app') }}</th>
-                                                <th>{{ 'Handle'|t('app') }}</th>
-                                                <th>{{ 'Field Type'|t('app') }}</th>
-                                            </thead>
-                                            <tbody>
-                                                {% for field in fields %}
-                                                    <tr>
-                                                        <td class="thin">
-                                                            {{ field.name }}
-                                                        </td>
-                                                        <td class="thin code">
-                                                            {{ field.handle }}
-                                                        </td>
-                                                        <td class="thin">
-                                                            <div class="flex flex-nowrap gap-s">
-                                                                <div class="cp-icon small">
-                                                                    {{ iconSvg(field.icon) }}
-                                                                </div>
-                                                                <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
-                                                                    {{ field.displayName }}
-                                                                </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </span>
                                 {% endif %}
                             </td>
                         </tr>
