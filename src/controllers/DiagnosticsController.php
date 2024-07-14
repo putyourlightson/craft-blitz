@@ -60,11 +60,11 @@ class DiagnosticsController extends Controller
         return $this->response;
     }
 
-    public function actionExportPages(int $siteId): Response
+    public function actionExportPages(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $tag = null, ?string $param = null): Response
     {
         App::maxPowerCaptain();
 
-        $pages = DiagnosticsHelper::getPagesQuery($siteId)
+        $pages = DiagnosticsHelper::getPagesQuery($siteId, $elementId, $queryId, $tag, $param)
             ->orderBy(['elementCount' => SORT_DESC])
             ->all();
 
@@ -74,6 +74,7 @@ class DiagnosticsController extends Controller
                 'uri' => $page['uri'] ?: '/',
                 'elements' => $page['elementCount'] ?: 0,
                 'elementQueries' => $page['elementQueryCount'] ?: 0,
+                'tags' => $page['tagCount'] ?: 0,
                 'expiryDate' => $page['expiryDate'],
             ];
         }

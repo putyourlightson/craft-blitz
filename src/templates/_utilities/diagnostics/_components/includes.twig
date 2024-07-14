@@ -61,6 +61,11 @@
                                 {{ 'Element Queries'|t('blitz') }}
                             </button>
                         </th>
+                        <th class="{{ orderBy == 'tagCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="tagCount" s-val:sort-by="{{ orderBy == 'tagCount' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Tags'|t('blitz') }}
+                            </button>
+                        </th>
                         <th class="{{ orderBy == 'expiryDate' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="expiryDate" s-val:sort-by="{{ orderBy == 'expiryDate' and sortBy == 'desc' ? 'asc' : 'desc' }}">
                                 {{ 'Expiry Date'|t('blitz') }}
@@ -101,6 +106,9 @@
                             </td>
                             <td>
                                 {{ (row.elementQueryCount ?? 0)|number }}
+                            </td>
+                            <td>
+                                {{ (row.tagCount ?? 0)|number }}
                             </td>
                             <td>
                                 {{ row.expiryDate ? craft.blitz.diagnostics.toDateTime(row.expiryDate)|datetime('short') }}

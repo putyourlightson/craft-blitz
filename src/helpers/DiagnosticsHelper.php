@@ -123,8 +123,10 @@ class DiagnosticsHelper
     {
         $includeId = Craft::$app->getRequest()->getRequiredParam('includeId');
 
+        $index = self::getIncludesIndexColumnForSelect();
+
         return CacheRecord::find()
-            ->select(['id', 'uri'])
+            ->select(['id', 'uri', $index . ' AS index'])
             ->where(['id' => $includeId])
             ->asArray()
             ->one();
@@ -196,20 +198,20 @@ class DiagnosticsHelper
         return new $elementType();
     }
 
-    public static function getPagesQuery(int $siteId): ActiveQuery
+    public static function getPagesQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $tag = null, ?string $param = null): ActiveQuery
     {
-        return self::getBasePagesQuery($siteId)
-            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
+        $query = self::getBasePagesQuery($siteId, $elementId, $queryId, $tag, $param);
+
+        if ($elementId === null && $queryId === null && $tag === null) {
+            $query->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
+        }
+
+        return $query;
     }
 
     public static function getIncludesQuery(int $siteId): ActiveQuery
     {
-        // Cast the string to a BIGINT for Postgres.
-        // https://github.com/putyourlightson/craft-blitz/issues/653
-        $index = 'SUBSTRING([[uri]], 49)';
-        if (Craft::$app->getDb()->getIsPgsql()) {
-            $index = 'CAST(' . $index . ' AS BIGINT)';
-        }
+        $index = self::getIncludesIndexColumnForSelect();
 
         return self::getBasePagesQuery($siteId)
             ->select(['caches.id', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'expiryDate'])
@@ -218,25 +220,6 @@ class DiagnosticsHelper
                     ->where(['siteId' => $siteId]),
             ], $index . ' = [[indexes.index]]')
             ->andWhere(self::IS_CACHED_INCLUDE_CONDITION);
-    }
-
-    public static function getElementPagesIncludesQuery(int $siteId, int $elementId): ActiveQuery
-    {
-        return self::getBasePagesQuery($siteId, withElement: true)
-            ->andWhere(['elementId' => $elementId]);
-    }
-
-    public static function getElementQueryPagesIncludesQuery(int $siteId, int $queryId): ActiveQuery
-    {
-        return self::getBasePagesQuery($siteId, withElementQuery: true)
-            ->andWhere(['queryId' => $queryId]);
-    }
-
-    public static function getParamPagesQuery(int $siteId, string $param): ActiveQuery
-    {
-        return self::getBasePagesQuery($siteId)
-            ->andWhere(['like', 'uri', $param])
-            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
     }
 
     public static function getParams(int $siteId): array
@@ -320,6 +303,21 @@ class DiagnosticsHelper
             ->all();
     }
 
+    public static function getPageTags(int $cacheId): array
+    {
+        $tags = CacheTagRecord::find()
+            ->select(['tag'])
+            ->where([
+                'cacheId' => $cacheId,
+            ])
+            ->distinct()
+            ->column();
+
+        sort($tags);
+
+        return $tags;
+    }
+
     public static function getPageElementFields(int $cacheId, int $elementId): array
     {
         $fieldInstanceUids = ElementFieldCacheRecord::find()
@@ -392,16 +390,6 @@ class DiagnosticsHelper
             ->where(['siteId' => $siteId])
             ->groupBy(['tag'])
             ->orderBy(['count' => SORT_DESC, 'tag' => SORT_ASC])
-            ->asArray();
-    }
-
-    public static function getTagPagesQuery(int $siteId, string $tag): ActiveQuery
-    {
-        return CacheTagRecord::find()
-            ->select(['uri'])
-            ->innerJoinWith('cache')
-            ->where(['siteId' => $siteId])
-            ->andWhere(['tag' => $tag])
             ->asArray();
     }
 
@@ -622,20 +610,22 @@ class DiagnosticsHelper
         return DateTimeHelper::toDateTime($value);
     }
 
-    private static function getBasePagesQuery(int $siteId, bool $withElement = false, bool $withElementQuery = false): ActiveQuery
+    private static function getBasePagesQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $tag = null, ?string $param = null): ActiveQuery
     {
         $query = CacheRecord::find()
             ->from(['caches' => CacheRecord::tableName()])
-            ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'expiryDate'])
+            ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'tagCount', 'expiryDate'])
             ->where(['caches.siteId' => $siteId])
             ->asArray();
 
-        if ($withElement) {
-            $query->leftJoin([
-                'elements' => ElementCacheRecord::find()
-                    ->select(['cacheId', 'elementId', 'count(*) as elementCount'])
-                    ->groupBy(['cacheId', 'elementId']),
-            ], 'id = [[elements.cacheId]]');
+        if ($elementId !== null) {
+            $query
+                ->innerJoin([
+                    'elements' => ElementCacheRecord::find()
+                        ->select(['cacheId', 'elementId', 'count(*) as elementCount'])
+                        ->groupBy(['cacheId', 'elementId']),
+                ], 'id = [[elements.cacheId]]')
+                ->andWhere(['elementId' => $elementId]);
         } else {
             $query->leftJoin([
                 'elements' => ElementCacheRecord::find()
@@ -644,13 +634,14 @@ class DiagnosticsHelper
             ], 'id = [[elements.cacheId]]');
         }
 
-        if ($withElementQuery) {
+        if ($queryId !== null) {
             $query
-                ->leftJoin([
+                ->innerJoin([
                     'elementquerycaches' => ElementQueryCacheRecord::find()
                         ->select(['cacheId', 'queryId', 'count(*) as elementQueryCount'])
                         ->groupBy(['cacheId', 'queryId']),
-                ], 'id = [[elementquerycaches.cacheId]]');
+                ], 'id = [[elementquerycaches.cacheId]]')
+                ->andWhere(['queryId' => $queryId]);
         } else {
             $query
                 ->leftJoin([
@@ -660,6 +651,39 @@ class DiagnosticsHelper
                 ], 'id = [[elementquerycaches.cacheId]]');
         }
 
+        if ($tag !== null) {
+            $query
+                ->innerJoin([
+                    'cachetags' => CacheTagRecord::find()
+                        ->select(['cacheId', 'tag', 'count(*) as tagCount'])
+                        ->groupBy(['cacheId', 'tag']),
+                ], '[[caches.id]] = [[cachetags.cacheId]]')
+                ->andWhere(['tag' => $tag]);
+        } else {
+            $query
+                ->leftJoin([
+                    'cachetags' => CacheTagRecord::find()
+                        ->select(['cacheId', 'count(*) as tagCount'])
+                        ->groupBy(['cacheId']),
+                ], '[[caches.id]] = [[cachetags.cacheId]]');
+        }
+
+        if ($param !== null) {
+            $query->andWhere(['like', 'uri', $param]);
+        }
+
         return $query;
+    }
+
+    private static function getIncludesIndexColumnForSelect(): string
+    {
+        // Cast the string to a BIGINT for Postgres.
+        // https://github.com/putyourlightson/craft-blitz/issues/653
+        $index = 'SUBSTRING([[uri]], 49)';
+        if (Craft::$app->getDb()->getIsPgsql()) {
+            $index = 'CAST(' . $index . ' AS BIGINT)';
+        }
+
+        return $index;
     }
 }

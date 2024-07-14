@@ -9,17 +9,11 @@
 {% endif %}
 
 {% set elementId = elementId ?? null %}
-{% set elementQueryId = elementQueryId ?? null %}
+{% set queryId = queryId ?? null %}
+{% set tag = tag ?? null %}
 {% set param = param ?? null %}
-{% set query = craft.blitz.diagnostics.getPagesQuery(siteId) %}
-{% if elementId %}
-    {% set query = craft.blitz.diagnostics.getElementPagesIncludesQuery(siteId, elementId) %}
-{% elseif elementQueryId %}
-    {% set query = craft.blitz.diagnostics.getElementQueryPagesIncludesQuery(siteId, elementQueryId) %}
-{% elseif param %}
-    {% set query = craft.blitz.diagnostics.getParamPagesQuery(siteId, param) %}
-{% endif %}
-{% do query.orderBy(order)
+{% set query = craft.blitz.diagnostics.getPagesQuery(siteId, elementId, queryId, tag, param)
+    .orderBy(order)
     .offset(offset)
     .limit(limit) %}
 {% if search %}
@@ -62,6 +56,11 @@
                                 {{ 'Element Queries'|t('blitz') }}
                             </button>
                         </th>
+                        <th class="{{ orderBy == 'tagCount' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="tagCount" s-val:sort-by="{{ orderBy == 'tagCount' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Tags'|t('blitz') }}
+                            </button>
+                        </th>
                         <th class="{{ orderBy == 'expiryDate' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="expiryDate" s-val:sort-by="{{ orderBy == 'expiryDate' and sortBy == 'desc' ? 'asc' : 'desc' }}">
                                 {{ 'Expiry Date'|t('blitz') }}
@@ -100,6 +99,28 @@
                                 {{ (row.elementQueryCount ?? 0)|number }}
                             </td>
                             <td>
+                                {% set tags = craft.blitz.diagnostics.getPageTags(row.id) %}
+                                {{ tags|length }}
+                                {% if tags|length > 0 %}
+                                    <span class="info">
+                                        <h2>{{ 'Tags'|t('blitz') }}</h2>
+                                        <table class="data fullwidth">
+                                            <tbody>
+                                                {% for tag in tags %}
+                                                    <tr>
+                                                        <td class="thin">
+                                                            <a href="{{ url('blitz/diagnostics/tags/tag', { tag: tag }) }}">
+                                                                {{ tag }}
+                                                            </a>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
                                 {{ row.expiryDate ? craft.blitz.diagnostics.toDateTime(row.expiryDate)|datetime('short') }}
                             </td>
                             <td class="thin">
@@ -117,7 +138,14 @@
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
         {% set exportButtons %}
-            <a href="{{ actionUrl('blitz/diagnostics/export-pages', { siteId: siteId }) }}" class="btn">
+            {% set params = {
+                siteId: siteId,
+                elementId: elementId,
+                queryId: queryId,
+                param: param,
+                tag: tag,
+            } %}
+            <a href="{{ actionUrl('blitz/diagnostics/export-pages', params) }}" class="btn">
                 {{ 'Export'|t('blitz') }}
             </a>
         {% endset %}

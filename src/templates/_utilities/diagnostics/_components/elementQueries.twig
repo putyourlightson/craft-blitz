@@ -20,22 +20,32 @@
     .limit(limit)
     .all() %}
 
-<div s-replace="#elementqueries" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries .elements">
+<div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries .elements">
     <div class="search-container flex-grow texticon has-filter-btn">
         <span class="texticon-icon search icon" aria-hidden="true"></span>
         <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
     </div>
-    <div id="elementqueries">
+    <div id="results">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>
                     <tr>
-                        <th class="{{ orderBy == 'uri' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                        <th class="{{ orderBy == 'index' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="index" s-val:sort-by="{{ orderBy == 'index' and sortBy == 'asc' ? 'desc' : 'asc' }}">
                                 {{ 'Index'|t('blitz') }}
                             </button>
+                        </th>
+                        {% if cacheId is not defined %}
+                            <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                                <button type="button" sprig s-val:order-by="count" s-val:sort-by="{{ orderBy == 'count' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                    {{ 'Pages/Includes'|t('blitz') }}
+                                </button>
+                            </th>
+                        {% endif %}
+                        <th>
+                            {{ 'Tracked Fields'|t('blitz') }}
                         </th>
                         <th class="{{ orderBy == 'params' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="params" s-val:sort-by="{{ orderBy == 'params' and sortBy == 'asc' ? 'desc' : 'asc' }}">
@@ -44,14 +54,6 @@
                         </th>
                         <th>
                             {{ 'SQL'|t('blitz') }}
-                        </th>
-                        <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="count" s-val:sort-by="{{ orderBy == 'count' and sortBy == 'desc' ? 'asc' : 'desc' }}">
-                                {{ 'Pages/Includes'|t('blitz') }}
-                            </button>
-                        </th>
-                        <th>
-                            {{ 'Tracked Fields'|t('blitz') }}
                         </th>
                     </tr>
                 </thead>
@@ -62,6 +64,44 @@
                                 <a href="{{ url('blitz/diagnostics/element-queries/pages-includes', { queryId: row.id }) }}">
                                     {{ row.index }}
                                 </a>
+                            </td>
+                            {% if cacheId is not defined %}
+                                <td>
+                                    {{ row.count }}
+                                </td>
+                            {% endif %}
+                            <td>
+                                {% set fields = craft.blitz.diagnostics.getElementQueryFields(row.id) %}
+                                {{ fields|length }}
+                                {% if fields|length > 0 %}
+                                    <span class="info">
+                                        <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
+                                        <table class="data fullwidth">
+                                            <thead>
+                                                <th>{{ 'Name'|t('app') }}</th>
+                                                <th>{{ 'Handle'|t('app') }}</th>
+                                                <th>{{ 'Field Type'|t('app') }}</th>
+                                            </thead>
+                                            <tbody>
+                                                {% for field in fields %}
+                                                    <tr>
+                                                        <td class="thin">
+                                                            <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
+                                                                {{ field.name }}
+                                                            </a>
+                                                        </td>
+                                                        <td class="thin code">
+                                                            {{ field.handle }}
+                                                        </td>
+                                                        <td class="thin">
+                                                            {{ field.displayName }}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </span>
+                                {% endif %}
                             </td>
                             <td class="code">
                                 {{ include('blitz/_utilities/diagnostics/_includes/copytext', {
