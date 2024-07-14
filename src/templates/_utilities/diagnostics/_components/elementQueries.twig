@@ -20,12 +20,12 @@
     .limit(limit)
     .all() %}
 
-<div s-replace="#elementqueries" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries .elements">
+<div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#elementqueries .elements">
     <div class="search-container flex-grow texticon has-filter-btn">
         <span class="texticon-icon search icon" aria-hidden="true"></span>
         <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
     </div>
-    <div id="elementqueries">
+    <div id="results">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
         <div class="elements">
@@ -86,7 +86,9 @@
                                                 {% for field in fields %}
                                                     <tr>
                                                         <td class="thin">
-                                                            <a href="{{ url('settings/fields/edit/' ~ field.id) }}">{{ field.name }}</a>
+                                                            <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
+                                                                {{ field.name }}
+                                                            </a>
                                                         </td>
                                                         <td class="thin code">
                                                             {{ field.handle }}
@@ -127,11 +129,5 @@
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
         {{ include('blitz/_utilities/diagnostics/_includes/footer') }}
-
-        {% if sprig.isRequest %}
-            <script>
-                Craft.initUiElements($('#elementqueries'));
-            </script>
-        {% endif %}
     </div>
 </div>

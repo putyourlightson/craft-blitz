@@ -199,23 +199,12 @@ class DiagnosticsHelper
         return new $elementType();
     }
 
-    public static function getPagesQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $param = null, ?string $tag = null): ActiveQuery
+    public static function getPagesQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $tag = null, ?string $param = null): ActiveQuery
     {
-        $query = self::getBasePagesQuery($siteId, $elementId, $queryId);
+        $query = self::getBasePagesQuery($siteId, $elementId, $queryId, $tag, $param);
 
-        if ($elementId === null && $queryId === null) {
+        if ($elementId === null && $queryId === null && $tag === null) {
             $query->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
-        }
-
-        if ($elementId !== null) {
-            $query->andWhere(['elementId' => $elementId]);
-        } elseif ($queryId !== null) {
-            $query->andWhere(['queryId' => $queryId]);
-        } elseif ($param !== null) {
-            $query->andWhere(['like', 'uri', $param]);
-        } elseif ($tag !== null) {
-            $query->innerJoin(['cachetags' => CacheTagRecord::tableName()], '[[caches.id]] = [[cachetags.cacheId]]')
-                ->andWhere(['tag' => $tag]);
         }
 
         return $query;
@@ -313,6 +302,21 @@ class DiagnosticsHelper
             ->fixedOrder()
             ->indexBy('id')
             ->all();
+    }
+
+    public static function getPageTags(int $cacheId): array
+    {
+        $tags = CacheTagRecord::find()
+            ->select(['tag'])
+            ->where([
+                'cacheId' => $cacheId,
+            ])
+            ->distinct()
+            ->column();
+
+        sort($tags);
+
+        return $tags;
     }
 
     public static function getPageElementFields(int $cacheId, int $elementId): array
@@ -615,20 +619,22 @@ class DiagnosticsHelper
         return DateTimeHelper::toDateTime($value);
     }
 
-    private static function getBasePagesQuery(int $siteId, ?int $elementId = null, ?int $queryId = null): ActiveQuery
+    private static function getBasePagesQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $tag = null, ?string $param = null): ActiveQuery
     {
         $query = CacheRecord::find()
             ->from(['caches' => CacheRecord::tableName()])
-            ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'expiryDate'])
+            ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'tagCount', 'expiryDate'])
             ->where(['caches.siteId' => $siteId])
             ->asArray();
 
         if ($elementId !== null) {
-            $query->leftJoin([
-                'elements' => ElementCacheRecord::find()
-                    ->select(['cacheId', 'elementId', 'count(*) as elementCount'])
-                    ->groupBy(['cacheId', 'elementId']),
-            ], 'id = [[elements.cacheId]]');
+            $query
+                ->innerJoin([
+                    'elements' => ElementCacheRecord::find()
+                        ->select(['cacheId', 'elementId', 'count(*) as elementCount'])
+                        ->groupBy(['cacheId', 'elementId']),
+                ], 'id = [[elements.cacheId]]')
+                ->andWhere(['elementId' => $elementId]);
         } else {
             $query->leftJoin([
                 'elements' => ElementCacheRecord::find()
@@ -639,11 +645,12 @@ class DiagnosticsHelper
 
         if ($queryId !== null) {
             $query
-                ->leftJoin([
+                ->innerJoin([
                     'elementquerycaches' => ElementQueryCacheRecord::find()
                         ->select(['cacheId', 'queryId', 'count(*) as elementQueryCount'])
                         ->groupBy(['cacheId', 'queryId']),
-                ], 'id = [[elementquerycaches.cacheId]]');
+                ], 'id = [[elementquerycaches.cacheId]]')
+                ->andWhere(['queryId' => $queryId]);
         } else {
             $query
                 ->leftJoin([
@@ -651,6 +658,27 @@ class DiagnosticsHelper
                         ->select(['cacheId', 'count(*) as elementQueryCount'])
                         ->groupBy(['cacheId']),
                 ], 'id = [[elementquerycaches.cacheId]]');
+        }
+
+        if ($tag !== null) {
+            $query
+                ->innerJoin([
+                    'cachetags' => CacheTagRecord::find()
+                        ->select(['cacheId', 'tag', 'count(*) as tagCount'])
+                        ->groupBy(['cacheId', 'tag']),
+                ], '[[caches.id]] = [[cachetags.cacheId]]')
+                ->andWhere(['tag' => $tag]);
+        } else {
+            $query
+                ->leftJoin([
+                    'cachetags' => CacheTagRecord::find()
+                        ->select(['cacheId', 'count(*) as tagCount'])
+                        ->groupBy(['cacheId']),
+                ], '[[caches.id]] = [[cachetags.cacheId]]');
+        }
+
+        if ($param !== null) {
+            $query->andWhere(['like', 'uri', $param]);
         }
 
         return $query;

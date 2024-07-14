@@ -28,3 +28,9 @@
         {{ parent() }}
     </div>
 {% endblock %}
+
+{% js %}
+    htmx.on('htmx:afterSwap', function() {
+        Craft.initUiElements(htmx.find('#results'));
+    });
+{% endjs %}
