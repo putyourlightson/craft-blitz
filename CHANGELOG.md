@@ -4,7 +4,8 @@
 
 ### Added
 
-- Added the ability to view which pages/includes are tracking each element in the Blitz Diagnostics utility.
+- Added the ability to view which tags are being tracked by each page in the Blitz Diagnostics utility.
+- Added the ability to view which pages are tracking each element in the Blitz Diagnostics utility.
 
 ### Changed
 
