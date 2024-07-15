@@ -80,7 +80,7 @@
                                 {% if cacheId is defined %}
                                     <td>
                                         {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
-                                        {{ fields|length }}
+                                        {{ fields|length|number }}
                                         {% if fields|length > 0 %}
                                             <span class="info">
                                                 <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>

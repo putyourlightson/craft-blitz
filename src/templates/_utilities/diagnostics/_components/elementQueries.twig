@@ -72,7 +72,7 @@
                             {% endif %}
                             <td>
                                 {% set fields = craft.blitz.diagnostics.getElementQueryFields(row.id) %}
-                                {{ fields|length }}
+                                {{ fields|length|number }}
                                 {% if fields|length > 0 %}
                                     <span class="info">
                                         <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
