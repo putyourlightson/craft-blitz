@@ -4,16 +4,26 @@
 {% if element is null %}
     {% redirect 'blitz/diagnostics/elements' with error 'The element no longer exists.' %}
 {% endif %}
-{% set title = element.uiLabel ?: element.type.name %}
+{% set title = element.uiLabel %}
 {% set crumbs = [
     {
         html: tag('a', {
         class: 'crumb-link',
         href: cpUrl('blitz/diagnostics/elements/element-type', { 'elementType': className(element) }),
         text: 'Tracked ' ~ element.pluralDisplayName,
-    })
-    },
+    }),
+    }
 ] %}
+{% set owner = element.primaryOwner %}
+{% if owner %}
+    {% set crumbs = crumbs|merge([{
+        html: elementChip(element.primaryOwner),
+    }]) %}
+{% endif %}
+{% set crumbs = crumbs|merge([{
+    html: elementChip(element),
+    current: true,
+}]) %}
 
 {% block content %}
     {{ sprig('blitz/_utilities/diagnostics/_components/pages', {
