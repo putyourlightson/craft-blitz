@@ -4,7 +4,7 @@
 {% if element is null %}
     {% redirect 'blitz/diagnostics/elements' with error 'The element no longer exists.' %}
 {% endif %}
-{% set title = element.title %}
+{% set title = element.uiLabel ?: element.type.name %}
 {% set crumbs = [
     {
         html: tag('a', {
