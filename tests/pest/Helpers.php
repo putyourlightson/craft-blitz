@@ -57,13 +57,18 @@ function createSiteUri(int $siteId = 1, string $uri = 'page'): SiteUriModel
     ]);
 }
 
-function createEntry(bool $enabled = true, bool $batchMode = false): Entry
+function createEntry(bool $enabled = true, array $params = [], bool $batchMode = false): Entry
 {
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
 
-    $entry = EntryFactory::factory()
-        ->section(App::env('TEST_CHANNEL_SECTION_HANDLE'))
+    $entryFactory = EntryFactory::factory();
+    foreach ($params as $key => $value) {
+        $entryFactory->$key($value);
+    }
+
+    /** @var Entry $entry */
+    $entry = $entryFactory->section(App::env('TEST_CHANNEL_SECTION_HANDLE'))
         ->enabled($enabled)
         ->create();
 

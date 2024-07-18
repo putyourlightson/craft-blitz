@@ -159,11 +159,18 @@ class GenerateCacheService extends Component
                                 $targetElementIds[] = $mapping['target'];
                             }
 
-                            // Query for the element IDs of the target elements to avoid including archived or deleted elements.
-                            // TODO: merge the eager loading map criteria.
-                            $elementIds = $targetElementType::find()
-                                ->id($targetElementIds)
+                            // Query for the element IDs of the target elements using the provided criteria, which also helps avoid including archived or deleted elements.
+                            $query = $targetElementType::find();
+                            $criteria = array_merge(
+                                $map['criteria'] ?? [],
+                                $plan->criteria
+                            );
+                            Craft::configure($query, $criteria);
+
+                            $elementIds = $query->id($targetElementIds)
                                 ->status(null)
+                                ->offset(null)
+                                ->limit(null)
                                 ->ids();
 
                             $this->generateData->addElementIds($elementIds);
