@@ -11,6 +11,10 @@
 
 - The “Served by Blitz” comment is now also output when the cached output is initially created and served.
 
+### Fixed
+
+- Fixed a bug in which archived and deleted eager-loaded elements were being tracked.
+
 ## 4.19.0 - 2024-07-04
 
 ### Added

@@ -146,15 +146,27 @@ class GenerateCacheService extends Component
             function(EagerLoadElementsEvent $event) {
                 foreach ($event->with as $plan) {
                     // Get the eager-loading map from the source element type
-                    /** @var ElementInterface|string $elementType */
-                    $elementType = $event->elementType;
-                    $map = $elementType::eagerLoadingMap($event->elements, $plan->handle);
+                    /** @var ElementInterface|string $sourceElementType */
+                    $sourceElementType = $event->elementType;
+                    $map = $sourceElementType::eagerLoadingMap($event->elements, $plan->handle);
 
                     if (is_array($map)) {
-                        if ($this->shouldTrackElementsOfType($map['elementType'])) {
+                        /** @var ElementInterface|string $targetElementType */
+                        $targetElementType = $map['elementType'];
+                        if ($this->shouldTrackElementsOfType($targetElementType)) {
+                            $targetElementIds = [];
                             foreach ($map['map'] as $mapping) {
-                                $this->generateData->addElementId($mapping['target']);
+                                $targetElementIds[] = $mapping['target'];
                             }
+
+                            // Query for the element IDs of the target elements to avoid including archived or deleted elements.
+                            // TODO: merge the eager loading map criteria.
+                            $elementIds = $targetElementType::find()
+                                ->id($targetElementIds)
+                                ->status(null)
+                                ->ids();
+
+                            $this->generateData->addElementIds($elementIds);
                         }
                     }
                 }
