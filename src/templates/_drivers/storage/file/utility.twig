@@ -27,8 +27,8 @@
     {% set rows = rows|merge([{
         heading: site.name,
         cacheFolderPath: site.path,
-        pages: site.pageCount,
-        includes: site.includeCount,
+        pages: site.pageCount|number,
+        includes: site.includeCount|number,
     }]) %}
 {% endfor %}
 

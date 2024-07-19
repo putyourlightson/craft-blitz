@@ -14,6 +14,9 @@
 ### Changed
 
 - The “Served by Blitz” comment is now also output when the cached output is initially created and served.
+- Batch mode is now enabled whenever a `ResaveElements` job is executed.
+- Archived and deleted elements are no longer tracked when populated via eager-loaded element queries.
+- Criteria defined in eager-loaded element query mappings are now respected when tracking elements.
 
 ## 5.4.0 - 2024-07-04
 

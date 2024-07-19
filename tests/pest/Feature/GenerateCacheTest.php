@@ -206,6 +206,40 @@ test('Element cache records are saved with all statuses for eager-loaded relatio
         ->toContain($enabledEntry->id, $disabledEntry->id);
 });
 
+test('Element cache records are saved respecting the criteria for eager-loaded relation field queries', function() {
+    $qualifyingEntry = createEntry(params: ['plainText' => '1']);
+    $nonQualifyingEntry = createEntry(params: ['plainText' => '2']);
+    $entry = createEntryWithRelationship([$qualifyingEntry, $nonQualifyingEntry]);
+
+    Blitz::$plugin->generateCache->reset();
+
+    // The entry must be fetched from the DB for the test to work.
+    Entry::find()->id($entry->id)
+        ->with([
+            ['relatedTo', ['plainText' => '1']],
+        ])
+        ->one();
+
+    expect(Blitz::$plugin->generateCache->generateData->getElementIds())
+        ->toContain($qualifyingEntry->id)
+        ->not()->toContain($nonQualifyingEntry->id);
+});
+
+test('Element cache records are not saved for archived and deleted elements with eager-loaded relation field queries', function() {
+    $archivedEntry = createEntry(params: ['archived' => true]);
+    $deletedEntry = createEntry(params: ['dateDeleted' => new DateTime()]);
+    $entry = createEntryWithRelationship([$archivedEntry, $deletedEntry]);
+
+    Blitz::$plugin->generateCache->reset();
+
+    // The entry must be fetched from the DB for the test to work.
+    Entry::find()->id($entry->id)->with('relatedTo')->one();
+
+    expect(Blitz::$plugin->generateCache->generateData->getElementIds())
+        ->not()->toContain($archivedEntry->id)
+        ->not()->toContain($deletedEntry->id);
+});
+
 test('Element query records without specific identifiers are saved', function() {
     $elementQuerySets = [
         [

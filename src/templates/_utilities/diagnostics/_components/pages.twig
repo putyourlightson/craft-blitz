@@ -100,7 +100,7 @@
                             </td>
                             <td>
                                 {% set tags = craft.blitz.diagnostics.getPageTags(row.id) %}
-                                {{ tags|length }}
+                                {{ tags|length|number }}
                                 {% if tags|length > 0 %}
                                     <span class="info">
                                         <h2>{{ 'Tags'|t('blitz') }}</h2>
