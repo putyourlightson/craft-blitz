@@ -31,7 +31,9 @@
 {% endblock %}
 
 {% js %}
-    htmx.on('htmx:afterSwap', function() {
-        Craft.initUiElements(htmx.find('#results'));
-    });
+htmx.on('htmx:afterSwap', function() {
+    let elements = $('#results .elements');
+    Craft.initUiElements(elements);
+    Craft.cp.elementThumbLoader.load(elements);
+});
 {% endjs %}
