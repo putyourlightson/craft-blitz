@@ -10,6 +10,7 @@
 ### Changed
 
 - The “Served by Blitz” comment is now also output when the cached output is initially created and served.
+- Batch mode is now enabled whenever entry types and sections are saved.
 - Archived and deleted elements are no longer tracked when populated via eager-loaded element queries.
 - Criteria defined in eager-loaded element query mappings are now respected when tracking elements.
 

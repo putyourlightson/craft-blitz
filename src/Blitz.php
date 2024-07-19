@@ -24,6 +24,7 @@ use craft\log\MonologTarget;
 use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\services\Plugins;
+use craft\services\Sections;
 use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
@@ -419,6 +420,8 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
+            [Sections::class, Sections::EVENT_BEFORE_SAVE_ENTRY_TYPE],
+            [Sections::class, Sections::EVENT_BEFORE_SAVE_SECTION],
             [ResaveController::class, Controller::EVENT_BEFORE_ACTION],
         ];
 
@@ -434,6 +437,8 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
+            [Sections::class, Sections::EVENT_AFTER_SAVE_ENTRY_TYPE],
+            [Sections::class, Sections::EVENT_AFTER_SAVE_SECTION],
             [ResaveController::class, Controller::EVENT_AFTER_ACTION],
         ];
 
