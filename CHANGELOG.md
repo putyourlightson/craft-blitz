@@ -18,6 +18,10 @@
 - Archived and deleted elements are no longer tracked when populated via eager-loaded element queries.
 - Criteria defined in eager-loaded element query mappings are now respected when tracking elements.
 
+### Fixed
+
+- Fixed a bug in which the presence of legacy File Storage settings in project config was throwing errors when upgrading from Blitz 4 ([#668](https://github.com/putyourlightson/craft-blitz/issues/668)).
+
 ## 5.4.0 - 2024-07-04
 
 ### Added
