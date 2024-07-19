@@ -69,18 +69,13 @@
                         {% if element %}
                             <tr>
                                 <td>
-                                    {{ statusIndicator(element.status) }}
-                                    <a href="{{ url('blitz/diagnostics/elements/pages-includes', {
-                                        siteId: siteId,
-                                        elementId: element.id,
-                                        elementType: elementType,
-                                    }) }}">
-                                        {% if element.uiLabel %}
-                                            {{ element.uiLabel }}
-                                        {% else %}
-                                            <em class="light">{{ element.type.name }}</em>
-                                        {% endif %}
-                                    </a>
+                                    {{ elementChip(element)|replace({
+                                        (element.cpEditUrl): url('blitz/diagnostics/elements/pages-includes', {
+                                            siteId: siteId,
+                                            elementId: element.id,
+                                            elementType: elementType,
+                                        })
+                                    })|raw }}
                                 </td>
                                 {% if cacheId is defined %}
                                     <td>
