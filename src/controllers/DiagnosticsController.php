@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\controllers;
 
 use Craft;
+use craft\base\Plugin;
 use craft\helpers\App;
 use craft\helpers\Json;
 use craft\web\Controller;
@@ -142,10 +143,19 @@ class DiagnosticsController extends Controller
 
     private function getReport(): string
     {
+        $modules = [];
+        foreach (Craft::$app->getModules(true) as $module) {
+            if (!($module instanceof Plugin)) {
+                $modules[] = $module;
+            }
+        }
+
         return Craft::$app->getView()->renderTemplate('blitz/_utilities/diagnostics/_includes/report',
             [
                 'phpVersion' => App::phpVersion(),
                 'dbDriver' => $this->dbDriver(),
+                'plugins' => Craft::$app->getPlugins()->getAllPlugins(),
+                'modules' => $modules,
                 'blitzPluginSettings' => $this->getRedacted(Blitz::$plugin->getSettings()->getAttributes()),
             ]
         );

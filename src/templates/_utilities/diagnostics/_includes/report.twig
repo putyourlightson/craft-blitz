@@ -7,18 +7,16 @@
 #### Installed Plugins
 
 {# @var plugin \craft\base\Plugin #}
-{% for plugin in craft.app.plugins.allPlugins -%}
+{% for plugin in plugins -%}
     - {{ plugin.name }}: {{ plugin.version }}
 {% endfor %}
 
 #### Loaded Modules
 
 {# @var module \yii\base\Module #}
-{% for module in craft.app.modules(true) -%}
-    {% if module is not instance of('\\craft\\base\\Plugin') -%}
-        - {{ module.id }}: {{ className(module) }}
-        {{- '\n' -}}
-    {% endif %}
+{% for module in modules -%}
+    - {{ module.id }}: {{ className(module) }}
+    {{- '\n' -}}
 {%- endfor %}
 
 #### Blitz Plugin Settings
