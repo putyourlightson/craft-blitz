@@ -304,6 +304,14 @@ test('Element query records with specific identifiers are not saved', function()
         ->toHaveRecordCount(0);
 });
 
+test('Element query record with select is saved', function() {
+    $elementQuery = Entry::find()->select(['title']);
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    expect(ElementQueryRecord::class)
+        ->toHaveRecordCount(1);
+});
+
 test('Element query record with join is saved', function() {
     $elementQuery = Entry::find()->innerJoin('{{%users}}');
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);
