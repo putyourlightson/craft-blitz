@@ -21,6 +21,7 @@ use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\log\MonologTarget;
 use craft\queue\jobs\ResaveElements;
+use craft\queue\Queue as CraftQueue;
 use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\services\Plugins;
@@ -449,7 +450,7 @@ class Blitz extends Plugin
             );
         }
 
-        Event::on(Queue::class, Queue::EVENT_AFTER_EXEC,
+        Event::on(CraftQueue::class, CraftQueue::EVENT_AFTER_EXEC_AND_RELEASE,
             function(ExecEvent $event) {
                 if ($event->job instanceof ResaveElements) {
                     $this->refreshCache->refresh();
