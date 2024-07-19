@@ -23,7 +23,7 @@
 {% set elements = craft.blitz.diagnostics.getElementsFromIds(siteId, elementType, elementIds) %}
 {% set isEntryElementType = elementType == 'craft\\elements\\Entry' %}
 
-<div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#elements .elements">
+<div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
     <div class="search-container flex-grow texticon has-filter-btn">
         <span class="texticon-icon search icon" aria-hidden="true"></span>
         <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
