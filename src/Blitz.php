@@ -8,7 +8,6 @@ namespace putyourlightson\blitz;
 use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
-use craft\console\controllers\ResaveController;
 use craft\elements\User;
 use craft\events\BatchElementActionEvent;
 use craft\events\DeleteElementEvent;
@@ -21,10 +20,10 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\log\MonologTarget;
+use craft\queue\jobs\ResaveElements;
 use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\services\Plugins;
-use craft\services\Sections;
 use craft\services\Structures;
 use craft\services\UserPermissions;
 use craft\services\Utilities;
@@ -57,11 +56,11 @@ use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\blitz\widgets\CacheWidget;
 use putyourlightson\blitzhints\BlitzHints;
 use putyourlightson\sprig\Sprig;
-use yii\base\Controller;
 use yii\base\Event;
 use yii\di\Instance;
 use yii\log\Dispatcher;
 use yii\log\Logger;
+use yii\queue\ExecEvent;
 use yii\queue\Queue;
 
 /**
@@ -420,11 +419,7 @@ class Blitz extends Plugin
         $events = [
             [Elements::class, Elements::EVENT_BEFORE_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_BEFORE_PROPAGATE_ELEMENTS],
-            [Sections::class, Sections::EVENT_BEFORE_SAVE_ENTRY_TYPE],
-            [Sections::class, Sections::EVENT_BEFORE_SAVE_SECTION],
-            [ResaveController::class, Controller::EVENT_BEFORE_ACTION],
         ];
-
         foreach ($events as $event) {
             Event::on($event[0], $event[1],
                 function() {
@@ -433,15 +428,19 @@ class Blitz extends Plugin
             );
         }
 
+        Event::on(Queue::class, Queue::EVENT_BEFORE_EXEC,
+            function(ExecEvent $event) {
+                if ($event->job instanceof ResaveElements) {
+                    $this->refreshCache->batchMode = true;
+                }
+            }
+        );
+
         // Refresh the cache
         $events = [
             [Elements::class, Elements::EVENT_AFTER_RESAVE_ELEMENTS],
             [Elements::class, Elements::EVENT_AFTER_PROPAGATE_ELEMENTS],
-            [Sections::class, Sections::EVENT_AFTER_SAVE_ENTRY_TYPE],
-            [Sections::class, Sections::EVENT_AFTER_SAVE_SECTION],
-            [ResaveController::class, Controller::EVENT_AFTER_ACTION],
         ];
-
         foreach ($events as $event) {
             Event::on($event[0], $event[1],
                 function() {
@@ -449,6 +448,14 @@ class Blitz extends Plugin
                 }
             );
         }
+
+        Event::on(Queue::class, Queue::EVENT_AFTER_EXEC,
+            function(ExecEvent $event) {
+                if ($event->job instanceof ResaveElements) {
+                    $this->refreshCache->refresh();
+                }
+            }
+        );
     }
 
     /**
