@@ -505,7 +505,7 @@ class DiagnosticsHelper
         $tests[] = [
             'pass' => $pass,
             'message' => $message,
-            'info' => '<a href="https://craftcms.com/docs/4.x/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>',
+            'info' => '<a href="https://craftcms.com/docs/5.x/reference/element-types/globals.html" target="">Globals</a> should be avoided, since they are preloaded on every page in your site, unless the <code>refreshCacheAutomaticallyForGlobals</code> config setting is disabled. <a href="https://putyourlightson.com/plugins/blitz#2-avoid-using-globals" target="_blank" class="go">Learn more</a>',
         ];
 
         /**
@@ -521,18 +521,18 @@ class DiagnosticsHelper
 
             $pass = $failedSites === 0;
             if ($pass) {
-                $message = 'The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any <a href="' . UrlHelper::cpUrl('settings/sites') . '">sites</a>.';
+                $message = 'The <a href="https://craftcms.com/docs/5.x/configure.html#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any <a href="' . UrlHelper::cpUrl('settings/sites') . '">sites</a>.';
             } else {
-                $message = 'The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in ' . $failedSites . ' ' . '<a href="' . UrlHelper::cpUrl('settings/sites') . '">' . Craft::t('blitz', '{num, plural, =1{site} other{sites}}', ['num' => $failedSites]) . '</a> and is not explicitly defined.';
+                $message = 'The <a href="https://craftcms.com/docs/5.x/configure.html#aliases" target="_blank"><code>@web</code></a> alias is used in ' . $failedSites . ' ' . '<a href="' . UrlHelper::cpUrl('settings/sites') . '">' . Craft::t('blitz', '{num, plural, =1{site} other{sites}}', ['num' => $failedSites]) . '</a> and is not explicitly defined.';
             }
         } else {
             $pass = true;
-            $message = 'The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.';
+            $message = 'The <a href="https://craftcms.com/docs/5.x/configure.html#aliases" target="_blank"><code>@web</code></a> alias is explicitly defined.';
         }
         $tests[] = [
             'pass' => $pass,
             'message' => $message,
-            'info' => 'Explicitly defining the <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>',
+            'info' => 'Explicitly defining the <a href="https://craftcms.com/docs/5.x/configure.html#aliases" target="_blank"><code>@web</code></a> alias is important for ensuring that URLs work correctly when the cache is generated via console requests. <a href="https://putyourlightson.com/plugins/blitz#the-site-is-not-cached-when-using-console-commands" target="_blank" class="go">Learn more</a>',
         ];
 
         /**
