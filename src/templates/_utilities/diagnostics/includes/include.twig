@@ -28,7 +28,7 @@
             <tbody>
                 {% for elementType in elementTypes %}
                     <tr>
-                        <td class="code">
+                        <td>
                             <a href="{{ url('blitz/diagnostics/includes/element-type', {
                                 includeId: include.id,
                                 elementType: elementType.type
@@ -63,7 +63,7 @@
             <tbody>
                 {% for elementQueryType in elementQueryTypes %}
                     <tr>
-                        <td class="code">
+                        <td>
                             <a href="{{ url('blitz/diagnostics/includes/element-query-type', {
                                 includeId: include.id,
                                 elementType: elementQueryType.type
