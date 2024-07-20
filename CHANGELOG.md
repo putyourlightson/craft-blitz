@@ -22,6 +22,7 @@
 ### Fixed
 
 - Fixed a bug in which the presence of legacy File Storage settings in project config was throwing errors when upgrading from Blitz 4 ([#668](https://github.com/putyourlightson/craft-blitz/issues/668)).
+- Fixed a bug in which the failed site count was not being correctly displayed in the Blitz Diagnostics recommendations.
 
 ## 5.4.0 - 2024-07-04
 
