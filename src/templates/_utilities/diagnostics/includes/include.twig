@@ -33,7 +33,7 @@
                                 includeId: include.id,
                                 elementType: elementType.type
                             }) }}">
-                                {{ elementType.type }}
+                                {{ create(elementType.type).pluralDisplayName }}
                             </a>
                         </td>
                         <td>
@@ -68,7 +68,7 @@
                                 includeId: include.id,
                                 elementType: elementQueryType.type
                             }) }}">
-                                {{ elementQueryType.type }}
+                                {{ create(elementQueryType.type).displayName }} Queries
                             </a>
                         </td>
                         <td>

@@ -21,7 +21,7 @@
             <thead>
                 <tr>
                     <th>
-                        {{ 'Element Type'|t('blitz') }}
+                        {{ 'Element Query Type'|t('blitz') }}
                     </th>
                     <th>
                         {{ 'Element Queries'|t('blitz') }}
@@ -31,11 +31,11 @@
             <tbody>
                 {% for elementQueryType in elementQueryTypes %}
                     <tr>
-                        <td class="code">
+                        <td>
                             <a href="{{ url('blitz/diagnostics/element-queries/element-query-type', {
                                 elementType: elementQueryType.type
                             }) }}">
-                                {{ elementQueryType.type }}
+                                {{ create(elementQueryType.type).displayName }} Queries
                             </a>
                         </td>
                         <td>
