@@ -523,7 +523,7 @@ class DiagnosticsHelper
             if ($pass) {
                 $message = 'The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is not used in the base URL of any <a href="' . UrlHelper::cpUrl('settings/sites') . '">sites</a>.';
             } else {
-                $message = '<a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in {{ failedSites }} <a href="' . UrlHelper::cpUrl('settings/sites') . '">' . Craft::t('blitz', '{num, plural, =1{site} other{sites}}', ['num' => $failedSites]) . '</a> and is not explicitly defined.';
+                $message = 'The <a href="https://craftcms.com/docs/4.x/config/#aliases" target="_blank"><code>@web</code></a> alias is used in ' . $failedSites . ' ' . '<a href="' . UrlHelper::cpUrl('settings/sites') . '">' . Craft::t('blitz', '{num, plural, =1{site} other{sites}}', ['num' => $failedSites]) . '</a> and is not explicitly defined.';
             }
         } else {
             $pass = true;
