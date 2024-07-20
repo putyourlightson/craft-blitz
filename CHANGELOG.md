@@ -15,6 +15,10 @@
 - Archived and deleted elements are no longer tracked when populated via eager-loaded element queries.
 - Criteria defined in eager-loaded element query mappings are now respected when tracking elements.
 
+### Fixed
+
+- Fixed a bug in which the failed site count was not being correctly displayed in the Blitz Diagnostics recommendations.
+
 ## 4.19.0 - 2024-07-04
 
 ### Added
