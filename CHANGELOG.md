@@ -17,6 +17,7 @@
 - Batch mode is now enabled whenever a `ResaveElements` job is executed.
 - Archived and deleted elements are no longer tracked when populated via eager-loaded element queries.
 - Criteria defined in eager-loaded element query mappings are now respected when tracking elements.
+- Updated links to Craft documentation to use the 5.x version.
 
 ### Fixed
 
