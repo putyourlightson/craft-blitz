@@ -28,12 +28,12 @@
             <tbody>
                 {% for elementType in elementTypes %}
                     <tr>
-                        <td class="code">
+                        <td>
                             <a href="{{ url('blitz/diagnostics/pages/element-type', {
                                 pageId: page.id,
                                 elementType: elementType.type
                             }) }}">
-                                {{ elementType.type }}
+                                {{ create(elementType.type).pluralDisplayName }}
                             </a>
                         </td>
                         <td>
@@ -63,12 +63,12 @@
             <tbody>
                 {% for elementQueryType in elementQueryTypes %}
                     <tr>
-                        <td class="code">
+                        <td>
                             <a href="{{ url('blitz/diagnostics/pages/element-query-type', {
                                 pageId: page.id,
                                 elementType: elementQueryType.type
                             }) }}">
-                                {{ elementQueryType.type }}
+                                {{ create(elementQueryType.type).displayName }} Queries
                             </a>
                         </td>
                         <td>
