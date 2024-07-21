@@ -329,11 +329,7 @@ class DiagnosticsHelper
             ->distinct()
             ->column();
 
-        $fields = FieldHelper::getFieldInstancesFromUids($fieldInstanceUids);
-
-        ArrayHelper::multisort($fields, 'name');
-
-        return $fields;
+        return FieldHelper::getFieldInstancesFromUids($fieldInstanceUids);
     }
 
     public static function getElementQueryFields(int $queryId): array
@@ -346,11 +342,7 @@ class DiagnosticsHelper
             ->distinct()
             ->column();
 
-        $fields = FieldHelper::getFieldInstancesFromUids($fieldInstanceUids);
-
-        ArrayHelper::multisort($fields, 'name');
-
-        return $fields;
+        return FieldHelper::getFieldInstancesFromUids($fieldInstanceUids);
     }
 
     public static function getElementQuerySql(string $elementQueryType, string $params): ?string

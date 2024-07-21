@@ -9,6 +9,7 @@ use Craft;
 use craft\base\ElementInterface;
 use craft\base\FieldInterface;
 use craft\elements\db\ElementQuery;
+use craft\helpers\ArrayHelper;
 use craft\models\FieldLayout;
 
 class FieldHelper
@@ -93,10 +94,15 @@ class FieldHelper
             foreach ($fieldLayout->getCustomFields() as $field) {
                 $layoutElement = $field->layoutElement;
                 if ($layoutElement !== null && in_array($layoutElement->uid, $fieldInstanceUids)) {
-                    $fields[] = $field;
+                    // Index by field ID and handle to prevent duplicates.
+                    $index = $field->id . '-' . $field->handle;
+                    $fields[$index] = $field;
                 }
             }
         }
+
+        // Sort fields by name ascending.
+        ArrayHelper::multisort($fields, 'name');
 
         return $fields;
     }
