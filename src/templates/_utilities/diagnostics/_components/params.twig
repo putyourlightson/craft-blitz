@@ -13,9 +13,8 @@
     {% set order = order|push('param') %}
     {% set sort = sort|push(SORT_ASC) %}
 {% endif %}
-{% set rows = rows|multisort(order, sort) %}
 {% set total = rows|length %}
-{% set rows = rows|slice(offset, limit) %}
+{% set rows = rows|multisort(order, sort)|slice(offset, limit) %}
 {% set maxVisible = rows|length + offset %}
 
 <div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
