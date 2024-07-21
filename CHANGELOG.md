@@ -11,7 +11,7 @@
 
 - Blitz now requires Craft CMS 4.4.8 or later.
 - The “Served by Blitz” comment is now also output when the cached output is initially created and served.
-- Batch mode is now enabled whenever a `ResaveElements` job is executed.
+- Batch mode is now enabled whenever elements are resaved via a queue job.
 - Archived and deleted elements are no longer tracked when populated via eager-loaded element queries.
 - Criteria defined in eager-loaded element query mappings are now respected when tracking elements.
 
