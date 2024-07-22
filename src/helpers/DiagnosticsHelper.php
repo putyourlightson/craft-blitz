@@ -10,6 +10,7 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\db\ActiveQuery;
 use craft\db\QueryAbortedException;
+use craft\db\Table;
 use craft\elements\GlobalSet;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
@@ -30,6 +31,7 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\services\CacheRequestService;
 use yii\db\ActiveRecordInterface;
+use yii\db\Expression;
 
 /**
  * @since 4.10.0
@@ -160,12 +162,16 @@ class DiagnosticsHelper
             $condition['cacheId'] = $cacheId;
         }
 
+        $nestedExpression = new Expression('CASE WHEN ownerId IS NULL THEN 0 ELSE 1 END');
+
         return ElementCacheRecord::find()
-            ->select(['type', 'count(DISTINCT [[elementId]]) as count'])
+            ->from(['elementcaches' => ElementCacheRecord::tableName()])
+            ->select(['type', 'count(DISTINCT [[elementcaches.elementId]]) as count', 'nested' => $nestedExpression])
             ->innerJoinWith('cache')
             ->innerJoinWith('element')
+            ->leftJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
             ->where($condition)
-            ->groupBy(['type'])
+            ->groupBy(['type', 'nested'])
             ->orderBy(['count' => SORT_DESC, 'type' => SORT_ASC])
             ->asArray()
             ->all();
@@ -245,16 +251,23 @@ class DiagnosticsHelper
         return $queryStringParams;
     }
 
-    public static function getElementsQuery(int $siteId, string $elementType, ?int $cacheId = null): ActiveQuery
+    public static function getElementsQuery(int $siteId, string $elementType, bool $nested = false, ?int $cacheId = null): ActiveQuery
     {
         $condition = [
-            CacheRecord::tableName() . '.siteId' => $siteId,
-            'elements_sites.siteId' => $siteId,
-            'type' => $elementType,
+            'and',
+            [CacheRecord::tableName() . '.siteId' => $siteId],
+            ['elements_sites.siteId' => $siteId],
+            ['type' => $elementType],
         ];
 
+        if ($nested) {
+            $condition[] = ['not', ['ownerId' => null]];
+        } else {
+            $condition[] = ['ownerId' => null];
+        }
+
         if ($cacheId) {
-            $condition['elementcaches.cacheId'] = $cacheId;
+            $condition[] = ['elementcaches.cacheId' => $cacheId];
         }
 
         return ElementCacheRecord::find()
@@ -264,6 +277,7 @@ class DiagnosticsHelper
             ->innerJoinWith('element')
             ->innerJoinWith('elementSite')
             ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
+            ->leftJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
             ->where($condition)
             ->groupBy(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'title'])
             ->asArray();

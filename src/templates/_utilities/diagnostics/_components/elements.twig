@@ -7,7 +7,7 @@
 {% if orderBy != 'title' %}
     {% set order = order|merge({ 'title': SORT_ASC }) %}
 {% endif %}
-{% set query = craft.blitz.diagnostics.getElementsQuery(siteId, elementType, cacheId ?? null)
+{% set query = craft.blitz.diagnostics.getElementsQuery(siteId, elementType, nested, cacheId ?? null)
     .orderBy(order) %}
 {% if search %}
     {% do query.andWhere(['like', 'title', search]) %}

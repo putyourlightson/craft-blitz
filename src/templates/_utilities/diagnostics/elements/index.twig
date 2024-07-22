@@ -22,8 +22,10 @@
                     <tr>
                         <td>
                             <a href="{{ url('blitz/diagnostics/elements/element-type', {
-                                elementType: elementType.type
+                                elementType: elementType.type,
+                                nested: elementType.nested ? 1 : 0,
                             }) }}">
+                                {{ elementType.nested ? 'Nested' }}
                                 {{ create(elementType.type).pluralDisplayName }}
                             </a>
                         </td>

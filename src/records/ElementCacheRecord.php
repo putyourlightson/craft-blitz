@@ -47,7 +47,7 @@ class ElementCacheRecord extends ActiveRecord
      */
     public function getElementSite(): ActiveQuery
     {
-        return $this->hasOne(Element_SiteSettings::class, ['id' => 'elementId']);
+        return $this->hasOne(Element_SiteSettings::class, ['elementId' => 'elementId']);
     }
 
     /**

@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.5.1 - Unreleased
+
+### Changed
+
+- Nested element types are now differentiated in the Blitz Diagnostics utility.
+
 ## 5.5.0 - 2024-07-22
 
 > [!IMPORTANT]

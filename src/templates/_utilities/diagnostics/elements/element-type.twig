@@ -1,12 +1,14 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/elements' %}
 
 {% set element = craft.blitz.diagnostics.getElementOfType() %}
-{% set title = 'Tracked ' ~ element.pluralDisplayName %}
+{% set nested = craft.app.request.param('nested') %}
+{% set title = 'Tracked ' ~ (nested ? 'Nested ') ~ element.pluralDisplayName %}
 
 {% block content %}
     {{ sprig('blitz/_utilities/diagnostics/_components/elements', {
         siteId: siteId,
         elementType: className(element),
+        nested: nested ? 1 : 0,
         displayName: element.displayName,
         pluralDisplayName: element.pluralDisplayName,
         hasUris: element.hasUris,
