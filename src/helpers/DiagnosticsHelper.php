@@ -10,7 +10,6 @@ use craft\base\Element;
 use craft\base\ElementInterface;
 use craft\db\ActiveQuery;
 use craft\db\QueryAbortedException;
-use craft\db\Table;
 use craft\elements\GlobalSet;
 use craft\helpers\ArrayHelper;
 use craft\helpers\DateTimeHelper;
@@ -164,7 +163,7 @@ class DiagnosticsHelper
         return ElementCacheRecord::find()
             ->select(['type', 'count(DISTINCT [[elementId]]) as count'])
             ->innerJoinWith('cache')
-            ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
+            ->innerJoinWith('element')
             ->where($condition)
             ->groupBy(['type'])
             ->orderBy(['count' => SORT_DESC, 'type' => SORT_ASC])
@@ -262,9 +261,9 @@ class DiagnosticsHelper
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
             ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title'])
             ->innerJoinWith('cache')
+            ->innerJoinWith('element')
+            ->innerJoinWith('elementSite')
             ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
-            ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementcaches.elementId]]')
-            ->innerJoin(['elements_sites' => Table::ELEMENTS_SITES], '[[elements_sites.elementId]] = [[elementcaches.elementId]]')
             ->where($condition)
             ->groupBy(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'title'])
             ->asArray();

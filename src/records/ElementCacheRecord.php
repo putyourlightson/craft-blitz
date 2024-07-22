@@ -8,6 +8,7 @@ namespace putyourlightson\blitz\records;
 use craft\db\ActiveQuery;
 use craft\db\ActiveRecord;
 use craft\records\Element;
+use craft\records\Element_SiteSettings;
 
 /**
  * @property int $cacheId
@@ -39,6 +40,14 @@ class ElementCacheRecord extends ActiveRecord
     public function getElement(): ActiveQuery
     {
         return $this->hasOne(Element::class, ['id' => 'elementId']);
+    }
+
+    /**
+     * Returns the associated element site
+     */
+    public function getElementSite(): ActiveQuery
+    {
+        return $this->hasOne(Element_SiteSettings::class, ['id' => 'elementId']);
     }
 
     /**
