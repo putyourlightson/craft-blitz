@@ -1,10 +1,14 @@
 # Release Notes for Blitz
 
-## 5.5.1 - Unreleased
+## 5.5.1 - 2024-07-23
 
 ### Changed
 
 - Nested element types are now differentiated in the Blitz Diagnostics utility.
+
+### Fixed
+
+- Fixed a bug in which the plugin install migration could throw an exception in version 5.5.0 ([#688](https://github.com/putyourlightson/craft-blitz/issues/688)).
 
 ## 5.5.0 - 2024-07-22
 
