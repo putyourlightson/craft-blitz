@@ -155,7 +155,6 @@ test('Element cache record is saved with eager-loaded matrix fields', function()
             [
                 'type' => 'test',
                 'fields' => [
-                    'test' => '1',
                     'relatedTo' => [$childEntry->id],
                 ],
             ],

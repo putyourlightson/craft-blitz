@@ -5,6 +5,7 @@
 ### Added
 
 - Added the ability to track eager-loaded relation fields nested inside matrix blocks ([#657](https://github.com/putyourlightson/craft-blitz/issues/657)).
+- Added statuses and edit links to elements displayed in the Blitz Diagnostics utility.
 
 ## 4.20.0 - 2024-07-22
 

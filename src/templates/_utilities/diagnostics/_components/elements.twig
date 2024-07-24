@@ -69,13 +69,7 @@
                         {% if element %}
                             <tr>
                                 <td>
-                                    <a href="{{ url('blitz/diagnostics/elements/pages-includes', {
-                                        siteId: siteId,
-                                        elementId: element.id,
-                                        elementType: elementType,
-                                    }) }}">
-                                        {{ element.title }}
-                                    </a>
+                                    {{ craft.blitz.diagnostics.getElementChip(element, 'blitz/diagnostics/elements/pages-includes') }}
                                 </td>
                                 {% if cacheId is defined %}
                                     <td>

@@ -12,6 +12,12 @@
     },
 ] %}
 
+{% block pageTitle %}
+    <h1>
+        {{ craft.blitz.diagnostics.getElementChip(element) }}
+    </h1>
+{% endblock %}
+
 {% block content %}
     {{ sprig('blitz/_utilities/diagnostics/_components/pages', {
         siteId: siteId,
