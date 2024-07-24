@@ -5,7 +5,7 @@
     {% redirect 'blitz/diagnostics/includes' with error 'The include no longer exists or may have been refreshed.' %}
 {% endif %}
 {% set element = craft.blitz.diagnostics.getElementOfType(include.id) %}
-{% set title = 'Tracked ' ~ element.pluralDisplayName %}
+{% set title = 'Tracked Nested ' ~ element.pluralDisplayName %}
 {% set crumbs = [
     {
         label: include.index,
@@ -14,7 +14,7 @@
 ] %}
 
 {% block content %}
-    {{ sprig('blitz/_utilities/diagnostics/_components/elements', {
+    {{ sprig('blitz/_utilities/diagnostics/_components/nestedElements', {
         siteId: siteId,
         cacheId: include.id,
         elementType: className(element),

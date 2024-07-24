@@ -1,17 +1,21 @@
 {% set cacheId = cacheId ?? null %}
-{% set orderBy = orderBy ?? (cacheId ? 'title' : 'count') %}
-{% set sortBy = sortBy ?? (cacheId ? 'asc' : 'desc') %}
+{% set orderBy = orderBy ?? 'ownerTitle' %}
+{% set sortBy = sortBy ?? 'asc' %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
 {% set order = { (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) } %}
-{% if orderBy != 'title' %}
-    {% set order = order|merge({ 'title': SORT_ASC }) %}
+{% if orderBy != 'sortOrder' %}
+    {% set order = order|merge({ 'sortOrder': SORT_ASC }) %}
 {% endif %}
-{% set query = craft.blitz.diagnostics.getElementsQuery(siteId, elementType, cacheId)
+{% set query = craft.blitz.diagnostics.getNestedElementsQuery(siteId, elementType, cacheId)
     .orderBy(order) %}
 {% if search %}
-    {% do query.andWhere(['like', 'title', search]) %}
+    {% do query.andWhere([
+        'or',
+        ['like', 'entrytypes.name', search],
+        ['like', 'elements_owners_sites.title', search],
+    ]) %}
 {% endif %}
 
 {# The count can only be correctly calculated without a limit. #}
@@ -36,20 +40,19 @@
             <table class="data fullwidth">
                 <thead>
                     <tr>
-                        <th class="{{ orderBy == 'title' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="title" s-val:sort-by="{{ orderBy == 'title' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                        <th class="{{ orderBy == 'sortOrder' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="sortOrder" s-val:sort-by="{{ orderBy == 'sortOrder' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                Nested {{ displayName }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'ownerTitle' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="ownerTitle" s-val:sort-by="{{ orderBy == 'ownerTitle' and sortBy == 'asc' ? 'desc' : 'asc' }}">
                                 {{ displayName }}
                             </button>
                         </th>
                         {% if cacheId %}
                             <th>
                                 {{ 'Tracked Fields'|t('blitz') }}
-                            </th>
-                        {% else %}
-                            <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                                <button type="button" sprig s-val:order-by="count" s-val:sort-by="{{ orderBy == 'count' and sortBy == 'desc' ? 'asc' : 'desc' }}">
-                                    {{ 'Pages/Includes'|t('blitz') }}
-                                </button>
                             </th>
                         {% endif %}
                         <th class="{{ orderBy == 'expiryDate' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
@@ -71,6 +74,12 @@
                             <tr>
                                 <td>
                                     {{ craft.blitz.diagnostics.getElementChip(element, 'blitz/diagnostics/elements/pages-includes') }}
+                                    <em class="light">
+                                        ({{ row.sortOrder }})
+                                    </em>
+                                </td>
+                                <td>
+                                    {{ craft.blitz.diagnostics.getElementChip(element.owner, 'blitz/diagnostics/elements/pages-includes') }}
                                 </td>
                                 {% if cacheId %}
                                     <td>
@@ -121,10 +130,6 @@
                                             </span>
                                         {% endif %}
                                     </td>
-                                {% else %}
-                                    <td>
-                                        {{ row.count|number }}
-                                    </td>
                                 {% endif %}
                                 <td>
                                     {{ row.expiryDate ? craft.blitz.diagnostics.toDateTime(row.expiryDate)|datetime('short') }}
@@ -144,6 +149,6 @@
             </table>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
-        {{ include('blitz/_utilities/diagnostics/_includes/footer', { rows: elements }) }}
+        {{ include('blitz/_utilities/diagnostics/_includes/footer', { rows: elements, nested: true }) }}
     </div>
 </div>

@@ -20,6 +20,7 @@
                 {% set maxVisible = rows|length + offset %}
                 {{ (maxVisible > 0 ? offset + 1 : 0)|number }}–{{ maxVisible|number }}
                 of {{ total|number }}
+                {{ (nested ?? false) ? 'nested' }}
                 {{ (total == 1 ? displayName ?? '' : pluralDisplayName ?? '')|lower }}
             </div>
         </div>

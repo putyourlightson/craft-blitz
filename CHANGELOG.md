@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.6.0 - Unreleased
+
+### Added
+
+- Added the ability to track eager-loaded relation fields nested inside matrix blocks ([#657](https://github.com/putyourlightson/craft-blitz/issues/657)).
+
 ## 5.5.1 - 2024-07-23
 
 ### Changed

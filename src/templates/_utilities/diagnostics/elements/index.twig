@@ -21,13 +21,19 @@
                 {% for elementType in elementTypes %}
                     <tr>
                         <td>
-                            <a href="{{ url('blitz/diagnostics/elements/element-type', {
-                                elementType: elementType.type,
-                                nested: elementType.nested ? 1 : 0,
-                            }) }}">
-                                {{ elementType.nested ? 'Nested' }}
-                                {{ create(elementType.type).pluralDisplayName }}
-                            </a>
+                            {% if elementType.nested %}
+                                <a href="{{ url('blitz/diagnostics/elements/nested-element-type', {
+                                    elementType: elementType.type,
+                                }) }}">
+                                    Nested {{ create(elementType.type).pluralDisplayName }}
+                                </a>
+                            {% else %}
+                                <a href="{{ url('blitz/diagnostics/elements/element-type', {
+                                    elementType: elementType.type,
+                                }) }}">
+                                    {{ create(elementType.type).pluralDisplayName }}
+                                </a>
+                            {% endif %}
                         </td>
                         <td>
                             {{ elementType.count|number }}

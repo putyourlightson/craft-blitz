@@ -254,20 +254,15 @@ class DiagnosticsHelper
         return $queryStringParams;
     }
 
-    public static function getElementsQuery(int $siteId, string $elementType, bool $nested = false, ?int $cacheId = null): ActiveQuery
+    public static function getElementsQuery(int $siteId, string $elementType, ?int $cacheId = null): ActiveQuery
     {
         $condition = [
             'and',
             [CacheRecord::tableName() . '.siteId' => $siteId],
             ['elements_sites.siteId' => $siteId],
             ['type' => $elementType],
+            ['elements_owners.ownerId' => null],
         ];
-
-        if ($nested) {
-            $condition[] = ['not', ['ownerId' => null]];
-        } else {
-            $condition[] = ['ownerId' => null];
-        }
 
         if ($cacheId) {
             $condition[] = ['elementcaches.cacheId' => $cacheId];
@@ -283,6 +278,35 @@ class DiagnosticsHelper
             ->leftJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
             ->where($condition)
             ->groupBy(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'title'])
+            ->asArray();
+    }
+
+    public static function getNestedElementsQuery(int $siteId, string $elementType, ?int $cacheId = null): ActiveQuery
+    {
+        $condition = [
+            'and',
+            [CacheRecord::tableName() . '.siteId' => $siteId],
+            ['elements_sites.siteId' => $siteId],
+            ['type' => $elementType],
+            ['not', ['elements_owners.ownerId' => null]],
+        ];
+
+        if ($cacheId) {
+            $condition[] = ['elementcaches.cacheId' => $cacheId];
+        }
+
+        return ElementCacheRecord::find()
+            ->from(['elementcaches' => ElementCacheRecord::tableName()])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'elements_sites.title', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
+            ->innerJoinWith('cache')
+            ->innerJoinWith('element')
+            ->innerJoinWith('elementSite')
+            ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
+            ->leftJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
+            ->leftJoin(['elements_owners_sites' => Table::ELEMENTS_SITES], '[[elements_owners.ownerId]] = [[elements_owners_sites.elementId]]')
+            ->leftJoin(['entrytypes' => Table::ENTRYTYPES], '[[elements.fieldLayoutId]] = [[entrytypes.fieldLayoutId]]')
+            ->where($condition)
+            ->groupBy(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'title', 'sortOrder', 'ownerTitle', 'entryType'])
             ->asArray();
     }
 

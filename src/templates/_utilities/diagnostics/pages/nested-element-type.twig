@@ -5,7 +5,7 @@
     {% redirect 'blitz/diagnostics/pages' with error 'The page no longer exists or may have been refreshed.' %}
 {% endif %}
 {% set element = craft.blitz.diagnostics.getElementOfType(page.id) %}
-{% set title = 'Tracked ' ~ element.pluralDisplayName %}
+{% set title = 'Tracked Nested ' ~ element.pluralDisplayName %}
 {% set crumbs = [
     {
         html: tag('a', {
@@ -17,7 +17,7 @@
 ] %}
 
 {% block content %}
-    {{ sprig('blitz/_utilities/diagnostics/_components/elements', {
+    {{ sprig('blitz/_utilities/diagnostics/_components/nestedElements', {
         siteId: siteId,
         cacheId: page.id,
         elementType: className(element),
