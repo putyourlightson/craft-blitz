@@ -229,12 +229,7 @@ class GenerateCacheService extends Component
         $this->generateData->addElement($element);
 
         // Add eager-loaded fields since they will be accessed directly on the element
-        $fieldHandles = array_keys(CustomFieldBehavior::$fieldHandles);
-        foreach ($fieldHandles as $handle) {
-            if ($element->hasEagerLoadedElements($handle)) {
-                $this->generateData->addElementTrackField($element, $handle);
-            }
-        }
+        $this->addEagerLoadedFields($element);
 
         // Replace the custom field behavior with our own (only once)
         $customFields = $element->getBehavior('customFields');
@@ -630,6 +625,31 @@ class GenerateCacheService extends Component
         }
     }
 
+    /**
+     * Adds eager-loaded fields to an element recursively.
+     * https://github.com/putyourlightson/craft-blitz/issues/657
+     *
+     * @since 4.21.0
+     */
+    private function addEagerLoadedFields(ElementInterface $element): void
+    {
+        $fieldHandles = array_keys(CustomFieldBehavior::$fieldHandles);
+
+        foreach ($fieldHandles as $handle) {
+            if ($element->hasEagerLoadedElements($handle)) {
+                $this->generateData->addElementTrackField($element, $handle);
+                $eagerLoadedElements = $element->getEagerLoadedElements($handle);
+
+                foreach ($eagerLoadedElements as $eagerLoadedElement) {
+                    $this->addEagerLoadedFields($eagerLoadedElement);
+                }
+            }
+        }
+    }
+
+    /**
+     * Returns whether elements of a given type should be tracked.
+     */
     private function shouldTrackElementsOfType(string $elementType): bool
     {
         // Don’t proceed if element tracking is disabled
@@ -645,6 +665,9 @@ class GenerateCacheService extends Component
         return true;
     }
 
+    /**
+     * Returns whether element queries of a given type should be tracked.
+     */
     private function shouldTrackElementQueriesOfType(string $elementType): bool
     {
         // Don’t proceed if element query tracking is disabled

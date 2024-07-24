@@ -132,6 +132,7 @@ test('Element cache record is saved with custom fields with renamed handles', fu
 });
 
 test('Element cache record is saved with eager-loaded custom fields', function() {
+    createEntry();
     $entry = Entry::find()->with(['relatedTo'])->one();
     Blitz::$plugin->generateCache->addElement($entry);
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
@@ -140,6 +141,45 @@ test('Element cache record is saved with eager-loaded custom fields', function()
         ->toHaveRecordCount(1, ['elementId' => $entry->id])
         ->and(ElementFieldCacheRecord::class)
         ->toHaveRecordCount(1, ['elementId' => $entry->id]);
+});
+
+test('Element cache record is saved with nested eager-loaded custom fields', function() {
+    $childEntry = createEntryWithRelationship();
+    $entry = createEntryWithRelationship([$childEntry]);
+    Craft::$app->elements->eagerLoadElements(Entry::class, [$entry], ['relatedTo.relatedTo']);
+    Blitz::$plugin->generateCache->addElement($entry);
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+
+    expect(ElementCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id])
+        ->toHaveRecordCount(1, ['elementId' => $childEntry->id])
+        ->and(ElementFieldCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id])
+        ->toHaveRecordCount(1, ['elementId' => $childEntry->id]);
+});
+
+test('Element cache record is saved with eager-loaded matrix fields', function() {
+    $childEntry = createEntryWithRelationship();
+    $entry = createEntry(customFields: [
+        'matrix' => [
+            [
+                'type' => 'test',
+                'fields' => [
+                    'relatedTo' => [$childEntry->id],
+                ],
+            ],
+        ],
+    ]);
+    Craft::$app->elements->eagerLoadElements(Entry::class, [$entry], ['matrix.test:relatedTo.relatedTo']);
+    Blitz::$plugin->generateCache->addElement($entry);
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+
+    expect(ElementCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id])
+        ->toHaveRecordCount(1, ['elementId' => $childEntry->id])
+        ->and(ElementFieldCacheRecord::class)
+        ->toHaveRecordCount(1, ['elementId' => $entry->id])
+        ->toHaveRecordCount(1, ['elementId' => $childEntry->id]);
 });
 
 test('Element cache record is saved with eager-loaded custom fields in variable', function() {
@@ -207,8 +247,8 @@ test('Element cache records are saved with all statuses for eager-loaded relatio
 });
 
 test('Element cache records are saved respecting the criteria for eager-loaded relation field queries', function() {
-    $qualifyingEntry = createEntry(params: ['plainText' => '1']);
-    $nonQualifyingEntry = createEntry(params: ['plainText' => '2']);
+    $qualifyingEntry = createEntry(customFields: ['plainText' => '1']);
+    $nonQualifyingEntry = createEntry(customFields: ['plainText' => '2']);
     $entry = createEntryWithRelationship([$qualifyingEntry, $nonQualifyingEntry]);
 
     Blitz::$plugin->generateCache->reset();
