@@ -13,9 +13,11 @@ use craft\db\QueryAbortedException;
 use craft\db\Table;
 use craft\elements\GlobalSet;
 use craft\helpers\ArrayHelper;
+use craft\helpers\Cp;
 use craft\helpers\DateTimeHelper;
 use craft\helpers\Db;
 use craft\helpers\Json;
+use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use DateTime;
 use putyourlightson\blitz\Blitz;
@@ -30,6 +32,7 @@ use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\services\CacheRequestService;
+use Twig\Markup;
 use yii\db\ActiveRecordInterface;
 use yii\db\Expression;
 
@@ -314,6 +317,22 @@ class DiagnosticsHelper
             ->fixedOrder()
             ->indexBy('id')
             ->all();
+    }
+
+    public static function getElementChip(Element $element, ?string $uri = null): Markup
+    {
+        $value = Cp::elementChipHtml($element);
+
+        if ($uri !== null) {
+            $url = UrlHelper::cpUrl($uri, [
+                'siteId' => $element->siteId,
+                'elementId' => $element->id,
+                'elementType' => $element::class,
+            ]);
+            $value = str_replace($element->getCpEditUrl(), $url, $value);
+        }
+
+        return Template::raw($value);
     }
 
     public static function getPageTags(int $cacheId): array
