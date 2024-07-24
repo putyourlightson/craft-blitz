@@ -73,10 +73,7 @@
                         {% if element %}
                             <tr>
                                 <td>
-                                    {{ craft.blitz.diagnostics.getElementChip(element, 'blitz/diagnostics/elements/pages-includes') }}
-                                    <em class="light">
-                                        ({{ row.sortOrder }})
-                                    </em>
+                                    {{ craft.blitz.diagnostics.getNestedElementChip(element, 'blitz/diagnostics/elements/pages-includes', row.sortOrder) }}
                                 </td>
                                 <td>
                                     {{ craft.blitz.diagnostics.getElementChip(element.owner, 'blitz/diagnostics/elements/pages-includes') }}

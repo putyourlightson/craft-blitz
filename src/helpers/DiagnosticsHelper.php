@@ -343,20 +343,25 @@ class DiagnosticsHelper
             ->all();
     }
 
-    public static function getElementChip(Element $element, ?string $uri = null): Markup
+    public static function getElementChip(Element $element, string $uri): Markup
     {
-        $value = Cp::elementChipHtml($element);
+        $url = UrlHelper::cpUrl($uri, [
+            'siteId' => $element->siteId,
+            'elementId' => $element->id,
+            'elementType' => $element::class,
+        ]);
+        $html = Cp::elementChipHtml($element);
+        $html = str_replace($element->getCpEditUrl(), $url, $html);
 
-        if ($uri !== null) {
-            $url = UrlHelper::cpUrl($uri, [
-                'siteId' => $element->siteId,
-                'elementId' => $element->id,
-                'elementType' => $element::class,
-            ]);
-            $value = str_replace($element->getCpEditUrl(), $url, $value);
-        }
+        return Template::raw($html);
+    }
 
-        return Template::raw($value);
+    public static function getNestedElementChip(Element $element, string $uri, int $sortOrder): Markup
+    {
+        $html = self::getElementChip($element, $uri);
+        $html = str_replace('</craft-element-label>', '<em class="light">(' . $sortOrder . ')</em></craft-element-label>', $html);
+
+        return Template::raw($html);
     }
 
     public static function getPageTags(int $cacheId): array
