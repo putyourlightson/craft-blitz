@@ -32,6 +32,7 @@
 
 {% js %}
 toggleNestedElements();
+
 htmx.on('htmx:afterSwap', () => {
     toggleNestedElements();
     let elements = $('#results .elements');

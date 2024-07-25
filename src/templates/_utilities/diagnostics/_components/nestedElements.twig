@@ -65,6 +65,9 @@
                                             <button type="button" data-id="{{ owner.id }}" class="toggle expanded" title="Show/hide nested elements"></button>
                                             {{ craft.blitz.diagnostics.getElementChip(element.owner, 'blitz/diagnostics/elements/pages-includes') }}
                                         </th>
+                                        {% if cacheId %}
+                                            <td></td>
+                                        {% endif %}
                                     </tr>
                                 {% endif %}
                                 <tr class="nested-{{ owner.id }}">
