@@ -131,6 +131,14 @@ table.editable th.code {
     height: 100%;
 }
 
+.blitz-diagnostics .owner {
+    padding-left: 32px;
+}
+
+.blitz-diagnostics .nested {
+    padding-left: 86px;
+}
+
 .blitz-hints.loading .checkmark-icon {
     display: none;
 }

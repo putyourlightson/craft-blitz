@@ -60,8 +60,8 @@
                                 {% if currentOwnerId != element.ownerId %}
                                     {% set owner = element.owner %}
                                     {% set currentOwnerId = owner.id %}
-                                    <tr class="owner">
-                                        <th style="padding-left: 24px;">
+                                    <tr>
+                                        <th class="owner">
                                             <button type="button" data-id="{{ owner.id }}" class="toggle expanded" title="Show/hide nested elements"></button>
                                             {{ craft.blitz.diagnostics.getElementChip(element.owner, 'blitz/diagnostics/elements/pages-includes') }}
                                         </th>
@@ -71,7 +71,7 @@
                                     </tr>
                                 {% endif %}
                                 <tr class="nested-{{ owner.id }}">
-                                    <td style="padding-left: 48px;">
+                                    <td class="nested">
                                         {{ craft.blitz.diagnostics.getNestedElementChip(element, 'blitz/diagnostics/elements/pages-includes', row.sortOrder) }}
                                     </td>
                                     {% if cacheId %}
