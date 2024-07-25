@@ -1,13 +1,13 @@
 {% set cacheId = cacheId ?? null %}
-{% set orderBy = orderBy ?? 'ownerTitle' %}
 {% set sortBy = sortBy ?? 'asc' %}
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
+
 {% set search = search ?? null %}
-{% set order = { (orderBy): (sortBy == 'desc' ? SORT_DESC : SORT_ASC) } %}
-{% if orderBy != 'sortOrder' %}
-    {% set order = order|merge({ 'sortOrder': SORT_ASC }) %}
-{% endif %}
+{% set order = {
+    ownerTitle: (sortBy == 'desc' ? SORT_DESC : SORT_ASC),
+    sortOrder: SORT_ASC,
+} %}
 {% set query = craft.blitz.diagnostics.getNestedElementsQuery(siteId, elementType, cacheId)
     .orderBy(order) %}
 {% if search %}
@@ -34,116 +34,99 @@
         <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
     </div>
     <div id="results">
-        {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
         <div class="elements">
-            <table class="data fullwidth">
-                <thead>
-                    <tr>
-                        <th class="{{ orderBy == 'sortOrder' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="sortOrder" s-val:sort-by="{{ orderBy == 'sortOrder' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                Nested {{ displayName }}
-                            </button>
-                        </th>
-                        <th class="{{ orderBy == 'ownerTitle' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="ownerTitle" s-val:sort-by="{{ orderBy == 'ownerTitle' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                {{ displayName }}
-                            </button>
-                        </th>
-                        {% if cacheId %}
-                            <th>
-                                {{ 'Tracked Fields'|t('blitz') }}
+            <div class="tableview">
+                <table class="data fullwidth">
+                    <thead>
+                        <tr>
+                            <th class="ordered {{ sortBy == 'desc' ? 'desc' }} orderable">
+                                <button type="button" sprig s-val:sort-by="{{ sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                    Owner / Nested {{ displayName }}
+                                </button>
                             </th>
-                        {% endif %}
-                        <th class="{{ orderBy == 'expiryDate' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="expiryDate" s-val:sort-by="{{ orderBy == 'expiryDate' and sortBy == 'desc' ? 'asc' : 'desc' }}">
-                                {{ 'Expiry Date'|t('blitz') }}
-                            </button>
-                        </th>
-                        {% if hasUris %}
-                            <th class="thin">
-                                <span data-icon="world"></span>
-                            </th>
-                        {% endif %}
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in rows %}
-                        {% set element = elements[row.elementId] ?? null %}
-                        {% if element %}
-                            <tr>
-                                <td>
-                                    {{ craft.blitz.diagnostics.getNestedElementChip(element, 'blitz/diagnostics/elements/pages-includes', row.sortOrder) }}
-                                </td>
-                                <td>
-                                    {{ craft.blitz.diagnostics.getElementChip(element.owner, 'blitz/diagnostics/elements/pages-includes') }}
-                                </td>
-                                {% if cacheId %}
-                                    <td>
-                                        {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
-                                        {{ fields|length|number }}
-                                        {% if fields|length > 0 %}
-                                            <span class="info">
-                                                <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
-                                                <table class="data fullwidth">
-                                                    <thead>
-                                                        <th>{{ 'Name'|t('app') }}</th>
-                                                        <th>{{ 'Handle'|t('app') }}</th>
-                                                        <th>{{ 'Field Type'|t('app') }}</th>
-                                                        {% if isEntryElementType %}
-                                                            <th>{{ 'Entry Type'|t('app') }}</th>
-                                                        {% endif %}
-                                                    </thead>
-                                                    <tbody>
-                                                        {% for field in fields %}
-                                                            <tr>
-                                                                <td class="thin">
-                                                                    {{ field.name }}
-                                                                </td>
-                                                                <td class="thin code">
-                                                                    {{ field.handle }}
-                                                                </td>
-                                                                <td class="thin">
-                                                                    <div class="flex flex-nowrap gap-s">
-                                                                        <div class="cp-icon small">
-                                                                            {{ iconSvg(field.icon) }}
-                                                                        </div>
-                                                                        <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
-                                                                            {{ field.displayName }}
-                                                                        </a>
-                                                                    </div>
-                                                                </td>
-                                                                {% if isEntryElementType %}
+                            {% if cacheId %}
+                                <th>
+                                    {{ 'Tracked Fields'|t('blitz') }}
+                                </th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set currentOwnerId = null %}
+                        {% for row in rows %}
+                            {% set element = elements[row.elementId] ?? null %}
+                            {% if element %}
+                                {% if currentOwnerId != element.ownerId %}
+                                    {% set owner = element.owner %}
+                                    {% set currentOwnerId = owner.id %}
+                                    <tr class="owner">
+                                        <th style="padding-left: 24px;">
+                                            <button type="button" data-id="{{ owner.id }}" class="toggle expanded" title="Show/hide nested elements"></button>
+                                            {{ craft.blitz.diagnostics.getElementChip(element.owner, 'blitz/diagnostics/elements/pages-includes') }}
+                                        </th>
+                                    </tr>
+                                {% endif %}
+                                <tr class="nested-{{ owner.id }}">
+                                    <td style="padding-left: 48px;">
+                                        {{ craft.blitz.diagnostics.getNestedElementChip(element, 'blitz/diagnostics/elements/pages-includes', row.sortOrder) }}
+                                    </td>
+                                    {% if cacheId %}
+                                        <td>
+                                            {% set fields = craft.blitz.diagnostics.getPageElementFields(cacheId, row.elementId) %}
+                                            {{ fields|length|number }}
+                                            {% if fields|length > 0 %}
+                                                <span class="info">
+                                                    <h2>{{ 'Tracked Fields'|t('blitz') }}</h2>
+                                                    <table class="data fullwidth">
+                                                        <thead>
+                                                            <th>{{ 'Name'|t('app') }}</th>
+                                                            <th>{{ 'Handle'|t('app') }}</th>
+                                                            <th>{{ 'Field Type'|t('app') }}</th>
+                                                            {% if isEntryElementType %}
+                                                                <th>{{ 'Entry Type'|t('app') }}</th>
+                                                            {% endif %}
+                                                        </thead>
+                                                        <tbody>
+                                                            {% for field in fields %}
+                                                                <tr>
                                                                     <td class="thin">
-                                                                        <a href="{{ url('settings/entry-types/' ~ element.typeId) }}">
-                                                                            {{ element.type.name }}
-                                                                        </a>
+                                                                        {{ field.name }}
                                                                     </td>
-                                                                {% endif %}
-                                                            </tr>
-                                                        {% endfor %}
-                                                    </tbody>
-                                                </table>
-                                            </span>
-                                        {% endif %}
-                                    </td>
-                                {% endif %}
-                                <td>
-                                    {{ row.expiryDate ? craft.blitz.diagnostics.toDateTime(row.expiryDate)|datetime('short') }}
-                                </td>
-                                {% if hasUris %}
-                                    <td>
-                                        {% set url = element.url %}
-                                        {% if url %}
-                                            <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
-                                        {% endif %}
-                                    </td>
-                                {% endif %}
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
+                                                                    <td class="thin code">
+                                                                        {{ field.handle }}
+                                                                    </td>
+                                                                    <td class="thin">
+                                                                        <div class="flex flex-nowrap gap-s">
+                                                                            <div class="cp-icon small">
+                                                                                {{ iconSvg(field.icon) }}
+                                                                            </div>
+                                                                            <a href="{{ url('settings/fields/edit/' ~ field.id) }}">
+                                                                                {{ field.displayName }}
+                                                                            </a>
+                                                                        </div>
+                                                                    </td>
+                                                                    {% if isEntryElementType %}
+                                                                        <td class="thin">
+                                                                            <a href="{{ url('settings/entry-types/' ~ element.typeId) }}">
+                                                                                {{ element.type.name }}
+                                                                            </a>
+                                                                        </td>
+                                                                    {% endif %}
+                                                                </tr>
+                                                            {% endfor %}
+                                                        </tbody>
+                                                    </table>
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                </tr>
+                            {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
             <div class="update-spinner spinner spinner-absolute"></div>
         </div>
         {{ include('blitz/_utilities/diagnostics/_includes/footer', { rows: elements, nested: true }) }}

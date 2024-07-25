@@ -31,9 +31,19 @@
 {% endblock %}
 
 {% js %}
-htmx.on('htmx:afterSwap', function() {
+toggleNestedElements();
+htmx.on('htmx:afterSwap', () => {
+    toggleNestedElements();
     let elements = $('#results .elements');
     Craft.initUiElements(elements);
     Craft.cp.elementThumbLoader.load(elements);
 });
+
+function toggleNestedElements() {
+    $('#results .elements').find('.owner .toggle').on('click', function() {
+        let id = $(this).data('id');
+        $(this).toggleClass('expanded');
+        $(this).closest('table').find('.nested-' + id).toggleClass('hidden');
+    });
+}
 {% endjs %}
