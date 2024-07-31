@@ -1,5 +1,16 @@
 # Release Notes for Blitz
 
+## 4.22.0 - Unreleased
+
+### Added
+
+- Added a sidebar panel to element edit pages ([#690](https://github.com/putyourlightson/craft-blitz/issues/690)).
+- Added a `dateCached` column to cache records which is output in the sidebar panel and the Blitz Diagnostics utility.
+
+### Changed
+
+- Blitz now requires Craft CMS 4.5.0 or later.
+
 ## 4.21.0 - 2024-07-24
 
 ### Added

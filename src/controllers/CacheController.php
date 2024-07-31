@@ -11,6 +11,8 @@ use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\SidebarPanelHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
@@ -45,7 +47,7 @@ class CacheController extends Controller
         // Require permission if posted from utility or sidebar panel
         if ($request->getIsPost() && $request->getParam('utility')) {
             $this->requirePermission('blitz:' . $action->id);
-        } elseif ($request->getIsPost() && $request->getParam('sidebar-panel') && $action->id === 'refresh-urls') {
+        } elseif ($request->getIsPost() && $action->id === 'refresh-site-uri') {
             $this->requirePermission('blitz:view-sidebar-panel');
         } else {
             // Verify API key
@@ -209,6 +211,25 @@ class CacheController extends Controller
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
 
         return $this->getSuccessResponse('Tagged cache successfully refreshed.');
+    }
+
+    /**
+     * Refreshes a cached site URI.
+     *
+     * @used-by SidebarPanelHelper::getHtml()
+     */
+    public function actionRefreshSiteUri(): ?Response
+    {
+        $siteId = Craft::$app->getRequest()->getRequiredParam('siteId');
+        $uri = Craft::$app->getRequest()->getRequiredParam('uri');
+        $siteUri = new SiteUriModel([
+            'siteId' => $siteId,
+            'uri' => $uri,
+        ]);
+
+        Blitz::$plugin->refreshCache->refreshSiteUris([$siteUri]);
+
+        return $this->getSuccessResponse('Cached page successfully refreshed.');
     }
 
     /**
