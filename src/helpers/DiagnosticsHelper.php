@@ -63,18 +63,12 @@ class DiagnosticsHelper
 
     public static function getPagesCount(int $siteId): int
     {
-        return CacheRecord::find()
-            ->where(['siteId' => $siteId])
-            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
-            ->count();
+        return self::getPagesQuery($siteId)->count();
     }
 
     public static function getIncludesCount(int $siteId): int
     {
-        return CacheRecord::find()
-            ->where(['siteId' => $siteId])
-            ->andWhere(self::IS_CACHED_INCLUDE_CONDITION)
-            ->count();
+        return self::getIncludesQuery($siteId)->count();
     }
 
     public static function getParamsCount(int $siteId): int
@@ -218,7 +212,7 @@ class DiagnosticsHelper
         $index = self::getIncludesIndexColumnForSelect();
 
         return self::getBasePagesQuery($siteId)
-            ->select(['caches.id', 'siteId', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'dateCached', 'expiryDate'])
+            ->select(['caches.id', 'caches.siteId', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'dateCached', 'expiryDate'])
             ->innerJoin([
                 'indexes' => IncludeRecord::find()
                     ->where(['siteId' => $siteId]),

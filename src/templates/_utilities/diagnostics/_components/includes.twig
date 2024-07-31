@@ -66,6 +66,11 @@
                                 {{ 'Tags'|t('blitz') }}
                             </button>
                         </th>
+                        <th class="{{ orderBy == 'dateCached' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="dateCached" s-val:sort-by="{{ orderBy == 'dateCached' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Date Cached'|t('blitz') }}
+                            </button>
+                        </th>
                         <th class="{{ orderBy == 'expiryDate' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="expiryDate" s-val:sort-by="{{ orderBy == 'expiryDate' and sortBy == 'desc' ? 'asc' : 'desc' }}">
                                 {{ 'Expiry Date'|t('blitz') }}
@@ -109,6 +114,9 @@
                             </td>
                             <td>
                                 {{ (row.tagCount ?? 0)|number }}
+                            </td>
+                            <td>
+                                {{ row.dateCached ? craft.blitz.diagnostics.toDateTime(row.dateCached)|datetime('short') }}
                             </td>
                             <td>
                                 {{ row.expiryDate ? craft.blitz.diagnostics.toDateTime(row.expiryDate)|datetime('short') }}
