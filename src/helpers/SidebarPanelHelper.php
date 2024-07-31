@@ -27,6 +27,8 @@ class SidebarPanelHelper
             'uri' => $uri,
         ]);
         $cachedValue = Blitz::$plugin->cacheStorage->get($siteUri);
+
+        /** @var CacheRecord|null $cacheRecord */
         $cacheRecord = CacheRecord::find()
             ->where($siteUri->toArray())
             ->one();
