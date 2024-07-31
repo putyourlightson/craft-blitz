@@ -1,11 +1,63 @@
 {% import '_includes/forms' as forms %}
 
 <fieldset>
-    <legend class="h6">Blitz</legend>
+    <legend class="h6">
+        {{ 'Blitz Cache'|t('blitz') }}
+    </legend>
     <div class="meta">
         <div class="data">
-            <h5 class="heading">Status</h5>
-            <div class="value">{{ status|ucfirst }}</div>
+            <h5 class="heading">
+                {{ 'Status'|t('blitz') }}
+            </h5>
+            <div class="value" style="justify-content: space-between">
+                {% if cached %}
+                    {{ expired ? 'Expired'|t('blitz') : 'Cached'|t('blitz') }}
+                    {{ tag('button', {
+                        text: 'Refresh'|t('blitz'),
+                        class: 'blitzRefreshUrl btn small',
+                        data: {
+                            action: refreshActionUrl,
+                            url: url,
+                        },
+                    }) }}
+                {% else %}
+                    {{ 'Uncached'|t('blitz') }}
+                {% endif %}
+            </div>
         </div>
     </div>
 </fieldset>
+
+{% js %}
+    $('.blitzRefreshUrl').click(function(event) {
+        event.preventDefault();
+
+        if ($(this).hasClass('disabled')) {
+            return;
+        }
+
+        $(this).addClass('disabled');
+
+        const data = {
+            urls: $(this).data('url'),
+            'sidebar-panel': 1
+        };
+
+        Craft.sendActionRequest('POST', $(this).data('action'), {data})
+        .then((response) => {
+            Craft.cp.displayNotice(response.data.message);
+            $('.blitzRefreshUrl').closest('.value').html('Refreshed');
+        })
+        .catch(({response}) => {
+            if (response.data.message) {
+                Craft.cp.displayError(response.data.message);
+            }
+            else {
+                Craft.cp.displayError();
+            }
+        })
+        .finally(() => {
+            $(this).removeClass('disabled');
+        });
+    });
+{% endjs %}

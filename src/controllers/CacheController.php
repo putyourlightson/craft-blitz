@@ -42,9 +42,11 @@ class CacheController extends Controller
 
         $request = Craft::$app->getRequest();
 
-        // Require permission if posted from utility
+        // Require permission if posted from utility or sidebar panel
         if ($request->getIsPost() && $request->getParam('utility')) {
             $this->requirePermission('blitz:' . $action->id);
+        } elseif ($request->getIsPost() && $request->getParam('sidebar-panel') && $action->id === 'refresh-urls') {
+            $this->requirePermission('blitz:view-sidebar-panel');
         } else {
             // Verify API key
             $key = $request->getParam('key');

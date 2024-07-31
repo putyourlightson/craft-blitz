@@ -44,7 +44,7 @@ use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
-use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\helpers\SidebarPanelHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -562,16 +562,7 @@ class Blitz extends Plugin
     {
         Event::on(Entry::class, Entry::EVENT_DEFINE_SIDEBAR_HTML,
             function(DefineHtmlEvent $event) {
-                /** @var Entry $entry */
-                $entry = $event->sender;
-                $url = $entry->getUrl();
-                if ($url === null) {
-                    return;
-                }
-                $cachedValue = $this->cacheStorage->get(SiteUriHelper::getSiteUriFromUrl($url));
-                $event->html .= Craft::$app->getView()->renderTemplate('blitz/_sidebar-panel', [
-                    'status' => !empty($cachedValue) ? 'cached' : 'uncached',
-                ]);
+                $event->html .= SidebarPanelHelper::getHtml($event->sender);
             }
         );
     }
@@ -634,6 +625,9 @@ class Blitz extends Plugin
                         ],
                         'blitz:refresh-tagged' => [
                             'label' => Craft::t('blitz', 'Refresh tagged cache'),
+                        ],
+                        'blitz:view-sidebar-panel' => [
+                            'label' => Craft::t('blitz', 'View sidebar panel'),
                         ],
                     ],
                 ];
