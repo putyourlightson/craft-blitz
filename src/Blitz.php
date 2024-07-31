@@ -8,7 +8,6 @@ namespace putyourlightson\blitz;
 use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
-use craft\elements\Entry;
 use craft\elements\User;
 use craft\events\BatchElementActionEvent;
 use craft\events\DefineHtmlEvent;
@@ -560,9 +559,11 @@ class Blitz extends Plugin
      */
     private function registerSidebarPanels(): void
     {
-        Event::on(Entry::class, Entry::EVENT_DEFINE_SIDEBAR_HTML,
+        Event::on(Element::class, Element::EVENT_DEFINE_SIDEBAR_HTML,
             function(DefineHtmlEvent $event) {
-                $event->html .= SidebarPanelHelper::getHtml($event->sender);
+                /** @var Element $element */
+                $element = $event->sender;
+                $event->html .= SidebarPanelHelper::getHtml($element);
             }
         );
     }
@@ -627,7 +628,7 @@ class Blitz extends Plugin
                             'label' => Craft::t('blitz', 'Refresh tagged cache'),
                         ],
                         'blitz:view-sidebar-panel' => [
-                            'label' => Craft::t('blitz', 'View sidebar panel'),
+                            'label' => Craft::t('blitz', 'View sidebar panel on element edit pages'),
                         ],
                     ],
                 ];

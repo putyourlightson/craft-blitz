@@ -6,16 +6,16 @@
 namespace putyourlightson\blitz\helpers;
 
 use Craft;
-use craft\elements\Entry;
+use craft\base\Element;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\CacheRecord;
 
 class SidebarPanelHelper
 {
-    public static function getHtml(Entry $entry): string
+    public static function getHtml(Element $element): string
     {
-        $url = $entry->getUrl();
+        $url = $element->getUrl();
         if ($url === null) {
             return '';
         }
