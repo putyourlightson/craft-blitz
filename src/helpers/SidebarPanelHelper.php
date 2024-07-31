@@ -7,6 +7,8 @@ namespace putyourlightson\blitz\helpers;
 
 use Craft;
 use craft\base\Element;
+use craft\base\Event;
+use craft\events\DefineHtmlEvent;
 use craft\helpers\Db;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
@@ -15,6 +17,14 @@ use putyourlightson\blitz\records\CacheRecord;
 
 class SidebarPanelHelper
 {
+    /**
+     * @event DefineHtmlEvent
+     */
+    public const EVENT_DEFINE_HTML = 'defineHtml';
+
+    /**
+     * Returns the HTML for the sidebar panel.
+     */
     public static function getHtml(Element $element): string
     {
         $uri = $element->uri;
@@ -33,7 +43,7 @@ class SidebarPanelHelper
             ->where($siteUri->toArray())
             ->one();
 
-        return Craft::$app->getView()->renderTemplate('blitz/_sidebar-panel', [
+        $html = Craft::$app->getView()->renderTemplate('blitz/_sidebar-panel', [
             'cached' => !empty($cachedValue),
             'expired' => $cacheRecord && $cacheRecord->expiryDate && $cacheRecord->expiryDate <= Db::prepareDateForDb('now'),
             'dateCached' => $cacheRecord->dateCached ?? null,
@@ -44,5 +54,12 @@ class SidebarPanelHelper
                 'sidebarPanel' => 1,
             ]),
         ]);
+
+        $event = new DefineHtmlEvent([
+            'html' => $html,
+        ]);
+        Event::trigger(static::class, self::EVENT_DEFINE_HTML, $event);
+
+        return $event->html;
     }
 }
