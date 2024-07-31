@@ -12,13 +12,15 @@
             <div class="value cacheStatus" style="justify-content: space-between">
                 {% if cached %}
                     {{ expired ? 'Expired'|t('blitz') : 'Cached'|t('blitz') }}
-                    {{ tag('button', {
-                        text: 'Refresh'|t('blitz'),
-                        class: 'refresh btn small',
-                        data: {
-                            action: refreshActionUrl,
-                        },
-                    }) }}
+                    {% if currentUser.can('blitz:refresh-page') %}
+                        {{ tag('button', {
+                            text: 'Refresh'|t('blitz'),
+                            class: 'refresh btn small',
+                            data: {
+                                action: refreshActionUrl,
+                            },
+                        }) }}
+                    {% endif %}
                 {% else %}
                     {{ 'Uncached'|t('blitz') }}
                 {% endif %}
@@ -30,7 +32,7 @@
                     <div class="heading">
                         {{ 'Cached at'|t('blitz') }}
                     </div>
-                    <div class="value dateCached">
+                    <div class="value">
                         {{ dateCached|datetime('short') }}
                     </div>
                 </div>
@@ -38,9 +40,9 @@
             {% if expiryDate %}
                 <div class="data date">
                     <div class="heading">
-                        {{ 'Expiry Date'|t('blitz') }}
+                        {{ expired ? 'Expired at'|t('blitz') : 'Expires at'|t('blitz') }}
                     </div>
-                    <div class="value expiryDate">
+                    <div class="value">
                         {{ expiryDate|datetime('short') }}
                     </div>
                 </div>
@@ -75,7 +77,7 @@
         .then((response) => {
             Craft.cp.displaySuccess(response.data.message);
             $('.blitz-sidebar-panel .cacheStatus').html(Craft.t('blitz', 'Refreshed'));
-            $('.blitz-sidebar-panel .date').html('');
+            $('.blitz-sidebar-panel .date').remove();
         })
         .catch(({response}) => {
             if (response.data.message) {

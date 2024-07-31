@@ -218,7 +218,7 @@ class DiagnosticsHelper
         $index = self::getIncludesIndexColumnForSelect();
 
         return self::getBasePagesQuery($siteId)
-            ->select(['caches.id', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'dateCached', 'expiryDate'])
+            ->select(['caches.id', 'siteId', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'dateCached', 'expiryDate'])
             ->innerJoin([
                 'indexes' => IncludeRecord::find()
                     ->where(['siteId' => $siteId]),
@@ -642,7 +642,7 @@ class DiagnosticsHelper
     {
         $query = CacheRecord::find()
             ->from(['caches' => CacheRecord::tableName()])
-            ->select(['id', 'uri', 'elementCount', 'elementQueryCount', 'tagCount', 'dateCached', 'expiryDate'])
+            ->select(['id', 'siteId', 'uri', 'elementCount', 'elementQueryCount', 'tagCount', 'dateCached', 'expiryDate'])
             ->leftJoin([
                 'elements' => ElementCacheRecord::find()
                     ->select(['cacheId', 'count(*) as elementCount'])

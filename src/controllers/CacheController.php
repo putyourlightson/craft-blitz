@@ -45,10 +45,8 @@ class CacheController extends Controller
         $request = Craft::$app->getRequest();
 
         // Require permission if posted from utility or sidebar panel
-        if ($request->getIsPost() && $request->getParam('utility')) {
+        if ($request->getIsPost() && ($request->getParam('utility') || $request->getParam('sidebarPanel'))) {
             $this->requirePermission('blitz:' . $action->id);
-        } elseif ($request->getIsPost() && $action->id === 'refresh-site-uri') {
-            $this->requirePermission('blitz:view-sidebar-panel');
         } else {
             // Verify API key
             $key = $request->getParam('key');
@@ -214,11 +212,11 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes a cached site URI.
+     * Refreshes a cached page, forcing a clear.
      *
      * @used-by SidebarPanelHelper::getHtml()
      */
-    public function actionRefreshSiteUri(): ?Response
+    public function actionRefreshPage(): ?Response
     {
         $siteId = Craft::$app->getRequest()->getRequiredParam('siteId');
         $uri = Craft::$app->getRequest()->getRequiredParam('uri');
@@ -227,7 +225,7 @@ class CacheController extends Controller
             'uri' => $uri,
         ]);
 
-        Blitz::$plugin->refreshCache->refreshSiteUris([$siteUri]);
+        Blitz::$plugin->refreshCache->refreshSiteUris([$siteUri], [], true);
 
         return $this->getSuccessResponse('Cached page successfully refreshed.');
     }

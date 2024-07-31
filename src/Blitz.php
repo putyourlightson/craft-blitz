@@ -627,6 +627,9 @@ class Blitz extends Plugin
                         'blitz:refresh-tagged' => [
                             'label' => Craft::t('blitz', 'Refresh tagged cache'),
                         ],
+                        'blitz:refresh-page' => [
+                            'label' => Craft::t('blitz', 'Refresh pages via the sidebar panel and diagnostics utility'),
+                        ],
                         'blitz:view-sidebar-panel' => [
                             'label' => Craft::t('blitz', 'View sidebar panel on element edit pages'),
                         ],

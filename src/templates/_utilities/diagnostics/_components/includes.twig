@@ -74,7 +74,7 @@
                         <th class="thin">
                             <span data-icon="world"></span>
                         </th>
-                        {% if currentUser.can('blitz:refresh-urls') %}
+                        {% if currentUser.can('blitz:refresh-page') %}
                             <th class="thin">
                                 <span data-icon="refresh"></span>
                             </th>
@@ -116,9 +116,9 @@
                             <td class="thin">
                                 <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
                             </td>
-                            {% if currentUser.can('blitz:refresh-urls') %}
+                            {% if currentUser.can('blitz:refresh-page') %}
                                 <td class="thin">
-                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" title="Refresh" data-icon="refresh"></a>
+                                    <a sprig s-action="blitz/cache/refresh-page" s-method="post" s-val:site-id="{{ row.siteId }}" s-val:uri="{{ row.uri }}" title="Refresh" data-icon="refresh"></a>
                                 </td>
                             {% endif %}
                         </tr>

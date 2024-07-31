@@ -7,8 +7,8 @@ namespace putyourlightson\blitz\helpers;
 
 use Craft;
 use craft\base\Element;
+use craft\helpers\Db;
 use craft\helpers\UrlHelper;
-use DateTime;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
@@ -35,12 +35,13 @@ class SidebarPanelHelper
 
         return Craft::$app->getView()->renderTemplate('blitz/_sidebar-panel', [
             'cached' => !empty($cachedValue),
-            'expired' => $cacheRecord && $cacheRecord->expiryDate && $cacheRecord->expiryDate <= (new DateTime()),
+            'expired' => $cacheRecord && $cacheRecord->expiryDate && $cacheRecord->expiryDate <= Db::prepareDateForDb('now'),
             'dateCached' => $cacheRecord->dateCached ?? null,
             'expiryDate' => $cacheRecord->expiryDate ?? null,
-            'refreshActionUrl' => UrlHelper::actionUrl('blitz/cache/refresh-site-uri', [
+            'refreshActionUrl' => UrlHelper::actionUrl('blitz/cache/refresh-page', [
                 'siteId' => $element->siteId,
                 'uri' => $uri,
+                'sidebarPanel' => 1,
             ]),
         ]);
     }
