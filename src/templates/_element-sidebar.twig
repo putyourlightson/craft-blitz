@@ -23,7 +23,7 @@
 </div>
 {% if cached %}
     {% if dateCached %}
-        <div class="data date">
+        <div class="data live">
             <div class="heading">
                 {{ 'Cached at'|t('blitz') }}
             </div>
@@ -33,7 +33,7 @@
         </div>
     {% endif %}
     {% if expiryDate %}
-        <div class="data date">
+        <div class="data live">
             <div class="heading">
                 {{ expired ? 'Expired at'|t('blitz') : 'Expires at'|t('blitz') }}
             </div>
@@ -70,7 +70,7 @@
         .then((response) => {
             Craft.cp.displaySuccess(response.data.message);
             $('.blitz-element-sidebar .cacheStatus').html(Craft.t('blitz', 'Refreshed'));
-            $('.blitz-element-sidebar .date').remove();
+            $('.blitz-element-sidebar .live').remove();
         })
         .catch(({response}) => {
             if (response.data.message) {

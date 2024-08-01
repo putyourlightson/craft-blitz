@@ -8,7 +8,7 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\Element;
 use craft\base\Event;
-use craft\events\DefineHtmlEvent;
+use craft\events\DefineElementEditorHtmlEvent;
 use craft\helpers\Db;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
@@ -38,17 +38,13 @@ class ElementSidebarHelper
             return '';
         }
 
-        $siteUri = new SiteUriModel([
-            'siteId' => $element->siteId,
-            'uri' => $element->uri,
-        ]);
-
         $html = Html::beginTag('fieldset', ['class' => 'blitz-element-sidebar']) .
             Html::tag('legend', 'Blitz', ['class' => 'h6']) .
-            Html::tag('div', self::metaFieldsHtml($siteUri), ['class' => 'meta']) .
+            Html::tag('div', self::metaFieldsHtml($element), ['class' => 'meta']) .
             Html::endTag('fieldset');
 
-        $event = new DefineHtmlEvent([
+        $event = new DefineElementEditorHtmlEvent([
+            'element' => $element,
             'html' => $html,
         ]);
         Event::trigger(self::class, self::EVENT_DEFINE_SIDEBAR_HTML, $event);
@@ -56,8 +52,12 @@ class ElementSidebarHelper
         return $event->html;
     }
 
-    private static function metaFieldsHtml(SiteUriModel $siteUri): string
+    private static function metaFieldsHtml(Element $element): string
     {
+        $siteUri = new SiteUriModel([
+            'siteId' => $element->siteId,
+            'uri' => $element->uri,
+        ]);
         $cachedValue = Blitz::$plugin->cacheStorage->get($siteUri);
 
         /** @var CacheRecord|null $cacheRecord */
@@ -70,14 +70,11 @@ class ElementSidebarHelper
             'expired' => $cacheRecord && $cacheRecord->expiryDate && $cacheRecord->expiryDate <= Db::prepareDateForDb('now'),
             'dateCached' => $cacheRecord->dateCached ?? null,
             'expiryDate' => $cacheRecord->expiryDate ?? null,
-            'refreshActionUrl' => UrlHelper::actionUrl('blitz/cache/refresh-page', [
-                'siteId' => $siteUri->siteId,
-                'uri' => $siteUri->uri,
-                'sidebarPanel' => 1,
-            ]),
+            'refreshActionUrl' => UrlHelper::actionUrl('blitz/cache/refresh-page', $siteUri->toArray()),
         ]);
 
-        $event = new DefineHtmlEvent([
+        $event = new DefineElementEditorHtmlEvent([
+            'element' => $element,
             'html' => $html,
         ]);
         Event::trigger(self::class, self::EVENT_DEFINE_META_FIELDS_HTML, $event);
