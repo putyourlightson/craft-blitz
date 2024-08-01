@@ -43,8 +43,8 @@ class CacheController extends Controller
 
         $request = Craft::$app->getRequest();
 
-        // Require permission if posted from utility or sidebar panel
-        if ($request->getIsPost() && ($request->getParam('utility') || $request->getParam('sidebarPanel'))) {
+        // Require permission if posted from the CP
+        if ($request->getIsPost() && $request->getIsCpRequest()) {
             $this->requirePermission('blitz:' . $action->id);
         } else {
             // Verify API key
@@ -211,9 +211,7 @@ class CacheController extends Controller
     }
 
     /**
-     * Refreshes a cached page, forcing a clear.
-     *
-     * @used-by SidebarPanelHelper::getHtml()
+     * Refreshes a cached page, forcing a clear. Used by the element sidebar panel and diagnostics utility.
      */
     public function actionRefreshPage(): ?Response
     {
