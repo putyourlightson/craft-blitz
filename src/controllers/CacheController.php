@@ -11,7 +11,6 @@ use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\SidebarPanelHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;

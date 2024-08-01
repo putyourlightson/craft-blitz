@@ -1,0 +1,87 @@
+{% import '_includes/forms' as forms %}
+
+<div class="data">
+    <div class="heading">
+        {{ 'Status'|t('blitz') }}
+    </div>
+    <div class="value cacheStatus" style="justify-content: space-between">
+        {% if cached %}
+            {{ expired ? 'Expired'|t('blitz') : 'Cached'|t('blitz') }}
+            {% if currentUser.can('blitz:refresh-page') %}
+                {{ tag('button', {
+                    text: 'Refresh'|t('blitz'),
+                    class: 'refresh btn small',
+                    data: {
+                        action: refreshActionUrl,
+                    },
+                }) }}
+            {% endif %}
+        {% else %}
+            {{ 'Uncached'|t('blitz') }}
+        {% endif %}
+    </div>
+</div>
+{% if cached %}
+    {% if dateCached %}
+        <div class="data date">
+            <div class="heading">
+                {{ 'Cached at'|t('blitz') }}
+            </div>
+            <div class="value">
+                {{ dateCached|datetime('short') }}
+            </div>
+        </div>
+    {% endif %}
+    {% if expiryDate %}
+        <div class="data date">
+            <div class="heading">
+                {{ expired ? 'Expired at'|t('blitz') : 'Expires at'|t('blitz') }}
+            </div>
+            <div class="value">
+                {{ expiryDate|datetime('short') }}
+            </div>
+        </div>
+    {% endif %}
+{% endif %}
+
+{% css %}
+    .blitz-element-sidebar .meta .data:first-of-type {
+        padding-top: 8px;
+    }
+    .blitz-element-sidebar .meta .data:last-of-type {
+        padding-bottom: 8px;
+    }
+    .blitz-element-sidebar .meta .data {
+        min-height: 0;
+    }
+{% endcss %}
+
+{% js %}
+    $('.blitz-element-sidebar .refresh').click(function(event) {
+        event.preventDefault();
+
+        if ($(this).hasClass('disabled')) {
+            return;
+        }
+
+        $(this).addClass('disabled');
+
+        Craft.sendActionRequest('POST', $(this).data('action'))
+        .then((response) => {
+            Craft.cp.displaySuccess(response.data.message);
+            $('.blitz-element-sidebar .cacheStatus').html(Craft.t('blitz', 'Refreshed'));
+            $('.blitz-element-sidebar .date').remove();
+        })
+        .catch(({response}) => {
+            if (response.data.message) {
+                Craft.cp.displayError(response.data.message);
+            }
+            else {
+                Craft.cp.displayError();
+            }
+        })
+        .finally(() => {
+            $(this).removeClass('disabled');
+        });
+    });
+{% endjs %}

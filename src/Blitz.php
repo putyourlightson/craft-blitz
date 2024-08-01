@@ -41,9 +41,9 @@ use putyourlightson\blitz\drivers\deployers\BaseDeployer;
 use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
+use putyourlightson\blitz\helpers\ElementSidebarHelper;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
-use putyourlightson\blitz\helpers\SidebarPanelHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -563,7 +563,7 @@ class Blitz extends Plugin
             function(DefineHtmlEvent $event) {
                 /** @var Element $element */
                 $element = $event->sender;
-                $event->html .= SidebarPanelHelper::getHtml($element);
+                $event->html .= ElementSidebarHelper::getSidebarHtml($element);
             }
         );
     }
