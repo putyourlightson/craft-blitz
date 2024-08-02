@@ -33,6 +33,10 @@ class ElementSidebarHelper
      */
     public static function getSidebarHtml(Element $element): string
     {
+        if (Blitz::$plugin->settings->cachingEnabled === false) {
+            return '';
+        }
+
         $uri = $element->uri;
         if ($uri === null) {
             return '';
@@ -68,6 +72,7 @@ class ElementSidebarHelper
         $html = Craft::$app->getView()->renderTemplate('blitz/_element-sidebar', [
             'cached' => !empty($cachedValue),
             'expired' => $cacheRecord && $cacheRecord->expiryDate && $cacheRecord->expiryDate <= Db::prepareDateForDb('now'),
+            'isCacheable' => Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri),
             'dateCached' => $cacheRecord->dateCached ?? null,
             'expiryDate' => $cacheRecord->expiryDate ?? null,
             'refreshActionUrl' => UrlHelper::actionUrl('blitz/cache/refresh-page', $siteUri->toArray()),

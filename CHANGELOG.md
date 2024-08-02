@@ -2,6 +2,9 @@
 
 ## 4.22.0 - Unreleased
 
+> [!NOTE]
+> For the cache and expiry dates to appear in the new sidebar panel, the cache should be cleared or refreshed after this update completes.
+
 ### Added
 
 - Added a sidebar panel to element edit pages ([#690](https://github.com/putyourlightson/craft-blitz/issues/690)).

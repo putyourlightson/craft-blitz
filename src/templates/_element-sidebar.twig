@@ -16,8 +16,15 @@
                     },
                 }) }}
             {% endif %}
-        {% else %}
+        {% elseif isCacheable %}
             {{ 'Uncached'|t('blitz') }}
+        {% else %}
+            <div>
+                {{ 'Not cacheable'|t('blitz') }}
+                <span class="info">
+                    {{ 'This page is not cacheable due to the Blitz URI pattern settings.'|t('blitz') }}
+                </span>
+            </div>
         {% endif %}
     </div>
 </div>
