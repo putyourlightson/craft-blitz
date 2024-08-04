@@ -12,6 +12,10 @@
 - Added the ability to track eager-loaded relation fields nested inside matrix blocks ([#657](https://github.com/putyourlightson/craft-blitz/issues/657)).
 - Added a structure view to tracked nested element pages in the Blitz Diagnostics utility.
 
+### Changed
+
+- The `craft.blitz.csrfInput()`, `craft.blitz.csrfParam()` and `craft.blitz.csrfToken()` functions now output inline values rather than inject scripts when called via AJAX requests.
+
 ## 5.5.1 - 2024-07-23
 
 ### Changed
