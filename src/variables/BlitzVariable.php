@@ -340,6 +340,7 @@ class BlitzVariable
                 'input' => Html::csrfInput(['async' => false]),
                 'param' => $request->csrfParam,
                 'token' => $request->getCsrfToken(),
+                default => '',
             };
 
             return Template::raw($value);
