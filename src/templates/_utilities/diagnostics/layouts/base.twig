@@ -33,7 +33,7 @@
 {% js %}
 toggleNestedElements();
 
-htmx.on('htmx:afterSwap', () => {
+$('body').on('htmx:afterSwap', () => {
     toggleNestedElements();
     let elements = $('#results .elements');
     Craft.initUiElements(elements);
