@@ -73,7 +73,7 @@ class ElementSidebarHelper
             'cached' => !empty($cachedValue),
             'expired' => $cacheRecord && $cacheRecord->expiryDate && $cacheRecord->expiryDate <= Db::prepareDateForDb('now'),
             'isCacheable' => Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri),
-            'pageId' => $cacheRecord->id,
+            'pageId' => $cacheRecord->id ?? null,
             'dateCached' => $cacheRecord->dateCached ?? null,
             'expiryDate' => $cacheRecord->expiryDate ?? null,
             'refreshActionUrl' => UrlHelper::actionUrl('blitz/cache/refresh-page', $siteUri->toArray()),

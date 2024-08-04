@@ -4,7 +4,7 @@
     <div class="heading">
         {{ 'Status'|t('blitz') }}
     </div>
-    <div class="value cacheStatus" style="justify-content: space-between">
+    <div class="value live" style="justify-content: space-between">
         {% if cached %}
             <div>
                 {{ expired ? 'Expired'|t('blitz') : 'Cached'|t('blitz') }}
@@ -40,6 +40,12 @@
             </div>
         {% endif %}
     </div>
+    <div class="value refreshed hidden">
+        <div>
+            {{ 'Refreshed'|t('blitz') }}
+            <span class="success" style="vertical-align: text-bottom;" data-icon="check"></span>
+        </div>
+    </div>
 </div>
 {% if cached %}
     {% if dateCached %}
@@ -65,14 +71,14 @@
 {% endif %}
 
 {% css %}
+    .blitz-element-sidebar .meta .data {
+        min-height: 0;
+    }
     .blitz-element-sidebar .meta .data:first-of-type {
         padding-top: 8px;
     }
     .blitz-element-sidebar .meta .data:last-of-type {
         padding-bottom: 8px;
-    }
-    .blitz-element-sidebar .meta .data {
-        min-height: 0;
     }
 {% endcss %}
 
@@ -89,8 +95,8 @@
         Craft.sendActionRequest('POST', $(this).data('action'))
         .then((response) => {
             Craft.cp.displaySuccess(response.data.message);
-            $('.blitz-element-sidebar .cacheStatus').html(Craft.t('blitz', 'Refreshed'));
             $('.blitz-element-sidebar .live').remove();
+            $('.blitz-element-sidebar .refreshed').removeClass('hidden');
         })
         .catch(({response}) => {
             if (response.data.message) {
