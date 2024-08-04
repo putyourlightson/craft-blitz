@@ -582,17 +582,29 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers sidebar panels
+     * Registers sidebar panels. Sidebar panels are registered on eligible element types first, followed by on other element types, so that they are displayed in the expected position.
      *
      * @since 4.22.0
      */
     private function registerSidebarPanels(): void
     {
+        foreach (ElementSidebarHelper::ELIGIBLE_ELEMENT_TYPES as $elementType) {
+            Event::on($elementType, $elementType::EVENT_DEFINE_SIDEBAR_HTML,
+                function(DefineHtmlEvent $event) {
+                    /** @var Element $element */
+                    $element = $event->sender;
+                    $event->html .= ElementSidebarHelper::getSidebarHtml($element);
+                },
+            );
+        }
+
         Event::on(Element::class, Element::EVENT_DEFINE_SIDEBAR_HTML,
             function(DefineHtmlEvent $event) {
                 /** @var Element $element */
                 $element = $event->sender;
-                $event->html .= ElementSidebarHelper::getSidebarHtml($element);
+                if (!in_array($element::class, ElementSidebarHelper::ELIGIBLE_ELEMENT_TYPES)) {
+                    $event->html .= ElementSidebarHelper::getSidebarHtml($element);
+                }
             },
         );
     }
