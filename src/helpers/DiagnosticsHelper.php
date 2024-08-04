@@ -105,7 +105,6 @@ class DiagnosticsHelper
     {
         $pageId = Craft::$app->getRequest()->getRequiredParam('pageId');
         $page = CacheRecord::find()
-            ->select(['id', 'uri'])
             ->where(['id' => $pageId])
             ->asArray()
             ->one();

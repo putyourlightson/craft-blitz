@@ -6,10 +6,24 @@
 {% endif %}
 {% set elementTypes = craft.blitz.diagnostics.getElementTypes(siteId, page.id) %}
 {% set elementQueryTypes = craft.blitz.diagnostics.getElementQueryTypes(siteId, page.id) %}
+{% set tags = craft.blitz.diagnostics.getPageTags(page.id) %}
 {% set title = page.uri %}
 {% set codeTitle = true %}
 
 {% block content %}
+    {% if page.dateCached %}
+        <h1>
+            {{ 'Date Cached'|t('blitz') }}:
+            {{ craft.blitz.diagnostics.toDateTime(page.dateCached)|datetime('short') }}
+        </h1>
+    {% endif %}
+    {% if page.expiryDate %}
+        <h1>
+            {{ 'Expiry Date'|t('blitz') }}:
+            {{  craft.blitz.diagnostics.toDateTime(page.expiryDate)|datetime('short') }}
+        </h1>
+    {% endif %}
+    <br>
     <h1>
         {{ 'Tracked Elements'|t('blitz') }}
     </h1>
@@ -73,6 +87,34 @@
                         </td>
                         <td>
                             {{ elementQueryType.count|number }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <h1>
+        {{ 'Tracked Tags'|t('blitz') }}
+    </h1>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Tag'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tag in tags %}
+                    <tr>
+                        <td class="code">
+                            <a href="{{ url('blitz/diagnostics/tags/tag', {
+                                tag: tag
+                            }) }}">
+                                {{ tag }}
+                            </a>
                         </td>
                     </tr>
                 {% endfor %}
