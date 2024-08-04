@@ -8,6 +8,8 @@ namespace putyourlightson\blitz\helpers;
 use Craft;
 use craft\base\Element;
 use craft\base\Event;
+use craft\elements\Category;
+use craft\elements\Entry;
 use craft\events\DefineElementEditorHtmlEvent;
 use craft\helpers\Db;
 use craft\helpers\Html;
@@ -27,6 +29,17 @@ class ElementSidebarHelper
      * @event DefineHtmlEvent
      */
     public const EVENT_DEFINE_META_FIELDS_HTML = 'defineMetaFieldsHtml';
+
+    /**
+     * @const string[]
+     */
+    public const ELIGIBLE_ELEMENT_TYPES = [
+        Entry::class,
+        Category::class,
+        'craft\commerce\elements\Product',
+        'putyourlightson\campaign\elements\CampaignElement',
+        'putyourlightson\campaign\elements\MailingListElement',
+    ];
 
     /**
      * Returns the HTML for the sidebar.
