@@ -13,6 +13,7 @@
 ### Changed
 
 - Blitz now requires Craft CMS 4.5.0 or later.
+- The `craft.blitz.csrfInput()`, `craft.blitz.csrfParam()` and `craft.blitz.csrfToken()` functions now output inline values rather than inject scripts when called via AJAX requests.
 
 ## 4.21.0 - 2024-07-24
 

@@ -130,11 +130,11 @@ class BlitzVariable
     }
 
     /**
-     * Returns a script to get a CSRF input field.
+     * Returns a CSRF input field or a script to inject it.
      */
     public function csrfInput(): Markup
     {
-        return $this->getCsrfScript('input');
+        return $this->getCsrfProperty('input');
     }
 
     /**
@@ -142,15 +142,15 @@ class BlitzVariable
      */
     public function csrfParam(): Markup
     {
-        return $this->getCsrfScript('param');
+        return $this->getCsrfProperty('param');
     }
 
     /**
-     * Returns a script to get a CSRF token.
+     * Returns a CSRF token or a script to inject it.
      */
     public function csrfToken(): Markup
     {
-        return $this->getCsrfScript('token');
+        return $this->getCsrfProperty('token');
     }
 
     /**
@@ -329,10 +329,22 @@ class BlitzVariable
     }
 
     /**
-     * Returns a script to inject the output of a CSRF property.
+     * Returns a CSRF property or a script to inject it, if this is not an AJAX request.
      */
-    private function getCsrfScript(string $property): Markup
+    private function getCsrfProperty(string $property): Markup
     {
+        $request = Craft::$app->getRequest();
+
+        if ($request->getIsAjax()) {
+            $value = match ($property) {
+                'input' => Html::csrfInput(['async' => false]),
+                'param' => $request->csrfParam,
+                'token' => $request->getCsrfToken(),
+            };
+
+            return Template::raw($value);
+        }
+
         $uri = $this->getActionUrl('blitz/csrf/json');
         $config = new VariableConfigModel(['property' => $property]);
 

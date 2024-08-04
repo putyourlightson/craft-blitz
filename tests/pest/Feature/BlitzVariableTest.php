@@ -66,3 +66,20 @@ test('Fetch URI tag does not contain unencoded slashes in params', function() {
         ->not()
         ->toContain('/');
 });
+
+test('The CSRF input function returns a Blitz inject script', function() {
+    $variable = new BlitzVariable();
+    $csrfInput = (string)$variable->csrfInput();
+
+    expect($csrfInput)
+        ->toContain('id="blitz-inject-1"');
+});
+
+test('The CSRF input function called in an AJAX request does not return a Blitz inject script', function() {
+    Craft::$app->getRequest()->getHeaders()->set('X-Requested-With', 'XMLHttpRequest');
+    $variable = new BlitzVariable();
+    $csrfInput = (string)$variable->csrfInput();
+
+    expect($csrfInput)
+        ->not()->toContain('id="blitz-inject-1"');
+});
