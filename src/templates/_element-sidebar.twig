@@ -6,7 +6,14 @@
     </div>
     <div class="value cacheStatus" style="justify-content: space-between">
         {% if cached %}
-            {{ expired ? 'Expired'|t('blitz') : 'Cached'|t('blitz') }}
+            <div>
+                {{ expired ? 'Expired'|t('blitz') : 'Cached'|t('blitz') }}
+                {% if currentUser.can('utility:blitz-diagnostics') %}
+                    <a href="{{ url('blitz/diagnostics/pages/page', { pageId: pageId }) }}" target="_blank">
+                        <span data-icon="tool" style="vertical-align: text-bottom"></span>
+                    </a>
+                {% endif %}
+            </div>
             {% if currentUser.can('blitz:refresh-page') %}
                 {{ tag('button', {
                     text: 'Refresh'|t('blitz'),
@@ -23,6 +30,12 @@
                 {{ 'Not cacheable'|t('blitz') }}
                 <span class="info">
                     {{ 'This page is not cacheable due to the Blitz URI pattern settings.'|t('blitz') }}
+                    {% if currentUser.admin and craft.app.config.general.allowAdminChanges %}
+                        <br>
+                        <a href="{{ url('settings/plugins/blitz') }}" class="go" target="_blank">
+                            {{- 'View settings'|t('blitz') -}}
+                        </a>
+                    {% endif %}
                 </span>
             </div>
         {% endif %}
@@ -34,7 +47,7 @@
             <div class="heading">
                 {{ 'Cached at'|t('blitz') }}
             </div>
-            <div class="value">
+            <div class="value" style="justify-content: space-between">
                 {{ dateCached|datetime('short') }}
             </div>
         </div>

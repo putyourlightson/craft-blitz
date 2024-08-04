@@ -564,7 +564,7 @@ class Blitz extends Plugin
                 /** @var Element $element */
                 $element = $event->sender;
                 $event->html .= ElementSidebarHelper::getSidebarHtml($element);
-            }
+            },
         );
     }
 
