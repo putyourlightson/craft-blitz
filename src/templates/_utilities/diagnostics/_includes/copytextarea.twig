@@ -26,7 +26,7 @@
         $('#{{ buttonId|namespaceInputId|e('js') }}').on('click', function() {
             document.getElementById('{{ id|namespaceInputId|e('js') }}').select();
             document.execCommand('copy');
-            Craft.cp.displayNotice("{{ 'Copied to clipboard.'|t('app')|e('js') }}");
+            Craft.cp.displaySuccess("{{ 'Copied to clipboard.'|t('app')|e('js') }}");
             $(this).parent().trigger('copy');
             document.getElementById('{{ id|namespaceInputId|e('js') }}').setSelectionRange(0, 0);
         });
@@ -39,7 +39,7 @@
         $('#{{ buttonId|namespaceInputId|e('js') }}').on('click', function() {
             document.getElementById('{{ id|namespaceInputId|e('js') }}').select();
             document.execCommand('copy');
-            Craft.cp.displayNotice("{{ 'Copied to clipboard.'|t('app')|e('js') }}");
+            Craft.cp.displaySuccess("{{ 'Copied to clipboard.'|t('app')|e('js') }}");
             $(this).parent().trigger('copy');
             document.getElementById('{{ id|namespaceInputId|e('js') }}').setSelectionRange(0, 0);
         });

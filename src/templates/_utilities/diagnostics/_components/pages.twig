@@ -36,7 +36,6 @@
     <div id="results">
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
-        {{ hiddenInput('utility', 1) }}
         <div class="elements">
             <table class="data fullwidth">
                 <thead>
@@ -61,6 +60,11 @@
                                 {{ 'Tags'|t('blitz') }}
                             </button>
                         </th>
+                        <th class="{{ orderBy == 'dateCached' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="dateCached" s-val:sort-by="{{ orderBy == 'dateCached' and sortBy == 'desc' ? 'asc' : 'desc' }}">
+                                {{ 'Date Cached'|t('blitz') }}
+                            </button>
+                        </th>
                         <th class="{{ orderBy == 'expiryDate' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="expiryDate" s-val:sort-by="{{ orderBy == 'expiryDate' and sortBy == 'desc' ? 'asc' : 'desc' }}">
                                 {{ 'Expiry Date'|t('blitz') }}
@@ -69,7 +73,7 @@
                         <th class="thin">
                             <span data-icon="world"></span>
                         </th>
-                        {% if currentUser.can('blitz:refresh-urls') %}
+                        {% if currentUser.can('blitz:refresh-page') %}
                             <th class="thin">
                                 <span data-icon="refresh"></span>
                             </th>
@@ -121,14 +125,17 @@
                                 {% endif %}
                             </td>
                             <td>
+                                {{ row.dateCached ? craft.blitz.diagnostics.toDateTime(row.dateCached)|datetime('short') }}
+                            </td>
+                            <td>
                                 {{ row.expiryDate ? craft.blitz.diagnostics.toDateTime(row.expiryDate)|datetime('short') }}
                             </td>
                             <td class="thin">
                                 <a href="{{ url }}" title="Visit webpage" rel="noopener" target="_blank" data-icon="world" aria-label="View"></a>
                             </td>
-                            {% if currentUser.can('blitz:refresh-urls') %}
+                            {% if currentUser.can('blitz:refresh-page') %}
                                 <td class="thin">
-                                    <a sprig s-action="blitz/cache/refresh-urls" s-method="post" s-val:urls="{{ url }}" title="Refresh" data-icon="refresh"></a>
+                                    <a sprig s-action="blitz/cache/refresh-page" s-method="post" s-val:site-id="{{ row.siteId }}" s-val:uri="{{ row.uri }}" title="Refresh" data-icon="refresh"></a>
                                 </td>
                             {% endif %}
                         </tr>

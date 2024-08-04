@@ -14,6 +14,7 @@ use DateTime;
  * @property int $siteId
  * @property string $uri
  * @property int|null $paginate
+ * @property DateTime|null $dateCached
  * @property DateTime|null $expiryDate
  * @property-read ElementCacheRecord[] $elements
  */

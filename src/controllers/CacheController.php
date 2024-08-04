@@ -11,6 +11,7 @@ use craft\helpers\StringHelper;
 use craft\web\Controller;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\models\SiteUriModel;
 use yii\web\ForbiddenHttpException;
 use yii\web\Response;
 
@@ -42,8 +43,8 @@ class CacheController extends Controller
 
         $request = Craft::$app->getRequest();
 
-        // Require permission if posted from utility
-        if ($request->getIsPost() && $request->getParam('utility')) {
+        // Require permission if posted from the CP
+        if ($request->getIsPost() && $request->getIsCpRequest()) {
             $this->requirePermission('blitz:' . $action->id);
         } else {
             // Verify API key
@@ -207,6 +208,23 @@ class CacheController extends Controller
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
 
         return $this->getSuccessResponse('Tagged cache successfully refreshed.');
+    }
+
+    /**
+     * Refreshes a cached page, forcing a clear. Used by the element sidebar panel and diagnostics utility.
+     */
+    public function actionRefreshPage(): ?Response
+    {
+        $siteId = Craft::$app->getRequest()->getRequiredParam('siteId');
+        $uri = Craft::$app->getRequest()->getRequiredParam('uri');
+        $siteUri = new SiteUriModel([
+            'siteId' => $siteId,
+            'uri' => $uri,
+        ]);
+
+        Blitz::$plugin->refreshCache->refreshSiteUris([$siteUri], [], true);
+
+        return $this->getSuccessResponse('Cached page successfully refreshed.');
     }
 
     /**

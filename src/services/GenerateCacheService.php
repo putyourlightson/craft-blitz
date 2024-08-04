@@ -527,6 +527,7 @@ class GenerateCacheService extends Component
 
         $cacheValue = array_merge($cacheValue, [
             'paginate' => $paginate,
+            'dateCached' => Db::prepareDateForDb('now'),
             'expiryDate' => Db::prepareDateForDb($this->options->expiryDate),
         ]);
 
