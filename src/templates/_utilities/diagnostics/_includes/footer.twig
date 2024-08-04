@@ -34,7 +34,7 @@
 
 {% if sprig.isSuccess %}
     <script>
-        Craft.cp.displayNotice('{{ sprig.message|e('js') }}');
+        Craft.cp.displaySuccess('{{ sprig.message|e('js') }}');
     </script>
 {% elseif sprig.isError %}
     <script>

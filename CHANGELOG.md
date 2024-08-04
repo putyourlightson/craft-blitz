@@ -2,8 +2,13 @@
 
 ## 5.6.0 - Unreleased
 
+> [!NOTE]
+> For the cache and expiry dates to appear in the new sidebar panel, the cache should be cleared or refreshed after this update completes.
+
 ### Added
 
+- Added a sidebar panel to element edit pages ([#690](https://github.com/putyourlightson/craft-blitz/issues/690)).
+- Added a `dateCached` column to cache records which is output in the sidebar panel and the Blitz Diagnostics utility.
 - Added the ability to track eager-loaded relation fields nested inside matrix blocks ([#657](https://github.com/putyourlightson/craft-blitz/issues/657)).
 - Added a structure view to tracked nested element pages in the Blitz Diagnostics utility.
 

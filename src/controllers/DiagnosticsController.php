@@ -76,6 +76,7 @@ class DiagnosticsController extends Controller
                 'elements' => $page['elementCount'] ?: 0,
                 'elementQueries' => $page['elementQueryCount'] ?: 0,
                 'tags' => $page['tagCount'] ?: 0,
+                'dateCached' => $page['dateCached'],
                 'expiryDate' => $page['expiryDate'],
             ];
         }
@@ -104,6 +105,7 @@ class DiagnosticsController extends Controller
                 'params' => $include['params'],
                 'elements' => $include['elementCount'] ?: 0,
                 'elementQueries' => $include['elementQueryCount'] ?: 0,
+                'dateCached' => $include['dateCached'],
                 'expiryDate' => $include['expiryDate'],
             ];
         }

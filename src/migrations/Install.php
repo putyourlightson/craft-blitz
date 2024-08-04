@@ -77,6 +77,7 @@ class Install extends Migration
                 'siteId' => $this->integer()->notNull(),
                 'uri' => $this->string(Blitz::$plugin->settings->maxUriLength)->notNull(),
                 'paginate' => $this->integer(),
+                'dateCached' => $this->dateTime(),
                 'expiryDate' => $this->dateTime(),
             ]);
         }

@@ -11,8 +11,7 @@
         </div>
         <div class="form hidden">
             <form method="post" accept-charset="UTF-8">
-                <input type="hidden" name="action" value="blitz/cache/{{ action.id }}">
-                <input type="hidden" name="utility" value="1">
+                {{ actionInput('blitz/cache/' ~ action.id) }}
                 {{ csrfInput() }}
 
                 {% if action.id == 'refresh-urls' %}

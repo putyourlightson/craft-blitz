@@ -12,6 +12,7 @@ use craft\elements\db\ElementQuery;
 use craft\elements\User;
 use craft\enums\CmsEdition;
 use craft\events\CancelableEvent;
+use craft\events\DefineHtmlEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
 use craft\events\MoveElementEvent;
@@ -43,6 +44,7 @@ use putyourlightson\blitz\drivers\deployers\BaseDeployer;
 use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
+use putyourlightson\blitz\helpers\ElementSidebarHelper;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
@@ -117,7 +119,7 @@ class Blitz extends Plugin
     /**
      * @inheritdoc
      */
-    public string $schemaVersion = '5.5.0';
+    public string $schemaVersion = '5.6.0';
 
     /**
      * @inheritdoc
@@ -158,6 +160,7 @@ class Blitz extends Plugin
             $this->registerCpUrlRules();
             $this->registerUtilities();
             $this->registerWidgets();
+            $this->registerSidebarPanels();
             $this->registerRedirectAfterInstall();
 
             if (Craft::$app->edition === CmsEdition::Pro) {
@@ -579,6 +582,22 @@ class Blitz extends Plugin
     }
 
     /**
+     * Registers sidebar panels
+     *
+     * @since 4.22.0
+     */
+    private function registerSidebarPanels(): void
+    {
+        Event::on(Element::class, Element::EVENT_DEFINE_SIDEBAR_HTML,
+            function(DefineHtmlEvent $event) {
+                /** @var Element $element */
+                $element = $event->sender;
+                $event->html .= ElementSidebarHelper::getSidebarHtml($element);
+            },
+        );
+    }
+
+    /**
      * Registers redirect after install
      */
     private function registerRedirectAfterInstall(): void
@@ -636,6 +655,12 @@ class Blitz extends Plugin
                         ],
                         'blitz:refresh-tagged' => [
                             'label' => Craft::t('blitz', 'Refresh tagged cache'),
+                        ],
+                        'blitz:refresh-page' => [
+                            'label' => Craft::t('blitz', 'Refresh pages via the sidebar panel and diagnostics utility'),
+                        ],
+                        'blitz:view-sidebar-panel' => [
+                            'label' => Craft::t('blitz', 'View sidebar panel on element edit pages'),
                         ],
                     ],
                 ];
