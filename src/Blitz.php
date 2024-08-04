@@ -589,13 +589,15 @@ class Blitz extends Plugin
     private function registerSidebarPanels(): void
     {
         foreach (ElementSidebarHelper::ELIGIBLE_ELEMENT_TYPES as $elementType) {
-            Event::on($elementType, $elementType::EVENT_DEFINE_SIDEBAR_HTML,
-                function(DefineHtmlEvent $event) {
-                    /** @var Element $element */
-                    $element = $event->sender;
-                    $event->html .= ElementSidebarHelper::getSidebarHtml($element);
-                },
-            );
+            if (class_exists($elementType)) {
+                Event::on($elementType, $elementType::EVENT_DEFINE_SIDEBAR_HTML,
+                    function(DefineHtmlEvent $event) {
+                        /** @var Element $element */
+                        $element = $event->sender;
+                        $event->html .= ElementSidebarHelper::getSidebarHtml($element);
+                    },
+                );
+            }
         }
 
         Event::on(Element::class, Element::EVENT_DEFINE_SIDEBAR_HTML,
