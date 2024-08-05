@@ -38,7 +38,7 @@ class CommerceIntegration extends BaseIntegration
                 $order = $event->sender;
                 foreach ($order->getLineItems() as $lineItem) {
                     $purchasable = $lineItem->getPurchasable();
-                    if ($purchasable instanceof Variant) {
+                    if ($purchasable instanceof Variant && !$purchasable->hasUnlimitedStock) {
                         Blitz::$plugin->refreshCache->addElement($purchasable);
                     }
                 }
