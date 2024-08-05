@@ -251,8 +251,8 @@ class DiagnosticsHelper
     {
         $condition = [
             'and',
-            [CacheRecord::tableName() . '.siteId' => $siteId],
-            [Table::ELEMENTS_SITES . '.siteId' => $siteId],
+            ['caches.siteId' => $siteId],
+            ['elementsites.siteId' => $siteId],
             ['type' => $elementType],
             ['elements_owners.ownerId' => null],
         ];
@@ -264,9 +264,9 @@ class DiagnosticsHelper
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
             ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title'])
-            ->innerJoinWith('cache')
-            ->innerJoinWith('element')
-            ->innerJoinWith('elementSite')
+            ->innerJoinWith('cache caches')
+            ->innerJoinWith('element elements')
+            ->innerJoinWith('elementSite elementsites')
             ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
             ->leftJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
             ->where($condition)
@@ -278,8 +278,8 @@ class DiagnosticsHelper
     {
         $condition = [
             'and',
-            [CacheRecord::tableName() . '.siteId' => $siteId],
-            [Table::ELEMENTS_SITES . '.siteId' => $siteId],
+            ['caches.siteId' => $siteId],
+            ['elementsites.siteId' => $siteId],
             ['type' => $elementType],
             ['not', ['elements_owners.ownerId' => null]],
         ];
@@ -290,10 +290,10 @@ class DiagnosticsHelper
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', Table::ELEMENTS_SITES . '.title', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
-            ->innerJoinWith('cache')
-            ->innerJoinWith('element')
-            ->innerJoinWith('elementSite')
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'elementsites.title', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
+            ->innerJoinWith('cache caches')
+            ->innerJoinWith('element elements')
+            ->innerJoinWith('elementSite elementsites')
             ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
             ->leftJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
             ->leftJoin(['elements_owners_sites' => Table::ELEMENTS_SITES], '[[elements_owners.ownerId]] = [[elements_owners_sites.elementId]]')
