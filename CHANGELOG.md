@@ -15,7 +15,7 @@
 ### Changed
 
 - The `craft.blitz.csrfInput()`, `craft.blitz.csrfParam()` and `craft.blitz.csrfToken()` functions now output inline values rather than inject scripts when called via AJAX requests.
-- The `CommerceIntegration` now only refreshes the variants if their inventory is tracked
+- The Commerce integration now only refreshes product variants if their inventory is tracked.
 
 ## 5.5.1 - 2024-07-23
 
