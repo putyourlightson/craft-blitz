@@ -252,7 +252,7 @@ class DiagnosticsHelper
         $condition = [
             'and',
             [CacheRecord::tableName() . '.siteId' => $siteId],
-            ['elements_sites.siteId' => $siteId],
+            [Table::ELEMENTS_SITES . '.siteId' => $siteId],
             ['type' => $elementType],
             ['elements_owners.ownerId' => null],
         ];
@@ -279,7 +279,7 @@ class DiagnosticsHelper
         $condition = [
             'and',
             [CacheRecord::tableName() . '.siteId' => $siteId],
-            ['elements_sites.siteId' => $siteId],
+            [Table::ELEMENTS_SITES . '.siteId' => $siteId],
             ['type' => $elementType],
             ['not', ['elements_owners.ownerId' => null]],
         ];
@@ -290,7 +290,7 @@ class DiagnosticsHelper
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'elements_sites.title', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', Table::ELEMENTS_SITES . '.title', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
             ->innerJoinWith('cache')
             ->innerJoinWith('element')
             ->innerJoinWith('elementSite')

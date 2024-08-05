@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.6.1 - 2024-08-05
+
+### Fixed
+
+- Fixed a bug that could throw an exception when viewing tracked entries in the Blitz Diagnostics utility when the database tables have a prefix.
+
 ## 5.6.0 - 2024-08-05
 
 > [!NOTE]
