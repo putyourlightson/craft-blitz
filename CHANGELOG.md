@@ -5,6 +5,7 @@
 ### Fixed
 
 - Fixed a bug that could throw an exception when viewing tracked entries in the Blitz Diagnostics utility when the database tables have a prefix.
+- Fixed the dropping of a foreign key in a database migration ([#693](https://github.com/putyourlightson/craft-blitz/issues/693)).
 
 ## 5.6.1 - 2024-08-05
 
