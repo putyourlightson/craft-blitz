@@ -6,7 +6,7 @@ use craft\db\Migration;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 
-class m240709_120000_alter_fieldid_column extends Migration
+class m240709_120000_add_fieldinstanceuid_column extends Migration
 {
     /**
      * @inheritdoc
@@ -15,18 +15,14 @@ class m240709_120000_alter_fieldid_column extends Migration
     {
         if ($this->db->columnExists(ElementFieldCacheRecord::tableName(), 'fieldId')) {
             ElementFieldCacheRecord::deleteAll();
-
-            $this->dropForeignKeyIfExists(ElementFieldCacheRecord::tableName(), 'fieldId');
-            $this->renameColumn(ElementFieldCacheRecord::tableName(), 'fieldId', 'fieldInstanceUid');
-            $this->alterColumn(ElementFieldCacheRecord::tableName(), 'fieldInstanceUid', $this->uid());
+            $this->dropColumn(ElementFieldCacheRecord::tableName(), 'fieldId');
+            $this->addColumn(ElementFieldCacheRecord::tableName(), 'fieldInstanceUid', $this->uid());
         }
 
         if ($this->db->columnExists(ElementQueryFieldRecord::tableName(), 'fieldId')) {
             ElementQueryFieldRecord::deleteAll();
-
-            $this->dropForeignKeyIfExists(ElementQueryFieldRecord::tableName(), 'fieldId');
-            $this->renameColumn(ElementQueryFieldRecord::tableName(), 'fieldId', 'fieldInstanceUid');
-            $this->alterColumn(ElementQueryFieldRecord::tableName(), 'fieldInstanceUid', $this->uid());
+            $this->dropColumn(ElementQueryFieldRecord::tableName(), 'fieldId');
+            $this->addColumn(ElementQueryFieldRecord::tableName(), 'fieldInstanceUid', $this->uid());
         }
 
         return true;
