@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.22.0 - Unreleased
+## 4.22.0 - 2024-08-05
 
 > [!NOTE]
 > For the cache and expiry dates to appear in the new sidebar panel, the cache should be cleared or refreshed after this update completes.
