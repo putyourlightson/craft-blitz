@@ -279,9 +279,8 @@ class DiagnosticsHelper
         $condition = [
             'and',
             ['caches.siteId' => $siteId],
-            ['elementsites.siteId' => $siteId],
+            ['elements_owners_sites.siteId' => $siteId],
             ['type' => $elementType],
-            ['not', ['elements_owners.ownerId' => null]],
         ];
 
         if ($cacheId) {
@@ -290,16 +289,15 @@ class DiagnosticsHelper
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'elementsites.title', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
             ->innerJoinWith('cache caches')
             ->innerJoinWith('element elements')
-            ->innerJoinWith('elementSite elementsites')
+            ->innerJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
+            ->innerJoin(['elements_owners_sites' => Table::ELEMENTS_SITES], '[[elements_owners.ownerId]] = [[elements_owners_sites.elementId]]')
+            ->innerJoin(['entrytypes' => Table::ENTRYTYPES], '[[elements.fieldLayoutId]] = [[entrytypes.fieldLayoutId]]')
             ->leftJoin(['elementexpirydates' => ElementExpiryDateRecord::tableName()], '[[elementexpirydates.elementId]] = [[elementcaches.elementId]]')
-            ->leftJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
-            ->leftJoin(['elements_owners_sites' => Table::ELEMENTS_SITES], '[[elements_owners.ownerId]] = [[elements_owners_sites.elementId]]')
-            ->leftJoin(['entrytypes' => Table::ENTRYTYPES], '[[elements.fieldLayoutId]] = [[entrytypes.fieldLayoutId]]')
             ->where($condition)
-            ->groupBy(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'title', 'sortOrder', 'ownerTitle', 'entryType'])
+            ->groupBy(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'sortOrder', 'ownerTitle', 'entryType'])
             ->asArray();
     }
 

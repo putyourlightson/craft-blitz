@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.6.3 - Unreleased
+
+### Fixed
+
+- Fixed the nested element type view in the Blitz Diagnostics utility.
+
 ## 5.6.2 - 2024-08-05
 
 ### Fixed
