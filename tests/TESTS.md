@@ -227,7 +227,8 @@ _Tests the site URI helper methods._
 
 _Tests that Commerce variants are refreshed on order completion so that their stock is updated._
 
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Variants are refreshed on order completion.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Variant with unlimited stock is refreshed on order completion.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Variant without unlimited stock is not refreshed on order completion.  
 
 ### [FeedMe](pest/Integration/FeedMeTest.php)
 

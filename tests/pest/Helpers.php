@@ -125,7 +125,7 @@ function createAsset(): Asset
     return $asset;
 }
 
-function createProductVariantOrder(bool $batchMode = false): array
+function createProductVariantOrder(bool $batchMode = false, bool $hasUnlimitedStock = true): array
 {
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
@@ -143,6 +143,7 @@ function createProductVariantOrder(bool $batchMode = false): array
         'price' => 10,
         'stock' => 100,
         'productId' => $product->id,
+        'hasUnlimitedStock' => $hasUnlimitedStock,
     ]);
     Craft::$app->elements->saveElement($variant);
 
