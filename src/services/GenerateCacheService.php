@@ -254,6 +254,14 @@ class GenerateCacheService extends Component
             return;
         }
 
+        // Don’t proceed if the query has related element IDs, but add them in case this is a relation field query so that disabled elements will trigger a refresh whenever enabled. Required as of Craft 5.3.0.
+        // https://github.com/putyourlightson/craft-blitz/issues/555
+        if (ElementQueryHelper::hasRelatedElementIds($elementQuery)) {
+            $this->generateData->addElementIds($elementQuery->id);
+
+            return;
+        }
+
         // Don’t proceed if the query has fixed IDs or slugs
         if (ElementQueryHelper::hasFixedIdsOrSlugs($elementQuery)) {
             return;
@@ -289,7 +297,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don’t proceed if this is a relation field query
+        // Don’t proceed if this is a relation field query. Required to support relations saved prior to Craft 5.3.0.
         if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
             $this->addRelatedElementIds($elementQuery);
 

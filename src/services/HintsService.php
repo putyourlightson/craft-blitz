@@ -58,6 +58,14 @@ class HintsService extends Component
             return;
         }
 
+        // TODO: Figure out how to add field hints for related element IDs.
+        // Required as of Craft 5.3.0.
+        if (ElementQueryHelper::hasRelatedElementIds($elementQuery)) {
+            //$this->addFieldHint($field->id);
+            return;
+        }
+
+        // Required to support relations saved prior to Craft 5.3.0.
         if (!ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
             return;
         }

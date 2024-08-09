@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Fixed the nested element type view in the Blitz Diagnostics utility.
+- Fixed the nested element type count displayed in the Blitz Diagnostics utility.
 
 ## 5.6.2 - 2024-08-05
 

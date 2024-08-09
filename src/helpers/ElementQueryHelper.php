@@ -274,6 +274,18 @@ class ElementQueryHelper
     }
 
     /**
+     * Returns whether the element query has numeric IDs that may be related element IDs.
+     */
+    public static function hasRelatedElementIds(ElementQuery $elementQuery): bool
+    {
+        if (!is_array($elementQuery->id)) {
+            return false;
+        }
+
+        return ArrayHelper::isNumeric($elementQuery->id);
+    }
+
+    /**
      * Returns whether the element query has fixed IDs.
      */
     public static function hasFixedIdsOrSlugs(ElementQuery $elementQuery): bool

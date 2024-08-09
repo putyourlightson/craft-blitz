@@ -35,6 +35,7 @@ beforeEach(function() {
     Blitz::$plugin->settings->outputComments = true;
     Blitz::$plugin->settings->excludedTrackedElementQueryParams = [];
     Blitz::$plugin->generateCache->options->outputComments = null;
+    Blitz::$plugin->generateCache->reset();
     Blitz::$plugin->cacheStorage->deleteAll();
     Blitz::$plugin->flushCache->flushAll(true);
 
@@ -237,8 +238,6 @@ test('Element cache records are saved with all statuses for eager-loaded relatio
     $disabledEntry = createEntry(enabled: false);
     $entry = createEntryWithRelationship([$enabledEntry, $disabledEntry]);
 
-    Blitz::$plugin->generateCache->reset();
-
     // The entry must be fetched from the DB for the test to work.
     Entry::find()->id($entry->id)->with('relatedTo')->one();
 
@@ -246,12 +245,10 @@ test('Element cache records are saved with all statuses for eager-loaded relatio
         ->toContain($enabledEntry->id, $disabledEntry->id);
 });
 
-test('Element cache records are saved respecting the criteria for eager-loaded relation field queries', function() {
+test('Element cache records are saved irrespective of the criteria for eager-loaded relation field queries', function() {
     $qualifyingEntry = createEntry(customFields: ['plainText' => '1']);
     $nonQualifyingEntry = createEntry(customFields: ['plainText' => '2']);
     $entry = createEntryWithRelationship([$qualifyingEntry, $nonQualifyingEntry]);
-
-    Blitz::$plugin->generateCache->reset();
 
     // The entry must be fetched from the DB for the test to work.
     Entry::find()->id($entry->id)
@@ -261,23 +258,19 @@ test('Element cache records are saved respecting the criteria for eager-loaded r
         ->one();
 
     expect(Blitz::$plugin->generateCache->generateData->getElementIds())
-        ->toContain($qualifyingEntry->id)
-        ->not()->toContain($nonQualifyingEntry->id);
+        ->toContain($qualifyingEntry->id, $nonQualifyingEntry->id);
 });
 
-test('Element cache records are not saved for archived and deleted elements with eager-loaded relation field queries', function() {
+test('Element cache records are saved for archived and deleted elements with eager-loaded relation field queries', function() {
     $archivedEntry = createEntry(params: ['archived' => true]);
     $deletedEntry = createEntry(params: ['dateDeleted' => new DateTime()]);
     $entry = createEntryWithRelationship([$archivedEntry, $deletedEntry]);
-
-    Blitz::$plugin->generateCache->reset();
 
     // The entry must be fetched from the DB for the test to work.
     Entry::find()->id($entry->id)->with('relatedTo')->one();
 
     expect(Blitz::$plugin->generateCache->generateData->getElementIds())
-        ->not()->toContain($archivedEntry->id)
-        ->not()->toContain($deletedEntry->id);
+        ->toContain($archivedEntry->id, $deletedEntry->id);
 });
 
 test('Element query records without specific identifiers are saved', function() {
