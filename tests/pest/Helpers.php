@@ -36,7 +36,7 @@ function getSiteId(): int
 
 function getChannelSectionId(): int
 {
-    return Craft::$app->sections->getSectionByHandle(App::env('TEST_CHANNEL_SECTION_HANDLE'))->id;
+    return Craft::$app->entries->getSectionByHandle(App::env('TEST_CHANNEL_SECTION_HANDLE'))->id;
 }
 
 function integrationIsActive(string $class): bool
@@ -125,7 +125,7 @@ function createAsset(): Asset
     return $asset;
 }
 
-function createProductVariantOrder(bool $batchMode = false): array
+function createProductVariantOrder(bool $batchMode = false, bool $inventoryTracked = false): array
 {
     $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
     Blitz::$plugin->refreshCache->batchMode = $batchMode;
@@ -143,6 +143,7 @@ function createProductVariantOrder(bool $batchMode = false): array
         'sku' => 'test-sku',
         'price' => 10,
         'productId' => $product->id,
+        'inventoryTracked' => $inventoryTracked,
     ]);
 
     Craft::$app->elements->saveElement($variant);
