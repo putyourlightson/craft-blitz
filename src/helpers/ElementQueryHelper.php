@@ -275,6 +275,8 @@ class ElementQueryHelper
 
     /**
      * Returns whether the element query has numeric IDs that may be related element IDs.
+     *
+     * @see BaseRelationField::getRelationTargetIds()
      */
     public static function hasRelatedElementIds(ElementQuery $elementQuery): bool
     {

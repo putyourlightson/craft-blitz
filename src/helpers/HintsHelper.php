@@ -42,11 +42,14 @@ class HintsHelper extends Component
             $hint = new HintModel();
             $hint->setAttributes($record->getAttributes(), false);
 
-            $field = Craft::$app->getFields()->getFieldById($hint->fieldId);
-            if ($field) {
-                $hint->field = $field;
-                $hints[] = $hint;
+            if ($hint->fieldId > 0) {
+                $field = Craft::$app->getFields()->getFieldById($hint->fieldId);
+                if ($field) {
+                    $hint->field = $field;
+                }
             }
+
+            $hints[] = $hint;
         }
 
         return $hints;

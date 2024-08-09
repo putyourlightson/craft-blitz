@@ -11,7 +11,6 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
-use craft\base\FieldInterface;
 use craft\elements\db\ElementQuery;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\models\HintModel;
@@ -58,19 +57,19 @@ class HintsService extends Component
             return;
         }
 
-        // TODO: Figure out how to add field hints for related element IDs.
+        if ($elementQuery->eagerly || $elementQuery->wasEagerLoaded()) {
+            return;
+        }
+
         // Required as of Craft 5.3.0.
         if (ElementQueryHelper::hasRelatedElementIds($elementQuery)) {
-            //$this->addFieldHint($field->id);
+            $this->addFieldHint();
+
             return;
         }
 
         // Required to support relations saved prior to Craft 5.3.0.
         if (!ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
-            return;
-        }
-
-        if ($elementQuery->eagerly || $elementQuery->wasEagerLoaded()) {
             return;
         }
 
@@ -116,17 +115,18 @@ class HintsService extends Component
     }
 
     /**
-     * Adds a field hint.
+     * Adds a field hint. As of Craft 5.3.0, we may not be able to detect the field ID from the element query, if the relation field value is stored in the `content` column. In this case we set a field ID of zero, so we can still store it, maintaining unique keys.
      */
-    private function addFieldHint(int $fieldId): void
+    private function addFieldHint(int $fieldId = 0): void
     {
-        $field = Craft::$app->getFields()->getFieldById($fieldId);
+        $fieldHandle = null;
 
-        if ($field === null) {
-            return;
+        if ($fieldId > 0) {
+            $field = Craft::$app->getFields()->getFieldById($fieldId);
+            $fieldHandle = $field->handle ?? null;
         }
 
-        $hint = $this->createHintWithTemplateLine($field);
+        $hint = $this->createHintWithTemplateLine($fieldId, $fieldHandle);
 
         if ($hint === null) {
             return;
@@ -152,7 +152,7 @@ class HintsService extends Component
     /**
      * Returns a new hint with the template and line number of the rendered template.
      */
-    protected function createHintWithTemplateLine(FieldInterface $field): ?HintModel
+    protected function createHintWithTemplateLine(int $fieldId, ?string $fieldHandle = null): ?HintModel
     {
         $hint = null;
         $traces = debug_backtrace();
@@ -167,7 +167,7 @@ class HintsService extends Component
                 if ($templatePath && $line) {
                     if ($hint === null) {
                         $hint = new HintModel([
-                            'fieldId' => $field->id,
+                            'fieldId' => $fieldId,
                             'template' => $templatePath,
                             'line' => $line,
                             'stackTrace' => [$templatePath . ':' . $line],
@@ -178,15 +178,17 @@ class HintsService extends Component
                         continue;
                     }
 
-                    // Read the contents of the template file, since the code cannot be retrieved from the source context with `devMode` disabled.
-                    $templateCode = file($this->getTemplatePath($template));
-                    $code = $templateCode[$line - 1] ?? '';
-                    preg_match('/(\w+?)\.' . $field->handle . '/', $code, $matches);
-                    $routeVariable = $matches[1] ?? null;
+                    if ($fieldHandle !== null) {
+                        // Read the contents of the template file, since the code cannot be retrieved from the source context with `devMode` disabled.
+                        $templateCode = file($this->getTemplatePath($template));
+                        $code = $templateCode[$line - 1] ?? '';
+                        preg_match('/(\w+?)\.' . $fieldHandle . '/', $code, $matches);
+                        $routeVariable = $matches[1] ?? null;
 
-                    // Don’t continue if the route variable is set.
-                    if ($routeVariable && !empty($trace['args'][0]['variables'][$routeVariable])) {
-                        return null;
+                        // Don’t continue if the route variable is set.
+                        if ($routeVariable && !empty($trace['args'][0]['variables'][$routeVariable])) {
+                            return null;
+                        }
                     }
                 }
             }

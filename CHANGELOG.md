@@ -1,6 +1,11 @@
 # Release Notes for Blitz
 
-## 5.6.3 - Unreleased
+## 5.7.0 - Unreleased
+
+### Added
+
+- Added compatibility for tracking of relation fields in Craft 5.3.0.
+- Added compatibility for detecting eager-loading opportunities in the Blitz Hints utility in Craft 5.3.0.
 
 ### Fixed
 
