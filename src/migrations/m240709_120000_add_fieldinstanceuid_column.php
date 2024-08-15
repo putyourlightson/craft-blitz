@@ -13,19 +13,20 @@ class m240709_120000_add_fieldinstanceuid_column extends Migration
      */
     public function safeUp(): bool
     {
-        if ($this->db->columnExists(ElementFieldCacheRecord::tableName(), 'fieldId')) {
-            ElementFieldCacheRecord::deleteAll();
-            $this->dropForeignKeyIfExists(ElementFieldCacheRecord::tableName(), 'fieldId');
-            $this->dropColumn(ElementFieldCacheRecord::tableName(), 'fieldId');
-            $this->addColumn(ElementFieldCacheRecord::tableName(), 'fieldInstanceUid', $this->uid()->after('elementId'));
-        }
+        $this->dropTableIfExists(ElementFieldCacheRecord::tableName());
+        $this->createTable(ElementFieldCacheRecord::tableName(), [
+            'cacheId' => $this->integer()->notNull(),
+            'elementId' => $this->integer()->notNull(),
+            'fieldInstanceUid' => $this->uid(),
+            'PRIMARY KEY([[cacheId]], [[elementId]], [[fieldInstanceUid]])',
+        ]);
 
-        if ($this->db->columnExists(ElementQueryFieldRecord::tableName(), 'fieldId')) {
-            ElementQueryFieldRecord::deleteAll();
-            $this->dropForeignKeyIfExists(ElementQueryFieldRecord::tableName(), 'fieldId');
-            $this->dropColumn(ElementQueryFieldRecord::tableName(), 'fieldId');
-            $this->addColumn(ElementQueryFieldRecord::tableName(), 'fieldInstanceUid', $this->uid()->after('queryId'));
-        }
+        $this->dropTableIfExists(ElementQueryFieldRecord::tableName());
+        $this->createTable(ElementQueryFieldRecord::tableName(), [
+            'queryId' => $this->integer()->notNull(),
+            'fieldInstanceUid' => $this->uid(),
+            'PRIMARY KEY([[queryId]], [[fieldInstanceUid]])',
+        ]);
 
         return true;
     }
