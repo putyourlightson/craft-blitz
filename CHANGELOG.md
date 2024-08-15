@@ -5,9 +5,13 @@
 > [!NOTE]
 > The cache should be cleared or refreshed after this update completes.
 
+### Changed
+
+- Recreated some database tables to ensure that composite primary keys are correctly created.
+
 ### Fixed
 
-- Fixed an exception that could be thrown during updating when using MariaDB ([#693](https://github.com/putyourlightson/craft-blitz/issues/693)).
+- Fixed an exception that could be thrown during database migrations when using MariaDB ([#693](https://github.com/putyourlightson/craft-blitz/issues/693)).
 
 ## 5.6.2 - 2024-08-05
 
