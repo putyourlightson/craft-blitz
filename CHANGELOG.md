@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.6.3 - 2024-08-15
+## 5.6.4 - 2024-08-15
 
 > [!NOTE]
 > The cache should be cleared or refreshed after this update completes.
@@ -8,6 +8,8 @@
 ### Changed
 
 - Recreated some database tables to ensure that composite primary keys are correctly created.
+
+## 5.6.3 - 2024-08-15
 
 ### Fixed
 
