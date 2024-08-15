@@ -6,7 +6,7 @@ use craft\db\Migration;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 
-class m240709_120000_add_fieldinstanceuid_column extends Migration
+class m240815_120000_add_fieldinstanceuid_column extends Migration
 {
     /**
      * @inheritdoc

@@ -2,6 +2,9 @@
 
 ## 5.6.3 - 2024-08-15
 
+> [!NOTE]
+> The cache should be cleared or refreshed after this update completes.
+
 ### Fixed
 
 - Fixed an exception that could be thrown during updating when using MariaDB ([#693](https://github.com/putyourlightson/craft-blitz/issues/693)).
