@@ -148,10 +148,11 @@ return [
         //'esiEnabled' => false,
 
         // Whether URLs with query strings should be cached and how.
-        // - `0`: Do not cache URLs with query strings
-        // - `1`: Cache URLs with query strings as unique pages
-        // - `2`: Cache URLs with query strings as the same page
-        //'queryStringCaching' => 0,
+        // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
+        // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES`: Cache URLs with query strings as unique pages
+        // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE`: Cache URLs with query strings as the same page
+        //'queryStringCaching' => \putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS,
+
 
         // The query string parameters to include (retain) when caching a URL (regular expressions may be used).
         //'includedQueryStringParams' => [
