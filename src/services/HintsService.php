@@ -154,7 +154,7 @@ class HintsService extends Component
     }
 
     /**
-     * Returns whether the class and function are in the backtrace.
+     * Returns whether at least one class and function are in the backtrace.
      *
      * @param string[][] $classFunctions
      */
