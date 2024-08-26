@@ -27,6 +27,13 @@ class IntegrationHelper
     {
         $integrations = Blitz::$plugin->settings->integrations;
 
+        // Only return integrations that exist (to prevent using legacy integrations).
+        foreach ($integrations as $key => $integration) {
+            if (!class_exists($integration)) {
+                unset($integrations[$key]);
+            }
+        }
+
         $event = new RegisterComponentTypesEvent([
             'types' => $integrations,
         ]);

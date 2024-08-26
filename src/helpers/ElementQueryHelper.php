@@ -274,11 +274,11 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns whether the element query has numeric IDs that may be related element IDs.
+     * Returns whether the element query has numeric element IDs.
      *
      * @see BaseRelationField::getRelationTargetIds()
      */
-    public static function hasRelatedElementIds(ElementQuery $elementQuery): bool
+    public static function hasNumericElementIds(ElementQuery $elementQuery): bool
     {
         if (!is_array($elementQuery->id)) {
             return false;
@@ -454,13 +454,11 @@ class ElementQueryHelper
         }
 
         /**
-         * Evaluate whether the element query has an owner.
+         * Evaluate whether the element query is for a specific field and owner.
          *
          * @see EntryQuery::beforePrepare()
          */
-        return !empty($elementQuery->fieldId)
-            || !empty($elementQuery->ownerId)
-            || !empty($elementQuery->primaryOwnerId);
+        return !empty($elementQuery->fieldId) && !empty($elementQuery->ownerId);
     }
 
     /**

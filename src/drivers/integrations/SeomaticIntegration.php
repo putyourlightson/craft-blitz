@@ -44,10 +44,6 @@ class SeomaticIntegration extends BaseIntegration
 
                     if (!empty($elementIds)) {
                         Blitz::$plugin->refreshCache->addElementIds($elementQuery->elementType, $elementIds);
-
-                        if (Blitz::$plugin->refreshCache->batchMode === false) {
-                            Blitz::$plugin->refreshCache->refresh();
-                        }
                     }
                 }
                 // Don't refresh cache for single URIs, since Blitz takes care of that for us.

@@ -13,7 +13,6 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
 use putyourlightson\blitz\drivers\integrations\CommerceIntegration;
-use putyourlightson\blitz\drivers\integrations\FeedMeIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
@@ -379,12 +378,11 @@ class SettingsModel extends Model
      */
     public array $integrations = [
         CommerceIntegration::class,
-        FeedMeIntegration::class,
         SeomaticIntegration::class,
     ];
 
     /**
-     * The value to send in the cache control header by default, if not null.
+     * The value to send in the cache control header for non-cached pages.
      *
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#no-store
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#preventing_storing
@@ -394,21 +392,21 @@ class SettingsModel extends Model
     public ?string $defaultCacheControlHeader = 'no-store';
 
     /**
-     * The value to send in the cache control header.
+     * The value to send in the cache control header for cached pages.
      *
      * https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
      * https://developers.cloudflare.com/cache/concepts/cache-control/
      *
      * @see Response::setCacheHeaders
      */
-    public string $cacheControlHeader = 'public, max-age=31536000';
+    public string $cacheControlHeader = 'public, s-maxage=31536000, max-age=0';
 
     /**
-     * The value to send in the cache control header when a page’s cache is expired.
+     * The value to send in the cache control header for expired pages.
      *
      * https://developers.cloudflare.com/cache/concepts/cache-control/#revalidation
      */
-    public string $cacheControlHeaderExpired = 'public, max-age=5';
+    public string $cacheControlHeaderExpired = 'public, s-maxage=5, max-age=0';
 
     /**
      * Whether an `X-Powered-By: Blitz` header should be added to the response.

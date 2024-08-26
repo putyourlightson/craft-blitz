@@ -2,14 +2,45 @@
 
 ## 5.7.0 - Unreleased
 
+> [!IMPORTANT]
+> To ensure the changes are applied, the cache should be refreshed after this update completes.
+
 ### Added
 
-- Added compatibility for tracking of relation fields in Craft 5.3.0.
-- Added compatibility for detecting eager-loading opportunities in the Blitz Hints utility in Craft 5.3.0.
+- Added a check for whether the cache should be refreshed after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed.
+- Added compatibility with Craft 5.3.0 for detecting eager-loading opportunities in the Blitz Hints utility.
+
+### Changed
+
+- The expiry date displayed in the element sidebar panel now reflects the entry’s expiry date, if set and sooner than the cached page’s expiry date ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+- Changed the default cache control header values back their more explicit values.
+- The `refreshCacheEnabled` config setting is now actually respected.
 
 ### Fixed
 
 - Fixed the nested element type count displayed in the Blitz Diagnostics utility.
+- Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone in the element sidebar panel ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+- Fixed a bug in which the homepage was not being displayed as cached in the element sidebar panel.
+- Fixed a bug that was causing integrity constraint violation errors to be logged ([#699](https://github.com/putyourlightson/craft-blitz/issues/699)).
+
+### Deprecated
+
+- Deprecated the `RefreshCacheService::batchMode` property.
+
+## 5.6.4 - 2024-08-15
+
+> [!NOTE]
+> The cache should be cleared or refreshed after this update completes.
+
+### Changed
+
+- Recreated some database tables to ensure that composite primary keys are correctly created.
+
+## 5.6.3 - 2024-08-15
+
+### Fixed
+
+- Fixed an exception that could be thrown during database migrations when using MariaDB ([#693](https://github.com/putyourlightson/craft-blitz/issues/693)).
 
 ## 5.6.2 - 2024-08-05
 
@@ -156,7 +187,8 @@
 
 ### Changed
 
-The `blitz/cache/refresh-cache-tags` and `blitz/cache/refresh-expired-elements` no longer forcibly generate the cache.
+The `blitz/cache/refresh-cache-tags` and
+`blitz/cache/refresh-expired-elements` no longer forcibly generate the cache.
 
 ## 5.1.3 - 2024-04-13
 

@@ -11,7 +11,9 @@ namespace putyourlightson\blitz\services;
 
 use Craft;
 use craft\base\Component;
+use craft\base\Element;
 use craft\elements\db\ElementQuery;
+use craft\services\Elements;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\models\HintModel;
 use putyourlightson\blitz\records\HintRecord;
@@ -57,13 +59,19 @@ class HintsService extends Component
             return;
         }
 
-        if ($elementQuery->eagerly || $elementQuery->wasEagerLoaded()) {
+        if ($this->isEagerLoading($elementQuery) || $this->isParsingReferenceTags($elementQuery)) {
+            return;
+        }
+
+        if (ElementQueryHelper::isNestedEntryQuery($elementQuery)) {
+            $this->addFieldHint($elementQuery->fieldId ?? null);
+
             return;
         }
 
         // Required as of Craft 5.3.0.
-        if (ElementQueryHelper::hasRelatedElementIds($elementQuery)) {
-            $this->addFieldHint();
+        if (ElementQueryHelper::hasNumericElementIds($elementQuery)) {
+            $this->addFieldHint($elementQuery->fieldId ?? null);
 
             return;
         }
@@ -115,10 +123,65 @@ class HintsService extends Component
     }
 
     /**
+     * Returns whether the element query is being eager-loaded.
+     */
+    private function isEagerLoading(ElementQuery $elementQuery): bool
+    {
+        if ($elementQuery->eagerly || $elementQuery->wasEagerLoaded()) {
+            return true;
+        }
+
+        $traces = debug_backtrace();
+        foreach ($traces as $trace) {
+            $class = $trace['class'] ?? null;
+            $function = $trace['function'] ?? null;
+
+            // Detect eager-loading of matrix fields.
+            if ($class === Elements::class && $function === 'eagerLoadElements') {
+                return true;
+            }
+
+            // Detect eager-loading of relation fields.
+            if ($class === Element::class && $function === 'getFieldValue') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns whether the element query is parsing reference tags.
+     */
+    private function isParsingReferenceTags(ElementQuery $elementQuery): bool
+    {
+        if ($elementQuery->ref !== null) {
+            return true;
+        }
+
+        // If the reference tag was an ID then the `ref` property will not be set, so we need to check the stack trace for the presence of `Elements::parseRefs()`.
+        $traces = debug_backtrace();
+        foreach ($traces as $trace) {
+            $class = $trace['class'] ?? null;
+            $function = $trace['function'] ?? null;
+            if ($class === Elements::class && $function === 'parseRefs') {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Adds a field hint. As of Craft 5.3.0, we may not be able to detect the field ID from the element query, if the relation field value is stored in the `content` column. In this case we set a field ID of zero, so we can still store it, maintaining unique keys.
      */
-    private function addFieldHint(int $fieldId = 0): void
+    private function addFieldHint(array|int|null $fieldId = null): void
     {
+        if (is_array($fieldId)) {
+            $fieldId = $fieldId[0] ?? null;
+        }
+
+        $fieldId = $fieldId ?? 0;
         $fieldHandle = null;
 
         if ($fieldId > 0) {

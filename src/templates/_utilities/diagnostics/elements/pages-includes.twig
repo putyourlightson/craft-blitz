@@ -14,7 +14,7 @@
     }),
     }
 ] %}
-{% set owner = element.primaryOwner %}
+{% set owner = element.primaryOwner ?? null %}
 {% if owner %}
     {% set crumbs = crumbs|merge([{
         html: elementChip(element.primaryOwner),

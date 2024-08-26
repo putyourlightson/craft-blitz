@@ -171,6 +171,7 @@ class GenerateCacheService extends Component
                                 ->status(null)
                                 ->offset(null)
                                 ->limit(null)
+                                ->eagerly()
                                 ->ids();
 
                             $this->generateData->addElementIds($elementIds);
@@ -254,9 +255,9 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don’t proceed if the query has related element IDs, but add them in case this is a relation field query so that disabled elements will trigger a refresh whenever enabled. Required as of Craft 5.3.0.
+        // Don’t proceed if the query has numeric element IDs, but add them in case this is a nested or relation field query so that disabled elements will trigger a refresh whenever enabled. Required as of Craft 5.3.0.
         // https://github.com/putyourlightson/craft-blitz/issues/555
-        if (ElementQueryHelper::hasRelatedElementIds($elementQuery)) {
+        if (ElementQueryHelper::hasNumericElementIds($elementQuery)) {
             $this->generateData->addElementIds($elementQuery->id);
 
             return;
