@@ -21,7 +21,7 @@ class TemplatesController extends Controller
     /**
      * Returns a rendered template.
      *
-     * @deprecated in 4.3.0.
+     * @deprecated in 4.3.0
      */
     public function actionGet(): Response
     {

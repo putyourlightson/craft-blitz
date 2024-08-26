@@ -148,10 +148,10 @@ return [
         //'esiEnabled' => false,
 
         // Whether URLs with query strings should be cached and how.
-        // - `0`: Do not cache URLs with query strings
-        // - `1`: Cache URLs with query strings as unique pages
-        // - `2`: Cache URLs with query strings as the same page
-        //'queryStringCaching' => 0,
+        // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
+        // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES`: Cache URLs with query strings as unique pages
+        // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE`: Cache URLs with query strings as the same page
+        //'queryStringCaching' => \putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS,
 
         // The query string parameters to include (retain) when caching a URL (regular expressions may be used).
         //'includedQueryStringParams' => [
@@ -225,17 +225,16 @@ return [
         // The integrations to initialise.
         //'integrations' => [
         //    'putyourlightson\blitz\drivers\integrations\CommerceIntegration',
-        //    'putyourlightson\blitz\drivers\integrations\FeedMeIntegration',
         //    'putyourlightson\blitz\drivers\integrations\SeomaticIntegration',
         //],
 
-        // The value to send in the cache control header by default, if not null.
-        //'defaultCacheControlHeader' => 'no-cache, no-store, must-revalidate',
+        // The value to send in the cache control header for non-cached pages.
+        //'defaultCacheControlHeader' => 'no-store',
 
-        // The value to send in the cache control header.
+        // The value to send in the cache control header for cached pages.
         //'cacheControlHeader' => 'public, s-maxage=31536000, max-age=0',
 
-        // The value to send in the cache control header when a page is expired.
+        // The value to send in the cache control header for expired pages.
         //'cacheControlHeaderExpired' => 'public, s-maxage=5, max-age=0',
 
         // Whether an `X-Powered-By: Blitz` header should be added to the response.

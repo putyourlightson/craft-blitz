@@ -12,12 +12,9 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\services\RefreshCacheService;
 
-// TODO: move skips from tests to the beforeEach function
-
 beforeEach(function() {
-    Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh,refreshAll]'));
+    Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refreshAll]'));
     Blitz::$plugin->refreshCache->reset();
-    Blitz::$plugin->refreshCache->batchMode = false;
 
     if (integrationIsActive(SeomaticIntegration::class)) {
         // Prevent invalidation of meta bundles and therefore queue jobs.
@@ -26,37 +23,34 @@ beforeEach(function() {
         Seomatic::$plugin->set('metaBundles', $metaBundles);
         Seomatic::$plugin->metaBundles->deleteMetaBundleBySourceId(SeoEntry::getMetaBundleType(), getChannelSectionId(), getSiteId());
     }
-});
+})->skip(fn() => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
 
 test('Invalidate container caches event without a URL or source triggers a refresh all', function() {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
-    $refreshCache->shouldNotReceive('refresh');
     $refreshCache->shouldReceive('refreshAll')->once();
 
-    createEntry(batchMode: true);
+    createEntry();
     Seomatic::$plugin->metaContainers->invalidateCaches();
-})->skip(fn() => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
+});
 
 test('Invalidate container caches event with a specific source triggers a refresh', function() {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
-    $refreshCache->shouldReceive('refresh')->once();
     $refreshCache->shouldNotReceive('refreshAll');
 
-    $entry = createEntry(batchMode: true);
+    $entry = createEntry();
     Seomatic::$plugin->metaContainers->invalidateContainerCacheById($entry->sectionId, SeoEntry::getMetaBundleType(), $entry->siteId);
 
     expect(Blitz::$plugin->refreshCache->refreshData->getElementIds($entry::class))
         ->toContain($entry->id);
-})->skip(fn() => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
+});
 
 test('Invalidate container caches event for a specific element does not trigger a refresh', function() {
     /** @var MockInterface $refreshCache */
     $refreshCache = Blitz::$plugin->refreshCache;
-    $refreshCache->shouldNotReceive('refresh');
     $refreshCache->shouldNotReceive('refreshAll');
 
-    $entry = createEntry(batchMode: true);
+    $entry = createEntry();
     Seomatic::$plugin->metaContainers->invalidateContainerCacheByPath($entry->uri);
-})->skip(fn() => !integrationIsActive(SeomaticIntegration::class), 'SEOmatic integration not found in active integrations.');
+});

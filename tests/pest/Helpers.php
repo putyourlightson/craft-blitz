@@ -57,11 +57,8 @@ function createSiteUri(int $siteId = 1, string $uri = 'page'): SiteUriModel
     ]);
 }
 
-function createEntry(bool $enabled = true, array $params = [], array $customFields = [], bool $batchMode = false): Entry
+function createEntry(bool $enabled = true, array $params = [], array $customFields = []): Entry
 {
-    $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
-    Blitz::$plugin->refreshCache->batchMode = $batchMode;
-
     /** @var Entry $entryFactory */
     $entryFactory = EntryFactory::factory();
     foreach ($params as $key => $value) {
@@ -82,7 +79,6 @@ function createEntry(bool $enabled = true, array $params = [], array $customFiel
 
     Blitz::$plugin->generateCache->reset();
     Blitz::$plugin->refreshCache->reset();
-    Blitz::$plugin->refreshCache->batchMode = $originalBatchMode;
 
     return $entry;
 }
@@ -125,10 +121,8 @@ function createAsset(): Asset
     return $asset;
 }
 
-function createProductVariantOrder(bool $batchMode = false, bool $hasUnlimitedStock = true): array
+function createProductVariantOrder(bool $hasUnlimitedStock = true): array
 {
-    $originalBatchMode = Blitz::$plugin->refreshCache->batchMode;
-    Blitz::$plugin->refreshCache->batchMode = $batchMode;
     $faker = FakerFactory::create();
 
     $type = Plugin::getInstance()->productTypes->getProductTypeByHandle(App::env('TEST_PRODUCT_TYPE_HANDLE'));
@@ -161,7 +155,6 @@ function createProductVariantOrder(bool $batchMode = false, bool $hasUnlimitedSt
 
     Blitz::$plugin->generateCache->reset();
     Blitz::$plugin->refreshCache->reset();
-    Blitz::$plugin->refreshCache->batchMode = $originalBatchMode;
 
     return [$variant, $order];
 }

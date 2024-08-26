@@ -16,7 +16,6 @@ beforeEach(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
     Blitz::$plugin->flushCache->flushAll(true);
     Blitz::$plugin->generateCache->options->cachingEnabled = true;
-    Blitz::$plugin->refreshCache->batchMode = true;
     Blitz::$plugin->refreshCache->reset();
     Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged = false;
     Blitz::$plugin->settings->refreshCacheWhenElementSavedNotLive = false;

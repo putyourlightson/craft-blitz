@@ -11,7 +11,7 @@ use craft\base\Event;
 use craft\elements\Category;
 use craft\elements\Entry;
 use craft\events\DefineElementEditorHtmlEvent;
-use craft\helpers\Db;
+use craft\helpers\DateTimeHelper;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
@@ -75,6 +75,9 @@ class ElementSidebarHelper
             'siteId' => $element->siteId,
             'uri' => $element->uri,
         ]);
+        if ($siteUri->uri === Element::HOMEPAGE_URI) {
+            $siteUri->uri = '';
+        }
         $cachedValue = Blitz::$plugin->cacheStorage->get($siteUri);
 
         /** @var CacheRecord|null $cacheRecord */
@@ -82,13 +85,23 @@ class ElementSidebarHelper
             ->where($siteUri->toArray())
             ->one();
 
+        $dateCached = $cacheRecord ? DateTimeHelper::toDateTime($cacheRecord->dateCached) : null;
+        $expiryDate = $cacheRecord ? DateTimeHelper::toDateTime($cacheRecord->expiryDate) : null;
+
+        if (property_exists($element, 'expiryDate')) {
+            $elementExpiryDate = DateTimeHelper::toDateTime($element->expiryDate);
+            if ($elementExpiryDate) {
+                $expiryDate = $expiryDate ? min($elementExpiryDate, $expiryDate) : $elementExpiryDate;
+            }
+        }
+
         $html = Craft::$app->getView()->renderTemplate('blitz/_element-sidebar', [
             'cached' => !empty($cachedValue),
-            'expired' => $cacheRecord && $cacheRecord->expiryDate && $cacheRecord->expiryDate <= Db::prepareDateForDb('now'),
+            'expired' => $expiryDate && $expiryDate <= DateTimeHelper::toDateTime('now'),
             'isCacheable' => Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri),
             'pageId' => $cacheRecord->id ?? null,
-            'dateCached' => $cacheRecord->dateCached ?? null,
-            'expiryDate' => $cacheRecord->expiryDate ?? null,
+            'dateCached' => $dateCached,
+            'expiryDate' => $expiryDate,
             'refreshActionUrl' => UrlHelper::actionUrl('blitz/cache/refresh-page', $siteUri->toArray()),
         ]);
 

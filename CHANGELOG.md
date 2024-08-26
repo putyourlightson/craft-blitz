@@ -1,5 +1,29 @@
 # Release Notes for Blitz
 
+## 4.23.0 - 2024-08-26
+
+> [!IMPORTANT]
+> To ensure the changes are applied, the cache should be refreshed after this update completes.
+
+### Added
+
+- Added a check for whether the cache should be refreshed after every request has ended, meaning that setting the `RefreshCacheService::batchMode` property no longer serves a purposes and can be safely removed from your code.
+
+### Changed
+
+- Blitz now requires Craft CMS 4.5.11 or later.
+- The expiry date displayed in the element sidebar panel now reflects the entry’s expiry date, if set and sooner than the cached page’s expiry date ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+- Changed the default cache control header values back their more explicit values.
+
+### Fixed
+
+- Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone in the element sidebar panel ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
+- Fixed a bug in which the homepage was not being displayed as cached in the element sidebar panel.
+
+### Deprecated
+
+- Deprecated the `RefreshCacheService::batchMode` property.
+
 ## 4.22.0 - 2024-08-05
 
 > [!NOTE]

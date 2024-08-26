@@ -230,12 +230,6 @@ _Tests that Commerce variants are refreshed on order completion so that their st
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Variant with unlimited stock is refreshed on order completion.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Variant without unlimited stock is not refreshed on order completion.  
 
-### [FeedMe](pest/Integration/FeedMeTest.php)
-
-_Tests that Feed Me imports refresh the cache with batch mode enabled._
-
-![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) Cache is refreshed with batch mode enabled.  
-
 ### [Seomatic](pest/Integration/SeomaticTest.php)
 
 _Tests that cached pages are refreshed when SEOmatic meta containers are invalidated._
