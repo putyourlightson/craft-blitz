@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.7.0 - Unreleased
+## 5.7.0 - 2024-08-26
 
 > [!IMPORTANT]
 > To ensure the changes are applied, the cache should be refreshed after this update completes.

@@ -131,23 +131,11 @@ class HintsService extends Component
             return true;
         }
 
-        $traces = debug_backtrace();
-        foreach ($traces as $trace) {
-            $class = $trace['class'] ?? null;
-            $function = $trace['function'] ?? null;
-
-            // Detect eager-loading of matrix fields.
-            if ($class === Elements::class && $function === 'eagerLoadElements') {
-                return true;
-            }
-
-            // Detect eager-loading of relation fields.
-            if ($class === Element::class && $function === 'getFieldValue') {
-                return true;
-            }
-        }
-
-        return false;
+        // Detect eager-loading of matrix or relation fields.
+        return $this->hasClassFunctionInBacktrace([
+            [Elements::class, 'eagerLoadElements'],
+            [Element::class, 'getFieldValue'],
+        ]);
     }
 
     /**
@@ -160,12 +148,27 @@ class HintsService extends Component
         }
 
         // If the reference tag was an ID then the `ref` property will not be set, so we need to check the stack trace for the presence of `Elements::parseRefs()`.
+        return $this->hasClassFunctionInBacktrace([
+            [Elements::class, 'parseRefs'],
+        ]);
+    }
+
+    /**
+     * Returns whether the class and function are in the backtrace.
+     *
+     * @param string[][] $classFunctions
+     */
+    private function hasClassFunctionInBacktrace(array $classFunctions): bool
+    {
         $traces = debug_backtrace();
         foreach ($traces as $trace) {
-            $class = $trace['class'] ?? null;
-            $function = $trace['function'] ?? null;
-            if ($class === Elements::class && $function === 'parseRefs') {
-                return true;
+            foreach ($classFunctions as $classFunction) {
+                $traceClass = $trace['class'] ?? null;
+                $traceFunction = $trace['function'];
+                [$class, $function] = $classFunction;
+                if ($class === $traceClass && $function === $traceFunction) {
+                    return true;
+                }
             }
         }
 
