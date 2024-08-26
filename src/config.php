@@ -230,14 +230,14 @@ return [
         //    'putyourlightson\blitz\drivers\integrations\SeomaticIntegration',
         //],
 
-        // The value to send in the cache control header by default, if not null.
-        //'defaultCacheControlHeader' => 'no-cache, no-store, must-revalidate',
+        // The value to send in the cache control header for non-cached pages.
+        //'defaultCacheControlHeader' => 'no-store',
 
-        // The value to send in the cache control header.
-        //'cacheControlHeader' => 'public, s-maxage=31536000, max-age=0',
+        // The value to send in the cache control header for cached pages.
+        //'cacheControlHeader' => 'public, maxage=31536000',
 
-        // The value to send in the cache control header when a page is expired.
-        //'cacheControlHeaderExpired' => 'public, s-maxage=5, max-age=0',
+        // The value to send in the cache control header for expired pages.
+        //'cacheControlHeaderExpired' => 'public, maxage=5',
 
         // Whether an `X-Powered-By: Blitz` header should be added to the response.
         //'sendPoweredByHeader' => true,
