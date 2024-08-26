@@ -151,16 +151,17 @@ class Blitz extends Plugin
         // Register events
         $this->registerCacheableRequestEvents();
         $this->registerClearCaches();
+
         if ($this->settings->refreshCacheEnabled) {
             $this->registerElementEvents();
             $this->registerStructureEvents();
             $this->registerIntegrationEvents();
         }
 
-        // Register site and control panel events
+        // Register site and control panel events with explicit conditionals, to account for console requests.
         if (Craft::$app->getRequest()->getIsSiteRequest()) {
             $this->registerHintsUtilityEvents();
-        } else {
+        } elseif (Craft::$app->getRequest()->getIsCpRequest()) {
             $this->registerCpUrlRules();
             $this->registerUtilities();
             $this->registerWidgets();

@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.7.1 - 2024-08-26
+
+### Fixed
+
+- Fixed a bug in which installing the plugin in the console could cause an error ([#705](https://github.com/putyourlightson/craft-blitz/issues/705)).
+
 ## 5.7.0 - 2024-08-26
 
 > [!IMPORTANT]
