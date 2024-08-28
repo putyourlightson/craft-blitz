@@ -4,7 +4,7 @@
 
 ### Fixed
 
-- Fixed a bug in which installing the plugin in the console could cause an error ([#705](https://github.com/putyourlightson/craft-blitz/issues/705)).
+- Fixed a bug in which installing the plugin via the CLI could cause an error ([#705](https://github.com/putyourlightson/craft-blitz/issues/705)).
 
 ## 5.7.0 - 2024-08-26
 
@@ -19,11 +19,11 @@
 ### Changed
 
 - The expiry date displayed in the element sidebar panel now reflects the entry’s expiry date, if set and sooner than the cached page’s expiry date ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
-- Changed the default cache control header values back their more explicit values.
 - The `refreshCacheEnabled` config setting is now actually respected.
 
 ### Fixed
 
+- Fixed the default cache control header values that were inadvertently set to incorrect values ([learn more](https://putyourlightson.com/articles/critical-update-for-a-blitz-blunder)).
 - Fixed the nested element type count displayed in the Blitz Diagnostics utility.
 - Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone in the element sidebar panel ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
 - Fixed a bug in which the homepage was not being displayed as cached in the element sidebar panel.
