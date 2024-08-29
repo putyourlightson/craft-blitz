@@ -1,9 +1,9 @@
 # Release Notes for Blitz
 
-## 4.23.0 - 2024-08-26
+## 4.23.0 - 2024-08-26 [CRITICAL]
 
-> [!IMPORTANT]
-> To ensure the changes are applied, the cache should be refreshed after this update completes.
+> [!WARNING]
+> This update includes a fix for an issue in which Blitz could send incorrect Cache-Control headers. Please [read this article](https://putyourlightson.com/articles/critical-update-for-a-blitz-blunder) to find out whether the issue affects your site, and what you should do. To ensure the changes in this update are applied, the cache should be refreshed after this update completes.
 
 ### Added
 
@@ -13,10 +13,10 @@
 
 - Blitz now requires Craft CMS 4.5.11 or later.
 - The expiry date displayed in the element sidebar panel now reflects the entry’s expiry date, if set and sooner than the cached page’s expiry date ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
-- Changed the default cache control header values back their more explicit values.
 
 ### Fixed
 
+- Fixed the default cache control header values that were inadvertently set to incorrect values ([learn more](https://putyourlightson.com/articles/critical-update-for-a-blitz-blunder)).
 - Fixed a bug in which the date cached and expiry dates were not being displayed in the correct timezone in the element sidebar panel ([#698](https://github.com/putyourlightson/craft-blitz/issues/698)).
 - Fixed a bug in which the homepage was not being displayed as cached in the element sidebar panel.
 
