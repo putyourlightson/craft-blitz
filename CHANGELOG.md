@@ -6,10 +6,10 @@
 
 - Fixed a bug in which installing the plugin via the CLI could cause an error ([#705](https://github.com/putyourlightson/craft-blitz/issues/705)).
 
-## 5.7.0 - 2024-08-26
+## 5.7.0 - 2024-08-26 [CRITICAL]
 
-> [!IMPORTANT]
-> To ensure the changes are applied, the cache should be refreshed after this update completes.
+> [!WARNING]
+> This update includes a fix for an issue in which Blitz could send incorrect Cache-Control headers. Please [read this article](https://putyourlightson.com/articles/critical-update-for-a-blitz-blunder) to find out whether the issue affects your site, and what you should do. To ensure the changes in this update are applied, the cache should be refreshed after this update completes.
 
 ### Added
 
