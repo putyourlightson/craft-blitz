@@ -135,7 +135,7 @@
                             </td>
                             {% if currentUser.can('blitz:refresh-page') %}
                                 <td class="thin">
-                                    <a sprig s-action="blitz/cache/refresh-page" s-method="post" s-val:site-id="{{ row.siteId }}" s-val:uri="{{ row.uri }}" title="Refresh" data-icon="refresh"></a>
+                                    <a sprig s-action="blitz/cache/refresh-page" s-method="post" s-val:site-id="{{ row.siteId }}" s-val:uri="{{ row.uri }}" href="#" title="Refresh" data-icon="refresh"></a>
                                 </td>
                             {% endif %}
                         </tr>

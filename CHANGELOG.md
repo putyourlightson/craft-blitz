@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.7.2 - Unreleased
+
+### Fixed
+
+- Fixed some styling in the Blitz Diagnostics utility.
+
 ## 5.7.1 - 2024-08-26
 
 ### Fixed
