@@ -177,7 +177,7 @@ class FlushCacheService extends Component
      */
     private function deleteAllCacheRecords(): void
     {
-        $batchSize = 10000;
+        $batchSize = 100000;
         $totalCount = CacheRecord::find()->count();
         $maxIterations = ceil($totalCount / $batchSize);
 
