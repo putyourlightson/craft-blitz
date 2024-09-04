@@ -2,6 +2,10 @@
 
 ## 5.7.2 - Unreleased
 
+### Changed
+
+- Increased the batch size used when flushing the entire cache.
+
 ### Fixed
 
 - Fixed some styling in the Blitz Diagnostics utility.
