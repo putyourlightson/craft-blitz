@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.1 - 2024-09-04
+
+### Changed
+
+- Improved the deletion of legacy cached element type records when updating to Blitz 4.10.1 and beyond.
+
 ## 4.23.0 - 2024-08-26 [CRITICAL]
 
 > [!WARNING]

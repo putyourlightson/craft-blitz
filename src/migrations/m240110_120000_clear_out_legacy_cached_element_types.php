@@ -15,6 +15,10 @@ class m240110_120000_clear_out_legacy_cached_element_types extends Migration
      */
     public function safeUp(): bool
     {
+        // Delete records in batches to help avoid memory limit issues.
+        // https://github.com/putyourlightson/craft-blitz/issues/708
+        $batchSize = 10000;
+
         // Element caches
         $elementTypes = ElementCacheRecord::find()
             ->select(['type'])
@@ -24,13 +28,21 @@ class m240110_120000_clear_out_legacy_cached_element_types extends Migration
 
         foreach ($elementTypes as $elementType) {
             if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
-                $legacyElementIds = ElementCacheRecord::find()
-                    ->select(['elementId'])
-                    ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
-                    ->where(['type' => $elementType])
-                    ->column();
+                $done = false;
+                while (!$done) {
+                    $legacyElementIds = ElementCacheRecord::find()
+                        ->select(['elementId'])
+                        ->innerJoin(['elements' => Table::ELEMENTS], '[[elements.id]] = [[elementId]]')
+                        ->where(['type' => $elementType])
+                        ->limit($batchSize)
+                        ->column();
 
-                ElementCacheRecord::deleteAll(['elementId' => $legacyElementIds]);
+                    if (empty($legacyElementIds)) {
+                        $done = true;
+                    } else {
+                        ElementCacheRecord::deleteAll(['elementId' => $legacyElementIds]);
+                    }
+                }
             }
         }
 
@@ -42,7 +54,20 @@ class m240110_120000_clear_out_legacy_cached_element_types extends Migration
 
         foreach ($elementTypes as $elementType) {
             if (!ElementTypeHelper::getIsCacheableElementType($elementType)) {
-                ElementQueryRecord::deleteAll(['type' => $elementType]);
+                $done = false;
+                while (!$done) {
+                    $legacyElementQueryIds = ElementQueryRecord::find()
+                        ->select(['id'])
+                        ->where(['type' => $elementType])
+                        ->limit($batchSize)
+                        ->column();
+
+                    if (empty($legacyElementQueryIds)) {
+                        $done = true;
+                    } else {
+                        ElementQueryRecord::deleteAll(['id' => $legacyElementQueryIds]);
+                    }
+                }
             }
         }
 
