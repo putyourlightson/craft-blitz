@@ -15,29 +15,35 @@
 {% set title = 'Blitz' %}
 
 {% set tabs = {
-    general: {label: 'General Settings'|t('blitz'), url: '#general'},
-    storage: {label: 'Cache Storage'|t('blitz'), url: '#storage'},
-    generating: {label: 'Cache Generation'|t('blitz'), url: '#generation'},
-    purging: {label: 'Reverse Proxy Purging'|t('blitz'), url: '#purging'},
-    deployment: {label: 'Remote Deployment'|t('blitz'), url: '#deployment'},
-    advanced: {label: 'Advanced Settings'|t('blitz'), url: '#advanced'},
+    general: { label: 'General Settings'|t('blitz'), url: '#general' },
+    storage: { label: 'Cache Storage'|t('blitz'), url: '#storage' },
+    generating: { label: 'Cache Generation'|t('blitz'), url: '#generation' },
+    purging: { label: 'Reverse Proxy Purging'|t('blitz'), url: '#purging' },
+    deployment: { label: 'Remote Deployment'|t('blitz'), url: '#deployment' },
+    advanced: { label: 'Advanced Settings'|t('blitz'), url: '#advanced' },
 } %}
 
 {% set fullPageForm = true %}
 {% set welcome = craft.app.request.getParam('welcome') %}
 {% set docs = 'https://putyourlightson.com/plugins/blitz#' %}
 
-{% set siteColumn = [] %}
+{% set enabledSiteColumns = {
+    enabled: {
+        type: 'lightswitch',
+        value: 1,
+        thin: true,
+    }
+} %}
 {% if craft.app.getIsMultiSite() %}
-    {% set allSiteOptions = [{value: '', label: 'All Sites'|t('blitz')}]|merge(siteOptions) %}
-    {% set siteColumn = {
+    {% set allSiteOptions = [{ value: '', label: 'All Sites'|t('blitz') }]|merge(siteOptions) %}
+    {% set enabledSiteColumns = enabledSiteColumns|merge({
         siteId: {
             type: 'select',
             heading: 'Site'|t('blitz'),
             options: allSiteOptions,
             thin: true,
         }
-    } %}
+    }) %}
 {% endif %}
 
 {% block actionButton %}
@@ -136,7 +142,7 @@
                 {% set info -%}
                     {{ include('blitz/_includes/uri-pattern-info', { docs: docs }) }}
                 {%- endset %}
-                {% set cols = siteColumn|merge({
+                {% set cols = enabledSiteColumns|merge({
                     uriPattern: {
                         type: 'singleline',
                         heading: 'URI Pattern'|t('blitz'),
@@ -369,6 +375,19 @@
             fieldClass: 'width-50',
         }) }}
 
+        <hr>
+
+        {% set info %}
+            {{ 'With this setting enabled, URIs containing uppercase characters will not be cached by Blitz. Redirecting uppercase URIs to lowercase URIs using server rewrites is recommended.'|t('blitz') }}
+        {% endset %}
+        {{ forms.lightswitchField({
+            label: "Only Cache Lowercase URIs"|t('blitz'),
+            instructions: instructions("Whether only URIs containing lowercase characters should be cached.", info),
+            warning: config.onlyCacheLowercaseUris is defined ? configWarning('onlyCacheLowercaseUris'),
+            name: 'settings[onlyCacheLowercaseUris]',
+            on: settings.onlyCacheLowercaseUris,
+        }) }}
+
         {% set info %}
             <p>
                 <strong>Do not cache URLs with query strings</strong>
@@ -405,60 +424,68 @@
                 2: "Cache URLs with unique query strings as the same page"|t('blitz'),
             },
             value: settings.queryStringCaching,
+            toggle: true,
+            targetPrefix: '.queryStringParams',
         }) }}
 
-        {% set cols = siteColumn|merge({
-            queryStringParam: {
-                type: 'singleline',
-                heading: 'Query String Parameter'|t('blitz'),
-                code: true,
-                info: 'The name of the query string parameter. Regular expressions can be used for pattern matching.'|t('blitz'),
-            }
-        }) %}
+        <div class="queryStringParams1 queryStringParams2 hidden">
+            {% set cols = enabledSiteColumns|merge({
+                queryStringParam: {
+                    type: 'singleline',
+                    heading: 'Query String Parameter'|t('blitz'),
+                    code: true,
+                    info: 'The name of the query string parameter. Regular expressions can be used for pattern matching.'|t('blitz'),
+                }
+            }) %}
 
-        {% set info %}
-            <p>
-                Query string parameters to include when caching a URL. This setting does <em>not</em> determine which pages are cached based on the query string. Instead, it can be used control which query string parameters are retained in the URL.
-            </p>
-            <a href="{{ docs ~ 'included-excluded-query-string-parameters' }}" class="go" target="_blank">
-                {{- 'Learn more'|t('blitz') -}}
-            </a>
-        {% endset %}
-        {{ forms.editableTableField({
-            label: "Included Query String Parameters"|t('blitz'),
-            instructions: instructions("The query string parameters to include (retain) when caching a URL.", info),
-            warning: (config.includedQueryStringParams is defined ? configWarning('includedQueryStringParams')),
-            name: 'settings[includedQueryStringParams]',
-            id: 'includedQueryStringParams',
-            cols: cols,
-            rows: settings.includedQueryStringParams,
-            addRowLabel: "Add a query string parameter"|t('blitz'),
-            allowAdd: true,
-            allowDelete: true,
-            allowReorder: true,
-        }) }}
+            {% set info %}
+                <p>
+                    Query string parameters to include when caching a URL. This setting does
+                    <em>not</em> determine which pages are cached based on the query string. Instead, it can be used control which query string parameters are retained in the URL.
+                </p>
+                <a href="{{ docs ~ 'included-excluded-query-string-parameters' }}" class="go" target="_blank">
+                    {{- 'Learn more'|t('blitz') -}}
+                </a>
+            {% endset %}
+            {{ forms.editableTableField({
+                label: "Included Query String Parameters"|t('blitz'),
+                instructions: instructions("The query string parameters to include (retain) when caching a URL.", info),
+                warning: (config.includedQueryStringParams is defined ? configWarning('includedQueryStringParams')),
+                name: 'settings[includedQueryStringParams]',
+                id: 'includedQueryStringParams',
+                cols: cols,
+                rows: settings.includedQueryStringParams,
+                addRowLabel: "Add a query string parameter"|t('blitz'),
+                allowAdd: true,
+                allowDelete: true,
+                allowReorder: true,
+            }) }}
 
-        {% set info %}
-            <p>
-                Query string parameters to exclude when caching a URL. This setting does <em>not</em> determine which pages are cached based on the query string. Instead, it can be used control which query string parameters are disregarded in the URL.
-            </p>
-            <a href="{{ docs ~ 'included-excluded-query-string-parameters' }}" class="go" target="_blank">
-                {{- 'Learn more'|t('blitz') -}}
-            </a>
-        {% endset %}
-        {{ forms.editableTableField({
-            label: "Excluded Query String Parameters"|t('blitz'),
-            instructions: instructions("The query string parameters to exclude (disregard) when caching a URL.", info),
-            warning: (config.excludedQueryStringParams is defined ? configWarning('excludedQueryStringParams')),
-            name: 'settings[excludedQueryStringParams]',
-            id: 'excludedQueryStringParams',
-            cols: cols,
-            rows: settings.excludedQueryStringParams,
-            addRowLabel: "Add a query string parameter"|t('blitz'),
-            allowAdd: true,
-            allowDelete: true,
-            allowReorder: true,
-        }) }}
+            {% set info %}
+                <p>
+                    Query string parameters to exclude when caching a URL. This setting does
+                    <em>not</em> determine which pages are cached based on the query string. Instead, it can be used control which query string parameters are disregarded in the URL.
+                </p>
+                <a href="{{ docs ~ 'included-excluded-query-string-parameters' }}" class="go" target="_blank">
+                    {{- 'Learn more'|t('blitz') -}}
+                </a>
+            {% endset %}
+            {{ forms.editableTableField({
+                label: "Excluded Query String Parameters"|t('blitz'),
+                instructions: instructions("The query string parameters to exclude (disregard) when caching a URL.", info),
+                warning: (config.excludedQueryStringParams is defined ? configWarning('excludedQueryStringParams')),
+                name: 'settings[excludedQueryStringParams]',
+                id: 'excludedQueryStringParams',
+                cols: cols,
+                rows: settings.excludedQueryStringParams,
+                addRowLabel: "Add a query string parameter"|t('blitz'),
+                allowAdd: true,
+                allowDelete: true,
+                allowReorder: true,
+            }) }}
+        </div>
+
+        <hr>
 
         {{ forms.autosuggestField({
             label: "API Key"|t('blitz'),

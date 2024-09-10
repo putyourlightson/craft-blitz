@@ -196,7 +196,13 @@ class CacheRequestService extends Component
             return false;
         }
 
-        $uri = strtolower($siteUri->uri);
+        $uri = mb_strtolower($siteUri->uri);
+
+        if (Blitz::$plugin->settings->onlyCacheLowercaseUris && $uri !== $siteUri->uri) {
+            Blitz::$plugin->debug('Page not cached because the URI contains uppercase characters.', [], $siteUri->uri);
+
+            return false;
+        }
 
         // Ignore URIs that are longer than the max URI length
         $max = Blitz::$plugin->settings->maxUriLength;
@@ -514,7 +520,7 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns true if the URI matches a set of patterns.
+     * Returns whether the URI matches a set of patterns.
      */
     public function matchesUriPatterns(SiteUriModel $siteUri, array|string $siteUriPatterns): bool
     {
@@ -523,29 +529,8 @@ class CacheRequestService extends Component
         }
 
         foreach ($siteUriPatterns as $siteUriPattern) {
-            if (empty($siteUriPattern['siteId']) || $siteUriPattern['siteId'] == $siteUri->siteId) {
-                $uriPattern = $siteUriPattern['uriPattern'];
-
-                // Replace a blank string with the homepage with query strings allowed
-                if ($uriPattern == '') {
-                    $uriPattern = '^(\?.*)?$';
-                }
-
-                // Replace "*" with 0 or more characters as otherwise it'll throw an error
-                if ($uriPattern == '*') {
-                    $uriPattern = '.*';
-                }
-
-                // Trim slashes
-                $uriPattern = trim($uriPattern, '/');
-
-                // Escape delimiters, removing already escaped delimiters first
-                // https://github.com/putyourlightson/craft-blitz/issues/261
-                $uriPattern = str_replace(['\/', '/'], ['/', '\/'], $uriPattern);
-
-                if (preg_match('/' . $uriPattern . '/', trim($siteUri->uri, '/'))) {
-                    return true;
-                }
+            if ($this->matchesUriPattern($siteUri, $siteUriPattern)) {
+                return true;
             }
         }
 
@@ -553,7 +538,7 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns true if the site and parameter match a set of query string parameters.
+     * Returns whether the site and parameter match a set of query string parameters.
      */
     public function matchesQueryStringParams(int $siteId, string $param, array|string $queryStringParams): bool
     {
@@ -562,10 +547,8 @@ class CacheRequestService extends Component
         }
 
         foreach ($queryStringParams as $queryStringParam) {
-            if (empty($queryStringParam['siteId']) || $queryStringParam['siteId'] == $siteId) {
-                if (preg_match('/' . $queryStringParam['queryStringParam'] . '/', $param)) {
-                    return true;
-                }
+            if ($this->matchesQueryStringParam($siteId, $param, $queryStringParam)) {
+                return true;
             }
         }
 
@@ -783,5 +766,62 @@ class CacheRequestService extends Component
         parse_str(Craft::$app->getRequest()->getQueryString(), $queryStringParams);
 
         return $queryStringParams['index'] ?? null;
+    }
+
+    /**
+     * Returns whether the URI matches a URI pattern.
+     */
+    private function matchesUriPattern(SiteUriModel $siteUri, array $siteUriPattern): bool
+    {
+        $enabled = $siteUriPattern['enabled'] ?? true;
+        if (!$enabled) {
+            return false;
+        }
+
+        if (empty($siteUriPattern['siteId']) || $siteUriPattern['siteId'] == $siteUri->siteId) {
+            $uriPattern = $siteUriPattern['uriPattern'];
+
+            // Replace a blank string with the homepage with query strings allowed
+            if ($uriPattern == '') {
+                $uriPattern = '^(\?.*)?$';
+            }
+
+            // Replace "*" with 0 or more characters as otherwise it'll throw an error
+            if ($uriPattern == '*') {
+                $uriPattern = '.*';
+            }
+
+            // Trim slashes
+            $uriPattern = trim($uriPattern, '/');
+
+            // Escape delimiters, removing already escaped delimiters first
+            // https://github.com/putyourlightson/craft-blitz/issues/261
+            $uriPattern = str_replace(['\/', '/'], ['/', '\/'], $uriPattern);
+
+            if (preg_match('/' . $uriPattern . '/', trim($siteUri->uri, '/'))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns whether the site and parameter match a query string parameter.
+     */
+    private function matchesQueryStringParam(int $siteId, string $param, array $queryStringParam): bool
+    {
+        $enabled = $queryStringParam['enabled'] ?? true;
+        if (!$enabled) {
+            return false;
+        }
+
+        if (empty($queryStringParam['siteId']) || $queryStringParam['siteId'] == $siteId) {
+            if (preg_match('/' . $queryStringParam['queryStringParam'] . '/', $param)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

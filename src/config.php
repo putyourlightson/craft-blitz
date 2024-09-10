@@ -41,10 +41,12 @@ return [
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
         //'includedUriPatterns' => [
         //    [
+        //        'enabled' => true,
         //        'siteId' => 1,
         //        'uriPattern' => 'pages/.*',
         //    ],
         //    [
+        //        'enabled' => true,
         //        'siteId' => 2,
         //        'uriPattern' => 'articles/.*',
         //    ],
@@ -53,6 +55,7 @@ return [
         // The URI patterns to exclude from caching (overrides any matching patterns to include). Set `siteId` to a blank string to indicate all sites.
         //'excludedUriPatterns' => [
         //    [
+        //        'enabled' => true,
         //        'siteId' => 1,
         //        'uriPattern' => 'pages/contact',
         //    ],
@@ -156,6 +159,7 @@ return [
         // The query string parameters to include (retain) when caching a URL (regular expressions may be used).
         //'includedQueryStringParams' => [
         //    [
+        //        'enabled' => true,
         //        'siteId' => '',
         //        'queryStringParam' => '.*',
         //    ],
@@ -164,10 +168,12 @@ return [
         // The query string parameters to exclude (disregard) when caching a URL (regular expressions may be used).
         //'excludedQueryStringParams' => [
         //    [
+        //        'enabled' => true,
         //        'siteId' => '',
         //        'queryStringParam' => 'gclid',
         //    ],
         //    [
+        //        'enabled' => true,
         //        'siteId' => '',
         //        'queryStringParam' => 'fbclid',
         //    ],

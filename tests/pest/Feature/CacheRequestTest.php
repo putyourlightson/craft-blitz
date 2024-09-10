@@ -11,6 +11,17 @@ use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
 
 beforeEach(function() {
+    Blitz::$plugin->settings->includedUriPatterns = [
+        [
+            'siteId' => '',
+            'uriPattern' => '',
+        ],
+        [
+            'siteId' => '',
+            'uriPattern' => 'page|Page|Übergröße',
+        ],
+    ];
+    Blitz::$plugin->settings->excludedUriPatterns = [];
     Blitz::$plugin->settings->includedQueryStringParams = [
         [
             'siteId' => '',
@@ -136,24 +147,72 @@ test('Requested cacheable site URI works with regular expressions', function() {
         ->toBe('page?sort=asc&search=waldo');
 });
 
-test('Site URI with included URI pattern is cacheable', function() {
+test('Site URI with uppercase URI is cacheable', function(string $uri) {
+    $siteUri = createSiteUri(uri: $uri);
+    Blitz::$plugin->settings->onlyCacheLowercaseUris = false;
+
+    expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
+        ->toBeTrue();
+})->with([
+    'Page',
+    'Übergröße',
+]);
+
+test('Site URI with uppercase URI is not cacheable when disallowed', function(string $uri) {
+    $siteUri = createSiteUri(uri: $uri);
+    Blitz::$plugin->settings->onlyCacheLowercaseUris = true;
+
+    expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
+        ->toBeFalse();
+})->with([
+    'Page',
+    'Übergröße',
+]);
+
+test('Site URI with included URI pattern is cacheable xyzzz', function() {
     $siteUri = createSiteUri();
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
         ->toBeTrue();
 });
 
-test('Site URI with excluded URI pattern is not cacheable', function() {
-    $siteUri = createSiteUri(uri: 'page-to-exclude');
-    Blitz::$plugin->settings->excludedUriPatterns = [
-        [
-            'siteId' => '',
-            'uriPattern' => 'exclude',
-        ],
+test('Site URI with disabled included URI pattern is not cacheable', function() {
+    $siteUri = createSiteUri(uri: 'cacheable');
+    Blitz::$plugin->settings->includedUriPatterns[] = [
+        'enabled' => false,
+        'siteId' => '',
+        'uriPattern' => 'cacheable',
     ];
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
         ->toBeFalse();
+});
+
+test('Site URI with excluded URI pattern is not cacheable', function() {
+    $siteUri = createSiteUri(uri: 'page-to-exclude');
+    Blitz::$plugin->settings->excludedUriPatterns[] = [
+        'siteId' => '',
+        'uriPattern' => 'exclude',
+    ];
+
+    expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
+        ->toBeFalse();
+});
+
+test('Site URI with disabled excluded URI pattern is cacheable', function() {
+    $siteUri = createSiteUri(uri: 'cacheable');
+    Blitz::$plugin->settings->includedUriPatterns[] = [
+        'siteId' => '',
+        'uriPattern' => 'cacheable',
+    ];
+    Blitz::$plugin->settings->excludedUriPatterns[] = [
+        'enabled' => false,
+        'siteId' => '',
+        'uriPattern' => 'cacheable',
+    ];
+
+    expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
+        ->toBeTrue();
 });
 
 test('Site URI with `admin` in URI is cacheable', function() {

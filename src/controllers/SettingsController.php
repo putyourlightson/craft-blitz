@@ -223,7 +223,7 @@ class SettingsController extends Controller
             return null;
         }
 
-        Craft::$app->getSession()->setNotice($notice);
+        Craft::$app->getSession()->setSuccess($notice);
 
         return $this->redirectToPostedUrl();
     }

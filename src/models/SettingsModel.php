@@ -100,10 +100,12 @@ class SettingsModel extends Model
      *
      * [
      *     [
+     *         'enabled' => true,
      *         'siteId' => 1,
      *         'uriPattern' => 'pages/.*',
      *     ],
      *     [
+     *         'enabled' => true,
      *         'siteId' => '',
      *         'uriPattern' => 'articles/.*',
      *     ],
@@ -116,6 +118,7 @@ class SettingsModel extends Model
      *
      * [
      *     [
+     *         'enabled' => true,
      *         'siteId' => 1,
      *         'uriPattern' => 'pages/contact',
      *     ],
@@ -229,6 +232,13 @@ class SettingsModel extends Model
     public bool $esiEnabled = false;
 
     /**
+     * Whether only URIs containing lowercase characters should be cached.
+     *
+     * @since 5.8.0
+     */
+    public bool $onlyCacheLowercaseUris = false;
+
+    /**
      * Whether URLs with query strings should be cached and how.
      *
      * - `self::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
@@ -242,6 +252,7 @@ class SettingsModel extends Model
      *
      * [
      *     [
+     *         'enabled' => true,
      *         'siteId' => '',
      *         'queryStringParam' => '.*',
      *     ],
@@ -251,6 +262,7 @@ class SettingsModel extends Model
      */
     public array|string $includedQueryStringParams = [
         [
+            'enabled' => true,
             'siteId' => '',
             'queryStringParam' => '.*',
         ],
@@ -261,10 +273,12 @@ class SettingsModel extends Model
      *
      * [
      *     [
+     *         'enabled' => true,
      *         'siteId' => '',
      *         'queryStringParam' => 'gclid',
      *     ],
      *     [
+     *         'enabled' => true,
      *         'siteId' => '',
      *         'queryStringParam' => 'fbclid',
      *     ],
@@ -274,10 +288,12 @@ class SettingsModel extends Model
      */
     public array|string $excludedQueryStringParams = [
         [
+            'enabled' => true,
             'siteId' => '',
             'queryStringParam' => 'gclid',
         ],
         [
+            'enabled' => true,
             'siteId' => '',
             'queryStringParam' => 'fbclid',
         ],
@@ -484,6 +500,28 @@ class SettingsModel extends Model
      * The position in the HTML of the injected script.
      */
     public int $injectScriptPosition = View::POS_END;
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributes($values, $safeOnly = true): void
+    {
+        parent::setAttributes($values, $safeOnly);
+
+        // Normalize enableable fields, ensuring that unset values default to `true`.
+        // TODO: Remove in version 6.0.0
+        $settingNames = [
+            'includedUriPatterns',
+            'excludedUriPatterns',
+            'includedQueryStringParams',
+            'excludedQueryStringParams',
+        ];
+        foreach ($settingNames as $settingName) {
+            foreach ($this->{$settingName} as &$setting) {
+                $setting['enabled'] = $setting['enabled'] ?? true;
+            }
+        }
+    }
 
     /**
      * @inheritdoc
