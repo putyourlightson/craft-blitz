@@ -1,6 +1,11 @@
 # Release Notes for Blitz
 
-## 5.7.2 - Unreleased
+## 5.8.0 - Unreleased
+
+### Added
+
+- Added the `onlyCacheLowercaseUris` config setting.
+- Added `enabled` lightswitches to the URI pattern and query string parameter settings.
 
 ### Changed
 
