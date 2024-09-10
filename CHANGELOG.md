@@ -9,6 +9,7 @@
 ### Fixed
 
 - Fixed some styling in the Blitz Diagnostics utility.
+- Fixed false positives from appearing in the Blitz Hints utility when querying entry authors ([#710](https://github.com/putyourlightson/craft-blitz/issues/710)).
 
 ## 5.7.1 - 2024-08-26
 

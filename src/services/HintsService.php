@@ -13,6 +13,8 @@ use Craft;
 use craft\base\Component;
 use craft\base\Element;
 use craft\elements\db\ElementQuery;
+use craft\elements\Entry;
+use craft\elements\User;
 use craft\services\Elements;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\models\HintModel;
@@ -59,7 +61,10 @@ class HintsService extends Component
             return;
         }
 
-        if ($this->isEagerLoading($elementQuery) || $this->isParsingReferenceTags($elementQuery)) {
+        if ($this->isEagerLoading($elementQuery)
+            || $this->isAuthorsQuery($elementQuery)
+            || $this->isParsingReferenceTags($elementQuery)
+        ) {
             return;
         }
 
@@ -135,6 +140,20 @@ class HintsService extends Component
         return $this->hasClassFunctionInBacktrace([
             [Elements::class, 'eagerLoadElements'],
             [Element::class, 'getFieldValue'],
+        ]);
+    }
+
+    /**
+     * Returns whether the element query is an authors query.
+     */
+    private function isAuthorsQuery(ElementQuery $elementQuery): bool
+    {
+        if ($elementQuery->elementType !== User::class) {
+            return false;
+        }
+
+        return $this->hasClassFunctionInBacktrace([
+            [Entry::class, 'getAuthors'],
         ]);
     }
 

@@ -517,7 +517,7 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns a class’ public, non-static properties using reflection.
+     * Returns the public, non-static properties of a class using reflection.
      *
      * @see ElementQuery::criteriaAttributes()
      */
