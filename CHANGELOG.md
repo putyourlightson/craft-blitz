@@ -5,6 +5,7 @@
 ### Changed
 
 - Improved the deletion of legacy cached element type records when updating to Blitz 4.10.1 and beyond.
+- The `injectScriptEvent` event is now called on the `window` element instead of `document`.
 - Increased the batch size used when flushing the entire cache.
 
 ## 4.23.0 - 2024-08-26 [CRITICAL]
