@@ -1,5 +1,5 @@
 // The event name will be replaced with the `injectScriptEvent` config setting.
-document.addEventListener('{injectScriptEvent}', injectElements, { once: true });
+window.addEventListener('{injectScriptEvent}', injectElements, {once: true});
 
 interface InjectElement {
     element: Element;
@@ -37,7 +37,7 @@ async function injectElements() {
                 detail: injectElement,
             })
         )) {
-            const url = injectElement.uri + (injectElement.params ? (injectElement.uri.indexOf('?') !== -1 ? '&' : '?') + injectElement.params : '') ;
+            const url = injectElement.uri + (injectElement.params ? (injectElement.uri.indexOf('?') !== -1 ? '&' : '?') + injectElement.params : '');
             injectElements[url] = injectElements[url] ?? [];
             injectElements[url].push(injectElement);
         }
