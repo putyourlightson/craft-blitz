@@ -4,11 +4,12 @@
 
 ### Added
 
-- Added the `onlyCacheLowercaseUris` config setting.
+- Added the `onlyCacheLowercaseUris` plugin setting.
 - Added `enabled` lightswitches to the URI pattern and query string parameter settings.
 
 ### Changed
 
+- The `injectScriptEvent` event is now called on the `window` element instead of `document`.
 - Increased the batch size used when flushing the entire cache.
 
 ### Fixed
