@@ -28,6 +28,13 @@ class IncludeController extends Controller
      */
     public function actionCached(): Response
     {
+        if (Blitz::$plugin->cacheRequest->getIsNewUniquelyCachedInclude()) {
+            $uid = Blitz::$plugin->generateCache->createUniqueIndex(
+                Craft::$app->getSecurity()->generateRandomString(40),
+            );
+            setcookie('BlitzUid', $uid, 0, '/');
+        }
+
         return $this->getRenderedTemplate();
     }
 

@@ -41,6 +41,21 @@ class BlitzVariable
     }
 
     /**
+     * Returns the markup to include a uniquely cached template.
+     *
+     * @since 5.9.0
+     */
+    public function includeCachedUnique(string $template, array $params = [], array $options = []): Markup
+    {
+        $options = array_merge($options, [
+            'isUniquelyCached' => true,
+            'requestType' => VariableConfigModel::AJAX_REQUEST_TYPE,
+        ]);
+
+        return $this->includeCached($template, $params, $options);
+    }
+
+    /**
      * Returns the markup to include a dynamically rendered template.
      *
      * @since 4.3.0
@@ -164,6 +179,10 @@ class BlitzVariable
             'action' => $action,
             'index' => $index,
         ];
+
+        if ($config->isUniquelyCached) {
+            $includeParams['uid'] = 0;
+        }
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
             if (Craft::$app->getRequest()->getIsPreview() || Craft::$app->getRequest()->getIsLivePreview()) {

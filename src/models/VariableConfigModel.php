@@ -30,6 +30,11 @@ class VariableConfigModel extends Model
     public string $requestType = 'ajax';
 
     /**
+     * @var bool Specifies whether the request should be uniquely cached.
+     */
+    public bool $isUniquelyCached = false;
+
+    /**
      * @var string Specifies the wrapper element type to use.
      */
     public string $wrapperElement = 'span';
@@ -56,6 +61,7 @@ class VariableConfigModel extends Model
     {
         return [
             [['requestType', 'wrapperElement', 'wrapperClass', 'placeholder', 'property'], 'string'],
+            [['isUniquelyCached'], 'boolean'],
             [['requestType'], 'in', 'range' => [self::AJAX_REQUEST_TYPE, self::INCLUDE_REQUEST_TYPE]],
         ];
     }

@@ -22,6 +22,12 @@ async function injectElements() {
     const injectElements = {};
     const promises = [];
 
+    let uid = null;
+    const uidCookie = document.cookie.split('; ').find(row => row.startsWith('BlitzUid='));
+    if (uidCookie) {
+        uid = uidCookie.split('=')[1] ?? null;
+    }
+
     elements.forEach(element => {
         const injectElement: InjectElement = {
             element: element,
@@ -30,6 +36,10 @@ async function injectElements() {
             params: element.getAttribute('data-blitz-params'),
             property: element.getAttribute('data-blitz-property'),
         };
+
+        if (uid) {
+            injectElement.params = injectElement.params.replace('uid=0', 'uid=' + uid)
+        }
 
         if (document.dispatchEvent(
             new CustomEvent('beforeBlitzInject', {
@@ -62,7 +72,7 @@ async function replaceUrls(url: string, injectElements: InjectElement[]) {
     }
 
     const responseText = await response.text();
-    let responseJson;
+    let responseJson = {};
 
     if (url.indexOf('blitz/csrf/json') !== -1) {
         responseJson = JSON.parse(responseText);

@@ -101,6 +101,10 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableRequest(): bool
     {
+        if ($this->getIsNewUniquelyCachedInclude()) {
+            return false;
+        }
+
         if ($this->getIsCachedInclude()) {
             return true;
         }
@@ -174,6 +178,10 @@ class CacheRequestService extends Component
             return false;
         }
 
+        if ($this->getIsNewUniquelyCachedInclude()) {
+            return false;
+        }
+
         if ($this->getIsCachedInclude()) {
             return true;
         }
@@ -209,6 +217,10 @@ class CacheRequestService extends Component
         if (strlen($uri) > $max) {
             Blitz::$plugin->debug('Page not cached because it exceeds the max URI length of {max}.', ['max' => $max], $uri);
 
+            return false;
+        }
+
+        if ($this->getIsNewUniquelyCachedInclude($uri)) {
             return false;
         }
 
@@ -271,8 +283,7 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns whether this is a cached include without memoizing the result,
-     * which would disrupt the local cache generator.
+     * Returns whether this is a cached include without memoizing the result, which would disrupt the local cache generator.
      *
      * @since 4.3.0
      */
@@ -299,8 +310,7 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns whether this is a dynamic include.
-     * Doesn’t memoize the result, which would disrupt the local cache generator.
+     * Returns whether this is a dynamic include without memoizing the result, which would disrupt the local cache generator.
      *
      * @since 4.6.0
      */
@@ -317,6 +327,56 @@ class CacheRequestService extends Component
             $action = implode('/', Craft::$app->getRequest()->getActionSegments());
 
             return $action === self::DYNAMIC_INCLUDE_ACTION;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns whether this is a uniquely cached include without memoizing the result, which would disrupt the local cache generator.
+     *
+     * @since 5.9.0
+     */
+    public function getIsUniquelyCachedInclude(string $uri = null): bool
+    {
+        if (!$this->getIsCachedInclude($uri)) {
+            return false;
+        }
+
+        // Includes based on the URI takes preference
+        if ($uri !== null) {
+            $uri = trim($uri, '/');
+
+            return str_contains($uri, 'uid=');
+        }
+
+        if (Craft::$app->getRequest()->getParam('uid') !== null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns whether this is a new uniquely cached include without memoizing the result, which would disrupt the local cache generator.
+     *
+     * @since 5.9.0
+     */
+    public function getIsNewUniquelyCachedInclude(string $uri = null): bool
+    {
+        if (!$this->getIsUniquelyCachedInclude($uri)) {
+            return false;
+        }
+
+        // Includes based on the URI takes preference
+        if ($uri !== null) {
+            $uri = trim($uri, '/');
+
+            return str_contains($uri, 'uid=0');
+        }
+
+        if (Craft::$app->getRequest()->getParam('uid') === '0') {
+            return true;
         }
 
         return false;
@@ -377,17 +437,24 @@ class CacheRequestService extends Component
     public function getRequestedCacheableSiteUri(): ?SiteUriModel
     {
         if ($this->getIsCachedInclude()) {
-            $index = $this->getCachedIncludeIndexFromQueryString();
+            $index = $this->getValueFromQueryString('index');
             $include = $this->getIncludeByIndex($index);
 
             if ($include === null) {
                 return null;
             }
 
-            $queryString = http_build_query([
+            $params = [
                 'action' => self::CACHED_INCLUDE_ACTION,
                 'index' => $index,
-            ]);
+            ];
+
+            $uid = $this->getValueFromQueryString('uid');
+            if ($uid !== null) {
+                $params['uid'] = $uid;
+            }
+
+            $queryString = http_build_query($params);
 
             return new SiteUriModel([
                 'siteId' => $include->siteId,
@@ -759,13 +826,13 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns a cached include index from the query string. This is necessary since query params do not reliably come through with SSI requests.
+     * Returns a key’s value from the query string. This is necessary since query params do not reliably come through with SSI requests.
      */
-    private function getCachedIncludeIndexFromQueryString(): ?string
+    private function getValueFromQueryString(string $key): ?string
     {
         parse_str(Craft::$app->getRequest()->getQueryString(), $queryStringParams);
 
-        return $queryStringParams['index'] ?? null;
+        return $queryStringParams[$key] ?? null;
     }
 
     /**

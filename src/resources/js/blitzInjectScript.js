@@ -10,6 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 window.addEventListener('{injectScriptEvent}', injectElements, { once: true });
 function injectElements() {
     return __awaiter(this, void 0, void 0, function* () {
+        var _a;
         if (!document.dispatchEvent(new CustomEvent('beforeBlitzInjectAll', {
             cancelable: true,
         }))) {
@@ -18,6 +19,11 @@ function injectElements() {
         const elements = document.querySelectorAll('.blitz-inject:not(.blitz-inject--injected)');
         const injectElements = {};
         const promises = [];
+        let uid = null;
+        const uidCookie = document.cookie.split('; ').find(row => row.startsWith('BlitzUid='));
+        if (uidCookie) {
+            uid = (_a = uidCookie.split('=')[1]) !== null && _a !== void 0 ? _a : null;
+        }
         elements.forEach(element => {
             var _a;
             const injectElement = {
@@ -27,6 +33,11 @@ function injectElements() {
                 params: element.getAttribute('data-blitz-params'),
                 property: element.getAttribute('data-blitz-property'),
             };
+            console.log('uid', uid, injectElement.params);
+            if (uid) {
+                injectElement.params = injectElement.params.replace('uid=0', 'uid=' + uid);
+            }
+            console.log('uid', uid, injectElement.params);
             if (document.dispatchEvent(new CustomEvent('beforeBlitzInject', {
                 cancelable: true,
                 detail: injectElement,
@@ -50,7 +61,7 @@ function replaceUrls(url, injectElements) {
             return null;
         }
         const responseText = yield response.text();
-        let responseJson;
+        let responseJson = {};
         if (url.indexOf('blitz/csrf/json') !== -1) {
             responseJson = JSON.parse(responseText);
         }

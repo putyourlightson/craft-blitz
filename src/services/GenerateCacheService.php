@@ -471,7 +471,9 @@ class GenerateCacheService extends Component
         // Use the primary connection when fetching the record
         $includeId = $db->usePrimary(fn() => IncludeRecord::find()
             ->select(['id'])
-            ->where(['index' => $index])
+            ->where([
+                'index' => $index,
+            ])
             ->scalar()
         );
 
@@ -633,6 +635,14 @@ class GenerateCacheService extends Component
         if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_CACHE)) {
             $this->trigger(self::EVENT_AFTER_SAVE_CACHE, $event);
         }
+    }
+
+    /**
+     * Creates a unique index for quicker indexing and less storage.
+     */
+    public function createUniqueIndex(string $value): int
+    {
+        return sprintf('%u', crc32($value));
     }
 
     /**
@@ -815,13 +825,5 @@ class GenerateCacheService extends Component
         } catch (Exception $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
-    }
-
-    /**
-     * Creates a unique index for quicker indexing and less storage.
-     */
-    private function createUniqueIndex(string $value): string
-    {
-        return sprintf('%u', crc32($value));
     }
 }
