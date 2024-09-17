@@ -21,6 +21,11 @@ use yii\web\NotFoundHttpException;
 class BlitzVariable
 {
     /**
+     * @const string
+     */
+    public const REGISTER_JS_KEY = 'BlitzInjectScript';
+
+    /**
      * @var int
      */
     private int $injected = 0;
@@ -253,19 +258,16 @@ class BlitzVariable
      */
     private function getScript(string $uri, array $params, VariableConfigModel $config): Markup
     {
-        $view = Craft::$app->getView();
-        $js = '';
-
         if ($this->injected === 0) {
             $blitzInjectScript = Craft::getAlias('@putyourlightson/blitz/resources/js/blitzInjectScript.js');
 
             if (file_exists($blitzInjectScript)) {
                 $js = file_get_contents($blitzInjectScript);
                 $js = str_replace('{injectScriptEvent}', Blitz::$plugin->settings->injectScriptEvent, $js);
+
+                Craft::$app->getView()->registerJs($js, Blitz::$plugin->settings->injectScriptPosition, self::REGISTER_JS_KEY);
             }
         }
-
-        $view->registerJs($js, Blitz::$plugin->settings->injectScriptPosition);
 
         $this->injected++;
         $id = $this->injected;

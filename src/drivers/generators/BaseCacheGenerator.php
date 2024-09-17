@@ -152,26 +152,13 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     }
 
     /**
-     * Calls the provided progress handles.
-     */
-    protected function callProgressHandler(callable $setProgressHandler, int $count, int $total): void
-    {
-        $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages', [
-            'count' => $count,
-            'total' => $total,
-        ]);
-
-        call_user_func($setProgressHandler, $count, $total, $progressLabel);
-    }
-
-    /**
      * Returns URLs to generate, deleting and purging any that are not cacheable.
      *
      * @param SiteUriModel[]|array[] $siteUris
      * @param bool $withToken
      * @return array
      */
-    protected function getUrlsToGenerate(array $siteUris, bool $withToken = true): array
+    public function getUrlsToGenerate(array $siteUris, bool $withToken = true): array
     {
         $urls = [];
         $nonCacheableSiteUris = [];
@@ -187,9 +174,11 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
                 $siteUri = new SiteUriModel($siteUri);
             }
 
-            // Only add if a cacheable site URI
             if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
-                $urls[] = $siteUri->getUrl($params);
+                // Only add if a (not uniquely) cacheable site URI
+                if (!Blitz::$plugin->cacheRequest->getIsUniquelyCachedInclude($siteUri->uri)) {
+                    $urls[] = $siteUri->getUrl($params);
+                }
             } else {
                 $nonCacheableSiteUris[] = $siteUri;
             }
@@ -202,6 +191,19 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         }
 
         return $urls;
+    }
+
+    /**
+     * Calls the provided progress handles.
+     */
+    protected function callProgressHandler(callable $setProgressHandler, int $count, int $total): void
+    {
+        $progressLabel = Craft::t('blitz', 'Generating {count} of {total} pages', [
+            'count' => $count,
+            'total' => $total,
+        ]);
+
+        call_user_func($setProgressHandler, $count, $total, $progressLabel);
     }
 
     /**

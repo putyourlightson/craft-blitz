@@ -7,6 +7,10 @@
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\variables\BlitzVariable;
 
+beforeEach(function() {
+    Craft::$app->getView()->js = [];
+});
+
 test('Cached include tag contains provided options', function() {
     Blitz::$plugin->settings->ssiEnabled = true;
     $variable = new BlitzVariable();
@@ -33,8 +37,7 @@ test('Cached include tag does not contain unencoded slashes in params', function
     preg_match('/_includes\?(.*)/', $tagString, $match);
 
     expect($match[1])
-        ->not()
-        ->toContain('/');
+        ->not->toContain('/');
 });
 
 test('Cached include tag does not contain path param', function() {
@@ -43,17 +46,34 @@ test('Cached include tag does not contain path param', function() {
     preg_match('/\?(.*)/', $tagString, $match);
 
     expect($match[1])
-        ->not()
-        ->toContain(Craft::$app->getConfig()->getGeneral()->pathParam . '=');
+        ->not->toContain(Craft::$app->getConfig()->getGeneral()->pathParam . '=');
 });
 
 test('Cached include tag with AJAX request type results in inject script being registered', function() {
     $variable = new BlitzVariable();
-    $variable->includeDynamic('test', [], [
+    $variable->includeCached('test', [], [
         'requestType' => 'ajax',
     ]);
 
-    expect(Craft::$app->getView()->js)
+    expect(Craft::$app->getView()->js[Blitz::$plugin->settings->injectScriptPosition])
+        ->toHaveCount(1);
+});
+
+test('Uniquely cached include tag contains a `uid` and results in inject script being registered', function() {
+    $variable = new BlitzVariable();
+    $output = (string)$variable->includeCachedUnique('test');
+
+    expect(Craft::$app->getView()->js[Blitz::$plugin->settings->injectScriptPosition])
+        ->toHaveCount(1)
+        ->and($output)
+        ->toContain('&amp;uid=0');
+});
+
+test('Dynamic include tag results in inject script being registered', function() {
+    $variable = new BlitzVariable();
+    $variable->includeDynamic('test');
+
+    expect(Craft::$app->getView()->js[Blitz::$plugin->settings->injectScriptPosition])
         ->toHaveCount(1);
 });
 
@@ -63,8 +83,7 @@ test('Fetch URI tag does not contain unencoded slashes in params', function() {
     preg_match('/blitz-params="(.*?)"/', $tagString, $match);
 
     expect($match[1])
-        ->not()
-        ->toContain('/');
+        ->not->toContain('/');
 });
 
 test('The CSRF input function returns a Blitz inject script', function() {
@@ -81,5 +100,5 @@ test('The CSRF input function called in an AJAX request does not return a Blitz 
     $csrfInput = (string)$variable->csrfInput();
 
     expect($csrfInput)
-        ->not()->toContain('id="blitz-inject-1"');
+        ->not->toContain('id="blitz-inject-1"');
 });

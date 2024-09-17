@@ -33,11 +33,9 @@ function injectElements() {
                 params: element.getAttribute('data-blitz-params'),
                 property: element.getAttribute('data-blitz-property'),
             };
-            console.log('uid', uid, injectElement.params);
             if (uid) {
                 injectElement.params = injectElement.params.replace('uid=0', 'uid=' + uid);
             }
-            console.log('uid', uid, injectElement.params);
             if (document.dispatchEvent(new CustomEvent('beforeBlitzInject', {
                 cancelable: true,
                 detail: injectElement,

@@ -22,9 +22,7 @@ class IncludeController extends Controller
     protected int|bool|array $allowAnonymous = true;
 
     /**
-     * Returns a rendered template using the cached include action.
-     * This is necessary for detecting SSI requests and will only be hit when
-     * no cached include exists.
+     * Returns a rendered template using the cached include action. This is necessary for detecting SSI requests and will only be hit when no cached include exists.
      */
     public function actionCached(): Response
     {

@@ -36,7 +36,6 @@ async function injectElements() {
             params: element.getAttribute('data-blitz-params'),
             property: element.getAttribute('data-blitz-property'),
         };
-
         if (uid) {
             injectElement.params = injectElement.params.replace('uid=0', 'uid=' + uid)
         }
