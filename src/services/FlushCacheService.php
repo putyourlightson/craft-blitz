@@ -169,7 +169,7 @@ class FlushCacheService extends Component
     }
 
     /**
-     * Deletes the cache records in batches, to avoid database memory issues.
+     * Deletes all cache records while preventing a database transaction, to avoid database memory issues.
      *
      * The reason this is important is due to foreign keys and transactions. Deleting cache records causes a cascade of deletes to other Blitz tables, potentially resulting in huge numbers of rows being deleted. Because it’s the result of a single query, it’s wrapped in a single DB transaction, so the database attempts to keep a rollback checkpoint for the whole thing (resulting in a copy of every deleted row in memory so that it can roll back if the transaction fails). If this uses more than the total memory allocated to the database then it may roll back and restart.
      *
@@ -177,23 +177,8 @@ class FlushCacheService extends Component
      */
     private function deleteAllCacheRecords(): void
     {
-        $batchSize = 100000;
-        $totalCount = CacheRecord::find()->count();
-        $maxIterations = ceil($totalCount / $batchSize);
-
-        $sql = 'DELETE FROM ' . CacheRecord::tableName() . ' LIMIT ' . $batchSize;
-
-        // Postgres does not support LIMIT in DELETE queries.
-        if (Craft::$app->getDb()->getIsPgsql()) {
-            $sql = 'DELETE FROM ' . CacheRecord::tableName() . ' WHERE id IN (SELECT id FROM ' . CacheRecord::tableName() . ' LIMIT ' . $batchSize . ')';
-        }
-
-        for ($i = 0; $i < $maxIterations; $i++) {
-            $deleteCount = Craft::$app->db->createCommand($sql)->execute();
-
-            if ($deleteCount === 0) {
-                return;
-            }
-        }
+        $command = Craft::$app->getDb()->createCommand()->delete(CacheRecord::tableName());
+        $command->prepare(false);
+        $command->pdoStatement->execute();
     }
 }
