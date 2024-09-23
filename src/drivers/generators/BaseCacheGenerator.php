@@ -176,7 +176,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
 
             if (Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri)) {
                 // Only add if a (not uniquely) cacheable site URI
-                if (!Blitz::$plugin->cacheRequest->getIsUniquelyCachedInclude($siteUri->uri)) {
+                if (!Blitz::$plugin->cacheRequest->getIsSessionCachedInclude($siteUri->uri)) {
                     $urls[] = $siteUri->getUrl($params);
                 }
             } else {

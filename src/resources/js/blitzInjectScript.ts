@@ -22,10 +22,10 @@ async function injectElements() {
     const injectElements = {};
     const promises = [];
 
-    let uid = null;
-    const uidCookie = document.cookie.split('; ').find(row => row.startsWith('BlitzUid='));
-    if (uidCookie) {
-        uid = uidCookie.split('=')[1] ?? null;
+    let sessionId = null;
+    const cookie = document.cookie.split('; ').find(row => row.startsWith('BlitzSessionId='));
+    if (cookie) {
+        sessionId = cookie.split('=')[1] ?? null;
     }
 
     elements.forEach(element => {
@@ -36,8 +36,8 @@ async function injectElements() {
             params: element.getAttribute('data-blitz-params'),
             property: element.getAttribute('data-blitz-property'),
         };
-        if (uid) {
-            injectElement.params = injectElement.params.replace('uid=0', 'uid=' + uid)
+        if (sessionId) {
+            injectElement.params = injectElement.params.replace('sessionId=0', 'sessionId=' + sessionId)
         }
 
         if (document.dispatchEvent(

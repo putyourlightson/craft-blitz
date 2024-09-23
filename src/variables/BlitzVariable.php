@@ -46,14 +46,14 @@ class BlitzVariable
     }
 
     /**
-     * Returns the markup to include a uniquely cached template.
+     * Returns the markup to include a session cached template.
      *
      * @since 5.9.0
      */
-    public function includeCachedUnique(string $template, array $params = [], array $options = []): Markup
+    public function includeSessionCached(string $template, array $params = [], array $options = []): Markup
     {
         $options = array_merge($options, [
-            'isUniquelyCached' => true,
+            'isSessionCached' => true,
             'requestType' => VariableConfigModel::AJAX_REQUEST_TYPE,
         ]);
 
@@ -185,8 +185,8 @@ class BlitzVariable
             'index' => $index,
         ];
 
-        if ($config->isUniquelyCached) {
-            $includeParams['uid'] = 0;
+        if ($config->isSessionCached) {
+            $includeParams['sessionId'] = 0;
         }
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {

@@ -19,10 +19,10 @@ function injectElements() {
         const elements = document.querySelectorAll('.blitz-inject:not(.blitz-inject--injected)');
         const injectElements = {};
         const promises = [];
-        let uid = null;
-        const uidCookie = document.cookie.split('; ').find(row => row.startsWith('BlitzUid='));
-        if (uidCookie) {
-            uid = (_a = uidCookie.split('=')[1]) !== null && _a !== void 0 ? _a : null;
+        let sessionId = null;
+        const cookie = document.cookie.split('; ').find(row => row.startsWith('BlitzSessionId='));
+        if (cookie) {
+            sessionId = (_a = cookie.split('=')[1]) !== null && _a !== void 0 ? _a : null;
         }
         elements.forEach(element => {
             var _a;
@@ -33,8 +33,8 @@ function injectElements() {
                 params: element.getAttribute('data-blitz-params'),
                 property: element.getAttribute('data-blitz-property'),
             };
-            if (uid) {
-                injectElement.params = injectElement.params.replace('uid=0', 'uid=' + uid);
+            if (sessionId) {
+                injectElement.params = injectElement.params.replace('sessionId=0', 'sessionId=' + sessionId);
             }
             if (document.dispatchEvent(new CustomEvent('beforeBlitzInject', {
                 cancelable: true,

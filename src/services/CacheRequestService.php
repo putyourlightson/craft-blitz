@@ -77,6 +77,11 @@ class CacheRequestService extends Component
     public const DYNAMIC_INCLUDE_URI_PREFIX = self::DYNAMIC_INCLUDE_PATH . '?action=';
 
     /**
+     * @const string
+     */
+    public const SESSION_CACHED_PARAM_NAME = 'sessionId';
+
+    /**
      * @var bool|null
      */
     private ?bool $isGeneratorRequest = null;
@@ -101,7 +106,7 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableRequest(): bool
     {
-        if ($this->getIsNewUniquelyCachedInclude()) {
+        if ($this->getIsNewSessionCachedInclude()) {
             return false;
         }
 
@@ -178,7 +183,7 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if ($this->getIsNewUniquelyCachedInclude()) {
+        if ($this->getIsNewSessionCachedInclude()) {
             return false;
         }
 
@@ -220,7 +225,7 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if ($this->getIsNewUniquelyCachedInclude($uri)) {
+        if ($this->getIsNewSessionCachedInclude($uri)) {
             return false;
         }
 
@@ -333,11 +338,11 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns whether this is a uniquely cached include without memoizing the result, which would disrupt the local cache generator.
+     * Returns whether this is a session cached include without memoizing the result, which would disrupt the local cache generator.
      *
      * @since 5.9.0
      */
-    public function getIsUniquelyCachedInclude(string $uri = null): bool
+    public function getIsSessionCachedInclude(string $uri = null): bool
     {
         if (!$this->getIsCachedInclude($uri)) {
             return false;
@@ -347,10 +352,10 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_contains($uri, 'uid=');
+            return str_contains($uri, self::SESSION_CACHED_PARAM_NAME . '=');
         }
 
-        if (Craft::$app->getRequest()->getParam('uid') !== null) {
+        if (Craft::$app->getRequest()->getParam(self::SESSION_CACHED_PARAM_NAME) !== null) {
             return true;
         }
 
@@ -358,13 +363,13 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns whether this is a new uniquely cached include without memoizing the result, which would disrupt the local cache generator.
+     * Returns whether this is a new session cached include without memoizing the result, which would disrupt the local cache generator.
      *
      * @since 5.9.0
      */
-    public function getIsNewUniquelyCachedInclude(string $uri = null): bool
+    public function getIsNewSessionCachedInclude(string $uri = null): bool
     {
-        if (!$this->getIsUniquelyCachedInclude($uri)) {
+        if (!$this->getIsSessionCachedInclude($uri)) {
             return false;
         }
 
@@ -372,10 +377,10 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_contains($uri, 'uid=0');
+            return str_contains($uri, self::SESSION_CACHED_PARAM_NAME . '=0');
         }
 
-        if (Craft::$app->getRequest()->getParam('uid') === '0') {
+        if (Craft::$app->getRequest()->getParam(self::SESSION_CACHED_PARAM_NAME) === '0') {
             return true;
         }
 
@@ -449,9 +454,9 @@ class CacheRequestService extends Component
                 'index' => $index,
             ];
 
-            $uid = $this->getValueFromQueryString('uid');
-            if ($uid !== null) {
-                $params['uid'] = $uid;
+            $sessionId = $this->getValueFromQueryString(self::SESSION_CACHED_PARAM_NAME);
+            if ($sessionId !== null) {
+                $params[self::SESSION_CACHED_PARAM_NAME] = $sessionId;
             }
 
             $queryString = http_build_query($params);
