@@ -24,7 +24,7 @@ class m240905_120000_convert_enabled_settings extends Migration
 
         foreach ($settingNames as $settingName) {
             $settings = $projectConfig->get('plugins.blitz.settings.' . $settingName);
-            if ($settings !== null) {
+            if (is_array($settings)) {
                 $settings = ProjectConfigHelper::unpackAssociativeArray($settings);
                 foreach ($settings as &$setting) {
                     $setting['enabled'] = true;
