@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.8.1 - 2024-10-01
+
+### Fixed
+
+- Fixed an error that could occur when updating to 5.8.0.
+
 ## 5.8.0 - 2024-10-01
 
 ### Added

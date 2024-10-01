@@ -516,8 +516,10 @@ class SettingsModel extends Model
             'excludedQueryStringParams',
         ];
         foreach ($settingNames as $settingName) {
-            foreach ($this->{$settingName} as &$setting) {
-                $setting['enabled'] = $setting['enabled'] ?? true;
+            if (is_array($this->{$settingName})) {
+                foreach ($this->{$settingName} as &$setting) {
+                    $setting['enabled'] = $setting['enabled'] ?? true;
+                }
             }
         }
     }
