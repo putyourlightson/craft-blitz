@@ -24,6 +24,10 @@ function injectElements() {
         if (cookie) {
             sessionId = (_a = cookie.split('=')[1]) !== null && _a !== void 0 ? _a : null;
         }
+        else {
+            sessionId = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+            document.cookie = 'BlitzSessionId=' + sessionId + '; path=/; SameSite=Lax';
+        }
         elements.forEach(element => {
             var _a;
             const injectElement = {

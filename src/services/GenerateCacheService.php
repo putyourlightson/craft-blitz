@@ -638,14 +638,6 @@ class GenerateCacheService extends Component
     }
 
     /**
-     * Creates a unique index for quicker indexing and less storage.
-     */
-    public function createUniqueIndex(string $value): int
-    {
-        return sprintf('%u', crc32($value));
-    }
-
-    /**
      * Adds eager-loaded fields to an element recursively.
      * https://github.com/putyourlightson/craft-blitz/issues/657
      *
@@ -825,5 +817,13 @@ class GenerateCacheService extends Component
         } catch (Exception $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
+    }
+
+    /**
+     * Creates a unique index for quicker indexing and less storage.
+     */
+    private function createUniqueIndex(string $value): int
+    {
+        return sprintf('%u', crc32($value));
     }
 }

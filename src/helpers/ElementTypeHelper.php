@@ -39,7 +39,7 @@ class ElementTypeHelper
     public const NON_CACHEABLE_ELEMENT_TYPES = [
         GlobalSet::class,
         'benf\neo\elements\Block',
-        'craft\commerce\elements\Order',
+        //        'craft\commerce\elements\Order',
         'putyourlightson\campaign\elements\ContactElement',
     ];
 

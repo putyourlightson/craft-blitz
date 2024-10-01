@@ -26,6 +26,9 @@ async function injectElements() {
     const cookie = document.cookie.split('; ').find(row => row.startsWith('BlitzSessionId='));
     if (cookie) {
         sessionId = cookie.split('=')[1] ?? null;
+    } else {
+        sessionId = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+        document.cookie = 'BlitzSessionId=' + sessionId + '; path=/; SameSite=Lax';
     }
 
     elements.forEach(element => {
