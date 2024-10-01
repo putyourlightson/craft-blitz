@@ -21,7 +21,9 @@ class HintsHelper extends Component
      */
     public static function getCount(): int
     {
-        return HintRecord::find()->count();
+        return HintRecord::find()
+            ->where(['ignored' => false])
+            ->count();
     }
 
     /**
@@ -35,6 +37,7 @@ class HintsHelper extends Component
 
         /** @var HintRecord[] $hintRecords */
         $hintRecords = HintRecord::find()
+            ->where(['ignored' => false])
             ->orderBy(['dateUpdated' => SORT_DESC])
             ->all();
 

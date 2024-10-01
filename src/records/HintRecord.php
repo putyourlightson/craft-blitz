@@ -14,6 +14,7 @@ use DateTime;
  * @property string $template
  * @property int $line
  * @property array $stackTrace
+ * @property bool $ignored
  * @property DateTime $lastUpdated
  */
 class HintRecord extends ActiveRecord
