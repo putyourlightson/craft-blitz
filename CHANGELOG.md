@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added the ability to ignore hints in the Blitz Hints utility.
+- Added the ability to ignore hints in the Blitz Hints utility ([#714](https://github.com/putyourlightson/craft-blitz/issues/714)).
 
 ## 5.8.1 - 2024-10-01
 
