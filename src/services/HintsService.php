@@ -53,6 +53,19 @@ class HintsService extends Component
     }
 
     /**
+     * Ignores a hint.
+     *
+     * @since 5.9.0
+     */
+    public function ignore(int $id): void
+    {
+        HintRecord::updateAll(
+            ['ignored' => true],
+            ['id' => $id],
+        );
+    }
+
+    /**
      * Checks for opportunities to eager-load elements.
      */
     public function checkElementQuery(ElementQuery $elementQuery): void

@@ -22,7 +22,7 @@
                     <th>Hint</th>
                     <th>Template</th>
                     <th class="nowrap">Last Occurrence</th>
-                    <th style="width: 14px;"></th>
+                    <th style="width: 62px;"></th>
                 </tr>
             </thead>
             <tbody>
@@ -65,7 +65,8 @@
                             {{ hint.dateUpdated|timestamp }}
                         </td>
                         <td>
-                            <a sprig s-method="post" s-action="blitz/hints/clear" s-val:id="{{ hint.id }}" class="delete icon" title="{{ 'Delete'|t('app') }}" role="button"></a>
+                            <button sprig s-method="post" s-action="blitz/hints/ignore" s-val:id="{{ hint.id }}" class="icon" data-icon="eye-slash" title="{{ 'Ignore'|t('blitz') }}" role="button"></button>
+                            <button sprig s-method="post" s-action="blitz/hints/clear" s-val:id="{{ hint.id }}" class="delete icon" title="{{ 'Delete'|t('app') }}" role="button"></button>
                         </td>
                     </tr>
                 {% endfor %}

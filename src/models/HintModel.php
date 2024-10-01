@@ -42,6 +42,11 @@ class HintModel extends Model
     public array $stackTrace = [];
 
     /**
+     * @var bool
+     */
+    public bool $ignored = false;
+
+    /**
      * @var DateTime|null
      */
     public ?DateTime $dateUpdated = null;

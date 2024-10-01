@@ -192,6 +192,7 @@ class Install extends Migration
                 'template' => $this->string()->notNull(),
                 'line' => $this->integer(),
                 'stackTrace' => $this->text(),
+                'ignored' => $this->boolean(),
                 'dateCreated' => $this->dateTime()->notNull(),
                 'dateUpdated' => $this->dateTime()->notNull(),
                 'uid' => $this->uid(),

@@ -43,4 +43,17 @@ class HintsController extends Controller
 
         return $this->redirectToPostedUrl();
     }
+
+    /**
+     * Ignores a specific hint.
+     */
+    public function actionIgnore(): Response
+    {
+        $this->requirePostRequest();
+
+        $id = Craft::$app->getRequest()->getRequiredBodyParam('id');
+        Blitz::$plugin->hints->ignore($id);
+
+        return $this->redirectToPostedUrl();
+    }
 }

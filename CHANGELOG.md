@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.9.0 - Unreleased
+
+### Added
+
+- Added the ability to ignore hints in the Blitz Hints utility.
+
 ## 5.8.1 - 2024-10-01
 
 ### Fixed
