@@ -378,7 +378,7 @@
         <hr>
 
         {% set info %}
-            {{ 'With this setting enabled, URIs containing uppercase characters will not be cached by Blitz. Redirecting uppercase URIs to lowercase URIs using server rewrites is recommended.'|t('blitz') }}
+            {{ 'With this setting enabled, URIs containing uppercase characters will not be cached by Blitz. Redirecting uppercase URIs to lowercase URIs using server rewrites may be recommended.'|t('blitz') }}
         {% endset %}
         {{ forms.lightswitchField({
             label: "Only Cache Lowercase URIs"|t('blitz'),

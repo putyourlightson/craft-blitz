@@ -150,6 +150,9 @@ return [
         // With this setting enabled, Blitz will statically include templates using Edge-Side Includes (ESI), which must be enabled on the web server or CDN.
         //'esiEnabled' => false,
 
+        // Whether only URIs containing lowercase characters should be cached.
+        //'onlyCacheLowercaseUris' => false,
+
         // Whether URLs with query strings should be cached and how.
         // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
         // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES`: Cache URLs with query strings as unique pages

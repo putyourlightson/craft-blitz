@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.8.0 - Unreleased
+## 5.8.0 - 2024-10-01
 
 ### Added
 
@@ -14,7 +14,7 @@
 
 ### Fixed
 
-- Fixed some styling in the Blitz Diagnostics utility.
+- Fixed some styling issues in the Blitz Diagnostics utility.
 - Fixed false positives from appearing in the Blitz Hints utility when querying entry authors ([#710](https://github.com/putyourlightson/craft-blitz/issues/710)).
 
 ## 5.7.1 - 2024-08-26

@@ -509,7 +509,6 @@ class SettingsModel extends Model
         parent::setAttributes($values, $safeOnly);
 
         // Normalize enableable fields, ensuring that unset values default to `true`.
-        // TODO: Remove in version 6.0.0
         $settingNames = [
             'includedUriPatterns',
             'excludedUriPatterns',
