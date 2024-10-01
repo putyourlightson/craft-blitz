@@ -211,6 +211,14 @@ _Tests what should happen when, based on the refresh modes._
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) The cache should not be purged after refresh when forcing a clear with data set `expire only`.  
 ![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) The cache should not be purged after refresh when forcing a clear with data set `expire and generate`.  
 
+### [Settings](pest/Feature/SettingsTest.php)
+
+_Tests the default plugin settings._
+
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) The default cache control header doesn’t allow caching.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) The cache control header doesn’t allow browser caching.  
+![Pass](https://raw.githubusercontent.com/putyourlightson/craft-generate-test-spec/main/icons/pass.svg) The expired cache control header doesn’t allow browser caching.  
+
 ### [SiteUri](pest/Feature/SiteUriTest.php)
 
 _Tests the site URI helper methods._
