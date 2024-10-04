@@ -1,10 +1,14 @@
 # Release Notes for Blitz
 
-## 5.9.0 - Unreleased
+## 5.9.0 - 2024-10-04
 
 ### Added
 
 - Added the ability to ignore hints in the Blitz Hints utility ([#714](https://github.com/putyourlightson/craft-blitz/issues/714)).
+
+### Fixed
+
+- Fixed a bug that was preventing the organic regeneration of expired cached pages. 
 
 ## 5.8.1 - 2024-10-01
 
