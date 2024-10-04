@@ -6,9 +6,13 @@
 
 - Added the ability to ignore hints in the Blitz Hints utility ([#714](https://github.com/putyourlightson/craft-blitz/issues/714)).
 
+### Changed
+
+- CSRF tokens are now only loaded via a script in non-Sprig requests.
+
 ### Fixed
 
-- Fixed a bug that was preventing the organic regeneration of expired cached pages. 
+- Fixed a bug that was preventing the organic regeneration of expired cached pages.
 
 ## 5.8.1 - 2024-10-01
 
