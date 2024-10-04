@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.2 - 2024-10-04
+
+### Fixed
+
+- Fixed a bug that was preventing the organic regeneration of expired cached pages. 
+
 ## 4.23.1 - 2024-10-01
 
 ### Changed

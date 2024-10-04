@@ -688,6 +688,7 @@ class CacheRequestService extends Component
         if (Blitz::$plugin->expireCache->getIsExpiredSiteUri($siteUri)) {
             $cacheControlHeader = Blitz::$plugin->settings->cacheControlHeaderExpired;
             Blitz::$plugin->refreshCache->refreshExpiredSiteUris([$siteUri]);
+            Blitz::$plugin->refreshCache->refresh();
         }
 
         $headers = $response->getHeaders();
