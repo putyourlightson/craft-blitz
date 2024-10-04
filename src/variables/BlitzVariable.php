@@ -276,17 +276,15 @@ class BlitzVariable
     }
 
     /**
-     * Returns a CSRF property or a script to inject it, if this is not an AJAX request.
+     * Returns a CSRF property or a script to inject it, if this is not an AJAX or Sprig request.
      */
     private function getCsrfProperty(string $property): Markup
     {
-        $request = Craft::$app->getRequest();
-
-        if ($request->getIsAjax()) {
+        if ($this->getIsAjaxOrSprigRequest()) {
             $value = match ($property) {
                 'input' => Html::csrfInput(['async' => false]),
-                'param' => $request->csrfParam,
-                'token' => $request->getCsrfToken(),
+                'param' => Craft::$app->getRequest()->csrfParam,
+                'token' => Craft::$app->getRequest()->getCsrfToken(),
                 default => '',
             };
 
@@ -297,5 +295,21 @@ class BlitzVariable
         $config = new VariableConfigModel(['property' => $property]);
 
         return $this->getScript($uri, [], $config);
+    }
+
+    /**
+     * Returns whether this is an AJAX or Sprig request.
+     */
+    private function getIsAjaxOrSprigRequest(): bool
+    {
+        if (Craft::$app->getRequest()->getIsAjax()) {
+            return true;
+        }
+
+        if (class_exists('\putyourlightson\sprig\base\Component')) {
+            return \putyourlightson\sprig\base\Component::isRequest();
+        }
+
+        return false;
     }
 }
