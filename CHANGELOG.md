@@ -2,6 +2,10 @@
 
 ## 4.23.2 - 2024-10-04
 
+### Changed
+
+- CSRF tokens are now only loaded via a script in non-Sprig requests.
+
 ### Fixed
 
 - Fixed a bug that was preventing the organic regeneration of expired cached pages. 
