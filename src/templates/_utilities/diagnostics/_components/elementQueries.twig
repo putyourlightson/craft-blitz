@@ -21,8 +21,6 @@
     .limit(limit)
     .all() %}
 
-{% set isEntryElementType = elementType == 'craft\\elements\\Entry' %}
-
 <div s-replace="#results" s-swap="outerHTML show:#main:top" s-indicator="#results .elements">
     <div class="search-container flex-grow texticon has-filter-btn">
         <span class="texticon-icon search icon" aria-hidden="true"></span>
@@ -84,9 +82,6 @@
                                                 <th>{{ 'Name'|t('app') }}</th>
                                                 <th>{{ 'Handle'|t('app') }}</th>
                                                 <th>{{ 'Field Type'|t('app') }}</th>
-                                                {% if isEntryElementType %}
-                                                    <th>{{ 'Entry Type'|t('app') }}</th>
-                                                {% endif %}
                                             </thead>
                                             <tbody>
                                                 {% for field in fields %}
@@ -107,13 +102,6 @@
                                                                 </a>
                                                             </div>
                                                         </td>
-                                                        {% if isEntryElementType %}
-                                                            <td class="thin">
-                                                                <a href="{{ url('settings/entry-types/' ~ element.typeId) }}">
-                                                                    {{ element.type.name }}
-                                                                </a>
-                                                            </td>
-                                                        {% endif %}
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>

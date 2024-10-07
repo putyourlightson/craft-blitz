@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.9.1 - Unreleased
+
+### Fixed
+
+- Fixed a bug on the Tracked Element Queries page in the Blitz Diagnostics utility ([#716](https://github.com/putyourlightson/craft-blitz/issues/716)).
+
 ## 5.9.0 - 2024-10-04
 
 ### Added
