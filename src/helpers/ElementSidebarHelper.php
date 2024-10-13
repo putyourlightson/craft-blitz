@@ -15,6 +15,7 @@ use craft\helpers\DateTimeHelper;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\DummyStorage;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\CacheRecord;
 
@@ -47,6 +48,10 @@ class ElementSidebarHelper
     public static function getSidebarHtml(Element $element): string
     {
         if (Blitz::$plugin->settings->cachingEnabled === false) {
+            return '';
+        }
+
+        if (Blitz::$plugin->cacheStorage instanceof DummyStorage) {
             return '';
         }
 

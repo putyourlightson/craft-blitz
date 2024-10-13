@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.3 - Unreleased
+
+### Changed
+
+- The element sidebar panel is no longer displayed when no storage driver is selected.
+
 ## 4.23.2 - 2024-10-04
 
 ### Changed
