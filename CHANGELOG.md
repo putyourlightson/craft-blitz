@@ -4,7 +4,7 @@
 
 ### Changed
 
-- The element sidebar panel is no longer displayed when no storage driver is selected.
+- The element sidebar panel is no longer displayed when no storage driver is selected ([#718](https://github.com/putyourlightson/craft-blitz/issues/718)).
 
 ### Fixed
 
