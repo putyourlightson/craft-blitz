@@ -4,7 +4,7 @@
 
 ### Changed
 
-- The element sidebar panel no longer appears when no storage driver is selected.
+- The element sidebar panel is no longer displayed when no storage driver is selected.
 
 ### Fixed
 
