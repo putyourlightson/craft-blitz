@@ -2,6 +2,10 @@
 
 ## 5.9.1 - Unreleased
 
+### Changed
+
+- The element sidebar panel no longer appears when no storage driver is selected.
+
 ### Fixed
 
 - Fixed a bug on the Tracked Element Queries page in the Blitz Diagnostics utility ([#716](https://github.com/putyourlightson/craft-blitz/issues/716)).
