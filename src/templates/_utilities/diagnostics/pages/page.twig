@@ -20,7 +20,7 @@
     {% if page.expiryDate %}
         <h1>
             {{ 'Expiry Date'|t('blitz') }}:
-            {{  craft.blitz.diagnostics.toDateTime(page.expiryDate)|datetime('short') }}
+            {{ craft.blitz.diagnostics.toDateTime(page.expiryDate)|datetime('short') }}
         </h1>
     {% endif %}
     <br>
