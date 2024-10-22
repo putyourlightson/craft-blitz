@@ -5,7 +5,7 @@
     {% redirect 'blitz/diagnostics/includes' with error 'The include no longer exists or may have been refreshed.' %}
 {% endif %}
 {% set element = craft.blitz.diagnostics.getElementOfType(include.id) %}
-{% set title = 'Tracked ' ~ element.displayName ~ ' Queries' %}
+{% set title = 'Tracked ' ~ element.displayName() ~ ' Queries' %}
 {% set crumbs = [
     {
         label: include.index,
@@ -19,6 +19,6 @@
         cacheId: include.id,
         elementType: className(element),
         displayName: element.displayName,
-        pluralDisplayName: element.displayName ~ ' Queries',
+        pluralDisplayName: element.displayName() ~ ' Queries',
     }) }}
 {% endblock %}

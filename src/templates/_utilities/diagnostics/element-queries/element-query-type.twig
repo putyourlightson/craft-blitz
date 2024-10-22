@@ -1,13 +1,13 @@
 {% extends 'blitz/_utilities/diagnostics/layouts/element-queries' %}
 
 {% set element = craft.blitz.diagnostics.getElementOfType() %}
-{% set title = 'Tracked ' ~ element.displayName ~ ' Queries' %}
+{% set title = 'Tracked ' ~ element.displayName() ~ ' Queries' %}
 
 {% block content %}
     {{ sprig('blitz/_utilities/diagnostics/_components/elementQueries', {
         siteId: siteId,
         elementType: className(element),
-        displayName: element.displayName,
-        pluralDisplayName: element.displayName ~ ' Queries',
+        displayName: element.displayName(),
+        pluralDisplayName: element.displayName() ~ ' Queries',
     }) }}
 {% endblock %}
