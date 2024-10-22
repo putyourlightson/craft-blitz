@@ -5,7 +5,7 @@
     {% redirect 'blitz/diagnostics/pages' with error 'The page no longer exists or may have been refreshed.' %}
 {% endif %}
 {% set element = craft.blitz.diagnostics.getElementOfType(page.id) %}
-{% set title = 'Tracked ' ~ element.displayName ~ ' Queries' %}
+{% set title = 'Tracked ' ~ element.displayName() ~ ' Queries' %}
 {% set crumbs = [
     {
         label: page.uri,
@@ -19,6 +19,6 @@
         cacheId: page.id,
         elementType: className(element),
         displayName: element.displayName,
-        pluralDisplayName: element.displayName ~ ' Queries',
+        pluralDisplayName: element.displayName() ~ ' Queries',
     }) }}
 {% endblock %}

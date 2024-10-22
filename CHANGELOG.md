@@ -7,6 +7,10 @@
 - The element sidebar panel is no longer displayed when no storage driver is selected ([#718](https://github.com/putyourlightson/craft-blitz/issues/718)).
 - All inject script events are now called on the `document` element except for `load`, which is called on the `window` element ([#721](https://github.com/putyourlightson/craft-blitz/issues/721)).
 
+### Fixed
+
+- Fixed a bug in the Blitz Diagnostics utility that could throw an error if a custom field existed with the handle `displayName` ([#723](https://github.com/putyourlightson/craft-blitz/issues/723)).
+
 ## 4.23.2 - 2024-10-04
 
 ### Changed

@@ -9,7 +9,7 @@
 {% set codeTitle = true %}
 {% set crumbs = [
     {
-        label: 'Tracked ' ~ element.displayName ~ ' Queries',
+        label: 'Tracked ' ~ element.displayName() ~ ' Queries',
         url: cpUrl('blitz/diagnostics/element-queries/element-query-type', { 'elementType': className(element) }),
     },
 ] %}
