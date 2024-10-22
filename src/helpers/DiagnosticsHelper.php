@@ -158,7 +158,7 @@ class DiagnosticsHelper
             $condition['cacheId'] = $cacheId;
         }
 
-        $nestedExpression = new Expression('CASE WHEN ownerId IS NULL THEN 0 ELSE 1 END');
+        $nestedExpression = new Expression('CASE WHEN [[ownerId]] IS NULL THEN 0 ELSE 1 END');
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])

@@ -10,6 +10,7 @@
 ### Fixed
 
 - Fixed a bug on the Tracked Element Queries page in the Blitz Diagnostics utility ([#716](https://github.com/putyourlightson/craft-blitz/issues/716)).
+- Fixed a bug in the Blitz Diagnostics utility when using a Postgres database ([#724](https://github.com/putyourlightson/craft-blitz/issues/724)).
 
 ## 5.9.0 - 2024-10-04
 
