@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.4 - Unreleased
+
+### Fixed
+
+- Fixed a bug in which refresh jobs we re not being created immediately in some console commands.
+
 ## 4.23.3 - 2024-10-22
 
 ### Changed
