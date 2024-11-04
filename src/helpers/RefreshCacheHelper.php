@@ -64,7 +64,7 @@ class RefreshCacheHelper
         return ElementCacheRecord::find()
             ->select(ElementCacheRecord::tableName() . '.cacheId')
             ->where($condition)
-            ->joinWith('elementFieldCaches')
+            ->joinWith('elementFieldCaches', false)
             ->groupBy(ElementCacheRecord::tableName() . '.cacheId')
             ->column();
     }

@@ -126,7 +126,7 @@ class SiteUriHelper
                 Element::tableName() . '.enabled' => true,
             ])
             ->andWhere(['not', ['uri' => null]])
-            ->joinWith('element')
+            ->joinWith('element', false)
             ->orderBy(['uri' => SORT_ASC])
             ->column();
 
@@ -460,7 +460,7 @@ class SiteUriHelper
         /** @var array $siteUris */
         $siteUris = CacheTagRecord::find()
             ->select(['siteId', 'uri'])
-            ->joinWith('cache')
+            ->joinWith('cache', false)
             ->where(['tag' => $tags])
             ->asArray()
             ->all();

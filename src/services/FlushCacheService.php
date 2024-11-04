@@ -121,7 +121,7 @@ class FlushCacheService extends Component
         // Get and delete element query records without an associated element query cache
         $elementQueryRecordIds = ElementQueryRecord::find()
             ->select(['id'])
-            ->joinWith('elementQueryCaches')
+            ->joinWith('elementQueryCaches', false)
             ->where(['cacheId' => null])
             ->column();
 

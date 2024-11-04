@@ -41,7 +41,7 @@ class CacheTagsService extends Component
     {
         return CacheTagRecord::find()
             ->select(['tag'])
-            ->joinWith('cache')
+            ->joinWith('cache', false)
             ->where($siteUri->toArray())
             ->groupBy(['tag'])
             ->column();
