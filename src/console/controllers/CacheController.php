@@ -322,6 +322,7 @@ class CacheController extends Controller
     public function actionRefreshExpired(): int
     {
         Blitz::$plugin->refreshCache->refreshExpiredCache();
+        Blitz::$plugin->refreshCache->refresh();
 
         if (!$this->queue) {
             Craft::$app->runAction('queue/run');
@@ -342,6 +343,7 @@ class CacheController extends Controller
     public function actionRefreshExpiredElements(): int
     {
         Blitz::$plugin->refreshCache->refreshExpiredElements();
+        Blitz::$plugin->refreshCache->refresh();
 
         if (!$this->queue) {
             Craft::$app->runAction('queue/run');
@@ -406,6 +408,7 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->refreshCache->refreshCachedUrls($urls);
+        Blitz::$plugin->refreshCache->refresh();
 
         if (!$this->queue) {
             Craft::$app->runAction('queue/run');
@@ -428,6 +431,7 @@ class CacheController extends Controller
         }
 
         Blitz::$plugin->refreshCache->refreshCacheTags($tags);
+        Blitz::$plugin->refreshCache->refresh();
 
         if (!$this->queue) {
             Craft::$app->runAction('queue/run');
