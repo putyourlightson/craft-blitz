@@ -1,9 +1,10 @@
 # Release Notes for Blitz
 
-## 4.23.4 - Unreleased
+## 4.23.4 - 2024-11-04
 
 ### Fixed
 
+- Fixed an error that could occur when generating tagged caches in some cases ([#728](https://github.com/putyourlightson/craft-blitz/issues/728)).
 - Fixed a bug in which refresh jobs we re not being created immediately in some console commands.
 
 ## 4.23.3 - 2024-10-22
