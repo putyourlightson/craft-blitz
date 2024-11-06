@@ -247,9 +247,9 @@ class CacheRequestService extends Component
         }
 
         if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
-            $allowedQueryString = $this->getAllowedQueryString($siteUri->siteId, $siteUri->uri);
+            $queryStringParams = $this->getQueryStringParams($siteUri->uri);
 
-            if ($allowedQueryString) {
+            if (!empty($queryStringParams)) {
                 Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $url);
 
                 return false;
@@ -575,6 +575,17 @@ class CacheRequestService extends Component
     }
 
     /**
+     * Returns the query string params of the URI.
+     */
+    public function getQueryStringParams(string $uri): array
+    {
+        $queryString = parse_url($uri, PHP_URL_QUERY) ?: '';
+        parse_str($queryString, $queryStringParams);
+
+        return $queryStringParams;
+    }
+
+    /**
      * Returns the query string after processing the included and excluded query string params.
      */
     public function getAllowedQueryString(int $siteId, string $uri): string
@@ -583,8 +594,7 @@ class CacheRequestService extends Component
             return $this->allowedQueryStrings[$siteId][$uri];
         }
 
-        $queryString = parse_url($uri, PHP_URL_QUERY) ?: '';
-        parse_str($queryString, $queryStringParams);
+        $queryStringParams = $this->getQueryStringParams($uri);
 
         if (!$this->getIsCachedInclude($uri)) {
             foreach ($queryStringParams as $key => $value) {
