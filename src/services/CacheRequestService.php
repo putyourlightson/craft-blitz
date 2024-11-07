@@ -418,13 +418,14 @@ class CacheRequestService extends Component
             }
         }
 
+        $allowedQueryString = '';
         if (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
-            $uri .= '?' . $queryString;
+            $allowedQueryString = $queryString;
         } elseif (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES) {
             $allowedQueryString = $this->getAllowedQueryString($site->id, '?' . $queryString);
-            if ($allowedQueryString) {
-                $uri .= '?' . $allowedQueryString;
-            }
+        }
+        if ($allowedQueryString) {
+            $uri .= '?' . $allowedQueryString;
         }
 
         return new SiteUriModel([
