@@ -418,10 +418,10 @@ class CacheRequestService extends Component
             }
         }
 
-        // Add the allowed query string if unique query strings should not be cached as the same page
-        if (Blitz::$plugin->settings->queryStringCaching !== SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE) {
+        if (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
+            $uri .= '?' . $queryString;
+        } elseif (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES) {
             $allowedQueryString = $this->getAllowedQueryString($site->id, '?' . $queryString);
-
             if ($allowedQueryString) {
                 $uri .= '?' . $allowedQueryString;
             }
