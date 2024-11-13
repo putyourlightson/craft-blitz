@@ -247,7 +247,7 @@ class CacheRequestService extends Component
         }
 
         if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
-            $queryStringParams = $this->getQueryStringParams($siteUri->uri);
+            $queryStringParams = $this->getQueryStringParamsWithoutToken($siteUri->uri);
 
             if (!empty($queryStringParams)) {
                 Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $url);
@@ -576,12 +576,17 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the query string params of the URI.
+     * Returns the query string params of the URI without the token param.
      */
-    public function getQueryStringParams(string $uri): array
+    public function getQueryStringParamsWithoutToken(string $uri): array
     {
         $queryString = parse_url($uri, PHP_URL_QUERY) ?: '';
         parse_str($queryString, $queryStringParams);
+
+        $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
+        if (isset($queryStringParams[$tokenParam])) {
+            unset($queryStringParams[$tokenParam]);
+        }
 
         return $queryStringParams;
     }
@@ -595,7 +600,7 @@ class CacheRequestService extends Component
             return $this->allowedQueryStrings[$siteId][$uri];
         }
 
-        $queryStringParams = $this->getQueryStringParams($uri);
+        $queryStringParams = $this->getQueryStringParamsWithoutToken($uri);
 
         if (!$this->getIsCachedInclude($uri)) {
             foreach ($queryStringParams as $key => $value) {
