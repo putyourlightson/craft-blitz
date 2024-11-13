@@ -12,6 +12,7 @@ use craft\web\Application;
 use craft\web\Controller;
 use craft\web\twig\variables\Paginate;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\QueryStringHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\records\CacheRecord;
 use Throwable;
@@ -66,21 +67,16 @@ class GeneratorController extends Controller
      */
     private function generateResponse(): ?Response
     {
-        // Remove the token query param.
-        $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
         $queryParams = $this->request->getQueryParams();
-
-        if (isset($queryParams[$tokenParam])) {
-            unset($queryParams[$tokenParam]);
-            $this->request->setQueryParams($queryParams);
-        }
+        $validQueryParams = QueryStringHelper::getValidQueryParams($queryParams);
+        $this->request->setQueryParams($validQueryParams);
 
         /**
          * Update the query string to avoid the token being added to URLs.
          *
          * @see Paginate::getPageUrl()
          */
-        $_SERVER['QUERY_STRING'] = http_build_query($queryParams);
+        $_SERVER['QUERY_STRING'] = http_build_query($validQueryParams);
 
         /**
          * Unset the token to avoid it being added to URLs.

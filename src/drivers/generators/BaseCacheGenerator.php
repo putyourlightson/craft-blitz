@@ -12,6 +12,7 @@ use craft\helpers\Console;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
+use putyourlightson\blitz\helpers\QueryStringHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use Throwable;
@@ -240,8 +241,13 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
     protected function outputVerbose(string $url, bool $success = true): void
     {
         if (Craft::$app->getRequest()->getIsConsoleRequest() && $this->verbose) {
-            $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
-            $url = preg_replace('/[?&]' . $tokenParam . '.*/', '', $url);
+            $queryString = parse_url($url, PHP_URL_QUERY) ?: '';
+            if ($queryString) {
+                $validQueryStringParams = QueryStringHelper::getValidQueryStringParams($url);
+                $validQueryString = http_build_query($validQueryStringParams);
+                $url = str_replace($queryString, $validQueryString, $url);
+                $url = trim($url, '?');
+            }
 
             if ($success) {
                 Console::stdout($url . PHP_EOL);

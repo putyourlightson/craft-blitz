@@ -19,6 +19,7 @@ use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\enums\HeaderEnum;
 use putyourlightson\blitz\events\ResponseEvent;
+use putyourlightson\blitz\helpers\QueryStringHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -246,8 +247,8 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if (Blitz::$plugin->settings->queryStringCaching == SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
-            $queryStringParams = $this->getQueryStringParamsWithoutToken($siteUri->uri);
+        if (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
+            $queryStringParams = QueryStringHelper::getValidQueryStringParams($siteUri->uri);
 
             if (!empty($queryStringParams)) {
                 Blitz::$plugin->debug('Page not cached because a query string was provided with the query string caching setting disabled.', [], $url);
@@ -401,7 +402,9 @@ class CacheRequestService extends Component
          *
          * @see Request::getQueryString()
          */
-        $queryString = http_build_query(Craft::$app->getRequest()->getQueryParams());
+        $queryParams = Craft::$app->getRequest()->getQueryParams();
+        $validQueryParams = QueryStringHelper::getValidQueryParams($queryParams);
+        $queryString = http_build_query($validQueryParams);
 
         /**
          * Remove the base site path from the full URI
@@ -576,22 +579,6 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the query string params of the URI without the token param.
-     */
-    public function getQueryStringParamsWithoutToken(string $uri): array
-    {
-        $queryString = parse_url($uri, PHP_URL_QUERY) ?: '';
-        parse_str($queryString, $queryStringParams);
-
-        $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
-        if (isset($queryStringParams[$tokenParam])) {
-            unset($queryStringParams[$tokenParam]);
-        }
-
-        return $queryStringParams;
-    }
-
-    /**
      * Returns the query string after processing the included and excluded query string params.
      */
     public function getAllowedQueryString(int $siteId, string $uri): string
@@ -600,7 +587,7 @@ class CacheRequestService extends Component
             return $this->allowedQueryStrings[$siteId][$uri];
         }
 
-        $queryStringParams = $this->getQueryStringParamsWithoutToken($uri);
+        $queryStringParams = QueryStringHelper::getValidQueryStringParams($uri);
 
         if (!$this->getIsCachedInclude($uri)) {
             foreach ($queryStringParams as $key => $value) {
