@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.7 - 2024-11-15
+
+### Fixed
+
+- Fixed a bug that was preventing cache generation when “Do not cache URLs with query strings” was selected ([#733](https://github.com/putyourlightson/craft-blitz/issues/733)).
+
 ## 4.23.6 - 2024-11-13
 
 ### Fixed
