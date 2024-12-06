@@ -1,5 +1,5 @@
 // The event name will be replaced with the `injectScriptEvent` config setting.
-const injectScriptEvent = '{injectScriptEvent}';
+var injectScriptEvent = '{injectScriptEvent}';
 // @ts-ignore
 if (injectScriptEvent === 'load') {
     window.addEventListener('load', injectElements, {once: true});
