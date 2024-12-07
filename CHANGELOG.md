@@ -1,12 +1,12 @@
 # Release Notes for Blitz
 
-## 5.9.7 - Unreleased
+## 5.9.7 - 2024-12-06
 
 ### Changed
 
 - More deployer settings are now redacted when generating a diagnostics report.
 - The existence of cached files is now checked before deletion, to prevent unnecessarily logged warnings ([#741](https://github.com/putyourlightson/craft-blitz/issues/741)).
-- The `injectScriptEvent` variable is no longer defined in the global scope, for better compatibility with JavaScript libraries.
+- The `injectScriptEvent` variable is no longer defined in the global scope, for better compatibility with JavaScript libraries ([#747](https://github.com/putyourlightson/craft-blitz/issues/747)).
 
 ## 5.9.6 - 2024-11-15
 
