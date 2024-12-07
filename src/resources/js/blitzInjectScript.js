@@ -7,12 +7,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-const injectScriptEvent = '{injectScriptEvent}';
-if (injectScriptEvent === 'load') {
-    window.addEventListener('load', injectElements, { once: true });
-}
-else {
-    document.addEventListener(injectScriptEvent, injectElements, { once: true });
+addInjectScriptEventListener();
+function addInjectScriptEventListener() {
+    const injectScriptEvent = '{injectScriptEvent}';
+    if (injectScriptEvent === 'load') {
+        window.addEventListener('load', injectElements, { once: true });
+    }
+    else {
+        document.addEventListener(injectScriptEvent, injectElements, { once: true });
+    }
 }
 function injectElements() {
     return __awaiter(this, void 0, void 0, function* () {
