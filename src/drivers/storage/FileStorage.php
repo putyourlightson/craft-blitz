@@ -452,7 +452,17 @@ class FileStorage extends BaseCacheStorage
      */
     private function delete(string $filePath): void
     {
-        FileHelper::unlink($filePath);
-        FileHelper::unlink($filePath . '.gz');
+        $this->deleteIfExists($filePath);
+        $this->deleteIfExists($filePath . '.gz');
+    }
+
+    /**
+     * Deletes a file if it exists.
+     */
+    private function deleteIfExists(string $filePath): void
+    {
+        if (file_exists($filePath)) {
+            FileHelper::unlink($filePath);
+        }
     }
 }

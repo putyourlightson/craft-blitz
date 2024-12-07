@@ -5,6 +5,7 @@
 ### Changed
 
 - More deployer settings are now redacted when generating a diagnostics report.
+- The existence of cached files is checked before deletion, to prevent unnecessarily logged warnings ([#741](https://github.com/putyourlightson/craft-blitz/issues/741)).
 
 ## 4.23.7 - 2024-11-15
 
