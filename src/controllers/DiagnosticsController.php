@@ -119,14 +119,25 @@ class DiagnosticsController extends Controller
     }
 
     /**
-     * Returns redacted values as a JSON encoded string.
+     * Returns redacted plugin settings as a JSON encoded string.
      */
-    private function getRedacted(array $values): string
+    private function getRedactedPluginSettings(): string
     {
-        $redacted = Craft::$app->getSecurity()->redactIfSensitive('', $values);
+        $settings = Blitz::$plugin->settings;
+
+        if (!empty($settings->deployerSettings)) {
+            $allowedKeys = ['gitRepositories'];
+            foreach ($settings->deployerSettings as $key => $value) {
+                if (!empty($settings->deployerSettings[$key]) && !in_array($key, $allowedKeys)) {
+                    $settings->deployerSettings[$key] = '*';
+                }
+            }
+        }
+
+        $redacted = Craft::$app->getSecurity()->redactIfSensitive('', $settings->getAttributes());
         $encoded = Json::encode($redacted, JSON_PRETTY_PRINT);
 
-        // Replace unicode character with asterisk
+        // Replace Unicode character with asterisk
         return str_replace('\u2022', '*', $encoded);
     }
 
@@ -158,7 +169,7 @@ class DiagnosticsController extends Controller
                 'dbDriver' => $this->dbDriver(),
                 'plugins' => Craft::$app->getPlugins()->getAllPlugins(),
                 'modules' => $modules,
-                'blitzPluginSettings' => $this->getRedacted(Blitz::$plugin->getSettings()->getAttributes()),
+                'blitzPluginSettings' => $this->getRedactedPluginSettings(),
             ]
         );
     }

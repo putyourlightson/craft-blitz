@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.8 - Unreleased
+
+### Changed
+
+- More deployer settings are now redacted when generating a diagnostics report.
+
 ## 4.23.7 - 2024-11-15
 
 ### Fixed
