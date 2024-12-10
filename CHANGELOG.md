@@ -4,7 +4,7 @@
 
 ### Changed
 
-- The logs now output the reason why pages failed to be generated using the Local Generator with debug mode enabled ([#737](https://github.com/putyourlightson/craft-blitz/issues/737)).
+- The reasons why pages failed to be generated using the Local Generator are now logged when debug mode is enabled ([#737](https://github.com/putyourlightson/craft-blitz/issues/737)).
 
 ## 5.9.7 - 2024-12-06
 
