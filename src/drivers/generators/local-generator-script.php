@@ -104,7 +104,7 @@ return function(Channel $channel): void {
     try {
         $success = $app->run() == 0;
     } catch (Throwable $exception) {
-        $error = 'Page not cached because an error was encountered: ' . $exception->getMessage();
+        $error = 'Page not cached because an error was encountered: ' . $exception->getMessage() . ' ' . $exception->getTraceAsString();
         Blitz::$plugin->debug($error, [], $url);
     }
 
