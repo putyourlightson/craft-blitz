@@ -6,6 +6,7 @@
 use Amp\Sync\Channel;
 use craft\services\Plugins;
 use craft\web\View;
+use putyourlightson\blitz\Blitz;
 use yii\base\Event;
 
 /**
@@ -98,8 +99,14 @@ return function(Channel $channel): void {
      * @var craft\web\Application $app
      */
     $app = require $root . '/vendor/craftcms/cms/bootstrap/web.php';
+    $success = false;
 
-    $success = $app->run() == 0;
+    try {
+        $success = $app->run() == 0;
+    } catch (Throwable $exception) {
+        $error = 'Page not cached because a error was encountered: ' . $exception->getMessage();
+        Blitz::$plugin->debug($error, [], $url);
+    }
 
     $channel->send($success);
 };

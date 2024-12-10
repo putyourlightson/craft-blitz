@@ -86,12 +86,13 @@ class LocalGenerator extends BaseCacheGenerator
                 $this->outputVerbose($url, false);
             });
 
+            $result = false;
+
             try {
                 $context->send($config);
                 $result = $context->receive($canceller);
             } catch (Throwable $exception) {
                 Blitz::$plugin->debug($exception->getMessage(), [], $url);
-                $result = false;
             }
 
             $canceller->unsubscribe($cancellerId);

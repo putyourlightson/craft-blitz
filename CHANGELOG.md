@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.9.8 - 2024-12-10
+
+### Changed
+
+- The logs now output the reason why pages failed to be generated using the Local Generator with debug mode enabled ([#737](https://github.com/putyourlightson/craft-blitz/issues/737)).
+
 ## 5.9.7 - 2024-12-06
 
 ### Changed
