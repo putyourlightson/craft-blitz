@@ -248,10 +248,15 @@ class BlitzVariable
         $this->injected++;
         $id = $this->injected;
 
+        // Decode slashes to prevent errors when the `AllowEncodedSlashes` is disabled, only when not using SSI or ESI.
+        // https://github.com/putyourlightson/craft-blitz/issues/595
+        $queryString = $this->getQueryString($params);
+        $queryString = str_replace('%2F', '/', $queryString);
+
         $data = [
             'blitz-id' => $id,
             'blitz-uri' => $uri,
-            'blitz-params' => $this->getQueryString($params),
+            'blitz-params' => $queryString,
             'blitz-property' => $config->property,
         ];
 
