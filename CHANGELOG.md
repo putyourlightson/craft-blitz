@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.10 - Unreleased
+
+### Changed
+
+- Slashes in inject script params are now decoded to prevent errors when the `AllowEncodedSlashes` directive is disabled.
+
 ## 4.23.9 - 2024-12-10
 
 ### Changed
