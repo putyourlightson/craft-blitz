@@ -73,8 +73,12 @@ class BaseDriverHelper
      */
     public static function releaseDriverJobs(string $driverId): void
     {
-        /** @var \craft\queue\Queue $queue */
         $queue = Craft::$app->getQueue();
+
+        // Only release jobs if the queue is a Craft queue.
+        if (!($queue instanceof \craft\queue\Queue)) {
+            return;
+        }
 
         $jobIds = (new Query())
             ->from([$queue->tableName])
