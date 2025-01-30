@@ -291,7 +291,7 @@ class Blitz extends Plugin
     private function registerLogTarget(): void
     {
         if (Craft::getLogger()->dispatcher instanceof Dispatcher) {
-            Craft::getLogger()->dispatcher->targets[] = new MonologTarget([
+            Craft::getLogger()->dispatcher->targets['blitz'] = new MonologTarget([
                 'name' => 'blitz',
                 'categories' => ['blitz'],
                 'level' => LogLevel::INFO,
