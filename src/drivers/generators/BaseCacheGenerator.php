@@ -238,7 +238,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
             if ($success) {
                 Console::stdout($url . PHP_EOL);
             } else {
-                Console::stdout($url . PHP_EOL, BaseConsole::FG_RED);
+                Console::stdout('FAIL: ' . $url . PHP_EOL, BaseConsole::FG_RED);
             }
         }
     }
