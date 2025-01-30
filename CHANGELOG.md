@@ -1,5 +1,15 @@
 # Release Notes for Blitz
 
+## 4.23.11 - Unreleased
+
+### Changed
+
+- Failed cache generated pages are now more explicitly logged when verbose mode is used.
+
+### Fixed
+
+- Fixed a bug that was throwing an exception when the Redis queue driver was being used ([#752](https://github.com/putyourlightson/craft-blitz/issues/752)).
+
 ## 4.23.10 - 2024-12-31
 
 ### Changed
