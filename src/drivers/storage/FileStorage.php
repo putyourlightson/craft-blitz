@@ -276,7 +276,7 @@ class FileStorage extends BaseCacheStorage
         $decodedUri = rawurldecode($siteUri->uri);
         $decodedFilePath = $this->getNormalizedFilePath($sitePath, $decodedUri);
         if ($decodedFilePath != $filePath) {
-            $filePaths[] = $filePath;
+            $filePaths[] = $decodedFilePath;
         }
 
         return $filePaths;

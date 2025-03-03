@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.12 - Unreleased
+
+### Fixed
+
+- Fixed a bug in which cache files with decoded characters were not being saved ([#767](https://github.com/putyourlightson/craft-blitz/issues/767)).
+
 ## 4.23.11 - 2025-01-30
 
 ### Changed
