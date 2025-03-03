@@ -47,6 +47,11 @@ class ElementSidebarHelper
      */
     public static function getSidebarHtml(Element $element): string
     {
+        $user = Craft::$app->getUser()->getIdentity();
+        if (!$user->can('blitz:view-sidebar-panel')) {
+            return '';
+        }
+
         if (Blitz::$plugin->settings->cachingEnabled === false) {
             return '';
         }
