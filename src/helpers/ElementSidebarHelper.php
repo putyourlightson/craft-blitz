@@ -85,9 +85,6 @@ class ElementSidebarHelper
             'siteId' => $element->siteId,
             'uri' => $element->uri,
         ]);
-        if ($siteUri->uri === Element::HOMEPAGE_URI) {
-            $siteUri->uri = '';
-        }
         $cachedValue = Blitz::$plugin->cacheStorage->get($siteUri);
 
         /** @var CacheRecord|null $cacheRecord */

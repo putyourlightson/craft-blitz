@@ -25,14 +25,22 @@ class SiteUriModel extends Model
     public string $uri = '';
 
     /**
+     * @inheritdoc
+     */
+    public function __construct($config = [])
+    {
+        parent::__construct($config);
+
+        if ($this->uri === Element::HOMEPAGE_URI) {
+            $this->uri = '';
+        }
+    }
+
+    /**
      * Returns a URL with optional params.
      */
     public function getUrl(array $params = []): string
     {
-        if ($this->uri === Element::HOMEPAGE_URI) {
-            return UrlHelper::siteUrl('', $params, null, $this->siteId);
-        }
-
         return UrlHelper::siteUrl($this->uri, $params, null, $this->siteId);
     }
 }
