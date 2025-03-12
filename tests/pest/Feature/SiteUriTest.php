@@ -4,7 +4,9 @@
  * Tests the site URI helper methods.
  */
 
+use craft\base\Element;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\SiteUriModel;
 
 test('Site URIs are returned from assets with transforms', function() {
     $asset = createAsset();
@@ -55,4 +57,13 @@ test('Site URIs without page triggers are not paginated', function() {
     Craft::$app->config->general->pageTrigger = '?page=';
     expect(SiteUriHelper::isPaginatedUri('?page3'))
         ->toBeFalse();
+});
+
+test('Site URIs containing the homepage URI are converted to an empty string', function() {
+    $siteUri = new SiteUriModel([
+        'uri' => Element::HOMEPAGE_URI,
+        'siteId' => 1,
+    ]);
+    expect($siteUri->uri)
+        ->toBe('');
 });

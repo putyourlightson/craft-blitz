@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 4.23.13 - 2025-03-12
+
+### Fixed
+
+- Fixed a bug in which the homepage was not being refreshed when only a Neo field was modified ([#754](https://github.com/putyourlightson/craft-blitz/issues/754)).
+
 ## 4.23.12 - 2025-03-06
 
 ### Changed
