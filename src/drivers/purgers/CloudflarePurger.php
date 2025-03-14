@@ -153,6 +153,7 @@ class CloudflarePurger extends BaseCachePurger
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/purgers/cloudflare/settings', [
             'purger' => $this,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 
@@ -181,18 +182,18 @@ class CloudflarePurger extends BaseCachePurger
         return [
             [
                 ['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiToken';
-                },
+                return $purger->authenticationMethod == 'apiToken';
+            },
             ],
             [
                 ['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiKey';
-                },
+                return $purger->authenticationMethod == 'apiKey';
+            },
             ],
             [
                 ['email'], 'email', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiKey';
-                },
+                return $purger->authenticationMethod == 'apiKey';
+            },
             ],
         ];
     }

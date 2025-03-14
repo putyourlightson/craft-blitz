@@ -116,6 +116,11 @@ class Blitz extends Plugin
     /**
      * @inheritdoc
      */
+    public bool $hasReadOnlyCpSettings = true;
+
+    /**
+     * @inheritdoc
+     */
     public string $schemaVersion = '5.9.0';
 
     /**
@@ -222,6 +227,14 @@ class Blitz extends Plugin
     protected function createSettingsModel(): SettingsModel
     {
         return new SettingsModel();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getReadOnlySettingsResponse(): mixed
+    {
+        return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('settings/plugins/blitz'));
     }
 
     /**

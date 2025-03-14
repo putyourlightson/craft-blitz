@@ -1,5 +1,6 @@
 {% import "_includes/forms" as forms %}
 
+{% set readOnly = readOnly ?? false %}
 {% set info %}
     <span class="info">{{ "The folder path should be in the site’s public webroot if the cached files should be publicly available."|t('blitz') }}</span>
 {% endset %}
@@ -14,6 +15,7 @@
     placeholder: '@webroot/cache/blitz',
     tip: "It is highly recommended to exclude the cache folder path from search engine indexing via a [`robots.txt`](https://www.robotstxt.org/robotstxt.html) file."|t('blitz'),
     required: true,
+    disabled: readOnly,
 }) }}
 
 {% set info %}
@@ -26,6 +28,7 @@
     tip: tip,
     name: 'compressCachedValues',
     on: driver.compressCachedValues,
+    disabled: readOnly,
 }) }}
 
 <p class="light">

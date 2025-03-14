@@ -1,5 +1,6 @@
 {% import "_includes/forms" as forms %}
 
+{% set readOnly = readOnly ?? false %}
 {% set info %}
     <span class="info">{{ 'With this setting enabled, Blitz will compress cached values using gzip, resulting in reduced storage and improved performance. The cache should be cleared or refreshed after changing this setting.'|t('blitz') }}</span>
 {% endset %}
@@ -10,6 +11,7 @@
     tip: tip,
     name: 'compressCachedValues',
     on: driver.compressCachedValues,
+    disabled: readOnly,
 }) }}
 
 <p class="light">

@@ -61,6 +61,7 @@ class HttpGenerator extends BaseCacheGenerator
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/generators/http/settings', [
             'generator' => $this,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

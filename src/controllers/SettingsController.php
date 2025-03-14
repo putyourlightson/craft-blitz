@@ -31,7 +31,7 @@ class SettingsController extends Controller
      */
     public function beforeAction($action): bool
     {
-        $this->requireAdmin();
+        $this->requireAdmin(false);
 
         return parent::beforeAction($action);
     }
@@ -125,6 +125,7 @@ class SettingsController extends Controller
             'deployerDrivers' => $deployerDrivers,
             'deployerTypeOptions' => array_map([$this, 'getSelectOption'], $deployerDrivers),
             'detectSsiTag' => $detectSsiTag,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

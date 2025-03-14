@@ -164,6 +164,7 @@ class YiiCacheStorage extends BaseCacheStorage
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/storage/yii-cache/settings', [
             'driver' => $this,
             'compressionSupported' => function_exists('gzencode'),
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

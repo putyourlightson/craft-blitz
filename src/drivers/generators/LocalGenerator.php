@@ -117,6 +117,7 @@ class LocalGenerator extends BaseCacheGenerator
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/generators/local/settings', [
             'generator' => $this,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

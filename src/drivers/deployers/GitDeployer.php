@@ -236,6 +236,7 @@ class GitDeployer extends BaseDeployer
     {
         return Craft::$app->getView()->renderTemplate('blitz/_drivers/deployers/git/settings', [
             'deployer' => $this,
+            'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
     }
 

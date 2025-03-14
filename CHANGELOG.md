@@ -1,5 +1,15 @@
 # Release Notes for Blitz
 
+## 5.10.0 - Unreleased
+
+### Added
+
+- Added support for viewing plugin settings when `allowAdminChanges` is disabled.
+
+### Changed
+
+- Blitz now requires Craft CMS 5.6.0.
+
 ## 5.9.12 - 2025-03-12
 
 ### Fixed
