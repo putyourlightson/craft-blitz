@@ -11,7 +11,6 @@ use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\DiagnosticsHelper;
-use putyourlightson\blitz\helpers\HintsHelper;
 use putyourlightson\blitz\helpers\QueryStringHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\VariableConfigModel;
@@ -135,14 +134,6 @@ class BlitzVariable
     public static function getDiagnostics(): DiagnosticsHelper
     {
         return new DiagnosticsHelper();
-    }
-
-    /**
-     * Returns an instance of the hints helper.
-     */
-    public static function getHints(): HintsHelper
-    {
-        return new HintsHelper();
     }
 
     /**

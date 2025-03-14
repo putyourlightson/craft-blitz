@@ -71,9 +71,9 @@ class SettingsModel extends Model
     public bool $debug = false;
 
     /**
-     * With this setting enabled, Blitz will provide template performance hints in a utility.
+     * @deprecated since 5.10.0
      */
-    public bool $hintsEnabled = true;
+    public bool $hintsEnabled = false;
 
     /**
      * With this setting enabled, Blitz will begin caching pages according to the included/excluded URI patterns. Disable this setting to prevent Blitz from caching any new pages.

@@ -21,7 +21,6 @@ use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
-use putyourlightson\blitz\records\HintRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 
@@ -61,7 +60,6 @@ class Install extends Migration
         $this->dropTableIfExists(SsiIncludeCacheRecord::tableName());
         $this->dropTableIfExists(IncludeRecord::tableName());
         $this->dropTableIfExists(CacheRecord::tableName());
-        $this->dropTableIfExists(HintRecord::tableName());
 
         return true;
     }
@@ -185,20 +183,6 @@ class Install extends Migration
             ]);
         }
 
-        if (!$this->db->tableExists(HintRecord::tableName())) {
-            $this->createTable(HintRecord::tableName(), [
-                'id' => $this->primaryKey(),
-                'fieldId' => $this->integer()->notNull(),
-                'template' => $this->string()->notNull(),
-                'line' => $this->integer(),
-                'stackTrace' => $this->text(),
-                'ignored' => $this->boolean(),
-                'dateCreated' => $this->dateTime()->notNull(),
-                'dateUpdated' => $this->dateTime()->notNull(),
-                'uid' => $this->uid(),
-            ]);
-        }
-
         return true;
     }
 
@@ -215,12 +199,6 @@ class Install extends Migration
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
         $this->createIndex(null, IncludeRecord::tableName(), 'index', true);
-
-        // Exclude the line number from the index to avoid duplicate hints appearing when templates are edited and lines shifted around.
-        $this->createIndex(null, HintRecord::tableName(), [
-            'fieldId',
-            'template',
-        ], true);
     }
 
     /**

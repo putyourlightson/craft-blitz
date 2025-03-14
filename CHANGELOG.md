@@ -4,11 +4,15 @@
 
 ### Added
 
-- Added support for viewing plugin settings when `allowAdminChanges` is disabled.
+- Added support for viewing plugin settings when `allowAdminChanges` is disabled ([#770](https://github.com/putyourlightson/craft-blitz/issues/770)).
 
 ### Changed
 
 - Blitz now requires Craft CMS 5.6.0.
+
+### Removed
+
+- Removed the Blitz Hints utility.
 
 ## 5.9.12 - 2025-03-12
 

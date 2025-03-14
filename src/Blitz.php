@@ -8,10 +8,8 @@ namespace putyourlightson\blitz;
 use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
-use craft\elements\db\ElementQuery;
 use craft\elements\User;
 use craft\enums\CmsEdition;
-use craft\events\CancelableEvent;
 use craft\events\DefineHtmlEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
@@ -53,11 +51,9 @@ use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\ExpireCacheService;
 use putyourlightson\blitz\services\FlushCacheService;
 use putyourlightson\blitz\services\GenerateCacheService;
-use putyourlightson\blitz\services\HintsService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use putyourlightson\blitz\utilities\CacheUtility;
 use putyourlightson\blitz\utilities\DiagnosticsUtility;
-use putyourlightson\blitz\utilities\HintsUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\blitz\widgets\CacheWidget;
 use putyourlightson\sprig\Sprig;
@@ -74,7 +70,6 @@ use yii\queue\Queue;
  * @property-read ExpireCacheService $expireCache
  * @property-read FlushCacheService $flushCache
  * @property-read GenerateCacheService $generateCache
- * @property-read HintsService $hints
  * @property-read RefreshCacheService $refreshCache
  * @property-read BaseCacheStorage $cacheStorage
  * @property-read BaseCacheGenerator $cacheGenerator
@@ -102,7 +97,6 @@ class Blitz extends Plugin
                 'expireCache' => ['class' => ExpireCacheService::class],
                 'flushCache' => ['class' => FlushCacheService::class],
                 'generateCache' => ['class' => GenerateCacheService::class],
-                'hints' => ['class' => HintsService::class],
                 'refreshCache' => ['class' => RefreshCacheService::class],
             ],
         ];
@@ -121,12 +115,12 @@ class Blitz extends Plugin
     /**
      * @inheritdoc
      */
-    public string $schemaVersion = '5.9.0';
+    public string $schemaVersion = '5.10.0';
 
     /**
      * @inheritdoc
      */
-    public string $minVersionRequired = '4.11.1';
+    public string $minVersionRequired = '5.9.0';
 
     /**
      * The queue to use for running jobs.
@@ -163,10 +157,7 @@ class Blitz extends Plugin
             $this->registerIntegrationEvents();
         }
 
-        // Register site and control panel events with explicit conditionals, to account for console requests.
-        if (Craft::$app->getRequest()->getIsSiteRequest()) {
-            $this->registerHintsUtilityEvents();
-        } elseif (Craft::$app->getRequest()->getIsCpRequest()) {
+        if (Craft::$app->getRequest()->getIsCpRequest()) {
             $this->registerCpUrlRules();
             $this->registerUtilities();
             $this->registerWidgets();
@@ -451,35 +442,6 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers hints utility events
-     */
-    private function registerHintsUtilityEvents(): void
-    {
-        if (!$this->settings->hintsEnabled) {
-            return;
-        }
-
-        Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE,
-            function(CancelableEvent $event) {
-                /** @var ElementQuery $elementQuery */
-                $elementQuery = $event->sender;
-                $this->hints->checkElementQuery($elementQuery);
-            },
-            null,
-            false
-        );
-
-        // Add the event listener without “appending”, so it triggers as early as possible.
-        Event::on(Response::class, Response::EVENT_AFTER_PREPARE,
-            function() {
-                $this->hints->save();
-            },
-            null,
-            false
-        );
-    }
-
-    /**
      * Registers clear caches
      */
     private function registerClearCaches(): void
@@ -523,7 +485,6 @@ class Blitz extends Plugin
             function(RegisterComponentTypesEvent $event) {
                 $event->types[] = CacheUtility::class;
                 $event->types[] = DiagnosticsUtility::class;
-                $event->types[] = HintsUtility::class;
             }
         );
     }

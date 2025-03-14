@@ -139,14 +139,6 @@ table.editable th.code {
     padding-left: 86px;
 }
 
-.blitz-hints.loading .checkmark-icon {
-    display: none;
-}
-
-.blitz-hints.loading .spinner {
-    display: inline-flex !important;
-}
-
 #footer {
     margin: 1px;
 }

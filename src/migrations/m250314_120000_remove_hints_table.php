@@ -3,18 +3,15 @@
 namespace putyourlightson\blitz\migrations;
 
 use craft\db\Migration;
-use putyourlightson\blitz\records\HintRecord;
 
-class m241001_120000_add_ignored_column extends Migration
+class m250314_120000_remove_hints_table extends Migration
 {
     /**
      * @inheritdoc
      */
     public function safeUp(): bool
     {
-        if (!$this->db->columnExists(HintRecord::tableName(), 'ignored')) {
-            $this->addColumn(HintRecord::tableName(), 'ignored', $this->boolean()->defaultValue(false)->after('stackTrace'));
-        }
+        $this->dropTableIfExists('{{%blitz_hints}}');
 
         return true;
     }

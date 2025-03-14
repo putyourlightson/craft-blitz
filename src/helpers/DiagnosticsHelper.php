@@ -595,27 +595,6 @@ class DiagnosticsHelper
         ];
 
         /**
-         * Blitz Hints test.
-         */
-        if (Blitz::$plugin->settings->hintsEnabled) {
-            $hintsCount = HintsHelper::getCount();
-            $pass = $hintsCount === 0;
-            if ($pass) {
-                $message = 'The <a href="' . UrlHelper::cpUrl('utilities/blitz-hints') . '">Blitz Hints</a> utility is not reporting any eager-loading opportunities.';
-            } else {
-                $message = 'The <a href="' . UrlHelper::cpUrl('utilities/blitz-hints') . '">Blitz Hints</a> utility is reporting ' . $hintsCount . ' eager-loading ' . Craft::t('blitz', '{num, plural, =1{opportunity} other{opportunities}}', ['num' => $hintsCount]) . '.';
-            }
-        } else {
-            $pass = true;
-            $message = 'The Blitz Hints utility is disabled.';
-        }
-        $tests[] = [
-            'pass' => $pass,
-            'message' => $message,
-            'info' => 'Eager-loading elements is highly recommended. The Blitz Hints utility lists opportunities for eager-loading elements including the field name, the template and the line number. <a href="https://putyourlightson.com/plugins/blitz#hints-utility" target="_blank" class="go">Learn more</a>',
-        ];
-
-        /**
          * Async Queue plugin test.
          */
         $pass = Craft::$app->getPlugins()->getPlugin('async-queue') === null;
