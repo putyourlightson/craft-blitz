@@ -221,14 +221,6 @@ class Blitz extends Plugin
     }
 
     /**
-     * @inheritdoc
-     */
-    public function getReadOnlySettingsResponse(): mixed
-    {
-        return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('settings/plugins/blitz'));
-    }
-
-    /**
      * Registers the components that should be defined via settings, providing
      * they have not already been set in `$pluginConfigs`.
      *
