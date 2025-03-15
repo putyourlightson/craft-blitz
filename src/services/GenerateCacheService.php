@@ -255,7 +255,7 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Don’t proceed if the query has numeric element IDs, but add them in case this is a nested or relation field query so that disabled elements will trigger a refresh whenever enabled. Required as of Craft 5.3.0.
+        // Don’t proceed if the query has numeric element IDs, but add them in case this is a nested or relation field query so that disabled elements will trigger a refresh whenever enabled. Required from Craft 5.3.0.
         // https://github.com/putyourlightson/craft-blitz/issues/555
         if (ElementQueryHelper::hasNumericElementIds($elementQuery)) {
             $this->generateData->addElementIds($elementQuery->id);
@@ -295,13 +295,6 @@ class GenerateCacheService extends Component
 
         // Don’t proceed if this is an asset query with a filename
         if (ElementQueryHelper::isAssetQueryWithFilename($elementQuery)) {
-            return;
-        }
-
-        // Don’t proceed if this is a relation field query. Required to support relations saved prior to Craft 5.3.0.
-        if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
-            $this->addRelatedElementIds($elementQuery);
-
             return;
         }
 
@@ -702,20 +695,6 @@ class GenerateCacheService extends Component
             ->select(['id'])
             ->where(['structureId' => $structureId])
             ->column();
-    }
-
-    /**
-     * Adds related element IDs with all statuses so that disabled elements will
-     * trigger a refresh whenever enabled.
-     * https://github.com/putyourlightson/craft-blitz/issues/555
-     */
-    private function addRelatedElementIds(ElementQuery $elementQuery): void
-    {
-        // Clone the original element query rather than manipulating it directly.
-        $elementQueryClone = ElementQueryHelper::clone($elementQuery);
-        $elementQueryClone->status(null);
-
-        $this->generateData->addElementIds($elementQueryClone->ids());
     }
 
     /**

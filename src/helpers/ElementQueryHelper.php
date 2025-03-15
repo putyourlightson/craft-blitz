@@ -462,20 +462,6 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns whether the element query is a relation field query.
-     *
-     * For example:
-     *
-     * ```twig
-     * {% set relatedEntries = entry.relatedEntries.all() %}
-     * ```
-     */
-    public static function isRelationFieldQuery(ElementQuery $elementQuery): bool
-    {
-        return $elementQuery->getBehavior(BaseRelationField::class) !== null;
-    }
-
-    /**
      * Returns an element query’s filterable params, which is the intersection
      * of its params and its element type’s params.
      */
