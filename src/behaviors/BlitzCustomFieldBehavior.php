@@ -65,7 +65,7 @@ class BlitzCustomFieldBehavior extends Behavior
         }
 
         // Get the property directly rather than going through the magic getter
-        return $this->customFields->$name;
+        return $this->customFields->{$name};
     }
 
     /**
@@ -74,7 +74,7 @@ class BlitzCustomFieldBehavior extends Behavior
     public function __set($name, $value)
     {
         // Set the property directly rather than going through the magic setter
-        $this->customFields->$name = $value;
+        $this->customFields->{$name} = $value;
     }
 
     /**

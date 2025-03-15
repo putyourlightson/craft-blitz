@@ -58,7 +58,6 @@ return function(Channel $channel): void {
         define('CRAFT_BASE_PATH', $root);
         define('CRAFT_VENDOR_PATH', CRAFT_BASE_PATH . '/vendor');
 
-        /** @noinspection PhpIncludeInspection */
         require_once CRAFT_VENDOR_PATH . '/autoload.php';
 
         // Load dotenv, depending on the available method and version.

@@ -261,14 +261,6 @@ class BlitzVariable
     }
 
     /**
-     * Returns an absolute action URL for a URI.
-     */
-    private function getActionUrl(string $uri): string
-    {
-        return UrlHelper::actionUrl($uri, null, null, false);
-    }
-
-    /**
      * Returns a CSRF property or a script to inject it, if this is not an AJAX or Sprig request.
      */
     private function getCsrfProperty(string $property): Markup
@@ -284,7 +276,7 @@ class BlitzVariable
             return Template::raw($value);
         }
 
-        $uri = $this->getActionUrl('blitz/csrf/json');
+        $uri = UrlHelper::actionUrl('blitz/csrf/json', null, null, false);
         $config = new VariableConfigModel(['property' => $property]);
 
         return $this->getScript($uri, [], $config);

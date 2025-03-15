@@ -30,9 +30,9 @@ class CacheController extends Controller
     /**
      * @inheritdoc
      */
-    public function options($actionId): array
+    public function options($actionID): array
     {
-        $options = parent::options($actionId);
+        $options = parent::options($actionID);
         $options[] = 'queue';
         $options[] = 'verbose';
 
@@ -600,12 +600,12 @@ class CacheController extends Controller
     private function output(string $message): void
     {
         $user = 'unknown';
-        
+
         if (function_exists('posix_getpwuid')) {
             $processUser = posix_getpwuid(posix_geteuid());
             $user = $processUser['name'] ?? $user;
         }
-        
+
         Blitz::$plugin->log($message . ' [via console command by "{user}"]', ['user' => $user]);
 
         $this->stdout(Craft::t('blitz', $message) . PHP_EOL, BaseConsole::FG_GREEN);

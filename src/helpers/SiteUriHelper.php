@@ -354,6 +354,7 @@ class SiteUriHelper
 
         $elementIdChunks = self::getChunkedQueryParams($elementIds);
         foreach ($elementIdChunks as $elementIds) {
+            /** @var Asset[] $assets */
             $assets = Asset::find()
                 ->id($elementIds)
                 ->all();
@@ -601,15 +602,15 @@ class SiteUriHelper
      */
     public static function getSiteUrisFlattenedToArrays(array $siteUris): array
     {
-        $flatennedSiteUris = [];
+        $flattenedSiteUris = [];
 
         foreach ($siteUris as $siteUri) {
             if ($siteUri instanceof SiteUriModel) {
-                $flatennedSiteUris[] = $siteUri->toArray();
+                $flattenedSiteUris[] = $siteUri->toArray();
             }
         }
 
-        return $flatennedSiteUris;
+        return $flattenedSiteUris;
     }
 
     /**
