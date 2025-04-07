@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.10.1 - Unreleased
+
+### Added
+
+- Added a `getCacheableSiteUri` event that makes it possible to modify the site URI.
+
 ## 5.10.0 - 2025-04-07
 
 ### Added

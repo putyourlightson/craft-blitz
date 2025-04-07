@@ -19,6 +19,7 @@ use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\enums\HeaderEnum;
 use putyourlightson\blitz\events\ResponseEvent;
+use putyourlightson\blitz\events\SiteUriEvent;
 use putyourlightson\blitz\helpers\QueryStringHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SettingsModel;
@@ -36,6 +37,11 @@ class CacheRequestService extends Component
      * @const CancelableEvent
      */
     public const EVENT_IS_CACHEABLE_REQUEST = 'isCacheableRequest';
+
+    /**
+     * @const SiteUriEvent
+     */
+    public const EVENT_GET_CACHEABLE_SITE_URI = 'getCacheableSiteUri';
 
     /**
      * @const ResponseEvent
@@ -435,10 +441,15 @@ class CacheRequestService extends Component
             $uri .= '?' . $allowedQueryString;
         }
 
-        return new SiteUriModel([
+        $siteUri = new SiteUriModel([
             'siteId' => Craft::$app->getSites()->getCurrentSite()->id,
             'uri' => $uri,
         ]);
+
+        $event = new SiteUriEvent($siteUri);
+        $this->trigger(self::EVENT_GET_CACHEABLE_SITE_URI, $event);
+
+        return $event->siteUri;
     }
 
     /**
