@@ -11,6 +11,7 @@
 - Blitz now requires Craft CMS 5.6.0.
 - Improved the tracking of eager-loaded fields.
 - Improved the tracking of disabled entries in nested and relation field queries.
+- Eager-loading params are now explicitly excluded from element query params.
 
 ### Removed
 

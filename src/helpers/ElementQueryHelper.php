@@ -89,6 +89,14 @@ class ElementQueryHelper
             }
         }
 
+        // Exclude eager-loading params, in case they are set.
+        // https://github.com/putyourlightson/craft-blitz/issues/772
+        foreach (['eagerLoadSourceElement', 'eagerLoadHandle'] as $key) {
+            if (array_key_exists($key, $params)) {
+                unset($params[$key]);
+            }
+        }
+
         // Exclude any params specified in the config setting.
         foreach (Blitz::$plugin->settings->excludedTrackedElementQueryParams as $key) {
             if (array_key_exists($key, $params)) {
