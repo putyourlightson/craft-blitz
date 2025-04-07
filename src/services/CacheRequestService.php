@@ -446,7 +446,9 @@ class CacheRequestService extends Component
             'uri' => $uri,
         ]);
 
-        $event = new SiteUriEvent($siteUri);
+        $event = new SiteUriEvent([
+            'siteUri' => $siteUri,
+        ]);
         $this->trigger(self::EVENT_GET_CACHEABLE_SITE_URI, $event);
 
         return $event->siteUri;
