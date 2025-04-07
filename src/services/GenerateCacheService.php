@@ -262,8 +262,9 @@ class GenerateCacheService extends Component
 
         // Don’t proceed if the query has numeric element IDs, but add them in case this is a nested or relation field query so that disabled elements will trigger a refresh whenever enabled. Required from Craft 5.3.0.
         // https://github.com/putyourlightson/craft-blitz/issues/555
-        if (ElementQueryHelper::hasNumericElementIds($elementQuery)) {
-            $this->generateData->addElementIds($elementQuery->id);
+        $numericElementIds = ElementQueryHelper::getNumericElementIds($elementQuery);
+        if (!empty($numericElementIds)) {
+            $this->generateData->addElementIds($numericElementIds);
 
             return;
         }

@@ -274,17 +274,21 @@ class ElementQueryHelper
     }
 
     /**
-     * Returns whether the element query has numeric element IDs.
+     * Returns the element query’s numeric element IDs.
      *
      * @see BaseRelationField::getRelationTargetIds()
      */
-    public static function hasNumericElementIds(ElementQuery $elementQuery): bool
+    public static function getNumericElementIds(ElementQuery $elementQuery): array
     {
-        if (!is_array($elementQuery->id)) {
-            return false;
+        if (is_array($elementQuery->id) && ArrayHelper::isNumeric($elementQuery->id)) {
+            return $elementQuery->id;
         }
 
-        return ArrayHelper::isNumeric($elementQuery->id);
+        if (isset($elementQuery->where['elements.id']) && ArrayHelper::isNumeric($elementQuery->where['elements.id'])) {
+            return $elementQuery->where['elements.id'];
+        }
+
+        return [];
     }
 
     /**
