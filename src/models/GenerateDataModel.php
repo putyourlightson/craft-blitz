@@ -6,6 +6,7 @@
 namespace putyourlightson\blitz\models;
 
 use craft\base\ElementInterface;
+use craft\models\FieldLayout;
 use putyourlightson\blitz\helpers\FieldHelper;
 
 /**
@@ -120,11 +121,22 @@ class GenerateDataModel extends BaseDataModel
         $this->addElementId($element->id);
     }
 
-    public function addElementTrackField(ElementInterface $element, $field): void
+    public function addElementIdsTrackField(array $elementIds, FieldLayout $fieldLayout, $handle): void
     {
-        $fieldInstanceUid = FieldHelper::getFieldInstanceUidForElement($element, $field);
+        $fieldInstanceUid = FieldHelper::getFieldInstanceUidForFieldLayout($fieldLayout, $handle);
 
-        $this->data['elements']['trackFields'][$element->id][$fieldInstanceUid] = true;
+        foreach ($elementIds as $elementId) {
+            $this->data['elements']['trackFields'][$elementId][$fieldInstanceUid] = true;
+        }
+    }
+
+    public function addElementTrackField(ElementInterface $element, $handle): void
+    {
+        $fieldInstanceUid = FieldHelper::getFieldInstanceUidForElement($element, $handle);
+
+        if ($fieldInstanceUid !== null) {
+            $this->data['elements']['trackFields'][$element->id][$fieldInstanceUid] = true;
+        }
     }
 
     public function addElementQuery(int $elementQueryId, string $elementType, array $params): void

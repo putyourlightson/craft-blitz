@@ -36,6 +36,7 @@ beforeEach(function() {
     Blitz::$plugin->settings->excludedTrackedElementQueryParams = [];
     Blitz::$plugin->generateCache->options->outputComments = null;
     Blitz::$plugin->generateCache->reset();
+    Blitz::$plugin->generateCache->registerElementPrepareEvents();
     Blitz::$plugin->cacheStorage->deleteAll();
     Blitz::$plugin->flushCache->flushAll(true);
 
@@ -147,8 +148,7 @@ test('Element cache record is saved with eager-loaded custom fields', function()
 test('Element cache record is saved with nested eager-loaded custom fields', function() {
     $childEntry = createEntryWithRelationship();
     $entry = createEntryWithRelationship([$childEntry]);
-    Craft::$app->elements->eagerLoadElements(Entry::class, [$entry], ['relatedTo.relatedTo']);
-    Blitz::$plugin->generateCache->addElement($entry);
+    Entry::find()->id($entry->id)->with('relatedTo.relatedTo')->one();
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)
@@ -171,8 +171,7 @@ test('Element cache record is saved with eager-loaded matrix fields', function()
             ],
         ],
     ]);
-    Craft::$app->elements->eagerLoadElements(Entry::class, [$entry], ['matrix.test:relatedTo.relatedTo']);
-    Blitz::$plugin->generateCache->addElement($entry);
+    Entry::find()->id($entry->id)->with('matrix.test:relatedTo.relatedTo')->one();
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)
@@ -185,8 +184,7 @@ test('Element cache record is saved with eager-loaded matrix fields', function()
 
 test('Element cache record is saved with eager-loaded custom fields in variable', function() {
     $entry = createEntryWithRelationship();
-    Craft::$app->elements->eagerLoadElements(Entry::class, [$entry], ['relatedTo']);
-    Blitz::$plugin->generateCache->addElement($entry);
+    Entry::find()->id($entry->id)->with('relatedTo')->one();
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)

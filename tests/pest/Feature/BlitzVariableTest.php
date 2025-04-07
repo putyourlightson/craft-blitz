@@ -57,14 +57,13 @@ test('Cached include tag with AJAX request type results in inject script being r
         ->toHaveCount(1);
 });
 
-test('Fetch URI tag does not contain unencoded slashes in params', function() {
+test('Fetch URI tag does not encode slashes in params', function() {
     $variable = new BlitzVariable();
     $tagString = (string)$variable->fetchUri('test', ['action' => 'x/y/z']);
     preg_match('/blitz-params="(.*?)"/', $tagString, $match);
 
     expect($match[1])
-        ->not()
-        ->toContain('/');
+        ->toContain('x/y/z');
 });
 
 test('The CSRF input function returns a Blitz inject script', function() {

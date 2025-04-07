@@ -9,6 +9,7 @@
 ### Changed
 
 - Blitz now requires Craft CMS 5.6.0.
+- Improved the tracking of eager-loaded fields.
 
 ### Removed
 

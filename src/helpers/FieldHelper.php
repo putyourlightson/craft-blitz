@@ -110,7 +110,7 @@ class FieldHelper
     /**
      * Returns the field instance UID of the provided field layout with the handle.
      */
-    private static function getFieldInstanceUidForFieldLayout(FieldLayout $fieldLayout, string $handle): ?string
+    public static function getFieldInstanceUidForFieldLayout(FieldLayout $fieldLayout, string $handle): ?string
     {
         $field = $fieldLayout->getFieldByHandle($handle);
 

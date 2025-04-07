@@ -119,6 +119,7 @@ class GenerateCacheService extends Component
          * fields are tracked respectively.
          * https://github.com/putyourlightson/craft-blitz/issues/514
          */
+        // Track eager-loaded elements
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
             function(PopulateElementEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
@@ -126,11 +127,15 @@ class GenerateCacheService extends Component
                 }
             }
         );
+
+        // Track eager-loaded fields
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENTS,
             function(PopulateElementsEvent $event) {
                 if (Craft::$app->getResponse()->getIsOk()) {
+                    $elementQuery = $event->sender;
                     foreach ($event->elements as $element) {
-                        $this->addElement($element);
+                        // Add eager-loaded fields since they will be accessed directly on the element
+                        $this->addEagerLoadedFields($element, $elementQuery);
                     }
                 }
             }
@@ -167,14 +172,17 @@ class GenerateCacheService extends Component
                             );
                             Craft::configure($query, $criteria);
 
-                            $elementIds = $query->id($targetElementIds)
+                            $elements = $query->id($targetElementIds)
                                 ->status(null)
                                 ->offset(null)
                                 ->limit(null)
                                 ->eagerly()
-                                ->ids();
+                                ->all();
 
-                            $this->generateData->addElementIds($elementIds);
+                            foreach ($elements as $element) {
+                                $this->generateData->addElement($element);
+                                $this->generateData->addElementTrackField($element, $plan->handle);
+                            }
                         }
                     }
                 }
@@ -228,9 +236,6 @@ class GenerateCacheService extends Component
         }
 
         $this->generateData->addElement($element);
-
-        // Add eager-loaded fields since they will be accessed directly on the element
-        $this->addEagerLoadedFields($element);
 
         // Replace the custom field behavior with our own (only once)
         $customFields = $element->getBehavior('customFields');
@@ -634,7 +639,7 @@ class GenerateCacheService extends Component
      *
      * @since 4.21.0
      */
-    private function addEagerLoadedFields(ElementInterface $element): void
+    private function addEagerLoadedFields(ElementInterface $element, ElementQuery $elementQuery): void
     {
         $fieldHandles = array_keys(CustomFieldBehavior::$fieldHandles);
 
@@ -644,7 +649,17 @@ class GenerateCacheService extends Component
                 $eagerLoadedElements = $element->getEagerLoadedElements($handle);
 
                 foreach ($eagerLoadedElements as $eagerLoadedElement) {
-                    $this->addEagerLoadedFields($eagerLoadedElement);
+                    $this->addEagerLoadedFields($eagerLoadedElement, $elementQuery);
+                }
+            } elseif ($elementQuery->with) {
+                $plans = Craft::$app->getElements()->createEagerLoadingPlans($elementQuery->with);
+                if (is_string($elementQuery->with)) {
+                    $elementQuery->with = [$elementQuery->with];
+                }
+                foreach ($plans as $plan) {
+                    if ($plan->handle === $handle) {
+                        $this->generateData->addElementTrackField($element, $handle);
+                    }
                 }
             }
         }
