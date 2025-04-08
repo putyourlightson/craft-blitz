@@ -4,7 +4,7 @@
 
 ### Added
 
-- Added a `getCacheableSiteUri` event that makes it possible to modify the site URI when Blitz reads it from the request.
+- Added a `getCacheableSiteUri` event that makes it possible to modify the site URI that Blitz reads from the request.
 
 ### Fixed
 
