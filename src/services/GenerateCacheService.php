@@ -176,7 +176,6 @@ class GenerateCacheService extends Component
                                 ->status(null)
                                 ->offset(null)
                                 ->limit(null)
-                                ->eagerly()
                                 ->all();
 
                             foreach ($elements as $element) {
