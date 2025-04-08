@@ -1,10 +1,14 @@
 # Release Notes for Blitz
 
-## 5.10.1 - Unreleased
+## 5.10.1 - 2025-04-08
 
 ### Added
 
-- Added a `getCacheableSiteUri` event that makes it possible to modify the site URI.
+- Added a `getCacheableSiteUri` event that makes it possible to modify the site URI when Blitz reads it from the request.
+
+### Fixed
+
+- Fixed a bug in which the tracking of eager-loaded elements was causing an infinite loop ([#785](https://github.com/putyourlightson/craft-blitz/issues/785)).
 
 ## 5.10.0 - 2025-04-07
 
