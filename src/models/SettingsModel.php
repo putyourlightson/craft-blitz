@@ -335,6 +335,11 @@ class SettingsModel extends Model
     public bool $refreshCacheWhenElementSavedNotLive = false;
 
     /**
+     * Whether expired cached pages should be refreshed after being visited by a user.
+     */
+    public bool $refreshExpiredCacheAfterVisit = true;
+
+    /**
      * Whether non-HTML responses should be cached.
      */
     public bool $cacheNonHtmlResponses = false;
