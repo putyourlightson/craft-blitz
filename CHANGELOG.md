@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.10.2 - 2025-04-09
+
+### Added
+
+- Added a `refreshExpiredCacheAfterVisit` config setting that determines whether expired cached pages should be refreshed after being visited by a user.
+
 ## 5.10.1 - 2025-04-08
 
 ### Added
