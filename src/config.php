@@ -200,6 +200,9 @@ return [
         // Whether the cache should be refreshed when an element is saved but not live.
         //'refreshCacheWhenElementSavedNotLive' => false,
 
+        // Whether expired cached pages should be refreshed after being visited by a user.
+        //'refreshExpiredCacheAfterVisit' => true,
+
         // Whether non-HTML responses should be cached. With this setting enabled, Blitz will also cache pages that return non-HTML responses. If enabled, you should ensure that URIs that should not be cached, such as API endpoints, XML sitemaps, etc. are added as excluded URI patterns.
         //'cacheNonHtmlResponses' => false,
 
