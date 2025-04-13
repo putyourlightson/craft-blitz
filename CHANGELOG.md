@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.23.14 - 2025-04-13
+
+- Moving assets between folders now triggers a cache refresh ([#784](https://github.com/putyourlightson/craft-blitz/issues/784)).
+
 ## 4.23.13 - 2025-03-12
 
 ### Fixed
