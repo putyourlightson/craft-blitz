@@ -120,7 +120,7 @@ class Blitz extends Plugin
     /**
      * @inheritdoc
      */
-    public string $minVersionRequired = '5.9.0';
+    public string $minVersionRequired = '4.11.1';
 
     /**
      * The queue to use for running jobs.
