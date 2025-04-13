@@ -157,7 +157,19 @@ test('Asset is tracked when its file is replaced', function() {
 
 test('Asset is tracked when its filename is changed', function() {
     $asset = createAsset();
-    $asset->filename = 'new-filename.jpg';
+    $asset->newFilename = 'new-filename.jpg';
+    $asset->beforeSave(false);
+    Blitz::$plugin->refreshCache->addElement($asset);
+
+    expect($asset)
+        ->toBeChangedByFile();
+});
+
+test('Asset is tracked when it is moved between folders', function() {
+    $asset = createAsset();
+    // Must be a valid folder ID
+    $asset->newFolderId = 7;
+    $asset->beforeSave(false);
     Blitz::$plugin->refreshCache->addElement($asset);
 
     expect($asset)

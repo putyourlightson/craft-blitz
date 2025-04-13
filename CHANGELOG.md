@@ -1,9 +1,9 @@
 # Release Notes for Blitz
 
-## 5.10.3 - Unreleased
+## 5.10.3 - 2025-04-13
 
 - Moving assets between folders now triggers a cache refresh ([#784](https://github.com/putyourlightson/craft-blitz/issues/784)).
-- Reverted the minimum plugin version requirement of 5.9.0 to help ease upgrading.
+- Reverted the minimum plugin version requirement back to 4.x to help ease upgrading.
 
 ## 5.10.2 - 2025-04-09
 
