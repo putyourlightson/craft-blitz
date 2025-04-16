@@ -189,8 +189,11 @@ class ElementChangedBehavior extends Behavior
             return true;
         }
 
-        // Check if the asset has a new filename or folder path
-        if ($element->newLocation) {
+        if ($element->filename != $this->originalElement->filename) {
+            return true;
+        }
+
+        if ($element->folderId != $this->originalElement->folderId) {
             return true;
         }
 
