@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.10.4 - 2025-04-16
+
+### Fixed
+
+- Fixed a bug in which an exception could be thrown when tracking eager-loaded element queries ([#789](https://github.com/putyourlightson/craft-blitz/issues/789)).
+
 ## 5.10.3 - 2025-04-13
 
 - Moving assets between folders now triggers a cache refresh ([#784](https://github.com/putyourlightson/craft-blitz/issues/784)).
