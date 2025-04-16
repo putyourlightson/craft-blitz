@@ -155,7 +155,7 @@ class GenerateCacheService extends Component
                     $sourceElementType = $event->elementType;
                     $map = $sourceElementType::eagerLoadingMap($event->elements, $plan->handle);
 
-                    if (is_array($map)) {
+                    if (is_array($map) && isset($map['elementType'])) {
                         /** @var ElementInterface|string $targetElementType */
                         $targetElementType = $map['elementType'];
                         if ($this->shouldTrackElementsOfType($targetElementType)) {
