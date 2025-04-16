@@ -4,7 +4,6 @@
 
 - Fixed triggering cache refreshes after moving assets between folders ([#784](https://github.com/putyourlightson/craft-blitz/issues/784)).
 
-
 ## 5.10.4 - 2025-04-16
 
 - Fixed a bug in which an exception could be thrown when tracking eager-loaded element queries ([#789](https://github.com/putyourlightson/craft-blitz/issues/789)).
