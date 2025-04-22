@@ -684,7 +684,7 @@ class DiagnosticsHelper
         }
 
         if ($param !== null) {
-            $query->andWhere(['like', 'uri', '[?&]' . $param . '=']);
+            $query->andWhere(['like', 'uri', $param . '=']);
         }
 
         return $query;
