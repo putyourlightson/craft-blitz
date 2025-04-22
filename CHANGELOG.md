@@ -3,6 +3,7 @@
 ## 4.23.15 - Unreleased
 
 - Fixed triggering cache refreshes after moving assets between folders ([#784](https://github.com/putyourlightson/craft-blitz/issues/784)).
+- Fixed a rendering issue in the tracked query string params section of the Blitz Diagnostics utility ([#790](https://github.com/putyourlightson/craft-blitz/issues/790)).
 
 ## 4.23.14 - 2025-04-13
 
