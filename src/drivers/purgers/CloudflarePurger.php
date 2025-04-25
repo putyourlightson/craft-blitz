@@ -25,13 +25,15 @@ class CloudflarePurger extends BaseCachePurger
 {
     /**
      * @const The API endpoint URL.
+     * https://developers.cloudflare.com/api/resources/cache/
      */
     public const API_ENDPOINT = 'https://api.cloudflare.com/client/v4/';
 
     /**
      * @const The API URL limit.
+     * https://developers.cloudflare.com/cache/how-to/purge-cache/#availability-and-limits
      */
-    public const API_URL_LIMIT = 30;
+    public const API_URL_LIMIT = 100;
 
     /**
      * @var string The API authentication method.
@@ -181,18 +183,18 @@ class CloudflarePurger extends BaseCachePurger
         return [
             [
                 ['apiToken'], 'required', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiToken';
-                },
+                return $purger->authenticationMethod == 'apiToken';
+            },
             ],
             [
                 ['apiKey', 'email'], 'required', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiKey';
-                },
+                return $purger->authenticationMethod == 'apiKey';
+            },
             ],
             [
                 ['email'], 'email', 'when' => function(CloudflarePurger $purger) {
-                    return $purger->authenticationMethod == 'apiKey';
-                },
+                return $purger->authenticationMethod == 'apiKey';
+            },
             ],
         ];
     }
