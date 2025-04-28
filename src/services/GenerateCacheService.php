@@ -268,6 +268,14 @@ class GenerateCacheService extends Component
             return;
         }
 
+        // Don’t proceed if this is a relation field query, but add related element IDs with all statuses so that disabled elements will trigger a refresh whenever enabled.
+        // https://github.com/putyourlightson/craft-blitz/issues/555
+        if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
+            $this->generateData->addElementIds(ElementQueryHelper::getRelatedElementIds($elementQuery));
+
+            return;
+        }
+
         // Don’t proceed if the query has fixed IDs or slugs
         if (ElementQueryHelper::hasFixedIdsOrSlugs($elementQuery)) {
             return;
@@ -639,7 +647,7 @@ class GenerateCacheService extends Component
      *
      * @since 4.21.0
      */
-    private function addEagerLoadedFields(ElementInterface $element, ElementQuery $elementQuery): void
+    private function addEagerLoadedFields(ElementInterface $element, ?ElementQuery $elementQuery): void
     {
         $fieldHandles = array_keys(CustomFieldBehavior::$fieldHandles);
 
@@ -651,7 +659,7 @@ class GenerateCacheService extends Component
                 foreach ($eagerLoadedElements as $eagerLoadedElement) {
                     $this->addEagerLoadedFields($eagerLoadedElement, $elementQuery);
                 }
-            } elseif ($elementQuery->with) {
+            } elseif ($elementQuery && $elementQuery->with) {
                 $plans = Craft::$app->getElements()->createEagerLoadingPlans($elementQuery->with);
                 if (is_string($elementQuery->with)) {
                     $elementQuery->with = [$elementQuery->with];

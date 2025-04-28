@@ -288,15 +288,33 @@ class ElementQueryHelper
      */
     public static function getNumericElementIds(ElementQuery $elementQuery): array
     {
-        if (is_array($elementQuery->id) && ArrayHelper::isNumeric($elementQuery->id)) {
+        if (
+            is_array($elementQuery->id)
+            && ArrayHelper::isNumeric($elementQuery->id)
+        ) {
             return $elementQuery->id;
         }
 
-        if (isset($elementQuery->where['elements.id']) && ArrayHelper::isNumeric($elementQuery->where['elements.id'])) {
+        if (
+            isset($elementQuery->where['elements.id'])
+            && ArrayHelper::isNumeric($elementQuery->where['elements.id'])
+        ) {
             return $elementQuery->where['elements.id'];
         }
 
         return [];
+    }
+
+    /**
+     * Returns the element query’s related element IDs.
+     */
+    public static function getRelatedElementIds(ElementQuery $elementQuery): array
+    {
+        // Clone the original element query rather than manipulating it directly.
+        $elementQueryClone = ElementQueryHelper::clone($elementQuery);
+        $elementQueryClone->status(null);
+
+        return $elementQueryClone->ids();
     }
 
     /**
@@ -471,6 +489,20 @@ class ElementQueryHelper
          * @see EntryQuery::beforePrepare()
          */
         return !empty($elementQuery->fieldId) && !empty($elementQuery->ownerId);
+    }
+
+    /**
+     * Returns whether the element query is a relation field query.
+     *
+     * For example:
+     *
+     * ```twig
+     * {% set relatedEntries = entry.relatedEntries.all() %}
+     * ```
+     */
+    public static function isRelationFieldQuery(ElementQuery $elementQuery): bool
+    {
+        return $elementQuery->getBehavior(BaseRelationField::class) !== null;
     }
 
     /**

@@ -1,10 +1,14 @@
 # Release Notes for Blitz
 
-## 5.10.5 - Unreleased
+## 5.10.5 - 2025-04-28
+
+> [!NOTE]
+> The cache should be cleared or refreshed after this update completes.
 
 - Increased the Cloudflare API limit on purge requests to 100 URLs per request.
 - Fixed triggering cache refreshes after moving assets between folders ([#784](https://github.com/putyourlightson/craft-blitz/issues/784)).
 - Fixed a rendering issue in the tracked query string params section of the Blitz Diagnostics utility ([#790](https://github.com/putyourlightson/craft-blitz/issues/790)).
+- Fixed an issue in which relation fields were resulting in element queries being inadvertently tracked.
 
 ## 5.10.4 - 2025-04-16
 
