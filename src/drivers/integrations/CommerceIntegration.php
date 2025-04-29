@@ -38,13 +38,11 @@ class CommerceIntegration extends BaseIntegration
                 /** @var Order $order */
                 $order = $event->sender;
                 foreach ($order->getLineItems() as $lineItem) {
-                    // Skip custom line items, as they are not purchasable.
-                    if ($lineItem->type === LineItemType::Custom) {
-                        continue;
-                    }
-                    $purchasable = $lineItem->getPurchasable();
-                    if ($purchasable instanceof Variant && $purchasable->inventoryTracked) {
-                        Blitz::$plugin->refreshCache->addElement($purchasable);
+                    if ($lineItem->type === LineItemType::Purchasable) {
+                        $purchasable = $lineItem->getPurchasable();
+                        if ($purchasable instanceof Variant && $purchasable->inventoryTracked) {
+                            Blitz::$plugin->refreshCache->addElement($purchasable);
+                        }
                     }
                 }
             }
