@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\drivers\integrations;
 
 use craft\commerce\elements\Order;
 use craft\commerce\elements\Variant;
+use craft\commerce\enums\LineItemType;
 use putyourlightson\blitz\Blitz;
 use yii\base\Event;
 
@@ -37,6 +38,10 @@ class CommerceIntegration extends BaseIntegration
                 /** @var Order $order */
                 $order = $event->sender;
                 foreach ($order->getLineItems() as $lineItem) {
+                    // Skip custom line items, as they are not purchasable.
+                    if ($lineItem->type === LineItemType::Custom) {
+                        continue;
+                    }
                     $purchasable = $lineItem->getPurchasable();
                     if ($purchasable instanceof Variant && $purchasable->inventoryTracked) {
                         Blitz::$plugin->refreshCache->addElement($purchasable);

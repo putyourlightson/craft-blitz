@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.10.6 - Unreleased
+
+- Fixed a bug in which an exception could be thrown after Craft Commerce checkout when the order contained one or more custom line items ([#799](https://github.com/putyourlightson/craft-blitz/issues/799)).
+
 ## 5.10.5 - 2025-04-28
 
 > [!NOTE]
