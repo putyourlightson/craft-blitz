@@ -832,19 +832,19 @@ class CacheRequestService extends Component
             $uriPattern = $siteUriPattern['uriPattern'];
 
             // Replace a blank string with the homepage with query strings allowed
-            if ($uriPattern == '') {
+            if ($uriPattern === '') {
                 $uriPattern = '^(\?.*)?$';
             }
 
             // Replace "*" with 0 or more characters as otherwise it'll throw an error
-            if ($uriPattern == '*') {
+            if ($uriPattern === '*') {
                 $uriPattern = '.*';
             }
 
             // Trim slashes
             $uriPattern = trim($uriPattern, '/');
 
-            // Escape delimiters, removing already escaped delimiters first
+            // Escape delimiters, removing already escaped delimiters first.
             // https://github.com/putyourlightson/craft-blitz/issues/261
             $uriPattern = str_replace(['\/', '/'], ['/', '\/'], $uriPattern);
 
