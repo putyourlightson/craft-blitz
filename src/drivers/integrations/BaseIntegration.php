@@ -18,6 +18,14 @@ abstract class BaseIntegration implements IntegrationInterface
     /**
      * @inheritdoc
      */
+    public static function getRequiredModules(): array
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public static function registerEvents(): void
     {
     }

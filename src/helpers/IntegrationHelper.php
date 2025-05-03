@@ -55,23 +55,17 @@ class IntegrationHelper
         foreach (self::getAllIntegrations() as $integration) {
             $enabled = true;
 
-            // Ensure all required plugins are enabled at the provided version or above
+            // Ensure all required plugins are enabled at the provided version or above.
             foreach ($integration::getRequiredPlugins() as $handle) {
-                $version = 0;
-
-                if (is_array($handle)) {
-                    $version = $handle['version'] ?? $version;
-                    $handle = $handle['handle'] ?? '';
-                }
-
-                $plugin = Craft::$app->getPlugins()->getPlugin($handle);
-
-                if ($plugin === null) {
+                if (!self::isEnabled($handle, 'plugin')) {
                     $enabled = false;
                     break;
                 }
+            }
 
-                if (version_compare($plugin->getVersion(), $version, '<')) {
+            // Ensure all required modules are installed.
+            foreach ($integration::getRequiredModules() as $handle) {
+                if (!self::isEnabled($handle, 'module')) {
                     $enabled = false;
                     break;
                 }
@@ -83,5 +77,38 @@ class IntegrationHelper
         }
 
         return $integrations;
+    }
+
+    /**
+     * Returns whether the plugin or module with the handle is enabled.
+     */
+    private static function isEnabled(array|string $handle, string $type): bool
+    {
+        $version = null;
+
+        if (is_array($handle)) {
+            $version = $handle['version'] ?? $version;
+            $handle = $handle['handle'] ?? '';
+        }
+
+        if ($type === 'plugin') {
+            $pluginOrModule = Craft::$app->getPlugins()->getPlugin($handle);
+        } elseif ($type === 'module') {
+            $pluginOrModule = Craft::$app->getModule($handle);
+        } else {
+            return false;
+        }
+
+        if ($pluginOrModule === null) {
+            return false;
+        }
+
+        if ($version !== null
+            && version_compare($pluginOrModule->getVersion(), $version, '<')
+        ) {
+            return false;
+        }
+
+        return true;
     }
 }

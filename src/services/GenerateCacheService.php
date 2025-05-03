@@ -583,26 +583,13 @@ class GenerateCacheService extends Component
             Blitz::$plugin->cacheTags->saveTags($this->options->tags, $cacheId);
         }
 
-        $isCachedInclude = Blitz::$plugin->cacheRequest->getIsCachedInclude();
-        if (!$isCachedInclude) {
-            $outputComments = $this->options->outputComments;
-
-            if ($outputComments === null) {
-                $outputComments = Blitz::$plugin->settings->outputComments;
-            }
-
-            $outputComments = $outputComments === true || $outputComments === SettingsModel::OUTPUT_COMMENTS_CACHED;
-
-            // Append cached by comment if allowed and has HTML mime type
-            if ($outputComments && SiteUriHelper::hasHtmlMimeType($siteUri)) {
-                $content .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
-            }
-        }
+        $content = $this->appendCachedByComment($content, $siteUri);
 
         $duration = $this->options->getCacheDuration();
 
         // Disallow encoding for cache includes and pages with includes
-        $allowEncoding = !$isCachedInclude && !$this->generateData->getHasIncludes();
+        $allowEncoding = !Blitz::$plugin->cacheRequest->getIsCachedInclude()
+            && !$this->generateData->getHasIncludes();
 
         $this->saveOutput($content, $siteUri, $duration, $allowEncoding);
 
@@ -642,10 +629,20 @@ class GenerateCacheService extends Component
     }
 
     /**
+     * Appends a “cached by” comment.
+     */
+    private function appendCachedByComment(string $content, SiteUriModel $siteUri): string
+    {
+        if (Blitz::$plugin->cacheRequest->shouldAppendComments(SettingsModel::OUTPUT_COMMENTS_CACHED, $siteUri)) {
+            $content .= '<!-- Cached by Blitz on ' . date('c') . ' -->';
+        }
+
+        return $content;
+    }
+
+    /**
      * Adds eager-loaded fields to an element recursively.
      * https://github.com/putyourlightson/craft-blitz/issues/657
-     *
-     * @since 4.21.0
      */
     private function addEagerLoadedFields(ElementInterface $element, ?ElementQuery $elementQuery): void
     {

@@ -150,6 +150,9 @@ return [
         // Whether only URIs containing lowercase characters should be cached.
         //'onlyCacheLowercaseUris' => false,
 
+        // Whether action requests can be cached.
+        //'cacheActionRequests' => false,
+
         // Whether URLs with query strings should be cached and how.
         // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings
         // `\putyourlightson\blitz\models\SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES`: Cache URLs with query strings as unique pages

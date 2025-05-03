@@ -54,6 +54,16 @@ class CacheRequestService extends Component
     public const EVENT_AFTER_GET_RESPONSE = 'afterGetResponse';
 
     /**
+     * @const ResponseEvent
+     */
+    public const EVENT_BEFORE_SAVE_AND_PREPARE_RESPONSE = 'beforeSaveAndPrepareResponse';
+
+    /**
+     * @const ResponseEvent
+     */
+    public const EVENT_AFTER_SAVE_AND_PREPARE_RESPONSE = 'afterSaveAndPrepareResponse';
+
+    /**
      * @const string
      */
     public const CACHED_INCLUDE_ACTION = 'blitz/include/cached';
@@ -118,8 +128,13 @@ class CacheRequestService extends Component
         if (!$request->getIsSiteRequest()
             || !$request->getIsGet()
             || $request->getIsConsoleRequest()
-            || $request->getIsActionRequest()
             || $request->getIsPreview()
+        ) {
+            return false;
+        }
+
+        if ($request->getIsActionRequest()
+            && !Blitz::$plugin->settings->cacheActionRequests
         ) {
             return false;
         }
@@ -177,10 +192,6 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableResponse(Response $response): bool
     {
-        if ($response->content === null) {
-            return false;
-        }
-
         if ($this->getIsCachedInclude()) {
             return true;
         }
@@ -509,13 +520,13 @@ class CacheRequestService extends Component
     /**
      * Saves and prepares the response for a given site URI.
      *
-     * The “served by” comment is intentionally not added to prevent reverse proxy caches from storing it.
+     * The “served by” comment is intentionally excluded to prevent reverse proxy caches from storing it.
      *
      * @since 3.12.0
      */
     public function saveAndPrepareResponse(?Response $response, SiteUriModel $siteUri): void
     {
-        if ($response === null || $response->content === null) {
+        if ($response === null) {
             return;
         }
 
@@ -527,12 +538,24 @@ class CacheRequestService extends Component
             return;
         }
 
-        // Save the content and prepare the response
-        $content = Blitz::$plugin->generateCache->save($response->content, $siteUri);
+        $event = new ResponseEvent([
+            'siteUri' => $siteUri,
+            'response' => $response,
+        ]);
+        $this->trigger(self::EVENT_BEFORE_SAVE_AND_PREPARE_RESPONSE, $event);
 
-        if ($content !== null) {
-            $response->content = $content;
-            $this->prepareResponse($response, $siteUri);
+        if (!$event->isValid) {
+            return;
+        }
+
+        if ($response->content !== null) {
+            $response->content = Blitz::$plugin->generateCache->save($response->content, $siteUri);
+        }
+
+        $this->prepareResponse($response, $siteUri);
+
+        if ($this->hasEventHandlers(self::EVENT_AFTER_SAVE_AND_PREPARE_RESPONSE)) {
+            $this->trigger(self::EVENT_AFTER_SAVE_AND_PREPARE_RESPONSE, $event);
         }
     }
 
@@ -637,6 +660,44 @@ class CacheRequestService extends Component
     }
 
     /**
+     * Returns whether the request should append comments.
+     */
+    public function shouldAppendComments(string $type, SiteUriModel $siteUri, bool $encoded = false): bool
+    {
+        // Appending onto encoded content is not possible.
+        if ($encoded) {
+            return false;
+        }
+
+        if ($this->getIsCachedInclude()
+            || Craft::$app->getResponse()->format !== Response::FORMAT_HTML
+            || !SiteUriHelper::hasHtmlMimeType($siteUri)
+        ) {
+            return false;
+        }
+
+        $outputComments = Blitz::$plugin->generateCache->options->outputComments;
+
+        if ($outputComments === null) {
+            $outputComments = Blitz::$plugin->settings->outputComments;
+        }
+
+        return $outputComments === true || $outputComments === $type;
+    }
+
+    /**
+     * Appends a “served by” comment.
+     */
+    private function appendServedByComment(string $content, SiteUriModel $siteUri, bool $encoded = false): string
+    {
+        if ($this->shouldAppendComments(SettingsModel::OUTPUT_COMMENTS_SERVED, $siteUri, $encoded)) {
+            $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
+        }
+
+        return $content;
+    }
+
+    /**
      * Adds headers that Craft normally would.
      *
      * @see Application::handleRequest()
@@ -678,7 +739,7 @@ class CacheRequestService extends Component
      */
     private function prepareResponse(Response $response, SiteUriModel $siteUri, bool $encoded = false): void
     {
-        $this->appendServedByComment($response, $siteUri, $encoded);
+        $response->content = $this->appendServedByComment($response->content, $siteUri, $encoded);
 
         $cacheControlHeader = Blitz::$plugin->settings->cacheControlHeader;
 
@@ -727,43 +788,13 @@ class CacheRequestService extends Component
         // Get the mime type from the site URI
         $mimeType = SiteUriHelper::getMimeType($siteUri);
 
-        if ($mimeType != SiteUriHelper::MIME_TYPE_HTML) {
+        if ($mimeType !== SiteUriHelper::MIME_TYPE_HTML) {
             $headers->set(HeaderEnum::CONTENT_TYPE->value, $mimeType);
 
             if ($response->format == Response::FORMAT_HTML) {
                 $response->format = Response::FORMAT_RAW;
             }
         }
-    }
-
-    /**
-     * Appends the served by comment to the response content.
-     */
-    private function appendServedByComment(Response $response, SiteUriModel $siteUri, bool $encoded): void
-    {
-        // Appending onto encoded content is not possible
-        if ($encoded) {
-            return;
-        }
-
-        if ($this->getIsCachedInclude()
-            || !$this->getIsCacheableResponse($response)
-            || !SiteUriHelper::hasHtmlMimeType($siteUri)
-        ) {
-            return;
-        }
-
-        $outputComments = Blitz::$plugin->generateCache->options->outputComments;
-
-        if ($outputComments === null) {
-            $outputComments = Blitz::$plugin->settings->outputComments;
-        }
-
-        if ($outputComments !== true && $outputComments !== SettingsModel::OUTPUT_COMMENTS_SERVED) {
-            return;
-        }
-
-        $response->content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
     }
 
     /**

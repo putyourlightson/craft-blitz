@@ -239,6 +239,13 @@ class SettingsModel extends Model
     public bool $onlyCacheLowercaseUris = false;
 
     /**
+     * Whether action requests can be cached.
+     *
+     * @since 5.11.0
+     */
+    public bool $cacheActionRequests = false;
+
+    /**
      * Whether URLs with query strings should be cached and how.
      *
      * - `self::QUERY_STRINGS_DO_NOT_CACHE_URLS`: Do not cache URLs with query strings

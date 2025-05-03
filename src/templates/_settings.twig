@@ -393,7 +393,7 @@
             disabled: readOnly,
         }) }}
 
-        <hr>
+        <hr/>
 
         {% set info %}
             {{ 'With this setting enabled, URIs containing uppercase characters will not be cached by Blitz. Redirecting uppercase URIs to lowercase URIs using server rewrites may be recommended.'|t('blitz') }}
@@ -404,8 +404,24 @@
             warning: config.onlyCacheLowercaseUris is defined ? configWarning('onlyCacheLowercaseUris'),
             name: 'settings[onlyCacheLowercaseUris]',
             on: settings.onlyCacheLowercaseUris,
+            fieldClass: 'width-50',
             disabled: readOnly,
         }) }}
+
+        {% set info %}
+            {{ 'With this setting enabled, action requests will be cached according to the included/excluded URI patterns. You should be careful to only include action requests that are safe to cache.'|t('blitz') }}
+        {% endset %}
+        {{ forms.lightswitchField({
+            label: "Cache Action Requests"|t('blitz'),
+            instructions: instructions("Whether action requests can be cached.", info),
+            warning: config.cacheActionRequests is defined ? configWarning('cacheActionRequests'),
+            name: 'settings[cacheActionRequests]',
+            on: settings.cacheActionRequests,
+            fieldClass: 'width-50',
+            disabled: readOnly,
+        }) }}
+
+        <hr/>
 
         {% set info %}
             <p>
@@ -507,7 +523,7 @@
             }) }}
         </div>
 
-        <hr>
+        <hr/>
 
         {{ forms.autosuggestField({
             label: "API Key"|t('blitz'),
