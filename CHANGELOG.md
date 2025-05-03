@@ -1,7 +1,9 @@
 # Release Notes for Blitz
 
-## 5.10.6 - Unreleased
+## 5.11.0 - Unreleased
 
+- Added a `cacheActionRequests` setting that determines whether action requests can be cached.
+- Added a [Datastar](https://putyourlightson.com/plugins/datastar) integration that makes it possible to cache and serve streamed responses.
 - Fixed a bug in which an exception could be thrown after Craft Commerce checkout when the order contained one or more custom line items ([#799](https://github.com/putyourlightson/craft-blitz/issues/799)).
 
 ## 5.10.5 - 2025-04-28
