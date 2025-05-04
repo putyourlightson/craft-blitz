@@ -10,9 +10,10 @@
 
 {% set elementId = elementId ?? null %}
 {% set queryId = queryId ?? null %}
-{% set tag = tag ?? null %}
+{% set action = action ?? null %}
 {% set param = param ?? null %}
-{% set query = craft.blitz.diagnostics.getPagesQuery(siteId, elementId, queryId, tag, param)
+{% set tag = tag ?? null %}
+{% set query = craft.blitz.diagnostics.getUrisQuery(siteId, elementId, queryId, action, param, tag)
     .orderBy(order)
     .offset(offset)
     .limit(limit) %}
@@ -86,13 +87,18 @@
                         {% set url = siteUrl(uri, null, null, siteId) %}
                         <tr>
                             <td class="code">
+                                {% set shortenedUri = craft.blitz.diagnostics.getShortenedUri(uri) %}
                                 {% if uri starts with '_includes?' %}
                                     <a href="{{ url('blitz/diagnostics/includes/include', { includeId: row.id }) }}">
-                                        {{ uri }}
+                                        {{ shortenedUri }}
+                                    </a>
+                                {% elseif uri starts with 'actions/' %}
+                                    <a href="{{ url('blitz/diagnostics/actions/action', { actionId: row.id }) }}">
+                                        {{ shortenedUri }}
                                     </a>
                                 {% else %}
                                     <a href="{{ url('blitz/diagnostics/pages/page', { pageId: row.id }) }}">
-                                        {{ uri }}
+                                        {{ shortenedUri }}
                                     </a>
                                 {% endif %}
                             </td>

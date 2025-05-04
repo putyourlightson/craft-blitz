@@ -61,11 +61,11 @@ class DiagnosticsController extends Controller
         return $this->response;
     }
 
-    public function actionExportPages(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $tag = null, ?string $param = null): Response
+    public function actionExportPages(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $action = null, ?string $param = null, ?string $tag = null): Response
     {
         App::maxPowerCaptain();
 
-        $pages = DiagnosticsHelper::getPagesQuery($siteId, $elementId, $queryId, $tag, $param)
+        $pages = DiagnosticsHelper::getUrisQuery($siteId, $elementId, $queryId, $action, $param, $tag)
             ->orderBy(['elementCount' => SORT_DESC])
             ->all();
 

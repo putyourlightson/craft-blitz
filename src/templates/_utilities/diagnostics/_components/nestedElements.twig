@@ -63,7 +63,7 @@
                                     <tr>
                                         <th class="owner">
                                             <button type="button" data-id="{{ owner.id }}" class="toggle expanded" title="Show/hide nested elements"></button>
-                                            {{ craft.blitz.diagnostics.getElementChip(element.owner, 'blitz/diagnostics/elements/pages-includes') }}
+                                            {{ craft.blitz.diagnostics.getElementChip(element.owner, 'blitz/diagnostics/elements/uris') }}
                                         </th>
                                         {% if cacheId %}
                                             <td></td>
@@ -72,7 +72,7 @@
                                 {% endif %}
                                 <tr class="nested-{{ owner.id }}">
                                     <td class="nested">
-                                        {{ craft.blitz.diagnostics.getNestedElementChip(element, 'blitz/diagnostics/elements/pages-includes', row.sortOrder) }}
+                                        {{ craft.blitz.diagnostics.getNestedElementChip(element, 'blitz/diagnostics/elements/uris', row.sortOrder) }}
                                     </td>
                                     {% if cacheId %}
                                         <td>

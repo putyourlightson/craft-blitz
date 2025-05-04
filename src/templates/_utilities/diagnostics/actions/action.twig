@@ -1,0 +1,148 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/action' %}
+
+{% set action = craft.blitz.diagnostics.getAction() %}
+{% if action is null %}
+    {% redirect 'blitz/diagnostics/actions' with error 'The action no longer exists or may have been refreshed.' %}
+{% endif %}
+{% set elementTypes = craft.blitz.diagnostics.getElementTypes(siteId, action.id) %}
+{% set elementQueryTypes = craft.blitz.diagnostics.getElementQueryTypes(siteId, action.id) %}
+{% set tags = craft.blitz.diagnostics.getPageTags(action.id) %}
+{% set title = craft.blitz.diagnostics.getActionSuffix(action.uri, 32) %}
+{% set codeTitle = true %}
+
+{% set actionPath = craft.blitz.diagnostics.getActionPath(action.uri) %}
+{% set crumbs = [
+    {
+        html: tag('a', {
+        class: 'crumb-link code',
+        href: cpUrl('blitz/diagnostics/actions/action-path', { 'actionPath': actionPath }),
+        text: actionPath,
+    }),
+    }
+] %}
+
+{% block content %}
+    <p>
+        <code>{{ action.uri }}</code>
+    </p>
+    <br>
+    {% if action.dateCached %}
+        <h1>
+            {{ 'Date Cached'|t('blitz') }}:
+            {{ craft.blitz.diagnostics.toDateTime(action.dateCached)|datetime('short') }}
+        </h1>
+    {% endif %}
+    {% if action.expiryDate %}
+        <h1>
+            {{ 'Expiry Date'|t('blitz') }}:
+            {{ craft.blitz.diagnostics.toDateTime(action.expiryDate)|datetime('short') }}
+        </h1>
+    {% endif %}
+    <br>
+    <h1>
+        {{ 'Tracked Elements'|t('blitz') }}
+    </h1>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Elements'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementType in elementTypes %}
+                    <tr>
+                        <td>
+                            {% if elementType.nested %}
+                                <a href="{{ url('blitz/diagnostics/actions/nested-element-type', {
+                                    actionId: action.id,
+                                    elementType: elementType.type,
+                                }) }}">
+                                    Nested {{ create(elementType.type).pluralDisplayName }}
+                                </a>
+                            {% else %}
+                                <a href="{{ url('blitz/diagnostics/actions/element-type', {
+                                    actionId: action.id,
+                                    elementType: elementType.type,
+                                }) }}">
+                                    {{ create(elementType.type).pluralDisplayName }}
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ elementType.count|number }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <h1>
+        {{ 'Tracked Element Queries'|t('blitz') }}
+    </h1>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Element Query Type'|t('blitz') }}
+                    </th>
+                    <th>
+                        {{ 'Element Queries'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for elementQueryType in elementQueryTypes %}
+                    <tr>
+                        <td>
+                            <a href="{{ url('blitz/diagnostics/actions/element-query-type', {
+                                actionId: action.id,
+                                elementType: elementQueryType.type
+                            }) }}">
+                                {{ create(elementQueryType.type).displayName() }} Queries
+                            </a>
+                        </td>
+                        <td>
+                            {{ elementQueryType.count|number }}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <br>
+    <h1>
+        {{ 'Tracked Tags'|t('blitz') }}
+    </h1>
+    <div class="elements">
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>
+                        {{ 'Tag'|t('blitz') }}
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for tag in tags %}
+                    <tr>
+                        <td class="code">
+                            <a href="{{ url('blitz/diagnostics/tags/tag', {
+                                tag: tag
+                            }) }}">
+                                {{ tag }}
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

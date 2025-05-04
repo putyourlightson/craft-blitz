@@ -1,0 +1,12 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/base' %}
+
+{% set title = 'Tracked Action Paths'|t('blitz') %}
+{% set showSiteMenu = true %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/_components/actionPaths', {
+        siteId: siteId,
+        displayName: 'Action Path',
+        pluralDisplayName: 'Action Paths',
+    }) }}
+{% endblock %}

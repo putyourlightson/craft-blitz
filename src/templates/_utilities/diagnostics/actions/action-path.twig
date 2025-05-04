@@ -1,0 +1,19 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/action' %}
+
+{% set actionPath = craft.app.request.param('actionPath') %}
+{% set title = actionPath %}
+
+{% block pageTitle %}
+    <h1 class="screen-title" title="{{ title }}">
+        <code>{{ title }}</code>
+    </h1>
+{% endblock %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/_components/actions', {
+        siteId: siteId,
+        action: actionPath,
+        displayName: 'Action',
+        pluralDisplayName: 'Actions',
+    }) }}
+{% endblock %}

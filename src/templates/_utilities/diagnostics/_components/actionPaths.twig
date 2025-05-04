@@ -3,14 +3,14 @@
 {% set offset = offset ?? 0 %}
 {% set limit = 50 %}
 {% set search = search ?? null %}
-{% set rows = craft.blitz.diagnostics.getParams(siteId) %}
+{% set rows = craft.blitz.diagnostics.getActionPaths(siteId) %}
 {% if search %}
-    {% set rows = rows|filter((count, param) => search in param) %}
+    {% set rows = rows|filter((count, actionPath) => search in actionPath) %}
 {% endif %}
 {% set order = [ (orderBy) ] %}
 {% set sort = [ sortBy == 'desc' ? SORT_DESC : SORT_ASC ] %}
-{% if orderBy != 'param' %}
-    {% set order = order|push('param') %}
+{% if orderBy != 'actionPath' %}
+    {% set order = order|push('actionPath') %}
     {% set sort = sort|push(SORT_ASC) %}
 {% endif %}
 {% set total = rows|length %}
@@ -29,14 +29,14 @@
             <table class="data fullwidth">
                 <thead>
                     <tr>
-                        <th class="{{ orderBy == 'param' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
-                            <button type="button" sprig s-val:order-by="param" s-val:sort-by="{{ orderBy == 'param' and sortBy == 'asc' ? 'desc' : 'asc' }}">
-                                {{ 'Query String Param'|t('blitz') }}
+                        <th class="{{ orderBy == 'actionPath' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="actionPath" s-val:sort-by="{{ orderBy == 'actionPath' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Action Path'|t('blitz') }}
                             </button>
                         </th>
                         <th class="{{ orderBy == 'count' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
                             <button type="button" sprig s-val:order-by="count" s-val:sort-by="{{ orderBy == 'count' and sortBy == 'desc' ? 'asc' : 'desc' }}">
-                                {{ 'Tracked Pages'|t('blitz') }}
+                                {{ 'Tracked Actions'|t('blitz') }}
                             </button>
                         </th>
                     </tr>
@@ -45,10 +45,10 @@
                     {% for row in rows %}
                         <tr>
                             <td class="code">
-                                <a href="{{ url('blitz/diagnostics/params/param', {
-                                    param: row.param,
+                                <a href="{{ url('blitz/diagnostics/actions/action-path', {
+                                    actionPath: row.actionPath,
                                 }) }}">
-                                    {{ row.param }}
+                                    {{ row.actionPath }}
                                 </a>
                             </td>
                             <td>

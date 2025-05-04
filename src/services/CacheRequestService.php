@@ -688,8 +688,12 @@ class CacheRequestService extends Component
     /**
      * Appends a “served by” comment.
      */
-    private function appendServedByComment(string $content, SiteUriModel $siteUri, bool $encoded = false): string
+    private function appendServedByComment(?string $content, SiteUriModel $siteUri, bool $encoded = false): string
     {
+        if ($content === null) {
+            return '';
+        }
+
         if ($this->shouldAppendComments(SettingsModel::OUTPUT_COMMENTS_SERVED, $siteUri, $encoded)) {
             $content .= '<!-- Served by Blitz on ' . date('c') . ' -->';
         }

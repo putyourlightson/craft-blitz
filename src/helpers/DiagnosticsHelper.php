@@ -44,6 +44,11 @@ class DiagnosticsHelper
     /**
      * @const array
      */
+    public const IS_ACTION_CONDITION = ['like', 'uri', 'actions/%', false];
+
+    /**
+     * @const array
+     */
     public const IS_CACHED_INCLUDE_CONDITION = ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX . '%', false];
 
     public static function getSiteId(): ?int
@@ -63,12 +68,17 @@ class DiagnosticsHelper
 
     public static function getPagesCount(int $siteId): int
     {
-        return self::getPagesQuery($siteId)->count();
+        return self::getUrisQuery($siteId)->count();
     }
 
     public static function getIncludesCount(int $siteId): int
     {
         return self::getIncludesQuery($siteId)->count();
+    }
+
+    public static function getActionsCount(int $siteId): int
+    {
+        return self::getActionsQuery($siteId)->count();
     }
 
     public static function getParamsCount(int $siteId): int
@@ -125,6 +135,16 @@ class DiagnosticsHelper
         return CacheRecord::find()
             ->select(['id', 'uri', $index . ' AS index'])
             ->where(['id' => $includeId])
+            ->asArray()
+            ->one();
+    }
+
+    public static function getAction(): ?array
+    {
+        $actionId = Craft::$app->getRequest()->getRequiredParam('actionId');
+
+        return CacheRecord::find()
+            ->where(['id' => $actionId])
             ->asArray()
             ->one();
     }
@@ -199,12 +219,13 @@ class DiagnosticsHelper
         return new $elementType();
     }
 
-    public static function getPagesQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $tag = null, ?string $param = null): ActiveQuery
+    public static function getUrisQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $action = null, ?string $param = null, ?string $tag = null): ActiveQuery
     {
-        $query = self::getBasePagesQuery($siteId, $elementId, $queryId, $tag, $param);
+        $query = self::getBaseUrisQuery($siteId, $elementId, $queryId, $action, $param, $tag);
 
-        if ($elementId === null && $queryId === null && $tag === null) {
+        if ($elementId === null && $queryId === null && $action === null && $tag === null) {
             $query->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
+            $query->andWhere(['not', self::IS_ACTION_CONDITION]);
         }
 
         return $query;
@@ -214,13 +235,59 @@ class DiagnosticsHelper
     {
         $index = self::getIncludesIndexColumnForSelect();
 
-        return self::getBasePagesQuery($siteId)
+        return self::getBaseUrisQuery($siteId)
             ->select(['caches.id', 'caches.siteId', 'uri', $index . ' AS index', 'template', 'params', 'elementCount', 'elementQueryCount', 'dateCached', 'expiryDate'])
             ->innerJoin([
                 'indexes' => IncludeRecord::find()
                     ->where(['siteId' => $siteId]),
             ], $index . ' = [[indexes.index]]')
             ->andWhere(self::IS_CACHED_INCLUDE_CONDITION);
+    }
+
+    public static function getActionsQuery(int $siteId): ActiveQuery
+    {
+        return self::getBaseUrisQuery($siteId)
+            ->andWhere(self::IS_ACTION_CONDITION);
+    }
+
+    public static function getActionPaths(int $siteId): array
+    {
+        $uris = CacheRecord::find()
+            ->select(['uri'])
+            ->where(['siteId' => $siteId])
+            ->andWhere(self::IS_ACTION_CONDITION)
+            ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
+            ->column();
+
+        $actionPaths = [];
+        foreach ($uris as $uri) {
+            $actionPath = self::getActionPath($uri);
+            parse_str($actionPath, $params);
+            $actionPaths[$actionPath] = [
+                'actionPath' => $actionPath,
+                'count' => ($actionPaths[$actionPath]['count'] ?? 0) + 1,
+            ];
+        }
+
+        return $actionPaths;
+    }
+
+    public static function getActionPath(string $uri): string
+    {
+        return substr(
+            substr($uri, 0, strpos($uri, '?')),
+            strlen('actions/')
+        );
+    }
+
+    public static function getActionSuffix(string $uri, ?int $length = 32): string
+    {
+        $start = strpos($uri, '?');
+        if ($start === false) {
+            return '/';
+        }
+
+        return self::getShortenedUri(substr($uri, $start), $length);
     }
 
     public static function getParams(int $siteId): array
@@ -480,6 +547,11 @@ class DiagnosticsHelper
         $record->save();
     }
 
+    public static function getShortenedUri(string $uri, ?int $length = 32): string
+    {
+        return substr($uri, 0, $length) . (strlen($uri) > $length ? '...' : '');
+    }
+
     public static function getTests(): array
     {
         $settings = Blitz::$plugin->settings;
@@ -633,7 +705,7 @@ class DiagnosticsHelper
         return DateTimeHelper::toDateTime($value);
     }
 
-    private static function getBasePagesQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $tag = null, ?string $param = null): ActiveQuery
+    private static function getBaseUrisQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $action = null, ?string $param = null, ?string $tag = null): ActiveQuery
     {
         $query = CacheRecord::find()
             ->from(['caches' => CacheRecord::tableName()])
@@ -674,6 +746,14 @@ class DiagnosticsHelper
                 ], 'id = [[elementquerycachesWithQueryId.cacheId]]');
         }
 
+        if ($action !== null) {
+            $query->andWhere(['like', 'uri', 'actions/' . $action . '%', false]);
+        }
+
+        if ($param !== null) {
+            $query->andWhere(['like', 'uri', $param . '=']);
+        }
+
         if ($tag !== null) {
             $query->andWhere(['tag' => $tag])
                 ->innerJoin([
@@ -681,10 +761,6 @@ class DiagnosticsHelper
                         ->select(['cacheId', 'tag'])
                         ->groupBy(['cacheId', 'tag']),
                 ], '[[caches.id]] = [[cachetags.cacheId]]');
-        }
-
-        if ($param !== null) {
-            $query->andWhere(['like', 'uri', $param . '=']);
         }
 
         return $query;

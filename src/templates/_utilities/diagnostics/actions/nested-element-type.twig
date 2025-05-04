@@ -1,0 +1,38 @@
+{% extends 'blitz/_utilities/diagnostics/layouts/action' %}
+
+{% set action = craft.blitz.diagnostics.getAction() %}
+{% if action is null %}
+    {% redirect 'blitz/diagnostics/actions' with error 'The action no longer exists or may have been refreshed.' %}
+{% endif %}
+{% set element = craft.blitz.diagnostics.getElementOfType(action.id) %}
+{% set title = 'Tracked Nested ' ~ element.pluralDisplayName %}
+
+{% set actionPath = craft.blitz.diagnostics.getActionPath(action.uri) %}
+{% set actionSuffix = craft.blitz.diagnostics.getActionSuffix(action.uri) %}
+{% set crumbs = [
+    {
+        html: tag('a', {
+        class: 'crumb-link code',
+        href: cpUrl('blitz/diagnostics/actions/action-path', { 'actionPath': actionPath }),
+        text: actionPath,
+    }),
+    },
+    {
+        html: tag('a', {
+        class: 'crumb-link code',
+        href: cpUrl('blitz/diagnostics/actions/action?actionId=' ~ action.id),
+        text: actionSuffix,
+    })
+    },
+] %}
+
+{% block content %}
+    {{ sprig('blitz/_utilities/diagnostics/_components/nestedElements', {
+        siteId: siteId,
+        cacheId: action.id,
+        elementType: className(element),
+        displayName: element.displayName,
+        pluralDisplayName: element.pluralDisplayName,
+        hasUris: element.hasUris,
+    }) }}
+{% endblock %}

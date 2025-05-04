@@ -15,10 +15,10 @@
 ] %}
 
 {% block content %}
-    {{ sprig('blitz/_utilities/diagnostics/_components/pages', {
+    {{ sprig('blitz/_utilities/diagnostics/_components/uris', {
         siteId: siteId,
         queryId: elementQuery.id,
-        displayName: 'Page/Include',
-        pluralDisplayName: 'Pages/Includes',
+        displayName: 'URI',
+        pluralDisplayName: 'URIs',
     }) }}
 {% endblock %}

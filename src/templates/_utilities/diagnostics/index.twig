@@ -34,6 +34,13 @@
         </a>
     </h2>
     <h2>
+        <a href="{{ cpUrl('blitz/diagnostics/actions') }}">
+            {% set count = craft.blitz.diagnostics.getActionsCount(siteId) %}
+            {{ count|number }}
+            {{ '{num, plural, =1{Tracked Action} other{Tracked Actions}}'|t('blitz', { num: count }) }}
+        </a>
+    </h2>
+    <h2>
         <a href="{{ cpUrl('blitz/diagnostics/params') }}">
             {% set count = craft.blitz.diagnostics.getParamsCount(siteId) %}
             {{ count|number }}
