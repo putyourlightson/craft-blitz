@@ -229,6 +229,19 @@ test('Site URI with `index.php` in URI is not cacheable', function() {
         ->toBeFalse();
 });
 
+test('Site URI with `index.php` and allowed action in URI is cacheable', function() {
+    Blitz::$plugin->settings->includedUriPatterns = [
+        [
+            'siteId' => '',
+            'uriPattern' => 'actions',
+        ],
+    ];
+    $siteUri = createSiteUri(uri: 'index.php?p=actions/test');
+
+    expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
+        ->toBeTrue();
+});
+
 test('Site URI with max URI length is cacheable', function() {
     $siteUri = createSiteUri(uri: 'page' . StringHelper::randomString(Blitz::$plugin->settings->maxUriLength - 4));
 

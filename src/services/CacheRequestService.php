@@ -248,8 +248,10 @@ class CacheRequestService extends Component
             return false;
         }
 
-        // Ignore URIs that contain `index.php`
-        if (str_contains($uri, 'index.php')) {
+        // Ignore URIs that contain `index.php` but that are not action requests
+        $generalConfig = Craft::$app->getConfig()->getGeneral();
+        $pattern = '/index\.php(?!\?' . preg_quote($generalConfig->pathParam) . '=' . preg_quote($generalConfig->actionTrigger) . '\/)/';
+        if (preg_match($pattern, $uri, $m)) {
             Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $url);
 
             return false;

@@ -280,14 +280,20 @@ class DiagnosticsHelper
         );
     }
 
-    public static function getActionSuffix(string $uri, ?int $length = 32): string
+    public static function getActionSuffix(string $uri, ?int $length = null): string
     {
         $start = strpos($uri, '?');
         if ($start === false) {
             return '/';
         }
 
-        return self::getShortenedUri(substr($uri, $start), $length);
+        $actionSuffix = substr($uri, $start);
+
+        if ($length !== null) {
+            $actionSuffix = self::getShortenedUri($actionSuffix, $length);
+        }
+
+        return $actionSuffix;
     }
 
     public static function getParams(int $siteId): array

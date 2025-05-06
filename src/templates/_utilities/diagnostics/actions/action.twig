@@ -22,8 +22,8 @@
 ] %}
 
 {% block content %}
-    <p>
-        <code>{{ action.uri }}</code>
+    <p style="word-break: break-all">
+        <code>{{ craft.blitz.diagnostics.getActionSuffix(action.uri) }}</code>
     </p>
     <br>
     {% if action.dateCached %}

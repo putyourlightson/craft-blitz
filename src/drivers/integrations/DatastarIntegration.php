@@ -54,7 +54,7 @@ class DatastarIntegration extends BaseIntegration
                 $siteUri = $event->siteUri;
                 Event::on(\craft\web\Response::class, Response::EVENT_AFTER_SEND,
                     function() use ($siteUri) {
-                        $content = Datastar::getInstance()->sse->getStreamedResponseData();
+                        $content = Datastar::getInstance()->sse->getResponseData();
                         Blitz::$plugin->generateCache->save($content, $siteUri);
                     },
                 );
