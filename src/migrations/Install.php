@@ -191,7 +191,15 @@ class Install extends Migration
      */
     protected function createIndexes(): void
     {
-        $this->createIndex(null, CacheRecord::tableName(), ['siteId', 'uri'], true);
+        // Create a non-unique length-limited index on the URI column
+        $maxUriIndexLength = Blitz::$plugin->settings->maxUriIndexLength;
+        $uriColumn = "uri($maxUriIndexLength)";
+        if (Craft::$app->getDb()->getIsPgsql()) {
+            // Use a functional index for Postgres
+            $uriColumn = "LEFT(uri, $maxUriIndexLength)";
+        }
+        $this->createIndex(null, CacheRecord::tableName(), ['siteId', $uriColumn]);
+
         $this->createIndex(null, CacheRecord::tableName(), 'expiryDate');
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'elementId', true);
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate');

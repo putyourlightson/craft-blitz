@@ -150,21 +150,15 @@ class FlushCacheService extends Component
     private function resetAutoIncrement(string $table): void
     {
         $db = Craft::$app->getDb();
-        $dbDriver = $db->getDriverName();
-        $sql = '';
-
-        if ($dbDriver == 'mysql') {
-            $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT=1';
-        } elseif ($dbDriver == 'postgres') {
+        $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT=1';
+        if (Craft::$app->getDb()->getIsPgsql()) {
             $sql = 'ALTER SEQUENCE ' . $table . '_id_seq RESTART WITH 1';
         }
 
-        if ($sql) {
-            try {
-                $db->createCommand($sql)->execute();
-            } catch (Exception $exception) {
-                Blitz::$plugin->log('Failed to reset auto increment: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
-            }
+        try {
+            $db->createCommand($sql)->execute();
+        } catch (Exception $exception) {
+            Blitz::$plugin->log('Failed to reset auto increment: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }
 
