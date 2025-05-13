@@ -237,6 +237,7 @@ return [
         // The integrations to initialise.
         //'integrations' => [
         //    'putyourlightson\blitz\drivers\integrations\CommerceIntegration',
+        //    'putyourlightson\blitz\drivers\integrations\DatastarIntegration',
         //    'putyourlightson\blitz\drivers\integrations\SeomaticIntegration',
         //],
 

@@ -13,6 +13,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\deployers\DummyDeployer;
 use putyourlightson\blitz\drivers\generators\HttpGenerator;
 use putyourlightson\blitz\drivers\integrations\CommerceIntegration;
+use putyourlightson\blitz\drivers\integrations\DatastarIntegration;
 use putyourlightson\blitz\drivers\integrations\SeomaticIntegration;
 use putyourlightson\blitz\drivers\purgers\DummyPurger;
 use putyourlightson\blitz\drivers\storage\FileStorage;
@@ -406,6 +407,7 @@ class SettingsModel extends Model
      */
     public array $integrations = [
         CommerceIntegration::class,
+        DatastarIntegration::class,
         SeomaticIntegration::class,
     ];
 
