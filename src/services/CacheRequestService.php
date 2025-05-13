@@ -664,7 +664,7 @@ class CacheRequestService extends Component
     /**
      * Returns whether the request should append comments.
      */
-    public function shouldAppendComments(string $type, SiteUriModel $siteUri, bool $encoded = false): bool
+    public function shouldAppendComments(int $type, SiteUriModel $siteUri, bool $encoded = false): bool
     {
         // Appending onto encoded content is not possible.
         if ($encoded) {
