@@ -29,6 +29,7 @@ use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use putyourlightson\campaign\elements\CampaignElement;
 use putyourlightson\campaign\elements\MailingListElement;
 use yii\db\Expression;
+use yii\web\Response;
 
 beforeEach(function() {
     Blitz::$plugin->settings->cachingEnabled = true;
@@ -39,6 +40,8 @@ beforeEach(function() {
     Blitz::$plugin->generateCache->registerElementPrepareEvents();
     Blitz::$plugin->cacheStorage->deleteAll();
     Blitz::$plugin->flushCache->flushAll(true);
+
+    Craft::$app->getResponse()->format = Response::FORMAT_HTML;
 
     $mutex = Mockery::mock(Mutex::class);
     $mutex->shouldReceive('acquire')->andReturn(true);

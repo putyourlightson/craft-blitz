@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.11.0 - Unreleased
+## 5.11.0 - 2025-05-19
 
 - Added a [Datastar](https://putyourlightson.com/plugins/datastar) integration that makes it possible to cache and serve streamed responses.
 - Added a `cacheActionRequests` setting that determines whether action requests can be cached.
