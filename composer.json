@@ -22,7 +22,7 @@
     "putyourlightson/craft-sprig-core": "^3.0"
   },
   "require-dev": {
-    "craftcms/commerce": "^5.0.0",
+    "craftcms/commerce": "^5.1.0",
     "craftcms/ecs": "dev-main",
     "craftcms/feed-me": "^6.0",
     "craftcms/phpstan": "dev-main",

@@ -22,7 +22,7 @@ class CommerceIntegration extends BaseIntegration
     public static function getRequiredPlugins(): array
     {
         return [
-            ['handle' => 'commerce', 'version' => '4.0.0'],
+            ['handle' => 'commerce', 'version' => '5.1.0'],
         ];
     }
 

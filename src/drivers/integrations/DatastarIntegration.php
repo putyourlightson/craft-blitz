@@ -15,7 +15,7 @@ use yii\base\Event;
 use yii\web\Response;
 
 /**
- * @since 4.2.0
+ * @since 5.11.0
  */
 class DatastarIntegration extends BaseIntegration
 {

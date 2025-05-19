@@ -21,7 +21,7 @@ class SeomaticIntegration extends BaseIntegration
     public static function getRequiredPlugins(): array
     {
         return [
-            ['handle' => 'seomatic', 'version' => '4.0.0'],
+            ['handle' => 'seomatic', 'version' => '5.0.0'],
         ];
     }
 
