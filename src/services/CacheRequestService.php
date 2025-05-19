@@ -134,7 +134,7 @@ class CacheRequestService extends Component
         }
 
         if ($request->getIsActionRequest()
-            && !Blitz::$plugin->settings->cacheActionRequests
+            && !$this->getIsCacheableActionRequest()
         ) {
             return false;
         }
@@ -216,7 +216,10 @@ class CacheRequestService extends Component
 
         $uri = mb_strtolower($siteUri->uri);
 
-        if (Blitz::$plugin->settings->onlyCacheLowercaseUris && $uri !== $siteUri->uri) {
+        if (Blitz::$plugin->settings->onlyCacheLowercaseUris
+            && $uri !== $siteUri->uri
+            && !$this->getIsCacheableActionRequest()
+        ) {
             Blitz::$plugin->debug('Page not cached because the URI contains uppercase characters.', [], $siteUri->uri);
 
             return false;
@@ -251,7 +254,7 @@ class CacheRequestService extends Component
         // Ignore URIs that contain `index.php` but that are not action requests
         $generalConfig = Craft::$app->getConfig()->getGeneral();
         $pattern = '/index\.php(?!\?' . preg_quote($generalConfig->pathParam) . '=' . preg_quote($generalConfig->actionTrigger) . '\/)/';
-        if (preg_match($pattern, $uri, $m)) {
+        if (preg_match($pattern, $uri)) {
             Blitz::$plugin->debug('Page not cached because the URL contains `index.php`.', [], $url);
 
             return false;
@@ -270,7 +273,9 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
+        if (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS
+            && !$this->getIsCacheableActionRequest()
+        ) {
             $queryStringParams = QueryStringHelper::getValidQueryStringParams($siteUri->uri);
 
             if (!empty($queryStringParams)) {
@@ -340,6 +345,17 @@ class CacheRequestService extends Component
         }
 
         return false;
+    }
+
+    /**
+     * Returns whether this is a cacheable action request.
+     *
+     * @since 5.11.1
+     */
+    public function getIsCacheableActionRequest(): bool
+    {
+        return Craft::$app->getRequest()->getIsActionRequest()
+            && Blitz::$plugin->settings->cacheActionRequests;
     }
 
     /**
