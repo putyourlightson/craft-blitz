@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.11.2 - Unreleased
+
+- Fixed the resetting of auto increment values when using Postgres ([#805](https://github.com/putyourlightson/craft-blitz/issues/805)).
+
 ## 5.11.1 - 2025-05-19
 
 - Improved checks for cacheable action requests.

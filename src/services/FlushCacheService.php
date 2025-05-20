@@ -152,7 +152,7 @@ class FlushCacheService extends Component
         $db = Craft::$app->getDb();
         $sql = 'ALTER TABLE ' . $table . ' AUTO_INCREMENT=1';
         if (Craft::$app->getDb()->getIsPgsql()) {
-            $sql = 'ALTER SEQUENCE ' . $table . '_id_seq RESTART WITH 1';
+            $sql = 'ALTER SEQUENCE ' . str_replace('}}', '_id_seq}}', $table) . ' RESTART WITH 1';
         }
 
         try {
