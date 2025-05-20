@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.11.2 - Unreleased
+## 5.11.2 - 2025-05-20
 
 - Fixed the resetting of auto increment values when using Postgres ([#805](https://github.com/putyourlightson/craft-blitz/issues/805)).
 
