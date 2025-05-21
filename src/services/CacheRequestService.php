@@ -567,7 +567,11 @@ class CacheRequestService extends Component
         }
 
         if ($response->content !== null) {
-            $response->content = Blitz::$plugin->generateCache->save($response->content, $siteUri);
+            $content = Blitz::$plugin->generateCache->save($response->content, $siteUri);
+            if ($content === null && $response->stream === null) {
+                return;
+            }
+            $response->content = $content;
         }
 
         $this->prepareResponse($response, $siteUri);

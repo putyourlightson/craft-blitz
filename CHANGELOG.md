@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.11.3 - 2025-05-21
+
+- Fixed a bug in which the response content could be empty when disabling caching using page specific options ([#808](https://github.com/putyourlightson/craft-blitz/issues/808)).
+
 ## 5.11.2 - 2025-05-20
 
 - Fixed the resetting of auto increment values when using Postgres ([#805](https://github.com/putyourlightson/craft-blitz/issues/805)).
