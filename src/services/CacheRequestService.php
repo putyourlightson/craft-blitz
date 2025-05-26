@@ -218,6 +218,7 @@ class CacheRequestService extends Component
 
         if (Blitz::$plugin->settings->onlyCacheLowercaseUris
             && $uri !== $siteUri->uri
+            && !$this->getIsCachedInclude($siteUri->uri)
             && !$this->getIsCacheableActionRequest()
         ) {
             Blitz::$plugin->debug('Page not cached because the URI contains uppercase characters.', [], $siteUri->uri);
