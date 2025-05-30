@@ -36,27 +36,27 @@
     #### Site Tracking {{ craft.app.isMultiSite ? '[' ~ siteId ~ ']' }}
     {{- '\n' -}}
     {{- '\n' -}}
-    - Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(siteId) }}
+    - Tracked Pages: {{ craft.blitz.diagnostics.getPagesCount(siteId)|number }}
     {{- '\n' -}}
-    - Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(siteId) }}
+    - Tracked Includes: {{ craft.blitz.diagnostics.getIncludesCount(siteId)|number }}
     {{- '\n' -}}
-    - Tracked Actions: {{ craft.blitz.diagnostics.getActionsCount(siteId) }}
+    - Tracked Actions: {{ craft.blitz.diagnostics.getActionsCount(siteId)|number }}
     {{- '\n' -}}
-    - Tracked Query String Params: {{ craft.blitz.diagnostics.getParamsCount(siteId) }}
+    - Tracked Query String Params: {{ craft.blitz.diagnostics.getParamsCount(siteId)|number }}
     {{- '\n' -}}
-    - Tracked Elements: {{ craft.blitz.diagnostics.getElementsCount(siteId) }}
+    - Tracked Elements: {{ craft.blitz.diagnostics.getElementsCount(siteId)|number }}
     {{- '\n' -}}
     {% for elementType in craft.blitz.diagnostics.getElementTypes(siteId) %}
-        {{- '\t' -}}- {{ elementType.type }}: {{ elementType.count|number }}
+        {{- '\t' -}}- {{ elementType.type }}{{ elementType.nested ? ' (nested)' }}: {{ elementType.count|number }}
         {{- '\n' -}}
     {% endfor -%}
-    - Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(siteId) }}
+    - Tracked Element Queries: {{ craft.blitz.diagnostics.getElementQueriesCount(siteId)|number }}
     {{- '\n' -}}
     {% for elementQueryType in craft.blitz.diagnostics.getElementQueryTypes(siteId) %}
         {{- '\t' -}}- {{ elementQueryType.type }}: {{ elementQueryType.count|number }}
         {{- '\n' -}}
     {%- endfor -%}
-    - Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(siteId) }}
+    - Tracked Tags: {{ craft.blitz.diagnostics.getTagsCount(siteId)|number }}
     {%- if not loop.last %}
         {{- '\n' -}}
         {{- '\n' -}}

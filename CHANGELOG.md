@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.11.4 - Unreleased
+
+- Nested element queries are now distinguished in the Blitz diagnostics report.
+
 ## 5.11.3 - 2025-05-21
 
 - Fixed a bug in which the response content could be empty when disabling caching using page specific options ([#808](https://github.com/putyourlightson/craft-blitz/issues/808)).
