@@ -1,8 +1,9 @@
 # Release Notes for Blitz
 
-## 5.11.4 - Unreleased
+## 5.11.4 - 2025-06-03
 
 - Nested element queries are now distinguished in the Blitz diagnostics report.
+- Duplicate foreign keys and indexes are now removed before performing database migrations.
 
 ## 5.11.3 - 2025-05-21
 

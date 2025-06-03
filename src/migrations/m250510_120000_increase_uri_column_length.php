@@ -4,6 +4,7 @@ namespace putyourlightson\blitz\migrations;
 
 use Craft;
 use craft\db\Migration;
+use craft\helpers\Db;
 use craft\records\Site;
 use putyourlightson\blitz\records\CacheRecord;
 
@@ -19,8 +20,7 @@ class m250510_120000_increase_uri_column_length extends Migration
         $projectConfig->set('plugins.blitz.settings.maxUriLength', $maxUriLength);
 
         if ($this->db->columnExists(CacheRecord::tableName(), 'uri')) {
-            $this->dropForeignKeyIfExists(CacheRecord::tableName(), 'siteId');
-            $this->dropIndexIfExists(CacheRecord::tableName(), ['siteId', 'uri'], true);
+            $this->dropForeignKeysAndIndexes();
             $this->alterColumn(CacheRecord::tableName(), 'uri', $this->string($maxUriLength)->notNull());
 
             // Create a length-limited index on the URI column
@@ -46,5 +46,19 @@ class m250510_120000_increase_uri_column_length extends Migration
         echo self::class . " cannot be reverted.\n";
 
         return true;
+    }
+
+    /**
+     * Drops foreign keys and indexes in a while loop to ensure duplicates are also removed.
+     */
+    private function dropForeignKeysAndIndexes(): void
+    {
+        while ($name = Db::findForeignKey(CacheRecord::tableName(), 'siteId')) {
+            $this->dropForeignKey($name, CacheRecord::tableName());
+        }
+
+        while ($name = Db::findIndex(CacheRecord::tableName(), ['siteId', 'uri'], true)) {
+            $this->dropIndex($name, CacheRecord::tableName());
+        }
     }
 }
