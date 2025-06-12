@@ -14,6 +14,7 @@ use craft\events\CancelableEvent;
 use craft\helpers\Json;
 use craft\web\Application;
 use craft\web\Request;
+use craft\web\TemplateResponseFormatter;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\generators\BaseCacheGenerator;
 use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
@@ -200,8 +201,7 @@ class CacheRequestService extends Component
             return false;
         }
 
-        return $response->format == Response::FORMAT_HTML
-            || $response->format == 'template'
+        return $this->getIsHtmlResponseFormat()
             || Blitz::$plugin->settings->cacheNonHtmlResponses;
     }
 
@@ -693,7 +693,7 @@ class CacheRequestService extends Component
         }
 
         if ($this->getIsCachedInclude()
-            || Craft::$app->getResponse()->format !== Response::FORMAT_HTML
+            || !$this->getIsHtmlResponseFormat()
             || !SiteUriHelper::hasHtmlMimeType($siteUri)
         ) {
             return false;
@@ -759,6 +759,14 @@ class CacheRequestService extends Component
         }
     }
 
+    private function getIsHtmlResponseFormat(): bool
+    {
+        return in_array(Craft::$app->getResponse()->format, [
+            Response::FORMAT_HTML,
+            TemplateResponseFormatter::FORMAT,
+        ]);
+    }
+
     /**
      * Prepares the response for a given site URI.
      *
@@ -818,7 +826,7 @@ class CacheRequestService extends Component
         if ($mimeType !== SiteUriHelper::MIME_TYPE_HTML) {
             $headers->set(HeaderEnum::CONTENT_TYPE->value, $mimeType);
 
-            if ($response->format == Response::FORMAT_HTML) {
+            if ($response->format === Response::FORMAT_HTML) {
                 $response->format = Response::FORMAT_RAW;
             }
         }

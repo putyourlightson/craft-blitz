@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.11.5 - Unreleased
+
+- Fixed a bug in which “cached by Blitz” comments were not being output.
+
 ## 5.11.4 - 2025-06-03
 
 - Nested element queries are now distinguished in the Blitz diagnostics report.
