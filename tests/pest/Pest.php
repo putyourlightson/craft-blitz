@@ -22,6 +22,14 @@ use putyourlightson\blitz\records\ElementExpiryDateRecord;
 |
 */
 
+// Suppress deprecation warnings in tests, as they are expected in some cases.
+set_error_handler(function($severity) {
+    if ($severity === E_USER_DEPRECATED) {
+        return true; // Suppress it
+    }
+    return false; // Let others through
+});
+
 uses(TestCase::class)
     ->beforeAll(function() {
         // Clear the cache directory without using Blitz, which is not yet instantiated.

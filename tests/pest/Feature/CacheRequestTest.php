@@ -6,6 +6,7 @@
 
 use craft\helpers\StringHelper;
 use craft\helpers\UrlHelper;
+use craft\web\TemplateResponseFormatter;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -286,4 +287,13 @@ test('URI patterns without matching regular expressions are not matched', functi
     );
     expect($matchesUriPatterns)
         ->toBeFalse();
+});
+
+test('Response with a template response format is cacheable', function() {
+    $response = Craft::$app->getResponse();
+    $response->format = TemplateResponseFormatter::FORMAT;
+    Blitz::$plugin->settings->cacheNonHtmlResponses = false;
+
+    expect(Blitz::$plugin->cacheRequest->getIsCacheableResponse($response))
+        ->toBeTrue();
 });
