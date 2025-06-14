@@ -422,9 +422,7 @@ class CacheRequestService extends Component
         }
 
         $allowedQueryString = '';
-        if (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_DO_NOT_CACHE_URLS) {
-            $allowedQueryString = $queryString;
-        } elseif (Blitz::$plugin->settings->queryStringCaching === SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_UNIQUE_PAGES) {
+        if (Blitz::$plugin->settings->queryStringCaching !== SettingsModel::QUERY_STRINGS_CACHE_URLS_AS_SAME_PAGE) {
             $allowedQueryString = $this->getAllowedQueryString($site->id, '?' . $queryString);
         }
         if ($allowedQueryString) {
