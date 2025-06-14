@@ -201,7 +201,7 @@ class CacheRequestService extends Component
             return false;
         }
 
-        return $this->getIsHtmlResponseFormat()
+        return $this->getIsHtmlResponseFormat($response)
             || Blitz::$plugin->settings->cacheNonHtmlResponses;
     }
 
@@ -759,9 +759,11 @@ class CacheRequestService extends Component
         }
     }
 
-    private function getIsHtmlResponseFormat(): bool
+    private function getIsHtmlResponseFormat(?Response $response = null): bool
     {
-        return in_array(Craft::$app->getResponse()->format, [
+        $response = $response ?? Craft::$app->getResponse();
+
+        return in_array($response->format, [
             Response::FORMAT_HTML,
             TemplateResponseFormatter::FORMAT,
         ]);
