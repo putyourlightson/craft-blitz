@@ -234,6 +234,16 @@ class CacheRequestService extends Component
             return false;
         }
 
+        // Ignore URIs with encoded period segments
+        $segments = explode('/', $uri);
+        foreach ($segments as $segment) {
+            if (preg_match('/^(%2e)+$/', $segment)) {
+                Blitz::$plugin->debug('Page not cached because it contains encoded period segments.', [], $uri);
+
+                return false;
+            }
+        }
+
         if ($this->getIsCachedInclude($uri)) {
             return true;
         }

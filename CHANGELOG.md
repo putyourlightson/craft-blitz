@@ -2,6 +2,7 @@
 
 ## 5.11.5 - Unreleased
 
+- URIs with encoded period segments are no longer cached.
 - Fixed a bug in which “cached by Blitz” comments were not being output.
 
 ## 5.11.4 - 2025-06-03

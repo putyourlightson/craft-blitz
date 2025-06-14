@@ -257,6 +257,17 @@ test('Site URI with max URI length exceeded is not cacheable', function() {
         ->toBeFalse();
 });
 
+test('Site URI with URL encoded period segments is not cacheable', function(string $uri) {
+    $siteUri = createSiteUri(uri: $uri);
+
+    expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
+        ->toBeFalse();
+})->with([
+    '%2E/page',
+    'page/%2E',
+    'page/%2E/1',
+]);
+
 test('URI patterns with matching regular expressions are matched', function() {
     $matchesUriPatterns = Blitz::$plugin->cacheRequest->matchesUriPatterns(
         createSiteUri(),
