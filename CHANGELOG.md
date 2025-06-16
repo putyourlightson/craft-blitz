@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.11.5 - Unreleased
+## 5.11.5 - 2025-06-16
 
 - URIs with period-only segments are no longer cached.
 - Fixed a bug in which “cached by Blitz” comments were not being output.
