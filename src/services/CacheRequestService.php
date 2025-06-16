@@ -209,6 +209,16 @@ class CacheRequestService extends Component
             return false;
         }
 
+        // Ignore URIs with period-only segments
+        $segments = explode('/', $uri);
+        foreach ($segments as $segment) {
+            if (preg_match('/^(\.|%2e)+$/', $segment)) {
+                Blitz::$plugin->debug('Page not cached because it contains period-only segments.', [], $uri);
+
+                return false;
+            }
+        }
+
         if ($this->getIsCachedInclude($uri)) {
             return true;
         }

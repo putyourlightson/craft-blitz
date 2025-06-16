@@ -3,6 +3,7 @@
 ## 4.23.15 - Unreleased
 
 - Increased the Cloudflare API limit on purge requests to 100 URLs per request.
+- URIs with encoded period segments are no longer cached.
 - Fixed triggering cache refreshes after moving assets between folders ([#784](https://github.com/putyourlightson/craft-blitz/issues/784)).
 - Fixed a rendering issue in the tracked query string params section of the Blitz Diagnostics utility ([#790](https://github.com/putyourlightson/craft-blitz/issues/790)).
 - Fixed a bug in which allowed query string params were not being applied when query string caching was set to `Do not cache URLs with query strings` ([#815](https://github.com/putyourlightson/craft-blitz/issues/815)).
