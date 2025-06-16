@@ -2,8 +2,9 @@
 
 ## 5.11.5 - Unreleased
 
-- URIs with encoded period segments are no longer cached.
+- URIs with period-only segments are no longer cached.
 - Fixed a bug in which “cached by Blitz” comments were not being output.
+- Fixed a bug in which allowed query string params were not being applied when query string caching was set to `Do not cache URLs with query strings` ([#815](https://github.com/putyourlightson/craft-blitz/issues/815)).
 
 ## 5.11.4 - 2025-06-03
 
