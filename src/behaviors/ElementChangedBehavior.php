@@ -185,6 +185,10 @@ class ElementChangedBehavior extends Behavior
             return false;
         }
 
+        if (!$element->getVolume()->getFs()->hasUrls) {
+            return false;
+        }
+
         if ($element->scenario == Asset::SCENARIO_REPLACE) {
             return true;
         }

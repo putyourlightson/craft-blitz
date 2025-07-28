@@ -361,6 +361,10 @@ class SiteUriHelper
 
             foreach ($assets as $asset) {
                 $url = $asset->getUrl();
+                if ($url === null) {
+                    continue;
+                }
+
                 $urls[] = $url;
 
                 // Get all existing image transform URLs
