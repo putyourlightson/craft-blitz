@@ -153,14 +153,16 @@ class CacheRequestService extends Component
             return false;
         }
 
+        if ($request->getSiteToken() !== null && !$this->getIsGeneratorRequest()) {
+            Blitz::$plugin->debug('Page not cached because a site token parameter was provided.', [], $url);
+
+            return false;
+        }
+
         $event = new CancelableEvent();
         $this->trigger(self::EVENT_IS_CACHEABLE_REQUEST, $event);
         if (!$event->isValid) {
             return false;
-        }
-
-        if ($this->getIsCachedInclude()) {
-            return true;
         }
 
         // Ensure this is a cacheable site request
@@ -168,12 +170,14 @@ class CacheRequestService extends Component
             || !$request->getIsGet()
             || $request->getIsConsoleRequest()
             || $request->getIsPreview()
+            || $request->getIsLivePreview()
         ) {
             return false;
         }
 
         if ($request->getIsActionRequest()
             && !$this->getIsCacheableActionRequest()
+            && !$this->getIsCachedInclude()
         ) {
             return false;
         }

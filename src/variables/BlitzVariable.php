@@ -158,7 +158,7 @@ class BlitzVariable
         ];
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
-            if (Craft::$app->getRequest()->getIsPreview() || Craft::$app->getRequest()->getIsLivePreview()) {
+            if (!Blitz::$plugin->cacheRequest->getIsCacheableRequest()) {
                 return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
             }
 
