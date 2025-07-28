@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.11.6 - Unreleased
+
+- Cached includes are no longer cached when the debug toolbar is enabled([#822](https://github.com/putyourlightson/craft-blitz/issues/822)).
+
 ## 5.11.5 - 2025-06-16
 
 - URIs with period-only segments are no longer cached.

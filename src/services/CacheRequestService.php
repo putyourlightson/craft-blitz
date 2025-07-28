@@ -119,32 +119,7 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableRequest(): bool
     {
-        if ($this->getIsCachedInclude()) {
-            return true;
-        }
-
         $request = Craft::$app->getRequest();
-
-        // Ensure this is a cacheable site request
-        if (!$request->getIsSiteRequest()
-            || !$request->getIsGet()
-            || $request->getIsConsoleRequest()
-            || $request->getIsPreview()
-        ) {
-            return false;
-        }
-
-        if ($request->getIsActionRequest()
-            && !$this->getIsCacheableActionRequest()
-        ) {
-            return false;
-        }
-
-        // Ensure the response is not an error
-        if (!Craft::$app->getResponse()->getIsOk()) {
-            return false;
-        }
-
         $url = $request->getAbsoluteUrl();
 
         /** @var User|null $user */
@@ -180,8 +155,31 @@ class CacheRequestService extends Component
 
         $event = new CancelableEvent();
         $this->trigger(self::EVENT_IS_CACHEABLE_REQUEST, $event);
-
         if (!$event->isValid) {
+            return false;
+        }
+
+        if ($this->getIsCachedInclude()) {
+            return true;
+        }
+
+        // Ensure this is a cacheable site request
+        if (!$request->getIsSiteRequest()
+            || !$request->getIsGet()
+            || $request->getIsConsoleRequest()
+            || $request->getIsPreview()
+        ) {
+            return false;
+        }
+
+        if ($request->getIsActionRequest()
+            && !$this->getIsCacheableActionRequest()
+        ) {
+            return false;
+        }
+
+        // Ensure the response is not an error
+        if (!Craft::$app->getResponse()->getIsOk()) {
             return false;
         }
 
