@@ -36,6 +36,21 @@ class HttpGenerator extends BaseCacheGenerator
     public int $timeout = 60;
 
     /**
+     * @var bool Whether to use basic auth for requests.
+     */
+    public bool $useBasicAuth = false;
+
+    /**
+     * @var string|null The username for basic auth.
+     */
+    public ?string $username = null;
+
+    /**
+     * @var string|null The password for basic auth.
+     */
+    public ?string $password = null;
+
+    /**
      * @inheritdoc
      */
     public static function displayName(): string
@@ -73,6 +88,7 @@ class HttpGenerator extends BaseCacheGenerator
         return [
             [['concurrency'], 'required'],
             [['concurrency'], 'integer', 'min' => 1, 'max' => 100],
+            [['username', 'password'], 'required', 'when' => fn(HttpGenerator $generator) => $generator->useBasicAuth],
         ];
     }
 
@@ -114,6 +130,11 @@ class HttpGenerator extends BaseCacheGenerator
     protected function createRequest(string $url): Request
     {
         $request = new Request($url);
+
+        if ($this->useBasicAuth) {
+            $auth = base64_encode($this->username . ':' . $this->password);
+            $request->setHeader('Authorization', 'Basic ' . $auth);
+        }
 
         // Set all timeout types, since at least two have been reported:
         // https://github.com/putyourlightson/craft-blitz/issues/467#issuecomment-1410308809

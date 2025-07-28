@@ -1,7 +1,8 @@
 # Release Notes for Blitz
 
-## 5.11.6 - Unreleased
+## 5.12.0 - Unreleased
 
+- Added “Basic” HTTP authentication support to the HTTP Generator ([#821](https://github.com/putyourlightson/craft-blitz/issues/821)).
 - Cached includes are no longer cached when the debug toolbar is enabled ([#822](https://github.com/putyourlightson/craft-blitz/issues/822)).
 - Fixed a bug in which assets in local filesystems without public URLs were causing refresh cache jobs to fail ([#819](https://github.com/putyourlightson/craft-blitz/issues/819)).
 

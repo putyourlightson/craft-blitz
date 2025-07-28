@@ -17,3 +17,38 @@
     required: true,
     disabled: readOnly,
 }) }}
+
+{% set info %}
+    <span class="info">{{ "A username and password are required when using [“Basic” HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/Authentication#basic_authentication_scheme)."|t('blitz') }}</span>
+{% endset %}
+{{ forms.lightswitchField({
+    label: "Use Basic Authentication"|t('blitz'),
+    instructions: "Whether to use basic HTTP authentication for requests."|t('blitz') ~ info,
+    name: 'useBasicAuth',
+    on: generator.useBasicAuth,
+    toggle: 'basicAuthFields',
+    disabled: readOnly,
+}) }}
+
+<div id="basicAuthFields" class="flex-fields hidden">
+    {{ forms.autosuggestField({
+        label: "Basic Authentication Username"|t('blitz'),
+        instructions: "The username to use for basic authentication requests."|t('blitz'),
+        suggestEnvVars: true,
+        name: 'username',
+        value: generator.username,
+        errors: generator.getErrors('username'),
+        fieldClass: 'width-50',
+        disabled: readOnly,
+    }) }}
+    {{ forms.autosuggestField({
+        label: "Basic Authentication Password"|t('blitz'),
+        instructions: "The password to use for basic authentication requests."|t('blitz'),
+        suggestEnvVars: true,
+        name: 'password',
+        value: generator.password,
+        errors: generator.getErrors('password'),
+        fieldClass: 'width-50',
+        disabled: readOnly,
+    }) }}
+</div>
