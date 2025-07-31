@@ -27,14 +27,42 @@ test('Cached include tag contains provided options', function() {
         );
 });
 
-test('Cached include tag does not contain unencoded slashes in params', function() {
+test('Cached include tag with SSI enabled does not contain encoded slashes in params', function() {
+    Blitz::$plugin->settings->ssiEnabled = true;
     $variable = new BlitzVariable();
     $tagString = (string)$variable->includeCached('test');
-    preg_match('/_includes\?(.*)/', $tagString, $match);
+    preg_match('/<!--#include virtual="[^?]*\?([^"]*)"/', $tagString, $match);
 
     expect($match[1])
+        ->toContain('action=blitz/include/cached')
         ->not()
-        ->toContain('/');
+        ->toContain('blitz%2Finclude%2Fcached');
+});
+
+test('Cached include tag with SSI disabled also does not contain encoded slashes in params', function() {
+    Blitz::$plugin->settings->ssiEnabled = false;
+    Blitz::$plugin->settings->esiEnabled = false;
+    $variable = new BlitzVariable();
+    $tagString = (string)$variable->includeCached('test');
+    preg_match('/blitz-params="([^"]*)"/', $tagString, $match);
+
+    expect($match[1])
+        ->toContain('action=blitz/include/cached')
+        ->not()
+        ->toContain('blitz%2Finclude%2Fcached');
+});
+
+test('Cached include tag with ESI enabled does not contain encoded slashes in params', function() {
+    Blitz::$plugin->settings->ssiEnabled = false;
+    Blitz::$plugin->settings->esiEnabled = true;
+    $variable = new BlitzVariable();
+    $tagString = (string)$variable->includeCached('test');
+    preg_match('/<esi:include src="[^?]*\?([^"]*)"/', $tagString, $match);
+
+    expect($match[1])
+        ->toContain('action=blitz/include/cached')
+        ->not()
+        ->toContain('blitz%2Finclude%2Fcached');
 });
 
 test('Cached include tag does not contain path param', function() {

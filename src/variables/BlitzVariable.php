@@ -207,7 +207,13 @@ class BlitzVariable
         // Get the URL path only
         $uri = parse_url(UrlHelper::siteUrl($uri), PHP_URL_PATH);
 
-        return $uri . '?' . $this->getQueryString($params);
+        $queryString = $this->getQueryString($params);
+        
+        // Decode slashes to prevent errors with SSI and ESI includes
+        // https://github.com/putyourlightson/craft-blitz/issues/823
+        $queryString = str_replace('%2F', '/', $queryString);
+
+        return $uri . '?' . $queryString;
     }
 
     private function getQueryString(array $params): string

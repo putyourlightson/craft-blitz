@@ -73,9 +73,16 @@ if ($includeQueryString) {
  */
 $action = $_GET['action'] ?? null;
 if ($action === CacheRequestService::CACHED_INCLUDE_ACTION) {
-    $uri = CacheRequestService::CACHED_INCLUDE_PATH . '/' . http_build_query($_GET);
+    $queryString = http_build_query($_GET);
+    // Decode slashes to prevent errors with SSI and ESI includes
+    // https://github.com/putyourlightson/craft-blitz/issues/823
+    $queryString = str_replace('%2F', '/', $queryString);
+    $uri = CacheRequestService::CACHED_INCLUDE_PATH . '/' . $queryString;
 } elseif ($action === CacheRequestService::DYNAMIC_INCLUDE_ACTION) {
-    $uri = http_build_query($_GET);
+    $queryString = http_build_query($_GET);
+    // Decode slashes to prevent errors with SSI and ESI includes
+    $queryString = str_replace('%2F', '/', $queryString);
+    $uri = $queryString;
 }
 
 $cacheFolderPath = defined('BLITZ_CACHE_FOLDER_PATH') ? BLITZ_CACHE_FOLDER_PATH : CRAFT_BASE_PATH . '/web/cache/blitz';

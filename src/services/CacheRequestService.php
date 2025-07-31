@@ -437,6 +437,10 @@ class CacheRequestService extends Component
                 'action' => self::CACHED_INCLUDE_ACTION,
                 'index' => $index,
             ]);
+            
+            // Decode slashes to prevent errors with SSI and ESI includes
+            // https://github.com/putyourlightson/craft-blitz/issues/823
+            $queryString = str_replace('%2F', '/', $queryString);
 
             return new SiteUriModel([
                 'siteId' => $include->siteId,
