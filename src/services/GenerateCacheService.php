@@ -544,6 +544,12 @@ class GenerateCacheService extends Component
 
         $cacheValue = $siteUri->toArray();
 
+        // Ignore the query string in the URI, if a cached include.
+        if (Blitz::$plugin->cacheRequest->getIsCachedInclude()) {
+            $parts = explode('?', $siteUri->uri);
+            $cacheValue['uri'] = $parts[0];
+        }
+
         // Delete cache records so we get a fresh cache.
         CacheRecord::deleteAll($cacheValue);
 

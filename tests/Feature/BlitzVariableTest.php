@@ -27,23 +27,12 @@ test('Cached include tag contains provided options', function() {
         );
 });
 
-test('Cached include tag does not contain unencoded slashes in params', function() {
-    $variable = new BlitzVariable();
-    $tagString = (string)$variable->includeCached('test');
-    preg_match('/_includes\?(.*)/', $tagString, $match);
-
-    expect($match[1])
-        ->not()
-        ->toContain('/');
-});
-
-test('Cached include tag does not contain path param', function() {
+test('Cached include tag contains path param', function() {
     $variable = new BlitzVariable();
     $tagString = (string)$variable->includeCached('test');
     preg_match('/\?(.*)/', $tagString, $match);
 
     expect($match[1])
-        ->not()
         ->toContain(Craft::$app->getConfig()->getGeneral()->pathParam . '=');
 });
 

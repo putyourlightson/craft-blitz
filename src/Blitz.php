@@ -141,6 +141,7 @@ class Blitz extends Plugin
         $this->registerInstances();
         $this->registerVariables();
         $this->registerLogTarget();
+        $this->registerSiteUrlRules();
 
         // Potentially refresh the cache at the end of every request
         Craft::$app->onAfterRequest(function() {
@@ -302,6 +303,19 @@ class Blitz extends Plugin
     }
 
     /**
+     * Registers site URL rules
+     */
+    private function registerSiteUrlRules(): void
+    {
+        Event::on(UrlManager::class, UrlManager::EVENT_REGISTER_SITE_URL_RULES,
+            function(RegisterUrlRulesEvent $event) {
+                $event->rules[CacheRequestService::CACHED_INCLUDE_PREFIX . '<index:(.+)?>'] = 'blitz/include/cached';
+                $event->rules[CacheRequestService::DYNAMIC_INCLUDE_PREFIX . '<index:(.+)?>'] = 'blitz/include/dynamic';
+            }
+        );
+    }
+
+    /**
      * Registers cacheable request events
      */
     private function registerCacheableRequestEvents(): void
@@ -450,7 +464,7 @@ class Blitz extends Plugin
     }
 
     /**
-     * Registers CP URL rules event
+     * Registers CP URL rules
      */
     private function registerCpUrlRules(): void
     {

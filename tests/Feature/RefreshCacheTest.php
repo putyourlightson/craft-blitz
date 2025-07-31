@@ -168,7 +168,7 @@ test('Asset is tracked when its filename is changed', function() {
 test('Asset is tracked when it is moved between folders', function() {
     $asset = createAsset();
     // Must be a valid folder ID
-    $asset->newFolderId = 7;
+    $asset->newFolderId = 6;
     Craft::$app->getElements()->saveElement($asset);
     Blitz::$plugin->refreshCache->addElement($asset);
 

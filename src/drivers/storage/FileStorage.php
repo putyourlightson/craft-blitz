@@ -310,7 +310,7 @@ class FileStorage extends BaseCacheStorage
         }
 
         return count(FileHelper::findFiles($path, [
-            'except' => [CacheRequestService::CACHED_INCLUDE_PATH . '/'],
+            'except' => [CacheRequestService::CACHED_INCLUDE_PREFIX . '/'],
             'only' => ['index.html'],
         ]));
     }
@@ -324,7 +324,7 @@ class FileStorage extends BaseCacheStorage
             return 0;
         }
 
-        $path = rtrim($path, '/') . '/' . CacheRequestService::CACHED_INCLUDE_PATH;
+        $path = rtrim($path, '/') . '/' . CacheRequestService::CACHED_INCLUDE_PREFIX;
 
         if (!is_dir($path)) {
             return 0;

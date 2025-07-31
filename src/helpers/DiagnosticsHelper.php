@@ -49,7 +49,7 @@ class DiagnosticsHelper
     /**
      * @const array
      */
-    public const IS_CACHED_INCLUDE_CONDITION = ['like', 'uri', CacheRequestService::CACHED_INCLUDE_URI_PREFIX . '%', false];
+    public const IS_CACHED_INCLUDE_CONDITION = ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PREFIX . '%', false];
 
     public static function getSiteId(): ?int
     {
@@ -774,9 +774,13 @@ class DiagnosticsHelper
 
     private static function getIncludesIndexColumnForSelect(): string
     {
+        $prefixLength = strlen(CacheRequestService::CACHED_INCLUDE_PREFIX);
+
+        // Extract the index from the URI, which comes after the prefix.
+        $index = 'SUBSTRING([[uri]], ' . ($prefixLength + 1) . ')';
+
         // Cast the string to a BIGINT for Postgres.
         // https://github.com/putyourlightson/craft-blitz/issues/653
-        $index = 'SUBSTRING([[uri]], 49)';
         if (Craft::$app->getDb()->getIsPgsql()) {
             $index = 'CAST(' . $index . ' AS BIGINT)';
         }

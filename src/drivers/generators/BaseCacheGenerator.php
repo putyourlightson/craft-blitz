@@ -216,7 +216,7 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
 
         foreach ($siteUris as $siteUri) {
             $uri = is_array($siteUri) ? $siteUri['uri'] : $siteUri->uri;
-            if (!str_starts_with($uri, CacheRequestService::CACHED_INCLUDE_PATH)) {
+            if (!str_starts_with($uri, CacheRequestService::CACHED_INCLUDE_PREFIX)) {
                 $count++;
             }
         }

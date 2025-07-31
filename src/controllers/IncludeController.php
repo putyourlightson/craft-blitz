@@ -26,25 +26,24 @@ class IncludeController extends Controller
      * This is necessary for detecting SSI requests and will only be hit when
      * no cached include exists.
      */
-    public function actionCached(): Response
+    public function actionCached(string $index): Response
     {
-        return $this->getRenderedTemplate();
+        return $this->getRenderedTemplate($index);
     }
 
     /**
      * Returns a dynamically rendered template.
      */
-    public function actionDynamic(): Response
+    public function actionDynamic(string $index): Response
     {
-        return $this->getRenderedTemplate();
+        return $this->getRenderedTemplate($index);
     }
 
     /**
      * Returns a rendered template.
      */
-    public function getRenderedTemplate(): Response
+    public function getRenderedTemplate(string $index): Response
     {
-        $index = Craft::$app->getRequest()->getRequiredParam('index');
         $include = Blitz::$plugin->cacheRequest->getIncludeByIndex($index);
 
         if ($include === null) {

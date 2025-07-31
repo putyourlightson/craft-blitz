@@ -5,7 +5,6 @@
  */
 
 use craft\helpers\StringHelper;
-use craft\helpers\UrlHelper;
 use craft\web\TemplateResponseFormatter;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
@@ -71,39 +70,17 @@ test('Request with token is not cacheable', function() {
         ->toBeFalse();
 });
 
-test('Request with a cached include prefix is a cached include', function() {
-    expect(Blitz::$plugin->cacheRequest->getIsCachedInclude('/_includes/xyz'))
-        ->toBeFalse()
-        ->and(Blitz::$plugin->cacheRequest->getIsCachedInclude('/' . CacheRequestService::CACHED_INCLUDE_URI_PREFIX))
+test('Request with a cached include path is a cached include', function() {
+    $uri = CacheRequestService::CACHED_INCLUDE_PREFIX . '?index=1234567890';
+
+    expect(Blitz::$plugin->cacheRequest->getIsCachedInclude($uri))
         ->toBeTrue();
 });
 
-test('Request with a cached include action is a cached include', function() {
-    [, $index] = Blitz::$plugin->generateCache->saveInclude(1, 'test/_include', []);
-    sendRequest(UrlHelper::actionUrl('', [
-        'action' => CacheRequestService::CACHED_INCLUDE_ACTION,
-        'index' => $index,
-    ]));
+test('Request with a dynamic include path is a dynamic include', function() {
+    $uri = CacheRequestService::DYNAMIC_INCLUDE_PREFIX . '?index=1234567890';
 
-    expect(Blitz::$plugin->cacheRequest->getIsCachedInclude())
-        ->toBeTrue();
-});
-
-test('Request with a dynamic include prefix is a dynamic include', function() {
-    expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/_dynamic/xyz'))
-        ->toBeFalse()
-        ->and(Blitz::$plugin->cacheRequest->getIsDynamicInclude('/' . CacheRequestService::DYNAMIC_INCLUDE_URI_PREFIX))
-        ->toBeTrue();
-});
-
-test('Request with dynamic include action is a dynamic include', function() {
-    [, $index] = Blitz::$plugin->generateCache->saveInclude(1, 'test/_include', []);
-    sendRequest(UrlHelper::actionUrl('', [
-        'action' => CacheRequestService::DYNAMIC_INCLUDE_ACTION,
-        'index' => $index,
-    ]));
-
-    expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude())
+    expect(Blitz::$plugin->cacheRequest->getIsDynamicInclude($uri))
         ->toBeTrue();
 });
 

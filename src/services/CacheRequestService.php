@@ -67,32 +67,12 @@ class CacheRequestService extends Component
     /**
      * @const string
      */
-    public const CACHED_INCLUDE_ACTION = 'blitz/include/cached';
+    public const CACHED_INCLUDE_PREFIX = '_cached_include_';
 
     /**
      * @const string
      */
-    public const DYNAMIC_INCLUDE_ACTION = 'blitz/include/dynamic';
-
-    /**
-     * @const string
-     */
-    public const CACHED_INCLUDE_PATH = '_includes';
-
-    /**
-     * @const string
-     */
-    public const DYNAMIC_INCLUDE_PATH = '_dynamic';
-
-    /**
-     * @const string
-     */
-    public const CACHED_INCLUDE_URI_PREFIX = self::CACHED_INCLUDE_PATH . '?action=';
-
-    /**
-     * @const string
-     */
-    public const DYNAMIC_INCLUDE_URI_PREFIX = self::DYNAMIC_INCLUDE_PATH . '?action=';
+    public const DYNAMIC_INCLUDE_PREFIX = '_dynamic_include_';
 
     /**
      * @var bool|null
@@ -177,7 +157,6 @@ class CacheRequestService extends Component
 
         if ($request->getIsActionRequest()
             && !$this->getIsCacheableActionRequest()
-            && !$this->getIsCachedInclude()
         ) {
             return false;
         }
@@ -320,20 +299,12 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::CACHED_INCLUDE_URI_PREFIX);
+            return str_starts_with($uri, self::CACHED_INCLUDE_PREFIX);
         }
 
-        if (Craft::$app->getRequest()->getIsActionRequest()) {
-            $action = implode('/', Craft::$app->getRequest()->getActionSegments());
+        $path = Craft::$app->getRequest()->getPathInfo();
 
-            return $action === self::CACHED_INCLUDE_ACTION;
-        }
-
-        // Fall back to checking the URI, in case this came through an SSI request.
-        $siteUri = SiteUriHelper::getSiteUriFromRequest();
-        $uri = $siteUri->uri ?? '';
-
-        return str_starts_with($uri, self::CACHED_INCLUDE_URI_PREFIX);
+        return str_starts_with($path, self::CACHED_INCLUDE_PREFIX);
     }
 
     /**
@@ -348,16 +319,12 @@ class CacheRequestService extends Component
         if ($uri !== null) {
             $uri = trim($uri, '/');
 
-            return str_starts_with($uri, self::DYNAMIC_INCLUDE_URI_PREFIX);
+            return str_starts_with($uri, self::DYNAMIC_INCLUDE_PREFIX);
         }
 
-        if (Craft::$app->getRequest()->getIsActionRequest()) {
-            $action = implode('/', Craft::$app->getRequest()->getActionSegments());
+        $path = Craft::$app->getRequest()->getPathInfo();
 
-            return $action === self::DYNAMIC_INCLUDE_ACTION;
-        }
-
-        return false;
+        return str_starts_with($path, self::DYNAMIC_INCLUDE_PREFIX);
     }
 
     /**
@@ -408,7 +375,7 @@ class CacheRequestService extends Component
      */
     public function getIncludeByIndex(int|string|null $index): ?IncludeRecord
     {
-        if ($index === null) {
+        if (empty($index)) {
             return null;
         }
 
@@ -421,7 +388,7 @@ class CacheRequestService extends Component
     }
 
     /**
-     * Returns the cacheable requested site URI taking the query string into account.
+     * Returns the cacheable requested site URI, taking the query string into account.
      */
     public function getRequestedCacheableSiteUri(): ?SiteUriModel
     {
@@ -433,14 +400,11 @@ class CacheRequestService extends Component
                 return null;
             }
 
-            $queryString = http_build_query([
-                'action' => self::CACHED_INCLUDE_ACTION,
-                'index' => $index,
-            ]);
+            $uri = self::CACHED_INCLUDE_PREFIX . $index;
 
             return new SiteUriModel([
                 'siteId' => $include->siteId,
-                'uri' => self::CACHED_INCLUDE_PATH . '?' . $queryString,
+                'uri' => $uri . '?' . Craft::$app->getConfig()->getGeneral()->pathParam . '=' . $uri,
             ]);
         }
 
@@ -861,8 +825,9 @@ class CacheRequestService extends Component
     private function getCachedIncludeIndexFromQueryString(): ?string
     {
         parse_str(Craft::$app->getRequest()->getQueryString(), $queryStringParams);
+        $path = $queryStringParams[Craft::$app->getConfig()->getGeneral()->pathParam] ?? null;
 
-        return $queryStringParams['index'] ?? null;
+        return $path ? str_replace(self::CACHED_INCLUDE_PREFIX, '', $path) : null;
     }
 
     /**

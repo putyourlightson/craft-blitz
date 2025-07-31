@@ -11,7 +11,6 @@ use craft\helpers\Template;
 use craft\helpers\UrlHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\DiagnosticsHelper;
-use putyourlightson\blitz\helpers\QueryStringHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\VariableConfigModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -37,7 +36,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PATH, CacheRequestService::CACHED_INCLUDE_ACTION, $params, $config);
+        return $this->includeTemplate($template, CacheRequestService::CACHED_INCLUDE_PREFIX, $params, $config);
     }
 
     /**
@@ -52,7 +51,7 @@ class BlitzVariable
         ]);
         $config->setAttributes($options);
 
-        return $this->includeTemplate($template, CacheRequestService::DYNAMIC_INCLUDE_PATH, CacheRequestService::DYNAMIC_INCLUDE_ACTION, $params, $config);
+        return $this->includeTemplate($template, CacheRequestService::DYNAMIC_INCLUDE_PREFIX, $params, $config);
     }
 
     /**
@@ -139,7 +138,7 @@ class BlitzVariable
     /**
      * Returns the code to inject the output of a template.
      */
-    private function includeTemplate(string $template, string $uriPrefix, string $action, array $params, VariableConfigModel $config): Markup
+    private function includeTemplate(string $template, string $uriPrefix, array $params, VariableConfigModel $config): Markup
     {
         if (!Craft::$app->getView()->resolveTemplate($template)) {
             throw new NotFoundHttpException('Template not found: ' . $template);
@@ -149,40 +148,39 @@ class BlitzVariable
 
         [$includeId, $index] = Blitz::$plugin->generateCache->saveInclude($siteId, $template, $params);
 
-        // Create a root relative URL to account for sub-folders
-        $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($uriPrefix));
+        $uri = $uriPrefix . $index;
 
-        $includeParams = [
-            'action' => $action,
-            'index' => $index,
-        ];
+        // Create a root relative URL to account for sub-folders
+        $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($uri));
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
             if (!Blitz::$plugin->cacheRequest->getIsCacheableRequest()) {
                 return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
             }
 
+            // Add the path param as a query string param with the value of the URI. Since SSI ignores the actual URI, the path param will route the request.
+            $uri = $uri . '?' . Craft::$app->getConfig()->getGeneral()->pathParam . '=' . trim($uri, '/');
+
             if (Blitz::$plugin->settings->ssiEnabled) {
-                return $this->getSsiTag($uri, $includeParams, $includeId);
+                return $this->getSsiTag($uri, $includeId);
             }
 
             if (Blitz::$plugin->settings->esiEnabled) {
-                return $this->getEsiTag($uri, $includeParams);
+                return $this->getEsiTag($uri);
             }
         }
 
-        return $this->getScript($uri, $includeParams, $config);
+        return $this->getScript($uri, $params, $config);
     }
 
     /**
      * Returns an SSI tag to inject the output of a URI.
      */
-    private function getSsiTag(string $uri, array $params, int $includeId): Markup
+    private function getSsiTag(string $uri, int $includeId): Markup
     {
         // Add an SSI include, so we can purge it whenever necessary
         Blitz::$plugin->generateCache->addSsiInclude($includeId);
 
-        $uri = $this->getUriWithParams($uri, $params);
         $ssiTag = Blitz::$plugin->settings->getSsiTag($uri);
 
         return Template::raw($ssiTag);
@@ -191,30 +189,14 @@ class BlitzVariable
     /**
      * Returns an ESI tag to inject the output of a URI.
      */
-    private function getEsiTag(string $uri, array $params): Markup
+    private function getEsiTag(string $uri): Markup
     {
         Blitz::$plugin->generateCache->generateData->setHasIncludes();
-        $uri = $this->getUriWithParams($uri, $params);
 
         // Add surrogate control header
         Craft::$app->getResponse()->getHeaders()->add('Surrogate-Control', 'content="ESI/1.0"');
 
         return Template::raw('<esi:include src="' . $uri . '" />');
-    }
-
-    private function getUriWithParams(string $uri, array $params): string
-    {
-        // Get the URL path only
-        $uri = parse_url(UrlHelper::siteUrl($uri), PHP_URL_PATH);
-
-        return $uri . '?' . $this->getQueryString($params);
-    }
-
-    private function getQueryString(array $params): string
-    {
-        $queryStringParams = QueryStringHelper::getValidQueryParams($params);
-
-        return http_build_query($queryStringParams);
     }
 
     /**
@@ -241,7 +223,7 @@ class BlitzVariable
 
         // Decode slashes to prevent errors when the `AllowEncodedSlashes` is disabled, only when not using SSI or ESI.
         // https://github.com/putyourlightson/craft-blitz/issues/595
-        $queryString = $this->getQueryString($params);
+        $queryString = http_build_query($params);
         $queryString = str_replace('%2F', '/', $queryString);
 
         $data = [
@@ -292,6 +274,8 @@ class BlitzVariable
         }
 
         if (class_exists('\putyourlightson\sprig\base\Component')) {
+            // DO NOT IMPORT!
+            /** @noinspection PhpFullyQualifiedNameUsageInspection */
             return \putyourlightson\sprig\base\Component::isRequest();
         }
 
