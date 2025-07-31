@@ -352,6 +352,17 @@ test('Element query record with relation field is not saved', function() {
         ->toHaveRecordCount(0);
 });
 
+test('Element query record with eager-loaded relation field is not saved', function() {
+    $entry = createEntryWithRelationship();
+    ElementQueryRecord::deleteAll();
+    $elementQuery = Entry::find();
+    $elementQuery->eagerLoadSourceElement = $entry;
+    Blitz::$plugin->generateCache->addElementQuery($elementQuery);
+
+    expect(ElementQueryRecord::class)
+        ->toHaveRecordCount(0);
+});
+
 test('Element query record with related to param is saved', function() {
     $elementQuery = Entry::find()->relatedTo(1);
     Blitz::$plugin->generateCache->addElementQuery($elementQuery);

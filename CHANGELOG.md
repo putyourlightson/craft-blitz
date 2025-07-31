@@ -5,6 +5,7 @@
 - Added “Basic” HTTP authentication support to the HTTP Generator ([#821](https://github.com/putyourlightson/craft-blitz/issues/821)).
 - Cached includes are no longer cached when the debug toolbar is enabled ([#822](https://github.com/putyourlightson/craft-blitz/issues/822)).
 - Cached includes are no longer cached when called via a preview URL ([#804](https://github.com/putyourlightson/craft-blitz/issues/804)).
+- Eager-loaded relation field queries are now explicitly excluded from tracking ([#812](https://github.com/putyourlightson/craft-blitz/issues/812), [#817](https://github.com/putyourlightson/craft-blitz/issues/817)).
 - Fixed a bug in which assets in local filesystems without public URLs were causing refresh cache jobs to fail ([#819](https://github.com/putyourlightson/craft-blitz/issues/819)).
 - Fixed a bug in which URLs with site tokens could be cached.
 

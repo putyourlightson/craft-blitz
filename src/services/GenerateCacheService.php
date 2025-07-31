@@ -276,6 +276,11 @@ class GenerateCacheService extends Component
             return;
         }
 
+        // Don’t proceed if this is an eager-loaded relation field query
+        if (ElementQueryHelper::isEagerLoadedRelationFieldQuery($elementQuery)) {
+            return;
+        }
+
         // Don’t proceed if the query has fixed IDs or slugs
         if (ElementQueryHelper::hasFixedIdsOrSlugs($elementQuery)) {
             return;

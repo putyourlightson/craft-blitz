@@ -506,6 +506,14 @@ class ElementQueryHelper
     }
 
     /**
+     * Returns whether the element query is an eager-loaded relation field query.
+     */
+    public static function isEagerLoadedRelationFieldQuery(ElementQuery $elementQuery): bool
+    {
+        return $elementQuery->eagerLoadSourceElement !== null;
+    }
+
+    /**
      * Returns an element query’s filterable params, which is the intersection
      * of its params and its element type’s params.
      */
