@@ -3,9 +3,10 @@
 ## 5.12.0 - Unreleased
 
 > [!NOTE]
-> The cache should be cleared or refreshed after this update completes.
+> The cache must be cleared _and_ flushed after this update completes.
 
 - Added “Basic” HTTP authentication support to the HTTP Generator ([#821](https://github.com/putyourlightson/craft-blitz/issues/821)).
+- Added template, code and backtrace info to tracked element queries in the Blitz diagnostics utility.
 - Refactored how cached include URIs are generated to help prevent issues with encoded slashes in URLs ([#823](https://github.com/putyourlightson/craft-blitz/issues/823)).
 - Cached includes are no longer cached when the debug toolbar is enabled ([#822](https://github.com/putyourlightson/craft-blitz/issues/822)).
 - Cached includes are no longer cached when called via a preview URL ([#804](https://github.com/putyourlightson/craft-blitz/issues/804)).

@@ -143,6 +143,9 @@ class Install extends Migration
                 'index' => $this->bigInteger()->notNull(),
                 'type' => $this->string()->notNull(),
                 'params' => $this->text(),
+                'template' => $this->string(),
+                'code' => $this->text(),
+                'backtrace' => $this->text(),
             ]);
         }
 

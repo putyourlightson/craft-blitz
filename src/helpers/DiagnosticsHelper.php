@@ -387,7 +387,7 @@ class DiagnosticsHelper
 
         return ElementQueryCacheRecord::find()
             ->from(['elementquerycaches' => ElementQueryCacheRecord::tableName()])
-            ->select([ElementQueryRecord::tableName() . '.id', 'index', 'params', 'count(*) as count'])
+            ->select([ElementQueryRecord::tableName() . '.id', 'index', 'params', 'template', 'code', 'backtrace', 'count(*) as count'])
             ->innerJoinWith('cache')
             ->innerJoinWith('elementQuery')
             ->where($condition)

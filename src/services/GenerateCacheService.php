@@ -18,6 +18,7 @@ use craft\events\EagerLoadElementsEvent;
 use craft\events\PopulateElementEvent;
 use craft\events\PopulateElementsEvent;
 use craft\events\TemplateEvent;
+use craft\helpers\App;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
 use craft\models\Section;
@@ -28,6 +29,7 @@ use craft\web\View;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
+use putyourlightson\blitz\helpers\BacktraceHelper;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
@@ -219,6 +221,7 @@ class GenerateCacheService extends Component
                 if (Craft::$app->getResponse()->getIsOk()) {
                     /** @var ElementQuery $elementQuery */
                     $elementQuery = $event->sender;
+
                     $this->addElementQuery($elementQuery);
                 }
             }
@@ -360,6 +363,8 @@ class GenerateCacheService extends Component
 
         if (!$queryId) {
             try {
+                [$template, $code] = BacktraceHelper::getOriginTemplateCode();
+
                 // Use DB connection, so we can exclude audit columns when inserting
                 $db->createCommand()
                     ->insert(
@@ -368,6 +373,9 @@ class GenerateCacheService extends Component
                             'index' => $index,
                             'type' => $elementQuery->elementType,
                             'params' => $encodedParams,
+                            'template' => $template,
+                            'code' => $code,
+                            'backtrace' => App::backtrace(),
                         ],
                     )
                     ->execute();

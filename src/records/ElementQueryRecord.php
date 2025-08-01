@@ -13,6 +13,9 @@ use yii\db\ActiveQuery;
  * @property int $index
  * @property string $type
  * @property string $params
+ * @property string $template
+ * @property string $code
+ * @property string $backtrace
  * @property-read ElementQueryCacheRecord[] $elementQueryCaches
  * @property-read ElementQuerySourceRecord[] $elementQuerySources
  * @property-read ElementQueryAttributeRecord[] $elementQueryAttributes

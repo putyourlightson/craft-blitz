@@ -75,6 +75,11 @@ table th.thin, table td.thin {
     max-width: none;
 }
 
+.blitz-diagnostics-body .info-hud textarea {
+    width: 480px;
+    height: 200px;
+}
+
 .info-hud li {
     margin: 2px 0;
 }

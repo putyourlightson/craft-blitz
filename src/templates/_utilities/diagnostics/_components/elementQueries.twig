@@ -53,8 +53,15 @@
                                 {{ 'Params'|t('blitz') }}
                             </button>
                         </th>
-                        <th>
-                            {{ 'SQL'|t('blitz') }}
+                        <th class="{{ orderBy == 'template' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="template" s-val:sort-by="{{ orderBy == 'template' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Template'|t('blitz') }}
+                            </button>
+                        </th>
+                        <th class="{{ orderBy == 'code' ? 'ordered' }} {{ sortBy == 'desc' ? 'desc' }} orderable">
+                            <button type="button" sprig s-val:order-by="code" s-val:sort-by="{{ orderBy == 'code' and sortBy == 'asc' ? 'desc' : 'asc' }}">
+                                {{ 'Twig Code'|t('blitz') }}
+                            </button>
                         </th>
                     </tr>
                 </thead>
@@ -109,24 +116,43 @@
                                     </span>
                                 {% endif %}
                             </td>
-                            <td class="code">
-                                {{ include('blitz/_utilities/diagnostics/_includes/copytext', {
-                                    id: 'params-' ~ row.id,
-                                    buttonId: 'copy-btn-params-' ~ row.id,
-                                    value: row.params,
-                                }) }}
+                            <td class="code" style="white-space: nowrap;">
+                                <div class="flex">
+                                    {{ include('blitz/_utilities/diagnostics/_includes/copytext', {
+                                        id: 'params-' ~ row.id,
+                                        buttonId: 'copy-btn-params-' ~ row.id,
+                                        value: row.params,
+                                    }) -}}
+                                    <span class="info">
+                                        <h3>Raw SQL</h3>
+                                        {% set sql = craft.blitz.diagnostics.getElementQuerySql(elementType, row.params) %}
+                                        {% if sql %}
+                                            <textarea>{{ sql }}</textarea>
+                                        {% else %}
+                                            {{ 'Invalid params'|t('blitz') }}
+                                        {% endif %}
+                                    </span>
+                                </div>
                             </td>
                             <td class="code">
-                                {% set value = craft.blitz.diagnostics.getElementQuerySql(elementType, row.params) %}
-                                {% if value %}
+                                <div class="flex">
                                     {{ include('blitz/_utilities/diagnostics/_includes/copytext', {
-                                        id: 'sql-' ~ row.id,
-                                        buttonId: 'copy-btn-sql-' ~ row.id,
-                                        value: value,
+                                        id: 'template-' ~ row.id,
+                                        buttonId: 'copy-btn-template-' ~ row.id,
+                                        value: row.template,
                                     }) }}
-                                {% else %}
-                                    {{ 'Invalid params'|t('blitz') }}
-                                {% endif %}
+                                    <span class="info">
+                                        <h3>Backtrace</h3>
+                                        <textarea>{{ row.backtrace }}</textarea>
+                                    </span>
+                                </div>
+                            </td>
+                            <td class="code">
+                                {{ include('blitz/_utilities/diagnostics/_includes/copytext', {
+                                    id: 'code-' ~ row.id,
+                                    buttonId: 'copy-btn-code-' ~ row.id,
+                                    value: row.code,
+                                }) }}
                             </td>
                         </tr>
                     {% endfor %}
