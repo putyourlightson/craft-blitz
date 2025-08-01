@@ -127,7 +127,7 @@
                                         <h3>Raw SQL</h3>
                                         {% set sql = craft.blitz.diagnostics.getElementQuerySql(elementType, row.params) %}
                                         {% if sql %}
-                                            <textarea>{{ sql }}</textarea>
+                                            <pre>{{ sql }}</pre>
                                         {% else %}
                                             {{ 'Invalid params'|t('blitz') }}
                                         {% endif %}
@@ -143,16 +143,22 @@
                                     }) }}
                                     <span class="info">
                                         <h3>Backtrace</h3>
-                                        <textarea>{{ row.backtrace }}</textarea>
+                                        <pre>{{ row.backtrace }}</pre>
                                     </span>
                                 </div>
                             </td>
                             <td class="code">
-                                {{ include('blitz/_utilities/diagnostics/_includes/copytext', {
-                                    id: 'code-' ~ row.id,
-                                    buttonId: 'copy-btn-code-' ~ row.id,
-                                    value: row.code,
-                                }) }}
+                                <div class="flex">
+                                    {{ include('blitz/_utilities/diagnostics/_includes/copytext', {
+                                        id: 'code-' ~ row.id,
+                                        buttonId: 'copy-btn-code-' ~ row.id,
+                                        value: row.code,
+                                    }) }}
+                                    <span class="info">
+                                        <h3>Twig Code</h3>
+                                        <pre>{{ row.code }}</pre>
+                                    </span>
+                                </div>
                             </td>
                         </tr>
                     {% endfor %}
