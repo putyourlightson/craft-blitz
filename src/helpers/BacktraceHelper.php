@@ -41,7 +41,7 @@ class BacktraceHelper
             }
         }
 
-        return [null, null, null];
+        return [null, null];
     }
 
     /**
@@ -124,8 +124,18 @@ class BacktraceHelper
 
     private static function getTemplateCode(Template $template, int $line): string
     {
-        $sourceCode = explode(PHP_EOL, $template->getSourceContext()->getCode());
-        $lines = array_slice($sourceCode, $line - 1);
+        $sourceContext = $template->getSourceContext();
+        $sourceCode = $sourceContext->getCode();
+
+        // If `devMode` is enabled, the source code will be empty, so we attempt to read the file.
+        if (empty($sourceCode)) {
+            $templatePath = $sourceContext->getPath();
+            if (file_exists($templatePath)) {
+                $sourceCode = file_get_contents($templatePath);
+            }
+        }
+
+        $lines = array_slice(explode(PHP_EOL, $sourceCode), $line - 1);
         if (empty($lines)) {
             return '';
         }
