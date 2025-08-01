@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.12.0 - Unreleased
+## 5.12.0 - 2025-08-01
 
 > [!NOTE]
 > The cache must be cleared _and_ flushed after this update completes.
