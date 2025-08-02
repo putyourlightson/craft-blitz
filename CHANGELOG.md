@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.1 - 2025-08-02
+
+- Added a `cachedIncludePathParam` config setting that determines the query string path parameter to use for cached includes.
+
 ## 5.12.0 - 2025-08-01
 
 > [!NOTE]

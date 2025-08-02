@@ -147,6 +147,9 @@ return [
         // With this setting enabled, Blitz will statically include templates using Edge-Side Includes (ESI), which must be enabled on the web server or CDN.
         //'esiEnabled' => false,
 
+        // The query string path parameter to use for cached includes.
+        //'cachedIncludePathParam' => 'p',
+
         // Whether only URIs containing lowercase characters should be cached.
         //'onlyCacheLowercaseUris' => false,
 

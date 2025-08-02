@@ -85,7 +85,7 @@ return function(Channel $channel): void {
         function() {
             Craft::$app->getRequest()->setIsConsoleRequest(false);
 
-            // Force the template mode too
+            // Force the site template mode
             // https://github.com/putyourlightson/craft-blitz/issues/437
             Craft::$app->getView()->setTemplateMode(View::TEMPLATE_MODE_SITE);
         }

@@ -233,6 +233,13 @@ class SettingsModel extends Model
     public bool $esiEnabled = false;
 
     /**
+     * The query string path parameter to use for cached includes.
+     *
+     * @since 5.12.1
+     */
+    public string $cachedIncludePathParam = 'p';
+
+    /**
      * Whether only URIs containing lowercase characters should be cached.
      *
      * @since 5.8.0

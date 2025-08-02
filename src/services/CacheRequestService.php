@@ -11,6 +11,7 @@ use craft\db\Query;
 use craft\db\Table;
 use craft\elements\User;
 use craft\events\CancelableEvent;
+use craft\helpers\App;
 use craft\helpers\Json;
 use craft\web\Application;
 use craft\web\Request;
@@ -75,6 +76,11 @@ class CacheRequestService extends Component
     public const DYNAMIC_INCLUDE_PREFIX = '_dynamic_include_';
 
     /**
+     * @var string
+     */
+    public string $cachedIncludePathParam = 'p';
+
+    /**
      * @var bool|null
      */
     private ?bool $isGeneratorRequest = null;
@@ -83,6 +89,22 @@ class CacheRequestService extends Component
      * @var array|null
      */
     private ?array $allowedQueryStrings = [];
+
+    /**
+     * @inheritdoc
+     */
+    public function init(): void
+    {
+        parent::init();
+
+        // Force cached include requests to use the cached include path param.
+        if ($this->getIsCachedInclude()) {
+            Craft::$app->getConfig()->getGeneral()->pathParam = Blitz::$plugin->settings->cachedIncludePathParam;
+            $config = App::webRequestConfig();
+            $request = Craft::createObject($config);
+            Craft::$app->set('request', $request);
+        }
+    }
 
     /**
      * Sets the default cache control header.
@@ -302,9 +324,16 @@ class CacheRequestService extends Component
             return str_starts_with($uri, self::CACHED_INCLUDE_PREFIX);
         }
 
-        $path = Craft::$app->getRequest()->getPathInfo();
+        // Only proceed if a web request.
+        if (!(Craft::$app->getRequest() instanceof Request)) {
+            return false;
+        }
 
-        return str_starts_with($path, self::CACHED_INCLUDE_PREFIX);
+        $uri = Craft::$app->getRequest()->getPathInfo();
+        $queryParam = Craft::$app->getRequest()->getQueryParam(Blitz::$plugin->settings->cachedIncludePathParam);
+
+        return str_starts_with($uri, self::CACHED_INCLUDE_PREFIX)
+            || str_starts_with($queryParam, self::CACHED_INCLUDE_PREFIX);
     }
 
     /**
@@ -401,10 +430,11 @@ class CacheRequestService extends Component
             }
 
             $uri = self::CACHED_INCLUDE_PREFIX . $index;
+            $fullUri = $uri . '?' . Blitz::$plugin->settings->cachedIncludePathParam . '=' . $uri;
 
             return new SiteUriModel([
                 'siteId' => $include->siteId,
-                'uri' => $uri . '?' . Craft::$app->getConfig()->getGeneral()->pathParam . '=' . $uri,
+                'uri' => $fullUri,
             ]);
         }
 
@@ -824,10 +854,9 @@ class CacheRequestService extends Component
      */
     private function getCachedIncludeIndexFromQueryString(): ?string
     {
-        parse_str(Craft::$app->getRequest()->getQueryString(), $queryStringParams);
-        $path = $queryStringParams[Craft::$app->getConfig()->getGeneral()->pathParam] ?? null;
+        $queryParam = Craft::$app->getRequest()->getQueryParam(Blitz::$plugin->settings->cachedIncludePathParam);
 
-        return $path ? str_replace(self::CACHED_INCLUDE_PREFIX, '', $path) : null;
+        return $queryParam ? str_replace(self::CACHED_INCLUDE_PREFIX, '', $queryParam) : null;
     }
 
     /**

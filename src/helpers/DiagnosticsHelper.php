@@ -775,9 +775,10 @@ class DiagnosticsHelper
     private static function getIncludesIndexColumnForSelect(): string
     {
         $prefixLength = strlen(CacheRequestService::CACHED_INCLUDE_PREFIX);
+        $prefixPos = $prefixLength + 1;
 
-        // Extract the index from the URI, which comes after the prefix.
-        $index = 'SUBSTRING([[uri]], ' . ($prefixLength + 1) . ')';
+        // Extract the index from the URI, which comes after the prefix and before the question mark.
+        $index = 'SUBSTRING(uri, ' . $prefixPos . ', POSITION(\'?\' IN uri) - ' . $prefixPos . ')';
 
         // Cast the string to a BIGINT for Postgres.
         // https://github.com/putyourlightson/craft-blitz/issues/653

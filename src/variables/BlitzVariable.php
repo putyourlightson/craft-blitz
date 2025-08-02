@@ -158,8 +158,8 @@ class BlitzVariable
                 return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
             }
 
-            // Add the path param as a query string param with the value of the URI. Since SSI ignores the actual URI, the path param will route the request.
-            $uri = $uri . '?' . Craft::$app->getConfig()->getGeneral()->pathParam . '=' . trim($uri, '/');
+            // Add the path param as a query string param with the value of the URI. Since SSI ignores the actual URI, we’ll use the path param to route the request.
+            $uri = $uri . '?' . Blitz::$plugin->cacheRequest->cachedIncludePathParam . '=' . trim($uri, '/');
 
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->getSsiTag($uri, $includeId);
