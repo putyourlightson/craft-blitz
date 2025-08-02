@@ -302,6 +302,7 @@ class DiagnosticsHelper
             ->select(['uri'])
             ->where(['siteId' => $siteId])
             ->andWhere(['like', 'uri', '?'])
+            ->andWhere(['not', self::IS_ACTION_CONDITION])
             ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
             ->column();
 
