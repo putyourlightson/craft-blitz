@@ -633,7 +633,7 @@ class CacheRequestService extends Component
 
         $queryStringParams = QueryStringHelper::getValidQueryStringParams($uri);
 
-        if (!$this->getIsCachedInclude($uri)) {
+        if (!$this->getIsCachedInclude($uri) && !$this->getIsCacheableActionRequest()) {
             foreach ($queryStringParams as $key => $value) {
                 if (!$this->getIsAllowedQueryStringParam($siteId, $key)) {
                     unset($queryStringParams[$key]);
