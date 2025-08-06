@@ -35,7 +35,7 @@
                             <a href="{{ url('blitz/diagnostics/element-queries/element-query-type', {
                                 elementType: elementQueryType.type
                             }) }}">
-                                {{ create(elementQueryType.type).displayName() }} Queries
+                                {{ craft.blitz.diagnostics.getElementTypeMethod('displayName', elementQueryType.type) }} Queries
                             </a>
                         </td>
                         <td>

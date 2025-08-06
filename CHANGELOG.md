@@ -3,6 +3,8 @@
 ## 5.12.2 - Unreleased
 
 - Improved the handling of cacheable action requests.
+- Improved the tracked actions view in the Blitz Diagnostics utility.
+- Fixed a bug in which an error could be thrown when viewing nested content block elements in the Blitz diagnostics utility ([#828](https://github.com/putyourlightson/craft-blitz/issues/828)).
 
 ## 5.12.1 - 2025-08-02
 

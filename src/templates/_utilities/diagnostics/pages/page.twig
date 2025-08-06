@@ -48,14 +48,14 @@
                                     pageId: page.id,
                                     elementType: elementType.type,
                                 }) }}">
-                                    Nested {{ create(elementType.type).pluralDisplayName }}
+                                    Nested {{ craft.blitz.diagnostics.getElementTypeMethod('pluralDisplayName', elementType.type) }}
                                 </a>
                             {% else %}
                                 <a href="{{ url('blitz/diagnostics/pages/element-type', {
                                     pageId: page.id,
                                     elementType: elementType.type,
                                 }) }}">
-                                    {{ create(elementType.type).pluralDisplayName }}
+                                    {{ craft.blitz.diagnostics.getElementTypeMethod('pluralDisplayName', elementType.type) }}
                                 </a>
                             {% endif %}
                         </td>
@@ -91,7 +91,7 @@
                                 pageId: page.id,
                                 elementType: elementQueryType.type
                             }) }}">
-                                {{ create(elementQueryType.type).displayName() }} Queries
+                                {{ craft.blitz.diagnostics.getElementTypeMethod('displayName', elementQueryType.type) }} Queries
                             </a>
                         </td>
                         <td>

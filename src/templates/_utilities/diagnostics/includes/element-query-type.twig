@@ -4,8 +4,7 @@
 {% if include is null %}
     {% redirect 'blitz/diagnostics/includes' with error 'The include no longer exists or may have been refreshed.' %}
 {% endif %}
-{% set element = craft.blitz.diagnostics.getElementOfType(include.id) %}
-{% set title = 'Tracked ' ~ element.displayName() ~ ' Queries' %}
+{% set title = 'Tracked ' ~ craft.blitz.diagnostics.getElementTypeMethod('displayName') ~ ' Queries' %}
 {% set crumbs = [
     {
         label: include.index,
@@ -17,8 +16,7 @@
     {{ sprig('blitz/_utilities/diagnostics/_components/elementQueries', {
         siteId: siteId,
         cacheId: include.id,
-        elementType: className(element),
-        displayName: element.displayName,
-        pluralDisplayName: element.displayName() ~ ' Queries',
+        displayName: craft.blitz.diagnostics.getElementTypeMethod('displayName'),
+        pluralDisplayName: craft.blitz.diagnostics.getElementTypeMethod('displayName') ~ ' Queries',
     }) }}
 {% endblock %}

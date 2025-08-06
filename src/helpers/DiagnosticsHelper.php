@@ -44,11 +44,6 @@ class DiagnosticsHelper
     /**
      * @const array
      */
-    public const IS_ACTION_CONDITION = ['like', 'uri', 'actions/%', false];
-
-    /**
-     * @const array
-     */
     public const IS_CACHED_INCLUDE_CONDITION = ['like', 'uri', CacheRequestService::CACHED_INCLUDE_PREFIX . '%', false];
 
     public static function getSiteId(): ?int
@@ -212,11 +207,13 @@ class DiagnosticsHelper
             ->all();
     }
 
-    public static function getElementOfType(): Element
+    public static function getElementTypeMethod(string $method, string $elementType = null): mixed
     {
-        $elementType = Craft::$app->getRequest()->getParam('elementType');
+        if ($elementType === null) {
+            $elementType = Craft::$app->getRequest()->getParam('elementType');
+        }
 
-        return new $elementType();
+        return $elementType ? $elementType::$method() : null;
     }
 
     public static function getUrisQuery(int $siteId, ?int $elementId = null, ?int $queryId = null, ?string $action = null, ?string $param = null, ?string $tag = null): ActiveQuery
@@ -225,7 +222,7 @@ class DiagnosticsHelper
 
         if ($elementId === null && $queryId === null && $action === null && $tag === null) {
             $query->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION]);
-            $query->andWhere(['not', self::IS_ACTION_CONDITION]);
+            $query->andWhere(['not', self::getIsActionCondition()]);
         }
 
         return $query;
@@ -247,7 +244,18 @@ class DiagnosticsHelper
     public static function getActionsQuery(int $siteId): ActiveQuery
     {
         return self::getBaseUrisQuery($siteId)
-            ->andWhere(self::IS_ACTION_CONDITION);
+            ->andWhere(self::getIsActionCondition());
+    }
+
+    public static function getIsActionCondition(): array
+    {
+        $actionTrigger = Craft::$app->getConfig()->getGeneral()->actionTrigger;
+
+        return [
+            'or',
+            ['like', 'uri', $actionTrigger . '/%', false],
+            ['like', 'uri', '%?action=%', false],
+        ];
     }
 
     public static function getActionPaths(int $siteId): array
@@ -255,7 +263,7 @@ class DiagnosticsHelper
         $uris = CacheRecord::find()
             ->select(['uri'])
             ->where(['siteId' => $siteId])
-            ->andWhere(self::IS_ACTION_CONDITION)
+            ->andWhere(self::getIsActionCondition())
             ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
             ->column();
 
@@ -274,20 +282,25 @@ class DiagnosticsHelper
 
     public static function getActionPath(string $uri): string
     {
-        return substr(
-            substr($uri, 0, strpos($uri, '?')),
-            strlen('actions/')
-        );
+        $startPosition = strpos($uri, '?action=');
+        if ($startPosition !== false) {
+            $offset = $startPosition + strlen('?action=');
+            $endPosition = strpos($uri, '&', $startPosition);
+            $length = $endPosition !== false ? $endPosition - $offset : strlen($uri) - $offset;
+
+            return substr($uri, $offset, $length);
+        }
+
+        $parts = explode('?', $uri);
+
+        return substr($parts[0], strlen('actions/'));
     }
 
     public static function getActionSuffix(string $uri, ?int $length = null): string
     {
-        $start = strpos($uri, '?');
-        if ($start === false) {
-            return '/';
-        }
-
-        $actionSuffix = substr($uri, $start);
+        $path = self::getActionPath($uri);
+        $offset = strpos($uri, $path) + strlen($path);
+        $actionSuffix = substr($uri, $offset);
 
         if ($length !== null) {
             $actionSuffix = self::getShortenedUri($actionSuffix, $length);
@@ -302,7 +315,7 @@ class DiagnosticsHelper
             ->select(['uri'])
             ->where(['siteId' => $siteId])
             ->andWhere(['like', 'uri', '?'])
-            ->andWhere(['not', self::IS_ACTION_CONDITION])
+            ->andWhere(['not', self::getIsActionCondition()])
             ->andWhere(['not', self::IS_CACHED_INCLUDE_CONDITION])
             ->column();
 
@@ -754,7 +767,8 @@ class DiagnosticsHelper
         }
 
         if ($action !== null) {
-            $query->andWhere(['like', 'uri', 'actions/' . $action . '%', false]);
+            $query->andWhere(self::getIsActionCondition());
+            $query->andWhere(['like', 'uri', '%' . $action . '%', false]);
         }
 
         if ($param !== null) {

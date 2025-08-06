@@ -34,14 +34,14 @@
                                     includeId: include.id,
                                     elementType: elementType.type,
                                 }) }}">
-                                    Nested {{ create(elementType.type).pluralDisplayName }}
+                                    Nested {{ craft.blitz.diagnostics.getElementTypeMethod('pluralDisplayName', elementType.type) }}
                                 </a>
                             {% else %}
                                 <a href="{{ url('blitz/diagnostics/includes/element-type', {
                                     includeId: include.id,
                                     elementType: elementType.type,
                                 }) }}">
-                                    {{ create(elementType.type).pluralDisplayName }}
+                                    {{ craft.blitz.diagnostics.getElementTypeMethod('pluralDisplayName', elementType.type) }}
                                 </a>
                             {% endif %}
                         </td>
@@ -77,7 +77,7 @@
                                 includeId: include.id,
                                 elementType: elementQueryType.type
                             }) }}">
-                                {{ create(elementQueryType.type).displayName() }} Queries
+                                {{ craft.blitz.diagnostics.getElementTypeMethod('displayName', elementQueryType.type) }} Queries
                             </a>
                         </td>
                         <td>

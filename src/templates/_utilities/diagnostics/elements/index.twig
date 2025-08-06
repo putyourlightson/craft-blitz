@@ -25,13 +25,13 @@
                                 <a href="{{ url('blitz/diagnostics/elements/nested-element-type', {
                                     elementType: elementType.type,
                                 }) }}">
-                                    Nested {{ create(elementType.type).pluralDisplayName }}
+                                    Nested {{ craft.blitz.diagnostics.getElementTypeMethod('pluralDisplayName', elementType.type) }}
                                 </a>
                             {% else %}
                                 <a href="{{ url('blitz/diagnostics/elements/element-type', {
                                     elementType: elementType.type,
                                 }) }}">
-                                    {{ create(elementType.type).pluralDisplayName }}
+                                    {{ craft.blitz.diagnostics.getElementTypeMethod('pluralDisplayName', elementType.type) }}
                                 </a>
                             {% endif %}
                         </td>

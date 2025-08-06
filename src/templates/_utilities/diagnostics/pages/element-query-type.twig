@@ -4,8 +4,7 @@
 {% if page is null %}
     {% redirect 'blitz/diagnostics/pages' with error 'The page no longer exists or may have been refreshed.' %}
 {% endif %}
-{% set element = craft.blitz.diagnostics.getElementOfType(page.id) %}
-{% set title = 'Tracked ' ~ element.displayName() ~ ' Queries' %}
+{% set title = 'Tracked ' ~ craft.blitz.diagnostics.getElementTypeMethod('displayName') ~ ' Queries' %}
 {% set crumbs = [
     {
         html: tag('a', {
@@ -20,8 +19,7 @@
     {{ sprig('blitz/_utilities/diagnostics/_components/elementQueries', {
         siteId: siteId,
         cacheId: page.id,
-        elementType: className(element),
-        displayName: element.displayName,
-        pluralDisplayName: element.displayName() ~ ' Queries',
+        displayName: craft.blitz.diagnostics.getElementTypeMethod('displayName'),
+        pluralDisplayName: craft.blitz.diagnostics.getElementTypeMethod('displayName') ~ ' Queries',
     }) }}
 {% endblock %}

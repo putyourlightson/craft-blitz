@@ -4,8 +4,7 @@
 {% if action is null %}
     {% redirect 'blitz/diagnostics/actions' with error 'The action no longer exists or may have been refreshed.' %}
 {% endif %}
-{% set element = craft.blitz.diagnostics.getElementOfType(action.id) %}
-{% set title = 'Tracked ' ~ element.displayName() ~ ' Queries' %}
+{% set title = 'Tracked ' ~ craft.blitz.diagnostics.getElementTypeMethod('displayName') ~ ' Queries' %}
 
 {% set actionPath = craft.blitz.diagnostics.getActionPath(action.uri) %}
 {% set actionSuffix = craft.blitz.diagnostics.getActionSuffix(action.uri) %}
@@ -30,8 +29,7 @@
     {{ sprig('blitz/_utilities/diagnostics/_components/elementQueries', {
         siteId: siteId,
         cacheId: action.id,
-        elementType: className(element),
-        displayName: element.displayName,
-        pluralDisplayName: element.displayName() ~ ' Queries',
+        displayName: craft.blitz.diagnostics.getElementTypeMethod('displayName'),
+        pluralDisplayName: craft.blitz.diagnostics.getElementTypeMethod('displayName') ~ ' Queries',
     }) }}
 {% endblock %}
