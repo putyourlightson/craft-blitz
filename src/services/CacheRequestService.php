@@ -149,31 +149,21 @@ class CacheRequestService extends Component
             return false;
         }
 
-        if ($request->getToken() !== null && !$this->getIsGeneratorRequest()) {
-            Blitz::$plugin->debug('Page not cached because a token request header/parameter was provided.', [], $url);
-
-            return false;
-        }
-
-        if ($request->getSiteToken() !== null && !$this->getIsGeneratorRequest()) {
-            Blitz::$plugin->debug('Page not cached because a site token parameter was provided.', [], $url);
-
-            return false;
-        }
-
         $event = new CancelableEvent();
         $this->trigger(self::EVENT_IS_CACHEABLE_REQUEST, $event);
         if (!$event->isValid) {
             return false;
         }
 
-        // Ensure this is a cacheable site request
+        // Ensure this is a site request
         if (!$request->getIsSiteRequest()
             || !$request->getIsGet()
             || $request->getIsConsoleRequest()
-            || $request->getIsPreview()
-            || $request->getIsLivePreview()
         ) {
+            return false;
+        }
+
+        if ($this->getIsPreviewOrTokenRequest()) {
             return false;
         }
 
@@ -395,6 +385,29 @@ class CacheRequestService extends Component
         }
 
         return $this->isGeneratorRequest;
+    }
+
+    /**
+     * Returns whether this is a preview or token request.
+     *
+     * @since 5.12.2
+     */
+    public function getIsPreviewOrTokenRequest(): bool
+    {
+        $request = Craft::$app->getRequest();
+        
+        if ($request->getIsPreview() || $request->getIsLivePreview()) {
+            return false;
+        }
+
+        if (
+            ($request->getSiteToken() !== null || $request->getToken() !== null)
+            && !$this->getIsGeneratorRequest() 
+        ) {
+            return false;
+        }
+        
+        return true;
     }
 
     /**

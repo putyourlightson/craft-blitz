@@ -154,7 +154,7 @@ class BlitzVariable
         $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($uri));
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
-            if (!Blitz::$plugin->cacheRequest->getIsCacheableRequest()) {
+            if (Blitz::$plugin->cacheRequest->getIsPreviewOrTokenRequest()) {
                 return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
             }
 

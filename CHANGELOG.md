@@ -5,6 +5,7 @@
 - Improved the handling of cacheable action requests.
 - Improved the tracked actions view in the Blitz Diagnostics utility.
 - Fixed a bug in which an error could be thrown when viewing nested content block elements in the Blitz diagnostics utility ([#828](https://github.com/putyourlightson/craft-blitz/issues/828)).
+- Fixed a bug in which cached includes were not being cached when included in non-cacheable pages ([#829](https://github.com/putyourlightson/craft-blitz/issues/829)).
 
 ## 5.12.1 - 2025-08-02
 
