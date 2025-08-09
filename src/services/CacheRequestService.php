@@ -402,7 +402,7 @@ class CacheRequestService extends Component
 
         if (
             ($request->getSiteToken() !== null || $request->getToken() !== null)
-            && !$this->getIsGeneratorRequest() 
+            && !$this->getIsGeneratorRequest()
         ) {
             return false;
         }
