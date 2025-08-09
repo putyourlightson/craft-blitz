@@ -259,6 +259,7 @@ class BlitzVariable
         }
 
         $uri = UrlHelper::actionUrl('blitz/csrf/json', null, null, false);
+        $uri = UrlHelper::siteUrl(UrlHelper::rootRelativeUrl($uri));
         $config = new VariableConfigModel(['property' => $property]);
 
         return $this->getScript($uri, [], $config);
