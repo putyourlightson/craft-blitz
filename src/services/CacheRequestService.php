@@ -395,19 +395,19 @@ class CacheRequestService extends Component
     public function getIsPreviewOrTokenRequest(): bool
     {
         $request = Craft::$app->getRequest();
-        
+
         if ($request->getIsPreview() || $request->getIsLivePreview()) {
-            return false;
+            return true;
         }
 
         if (
             ($request->getSiteToken() !== null || $request->getToken() !== null)
             && !$this->getIsGeneratorRequest()
         ) {
-            return false;
+            return true;
         }
-        
-        return true;
+
+        return false;
     }
 
     /**
