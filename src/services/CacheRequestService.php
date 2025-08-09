@@ -868,8 +868,10 @@ class CacheRequestService extends Component
     private function getCachedIncludeIndexFromQueryString(): ?string
     {
         $queryParam = Craft::$app->getRequest()->getQueryParam(Blitz::$plugin->settings->cachedIncludePathParam);
+        $startPos = strpos($queryParam, self::CACHED_INCLUDE_PREFIX);
+        $offset = $startPos + strlen(self::CACHED_INCLUDE_PREFIX);
 
-        return $queryParam ? str_replace(self::CACHED_INCLUDE_PREFIX, '', $queryParam) : null;
+        return $queryParam ? substr($queryParam, $offset) : null;
     }
 
     /**
