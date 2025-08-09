@@ -10,6 +10,7 @@ use Amp\Http\Client\HttpException;
 use Amp\Http\Client\Request;
 use Amp\Pipeline\Pipeline;
 use Craft;
+use craft\helpers\App;
 use putyourlightson\blitz\Blitz;
 
 /**
@@ -132,7 +133,9 @@ class HttpGenerator extends BaseCacheGenerator
         $request = new Request($url);
 
         if ($this->useBasicAuth) {
-            $auth = base64_encode($this->username . ':' . $this->password);
+            $username = App::parseEnv($this->username);
+            $password = App::parseEnv($this->password);
+            $auth = base64_encode($username . ':' . $password);
             $request->setHeader('Authorization', 'Basic ' . $auth);
         }
 

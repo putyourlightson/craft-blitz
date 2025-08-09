@@ -7,6 +7,7 @@
 - Fixed a bug in which an error could be thrown when viewing nested content block elements in the Blitz diagnostics utility ([#828](https://github.com/putyourlightson/craft-blitz/issues/828)).
 - Fixed a bug in which cached includes were not being cached when included in non-cacheable pages ([#829](https://github.com/putyourlightson/craft-blitz/issues/829)).
 - Fixed a bug in which the CSRF variables could result in CORS errors when used in a multi-site setup in which sites use different domains ([#831](https://github.com/putyourlightson/craft-blitz/issues/831)).
+- Fixed a bug in which basic authentication credentials using environment variables were not being correctly parsed by the HTTP Generator ([#821](https://github.com/putyourlightson/craft-blitz/issues/821)).
 
 ## 5.12.1 - 2025-08-02
 
