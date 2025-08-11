@@ -11,7 +11,7 @@ use putyourlightson\blitz\enums\HeaderEnum;
 use putyourlightson\blitz\events\ResponseEvent;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\datastar\Datastar;
-use putyourlightson\datastar\services\Sse;
+use putyourlightson\datastar\services\SseService;
 use yii\base\Event;
 use yii\web\Response;
 
@@ -55,7 +55,7 @@ class DatastarIntegration extends BaseIntegration
                 $siteUri = $event->siteUri;
                 Event::on(\craft\web\Response::class, Response::EVENT_AFTER_SEND,
                     function() use ($siteUri) {
-                        if (method_exists(Sse::class, 'getEventOutput')) {
+                        if (method_exists(SseService::class, 'getEventOutput')) {
                             $content = Datastar::getInstance()->sse->getEventOutput();
                             Blitz::$plugin->generateCache->save($content, $siteUri);
                         }

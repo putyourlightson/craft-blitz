@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.12.2 - Unreleased
+## 5.12.2 - 2025-08-11
 
 - Improved the handling of cacheable action requests.
 - Improved the tracked actions view in the Blitz Diagnostics utility.
