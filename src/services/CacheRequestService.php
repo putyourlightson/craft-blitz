@@ -97,9 +97,11 @@ class CacheRequestService extends Component
     {
         parent::init();
 
-        // Force cached include requests to use the cached include path param.
         if ($this->getIsCachedInclude()) {
-            Craft::$app->getConfig()->getGeneral()->pathParam = Blitz::$plugin->settings->cachedIncludePathParam;
+            // Force cached include requests to use the cached include path param and query string param.
+            Craft::$app->getConfig()->getGeneral()
+                ->pathParam(Blitz::$plugin->settings->cachedIncludePathParam)
+                ->usePathInfo(false);
             $config = App::webRequestConfig();
             $request = Craft::createObject($config);
             Craft::$app->set('request', $request);
