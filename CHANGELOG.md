@@ -9,7 +9,7 @@
 - Fixed a bug in which the CSRF variables could result in CORS errors when used in a multi-site setup in which sites use different domains ([#831](https://github.com/putyourlightson/craft-blitz/issues/831)).
 - Fixed a bug in which basic authentication credentials using environment variables were not being correctly parsed by the HTTP Generator ([#821](https://github.com/putyourlightson/craft-blitz/issues/821)).
 - Fixed a bug in which cached includes were not being cached in a multi-site setup using subfolders.
-- Fixed a bug in which image transform URLs containing URL encoded characters were not purged ([#76](https://github.com/putyourlightson/craft-cloudflare/issues/76)).
+- Fixed a bug in which image transform URLs containing URL encoded characters were not purged.
 
 ## 5.12.1 - 2025-08-02
 
