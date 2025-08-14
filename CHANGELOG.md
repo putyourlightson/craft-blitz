@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.12.3 - Unreleased
+## 5.12.3 - 2025-08-14
 
 - Fixed a bug in which the cached include file count was not being correctly calculated ([#833](https://github.com/putyourlightson/craft-blitz/issues/833)).
 - Fixed a bug in which cached includes were not being cached in a multi-site setup using subfolders.

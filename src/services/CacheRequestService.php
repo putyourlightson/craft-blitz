@@ -324,6 +324,7 @@ class CacheRequestService extends Component
         $uri = Craft::$app->getRequest()->getPathInfo();
         $queryParam = Craft::$app->getRequest()->getQueryParam(Blitz::$plugin->settings->cachedIncludePathParam, '');
 
+        // Check whether the URI or query parameter *contains* the cached include prefix, to account for subfolders. The exact site URI will be calculated by `getRequestedCacheableSiteUri()`.
         return str_contains($uri, self::CACHED_INCLUDE_PREFIX)
             || str_contains($queryParam, self::CACHED_INCLUDE_PREFIX);
     }
