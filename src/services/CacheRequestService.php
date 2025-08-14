@@ -322,10 +322,10 @@ class CacheRequestService extends Component
         }
 
         $uri = Craft::$app->getRequest()->getPathInfo();
-        $queryParam = Craft::$app->getRequest()->getQueryParam(Blitz::$plugin->settings->cachedIncludePathParam);
+        $queryParam = Craft::$app->getRequest()->getQueryParam(Blitz::$plugin->settings->cachedIncludePathParam, '');
 
-        return str_starts_with($uri, self::CACHED_INCLUDE_PREFIX)
-            || str_starts_with($queryParam, self::CACHED_INCLUDE_PREFIX);
+        return str_contains($uri, self::CACHED_INCLUDE_PREFIX)
+            || str_contains($queryParam, self::CACHED_INCLUDE_PREFIX);
     }
 
     /**
