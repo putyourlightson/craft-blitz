@@ -123,7 +123,37 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableRequest(): bool
     {
+        $event = new CancelableEvent();
+        $this->trigger(self::EVENT_IS_CACHEABLE_REQUEST, $event);
+        if (!$event->isValid) {
+            return false;
+        }
+
         $request = Craft::$app->getRequest();
+
+        // Ensure this is a site request
+        if (!$request->getIsSiteRequest()
+            || !$request->getIsGet()
+            || $request->getIsConsoleRequest()
+        ) {
+            return false;
+        }
+
+        if ($this->getIsPreviewOrTokenRequest()) {
+            return false;
+        }
+
+        if ($request->getIsActionRequest()
+            && !$this->getIsCacheableActionRequest()
+        ) {
+            return false;
+        }
+
+        // Ensure the response is not an error
+        if (!Craft::$app->getResponse()->getIsOk()) {
+            return false;
+        }
+
         $url = $request->getAbsoluteUrl();
 
         /** @var User|null $user */
@@ -148,35 +178,6 @@ class CacheRequestService extends Component
         if (!empty($request->getParam('no-cache'))) {
             Blitz::$plugin->debug('Page not cached because a `no-cache` request parameter was provided.', [], $url);
 
-            return false;
-        }
-
-        $event = new CancelableEvent();
-        $this->trigger(self::EVENT_IS_CACHEABLE_REQUEST, $event);
-        if (!$event->isValid) {
-            return false;
-        }
-
-        // Ensure this is a site request
-        if (!$request->getIsSiteRequest()
-            || !$request->getIsGet()
-            || $request->getIsConsoleRequest()
-        ) {
-            return false;
-        }
-
-        if ($this->getIsPreviewOrTokenRequest()) {
-            return false;
-        }
-
-        if ($request->getIsActionRequest()
-            && !$this->getIsCacheableActionRequest()
-        ) {
-            return false;
-        }
-
-        // Ensure the response is not an error
-        if (!Craft::$app->getResponse()->getIsOk()) {
             return false;
         }
 
