@@ -135,7 +135,7 @@ class CacheController extends Controller
     public function actionGenerate(): int
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.') . PHP_EOL, BaseConsole::FG_RED);
+            $this->stdout(Craft::t('blitz', 'Blitz caching is disabled.') . PHP_EOL, BaseConsole::FG_RED);
 
             return ExitCode::OK;
         }
@@ -269,7 +269,7 @@ class CacheController extends Controller
     public function actionDeploy(): int
     {
         if (!Blitz::$plugin->settings->cachingEnabled) {
-            $this->stderr(Craft::t('blitz', 'Blitz caching is disabled.') . PHP_EOL, BaseConsole::FG_RED);
+            $this->stdout(Craft::t('blitz', 'Blitz caching is disabled.') . PHP_EOL, BaseConsole::FG_RED);
 
             return ExitCode::OK;
         }
@@ -500,7 +500,7 @@ class CacheController extends Controller
     private function purgeCache(array $siteUris = null): void
     {
         if (Blitz::$plugin->cachePurger->isDummy) {
-            $this->stderr(Craft::t('blitz', 'Cache purging is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
+            $this->stdout(Craft::t('blitz', 'Cache purging is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
 
             return;
         }
@@ -571,7 +571,7 @@ class CacheController extends Controller
     private function deploy(array $siteUris): void
     {
         if (Blitz::$plugin->deployer->isDummy) {
-            $this->stderr(Craft::t('blitz', 'Deploying is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
+            $this->stdout(Craft::t('blitz', 'Deploying is disabled.') . PHP_EOL, BaseConsole::FG_GREEN);
 
             return;
         }

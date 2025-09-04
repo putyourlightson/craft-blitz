@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 5.12.4 - 2025-09-04
+
+- Fixed an issue in which disabled features resulted in error output when running certain console commands ([#642](https://github.com/putyourlightson/craft-blitz/issues/642)).
+- Fixed an issue in which Codeception tests could fail due to the request URL being read too early ([#835](https://github.com/putyourlightson/craft-blitz/issues/835)).
+
 ## 5.12.3 - 2025-08-14
 
 - Fixed a bug in which the cached include file count was not being correctly calculated ([#833](https://github.com/putyourlightson/craft-blitz/issues/833)).
