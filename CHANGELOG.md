@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.5 - Unreleased
+
+- The inject script is now loaded statically for better compatibility with Content Security Policies, unless the `injectScriptEvent` config setting has been set to the non-default value of `DOMContentLoaded`.
+
 ## 5.12.4 - 2025-09-04
 
 - Fixed an issue in which disabled features resulted in error output when running certain console commands ([#642](https://github.com/putyourlightson/craft-blitz/issues/642)).

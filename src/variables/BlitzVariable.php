@@ -9,6 +9,7 @@ use Craft;
 use craft\helpers\Html;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
+use putyourlightson\blitz\assets\BlitzInjectScriptAsset;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\blitz\models\CacheOptionsModel;
@@ -19,6 +20,11 @@ use yii\web\NotFoundHttpException;
 
 class BlitzVariable
 {
+    /**
+     * @const string The default event to use when injecting scripts.
+     */
+    private const DEFAULT_INJECT_SCRIPT_EVENT = 'DOMContentLoaded';
+
     /**
      * @var int
      */
@@ -208,15 +214,19 @@ class BlitzVariable
         $js = '';
 
         if ($this->injected === 0) {
-            $blitzInjectScript = Craft::getAlias('@putyourlightson/blitz/resources/js/blitzInjectScript.js');
+            if (Blitz::$plugin->settings->injectScriptEvent === self::DEFAULT_INJECT_SCRIPT_EVENT) {
+                $view->registerAssetBundle(BlitzInjectScriptAsset::class, Blitz::$plugin->settings->injectScriptPosition);
+            } else {
+                $blitzInjectScript = Craft::getAlias('@putyourlightson/blitz/resources/js/blitzInjectScript.js');
 
-            if (file_exists($blitzInjectScript)) {
-                $js = file_get_contents($blitzInjectScript);
-                $js = str_replace('{injectScriptEvent}', Blitz::$plugin->settings->injectScriptEvent, $js);
+                if (file_exists($blitzInjectScript)) {
+                    $js = file_get_contents($blitzInjectScript);
+                    $js = str_replace(self::DEFAULT_INJECT_SCRIPT_EVENT, Blitz::$plugin->settings->injectScriptEvent, $js);
+                }
+
+                $view->registerJs($js, Blitz::$plugin->settings->injectScriptPosition);
             }
         }
-
-        $view->registerJs($js, Blitz::$plugin->settings->injectScriptPosition);
 
         $this->injected++;
         $id = $this->injected;

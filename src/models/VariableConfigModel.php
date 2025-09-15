@@ -20,11 +20,6 @@ class VariableConfigModel extends Model
     public const INCLUDE_REQUEST_TYPE = 'include';
 
     /**
-     * @const string Specifies that the request should output cached content inline.
-     */
-    public const INLINE_REQUEST_TYPE = 'inline';
-
-    /**
      * @var string Specifies the request type to use.
      */
     public string $requestType = 'ajax';

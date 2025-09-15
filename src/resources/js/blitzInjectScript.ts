@@ -9,8 +9,8 @@ interface InjectElement {
 }
 
 function addInjectScriptEventListener() {
-    // The event name will be replaced with the `injectScriptEvent` config setting.
-    const injectScriptEvent = '{injectScriptEvent}';
+    // The event may be replaced with the `injectScriptEvent` config setting.
+    const injectScriptEvent = 'DOMContentLoaded';
 
     // @ts-ignore
     if (injectScriptEvent === 'load') {

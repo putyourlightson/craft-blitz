@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 addInjectScriptEventListener();
 function addInjectScriptEventListener() {
-    const injectScriptEvent = '{injectScriptEvent}';
+    const injectScriptEvent = 'DOMContentLoaded';
     if (injectScriptEvent === 'load') {
         window.addEventListener('load', injectElements, { once: true });
     }

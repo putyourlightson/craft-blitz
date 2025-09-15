@@ -292,7 +292,7 @@ return [
         //    'git' => '/usr/bin/git',
         //],
 
-        // The name of the JavaScript event that will trigger a script inject.
+        // The name of the JavaScript event that will trigger a script inject. Note that changing this from the default value of `DOMContentLoaded` will force the script to be output inline, which requires `script-src 'unsafe-inline'` when using a Content Security Policy.
         //'injectScriptEvent' => 'DOMContentLoaded',
 
         // The position in the HTML of the injected script.
