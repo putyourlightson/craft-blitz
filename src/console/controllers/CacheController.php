@@ -349,6 +349,8 @@ class CacheController extends Controller
             Craft::$app->runAction('queue/run');
         }
 
+        DiagnosticsHelper::updateDriverDataAction('refresh-expired-cli');
+
         $this->output('Expired elements successfully refreshed.');
 
         return ExitCode::OK;
