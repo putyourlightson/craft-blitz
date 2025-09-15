@@ -1,8 +1,8 @@
 # Release Notes for Blitz
 
-## 5.12.5 - Unreleased
+## 5.12.5 - 2025-09-15
 
-- The inject script is now loaded statically for better compatibility with Content Security Policies, unless the `injectScriptEvent` config setting has been set to the non-default value of `DOMContentLoaded`.
+- The inject script is now loaded statically for better compatibility with Content Security Policies, unless the `injectScriptEvent` config setting has been set to a value other than the default `DOMContentLoaded`.
 
 ## 5.12.4 - 2025-09-04
 

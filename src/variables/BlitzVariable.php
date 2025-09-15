@@ -23,7 +23,7 @@ class BlitzVariable
     /**
      * @const string The default event to use when injecting scripts.
      */
-    private const DEFAULT_INJECT_SCRIPT_EVENT = 'DOMContentLoaded';
+    public const DEFAULT_INJECT_SCRIPT_EVENT = 'DOMContentLoaded';
 
     /**
      * @var int
