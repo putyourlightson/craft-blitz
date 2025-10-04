@@ -160,7 +160,7 @@ class BlitzVariable
         $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($uri));
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
-            if (Blitz::$plugin->cacheRequest->getIsPreviewOrTokenRequest()) {
+            if (Blitz::$plugin->cacheRequest->shouldInlineIncludes()) {
                 return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
             }
 
@@ -284,10 +284,9 @@ class BlitzVariable
             return true;
         }
 
-        if (class_exists('\putyourlightson\sprig\base\Component')) {
-            // DO NOT IMPORT!
-            /** @noinspection PhpFullyQualifiedNameUsageInspection */
-            return \putyourlightson\sprig\base\Component::isRequest();
+        $sprigComponentClass = '\putyourlightson\sprig\base\Component';
+        if (class_exists($sprigComponentClass, false)) {
+            return $sprigComponentClass::isRequest();
         }
 
         return false;

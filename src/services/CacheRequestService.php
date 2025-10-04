@@ -81,6 +81,11 @@ class CacheRequestService extends Component
     public string $cachedIncludePathParam = 'p';
 
     /**
+     * @var bool
+     */
+    public bool $shouldInlineIncludes = false;
+
+    /**
      * @var bool|null
      */
     private ?bool $isGeneratorRequest = null;
@@ -701,6 +706,16 @@ class CacheRequestService extends Component
         $encodings = Craft::$app->getRequest()->parseAcceptHeader($encoding);
 
         return isset($encodings[BaseCacheStorage::ENCODING]);
+    }
+
+    /**
+     * Returns whether includes should be inlined.
+     *
+     * @since 5.12.6
+     */
+    public function shouldInlineIncludes(): bool
+    {
+        return $this->getIsPreviewOrTokenRequest() || $this->shouldInlineIncludes;
     }
 
     /**

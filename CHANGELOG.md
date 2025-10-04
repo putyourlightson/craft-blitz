@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.6 - Unreleased
+
+- Added a `shouldInlineIncludes` property to the `CacheRequestService` class that makes it possible to force inline includes programmatically ([#845](https://github.com/putyourlightson/craft-blitz/issues/845)).
+
 ## 5.12.5 - 2025-09-15
 
 - The inject script is now loaded statically for better compatibility with Content Security Policies, unless the `injectScriptEvent` config setting has been set to a value other than the default `DOMContentLoaded`.
