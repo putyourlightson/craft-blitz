@@ -37,12 +37,19 @@ test('Cached include tag contains path param', function() {
         ->toContain(Craft::$app->getConfig()->getGeneral()->pathParam . '=');
 });
 
-test('Cached include tag with AJAX request type results in inject script being registered', function() {
+test('Cached include tag should inline includes when configured to', function() {
+    Blitz::$plugin->cacheRequest->shouldInlineIncludes = true;
+    $variable = new BlitzVariable();
+    $tagString = (string)$variable->includeCached('test');
+
+    expect($tagString)
+        ->not()->toContain('blitz-inject');
+});
+
+test('Dynamic include results in inject script being registered', function() {
     Blitz::$plugin->settings->injectScriptEvent = BlitzVariable::DEFAULT_INJECT_SCRIPT_EVENT;
     $variable = new BlitzVariable();
-    $variable->includeDynamic('test', [], [
-        'requestType' => 'ajax',
-    ]);
+    $variable->includeDynamic('test');
 
     expect(Craft::$app->getView()->js)
         ->toHaveCount(0)
@@ -50,12 +57,10 @@ test('Cached include tag with AJAX request type results in inject script being r
         ->toHaveKey(BlitzInjectScriptAsset::class);
 });
 
-test('Cached include tag with AJAX request type results in inject script being output inline', function() {
+test('Dynamic include results in inject script being output inline', function() {
     Blitz::$plugin->settings->injectScriptEvent = 'load';
     $variable = new BlitzVariable();
-    $variable->includeDynamic('test', [], [
-        'requestType' => 'ajax',
-    ]);
+    $variable->includeDynamic('test');
 
     expect(Craft::$app->getView()->js)
         ->toHaveCount(1);
