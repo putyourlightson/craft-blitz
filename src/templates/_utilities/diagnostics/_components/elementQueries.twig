@@ -27,6 +27,7 @@
         <input sprig s-trigger="keyup changed delay:400ms" name="search" type="text" class="clearable text fullwidth" autocomplete="off" placeholder="Search">
     </div>
     <div id="results">
+        {{ hiddenInput('elementType', elementType) }}
         {{ hiddenInput('orderBy', orderBy) }}
         {{ hiddenInput('sortBy', sortBy) }}
         <div class="elements">
