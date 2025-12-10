@@ -4,6 +4,7 @@
 
 - Added a `shouldInlineIncludes` property to the `CacheRequestService` class that makes it possible to force inline includes programmatically ([#845](https://github.com/putyourlightson/craft-blitz/issues/845)).
 - Fixed a bug in which pagination was not working in some sections of the Blitz Diagnostics utility ([#850](https://github.com/putyourlightson/craft-blitz/issues/850)).
+- Fixed a bug in which URLs with invalid `x-craft-preview` and `x-craft-live-preview` query string params could be cached ([#858](https://github.com/putyourlightson/craft-blitz/issues/858)).
 
 ## 5.12.5 - 2025-09-15
 

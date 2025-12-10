@@ -29,10 +29,10 @@ return [
         //'refreshCacheEnabled' => true,
 
         // Determines when and how the cache should be refreshed.
-		//'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE, // Clear the cache and regenerate in a queue job
-		//'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE, // Expire the cache and regenerate in a queue job
-		//'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_CLEAR, // Clear the cache, regenerate manually or organically
-		//'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_EXPIRE, // Expire the cache, regenerate manually or organically
+        //'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE, // Clear the cache and regenerate in a queue job
+        //'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE, // Expire the cache and regenerate in a queue job
+        //'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_CLEAR, // Clear the cache, regenerate manually or organically
+        //'refreshMode' => \putyourlightson\blitz\models\SettingsModel::REFRESH_MODE_EXPIRE, // Expire the cache, regenerate manually or organically
 
         // The URI patterns to include in caching. Set `siteId` to a blank string to indicate all sites.
         //'includedUriPatterns' => [

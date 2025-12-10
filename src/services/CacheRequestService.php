@@ -409,6 +409,12 @@ class CacheRequestService extends Component
             return true;
         }
 
+        // Check query params explicitly to also exclude invalid values
+        // https://github.com/putyourlightson/craft-blitz/issues/858
+        if ($request->getQueryParam('x-craft-preview') || $request->getQueryParam('x-craft-live-preview')) {
+            return true;
+        }
+
         if (
             ($request->getSiteToken() !== null || $request->getToken() !== null)
             && !$this->getIsGeneratorRequest()
