@@ -194,6 +194,13 @@ class CacheRequestService extends Component
      */
     public function getIsCacheableResponse(Response $response): bool
     {
+        // Prevent two-step verification pages from being cached
+        // https://github.com/putyourlightson/craft-blitz/issues/853
+        $totpMethod = 'data-method="craft\auth\methods\TOTP"';
+        if ($response->content !== null && str_contains($response->content, $totpMethod)) {
+            return false;
+        }
+
         if ($this->getIsCachedInclude()) {
             return true;
         }
