@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 4.23.16 - 2026-01-06
+
+- Fixed a bug in which URLs with invalid `x-craft-preview` and `x-craft-live-preview` query string params could be cached ([#858](https://github.com/putyourlightson/craft-blitz/issues/858)).
+- Fixed a bug in which URLs with site tokens could be cached.
+
 ## 4.23.15 - 2025-06-16
 
 - Increased the Cloudflare API limit on purge requests to 100 URLs per request.

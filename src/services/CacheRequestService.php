@@ -115,8 +115,11 @@ class CacheRequestService extends Component
             || !$request->getIsGet()
             || $request->getIsConsoleRequest()
             || $request->getIsActionRequest()
-            || $request->getIsPreview()
         ) {
+            return false;
+        }
+
+        if ($this->getIsPreviewOrTokenRequest()) {
             return false;
         }
 
@@ -357,6 +360,34 @@ class CacheRequestService extends Component
         }
 
         return $this->isGeneratorRequest;
+    }
+
+    /**
+     * Returns whether this is a preview or token request.
+     *
+     * @since 4.23.16
+     */
+    public function getIsPreviewOrTokenRequest(): bool
+    {
+        $request = Craft::$app->getRequest();
+
+        // Check query params explicitly to also exclude invalid values
+        // https://github.com/putyourlightson/craft-blitz/issues/858
+        if ($request->getQueryParam('x-craft-preview')
+            || $request->getQueryParam('x-craft-live-preview')
+            || $request->getIsLivePreview()
+        ) {
+            return true;
+        }
+
+        if (
+            ($request->getSiteToken() !== null || $request->getToken() !== null)
+            && !$this->getIsGeneratorRequest()
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
