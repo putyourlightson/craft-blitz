@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.12.6 - Unreleased
+## 5.12.6 - 2026-01-06
 
 - Added a `shouldInlineIncludes` property to the `CacheRequestService` class that makes it possible to force inline includes programmatically ([#845](https://github.com/putyourlightson/craft-blitz/issues/845)).
 - Fixed a bug in which front-end two-factor verification pages were being cached ([#853](https://github.com/putyourlightson/craft-blitz/issues/853)).
