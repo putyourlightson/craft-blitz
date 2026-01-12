@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.23.17 - 2026-01-12
+
+- Fixed a bug introduced in 4.23.16 ([#865](https://github.com/putyourlightson/craft-blitz/issues/865)).
+
 ## 4.23.16 - 2026-01-06
 
 - Fixed a bug in which URLs with invalid `x-craft-preview` and `x-craft-live-preview` query string params could be cached ([#858](https://github.com/putyourlightson/craft-blitz/issues/858)).

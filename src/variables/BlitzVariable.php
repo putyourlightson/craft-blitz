@@ -220,7 +220,7 @@ class BlitzVariable
         ];
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
-            if (Blitz::$cacheRequest->getIsPreviewOrTokenRequest()) {
+            if (Blitz::$plugin->cacheRequest->getIsPreviewOrTokenRequest()) {
                 return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
             }
 
