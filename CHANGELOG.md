@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.7 - 2026-02-15
+
+- Fixed a bug in which reordering structure entries was not triggering cache refreshes in Craft 5.9.0 and above due to deprecated events ([#869](https://github.com/putyourlightson/craft-blitz/issues/869)).
+
 ## 5.12.6 - 2026-01-06
 
 - Added a `shouldInlineIncludes` property to the `CacheRequestService` class that makes it possible to force inline includes programmatically ([#845](https://github.com/putyourlightson/craft-blitz/issues/845)).

@@ -425,11 +425,19 @@ class Blitz extends Plugin
     private function registerStructureEvents(): void
     {
         if ($this->settings->refreshCacheWhenElementMovedInStructure) {
-            Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
-                function(MoveElementEvent $event) {
-                    $this->refreshCache->addElement($event->element);
-                }
-            );
+            if (version_compare(Craft::$app->getVersion(), '5.9.0', '>=')) {
+                Event::on(Structures::class, Structures::EVENT_AFTER_UPDATE_ELEMENT,
+                    function(MoveElementEvent $event) {
+                        $this->refreshCache->addElement($event->element);
+                    }
+                );
+            } else {
+                Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
+                    function(MoveElementEvent $event) {
+                        $this->refreshCache->addElement($event->element);
+                    }
+                );
+            }
         }
     }
 

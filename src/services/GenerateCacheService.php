@@ -20,6 +20,7 @@ use craft\events\PopulateElementsEvent;
 use craft\events\TemplateEvent;
 use craft\helpers\App;
 use craft\helpers\Db;
+use craft\helpers\Json;
 use craft\helpers\StringHelper;
 use craft\models\Section;
 use craft\records\Element as ElementRecord;
@@ -341,7 +342,7 @@ class GenerateCacheService extends Component
     public function saveElementQuery(ElementQuery $elementQuery): void
     {
         $params = ElementQueryHelper::getUniqueElementQueryParams($elementQuery);
-        $encodedParams = json_encode($params);
+        $encodedParams = Json::encode($params);
         $index = $this->createUniqueIndex($elementQuery->elementType . $encodedParams);
 
         // Require a mutex for the element query index to avoid doing the same operation multiple times
@@ -600,7 +601,7 @@ class GenerateCacheService extends Component
 
         $duration = $this->options->getCacheDuration();
 
-        // Disallow encoding for cache includes and pages with includes
+        // Disallow encoding for cached includes and pages with includes
         $allowEncoding = !Blitz::$plugin->cacheRequest->getIsCachedInclude()
             && !$this->generateData->getHasIncludes();
 
