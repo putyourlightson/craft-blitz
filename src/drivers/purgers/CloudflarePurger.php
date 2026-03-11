@@ -36,6 +36,13 @@ class CloudflarePurger extends BaseCachePurger
     public const API_URL_LIMIT = 100;
 
     /**
+     * @const The desired concurrency limit. Depending on Cloudflare plan, different settings
+     *        may work, but 6 is a safe default (3000/500 < 800/100).
+     * https://developers.cloudflare.com/cache/how-to/purge-cache/#availability-and-limits
+     */
+    public const CONCURRENCY_LIMIT = 6;
+
+    /**
      * @var string The API authentication method.
      */
     public string $authenticationMethod = 'apiToken';
@@ -251,8 +258,10 @@ class CloudflarePurger extends BaseCachePurger
 
         // Create a pool of requests
         $pool = new Pool($client, $requests, [
+            'concurrency' => self::CONCURRENCY_LIMIT,
             'fulfilled' => function() use (&$response) {
                 $response = true;
+                usleep(150_000);
             },
             'rejected' => function($reason) {
                 if ($reason instanceof RequestException) {
