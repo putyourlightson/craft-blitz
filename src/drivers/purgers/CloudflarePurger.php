@@ -261,7 +261,7 @@ class CloudflarePurger extends BaseCachePurger
             'concurrency' => self::CONCURRENCY_LIMIT,
             'fulfilled' => function() use (&$response) {
                 $response = true;
-                usleep(150_000);
+                usleep(15_000);
             },
             'rejected' => function($reason) {
                 if ($reason instanceof RequestException) {
