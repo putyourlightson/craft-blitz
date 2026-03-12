@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.23.18 - 2026-03-20
+
+- Modifying site URIs via the `EVENT_BEFORE_PURGE_CACHE` event now affects what is purged ([#879](https://github.com/putyourlightson/craft-blitz/issues/879)).
+
 ## 4.23.17 - 2026-01-12
 
 - Fixed a bug introduced in 4.23.16 ([#865](https://github.com/putyourlightson/craft-blitz/issues/865)).
