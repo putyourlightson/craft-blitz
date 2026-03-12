@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.8 - Unreleased
+
+- Modifying site URIs via the `EVENT_BEFORE_PURGE_CACHE` event now affects what is purged.
+
 ## 5.12.7 - 2026-02-15
 
 - Fixed a bug in which reordering structure entries was not triggering cache refreshes in Craft 5.9.0 and above due to deprecated events ([#869](https://github.com/putyourlightson/craft-blitz/issues/869)).
