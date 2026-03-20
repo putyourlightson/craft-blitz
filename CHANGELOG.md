@@ -1,8 +1,9 @@
 # Release Notes for Blitz
 
-## 5.12.8 - Unreleased
+## 5.12.8 - 2026-03-20
 
-- Modifying site URIs via the `EVENT_BEFORE_PURGE_CACHE` event now affects what is purged.
+- The Cloudflare purger now sends requests sequentially rather than in parallel, and can make up to 3 attempts, to help prevent rate limiting when purging a large number of URLs ([#880](https://github.com/putyourlightson/craft-blitz/issues/880)).
+- Modifying site URIs via the `EVENT_BEFORE_PURGE_CACHE` event now affects what is purged ([#879](https://github.com/putyourlightson/craft-blitz/issues/879)).
 
 ## 5.12.7 - 2026-02-15
 

@@ -12,8 +12,6 @@ use craft\errors\SiteNotFoundException;
 use craft\helpers\App;
 use craft\helpers\Db;
 use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Pool;
-use GuzzleHttp\Psr7\Request;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use yii\log\Logger;
@@ -31,9 +29,14 @@ class CloudflarePurger extends BaseCachePurger
 
     /**
      * @const The API URL limit.
-     * https://developers.cloudflare.com/cache/how-to/purge-cache/#availability-and-limits
+     * https://developers.cloudflare.com/cache/how-to/purge-cache/#single-file-purge-limits
      */
     public const API_URL_LIMIT = 100;
+
+    /**
+     * @const The max number of API attempts, in case of rate limiting.
+     */
+    public const MAX_ATTEMPTS = 3;
 
     /**
      * @var string The API authentication method.
@@ -205,7 +208,7 @@ class CloudflarePurger extends BaseCachePurger
      */
     private function sendRequest(string $method, string $action, int $siteId, array $params = []): bool
     {
-        $response = false;
+        $response = true;
 
         $headers = ['Content-Type' => 'application/json'];
 
@@ -232,42 +235,50 @@ class CloudflarePurger extends BaseCachePurger
         }
 
         $uri = 'zones/' . App::parseEnv($this->zoneIds[$siteUid]['zoneId']) . '/' . $action;
+        $optionSets = [];
 
-        $requests = [];
-
-        // If files requested then create requests from chunks to respect Cloudflare’s limit
         if (!empty($params['files'])) {
             $files = $params['files'];
             $batches = array_chunk($files, self::API_URL_LIMIT);
 
             foreach ($batches as $batch) {
-                $requests[] = new Request($method, $uri, [],
-                    json_encode(['files' => $batch])
-                );
+                $optionSets[] = [
+                    'json' => ['files' => $batch],
+                ];
             }
         } else {
-            $requests[] = new Request($method, $uri, [], json_encode($params));
+            $optionSets[] = [
+                'json' => $params,
+            ];
         }
 
-        // Create a pool of requests
-        $pool = new Pool($client, $requests, [
-            'fulfilled' => function() use (&$response) {
-                $response = true;
-            },
-            'rejected' => function($reason) {
-                if ($reason instanceof RequestException) {
-                    /** RequestException $reason */
-                    preg_match('/^(.*?)\R/', $reason->getMessage(), $matches);
+        foreach ($optionSets as $options) {
+            $attempts = 0;
+            while ($attempts < self::MAX_ATTEMPTS) {
+                try {
+                    $client->request($method, $uri, $options);
+                    break; // Success, exit retry loop
+                } catch (RequestException $exception) {
+                    $statusCode = $exception->getResponse()?->getStatusCode();
+                    $attempts++;
+
+                    // If 429 Too Many Requests, wait and retry
+                    if ($statusCode === 429 && $attempts < self::MAX_ATTEMPTS) {
+                        sleep(1);
+                        continue;
+                    }
+
+                    // For other errors, log and mark as failed
+                    $response = false;
+                    preg_match('/^(.*?)\R/', $exception->getMessage(), $matches);
 
                     if (!empty($matches[1])) {
                         Blitz::$plugin->log(trim($matches[1], ':'), [], Logger::LEVEL_ERROR);
                     }
+                    break;
                 }
-            },
-        ]);
-
-        // Initiate the transfers and wait for the pool of requests to complete
-        $pool->promise()->wait();
+            }
+        }
 
         return $response;
     }
