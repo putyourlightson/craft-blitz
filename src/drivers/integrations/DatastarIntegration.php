@@ -55,7 +55,7 @@ class DatastarIntegration extends BaseIntegration
                 $siteUri = $event->siteUri;
                 Event::on(\craft\web\Response::class, Response::EVENT_AFTER_SEND,
                     function() use ($siteUri) {
-                        if (method_exists(SseService::class, 'getEventOutput')) {
+                        if (class_exists(SseService::class) && method_exists(SseService::class, 'getEventOutput')) {
                             $content = Datastar::getInstance()->sse->getEventOutput();
                             Blitz::$plugin->generateCache->save($content, $siteUri);
                         }
