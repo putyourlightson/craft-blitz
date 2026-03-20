@@ -2,6 +2,7 @@
 
 ## 4.23.18 - 2026-03-20
 
+- The Cloudflare purger now sends requests sequentially rather than in parallel, and can make up to 3 attempts, to help prevent rate limiting when purging a large number of URLs ([#880](https://github.com/putyourlightson/craft-blitz/issues/880)).
 - Modifying site URIs via the `EVENT_BEFORE_PURGE_CACHE` event now affects what is purged ([#879](https://github.com/putyourlightson/craft-blitz/issues/879)).
 
 ## 4.23.17 - 2026-01-12
