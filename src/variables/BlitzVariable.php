@@ -154,18 +154,18 @@ class BlitzVariable
 
         [$includeId, $index] = Blitz::$plugin->generateCache->saveInclude($siteId, $template, $params);
 
-        $uri = $uriPrefix . $index;
+        $includeUri = $uriPrefix . $index;
 
         // Create a root relative URL to account for sub-folders
-        $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($uri));
+        $uri = UrlHelper::rootRelativeUrl(UrlHelper::siteUrl($includeUri));
 
         if ($config->requestType === VariableConfigModel::INCLUDE_REQUEST_TYPE) {
             if (Blitz::$plugin->cacheRequest->shouldInlineIncludes()) {
                 return Template::raw(Craft::$app->getView()->renderTemplate($template, $params));
             }
 
-            // Add the path param as a query string param with the value of the URI. Since SSI ignores the actual URI, we’ll use the path param to route the request.
-            $uri = $uri . '?' . Blitz::$plugin->cacheRequest->cachedIncludePathParam . '=' . trim($uri, '/');
+            // Add the path param as a query string param with the include URI. Since SSI ignores the actual URI, we’ll use the path param to route the request.
+            $uri = $uri . '?' . Blitz::$plugin->cacheRequest->cachedIncludePathParam . '=' . $includeUri;
 
             if (Blitz::$plugin->settings->ssiEnabled) {
                 return $this->getSsiTag($uri, $includeId);
