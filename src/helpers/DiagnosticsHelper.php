@@ -781,7 +781,7 @@ class DiagnosticsHelper
                     'cachetagsWithTag' => CacheTagRecord::find()
                         ->select(['cacheId', 'tag'])
                         ->groupBy(['cacheId', 'tag']),
-                ], '[[caches.id]] = [[cachetags.cacheId]]');
+                ], '[[caches.id]] = [[cachetagsWithTag.cacheId]]');
         }
 
         return $query;
