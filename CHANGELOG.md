@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.9 - Unreleased
+
+- Fixed a bug in which the cached include path in a multi-site setup using subfolders was not being served by server redirects ([#875](https://github.com/putyourlightson/craft-blitz/issues/875)).
+
 ## 5.12.8 - 2026-03-20
 
 - The Cloudflare purger now sends requests sequentially rather than in parallel, and can make up to 3 attempts, to help prevent rate limiting when purging a large number of URLs ([#880](https://github.com/putyourlightson/craft-blitz/issues/880)).
