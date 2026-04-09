@@ -3,6 +3,7 @@
 ## 5.12.9 - Unreleased
 
 - Fixed a bug in which the cached include path in a multi-site setup using subfolders was not being served by server redirects ([#875](https://github.com/putyourlightson/craft-blitz/issues/875)).
+- Fixed an error on the nested elements page in the Blitz Diagnostics utility ([#885](https://github.com/putyourlightson/craft-blitz/issues/885)).
 
 ## 5.12.8 - 2026-03-20
 
