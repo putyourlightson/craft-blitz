@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 4.23.19 - Unreleased
+## 4.23.19 - 2026-04-11
 
 - Fixed a bug in which the page count was inaccurate in the tracked tags page of the Blitz Diagnostics utility ([#887](https://github.com/putyourlightson/craft-blitz/issues/887)).
 - Fixed a bug in which deleting Super Table fields inside Matrix fields could throw an error ([#881](https://github.com/putyourlightson/craft-blitz/issues/881)).
