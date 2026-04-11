@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.23.19 - Unreleased
+
+- Fixed a bug in which the page count was inaccurate in the tracked tags page of the Blitz Diagnostics utility ([#887](https://github.com/putyourlightson/craft-blitz/issues/887)).
+
 ## 4.23.18 - 2026-03-20
 
 - The Cloudflare purger now sends requests sequentially rather than in parallel, and can make up to 3 attempts, to help prevent rate limiting when purging a large number of URLs ([#880](https://github.com/putyourlightson/craft-blitz/issues/880)).
