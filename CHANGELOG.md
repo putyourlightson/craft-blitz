@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.12.9 - Unreleased
+## 5.12.9 - 2026-04-11
 
 - Fixed a bug in which the cached include path in a multi-site setup using subfolders was not being served by server redirects ([#875](https://github.com/putyourlightson/craft-blitz/issues/875)).
 - Fixed a bug in which the page count was inaccurate in the tracked tags page of the Blitz Diagnostics utility ([#887](https://github.com/putyourlightson/craft-blitz/issues/887)).
