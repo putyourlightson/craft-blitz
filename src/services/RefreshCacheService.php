@@ -33,6 +33,7 @@ use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 use yii\db\ActiveQuery;
+use yii\db\Exception;
 
 /**
  * This class is responsible for keeping the cache fresh.
@@ -276,8 +277,12 @@ class RefreshCacheService extends Component
         }
 
         // Don’t proceed if element is a draft or revision
-        if (ElementHelper::isDraftOrRevision($element)) {
-            return false;
+        // Catch database exceptions that can be thrown in edge cases (https://github.com/putyourlightson/craft-blitz/issues/881)
+        try {
+            if (ElementHelper::isDraftOrRevision($element)) {
+                return false;
+            }
+        } catch (Exception) {
         }
 
         // Don’t proceed if propagating
