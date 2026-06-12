@@ -14,7 +14,6 @@ use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use Throwable;
-use TypeError;
 use yii\log\Logger;
 
 /**
@@ -205,10 +204,9 @@ class RefreshCacheHelper
         // https://github.com/putyourlightson/craft-blitz/issues/579
         try {
             foreach ($params as $key => $val) {
-                /** @throws TypeError if the type does not exist. */
                 $elementQuery->{$key} = $val;
             }
-        } catch (TypeError $exception) {
+        } catch (Throwable $exception) {
             Blitz::$plugin->log('Element query param `' . $key . '` could not be applied: ' . $exception->getMessage(), [], Logger::LEVEL_ERROR);
 
             return null;

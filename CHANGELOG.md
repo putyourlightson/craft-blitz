@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.10 - Unreleased
+
+- Improved the catching of errors when element query params are applied ([#896](https://github.com/putyourlightson/craft-blitz/issues/896)).
+
 ## 5.12.9 - 2026-04-11
 
 - Fixed a bug in which the cached include path in a multi-site setup using subfolders was not being served by server redirects ([#875](https://github.com/putyourlightson/craft-blitz/issues/875)).
