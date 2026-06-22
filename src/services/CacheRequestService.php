@@ -422,8 +422,19 @@ class CacheRequestService extends Component
             return true;
         }
 
+        // Detect the presence of a token, rather than a resolved one, so that
+        // expired or invalid tokens are also excluded from being cached.
+        // `Request::getToken()` returns null once a token has expired or can’t
+        // be resolved, which would otherwise leave the URL cacheable.
+        // https://github.com/putyourlightson/craft-blitz/issues/898
+        $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
+
         if (
-            ($request->getSiteToken() !== null || $request->getToken() !== null)
+            (
+                $request->getSiteToken() !== null
+                || $request->getQueryParam($tokenParam) !== null
+                || $request->getHeaders()->get('X-Craft-Token') !== null
+            )
             && !$this->getIsGeneratorRequest()
         ) {
             return true;
