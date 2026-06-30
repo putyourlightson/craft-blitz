@@ -170,6 +170,23 @@ class CacheOptionsModel extends Model
     }
 
     /**
+     * Adds tags to the tags option.
+     */
+    public function addTags(array|string|null $value): self
+    {
+        // Normalize $this->tags to an array
+        $tags = is_array($this->tags) ? $this->tags : explode(',', (string)$this->tags);
+    
+        if (is_array($value)) {
+            $this->tags = array_merge($tags, $value);
+        } elseif (is_string($value)) {
+            $this->tags = array_merge($tags, explode(',', $value));
+        }
+
+        return $this;
+    }
+
+    /**
      * Sets the paginate option.
      */
     public function paginate(int $value = null): self
