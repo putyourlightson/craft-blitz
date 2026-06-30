@@ -3,8 +3,9 @@
 ## 5.12.10 - Unreleased
 
 - Added a helper method `addTags()` to `CacheOptionsModel` ([#900](https://github.com/putyourlightson/craft-blitz/issues/900)).
-- Fixed a bug in which invalid options could be set on a `CacheOptionsModel` instance ([#900](https://github.com/putyourlightson/craft-blitz/issues/900)).
 - Improved the catching of errors when element query params are applied ([#896](https://github.com/putyourlightson/craft-blitz/issues/896)).
+- Fixed a bug in which invalid options could be set on a `CacheOptionsModel` instance ([#900](https://github.com/putyourlightson/craft-blitz/issues/900)).
+- Fixed a bug in which URLs with expired/invalid tokens were being cached ([#898](https://github.com/putyourlightson/craft-blitz/issues/898)).
 
 ## 5.12.9 - 2026-04-11
 
