@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.12.10 - Unreleased
+## 5.12.10 - 2026-06-30
 
 - Added a helper method `addTags()` to `CacheOptionsModel` ([#900](https://github.com/putyourlightson/craft-blitz/issues/900)).
 - Improved the catching of errors when element query params are applied ([#896](https://github.com/putyourlightson/craft-blitz/issues/896)).
