@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.11 - Unreleased
+
+- Fixed a bug in which the configured token param name was not being respected when generating URLs ([#902](https://github.com/putyourlightson/craft-blitz/issues/902)).
+
 ## 5.12.10 - 2026-06-30
 
 - Added a helper method `addTags()` to `CacheOptionsModel` ([#900](https://github.com/putyourlightson/craft-blitz/issues/900)).
