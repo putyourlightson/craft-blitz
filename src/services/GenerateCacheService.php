@@ -892,7 +892,7 @@ class GenerateCacheService extends Component
         }
 
         // PostgreSQL deadlock (SQLSTATE 40P01)
-        if ($exception->getCode() === '40P01') {
+        if ((string)$exception->getCode() === '40P01') {
             return true;
         }
 
