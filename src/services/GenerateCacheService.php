@@ -27,7 +27,6 @@ use craft\records\Element as ElementRecord;
 use craft\records\Section as SectionRecord;
 use craft\services\Elements;
 use craft\web\View;
-use PDOException;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
@@ -83,12 +82,7 @@ class GenerateCacheService extends Component
     /**
      * @const int
      */
-    public const DEADLOCK_MAX_RETRIES = 5;
-
-    /**
-     * @const int
-     */
-    public const DEADLOCK_RETRY_BASE_DELAY_MS = 10;
+    public const BATCH_INSERT_SIZE = 50;
 
     /**
      * @var GenerateDataModel
@@ -750,6 +744,15 @@ class GenerateCacheService extends Component
         $elementIds = $this->generateData->getElementIds();
         $elementTrackFields = $this->generateData->getElementTrackFields();
 
+        // Disable foreign key checks to prevent deadlocks.
+        // https://github.com/putyourlightson/craft-blitz/issues/903
+        $db = Craft::$app->getDb();
+        $command = 'SET FOREIGN_KEY_CHECKS = 0';
+        if ($db->getIsPgsql()) {
+            $command = 'SET CONSTRAINTS ALL DEFERRED';
+        }
+        $db->createCommand($command)->execute();
+
         $this->batchInsertCaches(
             $cacheId,
             $elementIds,
@@ -769,6 +772,16 @@ class GenerateCacheService extends Component
                 'fieldInstanceUid',
             );
         }
+
+        try {
+            $command = 'SET FOREIGN_KEY_CHECKS = 1';
+            if ($db->getIsPgsql()) {
+                $command = 'SET CONSTRAINTS ALL IMMEDIATE';
+            }
+            $db->createCommand($command)->execute();
+        } catch (Exception $exception) {
+            Blitz::$plugin->log('Failed to re-enable foreign key checks: ' . $exception->getMessage(), [], Logger::LEVEL_WARNING);
+        }
     }
 
     /**
@@ -780,12 +793,11 @@ class GenerateCacheService extends Component
             return;
         }
 
-        // Get valid IDs by selecting only records with existing IDs, sorted to prevent deadlocks
+        // Get valid IDs by selecting only records with existing IDs
         $validIds = ActiveRecord::find()
             ->from([$checkTable])
             ->select(['id'])
             ->where(['id' => $ids])
-            ->orderBy(['id' => SORT_ASC])
             ->column();
 
         $values = [];
@@ -798,36 +810,25 @@ class GenerateCacheService extends Component
                 }
             }
         }
+        $chunks = array_chunk($values, self::BATCH_INSERT_SIZE);
 
         $columns = ['cacheId', $columnName];
         if ($extraColumnName !== null) {
             $columns[] = $extraColumnName;
         }
 
-        // Retry on deadlock with exponential backoff
-        for ($attempt = 1; $attempt <= self::DEADLOCK_MAX_RETRIES; $attempt++) {
-            try {
+        try {
+            foreach ($chunks as $chunk) {
                 Craft::$app->getDb()->createCommand()
                     ->batchInsert(
                         $insertTable,
                         $columns,
-                        $values,
+                        $chunk,
                     )
                     ->execute();
-
-                return;
-            } catch (Exception $exception) {
-                if ($attempt < self::DEADLOCK_MAX_RETRIES && $this->isDeadlockException($exception)) {
-                    // Wait with exponential backoff before retrying
-                    $delayMs = self::DEADLOCK_RETRY_BASE_DELAY_MS * (2 ** ($attempt - 1));
-                    usleep($delayMs * 1000);
-                    continue;
-                }
-
-                // Log error if not retrying or max retries exceeded
-                Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
-                return;
             }
+        } catch (Exception $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }
 
@@ -836,40 +837,26 @@ class GenerateCacheService extends Component
      */
     private function batchInsertQueries(int $queryId, array $ids, string $insertTable, string $columnName): void
     {
-        // Sort IDs in ascending order to prevent deadlocks
-        sort($ids, SORT_NUMERIC);
-
         $values = [];
         foreach ($ids as $id) {
             $values[] = [$queryId, $id];
         }
+        $chunks = array_chunk($values, self::BATCH_INSERT_SIZE);
 
         $columns = ['queryId', $columnName];
 
-        // Retry on deadlock with exponential backoff
-        for ($attempt = 1; $attempt <= self::DEADLOCK_MAX_RETRIES; $attempt++) {
-            try {
+        try {
+            foreach ($chunks as $chunk) {
                 Craft::$app->getDb()->createCommand()
                     ->batchInsert(
                         $insertTable,
                         $columns,
-                        $values,
+                        $chunk,
                     )
                     ->execute();
-
-                return;
-            } catch (Exception $exception) {
-                if ($attempt < self::DEADLOCK_MAX_RETRIES && $this->isDeadlockException($exception)) {
-                    // Wait with exponential backoff before retrying
-                    $delayMs = self::DEADLOCK_RETRY_BASE_DELAY_MS * (2 ** ($attempt - 1));
-                    usleep($delayMs * 1000);
-                    continue;
-                }
-
-                // Log error if not retrying or max retries exceeded
-                Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
-                return;
             }
+        } catch (Exception $exception) {
+            Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
     }
 
@@ -879,32 +866,5 @@ class GenerateCacheService extends Component
     private function createUniqueIndex(string $value): string
     {
         return sprintf('%u', crc32($value));
-    }
-
-    /**
-     * Checks if an exception is a database deadlock.
-     */
-    private function isDeadlockException(Exception $exception): bool
-    {
-        $previous = $exception;
-
-        while ($previous !== null) {
-            if ($previous instanceof PDOException) {
-                $errorInfo = $previous->errorInfo ?? [];
-
-                // PostgreSQL serialization failure or deadlock (SQLSTATE 40001, 40P01)
-                if (($errorInfo[0] ?? null) === '40001' || ($errorInfo[0] ?? null) === '40P01') {
-                    return true;
-                }
-
-                // MySQL deadlock (error code 1213) or lock wait timeout (error code 1205)
-                if (in_array($errorInfo[1] ?? null, [1213, 1205])) {
-                    return true;
-                }
-            }
-            $previous = $previous->getPrevious();
-        }
-
-        return false;
     }
 }
