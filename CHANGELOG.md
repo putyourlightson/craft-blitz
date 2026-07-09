@@ -2,6 +2,7 @@
 
 ## 5.12.11 - Unreleased
 
+- Added a retry with exponential backoff when tracking elements and element queries to help prevent deadlocks ([#903](https://github.com/putyourlightson/craft-blitz/issues/903)).
 - Fixed a bug in which the configured token param name was not being respected when generating URLs ([#902](https://github.com/putyourlightson/craft-blitz/issues/902)).
 
 ## 5.12.10 - 2026-06-30
