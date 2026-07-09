@@ -27,6 +27,7 @@ use craft\records\Element as ElementRecord;
 use craft\records\Section as SectionRecord;
 use craft\services\Elements;
 use craft\web\View;
+use PDOException;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\SaveCacheEvent;
@@ -882,18 +883,26 @@ class GenerateCacheService extends Component
 
     /**
      * Checks if an exception is a database deadlock.
-     * Supports MySQL/MariaDB (error code 1213) and PostgreSQL (SQLSTATE 40P01).
      */
     private function isDeadlockException(Exception $exception): bool
     {
-        // MySQL/MariaDB deadlock (error code 1213)
-        if (isset($exception->errorInfo[1]) && $exception->errorInfo[1] == 1213) {
-            return true;
-        }
+        $previous = $exception;
 
-        // PostgreSQL deadlock (SQLSTATE 40P01)
-        if ((string)$exception->getCode() === '40P01') {
-            return true;
+        while ($previous !== null) {
+            if ($previous instanceof PDOException) {
+                $errorInfo = $previous->errorInfo ?? [];
+
+                // PostgreSQL serialization failure or deadlock (SQLSTATE 40001, 40P01)
+                if (($errorInfo[0] ?? null) === '40001' || ($errorInfo[0] ?? null) === '40P01') {
+                    return true;
+                }
+
+                // MySQL deadlock (error code 1213) or lock wait timeout (error code 1205)
+                if (in_array($errorInfo[1] ?? null, [1213, 1205])) {
+                    return true;
+                }
+            }
+            $previous = $previous->getPrevious();
         }
 
         return false;
