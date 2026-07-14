@@ -21,6 +21,7 @@ use yii\base\Behavior;
  * @property-read bool $hasChanged
  * @property-read bool $hasBeenDeleted
  * @property-read bool $hasStatusChanged
+ * @property-read bool $hasUriChanged
  * @property-read bool $hasAssetFileChanged
  * @property-read bool $hasRefreshableStatus
  */
@@ -97,6 +98,21 @@ class ElementChangedBehavior extends Behavior
         $this->changedAttributes = $this->getChangedAttributes();
         $this->changedFieldsHandles = $this->getChangedFieldHandles();
 
+        // Detect URI/slug changes even when dirty attributes have already been reset
+        // (for example after Craft’s updateSlugAndUri flow).
+        if ($this->getHasUriChanged()) {
+            if (!in_array('uri', $this->changedAttributes, true)) {
+                $this->changedAttributes[] = 'uri';
+            }
+            if (
+                $this->originalElement !== null
+                && $element->slug !== $this->originalElement->slug
+                && !in_array('slug', $this->changedAttributes, true)
+            ) {
+                $this->changedAttributes[] = 'slug';
+            }
+        }
+
         if ($element->firstSave) {
             return true;
         }
@@ -106,6 +122,12 @@ class ElementChangedBehavior extends Behavior
         }
 
         if ($this->getHasStatusChanged()) {
+            return true;
+        }
+
+        if ($this->getHasUriChanged()) {
+            $this->isChangedByAttributes = true;
+
             return true;
         }
 
@@ -138,6 +160,22 @@ class ElementChangedBehavior extends Behavior
         $element = $this->owner;
 
         return $element->dateDeleted !== null;
+    }
+
+    /**
+     * Returns whether the element’s URI has changed.
+     *
+     * @since 5.12.11
+     */
+    public function getHasUriChanged(): bool
+    {
+        $element = $this->owner;
+
+        if ($this->originalElement === null) {
+            return false;
+        }
+
+        return $element->uri !== $this->originalElement->uri;
     }
 
     /**

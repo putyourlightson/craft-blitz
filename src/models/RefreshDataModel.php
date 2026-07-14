@@ -16,6 +16,7 @@ use putyourlightson\blitz\helpers\FieldHelper;
  * request.
  *
  * @property-read int[] $cacheIds
+ * @property-read SiteUriModel[] $previousSiteUris
  * @property-read array $elementTypes
  * @property-read int[] $assetsChangedByFile
  * @property-read int[] $assetsChangedByImage
@@ -27,6 +28,7 @@ class RefreshDataModel extends BaseDataModel
     /**
      * @var array{
      *          cacheIds: array<int, int[]|bool>,
+     *          previousSiteUris: array<int, array<string, bool>>,
      *          elements: array<string, array{
      *              sourceIds: array<int, bool>,
      *              elementIds: array<int, bool>,
@@ -40,6 +42,7 @@ class RefreshDataModel extends BaseDataModel
      */
     public array $data = [
         'cacheIds' => [],
+        'previousSiteUris' => [],
         'elements' => [],
     ];
 
@@ -62,6 +65,28 @@ class RefreshDataModel extends BaseDataModel
     public function getCacheIds(): array
     {
         return $this->getKeysAsValues(['cacheIds']);
+    }
+
+    /**
+     * Returns previous site URIs that must be removed after an element URI change.
+     *
+     * @return SiteUriModel[]
+     * @since 5.12.11
+     */
+    public function getPreviousSiteUris(): array
+    {
+        $siteUris = [];
+
+        foreach ($this->data['previousSiteUris'] ?? [] as $siteId => $uris) {
+            foreach (array_keys($uris) as $uri) {
+                $siteUris[] = new SiteUriModel([
+                    'siteId' => $siteId,
+                    'uri' => $uri,
+                ]);
+            }
+        }
+
+        return $siteUris;
     }
 
     /**
@@ -160,6 +185,16 @@ class RefreshDataModel extends BaseDataModel
         }
     }
 
+    /**
+     * Adds a previous site URI to be cleared after a URI change.
+     *
+     * @since 5.12.11
+     */
+    public function addPreviousSiteUri(int $siteId, string $uri): void
+    {
+        $this->data['previousSiteUris'][$siteId][$uri] = true;
+    }
+
     public function addSourceId(string $elementType, int $sourceId): void
     {
         $this->data['elements'][$elementType]['sourceIds'][$sourceId] = true;
@@ -195,6 +230,17 @@ class RefreshDataModel extends BaseDataModel
             $this->addIsChangedByAttributes($element, $elementChanged->isChangedByAttributes);
             $this->addIsChangedByFields($element, $elementChanged->isChangedByFields);
             $this->addIsChangedByAssetFile($element, $elementChanged->isChangedByAssetFile);
+
+            if (
+                $elementChanged->getHasUriChanged()
+                && $elementChanged->originalElement !== null
+                && $elementChanged->originalElement->uri !== null
+            ) {
+                $this->addPreviousSiteUri(
+                    $elementChanged->originalElement->siteId,
+                    $elementChanged->originalElement->uri,
+                );
+            }
         }
     }
 

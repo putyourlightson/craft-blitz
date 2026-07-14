@@ -60,6 +60,10 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     {
         $refreshData = RefreshDataModel::createFromData($this->data);
 
+        // Always remove previous element URIs (slug/URI changes), regardless of refresh mode.
+        // Otherwise File Storage + server rewrites can keep serving the old path forever.
+        $this->clearPreviousSiteUris($refreshData);
+
         $this->populateCacheIdsFromElementCaches($refreshData);
 
         // Clear the site URIs early.
@@ -100,6 +104,22 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     protected function defaultDescription(): string
     {
         return Craft::t('blitz', 'Refreshing Blitz cache');
+    }
+
+    /**
+     * Clears, flushes and purges previous site URIs after element URI changes.
+     */
+    private function clearPreviousSiteUris(RefreshDataModel $refreshData): void
+    {
+        $previousSiteUris = $refreshData->getPreviousSiteUris();
+
+        if (empty($previousSiteUris)) {
+            return;
+        }
+
+        Blitz::$plugin->clearCache->clearUris($previousSiteUris);
+        Blitz::$plugin->flushCache->flushUris($previousSiteUris);
+        Blitz::$plugin->cachePurger->purgeUris($previousSiteUris);
     }
 
     /**

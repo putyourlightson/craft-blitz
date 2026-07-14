@@ -4,6 +4,7 @@
 
 - Disabled foreign key checks when inserting element caches to help prevent deadlocks when elements are saved ([#903](https://github.com/putyourlightson/craft-blitz/issues/903)).
 - Fixed a bug in which the configured token param name was not being respected when generating URLs ([#902](https://github.com/putyourlightson/craft-blitz/issues/902)).
+- Fixed a bug in which changing an element’s slug/URI left the previous URI cached and still available on the frontend.
 
 ## 5.12.10 - 2026-06-30
 
