@@ -8,7 +8,10 @@ use craft\elements\Asset;
 use craft\elements\Entry;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
+use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\RefreshDataModel;
+use putyourlightson\blitz\models\SettingsModel;
+use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 
@@ -104,6 +107,53 @@ test('Element is tracked when its attribute is changed', function() {
             changedBy: 'attributes',
             changedAttributes: ['title'],
         );
+});
+
+test('Element is tracked with its previous site URI when its URI is changed', function() {
+    $entry = createEntry();
+    $previousUri = $entry->uri;
+    $entry->uri = 'new-page-uri';
+    Blitz::$plugin->refreshCache->addElement($entry);
+
+    $refreshData = Blitz::$plugin->refreshCache->refreshData;
+    $previousSiteUris = $refreshData->getPreviousSiteUris();
+
+    expect($refreshData->getElementIds(Entry::class))
+        ->toEqual([$entry->id])
+        ->and($refreshData->getChangedAttributes(Entry::class, $entry->id))
+        ->toContain('uri')
+        ->and($previousSiteUris)
+        ->toHaveCount(1)
+        ->and($previousSiteUris[0]->siteId)
+        ->toEqual($entry->siteId)
+        ->and($previousSiteUris[0]->uri)
+        ->toEqual($previousUri);
+});
+
+test('Cached previous site URI is cleared when an element URI is changed', function() {
+    $entry = createEntry();
+    $previousSiteUri = createSiteUri(siteId: $entry->siteId, uri: $entry->uri);
+    Blitz::$plugin->generateCache->addElement($entry);
+    Blitz::$plugin->generateCache->save(createOutput(), $previousSiteUri);
+    Blitz::$plugin->settings->refreshMode = SettingsModel::REFRESH_MODE_EXPIRE;
+
+    expect(Blitz::$plugin->cacheStorage->get($previousSiteUri))
+        ->not->toBeEmpty()
+        ->and(CacheRecord::find()->where($previousSiteUri->toArray())->count())
+        ->toBe(1);
+
+    $entry->uri = 'new-page-uri';
+    Blitz::$plugin->refreshCache->addElement($entry);
+
+    $job = new RefreshCacheJob([
+        'data' => Blitz::$plugin->refreshCache->refreshData->data,
+    ]);
+    $job->execute(Craft::$app->getQueue());
+
+    expect(Blitz::$plugin->cacheStorage->get($previousSiteUri))
+        ->toBeEmpty()
+        ->and(CacheRecord::find()->where($previousSiteUri->toArray())->count())
+        ->toBe(0);
 });
 
 test('Element is tracked when its field is changed', function() {
