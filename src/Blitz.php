@@ -9,7 +9,6 @@ use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
 use craft\elements\User;
-use craft\enums\CmsEdition;
 use craft\events\DefineHtmlEvent;
 use craft\events\DeleteElementEvent;
 use craft\events\ElementEvent;
@@ -164,10 +163,7 @@ class Blitz extends Plugin
             $this->registerWidgets();
             $this->registerSidebarPanels();
             $this->registerRedirectAfterInstall();
-
-            if (Craft::$app->edition === CmsEdition::Pro) {
-                $this->registerUserPermissions();
-            }
+            $this->registerUserPermissions();
 
             Sprig::bootstrap();
         }
