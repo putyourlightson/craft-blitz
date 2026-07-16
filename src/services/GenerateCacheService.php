@@ -77,6 +77,11 @@ class GenerateCacheService extends Component
     public const MUTEX_LOCK_NAME_INCLUDE_RECORDS = 'blitz:includeRecords';
 
     /**
+     * @const int
+     */
+    public const BATCH_INSERT_SIZE = 50;
+
+    /**
      * @var GenerateDataModel
      */
     public GenerateDataModel $generateData;
@@ -724,6 +729,15 @@ class GenerateCacheService extends Component
         $elementIds = $this->generateData->getElementIds();
         $elementIndexedTrackFields = $this->generateData->getElementIndexedTrackFields();
 
+        // Disable foreign key checks to prevent deadlocks.
+        // https://github.com/putyourlightson/craft-blitz/issues/903
+        $db = Craft::$app->getDb();
+        $command = 'SET FOREIGN_KEY_CHECKS = 0';
+        if ($db->getIsPgsql()) {
+            $command = 'SET CONSTRAINTS ALL DEFERRED';
+        }
+        $db->createCommand($command)->execute();
+
         $this->batchInsertCaches(
             $cacheId,
             $elementIds,
@@ -742,6 +756,16 @@ class GenerateCacheService extends Component
                 $elementIndexedTrackFields,
                 'fieldId',
             );
+        }
+
+        try {
+            $command = 'SET FOREIGN_KEY_CHECKS = 1';
+            if ($db->getIsPgsql()) {
+                $command = 'SET CONSTRAINTS ALL IMMEDIATE';
+            }
+            $db->createCommand($command)->execute();
+        } catch (Exception $exception) {
+            Blitz::$plugin->log('Failed to re-enable foreign key checks: ' . $exception->getMessage(), [], Logger::LEVEL_WARNING);
         }
     }
 
@@ -771,6 +795,7 @@ class GenerateCacheService extends Component
                 }
             }
         }
+        $chunks = array_chunk($values, self::BATCH_INSERT_SIZE);
 
         $columns = ['cacheId', $columnName];
         if ($extraColumnName !== null) {
@@ -778,13 +803,15 @@ class GenerateCacheService extends Component
         }
 
         try {
-            Craft::$app->getDb()->createCommand()
-                ->batchInsert(
-                    $insertTable,
-                    $columns,
-                    $values,
-                )
-                ->execute();
+            foreach ($chunks as $chunk) {
+                Craft::$app->getDb()->createCommand()
+                    ->batchInsert(
+                        $insertTable,
+                        $columns,
+                        $chunk,
+                    )
+                    ->execute();
+            }
         } catch (Exception $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
@@ -800,16 +827,20 @@ class GenerateCacheService extends Component
             $values[] = [$queryId, $id];
         }
 
+        $chunks = array_chunk($values, self::BATCH_INSERT_SIZE);
+
         $columns = ['queryId', $columnName];
 
         try {
-            Craft::$app->getDb()->createCommand()
-                ->batchInsert(
-                    $insertTable,
-                    $columns,
-                    $values,
-                )
-                ->execute();
+            foreach ($chunks as $chunk) {
+                Craft::$app->getDb()->createCommand()
+                    ->batchInsert(
+                        $insertTable,
+                        $columns,
+                        $chunk,
+                    )
+                    ->execute();
+            }
         } catch (Exception $exception) {
             Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
         }
