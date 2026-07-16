@@ -180,7 +180,8 @@ abstract class BaseCacheGenerator extends SavableComponent implements CacheGener
         $params = [];
 
         if ($withToken) {
-            $params['token'] = Craft::$app->getTokens()->createToken(self::GENERATE_ACTION_ROUTE);
+            $tokenParam = Craft::$app->getConfig()->getGeneral()->tokenParam;
+            $params[$tokenParam] = Craft::$app->getTokens()->createToken(self::GENERATE_ACTION_ROUTE);
         }
 
         foreach ($siteUris as $siteUri) {

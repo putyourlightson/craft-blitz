@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.23.20 - 2026-07-16
+
+- Fixed a bug in which the configured token param name was not being respected when generating URLs ([#902](https://github.com/putyourlightson/craft-blitz/issues/902)).
+
 ## 4.23.19 - 2026-04-11
 
 - Fixed a bug in which the page count was inaccurate in the tracked tags page of the Blitz Diagnostics utility ([#887](https://github.com/putyourlightson/craft-blitz/issues/887)).
