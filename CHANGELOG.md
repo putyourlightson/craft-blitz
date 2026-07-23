@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.12 - 2026-07-23
+
+- Fixed a bug with setting cache option tags via Twig in some scenarios ([#909](https://github.com/putyourlightson/craft-blitz/issues/909)).
+
 ## 5.12.11 - 2026-07-16
 
 - Disabled foreign key checks when inserting element caches to help prevent deadlocks when elements are saved ([#903](https://github.com/putyourlightson/craft-blitz/issues/903)).

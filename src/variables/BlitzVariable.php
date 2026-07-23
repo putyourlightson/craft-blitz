@@ -102,8 +102,7 @@ class BlitzVariable
      */
     public function options(array $params = []): CacheOptionsModel
     {
-        // Clone the options to preserve the original state if validation fails
-        $options = clone Blitz::$plugin->generateCache->options;
+        $options = Blitz::$plugin->generateCache->options;
 
         if (isset($params['cacheDuration'])) {
             $options->cacheDuration($params['cacheDuration']);
@@ -111,11 +110,7 @@ class BlitzVariable
 
         $options->setAttributes($params, false);
 
-        if ($options->validate()) {
-            Blitz::$plugin->generateCache->options = $options;
-        }
-
-        return Blitz::$plugin->generateCache->options;
+        return $options;
     }
 
     /**
