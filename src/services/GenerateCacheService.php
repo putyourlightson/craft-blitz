@@ -744,15 +744,6 @@ class GenerateCacheService extends Component
         $elementIds = $this->generateData->getElementIds();
         $elementTrackFields = $this->generateData->getElementTrackFields();
 
-        // Disable foreign key checks to prevent deadlocks.
-        // https://github.com/putyourlightson/craft-blitz/issues/903
-        $db = Craft::$app->getDb();
-        $command = 'SET FOREIGN_KEY_CHECKS = 0';
-        if ($db->getIsPgsql()) {
-            $command = 'SET CONSTRAINTS ALL DEFERRED';
-        }
-        $db->createCommand($command)->execute();
-
         $this->batchInsertCaches(
             $cacheId,
             $elementIds,
@@ -771,16 +762,6 @@ class GenerateCacheService extends Component
                 $elementTrackFields,
                 'fieldInstanceUid',
             );
-        }
-
-        try {
-            $command = 'SET FOREIGN_KEY_CHECKS = 1';
-            if ($db->getIsPgsql()) {
-                $command = 'SET CONSTRAINTS ALL IMMEDIATE';
-            }
-            $db->createCommand($command)->execute();
-        } catch (Exception $exception) {
-            Blitz::$plugin->log('Failed to re-enable foreign key checks: ' . $exception->getMessage(), [], Logger::LEVEL_WARNING);
         }
     }
 

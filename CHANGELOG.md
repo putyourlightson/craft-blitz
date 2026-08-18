@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.13 - Unreleased
+
+- Reverted the disabling of foreign key checks when inserting element caches, which was causing issues with database clusters.
+
 ## 5.12.12 - 2026-07-23
 
 - Fixed a bug with setting cache option tags via Twig in some scenarios ([#909](https://github.com/putyourlightson/craft-blitz/issues/909)).
