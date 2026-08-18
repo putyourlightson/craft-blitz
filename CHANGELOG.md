@@ -1,8 +1,9 @@
 # Release Notes for Blitz
 
-## 5.12.13 - Unreleased
+## 5.12.13 - 2026-08-18
 
 - Reverted the disabling of foreign key checks when inserting element caches, which was causing issues with database clusters.
+- Fixed a bug in which generate cache jobs were not being released when they should have been ([#910](https://github.com/putyourlightson/craft-blitz/issues/910)).
 
 ## 5.12.12 - 2026-07-23
 
