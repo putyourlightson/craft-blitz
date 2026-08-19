@@ -80,12 +80,19 @@ class BaseDriverHelper
             return;
         }
 
-        $jobIds = (new Query())
+        $query = (new Query())
             ->from([$queue->tableName])
             ->select(['id'])
-            ->where(['like', 'job', '"putyourlightson\blitz\jobs\DriverJob"'])
-            ->andWhere(['like', 'job', '"' . $driverId . '"'])
-            ->column();
+            ->where(['dateReserved' => null]);
+
+        if ($driverId === 'cacheGenerator') {
+            $query->andWhere(['like', 'job', '"putyourlightson\\blitz\\jobs\\GenerateCacheJob"']);
+        } else {
+            $query->andWhere(['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"']);
+            $query->andWhere(['like', 'job', '"' . $driverId . '"']);
+        }
+
+        $jobIds = $query->column();
 
         foreach ($jobIds as $jobId) {
             $queue->release($jobId);

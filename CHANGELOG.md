@@ -1,5 +1,7 @@
 # Release Notes for Blitz
 
+- Fixed a bug in which generate cache jobs were not being released when they should have been ([#910](https://github.com/putyourlightson/craft-blitz/issues/910)).
+
 ## 4.23.20 - 2026-07-16
 
 - Disabled foreign key checks when inserting element caches to help prevent deadlocks when elements are saved ([#903](https://github.com/putyourlightson/craft-blitz/issues/903)).
