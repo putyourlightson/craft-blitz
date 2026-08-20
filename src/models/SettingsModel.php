@@ -503,6 +503,11 @@ class SettingsModel extends Model
     public int $mutexTimeout = 1;
 
     /**
+     * The number of records to insert in a single batch.
+     */
+    public int $batchInsertSize = 50;
+
+    /**
      * The paths to executable shell commands.
      *
      * [
