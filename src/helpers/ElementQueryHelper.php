@@ -533,7 +533,9 @@ class ElementQueryHelper
 
         // Convert element queries to element IDs
         if ($value instanceof ElementQueryInterface) {
-            $value = $value->ids();
+            // Reset keys because indexed element queries may return IDs with string keys.
+            // https://github.com/putyourlightson/craft-blitz/issues/914
+            $value = array_values($value->ids());
             return;
         }
 
