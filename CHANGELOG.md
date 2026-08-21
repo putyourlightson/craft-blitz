@@ -3,6 +3,7 @@
 ## 5.12.14 - Unreleased
 
 - Added a config setting `batchInsertSize` that determines the number of records to insert in a single batch ([#903](https://github.com/putyourlightson/craft-blitz/issues/903)).
+- Fixed an error that could occur when tracking indexed element queries used as relation parameters ([#914](https://github.com/putyourlightson/craft-blitz/issues/914)).
 
 ## 5.12.13 - 2026-08-18
 
