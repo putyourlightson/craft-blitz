@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.23.22 - Unreleased
+
+- Added a config setting `batchInsertSize` that determines the number of records to insert in a single batch ([#903](https://github.com/putyourlightson/craft-blitz/issues/903)).
+
 ## 4.23.21 - 2026-08-19
 
 - Reverted the disabling of foreign key checks when inserting element caches, which was causing issues with database clusters.

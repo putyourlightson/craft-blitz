@@ -77,11 +77,6 @@ class GenerateCacheService extends Component
     public const MUTEX_LOCK_NAME_INCLUDE_RECORDS = 'blitz:includeRecords';
 
     /**
-     * @const int
-     */
-    public const BATCH_INSERT_SIZE = 50;
-
-    /**
      * @var GenerateDataModel
      */
     public GenerateDataModel $generateData;
@@ -776,7 +771,7 @@ class GenerateCacheService extends Component
                 }
             }
         }
-        $chunks = array_chunk($values, self::BATCH_INSERT_SIZE);
+        $chunks = array_chunk($values, Blitz::$plugin->settings->batchInsertSize);
 
         $columns = ['cacheId', $columnName];
         if ($extraColumnName !== null) {
@@ -808,7 +803,7 @@ class GenerateCacheService extends Component
             $values[] = [$queryId, $id];
         }
 
-        $chunks = array_chunk($values, self::BATCH_INSERT_SIZE);
+        $chunks = array_chunk($values, Blitz::$plugin->settings->batchInsertSize);
 
         $columns = ['queryId', $columnName];
 

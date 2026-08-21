@@ -271,6 +271,9 @@ return [
         // The time in seconds to wait for mutex locks to be released.
         //'mutexTimeout' => 1,
 
+        // The number of records to insert in a single batch.
+        //'batchInsertSize' => 50,
+
         // The paths to executable shell commands.
         //'commands' => [
         //    'git' => '/usr/bin/git',
