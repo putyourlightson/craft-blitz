@@ -78,18 +78,12 @@ class RefreshCacheHelper
      */
     public static function getElementTypeQueryRecords(string $elementType, RefreshDataModel $refreshData): array
     {
-        $ignoreCacheIds = $refreshData->getCacheIds();
-        $sourceIds = $refreshData->getSourceIds($elementType);
-        $changedAttributes = $refreshData->getCombinedChangedAttributes($elementType);
-        $changedFields = $refreshData->getCombinedChangedFields($elementType);
-        $isChangedByAttributes = $refreshData->getCombinedIsChangedByAttributes($elementType);
-        $isChangedByFields = $refreshData->getCombinedIsChangedByFields($elementType);
-
         // Get element query records without eager loading
         $query = ElementQueryRecord::find()
             ->where(['type' => $elementType]);
 
         // Ignore element queries linked to cache IDs that we already have, or not linked to any cache IDs.
+        $ignoreCacheIds = $refreshData->getCacheIds();
         $query->innerJoinWith('elementQueryCaches', false)
             ->andWhere([
                 'not',
@@ -97,6 +91,7 @@ class RefreshCacheHelper
             ]);
 
         // Limit to queries without any sources or with sources in `sourceIds`.
+        $sourceIds = $refreshData->getSourceIds($elementType);
         $query->joinWith('elementQuerySources', false)
             ->andWhere([
                 'or',
@@ -104,8 +99,11 @@ class RefreshCacheHelper
                 ['sourceId' => $sourceIds],
             ]);
 
-        // Only limit the query if the elements were changed by attributes and/or fields.
-        if ($isChangedByAttributes || $isChangedByFields) {
+        // Only limit the query if every element was changed by attributes and/or fields.
+        if ($refreshData->getCombinedIsChangedByAttributesOrFields($elementType)) {
+            $changedAttributes = $refreshData->getCombinedChangedAttributes($elementType);
+            $changedFields = $refreshData->getCombinedChangedFields($elementType);
+
             // Limit queries to only those with attributes or fields that have changed
             $query->joinWith('elementQueryAttributes', false)
                 ->joinWith('elementQueryFields', false)

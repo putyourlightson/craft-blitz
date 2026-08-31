@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.15 - Unreleased
+
+- Fixed a bug that could prevent cached pages from being refreshed when a batch contained both attribute or field changes and other types of element changes.
+
 ## 5.12.14 - 2026-08-21
 
 - Added a config setting `batchInsertSize` that determines the number of records to insert in a single batch ([#903](https://github.com/putyourlightson/craft-blitz/issues/903)).

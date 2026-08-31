@@ -109,9 +109,30 @@ class RefreshDataModel extends BaseDataModel
         return $this->data['elements'][$elementType]['isChangedByAttributes'][$elementId] ?? false;
     }
 
-    public function getCombinedIsChangedByAttributes(string $elementType): bool
+    /**
+     * Returns whether every element was changed specifically by attributes
+     * and/or fields.
+     *
+     * @since 5.12.15
+     */
+    public function getCombinedIsChangedByAttributesOrFields(string $elementType): bool
     {
-        return $this->getCombinedIsChangedBy($elementType, 'isChangedByAttributes');
+        $elementIds = $this->getElementIds($elementType);
+
+        if (empty($elementIds)) {
+            return false;
+        }
+
+        foreach ($elementIds as $elementId) {
+            if (
+                !$this->getIsChangedByAttributes($elementType, $elementId)
+                && !$this->getIsChangedByFields($elementType, $elementId)
+            ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
