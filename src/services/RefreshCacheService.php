@@ -311,6 +311,8 @@ class RefreshCacheService extends Component
 
     /**
      * Generates element expiry dates.
+     *
+     * @param class-string<ElementInterface>|null $elementType
      */
     public function generateExpiryDates(string $elementType = null): void
     {
@@ -320,7 +322,6 @@ class RefreshCacheService extends Component
 
         $now = Db::prepareDateForDb('now');
 
-        /** @var Element $elementType */
         /** @var Element[] $elements */
         $elements = $elementType::find()
             ->where([

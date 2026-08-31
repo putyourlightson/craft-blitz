@@ -91,9 +91,9 @@ class CacheRequestService extends Component
     private ?bool $isGeneratorRequest = null;
 
     /**
-     * @var array|null
+     * @var array
      */
-    private ?array $allowedQueryStrings = [];
+    private array $allowedQueryStrings = [];
 
     /**
      * @inheritdoc

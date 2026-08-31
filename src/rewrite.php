@@ -39,7 +39,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     return;
 }
 
-$config = require CRAFT_BASE_PATH . '/config/general.php';
+// @phpstan-ignore require.fileNotFound (Craft config exists in the runtime project)
+$config = require(CRAFT_BASE_PATH . '/config/general.php');
 if ($config instanceof GeneralConfig) {
     $tokenParam = $config->tokenParam;
 } else {

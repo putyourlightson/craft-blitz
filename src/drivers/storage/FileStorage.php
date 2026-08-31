@@ -50,14 +50,14 @@ class FileStorage extends BaseCacheStorage
     public bool $countCachedFiles = true;
 
     /**
-     * @var string|null
+     * @var string
      */
-    private ?string $cacheFolderPath;
+    private string $cacheFolderPath;
 
     /**
-     * @var array|null
+     * @var array
      */
-    private ?array $sitePaths;
+    private array $sitePaths = [];
 
     /**
      * @inheritdoc

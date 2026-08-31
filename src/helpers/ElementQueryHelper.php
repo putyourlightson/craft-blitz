@@ -200,6 +200,8 @@ class ElementQueryHelper
 
     /**
      * Returns an element query's default values.
+     *
+     * @param class-string<ElementInterface>|null $elementType
      */
     public static function getDefaultElementQueryValues(string $elementType = null): array
     {
@@ -208,7 +210,6 @@ class ElementQueryHelper
         }
 
         if (empty(self::$defaultElementQueryParams[$elementType])) {
-            /** @var ElementInterface|string $elementType */
             $elementQuery = $elementType::find();
 
             $ignoreKeys = [

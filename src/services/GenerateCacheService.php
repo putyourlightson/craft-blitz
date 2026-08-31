@@ -154,12 +154,12 @@ class GenerateCacheService extends Component
             function(EagerLoadElementsEvent $event) {
                 foreach ($event->with as $plan) {
                     // Get the eager-loading map from the source element type
-                    /** @var ElementInterface|string $sourceElementType */
+                    /** @var class-string<ElementInterface> $sourceElementType */
                     $sourceElementType = $event->elementType;
                     $map = $sourceElementType::eagerLoadingMap($event->elements, $plan->handle);
 
                     if (is_array($map)) {
-                        /** @var ElementInterface|string|null $targetElementType */
+                        /** @var class-string<ElementInterface>|null $targetElementType */
                         $targetElementType = $map['elementType'] ?? null;
                         if ($targetElementType && $this->shouldTrackElementsOfType($targetElementType)) {
                             $targetElementIds = [];
@@ -202,7 +202,7 @@ class GenerateCacheService extends Component
                 if (Craft::$app->getResponse()->getIsOk()) {
                     $variables = $event->variables;
 
-                    if (Craft::$app->getConfig()->getGeneral()->preloadSingles ?? false) {
+                    if (Craft::$app->getConfig()->getGeneral()->preloadSingles) {
                         $singles = Craft::$app->getEntries()->getSectionsByType(Section::TYPE_SINGLE);
                         $handles = array_map(fn(Section $section) => $section->handle, $singles);
                         $variables += Craft::$app->getEntries()->getSingleEntriesByHandle($handles);

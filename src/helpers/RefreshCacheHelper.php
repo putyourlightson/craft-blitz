@@ -5,7 +5,7 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use craft\base\Element;
+use craft\base\ElementInterface;
 use craft\db\Query;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Json;
@@ -143,7 +143,7 @@ class RefreshCacheHelper
             return [];
         }
 
-        /** @var Element $elementType */
+        /** @var class-string<ElementInterface> $elementType */
         $elementType = $elementQueryRecord->type;
         $elementQuery = self::getElementQueryWithParams($elementType, $params);
 
@@ -188,10 +188,11 @@ class RefreshCacheHelper
 
     /**
      * Returns an element query of the provided element type with the params applied.
+     *
+     * @param class-string<ElementInterface> $elementType
      */
     public static function getElementQueryWithParams(string $elementType, array $params): ?ElementQueryInterface
     {
-        /** @var Element $elementType */
         $elementQuery = $elementType::find();
 
         // Get elements with all statuses

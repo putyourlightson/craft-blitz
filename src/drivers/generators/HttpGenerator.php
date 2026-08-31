@@ -118,9 +118,7 @@ class HttpGenerator extends BaseCacheGenerator
                     $this->outputVerbose($url, false);
                 }
 
-                if (is_callable($setProgressHandler)) {
-                    $this->callProgressHandler($setProgressHandler, $count, $total);
-                }
+                $this->callProgressHandler($setProgressHandler, $count, $total);
             } catch (HttpException $exception) {
                 Blitz::$plugin->debug($exception->getMessage());
                 $this->outputVerbose($url, false);

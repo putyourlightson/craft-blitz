@@ -409,9 +409,11 @@ class DiagnosticsHelper
             ->asArray();
     }
 
+    /**
+     * @param class-string<ElementInterface> $elementType
+     */
     public static function getElementsFromIds(int $siteId, string $elementType, array $elementIds): array
     {
-        /** @var Element $elementType */
         return $elementType::find()
             ->siteId($siteId)
             ->status(null)

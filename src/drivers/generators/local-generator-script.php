@@ -63,11 +63,13 @@ return function(Channel $channel): void {
         // Load dotenv, depending on the available method and version.
         // https://github.com/vlucas/phpdotenv/blob/master/UPGRADING.md
         if (class_exists(Dotenv\Dotenv::class) && file_exists(CRAFT_BASE_PATH . '/.env')) {
+            $dotenvReflection = new ReflectionClass(Dotenv\Dotenv::class);
+
             // Dotenv v5
-            if (method_exists('Dotenv\Dotenv', 'createUnsafeMutable')) {
+            if ($dotenvReflection->hasMethod('createUnsafeMutable')) {
                 Dotenv\Dotenv::createUnsafeMutable(CRAFT_BASE_PATH)->safeLoad();
             } // Dotenv v3
-            elseif (method_exists('Dotenv\Dotenv', 'create')) {
+            elseif ($dotenvReflection->hasMethod('create')) {
                 /** @noinspection PhpParamsInspection */
                 /** @phpstan-ignore-next-line */
                 Dotenv\Dotenv::create(CRAFT_BASE_PATH)->load();

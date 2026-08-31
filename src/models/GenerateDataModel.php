@@ -97,7 +97,7 @@ class GenerateDataModel extends BaseDataModel
 
     public function getHasIncludes(): bool
     {
-        return $this->data['hasIncludes'] ?? false;
+        return $this->data['hasIncludes'];
     }
 
     public function addElementId(int $elementId): void

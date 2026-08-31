@@ -27,7 +27,8 @@
     "craftcms/feed-me": "^6.0",
     "craftcms/phpstan": "dev-main",
     "nystudio107/craft-seomatic": "^5.0.0",
-    "putyourlightson/craft-datastar-module": "^1.0.0-beta.7",
+    "phpstan/phpstan": "^2.0",
+    "putyourlightson/craft-datastar-module": "^1.0.0",
     "vlucas/phpdotenv": "^5.4.0",
     "yiisoft/yii2-redis": "^2.0"
   },

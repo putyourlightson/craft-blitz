@@ -64,7 +64,7 @@ class DriverJob extends BaseJob implements RetryableJobInterface
         // Get driver from ID
         $driver = Blitz::$plugin->get($this->driverId);
 
-        if ($driver !== null && is_callable([$driver, $this->driverMethod])) {
+        if (is_callable([$driver, $this->driverMethod])) {
             call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler']);
         }
     }
