@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.12.15 - Unreleased
+## 5.12.15 - 2026-09-02
 
 - Fixed a bug that could prevent cached pages from being refreshed when a batch contained both attribute or field changes and other types of element changes.
 
