@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.12.16 - 2026-09-11
+
+- Fixed a bug in which POST requests could be processed multiple times when responses contained cached includes ([#849](https://github.com/putyourlightson/craft-blitz/issues/849)).
+
 ## 5.12.15 - 2026-09-02
 
 - Fixed a bug that could prevent cached pages from being refreshed when a batch contained both attribute or field changes and other types of element changes.

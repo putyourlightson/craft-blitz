@@ -46,6 +46,20 @@ test('Cached include tag should inline includes when configured to', function() 
         ->not()->toContain('blitz-inject');
 });
 
+test('Cached includes should be inlined for POST requests', function() {
+    $request = Craft::$app->getRequest();
+    $shouldInlineIncludes = Blitz::$plugin->cacheRequest->shouldInlineIncludes;
+
+    $request->getHeaders()->set('X-Http-Method-Override', 'POST');
+    Blitz::$plugin->cacheRequest->shouldInlineIncludes = false;
+
+    expect(Blitz::$plugin->cacheRequest->shouldInlineIncludes())
+        ->toBeTrue();
+
+    $request->getHeaders()->remove('X-Http-Method-Override');
+    Blitz::$plugin->cacheRequest->shouldInlineIncludes = $shouldInlineIncludes;
+});
+
 test('Dynamic include results in inject script being registered', function() {
     Blitz::$plugin->settings->injectScriptEvent = BlitzVariable::DEFAULT_INJECT_SCRIPT_EVENT;
     $variable = new BlitzVariable();

@@ -736,7 +736,9 @@ class CacheRequestService extends Component
      */
     public function shouldInlineIncludes(): bool
     {
-        return $this->getIsPreviewOrTokenRequest() || $this->shouldInlineIncludes;
+        return !Craft::$app->getRequest()->getIsGet()
+            || $this->getIsPreviewOrTokenRequest()
+            || $this->shouldInlineIncludes;
     }
 
     /**
