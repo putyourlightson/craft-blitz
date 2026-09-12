@@ -13,7 +13,9 @@ use putyourlightson\blitz\services\RefreshCacheService;
 beforeEach(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
     Blitz::$plugin->generateCache->options->outputComments = null;
-    Blitz::$plugin->set('refreshCache', Mockery::mock(RefreshCacheService::class . '[refresh]'));
+    $refreshCache = Mockery::mock(RefreshCacheService::class . '[refresh]');
+    $refreshCache->shouldReceive('refresh')->byDefault();
+    Blitz::$plugin->set('refreshCache', $refreshCache);
 });
 
 afterAll(function() {
