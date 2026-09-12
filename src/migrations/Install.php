@@ -10,6 +10,7 @@ use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
@@ -84,7 +85,8 @@ class Install extends Migration
             $this->createTable(ElementCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
-                'PRIMARY KEY([[cacheId]], [[elementId]])',
+                'siteId' => $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY),
+                'PRIMARY KEY([[cacheId]], [[elementId]], [[siteId]])',
             ]);
         }
 
@@ -93,7 +95,8 @@ class Install extends Migration
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
                 'fieldInstanceUid' => $this->uid(),
-                'PRIMARY KEY([[cacheId]], [[elementId]], [[fieldInstanceUid]])',
+                'siteId' => $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY),
+                'PRIMARY KEY([[cacheId]], [[elementId]], [[siteId]], [[fieldInstanceUid]])',
             ]);
         }
 

@@ -85,7 +85,7 @@ class DiagnosticsHelper
     {
         return ElementCacheRecord::find()
             ->innerJoinWith('cache')
-            ->where(['siteId' => $siteId])
+            ->where([CacheRecord::tableName() . '.siteId' => $siteId])
             ->count('DISTINCT [[elementId]]');
     }
 
@@ -167,7 +167,7 @@ class DiagnosticsHelper
 
     public static function getElementTypes(int $siteId, ?int $cacheId = null): array
     {
-        $condition = ['siteId' => $siteId];
+        $condition = [CacheRecord::tableName() . '.siteId' => $siteId];
 
         if ($cacheId) {
             $condition['cacheId'] = $cacheId;
@@ -350,7 +350,7 @@ class DiagnosticsHelper
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'title'])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(DISTINCT [[elementcaches.cacheId]]) as count', 'title'])
             ->innerJoinWith('cache caches')
             ->innerJoinWith('element elements')
             ->innerJoinWith('elementSite elementsites')
@@ -376,7 +376,7 @@ class DiagnosticsHelper
 
         return ElementCacheRecord::find()
             ->from(['elementcaches' => ElementCacheRecord::tableName()])
-            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(*) as count', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
+            ->select(['elementcaches.elementId', 'elementexpirydates.expiryDate', 'count(DISTINCT [[elementcaches.cacheId]]) as count', 'sortOrder', 'ownerTitle' => 'elements_owners_sites.title', 'entryType' => 'entrytypes.name'])
             ->innerJoinWith('cache caches')
             ->innerJoinWith('element elements')
             ->innerJoin(['elements_owners' => Table::ELEMENTS_OWNERS], '[[elementcaches.elementId]] = [[elements_owners.elementId]]')
@@ -734,7 +734,7 @@ class DiagnosticsHelper
             ->select(['id', 'siteId', 'uri', 'elementCount', 'elementQueryCount', 'tagCount', 'dateCached', 'expiryDate'])
             ->leftJoin([
                 'elements' => ElementCacheRecord::find()
-                    ->select(['cacheId', 'count(*) as elementCount'])
+                    ->select(['cacheId', 'count(DISTINCT [[elementId]]) as elementCount'])
                     ->groupBy(['cacheId']),
             ], '[[caches.id]] = [[elements.cacheId]]')
             ->leftJoin([

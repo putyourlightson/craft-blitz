@@ -289,6 +289,10 @@ class ElementQueryHelper
      */
     public static function getNumericElementIds(ElementQuery $elementQuery): array
     {
+        if (is_numeric($elementQuery->id)) {
+            return [(int)$elementQuery->id];
+        }
+
         if (
             is_array($elementQuery->id)
             && ArrayHelper::isNumeric($elementQuery->id)

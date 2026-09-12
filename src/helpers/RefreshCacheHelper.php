@@ -7,11 +7,14 @@ namespace putyourlightson\blitz\helpers;
 
 use craft\base\ElementInterface;
 use craft\db\Query;
+use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Json;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\ElementCacheRecord;
+use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use Throwable;
 use yii\log\Logger;
@@ -36,28 +39,27 @@ class RefreshCacheHelper
     public static function getElementCacheIds(string $elementType, RefreshDataModel $refreshData): array
     {
         $elementIds = $refreshData->getElementIds($elementType);
-        $tableColumn = ElementCacheRecord::tableName() . '.elementId';
-        $condition = [$tableColumn => $elementIds];
+        if (empty($elementIds)) {
+            return [];
+        }
 
-        if ($refreshData->getCombinedIsChangedByFields($elementType)) {
-            $condition = ['or'];
-            $elementIdsNotChangedByFields = [];
-
-            foreach ($elementIds as $elementId) {
-                $isChangedByFields = $refreshData->getIsChangedByFields($elementType, $elementId);
-                if ($isChangedByFields) {
-                    $changedFields = $refreshData->getChangedFields($elementType, $elementId);
-                    $condition[] = [
-                        'and',
-                        [$tableColumn => $elementId],
-                        ['fieldInstanceUid' => $changedFields],
-                    ];
-                } else {
-                    $elementIdsNotChangedByFields[] = $elementId;
+        $table = ElementCacheRecord::tableName();
+        $fieldTable = ElementFieldCacheRecord::tableName();
+        $condition = ['or'];
+        foreach ($elementIds as $elementId) {
+            $elementCondition = ['and', [$table . '.elementId' => $elementId]];
+            $siteIds = $refreshData->getElementSiteIds($elementType, $elementId);
+            if ($siteIds !== null) {
+                $siteIds = array_merge([BaseDataModel::SITE_ID_ANY], $siteIds);
+                $elementCondition[] = [$table . '.siteId' => $siteIds];
+            }
+            if ($refreshData->getIsChangedByFields($elementType, $elementId)) {
+                $elementCondition[] = ['fieldInstanceUid' => $refreshData->getChangedFields($elementType, $elementId)];
+                if ($siteIds !== null) {
+                    $elementCondition[] = [$fieldTable . '.siteId' => $siteIds];
                 }
             }
-
-            $condition[] = [$tableColumn => $elementIdsNotChangedByFields];
+            $condition[] = $elementCondition;
         }
 
         return ElementCacheRecord::find()
@@ -162,9 +164,9 @@ class RefreshCacheHelper
          */
         try {
             $elementQueryIds = $elementQuery
-                ->select(['elements.id' => 'elements.id'])
+                ->select(['id' => 'elements.id', 'siteId' => 'elements_sites.siteId'])
                 ->createCommand()
-                ->queryColumn();
+                ->queryAll();
         } catch (Throwable) {
             $elementQueryRecord->delete();
         }
@@ -175,8 +177,21 @@ class RefreshCacheHelper
 
         $elementIds = $refreshData->getElementIds($elementType);
 
-        // If no element IDs are in the element query’s IDs
-        if (empty(array_intersect($elementIds, $elementQueryIds))) {
+        // Craft updates timestamps across propagated variants even when only translated content changes.
+        $usesDateUpdated = !($elementQuery instanceof ElementQuery)
+            || in_array('dateUpdated', ElementQueryHelper::getElementQueryAttributes($elementQuery), true);
+        $matches = false;
+        foreach ($elementQueryIds as $row) {
+            if (!in_array($row['id'], $elementIds)) {
+                continue;
+            }
+            $siteIds = $refreshData->getElementSiteIds($elementType, (int)$row['id']);
+            if ($usesDateUpdated || $siteIds === null || in_array((int)$row['siteId'], $siteIds, true)) {
+                $matches = true;
+                break;
+            }
+        }
+        if (!$matches) {
             return [];
         }
 

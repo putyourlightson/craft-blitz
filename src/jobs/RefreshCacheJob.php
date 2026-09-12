@@ -77,8 +77,15 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         foreach ($refreshData->getElementTypes() as $elementType) {
             /** @var ElementInterface|string $elementType */
             if ($elementType::hasUris()) {
-                $elementIds = $refreshData->getElementIds($elementType);
-                $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementIds));
+                $elementIdsBySites = [];
+                foreach ($refreshData->getElementIds($elementType) as $elementId) {
+                    $siteIds = $refreshData->getElementSiteIds($elementType, $elementId);
+                    $key = json_encode($siteIds);
+                    $elementIdsBySites[$key][] = $elementId;
+                }
+                foreach ($elementIdsBySites as $sites => $elementIds) {
+                    $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementIds, json_decode($sites, true)));
+                }
             }
         }
 

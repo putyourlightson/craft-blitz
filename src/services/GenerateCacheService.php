@@ -174,6 +174,15 @@ class GenerateCacheService extends Component
                                 $plan->criteria
                             );
                             Craft::configure($query, $criteria);
+                            if (!$query->siteId) {
+                                $siteIds = [];
+                                foreach ($event->elements as $element) {
+                                    if (!in_array($element->siteId, $siteIds, true)) {
+                                        $siteIds[] = $element->siteId;
+                                    }
+                                }
+                                $query->siteId($siteIds);
+                            }
 
                             $elements = $query->id($targetElementIds)
                                 ->status(null)
@@ -267,7 +276,7 @@ class GenerateCacheService extends Component
         // https://github.com/putyourlightson/craft-blitz/issues/555
         $numericElementIds = ElementQueryHelper::getNumericElementIds($elementQuery);
         if (!empty($numericElementIds)) {
-            $this->generateData->addElementIds($numericElementIds);
+            $this->addQueryElementIds($elementQuery, $numericElementIds);
 
             return;
         }
@@ -275,7 +284,7 @@ class GenerateCacheService extends Component
         // Don’t proceed if this is a relation field query, but add related element IDs with all statuses so that disabled elements will trigger a refresh whenever enabled.
         // https://github.com/putyourlightson/craft-blitz/issues/555
         if (ElementQueryHelper::isRelationFieldQuery($elementQuery)) {
-            $this->generateData->addElementIds(ElementQueryHelper::getRelatedElementIds($elementQuery));
+            $this->addQueryElementIds($elementQuery, ElementQueryHelper::getRelatedElementIds($elementQuery));
 
             return;
         }
@@ -737,26 +746,64 @@ class GenerateCacheService extends Component
     private function batchInsertElementCaches(int $cacheId): void
     {
         $elementIds = $this->generateData->getElementIds();
-        $elementTrackFields = $this->generateData->getElementTrackFields();
+        if (empty($elementIds)) {
+            return;
+        }
+        $validIds = ElementRecord::find()->select(['id'])->where(['id' => $elementIds])->column();
+        $elementSites = $this->generateData->getElementSiteIds();
+        $fieldSites = $this->generateData->getElementFieldSiteIds();
+        $elementRows = [];
+        $fieldRows = [];
+        foreach ($validIds as $elementId) {
+            $sites = array_fill_keys($elementSites[$elementId], true);
+            foreach ($fieldSites[$elementId] ?? [] as $field => $siteIds) {
+                foreach ($siteIds as $siteId) {
+                    $sites[$siteId] = true;
+                    $fieldRows[] = [$cacheId, $elementId, $siteId, $field];
+                }
+            }
+            foreach (array_keys($sites) as $siteId) {
+                $elementRows[] = [$cacheId, $elementId, $siteId];
+            }
+        }
 
-        $this->batchInsertCaches(
-            $cacheId,
-            $elementIds,
-            ElementRecord::tableName(),
-            ElementCacheRecord::tableName(),
-            'elementId',
-        );
+        foreach ([
+            [ElementCacheRecord::tableName(), ['cacheId', 'elementId', 'siteId'], $elementRows],
+            [ElementFieldCacheRecord::tableName(), ['cacheId', 'elementId', 'siteId', 'fieldInstanceUid'], $fieldRows],
+        ] as [$table, $columns, $rows]) {
+            foreach (array_chunk($rows, Blitz::$plugin->settings->batchInsertSize) as $chunk) {
+                try {
+                    Craft::$app->getDb()->createCommand()->batchInsert($table, $columns, $chunk)->execute();
+                } catch (Exception $exception) {
+                    Blitz::$plugin->log($exception->getMessage(), [], Logger::LEVEL_ERROR);
+                }
+            }
+        }
+    }
 
-        if (!empty($elementTrackFields)) {
-            $this->batchInsertCaches(
-                $cacheId,
-                $elementIds,
-                ElementRecord::tableName(),
-                ElementFieldCacheRecord::tableName(),
-                'elementId',
-                $elementTrackFields,
-                'fieldInstanceUid',
-            );
+    /**
+     * Keeps disabled and not-yet-created variants as dependencies without assuming the page's site.
+     *
+     * @since 5.13.0
+     */
+    private function addQueryElementIds(ElementQuery $query, array $elementIds): void
+    {
+        $sites = $query->siteId;
+        if (!$sites) {
+            $sites = Craft::$app->getSites()->getCurrentSite()->id;
+        }
+        if ($sites === '*') {
+            $sites = Craft::$app->getSites()->getAllSiteIds();
+        }
+        $sites = (array)$sites;
+        foreach ($sites as $siteId) {
+            if (!is_numeric($siteId)) {
+                $this->generateData->addElementIds($elementIds);
+                return;
+            }
+        }
+        foreach ($sites as $siteId) {
+            $this->generateData->addElementIds($elementIds, (int)$siteId);
         }
     }
 

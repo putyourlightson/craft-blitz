@@ -178,11 +178,11 @@ test('Element cache record is saved with eager-loaded matrix fields', function()
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)
-        ->toHaveRecordCount(1, ['elementId' => $entry->id])
-        ->toHaveRecordCount(1, ['elementId' => $childEntry->id])
+        ->toHaveRecordCount(1, ['elementId' => $entry->id, 'siteId' => $entry->siteId])
+        ->toHaveRecordCount(1, ['elementId' => $childEntry->id, 'siteId' => $childEntry->siteId])
         ->and(ElementFieldCacheRecord::class)
-        ->toHaveRecordCount(1, ['elementId' => $entry->id])
-        ->toHaveRecordCount(1, ['elementId' => $childEntry->id]);
+        ->toHaveRecordCount(1, ['elementId' => $entry->id, 'siteId' => $entry->siteId])
+        ->toHaveRecordCount(1, ['elementId' => $childEntry->id, 'siteId' => $childEntry->siteId]);
 });
 
 test('Element cache record is saved with eager-loaded custom fields in variable', function() {
@@ -203,7 +203,7 @@ test('Element cache record is saved for preloaded single', function() {
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)
-        ->toHaveRecordCount(1, ['elementId' => $entry->id]);
+        ->toHaveRecordCount(1, ['elementId' => $entry->id, 'siteId' => $entry->siteId]);
 });
 
 test('Element cache record is saved with eager-loaded custom fields for preloaded single', function() {
@@ -216,9 +216,9 @@ test('Element cache record is saved with eager-loaded custom fields for preloade
     Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
 
     expect(ElementCacheRecord::class)
-        ->toHaveRecordCount(1, ['elementId' => $entry->id])
+        ->toHaveRecordCount(1, ['elementId' => $entry->id, 'siteId' => $entry->siteId])
         ->and(ElementFieldCacheRecord::class)
-        ->toHaveRecordCount(1, ['elementId' => $entry->id]);
+        ->toHaveRecordCount(1, ['elementId' => $entry->id, 'siteId' => $entry->siteId]);
 });
 
 test('Element cache records are saved with all statuses for relation field queries', function() {

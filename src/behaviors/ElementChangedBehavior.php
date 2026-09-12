@@ -7,7 +7,9 @@ namespace putyourlightson\blitz\behaviors;
 
 use Craft;
 use craft\base\Element;
+use craft\base\Field;
 use craft\elements\Asset;
+use craft\elements\Entry;
 use craft\helpers\ElementHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use yii\base\Behavior;
@@ -138,6 +140,83 @@ class ElementChangedBehavior extends Behavior
         $element = $this->owner;
 
         return $element->dateDeleted !== null;
+    }
+
+    /**
+     * Returns sites affected by translatable content changes, or null for changes whose scope is global or unknown.
+     *
+     * @return int[]|null
+     * @since 5.13.0
+     */
+    public function getAffectedSiteIds(): ?array
+    {
+        $element = $this->owner;
+
+        if (!$element::isLocalized() || $this->originalElement === null
+            || $element->firstSave || $element->isNewForSite || $element->propagateAll || $element->propagateRequired
+            || $element->resaving || $this->getHasBeenDeleted() || $this->getHasStatusChanged() || $this->getHasAssetFileChanged()
+            || (!$this->isChangedByAttributes && !$this->isChangedByFields)
+        ) {
+            return null;
+        }
+
+        // Other attributes (including timestamps, structure positions and publication dates) are shared or have unknown scope.
+        foreach ($this->changedAttributes as $attribute) {
+            if (!in_array($attribute, ['title', 'slug', 'uri'], true)) {
+                return null;
+            }
+        }
+
+        $hasTitleChanged = in_array('title', $this->changedAttributes, true);
+        $hasSlugChanged = in_array('slug', $this->changedAttributes, true);
+        if ($hasTitleChanged || $hasSlugChanged) {
+            if (!($element instanceof Entry)) {
+                return null;
+            }
+            $entryType = $element->getType();
+            if (($hasTitleChanged && $entryType->titleTranslationMethod === Field::TRANSLATION_METHOD_CUSTOM)
+                || ($hasSlugChanged && $entryType->slugTranslationMethod === Field::TRANSLATION_METHOD_CUSTOM)) {
+                return null;
+            }
+        }
+
+        $fields = [];
+        foreach ($this->changedFieldsHandles as $handle) {
+            $field = $element->getFieldLayout()?->getFieldByHandle($handle);
+            if (!($field instanceof Field) || $field->translationMethod === Field::TRANSLATION_METHOD_CUSTOM) {
+                return null;
+            }
+            $fields[] = $field;
+        }
+
+        // The element’s site is implicitly affected.
+        $affectedSites = [$element->siteId];
+        foreach (ElementHelper::supportedSitesForElement($element) as $site) {
+            if (!in_array($site['siteId'], $affectedSites, true)) {
+                $variant = clone $element;
+                $variant->siteId = $site['siteId'];
+                $isAffected = false;
+                if ($hasTitleChanged) {
+                    $isAffected = $variant->getTitleTranslationKey() === $element->getTitleTranslationKey();
+                }
+                if (!$isAffected && $hasSlugChanged) {
+                    $isAffected = $variant->getSlugTranslationKey() === $element->getSlugTranslationKey();
+                }
+                if (!$isAffected) {
+                    foreach ($fields as $field) {
+                        if ($field->getTranslationKey($variant) === $field->getTranslationKey($element)) {
+                            $isAffected = true;
+                            break;
+                        }
+                    }
+                }
+                if ($isAffected) {
+                    $affectedSites[] = $site['siteId'];
+                }
+            }
+        }
+
+        return $affectedSites;
     }
 
     /**

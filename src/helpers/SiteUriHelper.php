@@ -304,11 +304,12 @@ class SiteUriHelper
      * Returns the site URIs of an array of element IDs.
      *
      * @param int[] $elementIds
+     * @param int[]|null $siteIds
      * @return SiteUriModel[]
      */
-    public static function getElementSiteUris(array $elementIds): array
+    public static function getElementSiteUris(array $elementIds, ?array $siteIds = null): array
     {
-        if (empty($elementIds)) {
+        if (empty($elementIds) || $siteIds === []) {
             return [];
         }
 
@@ -321,6 +322,7 @@ class SiteUriHelper
             $siteUris = Element_SiteSettings::find()
                 ->select(['siteId', 'uri'])
                 ->where(['elementId' => $elementIds])
+                ->andFilterWhere(['siteId' => $siteIds])
                 ->andWhere([
                     'not',
                     ['uri' => null],
