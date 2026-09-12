@@ -6,6 +6,7 @@
 
 use craft\elements\Asset;
 use craft\elements\Entry;
+use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
@@ -157,7 +158,7 @@ test('Asset is tracked when its file is replaced', function() {
 
 test('Asset is tracked when its filename is changed', function() {
     $asset = createAsset();
-    $asset->newFilename = 'new-filename-' . rand(1, 100) . '.jpg';
+    $asset->newFilename = 'new-filename-' . StringHelper::randomString() . '.jpg';
     Craft::$app->getElements()->saveElement($asset);
     Blitz::$plugin->refreshCache->addElement($asset);
 
