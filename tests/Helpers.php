@@ -146,6 +146,9 @@ function createProductVariantOrder(bool $inventoryTracked = false): array
     ]);
 
     Craft::$app->elements->saveElement($variant);
+    if ($inventoryTracked) {
+        Plugin::getInstance()->getInventory()->updatePurchasableInventoryLevel($variant, 100);
+    }
 
     $variant->attachBehavior(ElementChangedBehavior::BEHAVIOR_NAME, ElementChangedBehavior::class);
 
