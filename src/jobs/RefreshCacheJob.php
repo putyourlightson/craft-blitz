@@ -13,6 +13,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\models\RefreshDataModel;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
@@ -75,16 +76,17 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         // Merge in site URIs of element IDs to ensure that uncached elements are also generated
         foreach ($refreshData->getElementTypes() as $elementType) {
-            /** @var ElementInterface|string $elementType */
+            /** @var class-string<ElementInterface> $elementType */
             if ($elementType::hasUris()) {
-                $elementIdsBySites = [];
+                $elementGroups = [];
                 foreach ($refreshData->getElementIds($elementType) as $elementId) {
                     $siteIds = $refreshData->getElementSiteIds($elementType, $elementId);
-                    $key = json_encode($siteIds);
-                    $elementIdsBySites[$key][] = $elementId;
+                    $siteIdsKey = $siteIds === null ? BaseDataModel::SITE_ID_ANY : implode(',', $siteIds);
+                    $elementGroups[$siteIdsKey]['siteIds'] = $siteIds;
+                    $elementGroups[$siteIdsKey]['elementIds'][] = $elementId;
                 }
-                foreach ($elementIdsBySites as $sites => $elementIds) {
-                    $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementIds, json_decode($sites, true)));
+                foreach ($elementGroups as $elementGroup) {
+                    $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementGroup['elementIds'], $elementGroup['siteIds']));
                 }
             }
         }

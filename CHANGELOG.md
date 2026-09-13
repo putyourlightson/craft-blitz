@@ -2,6 +2,9 @@
 
 ## 5.13.0 - Unreleased
 
+> [!NOTE]
+> The cache should be cleared or refreshed after this update completes.
+
 - Added site-aware element and field dependency tracking.
 - Improved cache refreshes for translated content so that only affected site variants and pages depending on them are refreshed ([#803](https://github.com/putyourlightson/craft-blitz/issues/803)).
 

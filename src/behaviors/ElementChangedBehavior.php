@@ -191,6 +191,7 @@ class ElementChangedBehavior extends Behavior
 
         // The element’s site is implicitly affected.
         $affectedSites = [$element->siteId];
+
         foreach (ElementHelper::supportedSitesForElement($element) as $site) {
             if (!in_array($site['siteId'], $affectedSites, true)) {
                 $variant = clone $element;
