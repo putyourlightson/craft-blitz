@@ -34,6 +34,7 @@ use putyourlightson\blitz\helpers\BacktraceHelper;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
 use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\models\CacheOptionsModel;
 use putyourlightson\blitz\models\GenerateDataModel;
 use putyourlightson\blitz\models\SettingsModel;
@@ -45,6 +46,7 @@ use putyourlightson\blitz\records\ElementQueryAttributeRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\ElementQuerySiteRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
@@ -392,6 +394,7 @@ class GenerateCacheService extends Component
 
                 $queryId = (int)$db->getLastInsertID();
 
+                $this->saveElementQuerySites($elementQuery, $queryId);
                 $this->saveElementQuerySources($elementQuery, $queryId);
                 $this->saveElementQueryAttributes($elementQuery, $queryId);
                 $this->saveElementQueryFields($elementQuery, $queryId);
@@ -405,6 +408,36 @@ class GenerateCacheService extends Component
         }
 
         $mutex->release($lockName);
+    }
+
+    /**
+     * Saves an element query's sites.
+     */
+    public function saveElementQuerySites(ElementQuery $elementQuery, int $queryId): void
+    {
+        $siteIds = $elementQuery->siteId;
+
+        if (in_array('dateUpdated', ElementQueryHelper::getElementQueryAttributes($elementQuery), true)) {
+            $siteIds = BaseDataModel::SITE_ID_ANY;
+        } elseif (!$siteIds) {
+            $siteIds = Craft::$app->getSites()->getCurrentSite()->id;
+        }
+
+        $siteIds = (array)$siteIds;
+        foreach ($siteIds as $siteId) {
+            if (!is_numeric($siteId)) {
+                $siteIds = [BaseDataModel::SITE_ID_ANY];
+                break;
+            }
+        }
+
+        $siteIds = array_unique(array_map('intval', $siteIds));
+        $this->batchInsertQueries(
+            $queryId,
+            $siteIds,
+            ElementQuerySiteRecord::tableName(),
+            'siteId',
+        );
     }
 
     /**

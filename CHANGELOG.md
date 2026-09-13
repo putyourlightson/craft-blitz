@@ -5,7 +5,7 @@
 > [!NOTE]
 > The cache should be cleared or refreshed after this update completes.
 
-- Added site-aware element and field dependency tracking.
+- Added site-aware element, field and element query dependency tracking.
 - Improved cache refreshes for translated content so that only affected site variants and pages depending on them are refreshed ([#803](https://github.com/putyourlightson/craft-blitz/issues/803)).
 
 ## 5.12.16 - 2026-09-11

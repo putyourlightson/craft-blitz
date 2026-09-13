@@ -2,6 +2,7 @@
 
 use craft\base\Field;
 use craft\elements\Entry;
+use craft\helpers\Json;
 use markhuot\craftpest\test\TestCase;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
@@ -16,6 +17,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\ElementQuerySiteRecord;
 use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use yii\base\Event;
@@ -129,8 +131,22 @@ test('SiteAware query matching respects the queried variant rather than the cach
     }
     $data = new RefreshDataModel();
     $data->addElementId(Entry::class, $this->entry->id, [$this->entry->siteId]);
-    expect(RefreshCacheHelper::getElementQueryCacheIds($records[$this->entry->siteId], $data))->toHaveCount(1)
-        ->and(RefreshCacheHelper::getElementQueryCacheIds($records[$this->otherSiteId], $data))->toBeEmpty();
+    $data->addSourceId(Entry::class, $this->entry->sectionId);
+    $queryRecords = RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $data);
+    expect($queryRecords)->toHaveCount(1)
+        ->and($queryRecords[0]->id)->toBe($records[$this->entry->siteId]->id)
+        ->and(ElementQuerySiteRecord::find()->select(['siteId'])->where(['queryId' => $records[$this->entry->siteId]->id])->column())->toBe([$this->entry->siteId])
+        ->and(ElementQuerySiteRecord::find()->select(['siteId'])->where(['queryId' => $records[$this->otherSiteId]->id])->column())->toBe([$this->otherSiteId]);
+    expect(RefreshCacheHelper::getElementQueryCacheIds($records[$this->entry->siteId], $data))->toHaveCount(1);
+
+    // Use an invalid order column to prove that the other-site query is not executed.
+    $otherSiteRecord = $records[$this->otherSiteId];
+    $params = Json::decode($otherSiteRecord->params);
+    $params['orderBy'] = ['invalidColumn' => SORT_ASC];
+    $otherSiteRecord->params = Json::encode($params);
+    $otherSiteRecord->save(false);
+    expect(RefreshCacheHelper::getElementQueryCacheIds($otherSiteRecord, $data))->toBeEmpty()
+        ->and(ElementQueryRecord::findOne($otherSiteRecord->id))->not->toBeNull();
 });
 
 test('SiteAware shared fields and global status changes retain all affected variants', function() {
@@ -202,12 +218,17 @@ test('SiteAware ID queries retain explicit and wildcard site dependencies', func
 });
 
 test('SiteAware multi-site and timestamp queries still refresh when affected', function() {
-    foreach ([Entry::find()->site('*'), Entry::find()->siteId($this->otherSiteId)->orderBy(['dateUpdated' => SORT_DESC])] as $query) {
+    $queries = [
+        [Entry::find()->site('*'), [$this->entry->siteId, $this->otherSiteId]],
+        [Entry::find()->siteId($this->otherSiteId)->orderBy(['dateUpdated' => SORT_DESC]), [BaseDataModel::SITE_ID_ANY]],
+    ];
+    foreach ($queries as [$query, $expectedSiteIds]) {
         $generate = Blitz::$plugin->generateCache;
         $generate->reset();
         $query->sectionId($this->entry->sectionId)->limit(100);
         $generate->saveElementQuery($query);
         $record = ElementQueryRecord::find()->orderBy(['id' => SORT_DESC])->one();
+        expect(ElementQuerySiteRecord::find()->select(['siteId'])->where(['queryId' => $record->id])->column())->toBe($expectedSiteIds);
         $generate->save('Site-aware query', createSiteUri($this->entry->siteId, 'site-aware/multi-' . $record->id));
         $data = new RefreshDataModel();
         $data->addElementId(Entry::class, $this->entry->id, [$this->entry->siteId]);

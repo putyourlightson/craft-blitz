@@ -16,6 +16,7 @@ use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\ElementQuerySiteRecord;
 use Throwable;
 use yii\log\Logger;
 
@@ -84,13 +85,30 @@ class RefreshCacheHelper
         $query = ElementQueryRecord::find()
             ->where(['type' => $elementType]);
 
+        $affectedSiteIds = [];
+        foreach ($refreshData->getElementIds($elementType) as $elementId) {
+            $siteIds = $refreshData->getElementSiteIds($elementType, $elementId);
+            if ($siteIds === null) {
+                $affectedSiteIds = null;
+                break;
+            }
+            array_push($affectedSiteIds, ...$siteIds);
+        }
+
+        if ($affectedSiteIds !== null) {
+            if ($affectedSiteIds === []) {
+                return [];
+            }
+            $affectedSiteIds[] = BaseDataModel::SITE_ID_ANY;
+            $siteTable = ElementQuerySiteRecord::tableName();
+            $query->innerJoinWith('elementQuerySites', false)
+                ->andWhere([$siteTable . '.siteId' => array_unique($affectedSiteIds)]);
+        }
+
         // Ignore element queries linked to cache IDs that we already have, or not linked to any cache IDs.
         $ignoreCacheIds = $refreshData->getCacheIds();
         $query->innerJoinWith('elementQueryCaches', false)
-            ->andWhere([
-                'not',
-                ['cacheId' => $ignoreCacheIds],
-            ]);
+            ->andWhere(['not', ['cacheId' => $ignoreCacheIds]]);
 
         // Limit to queries without any sources or with sources in `sourceIds`.
         $sourceIds = $refreshData->getSourceIds($elementType);
@@ -155,6 +173,16 @@ class RefreshCacheHelper
             return [];
         }
 
+        $elementIds = $refreshData->getElementIds($elementType);
+
+        // Craft updates timestamps across propagated variants even when only translated content changes.
+        $usesDateUpdated = !($elementQuery instanceof ElementQuery)
+            || in_array('dateUpdated', ElementQueryHelper::getElementQueryAttributes($elementQuery), true);
+
+        if (!$usesDateUpdated && !self::elementQueryMatchesAffectedSites($elementQuery, $elementType, $elementIds, $refreshData)) {
+            return [];
+        }
+
         $elementQueryIds = [];
         /**
          * Execute the element query, deleting the record if any exception is thrown.
@@ -175,11 +203,6 @@ class RefreshCacheHelper
             return [];
         }
 
-        $elementIds = $refreshData->getElementIds($elementType);
-
-        // Craft updates timestamps across propagated variants even when only translated content changes.
-        $usesDateUpdated = !($elementQuery instanceof ElementQuery)
-            || in_array('dateUpdated', ElementQueryHelper::getElementQueryAttributes($elementQuery), true);
         $matches = false;
         foreach ($elementQueryIds as $row) {
             if (!in_array($row['id'], $elementIds)) {
@@ -199,6 +222,37 @@ class RefreshCacheHelper
         return $elementQueryRecord->getElementQueryCaches()
             ->select(['cacheId'])
             ->column();
+    }
+
+    /**
+     * Returns whether an element query includes a site affected by the refresh data.
+     *
+     * @param class-string<ElementInterface> $elementType
+     * @param int[] $elementIds
+     */
+    private static function elementQueryMatchesAffectedSites(ElementQuery $elementQuery, string $elementType, array $elementIds, RefreshDataModel $refreshData): bool
+    {
+        $querySiteIds = (array)$elementQuery->siteId;
+
+        if ($querySiteIds === [] || in_array('*', $querySiteIds, true)) {
+            return true;
+        }
+
+        foreach ($querySiteIds as $querySiteId) {
+            if (!is_numeric($querySiteId)) {
+                return true;
+            }
+        }
+
+        $querySiteIds = array_map('intval', $querySiteIds);
+        foreach ($elementIds as $elementId) {
+            $affectedSiteIds = $refreshData->getElementSiteIds($elementType, $elementId);
+            if ($affectedSiteIds === null || array_intersect($querySiteIds, $affectedSiteIds) !== []) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

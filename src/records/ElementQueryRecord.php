@@ -20,6 +20,7 @@ use yii\db\ActiveQuery;
  * @property-read ElementQuerySourceRecord[] $elementQuerySources
  * @property-read ElementQueryAttributeRecord[] $elementQueryAttributes
  * @property-read ElementQueryFieldRecord[] $elementQueryFields
+ * @property-read ElementQuerySiteRecord[] $elementQuerySites
  */
 class ElementQueryRecord extends ActiveRecord
 {
@@ -61,5 +62,13 @@ class ElementQueryRecord extends ActiveRecord
     public function getElementQueryFields(): ActiveQuery
     {
         return $this->hasMany(ElementQueryFieldRecord::class, ['queryId' => 'id']);
+    }
+
+    /**
+     * Returns the associated element query sites
+     */
+    public function getElementQuerySites(): ActiveQuery
+    {
+        return $this->hasMany(ElementQuerySiteRecord::class, ['queryId' => 'id']);
     }
 }
