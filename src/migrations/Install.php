@@ -94,8 +94,8 @@ class Install extends Migration
             $this->createTable(ElementFieldCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
-                'fieldInstanceUid' => $this->uid(),
                 'siteId' => $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY),
+                'fieldInstanceUid' => $this->uid(),
                 'PRIMARY KEY([[cacheId]], [[elementId]], [[siteId]], [[fieldInstanceUid]])',
             ]);
         }

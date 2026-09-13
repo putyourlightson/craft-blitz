@@ -16,7 +16,7 @@ class m260911_120000_add_siteid_columns extends Migration
         foreach ($tables as $table) {
             if (!$this->db->columnExists($table, 'siteId')) {
                 // Retain old dependencies as unknown-site dependencies until the page is generated again.
-                $this->addColumn($table, 'siteId', $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY));
+                $this->addColumn($table, 'siteId', $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY)->after('elementId'));
 
                 // MySQL needs a separate index for the cacheId foreign key while replacing the primary key.
                 $primaryKey = $this->db->getSchema()->getTablePrimaryKey($table);
