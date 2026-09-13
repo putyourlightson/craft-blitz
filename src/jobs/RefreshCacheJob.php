@@ -86,7 +86,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
                     $elementGroups[$siteIdsKey]['elementIds'][] = $elementId;
                 }
                 foreach ($elementGroups as $elementGroup) {
-                    $siteUris = array_merge($siteUris, SiteUriHelper::getElementSiteUris($elementGroup['elementIds'], $elementGroup['siteIds']));
+                    array_push($siteUris, ...SiteUriHelper::getElementSiteUris($elementGroup['elementIds'], $elementGroup['siteIds']));
                 }
             }
         }
