@@ -382,7 +382,7 @@ class RefreshCacheService extends Component
 
         // If SSI is enabled, merge site URIs from SSI includes into purgeable site URIs.
         if (Blitz::$plugin->settings->ssiEnabled) {
-            $purgeableSiteUris = array_merge($purgeableSiteUris, $this->getSsiIncludeSiteUris($siteUris));
+            array_push($purgeableSiteUris, ...$this->getSsiIncludeSiteUris($siteUris));
         }
 
         if (Blitz::$plugin->settings->shouldClearOnRefresh($forceClear)) {
