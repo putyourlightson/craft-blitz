@@ -18,9 +18,6 @@ use putyourlightson\blitz\models\RefreshDataModel;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
-/**
- * TODO: make this job batchable.
- */
 class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 {
     /**
