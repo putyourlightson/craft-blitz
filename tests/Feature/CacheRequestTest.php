@@ -101,15 +101,14 @@ test('Requested cacheable site URI does not include query strings when urls cach
         ->toBe('page');
 });
 
-// TODO: figure out why a `Page Not Found` error is thrown.
 test('Requested cacheable site URI includes page trigger', function() {
     Craft::$app->config->general->pageTrigger = 'p';
-    sendRequest('page/p1');
+    sendRequest('page/p2');
     $siteUri = Blitz::$plugin->cacheRequest->getRequestedCacheableSiteUri();
 
     expect($siteUri->uri)
-        ->toBe('page/p1');
-})->todo();
+        ->toBe('page/p2');
+});
 
 test('Requested cacheable site URI works with regular expressions', function() {
     Blitz::$plugin->settings->excludedQueryStringParams = [

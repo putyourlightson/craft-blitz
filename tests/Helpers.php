@@ -21,7 +21,8 @@ use craft\records\Entry as EntryRecord;
 use Faker\Factory as FakerFactory;
 use markhuot\craftpest\factories\Asset as AssetFactory;
 use markhuot\craftpest\factories\Entry as EntryFactory;
-use markhuot\craftpest\http\RequestBuilder;
+use markhuot\craftpest\http\RequestHandler;
+use markhuot\craftpest\http\requests\GetRequest;
 use markhuot\craftpest\web\TestableResponse;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
@@ -170,7 +171,12 @@ function createProductVariantOrder(bool $inventoryTracked = false): array
 
 function sendRequest(string $uri = ''): TestableResponse
 {
-    $response = (new RequestBuilder('get', $uri))->send();
+    $request = GetRequest::make($uri);
+
+    // Parse routing details such as page triggers after the URI is populated.
+    $request->init();
+
+    $response = (new RequestHandler())->handle($request);
     $response->trigger(Response::EVENT_AFTER_PREPARE);
 
     return $response;
