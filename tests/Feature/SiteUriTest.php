@@ -67,3 +67,38 @@ test('Site URIs containing the homepage URI are converted to an empty string', f
     expect($siteUri->uri)
         ->toBe('');
 });
+
+test('Site URIs are matched using complete base URL path segments', function() {
+    $primarySite = Craft::$app->getSites()->getPrimarySite();
+    $secondarySite = Craft::$app->getSites()->getSiteByHandle('deutsch');
+    $primaryBaseUrl = rtrim($primarySite->getBaseUrl(), '/');
+    $secondaryBaseUrl = rtrim($secondarySite->getBaseUrl(), '/');
+    $secondaryBasePath = trim(parse_url($secondaryBaseUrl, PHP_URL_PATH), '/');
+
+    $secondaryHomepage = SiteUriHelper::getSiteUriFromUrl($secondaryBaseUrl);
+    $secondaryHomepageWithSlash = SiteUriHelper::getSiteUriFromUrl($secondaryBaseUrl . '/');
+    $secondaryHomepageWithQuery = SiteUriHelper::getSiteUriFromUrl($secondaryBaseUrl . '?foo=bar');
+    $secondaryPage = SiteUriHelper::getSiteUriFromUrl($secondaryBaseUrl . '/page');
+    $primaryPage = SiteUriHelper::getSiteUriFromUrl($primaryBaseUrl . '/' . $secondaryBasePath . 'utsch/page');
+
+    expect($secondaryHomepage->siteId)
+        ->toBe($secondarySite->id)
+        ->and($secondaryHomepage->uri)
+        ->toBe('')
+        ->and($secondaryHomepageWithSlash->siteId)
+        ->toBe($secondarySite->id)
+        ->and($secondaryHomepageWithSlash->uri)
+        ->toBe('')
+        ->and($secondaryHomepageWithQuery->siteId)
+        ->toBe($secondarySite->id)
+        ->and($secondaryHomepageWithQuery->uri)
+        ->toBe('?foo=bar')
+        ->and($secondaryPage->siteId)
+        ->toBe($secondarySite->id)
+        ->and($secondaryPage->uri)
+        ->toBe('page')
+        ->and($primaryPage->siteId)
+        ->toBe($primarySite->id)
+        ->and($primaryPage->uri)
+        ->toBe($secondaryBasePath . 'utsch/page');
+});

@@ -7,6 +7,7 @@
 
 - Added site-aware element, field and element query dependency tracking.
 - Improved cache refreshes for translated content so that only affected site variants and pages depending on them are refreshed ([#803](https://github.com/putyourlightson/craft-blitz/issues/803)).
+- Fixed an infinite cache refresh loop that could occur when page generation failed in multi-site setups with overlapping site URI prefixes ([#917](https://github.com/putyourlightson/craft-blitz/issues/917)).
 
 ## 5.12.16 - 2026-09-11
 
