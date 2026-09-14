@@ -523,9 +523,7 @@ class SiteUriHelper
     /**
      * Returns site URI from a given URL.
      *
-     * This method looks for the site with the longest base URL that matches
-     * the provided URL. For example, the URL `site.com/en/page` will match
-     * the site with base URL `site.com/en` over `site.com`.
+     * This method looks for the site with the longest base URL that matches the provided URL. For example, the URL `site.com/en/page` will match the site with base URL `site.com/en` over `site.com`.
      */
     public static function getSiteUriFromUrl(string $url): ?SiteUriModel
     {

@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.13.0 - Unreleased
+## 5.13.0 - 2026-09-14
 
 > [!NOTE]
 > The cache should be cleared or refreshed after this update completes.
