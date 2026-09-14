@@ -13,6 +13,7 @@ use craft\records\Element_SiteSettings;
 /**
  * @property int $cacheId
  * @property int $elementId
+ * @property int $siteId
  * @property-read CacheRecord $cache
  * @property-read ElementFieldCacheRecord[] $elementFieldCaches
  */

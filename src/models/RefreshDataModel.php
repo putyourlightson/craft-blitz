@@ -30,6 +30,7 @@ class RefreshDataModel extends BaseDataModel
      *          elements: array<string, array{
      *              sourceIds: array<int, bool>,
      *              elementIds: array<int, bool>,
+     *              siteIds?: array<int, array<int, bool>>,
      *              changedAttributes: array<int, array<string, bool>>,
      *              changedFields: array<int, array<string, bool>>,
      *              isChangedByAttributes: array<int, bool>,
@@ -186,9 +187,36 @@ class RefreshDataModel extends BaseDataModel
         $this->data['elements'][$elementType]['sourceIds'][$sourceId] = true;
     }
 
-    public function addElementId(string $elementType, int $elementId): void
+    public function addElementId(string $elementType, int $elementId, ?array $siteIds = null): void
     {
-        $this->data['elements'][$elementType]['elementIds'][$elementId] = true;
+        $siteIds = $siteIds ?? [BaseDataModel::SITE_ID_ANY];
+        $elementTypeData = &$this->data['elements'][$elementType];
+
+        if (isset($elementTypeData['elementIds'][$elementId]) && !isset($elementTypeData['siteIds'][$elementId])) {
+            $elementTypeData['siteIds'][$elementId][BaseDataModel::SITE_ID_ANY] = true;
+        }
+
+        $elementTypeData['elementIds'][$elementId] = true;
+
+        foreach ($siteIds as $siteId) {
+            $elementTypeData['siteIds'][$elementId][$siteId] = true;
+        }
+    }
+
+    /**
+     * Returns null when any site may be affected.
+     *
+     * @return int[]|null
+     */
+    public function getElementSiteIds(string $elementType, int $elementId): ?array
+    {
+        $sites = $this->data['elements'][$elementType]['siteIds'][$elementId] ?? self::SITE_IDS_ANY;
+
+        if (isset($sites[BaseDataModel::SITE_ID_ANY])) {
+            return null;
+        }
+
+        return array_keys($sites);
     }
 
     public function addElementIds(string $elementType, array $elementIds): void
@@ -200,7 +228,7 @@ class RefreshDataModel extends BaseDataModel
 
     public function addElement(ElementInterface $element, ?ElementChangedBehavior $elementChanged = null): void
     {
-        $this->addElementId($element::class, $element->id);
+        $this->addElementId($element::class, $element->id, $elementChanged?->getAffectedSiteIds());
 
         $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($element::class);
         if ($sourceIdAttribute !== null) {

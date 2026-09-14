@@ -304,11 +304,12 @@ class SiteUriHelper
      * Returns the site URIs of an array of element IDs.
      *
      * @param int[] $elementIds
+     * @param int[]|null $siteIds
      * @return SiteUriModel[]
      */
-    public static function getElementSiteUris(array $elementIds): array
+    public static function getElementSiteUris(array $elementIds, ?array $siteIds = null): array
     {
-        if (empty($elementIds)) {
+        if (empty($elementIds) || $siteIds === []) {
             return [];
         }
 
@@ -317,16 +318,18 @@ class SiteUriHelper
         $elementIdChunks = self::getChunkedQueryParams($elementIds);
         foreach ($elementIdChunks as $elementIds) {
             // Get the site URIs of the elements themselves
-            /** @var array $siteUris */
-            $siteUris = Element_SiteSettings::find()
+            $query = Element_SiteSettings::find()
                 ->select(['siteId', 'uri'])
                 ->where(['elementId' => $elementIds])
-                ->andWhere([
-                    'not',
-                    ['uri' => null],
-                ])
-                ->asArray()
-                ->all();
+                ->andWhere(['not', ['uri' => null]])
+                ->asArray();
+
+            if ($siteIds !== null) {
+                $query->andWhere(['siteId' => $siteIds]);
+            }
+
+            /** @var array $siteUris */
+            $siteUris = $query->all();
 
             foreach ($siteUris as $siteUri) {
                 $siteUriModels[] = new SiteUriModel($siteUri);

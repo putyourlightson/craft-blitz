@@ -1,5 +1,13 @@
 # Release Notes for Blitz
 
+## 5.13.0 - Unreleased
+
+> [!NOTE]
+> The cache should be cleared or refreshed after this update completes.
+
+- Added site-aware element, field and element query dependency tracking.
+- Improved cache refreshes for translated content so that only affected site variants and pages depending on them are refreshed ([#803](https://github.com/putyourlightson/craft-blitz/issues/803)).
+
 ## 5.12.16 - 2026-09-11
 
 - Fixed a bug in which POST requests could be processed multiple times when responses contained cached includes ([#849](https://github.com/putyourlightson/craft-blitz/issues/849)).

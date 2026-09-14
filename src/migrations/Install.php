@@ -10,6 +10,7 @@ use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
@@ -20,6 +21,7 @@ use putyourlightson\blitz\records\ElementQueryAttributeRecord;
 use putyourlightson\blitz\records\ElementQueryCacheRecord;
 use putyourlightson\blitz\records\ElementQueryFieldRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
+use putyourlightson\blitz\records\ElementQuerySiteRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\IncludeRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
@@ -50,6 +52,7 @@ class Install extends Migration
         $this->dropTableIfExists(DriverDataRecord::tableName());
         $this->dropTableIfExists(ElementQueryFieldRecord::tableName());
         $this->dropTableIfExists(ElementQueryAttributeRecord::tableName());
+        $this->dropTableIfExists(ElementQuerySiteRecord::tableName());
         $this->dropTableIfExists(ElementQuerySourceRecord::tableName());
         $this->dropTableIfExists(ElementQueryCacheRecord::tableName());
         $this->dropTableIfExists(ElementQueryRecord::tableName());
@@ -84,7 +87,8 @@ class Install extends Migration
             $this->createTable(ElementCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
-                'PRIMARY KEY([[cacheId]], [[elementId]])',
+                'siteId' => $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY),
+                'PRIMARY KEY([[cacheId]], [[elementId]], [[siteId]])',
             ]);
         }
 
@@ -92,8 +96,9 @@ class Install extends Migration
             $this->createTable(ElementFieldCacheRecord::tableName(), [
                 'cacheId' => $this->integer()->notNull(),
                 'elementId' => $this->integer()->notNull(),
+                'siteId' => $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY),
                 'fieldInstanceUid' => $this->uid(),
-                'PRIMARY KEY([[cacheId]], [[elementId]], [[fieldInstanceUid]])',
+                'PRIMARY KEY([[cacheId]], [[elementId]], [[siteId]], [[fieldInstanceUid]])',
             ]);
         }
 
@@ -118,6 +123,14 @@ class Install extends Migration
                 'queryId' => $this->integer()->notNull(),
                 'sourceId' => $this->integer()->notNull(),
                 'PRIMARY KEY([[queryId]], [[sourceId]])',
+            ]);
+        }
+
+        if (!$this->db->tableExists(ElementQuerySiteRecord::tableName())) {
+            $this->createTable(ElementQuerySiteRecord::tableName(), [
+                'queryId' => $this->integer()->notNull(),
+                'siteId' => $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY),
+                'PRIMARY KEY([[queryId]], [[siteId]])',
             ]);
         }
 
@@ -226,6 +239,7 @@ class Install extends Migration
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryCacheRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQuerySourceRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, ElementQuerySiteRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryAttributeRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementQueryFieldRecord::tableName(), 'queryId', ElementQueryRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, CacheTagRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');

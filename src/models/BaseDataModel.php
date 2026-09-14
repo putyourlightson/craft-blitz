@@ -17,6 +17,18 @@ use craft\base\Model;
 abstract class BaseDataModel extends Model
 {
     /**
+     * Site ID used when any site may be affected.
+     *
+     * @since 5.13.0
+     */
+    public const SITE_ID_ANY = 0;
+
+    /**
+     * @since 5.13.0
+     */
+    protected const SITE_IDS_ANY = [self::SITE_ID_ANY => true];
+
+    /**
      * @var array
      */
     public array $data = [];

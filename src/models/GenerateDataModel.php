@@ -14,7 +14,8 @@ use putyourlightson\blitz\helpers\FieldHelper;
  * request.
  *
  * @property-read int[] $elementIds
- * @property-read int[][] $elementIndexedTrackFields
+ * @property-read array<int, int[]> $elementSiteIds
+ * @property-read array<int, string[]> $elementTrackFields
  * @property-read int[] $elementQueryIds
  * @property-read int[] $ssiIncludeIds
  * @property bool $hasIncludes
@@ -28,6 +29,8 @@ class GenerateDataModel extends BaseDataModel
      *          elements: array{
      *              elementIds: array<int, bool>,
      *              trackFields: array<int, array<string, bool>>,
+     *              siteIds: array<int, array<int, bool>>,
+     *              siteTrackFields: array<int, array<string, array<int, bool>>>,
      *          },
      *          elementQueries: array<string, array<int, array<string, mixed>>>,
      *          ssiIncludeIds: array<int, bool>,
@@ -38,6 +41,8 @@ class GenerateDataModel extends BaseDataModel
         'elements' => [
             'elementIds' => [],
             'trackFields' => [],
+            'siteIds' => [],
+            'siteTrackFields' => [],
         ],
         'elementQueries' => [],
         'ssiIncludeIds' => [],
@@ -45,21 +50,67 @@ class GenerateDataModel extends BaseDataModel
     ];
 
     /**
+     * Returns element IDs, optionally limited to a site, including dependencies with an unknown site.
+     *
      * @return int[]
      */
-    public function getElementIds(): array
+    public function getElementIds(?int $siteId = null): array
     {
+        if ($siteId !== null) {
+            $elementIds = [];
+            foreach ($this->getElementSiteIds() as $elementId => $siteIds) {
+                if (in_array($siteId, $siteIds, true) || in_array(BaseDataModel::SITE_ID_ANY, $siteIds, true)) {
+                    $elementIds[] = $elementId;
+                }
+            }
+
+            return $elementIds;
+        }
+
         return $this->getKeysAsValues(['elements', 'elementIds']);
     }
 
     /**
-     * @return string[][]
+     * Returns tracked site IDs for each element. SITE_ID_ANY represents an unknown site.
+     *
+     * @return array<int, int[]>
+     * @since 5.13.0
      */
-    public function getElementTrackFields(): array
+    public function getElementSiteIds(): array
+    {
+        $siteIds = [];
+
+        foreach ($this->getElementIds() as $elementId) {
+            $siteIds[$elementId] = array_keys($this->data['elements']['siteIds'][$elementId] ?? self::SITE_IDS_ANY);
+        }
+
+        return $siteIds;
+    }
+
+    /**
+     * Returns tracked fields, optionally limited to a site, including dependencies with an unknown site.
+     *
+     * @return array<int, string[]>
+     */
+    public function getElementTrackFields(?int $siteId = null): array
     {
         $trackFields = [];
+        $elementFields = $this->data['elements']['trackFields'];
 
-        foreach ($this->data['elements']['trackFields'] as $elementId => $fields) {
+        if ($siteId !== null) {
+            foreach ($elementFields as $elementId => $fields) {
+                $elementFields[$elementId] = array_filter($fields, function(string $fieldInstanceUid) use ($elementId, $siteId) {
+                    $siteIds = $this->data['elements']['siteTrackFields'][$elementId][$fieldInstanceUid] ?? self::SITE_IDS_ANY;
+
+                    return isset($siteIds[$siteId]) || isset($siteIds[BaseDataModel::SITE_ID_ANY]);
+                }, ARRAY_FILTER_USE_KEY);
+                if (empty($elementFields[$elementId])) {
+                    unset($elementFields[$elementId]);
+                }
+            }
+        }
+
+        foreach ($elementFields as $elementId => $fields) {
             $trackFields[$elementId] = array_keys($fields);
         }
 
@@ -100,15 +151,19 @@ class GenerateDataModel extends BaseDataModel
         return $this->data['hasIncludes'];
     }
 
-    public function addElementId(int $elementId): void
+    public function addElementId(int $elementId, ?int $siteId = null): void
     {
+        if (isset($this->data['elements']['elementIds'][$elementId]) && !isset($this->data['elements']['siteIds'][$elementId])) {
+            $this->data['elements']['siteIds'][$elementId][BaseDataModel::SITE_ID_ANY] = true;
+        }
         $this->data['elements']['elementIds'][$elementId] = true;
+        $this->data['elements']['siteIds'][$elementId][$siteId ?? BaseDataModel::SITE_ID_ANY] = true;
     }
 
-    public function addElementIds(array $elementIds): void
+    public function addElementIds(array $elementIds, ?int $siteId = null): void
     {
         foreach ($elementIds as $elementId) {
-            $this->addElementId($elementId);
+            $this->addElementId($elementId, $siteId);
         }
     }
 
@@ -118,25 +173,58 @@ class GenerateDataModel extends BaseDataModel
             return;
         }
 
-        $this->addElementId($element->id);
+        $this->addElementId($element->id, $element->siteId);
     }
 
-    public function addElementIdsTrackField(array $elementIds, FieldLayout $fieldLayout, $handle): void
+    public function addElementIdsTrackField(array $elementIds, FieldLayout $fieldLayout, $handle, ?int $siteId = null): void
     {
         $fieldInstanceUid = FieldHelper::getFieldInstanceUidForFieldLayout($fieldLayout, $handle);
 
+        if ($fieldInstanceUid === null) {
+            return;
+        }
+
         foreach ($elementIds as $elementId) {
-            $this->data['elements']['trackFields'][$elementId][$fieldInstanceUid] = true;
+            $this->addTrackedField($elementId, $fieldInstanceUid, $siteId);
         }
     }
 
     public function addElementTrackField(ElementInterface $element, $handle): void
     {
+        if ($element->id === null) {
+            return;
+        }
+
         $fieldInstanceUid = FieldHelper::getFieldInstanceUidForElement($element, $handle);
 
         if ($fieldInstanceUid !== null) {
-            $this->data['elements']['trackFields'][$element->id][$fieldInstanceUid] = true;
+            $this->addTrackedField($element->id, $fieldInstanceUid, $element->siteId);
         }
+    }
+
+    /**
+     * @return array<int, array<string, int[]>>
+     * @since 5.13.0
+     */
+    public function getElementFieldSiteIds(): array
+    {
+        $sites = [];
+        foreach ($this->getElementTrackFields() as $elementId => $fields) {
+            foreach ($fields as $field) {
+                $sites[$elementId][$field] = array_keys($this->data['elements']['siteTrackFields'][$elementId][$field] ?? self::SITE_IDS_ANY);
+            }
+        }
+
+        return $sites;
+    }
+
+    private function addTrackedField(int $elementId, string $fieldInstanceUid, ?int $siteId): void
+    {
+        if (isset($this->data['elements']['trackFields'][$elementId][$fieldInstanceUid]) && !isset($this->data['elements']['siteTrackFields'][$elementId][$fieldInstanceUid])) {
+            $this->data['elements']['siteTrackFields'][$elementId][$fieldInstanceUid][BaseDataModel::SITE_ID_ANY] = true;
+        }
+        $this->data['elements']['trackFields'][$elementId][$fieldInstanceUid] = true;
+        $this->data['elements']['siteTrackFields'][$elementId][$fieldInstanceUid][$siteId ?? BaseDataModel::SITE_ID_ANY] = true;
     }
 
     public function addElementQuery(int $elementQueryId, string $elementType, array $params): void
