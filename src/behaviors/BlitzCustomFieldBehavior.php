@@ -5,6 +5,7 @@
 
 namespace putyourlightson\blitz\behaviors;
 
+use craft\base\Component;
 use craft\base\ElementInterface;
 use craft\behaviors\CustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
@@ -15,6 +16,7 @@ use yii\base\Behavior;
  * that routes requests through its methods, allowing this class’s magic getter
  * method to register when custom fields are accessed.
  *
+ * @extends Behavior<Component>
  * @since 4.4.0
  */
 class BlitzCustomFieldBehavior extends Behavior
