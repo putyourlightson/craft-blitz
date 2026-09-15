@@ -4,6 +4,7 @@
 
 - Fixed a bug in which cancelling a generate cache job could result in the next batch being spawned ([#870](https://github.com/putyourlightson/craft-blitz/issues/870)).
 - Fixed an infinite cache refresh loop that could occur when page generation failed in multi-site setups with overlapping site URI prefixes ([#917](https://github.com/putyourlightson/craft-blitz/issues/917)).
+- Fixed a bug that could prevent cached pages from being refreshed when a batch contained both attribute or field changes and other types of element changes.
 
 ## 4.23.22 - 2026-08-21
 
