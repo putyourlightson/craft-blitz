@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.13.1 - 2026-09-15
+
+- Fixed a bug in which cancelling a generate cache job could result in the next batch being spawned ([#870](https://github.com/putyourlightson/craft-blitz/issues/870)).
+
 ## 5.13.0 - 2026-09-14
 
 > [!NOTE]
