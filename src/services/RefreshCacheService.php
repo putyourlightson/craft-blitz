@@ -135,10 +135,21 @@ class RefreshCacheService extends Component
     public function getSsiIncludeSiteUris(array $siteUris): array
     {
         $indexes = [];
-        foreach ($siteUris as $siteUri) {
-            $index = $this->getCachedIncludeIndex($siteUri);
+        $prefix = CacheRequestService::CACHED_INCLUDE_PREFIX;
 
-            if ($index !== null) {
+        foreach ($siteUris as $siteUri) {
+            $path = trim(parse_url($siteUri->uri, PHP_URL_PATH) ?: '', '/');
+
+            if (str_starts_with($path, $prefix)) {
+                $index = substr($path, strlen($prefix));
+            } else {
+                // Fall back to the legacy URI format used before version 5.12.0.
+                $queryString = parse_url($siteUri->uri, PHP_URL_QUERY) ?: '';
+                parse_str($queryString, $queryStringParams);
+                $index = $queryStringParams['index'] ?? null;
+            }
+
+            if (is_string($index) && $index !== '') {
                 $indexes[] = $index;
             }
         }
@@ -157,30 +168,6 @@ class RefreshCacheService extends Component
             ->column();
 
         return SiteUriHelper::getCachedSiteUris($cacheIds);
-    }
-
-    /**
-     * Returns the index of a cached include from its site URI, or `null` if the site URI is not a cached include.
-     *
-     * Cached include URIs have the format `_cached_include_{index}?{cachedIncludePathParam}=_cached_include_{index}`
-     * since version 5.12.0. URIs created by earlier versions contained the index in an `index` query string param.
-     */
-    private function getCachedIncludeIndex(SiteUriModel $siteUri): ?string
-    {
-        $path = trim(parse_url($siteUri->uri, PHP_URL_PATH) ?: '', '/');
-        $prefix = CacheRequestService::CACHED_INCLUDE_PREFIX;
-
-        if (str_starts_with($path, $prefix)) {
-            $index = substr($path, strlen($prefix));
-
-            return $index !== '' ? $index : null;
-        }
-
-        $queryString = parse_url($siteUri->uri, PHP_URL_QUERY) ?: '';
-        parse_str($queryString, $queryStringParams);
-        $index = $queryStringParams['index'] ?? null;
-
-        return is_string($index) && $index !== '' ? $index : null;
     }
 
     /**
