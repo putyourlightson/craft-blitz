@@ -7,6 +7,7 @@ namespace putyourlightson\blitz\jobs;
 
 use craft\helpers\Queue as QueueHelper;
 use craft\queue\BaseBatchedJob;
+use craft\queue\Queue as CraftQueue;
 use putyourlightson\blitz\batchers\SiteUriBatcher;
 use putyourlightson\blitz\Blitz;
 use yii\queue\Queue;
@@ -71,6 +72,11 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
         $siteUris = $this->data()->getSlice($this->itemOffset, $this->batchSize);
         Blitz::$plugin->cacheGenerator->generateUrisWithProgress($siteUris, [$this, 'setProgressHandler']);
         $this->itemOffset += count($siteUris);
+
+        // Make sure the job is still reserved before spawning another job.
+        if ($queue instanceof CraftQueue && !$queue->isReserved($queue->getJobId())) {
+            return;
+        }
 
         // Spawn another job if there are more items
         if ($this->itemOffset < $this->totalItems()) {

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.23.23 - 2026-09-15
+
+- Fixed a bug in which cancelling a generate cache job could result in the next batch being spawned ([#870](https://github.com/putyourlightson/craft-blitz/issues/870)).
+
 ## 4.23.22 - 2026-08-21
 
 - Added a config setting `batchInsertSize` that determines the number of records to insert in a single batch ([#903](https://github.com/putyourlightson/craft-blitz/issues/903)).
