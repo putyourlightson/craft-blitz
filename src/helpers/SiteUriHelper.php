@@ -515,9 +515,7 @@ class SiteUriHelper
     /**
      * Returns site URI from a given URL.
      *
-     * This method looks for the site with the longest base URL that matches
-     * the provided URL. For example, the URL `site.com/en/page` will match
-     * the site with base URL `site.com/en` over `site.com`.
+     * This method looks for the site with the longest base URL that matches the provided URL. For example, the URL `site.com/en/page` will match the site with base URL `site.com/en` over `site.com`.
      */
     public static function getSiteUriFromUrl(string $url): ?SiteUriModel
     {
@@ -527,17 +525,19 @@ class SiteUriHelper
         foreach (Craft::$app->getSites()->getAllSites() as $site) {
             $baseUrl = trim($site->getBaseUrl(), '/');
 
-            // If the URL begins with the base URL and the base URL is longer than any already found.
             if (stripos($url, $baseUrl) === 0 && strlen($baseUrl) > strlen($siteBaseUrl)) {
-                $siteBaseUrl = $baseUrl;
+                $uri = substr($url, strlen($baseUrl));
 
-                $uri = preg_replace('/' . preg_quote($baseUrl, '/') . '/', '', $url, 1);
-                $uri = trim($uri, '/');
+                // Ensure the base URL ends at a complete path segment.
+                if ($uri === '' || in_array($uri[0], ['/', '?', '#'], true)) {
+                    $siteBaseUrl = $baseUrl;
+                    $uri = trim($uri, '/');
 
-                $siteUri = new SiteUriModel([
-                    'siteId' => $site->id,
-                    'uri' => self::encodeQueryString($uri),
-                ]);
+                    $siteUri = new SiteUriModel([
+                        'siteId' => $site->id,
+                        'uri' => self::encodeQueryString($uri),
+                    ]);
+                }
             }
         }
 
