@@ -12,6 +12,7 @@ use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use putyourlightson\blitz\services\CacheRequestService;
 
 beforeEach(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
@@ -353,4 +354,40 @@ test('Element query type records are deleted when executing them results in an e
 
     expect(ElementQueryRecord::find()->count())
         ->toBe(0);
+});
+
+test('SSI include site URIs are returned for a cached include site URI', function() {
+    [$includeId, $index] = Blitz::$plugin->generateCache->saveInclude(1, 't', []);
+    Blitz::$plugin->generateCache->addSsiInclude($includeId);
+    $siteUri = createSiteUri();
+    Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
+
+    $includeUri = CacheRequestService::CACHED_INCLUDE_PREFIX . $index;
+    $includeSiteUri = createSiteUri(uri: $includeUri . '?' . Blitz::$plugin->settings->cachedIncludePathParam . '=' . $includeUri);
+    $ssiIncludeSiteUris = Blitz::$plugin->refreshCache->getSsiIncludeSiteUris([$includeSiteUri]);
+
+    expect($ssiIncludeSiteUris)
+        ->toHaveCount(1)
+        ->and($ssiIncludeSiteUris[0]->uri)
+        ->toBe($siteUri->uri);
+});
+
+test('SSI include site URIs are returned for a legacy cached include site URI', function() {
+    [$includeId, $index] = Blitz::$plugin->generateCache->saveInclude(1, 't', []);
+    Blitz::$plugin->generateCache->addSsiInclude($includeId);
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+
+    $includeSiteUri = createSiteUri(uri: '_includes?action=blitz/include/cached&index=' . $index);
+
+    expect(Blitz::$plugin->refreshCache->getSsiIncludeSiteUris([$includeSiteUri]))
+        ->toHaveCount(1);
+});
+
+test('SSI include site URIs are not returned for a site URI that is not a cached include', function() {
+    [$includeId] = Blitz::$plugin->generateCache->saveInclude(1, 't', []);
+    Blitz::$plugin->generateCache->addSsiInclude($includeId);
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri());
+
+    expect(Blitz::$plugin->refreshCache->getSsiIncludeSiteUris([createSiteUri()]))
+        ->toBeEmpty();
 });
