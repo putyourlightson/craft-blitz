@@ -153,10 +153,15 @@ class ElementChangedBehavior extends Behavior
         $element = $this->owner;
 
         if (!$element::isLocalized() || $this->originalElement === null
-            || $element->firstSave || $element->isNewForSite || $element->propagateAll || $element->propagateRequired
+            || $element->firstSave || $element->isNewForSite || $element->propagateAll
             || $element->resaving || $this->getHasBeenDeleted() || $this->getHasStatusChanged() || $this->getHasAssetFileChanged()
             || (!$this->isChangedByAttributes && !$this->isChangedByFields)
         ) {
+            return null;
+        }
+
+        // TODO: remove in Blitz 6.
+        if (version_compare(Craft::$app->getVersion(), '5.9.0', '>=') && $element->propagateRequired) {
             return null;
         }
 

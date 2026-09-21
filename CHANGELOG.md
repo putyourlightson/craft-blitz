@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.13.3 - 2026-09-21
+
+- Fixed an error that could occur when saving elements on versions of Craft earlier than 5.9.
+
 ## 5.13.2 - 2026-09-15
 
 - Fixed a bug in which pages containing cached SSI includes were not being purged when the includes were refreshed ([#918](https://github.com/putyourlightson/craft-blitz/issues/918)).
