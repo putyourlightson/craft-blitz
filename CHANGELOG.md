@@ -2,7 +2,7 @@
 
 ## 5.13.3 - 2026-09-21
 
-- Fixed an error that could occur when saving elements on versions of Craft earlier than 5.9.
+- Fixed an error that could occur when saving elements on versions of Craft earlier than 5.9 ([#919](https://github.com/putyourlightson/craft-blitz/issues/919)).
 
 ## 5.13.2 - 2026-09-15
 
