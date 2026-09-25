@@ -19,14 +19,31 @@ class m260911_120000_add_siteid_columns extends Migration
                 $this->addColumn($table, 'siteId', $this->integer()->notNull()->defaultValue(BaseDataModel::SITE_ID_ANY)->after('elementId'));
 
                 // MySQL needs a separate index for the cacheId foreign key while replacing the primary key.
-                $primaryKey = $this->db->getSchema()->getTablePrimaryKey($table);
                 $this->createIndex(null, $table, ['cacheId']);
-                $this->dropPrimaryKey($primaryKey->name, $table);
-                $columns = ['cacheId', 'elementId', 'siteId'];
-                if ($table === ElementFieldCacheRecord::tableName()) {
-                    $columns[] = 'fieldInstanceUid';
+            }
+
+            $columns = ['cacheId', 'elementId', 'siteId'];
+            if ($table === ElementFieldCacheRecord::tableName()) {
+                $columns[] = 'fieldInstanceUid';
+            }
+
+            $primaryKey = $this->db->getSchema()->getTablePrimaryKey($table, true);
+
+            if ($primaryKey?->columnNames !== $columns) {
+                if ($this->db->getIsMysql() && $primaryKey !== null) {
+                    // Replace the primary key atomically to support generated invisible primary keys.
+                    $quotedColumns = array_map($this->db->quoteColumnName(...), $columns);
+                    $this->execute(sprintf(
+                        'ALTER TABLE %s DROP PRIMARY KEY, ADD PRIMARY KEY (%s)',
+                        $this->db->quoteTableName($table),
+                        implode(', ', $quotedColumns),
+                    ));
+                } else {
+                    if ($primaryKey !== null) {
+                        $this->dropPrimaryKey($primaryKey->name, $table);
+                    }
+                    $this->addPrimaryKey($primaryKey?->name, $table, $columns);
                 }
-                $this->addPrimaryKey($primaryKey->name, $table, $columns);
             }
         }
 

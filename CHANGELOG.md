@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.13.4 - 2026-09-25
+
+- Fixed a migration error that could occur when using MySQL with generated invisible primary keys enabled ([#920](https://github.com/putyourlightson/craft-blitz/issues/920)).
+
 ## 5.13.3 - 2026-09-21
 
 - Fixed an error that could occur when saving elements on versions of Craft earlier than 5.9 ([#919](https://github.com/putyourlightson/craft-blitz/issues/919)).
