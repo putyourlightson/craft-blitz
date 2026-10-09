@@ -97,33 +97,31 @@ class HttpGenerator extends BaseCacheGenerator
     {
         $client = HttpClientBuilder::buildDefault();
 
-        $concurrentIterator = Pipeline::fromIterable($urls)
-            ->concurrent($this->concurrency);
+        Pipeline::fromIterable($urls)
+            ->concurrent($this->concurrency)
+            ->forEach(function(string $url) use ($client, $setProgressHandler, &$count, $total): void {
+                try {
+                    $request = $this->createRequest($url);
+                    $response = $client->request($request);
 
-        foreach ($concurrentIterator as $url) {
-            $count++;
-
-            try {
-                $request = $this->createRequest($url);
-                $response = $client->request($request);
-
-                if ($response->getStatus() === 200) {
-                    $this->generated++;
-                    $this->outputVerbose($url);
-                } else {
-                    Blitz::$plugin->debug('{status} error: {reason}', [
-                        'status' => $response->getStatus(),
-                        'reason' => $response->getReason(),
-                    ], $url);
+                    if ($response->getStatus() === 200) {
+                        $this->generated++;
+                        $this->outputVerbose($url);
+                    } else {
+                        Blitz::$plugin->debug('{status} error: {reason}', [
+                            'status' => $response->getStatus(),
+                            'reason' => $response->getReason(),
+                        ], $url);
+                        $this->outputVerbose($url, false);
+                    }
+                } catch (HttpException $exception) {
+                    Blitz::$plugin->debug($exception->getMessage());
                     $this->outputVerbose($url, false);
+                } finally {
+                    $count++;
+                    $this->callProgressHandler($setProgressHandler, $count, $total);
                 }
-
-                $this->callProgressHandler($setProgressHandler, $count, $total);
-            } catch (HttpException $exception) {
-                Blitz::$plugin->debug($exception->getMessage());
-                $this->outputVerbose($url, false);
-            }
-        }
+            });
     }
 
     protected function createRequest(string $url): Request
