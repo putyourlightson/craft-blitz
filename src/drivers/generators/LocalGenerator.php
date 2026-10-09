@@ -65,49 +65,49 @@ class LocalGenerator extends BaseCacheGenerator
             'pathParam' => Craft::$app->getConfig()->getGeneral()->pathParam,
         ];
 
-        $concurrentIterator = Pipeline::fromIterable($urls)
-            ->concurrent($this->concurrency);
+        Pipeline::fromIterable($urls)
+            ->concurrent($this->concurrency)
+            ->forEach(function(string $url) use ($config, $setProgressHandler, &$count, $total): void {
+                $requestConfig = $config;
+                $requestConfig['url'] = $url;
 
-        foreach ($concurrentIterator as $url) {
-            $count++;
+                // Create a context to send data between parent and child processes.
+                // https://amphp.org/parallel#context-creation
+                $context = startContext(__DIR__ . '/local-generator-script.php');
 
-            $config['url'] = $url;
+                // Create a timeout to apply to the context.
+                // https://amphp.org/amp#cancellation
+                $canceller = new TimeoutCancellation($this->timeout);
+                $cancellerId = $canceller->subscribe(function() use ($url) {
+                    $message = 'Local generator request timed out.';
+                    Blitz::$plugin->debug($message, [], $url);
+                    $this->outputVerbose($url, false);
+                });
 
-            // Create a context to send data between parent and child processes.
-            // https://amphp.org/parallel#context-creation
-            $context = startContext(__DIR__ . '/local-generator-script.php');
+                $result = false;
 
-            // Create a timeout to apply to the context.
-            // https://amphp.org/amp#cancellation
-            $canceller = new TimeoutCancellation($this->timeout);
-            $cancellerId = $canceller->subscribe(function() use ($url) {
-                $message = 'Local generator request timed out.';
-                Blitz::$plugin->debug($message, [], $url);
-                $this->outputVerbose($url, false);
+                try {
+                    $context->send($requestConfig);
+                    $result = $context->receive($canceller);
+                } catch (Throwable $exception) {
+                    Blitz::$plugin->debug($exception->getMessage(), [], $url);
+                }
+
+                $canceller->unsubscribe($cancellerId);
+
+                if ($result) {
+                    $this->generated++;
+                    $this->outputVerbose($url);
+                } else {
+                    $this->outputVerbose($url, false);
+                }
+
+                $count++;
+
+                if (is_callable($setProgressHandler)) {
+                    $this->callProgressHandler($setProgressHandler, $count, $total);
+                }
             });
-
-            $result = false;
-
-            try {
-                $context->send($config);
-                $result = $context->receive($canceller);
-            } catch (Throwable $exception) {
-                Blitz::$plugin->debug($exception->getMessage(), [], $url);
-            }
-
-            $canceller->unsubscribe($cancellerId);
-
-            if ($result) {
-                $this->generated++;
-                $this->outputVerbose($url);
-            } else {
-                $this->outputVerbose($url, false);
-            }
-
-            if (is_callable($setProgressHandler)) {
-                $this->callProgressHandler($setProgressHandler, $count, $total);
-            }
-        }
     }
 
     /**
