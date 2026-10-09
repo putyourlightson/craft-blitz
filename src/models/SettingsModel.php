@@ -315,7 +315,7 @@ class SettingsModel extends Model
     ];
 
     /**
-     * An API key that can be used via a URL (min. 16 characters).
+     * An API key for cache utility requests (min. 16 characters).
      */
     public string $apiKey = '';
 

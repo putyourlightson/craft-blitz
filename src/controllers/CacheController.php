@@ -48,10 +48,10 @@ class CacheController extends Controller
             $this->requirePermission('blitz:' . $action->id);
         } else {
             // Verify API key
-            $key = $request->getParam('key');
+            $key = $request->getBearerToken() ?? $request->getParam('key');
             $apiKey = App::parseEnv(Blitz::$plugin->settings->apiKey);
 
-            if (empty($key) || empty($apiKey) || $key != $apiKey) {
+            if (!is_string($key) || $key === '' || !is_string($apiKey) || $apiKey === '' || !hash_equals($apiKey, $key)) {
                 throw new ForbiddenHttpException('Unauthorised access.');
             }
         }
