@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.13.5 - Unreleased
+
+- Fixed a bug in which failed cache API requests returned status code 200 instead of 400 ([#922](https://github.com/putyourlightson/craft-blitz/issues/922)).
+
 ## 5.13.4 - 2026-09-25
 
 - Fixed a migration error that could occur when using MySQL with generated invisible primary keys enabled ([#920](https://github.com/putyourlightson/craft-blitz/issues/920)).

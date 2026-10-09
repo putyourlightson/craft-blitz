@@ -258,6 +258,8 @@ class CacheController extends Controller
 
         // If front-end or JSON request
         if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE || $request->getAcceptsJson()) {
+            $this->response->setStatusCode($success ? 200 : 400);
+
             return $this->asJson([
                 'success' => $success,
                 'message' => Craft::t('blitz', $message),
