@@ -73,10 +73,20 @@ class Install extends Migration
     protected function createTables(): bool
     {
         if (!$this->db->tableExists(CacheRecord::tableName())) {
+            $collation = '"C"';
+            if ($this->db->getIsMysql()) {
+                $charset = Craft::$app->getConfig()->getDb()->getCharset();
+                $collation = $charset === 'binary' ? 'binary' : $charset . '_bin';
+            }
+
+            // Cache URIs must match the case- and accent-sensitive storage paths.
+            $uriColumn = $this->string(Blitz::$plugin->settings->maxUriLength)
+                ->append('COLLATE ' . $collation . ' NOT NULL');
+
             $this->createTable(CacheRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string(Blitz::$plugin->settings->maxUriLength)->notNull(),
+                'uri' => $uriColumn,
                 'paginate' => $this->integer(),
                 'dateCached' => $this->dateTime(),
                 'expiryDate' => $this->dateTime(),
