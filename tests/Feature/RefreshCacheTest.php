@@ -10,6 +10,7 @@ use craft\helpers\StringHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
+use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -240,6 +241,30 @@ test('Element cache IDs are not returned when an entry is changed by custom fiel
 
     expect(RefreshCacheHelper::getElementCacheIds(Entry::class, $refreshData))
         ->toBeEmpty();
+});
+
+test('Element cache IDs are returned when an entry no longer matches a custom field query', function() {
+    $value = StringHelper::randomString();
+    $entry = createEntry(customFields: ['plainText' => $value]);
+    $generateCache = Blitz::$plugin->generateCache;
+    $generateCache->registerElementPrepareEvents();
+
+    $query = Entry::find()->sectionId($entry->sectionId)->plainText($value);
+    $entries = $query->all();
+    expect($entries)->toHaveCount(1);
+
+    // Save the page without accessing the field used to filter its entries.
+    $siteUri = createSiteUri();
+    $generateCache->save(createOutput(), $siteUri);
+    $cacheId = CacheRecord::find()->select('id')->where($siteUri->toArray())->scalar();
+
+    $entry = $entries[0];
+    $entry->setFieldValue('plainText', 'excluded');
+    expect(Craft::$app->getElements()->saveElement($entry))->toBeTrue();
+
+    expect((clone $query)->all())->toBeEmpty()
+        ->and(Blitz::$plugin->refreshCache->refreshData->getIsChangedByFields(Entry::class, $entry->id))->toBeTrue()
+        ->and(RefreshCacheHelper::getElementCacheIds(Entry::class, Blitz::$plugin->refreshCache->refreshData))->toEqual([$cacheId]);
 });
 
 test('Element query cache IDs are returned when a disabled entry is changed', function() {

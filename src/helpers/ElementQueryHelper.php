@@ -151,10 +151,19 @@ class ElementQueryHelper
      */
     public static function getElementQueryFieldInstanceUids(ElementQuery $elementQuery): array
     {
-        $fieldHandles = CustomFieldBehavior::$fieldHandles;
-        $fieldHandles = self::getUsedElementQueryParams($elementQuery, $fieldHandles);
+        $fieldHandles = self::getElementQueryFieldHandles($elementQuery);
 
         return FieldHelper::getFieldInstanceUidsForElementQuery($elementQuery, $fieldHandles);
+    }
+
+    /**
+     * Returns the custom field handles that the element query is filtered or ordered by.
+     *
+     * @return string[]
+     */
+    public static function getElementQueryFieldHandles(ElementQuery $elementQuery): array
+    {
+        return self::getUsedElementQueryParams($elementQuery, CustomFieldBehavior::$fieldHandles);
     }
 
     /**

@@ -6,6 +6,7 @@
 - Fixed a security issue in which cache API authentication was not enforcing strings ([#923](https://github.com/putyourlightson/craft-blitz/issues/923)).
 - Fixed a bug in which failed cache API requests returned status code 200 instead of 400 ([#922](https://github.com/putyourlightson/craft-blitz/issues/922)).
 - Fixed a bug in which the HTTP and local generators generated pages sequentially regardless of the configured concurrency ([#924](https://github.com/putyourlightson/craft-blitz/issues/924)).
+- Fixed a bug in which cached pages were not refreshed when custom field changes caused entries to stop matching a tracked element query ([#925](https://github.com/putyourlightson/craft-blitz/issues/925)).
 
 ## 5.13.4 - 2026-09-25
 
