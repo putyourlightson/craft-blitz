@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.14.0 - Unreleased
+## 5.14.0 - 2026-10-14
 
 > [!NOTE]
 > The cache should be cleared after this update completes to remove any previously orphaned cache files.
