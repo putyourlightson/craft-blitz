@@ -9,6 +9,7 @@ use Craft;
 use craft\helpers\App;
 use craft\helpers\StringHelper;
 use craft\web\Controller;
+use craft\web\Request;
 use craft\web\View;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SiteUriModel;
@@ -48,10 +49,10 @@ class CacheController extends Controller
             $this->requirePermission('blitz:' . $action->id);
         } else {
             // Verify API key
-            $key = $request->getParam('key');
+            $key = $this->getBearerToken($request) ?? $request->getParam('key');
             $apiKey = App::parseEnv(Blitz::$plugin->settings->apiKey);
 
-            if (empty($key) || empty($apiKey) || $key != $apiKey) {
+            if (!is_string($key) || $key === '' || !is_string($apiKey) || $apiKey === '' || !hash_equals($apiKey, $key)) {
                 throw new ForbiddenHttpException('Unauthorised access.');
             }
         }
@@ -250,6 +251,28 @@ class CacheController extends Controller
     }
 
     /**
+     * Returns a Bearer token, including on Craft versions before 4.9.
+     */
+    private function getBearerToken(Request $request): ?string
+    {
+        $authHeaders = $request->getHeaders()->get('X-Craft-Authorization', null, false)
+            ?? $request->getHeaders()->get('Authorization', null, false)
+            ?? [];
+
+        foreach ($authHeaders as $authHeader) {
+            $authValues = array_map('trim', explode(',', $authHeader));
+
+            foreach ($authValues as $authValue) {
+                if (preg_match('/^Bearer\s+(.+)$/i', $authValue, $matches)) {
+                    return $matches[1];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Returns a response with the provided message.
      */
     private function getResponse(string $message, bool $success = true): ?Response
@@ -258,6 +281,8 @@ class CacheController extends Controller
 
         // If front-end or JSON request
         if (Craft::$app->getView()->templateMode == View::TEMPLATE_MODE_SITE || $request->getAcceptsJson()) {
+            $this->response->setStatusCode($success ? 200 : 400);
+
             return $this->asJson([
                 'success' => $success,
                 'message' => Craft::t('blitz', $message),

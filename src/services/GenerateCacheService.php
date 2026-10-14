@@ -121,8 +121,15 @@ class GenerateCacheService extends Component
          */
         Event::on(ElementQuery::class, ElementQuery::EVENT_AFTER_POPULATE_ELEMENT,
             function(PopulateElementEvent $event) {
-                if (Craft::$app->getResponse()->getIsOk()) {
+                if (Craft::$app->getResponse()->getIsOk() && $this->shouldTrackElementsOfType($event->element::class)) {
                     $this->addElement($event->element);
+
+                    // Query fields determine whether this element appears, even when the template never accesses them.
+                    /** @var ElementQuery $elementQuery */
+                    $elementQuery = $event->sender;
+                    foreach (ElementQueryHelper::getElementQueryFieldHandles($elementQuery) as $handle) {
+                        $this->generateData->addElementTrackField($event->element, $handle);
+                    }
                 }
             }
         );

@@ -462,7 +462,7 @@
 
         {{ forms.autosuggestField({
             label: "API Key"|t('blitz'),
-            instructions: "An API key that can be used to clear, flush, purge, generate, deploy and refresh cache through a URL (min. 16 characters)."|t('blitz'),
+            instructions: "An API key that can be used to clear, flush, purge, generate, deploy and refresh cache (min. 16 characters).\nSend the key as a key parameter in the POST body or in an `Authorization: Bearer` header. Avoid including the key in the URL, as it may appear in access logs."|t('blitz'),
             suggestEnvVars: true,
             name: 'settings[apiKey]',
             value: settings.apiKey,

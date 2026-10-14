@@ -179,6 +179,18 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
+        // Refresh globals after saving, since they are populated on every request.
+        if ($element instanceof GlobalSet) {
+            if (!ElementHelper::isDraftOrRevision($element)
+                && !$element->propagating
+                && Blitz::$plugin->settings->refreshCacheAutomaticallyForGlobals
+            ) {
+                $this->refreshAll();
+            }
+
+            return;
+        }
+
         if (!$this->isRefreshableElement($element)) {
             return;
         }
@@ -295,12 +307,8 @@ class RefreshCacheService extends Component
             return false;
         }
 
-        // Refresh the entire cache if this is a global set since they are populated on every request
+        // Global sets refresh the entire cache rather than being tracked individually.
         if ($element instanceof GlobalSet) {
-            if (Blitz::$plugin->settings->refreshCacheAutomaticallyForGlobals) {
-                $this->refreshAll();
-            }
-
             return false;
         }
 

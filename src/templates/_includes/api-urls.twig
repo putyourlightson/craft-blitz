@@ -1,8 +1,5 @@
 {% import "_includes/forms" as forms %}
 
-
-{% set apiKey = settings.apiKey|replace('$', '') %}
-
 {% set cols = {
     action: {
         type: 'heading',
@@ -19,43 +16,43 @@
 {% set rows = [
     {
         action: "Clear Cache"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear', { key: apiKey }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/clear'),
     },
     {
         action: "Flush Cache"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush', { key: apiKey }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/flush'),
     },
     {
         action: "Purge Cache"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/purge', { key: apiKey }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/purge'),
     },
     {
         action: "Generate Cache"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/generate', { key: apiKey }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/generate'),
     },
     {
         action: "Remote Deploy"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/deploy', { key: apiKey }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/deploy'),
     },
     {
         action: "Refresh Cache"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh', { key: apiKey }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh'),
     },
     {
         action: "Refresh Expired Cache"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired', { key: apiKey }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-expired'),
     },
     {
         action: "Refresh Site Cache"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-site', { key: apiKey, siteId: currentSite.id }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-site', { siteId: currentSite.id }),
     },
     {
         action: "Refresh Cached URLs"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-urls', { key: apiKey, urls: siteUrl('page1') ~ ',' ~ siteUrl('page2') }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-urls', { urls: siteUrl('page1') ~ ',' ~ siteUrl('page2') }),
     },
     {
         action: "Refresh Tagged Cache"|t('blitz'),
-        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-tagged', { key: apiKey, tags: 'tag1,tag2,tag3' }),
+        url: siteUrl(craft.app.config.general.actionTrigger ~ '/blitz/cache/refresh-tagged', { tags: 'tag1,tag2,tag3' }),
     },
 ] %}
 

@@ -73,9 +73,8 @@ class LocalGenerator extends BaseCacheGenerator
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
             function(string $url) use ($setProgressHandler, &$count, $total, $config) {
-                $count++;
-
-                $config['url'] = $url;
+                $requestConfig = $config;
+                $requestConfig['url'] = $url;
 
                 // Create a context to send data between the parent and child processes
                 // https://amphp.org/parallel/processes#parent-process
@@ -91,18 +90,17 @@ class LocalGenerator extends BaseCacheGenerator
                     $context->kill();
                 });
 
-                yield $context->start();
-                yield $context->send($config);
-
                 try {
+                    yield $context->start();
+                    yield $context->send($requestConfig);
                     $result = yield $context->receive();
                 } catch (Throwable $exception) {
                     Blitz::$plugin->debug($this->getAllExceptionMessages($exception), [], $url);
                     $result = false;
+                } finally {
+                    // Unsubscribe the timeout.
+                    $canceller->unsubscribe($cancellerId);
                 }
-
-                // Unsubscribe the timeout.
-                $canceller->unsubscribe($cancellerId);
 
                 if ($result) {
                     $this->generated++;
@@ -110,6 +108,8 @@ class LocalGenerator extends BaseCacheGenerator
                 } else {
                     $this->outputVerbose($url, false);
                 }
+
+                $count++;
 
                 if (is_callable($setProgressHandler)) {
                     $this->callProgressHandler($setProgressHandler, $count, $total);

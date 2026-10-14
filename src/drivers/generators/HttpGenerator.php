@@ -89,8 +89,6 @@ class HttpGenerator extends BaseCacheGenerator
             fromIterable($urls),
             new LocalSemaphore($this->concurrency),
             function(string $url) use ($setProgressHandler, &$count, $total, $client) {
-                $count++;
-
                 try {
                     $request = $this->createRequest($url);
                     $response = yield $client->request($request);
@@ -105,13 +103,14 @@ class HttpGenerator extends BaseCacheGenerator
                         ], $url);
                         $this->outputVerbose($url, false);
                     }
-
-                    if (is_callable($setProgressHandler)) {
-                        $this->callProgressHandler($setProgressHandler, $count, $total);
-                    }
                 } catch (HttpException $exception) {
                     Blitz::$plugin->debug($exception->getMessage());
                     $this->outputVerbose($url, false);
+                } finally {
+                    $count++;
+                    if (is_callable($setProgressHandler)) {
+                        $this->callProgressHandler($setProgressHandler, $count, $total);
+                    }
                 }
             }
         );

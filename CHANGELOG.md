@@ -1,5 +1,17 @@
 # Release Notes for Blitz
 
+## 4.24.0 - 2026-10-14
+
+> [!NOTE]
+> The cache should be cleared or refreshed after this update completes so that custom field query dependencies are tracked.
+
+- Added support for cache API keys in Bearer authorization headers ([#923](https://github.com/putyourlightson/craft-blitz/issues/923)).
+- Fixed a security issue in which cache API authentication was not enforcing strings ([#923](https://github.com/putyourlightson/craft-blitz/issues/923)).
+- Fixed a bug in which failed cache API requests returned status code 200 instead of 400 ([#922](https://github.com/putyourlightson/craft-blitz/issues/922)).
+- Fixed generator progress reporting so that completed requests are counted, including failed HTTP requests ([#924](https://github.com/putyourlightson/craft-blitz/issues/924)).
+- Fixed a bug in which cached pages were not refreshed when custom field changes caused entries to stop matching a tracked element query ([#925](https://github.com/putyourlightson/craft-blitz/issues/925)).
+- Fixed a bug in which saving globals refreshed the entire cache twice, which could queue duplicate cache generation jobs ([#926](https://github.com/putyourlightson/craft-blitz/issues/926)).
+
 ## 4.23.23 - 2026-09-15
 
 - Fixed a bug in which cancelling a generate cache job could result in the next batch being spawned ([#870](https://github.com/putyourlightson/craft-blitz/issues/870)).
