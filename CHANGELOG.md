@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.14.1 - 2026-10-15
+
+- Fixed a migration error that could occur when updating to Blitz 5.14.0 on PostgreSQL ([#927](https://github.com/putyourlightson/craft-blitz/issues/927)).
+
 ## 5.14.0 - 2026-10-14
 
 > [!NOTE]

@@ -7,6 +7,9 @@ use putyourlightson\blitz\records\CacheRecord;
 
 class m261010_120000_make_uri_comparisons_sensitive extends Migration
 {
+    /**
+     * @inheritdoc
+     */
     public function safeUp(): bool
     {
         $table = CacheRecord::tableName();
@@ -44,7 +47,7 @@ class m261010_120000_make_uri_comparisons_sensitive extends Migration
                 'SELECT c.collname FROM pg_catalog.pg_attribute a
                 INNER JOIN pg_catalog.pg_collation c ON c.oid = a.attcollation
                 WHERE a.attrelid = CAST(:table AS regclass) AND a.attname = :column',
-                [':table' => $this->db->quoteTableName($table), ':column' => 'uri'],
+                [':table' => $this->db->quoteTableName($tableSchema->fullName), ':column' => 'uri'],
             )->queryScalar();
             if (!$currentCollation) {
                 return false;
@@ -62,12 +65,16 @@ class m261010_120000_make_uri_comparisons_sensitive extends Migration
 
         // Preserve the installed column length while making URI identity explicit.
         $type = $this->string($column->size)
-            ->append('COLLATE ' . $quotedCollation . ' NOT NULL');
+            ->notNull()
+            ->append('COLLATE ' . $quotedCollation);
         $this->alterColumn($table, 'uri', $type);
 
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function safeDown(): bool
     {
         echo self::class . " cannot be reverted.\n";
