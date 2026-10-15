@@ -40,11 +40,13 @@ class m261010_120000_make_uri_comparisons_sensitive extends Migration
             $quotedCollation = $collation;
         } elseif ($this->db->getIsPgsql()) {
             // Yii's PostgreSQL column metadata does not include the collation.
+            // The table name is bound as a parameter, so it must be the resolved
+            // name: the `{{%table}}` placeholder is only replaced in the SQL itself.
             $currentCollation = $this->db->createCommand(
                 'SELECT c.collname FROM pg_catalog.pg_attribute a
                 INNER JOIN pg_catalog.pg_collation c ON c.oid = a.attcollation
                 WHERE a.attrelid = CAST(:table AS regclass) AND a.attname = :column',
-                [':table' => $this->db->quoteTableName($table), ':column' => 'uri'],
+                [':table' => $this->db->quoteTableName($tableSchema->fullName), ':column' => 'uri'],
             )->queryScalar();
             if (!$currentCollation) {
                 return false;
