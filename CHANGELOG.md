@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.14.2 - 2026-10-27
+
+- Fixed a bug in which refresh cache jobs could exhaust memory when tracked element queries were shared by many cached pages ([#930](https://github.com/putyourlightson/craft-blitz/issues/930)).
+
 ## 5.14.1 - 2026-10-15
 
 - Fixed a migration error that could occur when updating to Blitz 5.14.0 on PostgreSQL ([#927](https://github.com/putyourlightson/craft-blitz/issues/927)).

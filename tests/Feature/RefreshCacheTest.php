@@ -14,6 +14,7 @@ use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\services\CacheRequestService;
+use yii\base\Event;
 
 beforeEach(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
@@ -287,6 +288,48 @@ test('Element query type records are returned when an entry is changed', functio
 
     expect(RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $refreshData))
         ->toHaveCount(2);
+});
+
+test('Element query type records are loaded once when linked to multiple remaining caches', function() {
+    $entry = createEntry();
+    $generateCache = Blitz::$plugin->generateCache;
+    for ($i = 0; $i < 3; $i++) {
+        $generateCache->reset();
+        $generateCache->options->cachingEnabled = true;
+        $generateCache->addElementQuery(Entry::find());
+        $generateCache->save(createOutput(), createSiteUri(uri: 'shared-query-' . $i));
+    }
+
+    $queryRecord = ElementQueryRecord::find()->innerJoinWith('elementQueryCaches', false)->one();
+    $backtrace = str_repeat('backtrace', 800);
+    $queryRecord->backtrace = $backtrace;
+    $queryRecord->save(false);
+    $cacheIds = $queryRecord->getElementQueryCaches()->select('cacheId')->column();
+    expect($cacheIds)->toHaveCount(3);
+
+    $refreshData = RefreshDataModel::createFromElement($entry);
+    $refreshData->addCacheId((int)$cacheIds[0]);
+
+    // Count models before Yii removes duplicate joined rows from the result.
+    $models = [];
+    $handler = function(Event $event) use (&$models) {
+        $models[] = $event->sender;
+    };
+    Event::on(ElementQueryRecord::class, ElementQueryRecord::EVENT_INIT, $handler);
+    try {
+        $records = RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $refreshData);
+
+        expect($records)->toHaveCount(1)
+            ->and($records[0]->id)->toBe($queryRecord->id)
+            ->and($records[0]->backtrace)->toBe($backtrace)
+            ->and(array_filter($models, fn($model) => $model->id !== null))->toHaveCount(1);
+
+        $refreshData->addCacheIds($cacheIds);
+        expect(RefreshCacheHelper::getElementTypeQueryRecords(Entry::class, $refreshData))->toBeEmpty()
+            ->and(array_filter($models, fn($model) => $model->id !== null))->toHaveCount(1);
+    } finally {
+        Event::off(ElementQueryRecord::class, ElementQueryRecord::EVENT_INIT, $handler);
+    }
 });
 
 test('Element query type records without a cache ID are not returned when an entry is changed', function() {
