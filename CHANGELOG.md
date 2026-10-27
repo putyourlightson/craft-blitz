@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.24.1 - 2026-10-27
+
+- Fixed a bug in which refresh cache jobs could exhaust memory when tracked element queries were shared by many cached pages ([#930](https://github.com/putyourlightson/craft-blitz/issues/930)).
+
 ## 4.24.0 - 2026-10-14
 
 > [!NOTE]

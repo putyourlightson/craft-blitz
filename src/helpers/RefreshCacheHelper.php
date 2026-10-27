@@ -117,8 +117,15 @@ class RefreshCacheHelper
                 ]);
         }
 
+        // Deduplicate IDs before loading full records, which may contain large backtraces.
+        $queryIds = $query
+            ->select([ElementQueryRecord::tableName() . '.id'])
+            ->distinct();
+
         /** @var ElementQueryRecord[] */
-        return $query->all();
+        return ElementQueryRecord::find()
+            ->where(['id' => $queryIds])
+            ->all();
     }
 
     /**
