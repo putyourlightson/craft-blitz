@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.14.3 - 2026-10-31
+
+- Fixed a bug in which Cloudflare could be purged before cache generation completed, allowing stale pages to be cached again ([#931](https://github.com/putyourlightson/craft-blitz/issues/931)).
+
 ## 5.14.2 - 2026-10-27
 
 - Fixed a bug in which refresh cache jobs could exhaust memory when tracked element queries were shared by many cached pages ([#930](https://github.com/putyourlightson/craft-blitz/issues/930)).
