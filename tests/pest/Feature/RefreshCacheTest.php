@@ -6,13 +6,17 @@
 
 use craft\elements\Asset;
 use craft\elements\Entry;
+use craft\events\ElementEvent;
 use craft\helpers\StringHelper;
+use craft\services\Elements;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
+use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
+use yii\base\Event;
 
 beforeEach(function() {
     Blitz::$plugin->cacheStorage->deleteAll();
@@ -103,6 +107,53 @@ test('Element is tracked when its attribute is changed', function() {
 
     expect($entry)
         ->toBeTracked('attributes', ['title']);
+});
+
+test('Element is tracked when its slug or URI changes without being marked dirty', function(string $attribute) {
+    $entry = createEntry();
+    $entry->$attribute = 'updated-' . $entry->$attribute;
+
+    expect($entry->getDirtyAttributes())
+        ->not->toContain($attribute);
+
+    Blitz::$plugin->refreshCache->addElement($entry);
+
+    expect($entry)
+        ->toBeTracked('attributes', [$attribute]);
+})->with(['slug', 'uri']);
+
+test('Queued URI updates track the element and its old cached page', function() {
+    $entry = createEntry();
+    $oldUri = $entry->uri;
+    Blitz::$plugin->generateCache->addElement($entry);
+    Blitz::$plugin->generateCache->save(createOutput(), createSiteUri($entry->siteId, $oldUri));
+    Blitz::$plugin->refreshCache->reset();
+
+    // Reload the element as Craft’s queue job does, without dirty attributes.
+    $entry = Entry::find()->id($entry->id)->siteId($entry->siteId)->one();
+    $newUri = 'updated-' . $oldUri;
+    $handler = function(ElementEvent $event) use ($entry, $newUri) {
+        if ($event->element === $entry) {
+            $event->element->uri = $newUri;
+            $event->handled = true;
+        }
+    };
+    Event::on(Elements::class, Elements::EVENT_SET_ELEMENT_URI, $handler);
+
+    try {
+        Craft::$app->getElements()->updateElementSlugAndUri($entry, false, false);
+    } finally {
+        Event::off(Elements::class, Elements::EVENT_SET_ELEMENT_URI, $handler);
+    }
+
+    expect($entry)
+        ->toBeTracked('attributes', ['uri'])
+        ->and($entry->getDirtyAttributes())
+        ->not->toContain('uri')
+        ->and(RefreshCacheHelper::getElementCacheIds(Entry::class, Blitz::$plugin->refreshCache->refreshData))
+        ->toHaveCount(1)
+        ->and(SiteUriHelper::getElementSiteUris([$entry->id], [$entry->siteId])[0]->uri)
+        ->toBe($newUri);
 });
 
 test('Element is tracked when its field is changed', function() {

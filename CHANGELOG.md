@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.24.2 - 2026-11-01
+
+- Fixed a bug in which descendant pages could fail to refresh when a parent entry’s slug or URI changed.
+
 ## 4.24.1 - 2026-10-27
 
 - Fixed a bug in which refresh cache jobs could exhaust memory when tracked element queries were shared by many cached pages ([#930](https://github.com/putyourlightson/craft-blitz/issues/930)).
