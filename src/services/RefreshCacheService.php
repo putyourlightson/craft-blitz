@@ -408,6 +408,7 @@ class RefreshCacheService extends Component
 
         if (Blitz::$plugin->settings->shouldClearOnRefresh($forceClear)) {
             Blitz::$plugin->clearCache->clearUris($siteUris);
+            Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
         }
 
         if (Blitz::$plugin->settings->shouldExpireOnRefresh($forceClear, $forceGenerate)) {
@@ -419,8 +420,7 @@ class RefreshCacheService extends Component
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldClearOnRefresh($forceClear)
-            || Blitz::$plugin->settings->shouldPurgeAfterRefresh($forceClear)) {
+        if (Blitz::$plugin->settings->shouldPurgeAfterRefresh($forceClear)) {
             Blitz::$plugin->cachePurger->purgeUris($purgeableSiteUris);
         }
 
@@ -459,6 +459,7 @@ class RefreshCacheService extends Component
 
             Blitz::$plugin->clearCache->clearAll();
             Blitz::$plugin->flushCache->flushAll(true);
+            Blitz::$plugin->cachePurger->purgeAll();
         }
 
         if (Blitz::$plugin->settings->shouldExpireOnRefresh()) {
@@ -470,8 +471,7 @@ class RefreshCacheService extends Component
             Blitz::$plugin->deployer->deployUris($siteUris);
         }
 
-        if (Blitz::$plugin->settings->shouldClearOnRefresh()
-            || Blitz::$plugin->settings->shouldPurgeAfterRefresh()) {
+        if (Blitz::$plugin->settings->shouldPurgeAfterRefresh()) {
             Blitz::$plugin->cachePurger->purgeAll();
         }
 

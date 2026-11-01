@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.14.4 - 2026-11-01
+
+- Restored immediate cache purging when the cache is cleared during a refresh.
+
 ## 5.14.3 - 2026-10-31
 
 - Fixed a bug in which Cloudflare could be purged before cache generation completed, allowing stale pages to be cached again ([#931](https://github.com/putyourlightson/craft-blitz/issues/931)).
