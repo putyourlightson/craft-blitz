@@ -347,7 +347,17 @@ class ElementChangedBehavior extends Behavior
             $changedAttributes = $element->duplicateOf->getModifiedAttributes();
         }
 
-        return $changedAttributes;
+        // Craft’s queued slug and URI updates don’t mark these attributes as dirty.
+        if ($this->originalElement !== null) {
+            if ($element->slug !== $this->originalElement->slug) {
+                $changedAttributes[] = 'slug';
+            }
+            if ($element->uri !== $this->originalElement->uri) {
+                $changedAttributes[] = 'uri';
+            }
+        }
+
+        return array_values(array_unique($changedAttributes));
     }
 
     /**
