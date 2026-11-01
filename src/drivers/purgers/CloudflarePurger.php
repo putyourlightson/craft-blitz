@@ -11,9 +11,11 @@ use craft\db\Table;
 use craft\errors\SiteNotFoundException;
 use craft\helpers\App;
 use craft\helpers\Db;
+use craft\helpers\Queue;
 use GuzzleHttp\Exception\RequestException;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\SiteUriHelper;
+use putyourlightson\blitz\jobs\PurgeSiteJob;
 use yii\log\Logger;
 
 /**
@@ -88,6 +90,16 @@ class CloudflarePurger extends BaseCachePurger
      */
     public function purgeSite(int $siteId, callable $setProgressHandler = null, bool $queue = true): void
     {
+        if ($queue) {
+            Queue::push(
+                job: new PurgeSiteJob(['siteId' => $siteId]),
+                priority: Blitz::$plugin->settings->driverJobPriority,
+                queue: Blitz::$plugin->queue,
+            );
+
+            return;
+        }
+
         $this->sendRequest('delete', 'purge_cache', $siteId, [
             'purge_everything' => true,
         ]);

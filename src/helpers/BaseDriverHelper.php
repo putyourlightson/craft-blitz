@@ -87,6 +87,14 @@ class BaseDriverHelper
 
         if ($driverId === 'cacheGenerator') {
             $query->andWhere(['like', 'job', '"putyourlightson\\blitz\\jobs\\GenerateCacheJob"']);
+        } elseif ($driverId === 'cachePurger') {
+            $query->andWhere(['or',
+                ['like', 'job', '"putyourlightson\\blitz\\jobs\\PurgeSiteJob"'],
+                ['and',
+                    ['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"'],
+                    ['like', 'job', '"' . $driverId . '"'],
+                ],
+            ]);
         } else {
             $query->andWhere(['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"']);
             $query->andWhere(['like', 'job', '"' . $driverId . '"']);

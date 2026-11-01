@@ -2,6 +2,7 @@
 
 ## 4.24.2 - 2026-11-01
 
+- Fixed a bug in which Cloudflare could be purged before cache generation completed, allowing stale pages to be cached again ([#931](https://github.com/putyourlightson/craft-blitz/issues/931)).
 - Fixed a bug in which descendant pages could fail to refresh when a parent entry’s slug or URI changed.
 
 ## 4.24.1 - 2026-10-27
