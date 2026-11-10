@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.24.3 - 2026-11-09
+
+- Fixed a security issue in which encoded URIs could access files outside the site’s cache directory when using file storage.
+
 ## 4.24.2 - 2026-11-01
 
 - Fixed a bug in which Cloudflare could be purged before cache generation completed, allowing stale pages to be cached again ([#931](https://github.com/putyourlightson/craft-blitz/issues/931)).
