@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.14.5 - 2026-11-09
+
+- Fixed a security issue in which encoded URIs could access files outside the site’s cache directory when using file storage.
+
 ## 5.14.4 - 2026-11-01
 
 - Fixed a bug in which descendant pages could fail to refresh when a parent entry’s slug or URI changed.

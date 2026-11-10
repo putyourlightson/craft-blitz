@@ -237,8 +237,8 @@ class FileStorage extends BaseCacheStorage
 
         $filePath = $this->getNormalizedFilePath($sitePath, $siteUri->uri);
 
-        // Ensure that file path is a sub path of the site path
-        if (!str_contains($filePath, $sitePath)) {
+        // Ensure the file path is a subpath of the site path
+        if (!FileHelper::isWithin($filePath, $sitePath)) {
             return [];
         }
 
@@ -258,7 +258,7 @@ class FileStorage extends BaseCacheStorage
          */
         $decodedUri = rawurldecode($siteUri->uri);
         $decodedFilePath = $this->getNormalizedFilePath($sitePath, $decodedUri);
-        if ($decodedFilePath != $filePath) {
+        if ($decodedFilePath != $filePath && FileHelper::isWithin($decodedFilePath, $sitePath)) {
             $filePaths[] = $decodedFilePath;
         }
 
