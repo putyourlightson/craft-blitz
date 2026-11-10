@@ -245,6 +245,9 @@ test('Site URI with period-only segments is not cacheable', function(string $uri
     '%2E/page',
     'page/%2E',
     'page/%2E/1',
+    'page/..\\..\\outside.txt',
+    'page/%2e%2e%2f%2e%2e%2foutside.txt',
+    'page/%2e%2e%5c%2e%2e%5coutside.txt',
 ]);
 
 test('URI patterns with matching regular expressions are matched', function() {

@@ -9,12 +9,14 @@ use Craft;
 use craft\base\Plugin;
 use craft\helpers\App;
 use craft\helpers\Json;
+use craft\helpers\Path;
 use craft\web\Controller;
 use craft\web\CsvResponseFormatter;
 use putyourlightson\blitz\assets\BlitzAsset;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\DiagnosticsHelper;
 use putyourlightson\sprig\Sprig;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -31,6 +33,10 @@ class DiagnosticsController extends Controller
 
     public function actionIndex(string $path): Response
     {
+        if (!Path::ensurePathIsContained($path)) {
+            throw new NotFoundHttpException('Invalid diagnostics path.');
+        }
+
         Sprig::bootstrap();
         Sprig::$core->components->setConfig(['requestClass' => 'busy']);
 

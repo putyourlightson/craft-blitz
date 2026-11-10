@@ -3,6 +3,8 @@
 ## 5.14.5 - 2026-11-09
 
 - Fixed a security issue in which encoded URIs could access files outside the site’s cache directory when using file storage.
+- Fixed a security issue in which URIs could write or delete files outside the repository directory when using the Git deployer.
+- Fixed a security issue in which diagnostics paths could resolve files outside the diagnostics templates directory.
 
 ## 5.14.4 - 2026-11-01
 
