@@ -144,6 +144,10 @@ class GitDeployer extends BaseDeployer
                     $filePath .= '/index.html';
                 }
 
+                if (!FileHelper::isWithin($filePath, $repository['repositoryPath'])) {
+                    continue;
+                }
+
                 $this->updateFile($filePath, $value);
             }
 

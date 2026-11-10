@@ -215,3 +215,20 @@ test('URI patterns without matching regular expressions are not matched', functi
     expect($matchesUriPatterns)
         ->toBeFalse();
 });
+
+test('Site URI with period-only segments is not cacheable', function(string $uri) {
+    $siteUri = createSiteUri(uri: $uri);
+
+    expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
+        ->toBeFalse();
+})->with([
+    './page',
+    'page/.',
+    'page/./1',
+    '%2E/page',
+    'page/%2E',
+    'page/%2E/1',
+    'page/..\\..\\outside.txt',
+    'page/%2e%2e%2f%2e%2e%2foutside.txt',
+    'page/%2e%2e%5c%2e%2e%5coutside.txt',
+]);
