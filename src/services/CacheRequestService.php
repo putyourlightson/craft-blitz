@@ -108,6 +108,9 @@ class CacheRequestService extends Component
                 ->pathParam(Blitz::$plugin->settings->cachedIncludePathParam)
                 ->usePathInfo(false);
             $config = App::webRequestConfig();
+            // Forcing a web request is required for cached includes using the local generator
+            // https://github.com/putyourlightson/craft-blitz/issues/932
+            $config['isConsoleRequest'] = false;
             $request = Craft::createObject($config);
             Craft::$app->set('request', $request);
         }

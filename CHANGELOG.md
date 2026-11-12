@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.14.6 - 2026-11-12
+
+- Fixed a bug in which the Local Generator could fail to regenerate cached includes ([#932](https://github.com/putyourlightson/craft-blitz/issues/932)).
+
 ## 5.14.5 - 2026-11-09
 
 - Fixed a security issue in which encoded URIs could access files outside the site’s cache directory when using file storage.
