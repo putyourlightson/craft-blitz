@@ -10,6 +10,9 @@ use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\FieldHelper;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
+use putyourlightson\blitz\tests\TestCase as IsolatedTestCase;
+
+require_once __DIR__ . '/TestCase.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -47,6 +50,11 @@ uses(TestCase::class)
 uses(TestCase::class)
     ->group('interface')
     ->in('Interface');
+
+// Isolated tests provide their own setup and cleanup.
+uses(IsolatedTestCase::class)
+    ->in('Isolated');
+
 /*
 |--------------------------------------------------------------------------
 | Expectations

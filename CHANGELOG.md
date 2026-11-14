@@ -5,6 +5,7 @@
 - Added MCP tools for Blitz.
 - Added the `blitz/flush-site` and `blitz/flush-urls` cache console commands.
 - Fixed a bug in which deploying all cached pages could omit custom site URIs.
+- Fixed a bug in which changing a parent entry’s slug or URI could require two cache refresh and deployment passes.
 
 ## 5.14.6 - 2026-11-12
 

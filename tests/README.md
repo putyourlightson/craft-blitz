@@ -21,7 +21,7 @@ php vendor/bin/ecs check -c vendor/putyourlightson/craft-blitz/ecs.php
 To run Pest tests, first install [Craft Pest](https://craft-pest.com/) core as a dev dependency.
 
 ```shell
-composer require markhuot/craft-pest-core:^2.0.0-rc2 --dev
+composer require markhuot/craft-pest-core:^3.0.0 --dev
 ```
 
 Then run the following command from the root of your project.

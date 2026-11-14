@@ -3,7 +3,6 @@
 use craft\base\Field;
 use craft\elements\Entry;
 use craft\helpers\Json;
-use markhuot\craftpest\test\TestCase;
 use putyourlightson\blitz\behaviors\ElementChangedBehavior;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\drivers\storage\DummyStorage;
@@ -18,34 +17,7 @@ use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySiteRecord;
-use putyourlightson\blitz\services\CacheRequestService;
 use putyourlightson\blitz\services\RefreshCacheService;
-use yii\base\Event;
-
-// These site-aware tests use an already migrated multisite installation and roll back all database changes.
-// Do not apply unrelated project config or invoke the feature suite's destructive fixture cleanup.
-class SiteAwareTestCase extends TestCase
-{
-    public function createApplication()
-    {
-        if ($this->needsRequireStatements()) {
-            // Booting the test app must not serve an existing cached homepage and exit PHP.
-            $handler = function($event) {
-                $event->isValid = false;
-            };
-            Event::on(CacheRequestService::class, CacheRequestService::EVENT_IS_CACHEABLE_REQUEST, $handler);
-            try {
-                $this->requireCraft();
-            } finally {
-                Event::off(CacheRequestService::class, CacheRequestService::EVENT_IS_CACHEABLE_REQUEST, $handler);
-            }
-        }
-
-        return Craft::$app;
-    }
-}
-
-uses(SiteAwareTestCase::class);
 
 beforeEach(function() {
     $this->transaction = Craft::$app->getDb()->beginTransaction();
