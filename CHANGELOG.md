@@ -1,5 +1,11 @@
 # Release Notes for Blitz
 
+## 5.15.0 - Unreleased
+
+- Added MCP tools for Blitz.
+- Added the `blitz/flush-site` and `blitz/flush-urls` cache console commands.
+- Fixed a bug in which deploying all cached pages could omit custom site URIs.
+
 ## 5.14.6 - 2026-11-12
 
 - Fixed a bug in which the Local Generator could fail to regenerate cached includes ([#932](https://github.com/putyourlightson/craft-blitz/issues/932)).

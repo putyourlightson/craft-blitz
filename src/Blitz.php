@@ -23,6 +23,7 @@ use craft\helpers\UrlHelper;
 use craft\log\MonologTarget;
 use craft\services\Dashboard;
 use craft\services\Elements;
+use craft\services\Mcp;
 use craft\services\Plugins;
 use craft\services\Structures;
 use craft\services\UserPermissions;
@@ -42,6 +43,7 @@ use putyourlightson\blitz\drivers\storage\BaseCacheStorage;
 use putyourlightson\blitz\helpers\ElementSidebarHelper;
 use putyourlightson\blitz\helpers\IntegrationHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
+use putyourlightson\blitz\mcp\CacheTools;
 use putyourlightson\blitz\models\RefreshDataModel;
 use putyourlightson\blitz\models\SettingsModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -140,6 +142,8 @@ class Blitz extends Plugin
         $this->registerVariables();
         $this->registerLogTarget();
         $this->registerSiteUrlRules();
+        $this->registerMcpTools();
+        $this->registerUserPermissions();
 
         // Potentially refresh the cache at the end of every request
         Craft::$app->onAfterRequest(function() {
@@ -162,7 +166,6 @@ class Blitz extends Plugin
             $this->registerWidgets();
             $this->registerSidebarPanels();
             $this->registerRedirectAfterInstall();
-            $this->registerUserPermissions();
 
             Sprig::bootstrap();
         }
@@ -479,6 +482,23 @@ class Blitz extends Plugin
                 ],
                     $event->rules
                 );
+            }
+        );
+    }
+
+    /**
+     * Registers MCP tools when supported by Craft.
+     */
+    private function registerMcpTools(): void
+    {
+        // TODO: remove in Blitz 6
+        if (!class_exists(Mcp::class)) {
+            return;
+        }
+
+        Event::on(Mcp::class, Mcp::EVENT_REGISTER_CAPABILITY_TYPES,
+            function(RegisterComponentTypesEvent $event) {
+                $event->types[] = CacheTools::class;
             }
         );
     }

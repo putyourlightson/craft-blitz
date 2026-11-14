@@ -344,7 +344,10 @@ class FileStorage extends BaseCacheStorage
         ];
     }
 
-    private function getSitePageCount(): array
+    /**
+     * Returns cached page and include counts for each site.
+     */
+    public function getSitePageCount(): array
     {
         $sites = [];
 

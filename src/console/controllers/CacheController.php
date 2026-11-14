@@ -130,6 +130,42 @@ class CacheController extends Controller
     }
 
     /**
+     * Deletes all cache records for the provided site from the database.
+     *
+     * @since 5.15.0
+     */
+    public function actionFlushSite(int $siteId = null): int
+    {
+        if (empty($siteId) || Craft::$app->getSites()->getSiteById($siteId) === null) {
+            $this->stderr(Craft::t('blitz', 'A valid site ID must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::USAGE;
+        }
+
+        $this->flushCache(SiteUriHelper::getSiteUrisForSite($siteId));
+
+        return ExitCode::OK;
+    }
+
+    /**
+     * Deletes cache records with the provided URLs from the database (the `*` wildcard is supported).
+     *
+     * @since 5.15.0
+     */
+    public function actionFlushUrls(array $urls = []): int
+    {
+        if (empty($urls)) {
+            $this->stderr(Craft::t('blitz', 'One or more URLs must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::USAGE;
+        }
+
+        $this->flushCache(SiteUriHelper::getSiteUrisFromUrls($urls));
+
+        return ExitCode::OK;
+    }
+
+    /**
      * Generates all cacheable pages.
      */
     public function actionGenerate(): int
