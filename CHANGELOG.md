@@ -1,6 +1,6 @@
 # Release Notes for Blitz
 
-## 5.15.0 - Unreleased
+## 5.15.0 - 2026-11-16
 
 - Added MCP tools for Blitz.
 - Added the `blitz/flush-site` and `blitz/flush-urls` cache console commands.
