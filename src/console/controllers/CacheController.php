@@ -166,6 +166,24 @@ class CacheController extends Controller
     }
 
     /**
+     * Deletes cache records with the provided tags from the database.
+     *
+     * @since 5.15.1
+     */
+    public function actionFlushTagged(array $tags = []): int
+    {
+        if (empty($tags)) {
+            $this->stderr(Craft::t('blitz', 'One or more tags must be provided as an argument.') . PHP_EOL, BaseConsole::FG_RED);
+
+            return ExitCode::USAGE;
+        }
+
+        $this->flushCache(SiteUriHelper::getSiteUrisFromTags($tags));
+
+        return ExitCode::OK;
+    }
+
+    /**
      * Generates all cacheable pages.
      */
     public function actionGenerate(): int

@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 5.15.1 - Unreleased
+
+- Added the `blitz/flush-tagged` cache console command and `blitz.flush-tagged` MCP tool.
+
 ## 5.15.0 - 2026-11-16
 
 - Added MCP tools for Blitz.

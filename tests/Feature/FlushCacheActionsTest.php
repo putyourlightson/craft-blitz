@@ -36,15 +36,21 @@ test('Scoped flush deletes only selected database records and retains cached fil
     ];
 
     try {
-        foreach ($siteUris as $siteUri) {
+        foreach ($siteUris as $index => $siteUri) {
             Craft::$app->getDb()->createCommand()->insert(CacheRecord::tableName(), $siteUri->toArray())->execute();
             Blitz::$plugin->cacheStorage->save('Retained cached content', $siteUri);
+            $cacheId = SiteUriHelper::getCacheIdsFromSiteUris([$siteUri])[0];
+            Blitz::$plugin->cacheTags->saveTags([$prefix . '-' . $index], $cacheId);
         }
         $arguments = $scope === 'site' ? [$site->id] : [[rtrim($site->getBaseUrl(), '/') . '/' . $prefix . '/selected/*']];
         if ($scope === 'unmatched') {
             $arguments = [[rtrim($site->getBaseUrl(), '/') . '/' . $prefix . '/missing/*']];
         }
         $method = $scope === 'site' ? 'flushSite' : 'flushUrls';
+        if (in_array($scope, ['tagged', 'unmatched-tags'], true)) {
+            $method = 'flushTagged';
+            $arguments = [$scope === 'tagged' ? [$prefix . '-0', $prefix . '-1'] : [$prefix . '-missing']];
+        }
         if ($interface === 'console') {
             $method = 'action' . ucfirst($method);
             expect($this->controller->$method(...$arguments))->toBe(ExitCode::OK);
@@ -53,7 +59,7 @@ test('Scoped flush deletes only selected database records and retains cached fil
         }
 
         foreach ($siteUris as $index => $siteUri) {
-            expect(SiteUriHelper::getCacheIdsFromSiteUris([$siteUri]))->toHaveCount($scope === 'unmatched' || $index === 2 ? 1 : 0)
+            expect(SiteUriHelper::getCacheIdsFromSiteUris([$siteUri]))->toHaveCount(in_array($scope, ['unmatched', 'unmatched-tags'], true) || $index === 2 ? 1 : 0)
                 ->and(Blitz::$plugin->cacheStorage->get($siteUri))->toBe('Retained cached content');
         }
     } finally {
@@ -62,7 +68,7 @@ test('Scoped flush deletes only selected database records and retains cached fil
         }
         Blitz::$plugin->cacheStorage->deleteUris($siteUris);
     }
-})->with(['console', 'mcp'])->with(['site', 'urls', 'unmatched']);
+})->with(['console', 'mcp'])->with(['site', 'urls', 'unmatched', 'tagged', 'unmatched-tags']);
 
 test('Console scoped flush rejects missing or invalid arguments without flushing all records', function(string $method, array $arguments) {
     expect($this->controller->$method(...$arguments))->toBe(ExitCode::USAGE);
@@ -70,4 +76,5 @@ test('Console scoped flush rejects missing or invalid arguments without flushing
     ['actionFlushSite', []],
     ['actionFlushSite', [-1]],
     ['actionFlushUrls', []],
+    ['actionFlushTagged', []],
 ]);

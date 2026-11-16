@@ -302,6 +302,23 @@ class CacheTools
         return $this->success('flush-urls');
     }
 
+    /**
+     * @param string[] $tags
+     */
+    #[McpTool(
+        name: 'blitz.flush-tagged',
+        description: 'Deletes cache records with the provided tags from the database. Cached files are retained.',
+        annotations: new ToolAnnotations(destructiveHint: true),
+    )]
+    #[RequiresPermission('blitz:flush')]
+    public function flushTagged(#[Schema(items: ['type' => 'string', 'minLength' => 1], minItems: 1)] array $tags): array
+    {
+        $this->requireValues($tags);
+        Blitz::$plugin->flushCache->flushUris(SiteUriHelper::getSiteUrisFromTags($tags));
+
+        return $this->success('flush-tagged');
+    }
+
     #[McpTool(
         name: 'blitz.deploy',
         description: 'Queues deployment of all cached files to the configured remote location.',

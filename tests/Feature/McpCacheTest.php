@@ -27,7 +27,7 @@ test('MCP tools are registered outside control panel requests and have permissio
 
     $definitions = $registry->definitions();
     $tools = array_filter($definitions->getTools(), fn(ToolReference $tool) => $tool->handler[0] === CacheTools::class);
-    expect($tools)->toHaveCount(25);
+    expect($tools)->toHaveCount(26);
 
     foreach ($tools as $name => $tool) {
         expect($name)->toStartWith('blitz.');
@@ -50,7 +50,7 @@ test('MCP inputs describe non-empty string lists and positive site IDs', functio
 
 test('MCP rejects empty or malformed lists before executing cache operations', function(string $method, array $values) {
     expect(fn() => (new CacheTools())->$method($values))->toThrow(ToolCallException::class);
-})->with(['flushUrls', 'clearUrls', 'clearTagged', 'generateUrls', 'generateTagged', 'purgeUrls', 'purgeTagged', 'refreshUrls', 'refreshTagged'])
+})->with(['flushTagged', 'flushUrls', 'clearUrls', 'clearTagged', 'generateUrls', 'generateTagged', 'purgeUrls', 'purgeTagged', 'refreshUrls', 'refreshTagged'])
     ->with([[[]], [['']], [['   ']], [[null]], [[['nested']]], [[42]]]);
 
 test('MCP rejects unknown sites before executing cache operations', function(string $method) {
