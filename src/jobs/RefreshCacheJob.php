@@ -7,6 +7,8 @@ namespace putyourlightson\blitz\jobs;
 
 use Craft;
 use craft\base\ElementInterface;
+use craft\elements\Entry;
+use craft\models\Section;
 use craft\queue\BaseJob;
 use craft\queue\QueueInterface;
 use putyourlightson\blitz\Blitz;
@@ -60,6 +62,8 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     {
         $refreshData = RefreshDataModel::createFromData($this->data);
 
+        $this->updateDescendantSlugsAndUris($refreshData);
+
         $this->populateCacheIdsFromElementCaches($refreshData);
 
         // Clear the site URIs early.
@@ -100,6 +104,45 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     protected function defaultDescription(): string
     {
         return Craft::t('blitz', 'Refreshing Blitz cache');
+    }
+
+    /**
+     * Updates descendant URIs before resolving the URLs to refresh.
+     */
+    private function updateDescendantSlugsAndUris(RefreshDataModel $refreshData): void
+    {
+        $refreshCache = Blitz::$plugin->refreshCache;
+        $pendingRefreshData = $refreshCache->refreshData;
+
+        // Collect Craft’s URI update events in this refresh rather than queueing another one.
+        $refreshCache->refreshData = $refreshData;
+
+        try {
+            foreach ($refreshData->getElementIds(Entry::class) as $elementId) {
+                if (!array_intersect(['slug', 'uri'], $refreshData->getChangedAttributes(Entry::class, $elementId))) {
+                    continue;
+                }
+
+                $entries = Entry::find()->id($elementId)->siteId('*')->unique(false)->status(null)->all();
+                $entry = $entries[0] ?? null;
+
+                if ($entry === null || !$entry->getIsCanonical() || $entry->getSection()->type !== Section::TYPE_STRUCTURE) {
+                    continue;
+                }
+
+                // Include descendants even on retries, when their URIs may already have been updated.
+                // Other sites are updated too, so conservatively refresh all their variants.
+                $descendantIds = Entry::find()->descendantOf($entry)->status(null)->siteId('*')->ids();
+                $refreshData->addElementIds(Entry::class, $descendantIds);
+
+                // Walk each site separately so descendants absent from another site are included too.
+                foreach ($entries as $entry) {
+                    Craft::$app->getElements()->updateDescendantSlugsAndUris($entry, false);
+                }
+            }
+        } finally {
+            $refreshCache->refreshData = $pendingRefreshData;
+        }
     }
 
     /**

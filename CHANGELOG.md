@@ -1,5 +1,10 @@
 # Release Notes for Blitz
 
+## 4.24.4 - 2026-11-16
+
+- Fixed a bug in which deploying all cached pages could omit custom site URIs.
+- Fixed a bug in which changing a parent entry’s slug or URI could require two cache refresh and deployment passes.
+
 ## 4.24.3 - 2026-11-09
 
 - Fixed a security issue in which encoded URIs could access files outside the site’s cache directory when using file storage.
