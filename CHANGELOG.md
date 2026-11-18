@@ -1,8 +1,11 @@
 # Release Notes for Blitz
 
-## 5.15.1 - Unreleased
+## 5.16.0 - Unreleased
 
-- Added the `blitz/flush-tagged` cache console command and `blitz.flush-tagged` MCP tool.
+- Added the `blitz/flush-tagged` console command and `blitz.flush-tagged` MCP tool.
+- Changed cache refreshes to generate updated elements’ own pages first.
+- Changed cache refreshes to clear pages with matching source tags before checking element queries.
+- Improved element query matching performance.
 
 ## 5.15.0 - 2026-11-16
 
