@@ -3,6 +3,7 @@
 use craft\elements\db\ElementQuery;
 use craft\elements\Entry;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\purgers\BaseCachePurger;
 use putyourlightson\blitz\events\RefreshCacheEvent;
 use putyourlightson\blitz\jobs\RefreshCacheJob;
 use putyourlightson\blitz\models\RefreshDataModel;
@@ -13,7 +14,29 @@ use putyourlightson\blitz\services\ClearCacheService;
 use putyourlightson\blitz\services\RefreshCacheService;
 use yii\base\Event;
 
-test('Refresh jobs prioritise element pages and clear direct and tagged pages before query checks', function(bool $cached, int $refreshMode) {
+beforeEach(function() {
+    $this->originalPurger = Blitz::$plugin->cachePurger;
+    $this->purger = new class() extends BaseCachePurger {
+        public array $purgedSiteUris = [];
+
+        public static function displayName(): string
+        {
+            return 'Test';
+        }
+
+        public function purgeUrisWithProgress(array $siteUris, ?callable $setProgressHandler = null): void
+        {
+            $this->purgedSiteUris[] = $siteUris;
+        }
+    };
+    Blitz::$plugin->set('cachePurger', $this->purger);
+});
+
+afterEach(function() {
+    Blitz::$plugin->set('cachePurger', $this->originalPurger);
+});
+
+test('Refresh jobs synchronously clear and purge only element pages before query checks', function(bool $cached, int $refreshMode, bool $forceClear) {
     $plugin = Blitz::$plugin;
     $plugin->cacheStorage->deleteAll();
     $plugin->flushCache->flushAll(true);
@@ -59,15 +82,12 @@ test('Refresh jobs prioritise element pages and clear direct and tagged pages be
     $queryHandler = function() use (&$queriesChecked) {
         $queriesChecked = true;
     };
-    $afterClearHandler = function() use ($plugin, $entry, $cached, &$queriesChecked) {
+    $afterClearHandler = function() use ($plugin, $entry, &$queriesChecked) {
         expect($queriesChecked)->toBeFalse();
-        foreach (['m-direct', 'n-explicit', 'z-direct', 'c-tagged'] as $uri) {
-            expect($plugin->cacheStorage->get(createSiteUri($entry->siteId, $uri)))->toBeNull();
-        }
-        foreach (['a-query', 'b-query', 'unrelated'] as $uri) {
+        expect($plugin->cacheStorage->get(createSiteUri($entry->siteId, $entry->uri)))->toBeNull();
+        foreach (['m-direct', 'n-explicit', 'z-direct', 'c-tagged', 'a-query', 'b-query', 'unrelated'] as $uri) {
             expect($plugin->cacheStorage->get(createSiteUri($entry->siteId, $uri)))->not->toBeNull();
         }
-        expect($plugin->cacheStorage->get(createSiteUri($entry->siteId, $entry->uri)) !== null)->toBe($cached);
     };
     $clearHandler = function(RefreshCacheEvent $event) use (&$clearedUris) {
         $clearedUris = array_map(fn($siteUri) => $siteUri->uri, $event->siteUris);
@@ -76,35 +96,82 @@ test('Refresh jobs prioritise element pages and clear direct and tagged pages be
         $refreshedUris = array_values(array_map(fn($siteUri) => $siteUri->uri, $event->siteUris));
         $event->isValid = false;
     };
+    $purgeHandler = function() use ($entry, &$queriesChecked, &$clearedUris) {
+        expect($queriesChecked)->toBeFalse()
+            ->and($clearedUris)->toBe([$entry->uri]);
+    };
     Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE, $queryHandler);
     $plugin->clearCache->on(ClearCacheService::EVENT_BEFORE_CLEAR_CACHE, $clearHandler);
     $plugin->clearCache->on(ClearCacheService::EVENT_AFTER_CLEAR_CACHE, $afterClearHandler);
     $plugin->refreshCache->on(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE, $refreshHandler);
+    $this->purger->on(BaseCachePurger::EVENT_BEFORE_PURGE_CACHE, $purgeHandler);
 
     try {
-        (new RefreshCacheJob(['data' => $refreshData->data]))->execute($plugin->queue);
+        (new RefreshCacheJob(['data' => $refreshData->data, 'forceClear' => $forceClear]))->execute($plugin->queue);
 
         expect($refreshedUris[0])->toBe($entry->uri)
             ->and(array_slice($refreshedUris, 1))
             ->toEqualCanonicalizing(['a-query', 'b-query', 'c-tagged', 'm-direct', 'n-explicit', 'z-direct']);
 
         $expectedClearedUris = [];
-        if ($refreshMode === SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE) {
-            $expectedClearedUris = ['c-tagged', 'm-direct', 'n-explicit', 'z-direct'];
+        if ($refreshMode === SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE || $forceClear) {
+            $expectedClearedUris = [$entry->uri];
         }
         expect($clearedUris)->toBe($expectedClearedUris)
-            ->and($queriesChecked)->toBeTrue();
+            ->and($queriesChecked)->toBeTrue()
+            ->and(array_map(
+                fn(array $siteUris) => array_map(fn($siteUri) => $siteUri->uri, $siteUris),
+                $this->purger->purgedSiteUris,
+            ))->toBe($expectedClearedUris === [] ? [] : [$expectedClearedUris]);
     } finally {
         Event::off(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE, $queryHandler);
         $plugin->clearCache->off(ClearCacheService::EVENT_AFTER_CLEAR_CACHE, $afterClearHandler);
         $plugin->clearCache->off(ClearCacheService::EVENT_BEFORE_CLEAR_CACHE, $clearHandler);
         $plugin->refreshCache->off(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE, $refreshHandler);
         $plugin->settings->refreshMode = $previousRefreshMode;
+        $this->purger->off(BaseCachePurger::EVENT_BEFORE_PURGE_CACHE, $purgeHandler);
     }
 })->with([true, false])->with([
-    SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE,
-    SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE,
+    'clear and generate' => [SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE, false],
+    'expire and generate' => [SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE, false],
+    'forced clear' => [SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE, true],
 ]);
+
+test('Cache-ID-only refreshes skip early clearing and purging', function() {
+    $plugin = Blitz::$plugin;
+    $previousRefreshMode = $plugin->settings->refreshMode;
+    $plugin->settings->refreshMode = SettingsModel::REFRESH_MODE_CLEAR_AND_GENERATE;
+    $plugin->generateCache->reset();
+    $plugin->generateCache->options->cachingEnabled = true;
+    $siteUri = createSiteUri(uri: 'cache-id-only');
+    $plugin->generateCache->save(createOutput(), $siteUri);
+    $refreshData = new RefreshDataModel();
+    $refreshData->addCacheId((int)CacheRecord::find()->select('id')->where($siteUri->toArray())->scalar());
+    $clears = 0;
+    $refreshedUris = [];
+    $clearHandler = function() use (&$clears) {
+        $clears++;
+    };
+    $refreshHandler = function(RefreshCacheEvent $event) use (&$refreshedUris) {
+        $refreshedUris = array_map(fn($siteUri) => $siteUri->uri, $event->siteUris);
+        $event->isValid = false;
+    };
+    $plugin->clearCache->on(ClearCacheService::EVENT_BEFORE_CLEAR_CACHE, $clearHandler);
+    $plugin->refreshCache->on(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE, $refreshHandler);
+
+    try {
+        (new RefreshCacheJob(['data' => $refreshData->data]))->execute($plugin->queue);
+
+        expect($clears)->toBe(0)
+            ->and($this->purger->purgedSiteUris)->toBe([])
+            ->and($refreshedUris)->toBe([$siteUri->uri])
+            ->and($plugin->cacheStorage->get($siteUri))->not->toBeNull();
+    } finally {
+        $plugin->clearCache->off(ClearCacheService::EVENT_BEFORE_CLEAR_CACHE, $clearHandler);
+        $plugin->refreshCache->off(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE, $refreshHandler);
+        $plugin->settings->refreshMode = $previousRefreshMode;
+    }
+});
 
 test('Changed elements’ own pages are sorted by site ID and URI', function() {
     $plugin = Blitz::$plugin;

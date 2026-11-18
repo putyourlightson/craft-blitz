@@ -53,35 +53,27 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     {
         $refreshData = RefreshDataModel::createFromData($this->data);
 
-        // Update descendant URIs first so the refresh includes their new URLs.
+        // Update descendant URIs and include those elements in the refresh.
         RefreshCacheHelper::updateDescendantSlugsAndUris($refreshData);
 
-        // Collect direct dependencies and source-tag matches.
+        // Resolve element pages once, including updated descendants, for clearing, purging and generation.
+        $elementSiteUris = RefreshCacheHelper::getElementSiteUris($refreshData);
+
+        // Clear and synchronously purge element pages before checking dependencies and queries.
+        if (Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear)) {
+            if ($elementSiteUris !== []) {
+                Blitz::$plugin->clearCache->clearUris($elementSiteUris);
+                Blitz::$plugin->cachePurger->purgeUris($elementSiteUris, queue: false);
+            }
+        }
+
+        // Collect direct dependencies and source-tag matches for the final refresh.
         foreach ($refreshData->getElementTypes() as $elementType) {
             $refreshData->addCacheIds(RefreshCacheHelper::getElementCacheIds($elementType, $refreshData));
             $refreshData->addCacheIds(RefreshCacheHelper::getSourceTagCacheIds($elementType, $refreshData));
         }
 
-        // Clear identified cache records before checking element queries.
-        $cachedSiteUris = [];
-        if (Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear)) {
-            $cachedSiteUris = SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds());
-            Blitz::$plugin->clearCache->clearUris($cachedSiteUris);
-        }
-
-        // Site URIs to refresh, keyed by site ID and URI, to maintain order and uniqueness.
-        $siteUris = [];
-
-        // Start with the changed elements’ own pages.
-        foreach (RefreshCacheHelper::getElementSiteUris($refreshData) as $siteUri) {
-            $siteUris[$siteUri->siteId . ':' . $siteUri->uri] ??= $siteUri;
-        }
-
-        foreach ($cachedSiteUris as $siteUri) {
-            $siteUris[$siteUri->siteId . ':' . $siteUri->uri] ??= $siteUri;
-        }
-
-        // Check potentially expensive element queries after clearing known pages.
+        // Find cached pages affected by tracked element queries.
         foreach ($refreshData->getElementTypes() as $elementType) {
             if (!empty($refreshData->getElementIds($elementType))) {
                 $elementQueryRecords = RefreshCacheHelper::getElementTypeQueryRecords($elementType, $refreshData);
@@ -102,7 +94,15 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
             }
         }
 
-        // Add any pages identified by element queries.
+        // Site URIs to refresh, keyed by site ID and URI, to maintain order and uniqueness.
+        $siteUris = [];
+
+        // Generate element pages first.
+        foreach ($elementSiteUris as $siteUri) {
+            $siteUris[$siteUri->siteId . ':' . $siteUri->uri] ??= $siteUri;
+        }
+
+        // Append affected cached pages without duplicating element pages.
         foreach (SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds()) as $siteUri) {
             $siteUris[$siteUri->siteId . ':' . $siteUri->uri] ??= $siteUri;
         }
@@ -110,7 +110,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         $purgeSiteUris = [];
 
         if (Blitz::$plugin->settings->shouldPurgeAssetImages()) {
-            // Purge assets whose image has changed
+            // Include changed asset images in the final purge.
             $assetIds = $refreshData->getAssetsChangedByFile();
             $purgeSiteUris = SiteUriHelper::getAssetSiteUris($assetIds);
         }

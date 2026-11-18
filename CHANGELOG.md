@@ -3,8 +3,8 @@
 ## 5.16.0 - Unreleased
 
 - Added the `blitz/flush-tagged` console command and `blitz.flush-tagged` MCP tool.
+- Changed cache refreshes to clear and immediately purge updated elements’ own pages before checking dependencies and element queries.
 - Changed cache refreshes to generate updated elements’ own pages first.
-- Changed cache refreshes to clear pages with matching source tags before checking element queries.
 - Improved element query matching performance.
 
 ## 5.15.0 - 2026-11-16
