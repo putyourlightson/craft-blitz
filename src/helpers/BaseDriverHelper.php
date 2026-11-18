@@ -6,11 +6,13 @@
 namespace putyourlightson\blitz\helpers;
 
 use craft\base\SavableComponent;
-use craft\db\Query;
 use craft\helpers\Component;
 use craft\helpers\Queue;
+use craft\queue\Queue as CraftQueue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
+use putyourlightson\blitz\jobs\PurgeSiteJob;
+use yii\base\InvalidArgumentException;
 
 class BaseDriverHelper
 {
@@ -69,7 +71,7 @@ class BaseDriverHelper
     }
 
     /**
-     * Releases driver jobs from the queue.
+     * Shared jobs become no-ops so cancellation cannot remove jobs for newly added work.
      */
     public static function releaseDriverJobs(string $driverId): void
     {
@@ -77,31 +79,24 @@ class BaseDriverHelper
 
         $queue = Blitz::$plugin->queue;
 
-        // Only release jobs if the queue is a Craft queue.
-        if (!($queue instanceof \craft\queue\Queue)) {
+        if ($driverId !== CachePurgerHelper::DRIVER_ID || !($queue instanceof CraftQueue)) {
             return;
         }
 
-        $query = (new Query())
-            ->from([$queue->tableName])
-            ->select(['id'])
-            ->where(['dateReserved' => null]);
-
-        $condition = ['and',
-            ['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"'],
-            ['like', 'job', '"' . $driverId . '"'],
-        ];
-        if ($driverId === CacheGeneratorHelper::DRIVER_ID) {
-            $condition = ['or', $condition, ['like', 'job', '"putyourlightson\\blitz\\jobs\\GenerateCacheJob"']];
-        } elseif ($driverId === CachePurgerHelper::DRIVER_ID) {
-            $condition = ['or', $condition, ['like', 'job', '"putyourlightson\\blitz\\jobs\\PurgeSiteJob"']];
-        }
-        $query->andWhere($condition);
-
-        $jobIds = $query->column();
-
-        foreach ($jobIds as $jobId) {
-            $queue->release($jobId);
+        // Site purges carry their own work, so clearing pending URLs cannot cancel them.
+        foreach ($queue->getJobInfo() as $info) {
+            if ($info['status'] === CraftQueue::STATUS_RESERVED) {
+                continue;
+            }
+            try {
+                $details = $queue->getJobDetails($info['id']);
+            } catch (InvalidArgumentException) {
+                // Another worker may have completed the job since the list was fetched.
+                continue;
+            }
+            if ($details['status'] !== CraftQueue::STATUS_RESERVED && $details['job'] instanceof PurgeSiteJob) {
+                $queue->release($info['id']);
+            }
         }
     }
 }

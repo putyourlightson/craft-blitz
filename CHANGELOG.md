@@ -7,6 +7,7 @@
 - Changed cache refreshes to clear and immediately purge updated elements’ own pages before checking dependencies and element queries.
 - Changed cache refreshes to generate updated elements’ own pages first.
 - Improved element query matching performance.
+- Fixed a bug in which releasing Blitz queue jobs could remove unrelated jobs.
 
 ## 5.15.0 - 2026-11-16
 

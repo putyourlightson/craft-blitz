@@ -67,23 +67,19 @@ class DriverJob extends BaseJob implements RetryableJobInterface
 
         $this->queue = $queue;
 
-        // Get driver from ID
-        $driver = Blitz::$plugin->get($this->driverId);
-
-        if (is_callable([$driver, $this->driverMethod])) {
-            $processed = SiteUriQueueHelper::process($this->driverId, $this->driverMethod,
-                fn(array $siteUris) => call_user_func([$driver, $this->driverMethod], $siteUris, [$this, 'setProgressHandler']),
-            );
-            $priority = SiteUriQueueHelper::getPriority($this->driverId, $this->driverMethod);
-            if ($priority !== null) {
-                // Let prerequisite work run before retrying blocked URLs.
-                $nextJob = new self([
-                    'driverId' => $this->driverId,
-                    'driverMethod' => $this->driverMethod,
-                    'description' => $this->description,
-                ]);
-                QueueHelper::push($nextJob, $priority, $processed === 0 ? 1 : 0, $this->getTtr(), $queue);
-            }
+        // Resolve the driver only when there is work so cancelled jobs can finish as no-ops.
+        $processed = SiteUriQueueHelper::process($this->driverId, $this->driverMethod,
+            fn(array $siteUris) => call_user_func([Blitz::$plugin->get($this->driverId), $this->driverMethod], $siteUris, [$this, 'setProgressHandler']),
+        );
+        $priority = SiteUriQueueHelper::getPriority($this->driverId, $this->driverMethod);
+        if ($priority !== null) {
+            // Let prerequisite work run before retrying blocked URLs.
+            $nextJob = new self([
+                'driverId' => $this->driverId,
+                'driverMethod' => $this->driverMethod,
+                'description' => $this->description,
+            ]);
+            QueueHelper::push($nextJob, $priority, $processed === 0 ? 1 : 0, $this->getTtr(), $queue);
         }
     }
 

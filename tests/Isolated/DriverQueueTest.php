@@ -15,6 +15,7 @@ use putyourlightson\blitz\helpers\DeployerHelper;
 use putyourlightson\blitz\helpers\SiteUriQueueHelper;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\jobs\GenerateCacheJob;
+use putyourlightson\blitz\jobs\PurgeSiteJob;
 use putyourlightson\blitz\migrations\Install;
 use putyourlightson\blitz\migrations\m261118_120000_add_driverqueue_table;
 use putyourlightson\blitz\models\SettingsModel;
@@ -384,6 +385,76 @@ test('Releasing a custom driver cancels all its methods while retaining other dr
         ->and(SiteUriQueueHelper::getCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->toBe(1);
     ($this->drain)();
     expect($this->generator->batches)->toBe([['work-a']]);
+});
+
+test('Releasing shared work leaves its jobs available for newer requests', function(string $driverId, string $method) {
+    [$a, $b] = $this->uris;
+    $driver = Blitz::$plugin->get($driverId);
+    $driver->$method([$a]);
+    $jobId = (new Query())->select('id')->from($this->queue->tableName)->where(['channel' => $this->queue->channel])->scalar();
+    BaseDriverHelper::releaseDriverJobs($driverId);
+
+    expect(SiteUriQueueHelper::getCount($driverId, $method . 'WithProgress'))->toBe(0)
+        ->and((new Query())->from($this->queue->tableName)->where(['id' => $jobId])->exists())->toBeTrue();
+
+    $driver->$method([$b]);
+    ($this->drain)();
+    expect($driver->batches)->toBe([['work-b']]);
+})->with([
+    ['cacheGenerator', 'generateUris'],
+    ['deployer', 'deployUris'],
+    ['cachePurger', 'purgeUris'],
+]);
+
+test('Releasing a driver ignores its name in another job’s description', function() {
+    BaseDriverHelper::addDriverJob([$this->uris[0]], 'cachePurger', 'purgeUrisWithProgress', 'deployer');
+    BaseDriverHelper::releaseDriverJobs('deployer');
+    ($this->drain)();
+
+    expect($this->purger->batches)->toBe([['work-a']]);
+});
+
+test('Releasing site purges preserves other channels, running jobs and misleading descriptions', function() {
+    $siteId = $this->uris[0]->siteId;
+    $waitingId = $this->queue->push(new PurgeSiteJob(['siteId' => $siteId]));
+    $runningId = $this->queue->push(new PurgeSiteJob(['siteId' => $siteId]));
+    Db::update($this->queue->tableName, ['dateReserved' => Db::prepareDateForDb('now'), 'timeUpdated' => time()], ['id' => $runningId]);
+    $otherQueue = new Queue(['channel' => 'blitz-other-' . bin2hex(random_bytes(6))]);
+    $otherId = $otherQueue->push(new PurgeSiteJob(['siteId' => $siteId]));
+    $unrelatedId = $this->queue->push(new GenerateCacheJob(['description' => PurgeSiteJob::class]));
+
+    CachePurgerHelper::releasePurgerJobs();
+
+    $exists = fn($id) => (new Query())->from($this->queue->tableName)->where(['id' => $id])->exists();
+    expect($exists($waitingId))->toBeFalse()
+        ->and($exists($runningId))->toBeTrue()
+        ->and($exists($otherId))->toBeTrue()
+        ->and($exists($unrelatedId))->toBeTrue();
+});
+
+test('Site purge cancellation uses the configured queue API and tolerates concurrent workers', function() {
+    $db = Mockery::mock(Connection::class . '[createCommand]', [['dsn' => 'mysql:host=unused;dbname=unused']]);
+    $db->shouldNotReceive('createCommand');
+    $queue = Mockery::mock(Queue::class . '[getJobInfo,getJobDetails,release]', [[
+        'db' => $db,
+        'channel' => 'external',
+        'tableName' => '{{%external_queue}}',
+    ]]);
+    $job = new PurgeSiteJob(['siteId' => $this->uris[0]->siteId]);
+    $queue->shouldReceive('getJobInfo')->once()->andReturn([
+        ['id' => 'gone', 'status' => Queue::STATUS_WAITING],
+        ['id' => 'running', 'status' => Queue::STATUS_RESERVED],
+        ['id' => 'claimed', 'status' => Queue::STATUS_WAITING],
+        ['id' => 'waiting', 'status' => Queue::STATUS_WAITING],
+    ]);
+    $queue->shouldReceive('getJobDetails')->with('gone')->once()->andThrow(new \yii\base\InvalidArgumentException());
+    $queue->shouldNotReceive('getJobDetails')->with('running');
+    $queue->shouldReceive('getJobDetails')->with('claimed')->once()->andReturn(['status' => Queue::STATUS_RESERVED, 'job' => $job]);
+    $queue->shouldReceive('getJobDetails')->with('waiting')->once()->andReturn(['status' => Queue::STATUS_WAITING, 'job' => $job]);
+    $queue->shouldReceive('release')->with('waiting')->once();
+    Blitz::$plugin->queue = $queue;
+
+    BaseDriverHelper::releaseDriverJobs(CachePurgerHelper::DRIVER_ID);
 });
 
 test('Queue payloads contain no URL lists and stale jobs perform no driver calls', function() {
