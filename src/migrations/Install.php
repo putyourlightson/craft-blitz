@@ -91,6 +91,7 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
                 'uri' => $uriColumn,
+                'uriHash' => $this->char(32)->notNull(),
                 'paginate' => $this->integer(),
                 'dateCached' => $this->dateTime(),
                 'expiryDate' => $this->dateTime(),
@@ -218,7 +219,7 @@ class Install extends Migration
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
                 'uri' => $this->string(Blitz::$plugin->settings->maxUriLength)->notNull(),
-                'uriHash' => $this->char(64)->notNull(),
+                'uriHash' => $this->char(32)->notNull(),
             ]);
         }
 
@@ -241,11 +242,6 @@ class Install extends Migration
      */
     protected function createIndexes(): void
     {
-        // Hash the full site/URI identity so long, case-sensitive URIs remain distinct on both databases.
-        $this->createIndex(null, QueueSiteUriRecord::tableName(), 'uriHash', true);
-        $this->createIndex(null, DriverQueueRecord::tableName(), ['siteUriId', 'driverId', 'driverMethod'], true);
-        $this->createIndex(null, DriverQueueRecord::tableName(), ['driverId', 'driverMethod', 'priority', 'id']);
-
         // Create a non-unique length-limited index on the URI column
         $maxUriIndexLength = Blitz::$plugin->settings->maxUriIndexLength;
         $uriColumn = "uri($maxUriIndexLength)";
@@ -255,6 +251,9 @@ class Install extends Migration
         }
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', $uriColumn]);
 
+        // Hash the full site/URI identity so long, case-sensitive URIs remain distinct on both databases.
+        $this->createIndex(null, CacheRecord::tableName(), 'uriHash', true);
+
         $this->createIndex(null, CacheRecord::tableName(), 'expiryDate');
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'elementId', true);
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'expiryDate');
@@ -262,6 +261,10 @@ class Install extends Migration
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
         $this->createIndex(null, IncludeRecord::tableName(), 'index', true);
+
+        $this->createIndex(null, QueueSiteUriRecord::tableName(), 'uriHash', true);
+        $this->createIndex(null, DriverQueueRecord::tableName(), ['siteUriId', 'driverId', 'driverMethod'], true);
+        $this->createIndex(null, DriverQueueRecord::tableName(), ['driverId', 'driverMethod', 'priority', 'id']);
     }
 
     /**

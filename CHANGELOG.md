@@ -2,15 +2,15 @@
 
 ## 5.16.0 - Unreleased
 
-> [!NOTE]
+> [!WARNING]
 > All pending Blitz queue jobs must complete before updating, as their previous payload format is no longer supported.
+> The cache must be cleared or refreshed after this update completes.
 
 - Added shared database tables to avoid generating, purging and deploying the same pending URLs more than once.
 - Added the `blitz/flush-tagged` console command and `blitz.flush-tagged` MCP tool.
 - Changed cache refreshes to clear and immediately purge updated elements’ own pages before checking dependencies and element queries.
 - Changed cache refreshes to generate updated elements’ own pages first.
 - Changed queued driver methods to receive `SiteUriModel` objects instead of arrays. Custom drivers may need updating.
-- Changed driver jobs to read URLs from shared tables instead of a `$siteUris` property.
 - Improved element query matching performance.
 - Fixed a bug in which releasing Blitz queue jobs could remove unrelated jobs.
 

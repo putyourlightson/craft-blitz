@@ -33,7 +33,9 @@ test('URI migration preserves the existing MySQL charset, length and text', func
     try {
         $migration->alterColumn(CacheRecord::tableName(), 'uri', 'varchar(1024) COLLATE ' . $charset . '_general_ci NOT NULL');
         $siteUri = createSiteUri(uri: 'tëst');
-        $db->createCommand()->insert(CacheRecord::tableName(), $siteUri->toArray())->execute();
+        $db->createCommand()->insert(CacheRecord::tableName(), array_merge($siteUri->toArray(), [
+            'uriHash' => SiteUriHelper::getSiteUriHash($siteUri->siteId, $siteUri->uri),
+        ]))->execute();
 
         $migration->safeUp();
 
@@ -92,4 +94,5 @@ test('Distinct URI variants retain their cache files and refresh dependencies', 
     'accents' => ['test', 'tëst'],
     'case' => ['test', 'Test'],
     'query string case' => ['test?value=a', 'test?value=A'],
+    'long URI suffix' => [str_repeat('segment/', 100) . 'b', str_repeat('segment/', 100) . 'B'],
 ]);

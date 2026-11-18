@@ -37,7 +37,9 @@ test('Scoped flush deletes only selected database records and retains cached fil
 
     try {
         foreach ($siteUris as $index => $siteUri) {
-            Craft::$app->getDb()->createCommand()->insert(CacheRecord::tableName(), $siteUri->toArray())->execute();
+            Craft::$app->getDb()->createCommand()->insert(CacheRecord::tableName(), array_merge($siteUri->toArray(), [
+                'uriHash' => SiteUriHelper::getSiteUriHash($siteUri->siteId, $siteUri->uri),
+            ]))->execute();
             Blitz::$plugin->cacheStorage->save('Retained cached content', $siteUri);
             $cacheId = SiteUriHelper::getCacheIdsFromSiteUris([$siteUri])[0];
             Blitz::$plugin->cacheTags->saveTags([$prefix . '-' . $index], $cacheId);

@@ -40,7 +40,7 @@ class DriverQueueHelper
                 $siteUri = $siteUri->toArray();
             }
             $siteUri['siteId'] = (int)$siteUri['siteId'];
-            $hash = hash('sha256', $siteUri['siteId'] . ':' . $siteUri['uri']);
+            $hash = SiteUriHelper::getSiteUriHash($siteUri['siteId'], $siteUri['uri']);
             $siteUrisByHash[$hash] ??= $siteUri;
         }
 

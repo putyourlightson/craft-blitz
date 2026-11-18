@@ -89,7 +89,7 @@ class ElementSidebarHelper
 
         /** @var CacheRecord|null $cacheRecord */
         $cacheRecord = CacheRecord::find()
-            ->where($siteUri->toArray())
+            ->where(['uriHash' => SiteUriHelper::getSiteUriHash($siteUri->siteId, $siteUri->uri)])
             ->one();
 
         $dateCached = $cacheRecord ? DateTimeHelper::toDateTime($cacheRecord->dateCached) : null;

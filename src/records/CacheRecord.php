@@ -13,6 +13,7 @@ use DateTime;
  * @property int $id
  * @property int $siteId
  * @property string $uri
+ * @property string $uriHash
  * @property int|null $paginate
  * @property DateTime|null $dateCached
  * @property DateTime|null $expiryDate

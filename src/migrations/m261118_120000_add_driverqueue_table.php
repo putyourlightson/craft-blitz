@@ -25,7 +25,7 @@ class m261118_120000_add_driverqueue_table extends Migration
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
                 'uri' => $this->string(Blitz::$plugin->settings->maxUriLength)->notNull(),
-                'uriHash' => $this->char(64)->notNull(),
+                'uriHash' => $this->char(32)->notNull(),
             ]);
             // Hash the full site/URI identity so long, case-sensitive URIs remain distinct on both databases.
             $this->createIndex(null, $table, 'uriHash', true);

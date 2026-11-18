@@ -600,10 +600,12 @@ class GenerateCacheService extends Component
 
         $db = Craft::$app->getDb();
 
+        $uriHash = SiteUriHelper::getSiteUriHash($siteUri->siteId, $siteUri->uri);
         $cacheValue = $siteUri->toArray();
+        $cacheValue['uriHash'] = $uriHash;
 
         // Delete cache records so we get a fresh cache.
-        CacheRecord::deleteAll($cacheValue);
+        CacheRecord::deleteAll(['uriHash' => $uriHash]);
 
         // Don’t paginate URIs that are already paginated.
         $paginate = SiteUriHelper::isPaginatedUri($siteUri->uri) ? null : $this->options->paginate;

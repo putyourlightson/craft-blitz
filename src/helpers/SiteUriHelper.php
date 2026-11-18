@@ -399,6 +399,16 @@ class SiteUriHelper
     }
 
     /**
+     * Matches complete site/URI identities without database index length or collation limits.
+     *
+     * @since 5.16.0
+     */
+    public static function getSiteUriHash(int $siteId, string $uri): string
+    {
+        return md5($siteId . ':' . $uri);
+    }
+
+    /**
      * Returns cache IDs from the given site URIs.
      *
      * @return int[]
@@ -412,17 +422,16 @@ class SiteUriHelper
 
         $cacheIdSets = [];
 
-        $siteUriChunks = self::getChunkedQueryParams($siteUris, 2);
+        $siteUriChunks = self::getChunkedQueryParams($siteUris);
         foreach ($siteUriChunks as $siteUris) {
-            $condition = ['or'];
-
+            $uriHashes = [];
             foreach ($siteUris as $siteUri) {
-                $condition[] = $siteUri->toArray();
+                $uriHashes[] = self::getSiteUriHash($siteUri->siteId, $siteUri->uri);
             }
 
             $cacheIdSets[] = CacheRecord::find()
                 ->select(['id'])
-                ->where($condition)
+                ->where(['uriHash' => $uriHashes])
                 ->column();
         }
 
