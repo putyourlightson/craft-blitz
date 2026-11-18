@@ -11,7 +11,7 @@ use craft\queue\BaseJob;
 use craft\queue\Queue as CraftQueue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
-use putyourlightson\blitz\helpers\SiteUriQueueHelper;
+use putyourlightson\blitz\helpers\DriverQueueHelper;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
@@ -38,8 +38,8 @@ class GenerateCacheJob extends BaseJob implements RetryableJobInterface
     public function getDescription(): string
     {
         $description = $this->description ?? Craft::t('blitz', 'Generating Blitz cache');
-        $count = SiteUriQueueHelper::getCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
-        $totalBatches = $this->batchIndex + max(1, (int)ceil($count / Blitz::$plugin->settings->driverJobBatchSize));
+        $pendingCount = DriverQueueHelper::getPendingCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
+        $totalBatches = $this->batchIndex + max(1, (int)ceil($pendingCount / Blitz::$plugin->settings->driverJobBatchSize));
         if ($totalBatches <= 1) {
             return $description;
         }
@@ -73,7 +73,7 @@ class GenerateCacheJob extends BaseJob implements RetryableJobInterface
     public function execute($queue): void
     {
         $this->queue = $queue;
-        SiteUriQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress',
+        DriverQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress',
             fn(array $siteUris) => Blitz::$plugin->cacheGenerator->generateUrisWithProgress($siteUris, [$this, 'setProgressHandler']),
             Blitz::$plugin->settings->driverJobBatchSize,
         );
@@ -82,7 +82,7 @@ class GenerateCacheJob extends BaseJob implements RetryableJobInterface
         if ($queue instanceof CraftQueue && !$queue->isReserved($queue->getJobId())) {
             return;
         }
-        $priority = SiteUriQueueHelper::getPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
+        $priority = DriverQueueHelper::getPendingPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
         if ($priority !== null) {
             // Continue generation before deployment jobs at the same priority.
             $nextJob = new self([

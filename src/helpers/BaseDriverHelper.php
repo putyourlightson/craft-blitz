@@ -54,7 +54,7 @@ class BaseDriverHelper
     public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $priority = null): void
     {
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
-        if (!SiteUriQueueHelper::add($driverId, $driverMethod, $siteUris, $priority)) {
+        if (!DriverQueueHelper::add($driverId, $driverMethod, $siteUris, $priority)) {
             return;
         }
 
@@ -75,7 +75,7 @@ class BaseDriverHelper
      */
     public static function releaseDriverJobs(string $driverId): void
     {
-        SiteUriQueueHelper::clear($driverId);
+        DriverQueueHelper::clear($driverId);
 
         $queue = Blitz::$plugin->queue;
 

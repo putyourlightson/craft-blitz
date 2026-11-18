@@ -282,7 +282,7 @@ class RefreshCacheHelper
             return [];
         }
 
-        $elementQueryIds = [];
+        $elementQueryResults = [];
         /**
          * Execute the element query, deleting the record if any exception is thrown.
          * Avoid calling the `ids()` method, as it catches exceptions.
@@ -290,7 +290,7 @@ class RefreshCacheHelper
          * @see Query::column()
          */
         try {
-            $elementQueryIds = $elementQuery
+            $elementQueryResults = $elementQuery
                 ->select(['id' => 'elements.id', 'siteId' => 'elements_sites.siteId'])
                 ->createCommand()
                 ->queryAll();
@@ -298,14 +298,14 @@ class RefreshCacheHelper
             $elementQueryRecord->delete();
         }
 
-        if (empty($elementQueryIds)) {
+        if (empty($elementQueryResults)) {
             return [];
         }
 
         // Build the lookup once to avoid scanning changed IDs for every query result.
         $elementIdSet = array_fill_keys($elementIds, true);
         $matches = false;
-        foreach ($elementQueryIds as $row) {
+        foreach ($elementQueryResults as $row) {
             if (!isset($elementIdSet[$row['id']])) {
                 continue;
             }

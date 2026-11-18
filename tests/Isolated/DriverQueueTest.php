@@ -12,7 +12,7 @@ use putyourlightson\blitz\helpers\BaseDriverHelper;
 use putyourlightson\blitz\helpers\CacheGeneratorHelper;
 use putyourlightson\blitz\helpers\CachePurgerHelper;
 use putyourlightson\blitz\helpers\DeployerHelper;
-use putyourlightson\blitz\helpers\SiteUriQueueHelper;
+use putyourlightson\blitz\helpers\DriverQueueHelper;
 use putyourlightson\blitz\jobs\DriverJob;
 use putyourlightson\blitz\jobs\GenerateCacheJob;
 use putyourlightson\blitz\jobs\PurgeSiteJob;
@@ -101,7 +101,7 @@ test('Overlapping refreshes generate, purge and deploy each pending URL once', f
     Blitz::$plugin->refreshCache->refreshSiteUris([$b, $c, $a]);
 
     foreach ([[CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'], [CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress'], [DeployerHelper::DRIVER_ID, 'deployUrisWithProgress']] as [$driverId, $driverMethod]) {
-        expect(SiteUriQueueHelper::getCount($driverId, $driverMethod))->toBe(3);
+        expect(DriverQueueHelper::getPendingCount($driverId, $driverMethod))->toBe(3);
     }
     expect((int)QueueSiteUriRecord::find()->count())->toBe(3);
 
@@ -115,11 +115,11 @@ test('Overlapping refreshes generate, purge and deploy each pending URL once', f
 
 test('Duplicate requests retain input order and promote their priority', function() {
     [$a, $b, $c] = $this->uris;
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$b, $a, $b], 100);
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$c, $a], 10);
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$a], 200);
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$b, $a, $b], 100);
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$c, $a], 10);
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$a], 200);
     $result = [];
-    SiteUriQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', function($siteUris) use (&$result) {
+    DriverQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', function($siteUris) use (&$result) {
         $result = array_map(fn($siteUri) => $siteUri->uri, $siteUris);
     });
     expect($result)->toBe(['work-a', 'work-c', 'work-b']);
@@ -137,9 +137,9 @@ test('Shared identities distinguish sites, case, accents and long URI suffixes',
         ['siteId' => $siteIds[0], 'uri' => $prefix . 'a'],
         ['siteId' => $siteIds[0], 'uri' => $prefix . 'b'],
     ];
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', array_merge($uris, $uris));
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', array_merge($uris, $uris));
     $result = [];
-    SiteUriQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', function($siteUris) use (&$result) {
+    DriverQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', function($siteUris) use (&$result) {
         $result = array_map(fn($siteUri) => $siteUri->toArray(), $siteUris);
     });
     expect($result)->toBe($uris);
@@ -148,10 +148,10 @@ test('Shared identities distinguish sites, case, accents and long URI suffixes',
 test('Large refreshes enqueue in bounded chunks without losing order', function() {
     $siteId = $this->uris[0]->siteId;
     $uris = array_map(fn($i) => ['siteId' => $siteId, 'uri' => 'bulk-' . $i], range(1, 1200));
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', array_merge($uris, $uris));
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', $uris);
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', array_merge($uris, $uris));
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', $uris);
     $result = [];
-    SiteUriQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', function($siteUris) use (&$result) {
+    DriverQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', function($siteUris) use (&$result) {
         $result = array_map(fn($siteUri) => $siteUri->toArray(), $siteUris);
     });
     expect($result)->toBe($uris)
@@ -160,63 +160,63 @@ test('Large refreshes enqueue in bounded chunks without losing order', function(
 
 test('Requests arriving during execution survive completion of the older revision', function(string $driverId, string $driverMethod) {
     [$a] = $this->uris;
-    SiteUriQueueHelper::add($driverId, $driverMethod, [$a]);
-    SiteUriQueueHelper::process($driverId, $driverMethod, function() use ($driverId, $driverMethod, $a) {
-        SiteUriQueueHelper::add($driverId, $driverMethod, [$a]);
+    DriverQueueHelper::add($driverId, $driverMethod, [$a]);
+    DriverQueueHelper::process($driverId, $driverMethod, function() use ($driverId, $driverMethod, $a) {
+        DriverQueueHelper::add($driverId, $driverMethod, [$a]);
     });
-    expect(SiteUriQueueHelper::getPriority($driverId, $driverMethod))->not->toBeNull();
+    expect(DriverQueueHelper::getPendingPriority($driverId, $driverMethod))->not->toBeNull();
     $calls = 0;
-    SiteUriQueueHelper::process($driverId, $driverMethod, function() use (&$calls) {
+    DriverQueueHelper::process($driverId, $driverMethod, function() use (&$calls) {
         $calls++;
     });
     expect($calls)->toBe(1)
-        ->and(SiteUriQueueHelper::getPriority($driverId, $driverMethod))->toBeNull()
+        ->and(DriverQueueHelper::getPendingPriority($driverId, $driverMethod))->toBeNull()
         ->and((int)QueueSiteUriRecord::find()->count())->toBe(0);
 })->with([[CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'], [CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress'], [DeployerHelper::DRIVER_ID, 'deployUrisWithProgress']]);
 
 test('Failed work remains pending for retry', function(string $driverId, string $driverMethod) {
-    SiteUriQueueHelper::add($driverId, $driverMethod, [$this->uris[0]]);
-    expect(fn() => SiteUriQueueHelper::process($driverId, $driverMethod, function() {
+    DriverQueueHelper::add($driverId, $driverMethod, [$this->uris[0]]);
+    expect(fn() => DriverQueueHelper::process($driverId, $driverMethod, function() {
         throw new RuntimeException('Driver failed');
     }))->toThrow(RuntimeException::class, 'Driver failed');
-    expect(SiteUriQueueHelper::getPriority($driverId, $driverMethod))->not->toBeNull();
-    expect(SiteUriQueueHelper::process($driverId, $driverMethod, fn() => null))->toBe(1);
+    expect(DriverQueueHelper::getPendingPriority($driverId, $driverMethod))->not->toBeNull();
+    expect(DriverQueueHelper::process($driverId, $driverMethod, fn() => null))->toBe(1);
 })->with([[CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'], [CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress'], [DeployerHelper::DRIVER_ID, 'deployUrisWithProgress']]);
 
 test('Deployment waits for generation and expire-mode purging waits for both', function() {
     Blitz::$plugin->settings->refreshMode = SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE;
     foreach ([[CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'], [CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress'], [DeployerHelper::DRIVER_ID, 'deployUrisWithProgress']] as [$driverId, $driverMethod]) {
-        SiteUriQueueHelper::add($driverId, $driverMethod, [$this->uris[0]]);
+        DriverQueueHelper::add($driverId, $driverMethod, [$this->uris[0]]);
     }
     $unexpected = function() {
         throw new RuntimeException('Work ran before its prerequisite');
     };
-    expect(SiteUriQueueHelper::process(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', $unexpected))->toBe(0)
-        ->and(SiteUriQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', $unexpected))->toBe(0);
-    SiteUriQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', fn() => null);
-    expect(SiteUriQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', $unexpected))->toBe(0);
-    SiteUriQueueHelper::process(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', fn() => null);
-    expect(SiteUriQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', fn() => null))->toBe(1);
+    expect(DriverQueueHelper::process(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', $unexpected))->toBe(0)
+        ->and(DriverQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', $unexpected))->toBe(0);
+    DriverQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', fn() => null);
+    expect(DriverQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', $unexpected))->toBe(0);
+    DriverQueueHelper::process(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', fn() => null);
+    expect(DriverQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', fn() => null))->toBe(1);
 });
 
 test('Clear-mode purging does not wait for generation', function() {
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$this->uris[0]]);
-    SiteUriQueueHelper::add(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', [$this->uris[0]]);
-    expect(SiteUriQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', fn() => null))->toBe(1)
-        ->and(SiteUriQueueHelper::getPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->not->toBeNull();
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$this->uris[0]]);
+    DriverQueueHelper::add(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', [$this->uris[0]]);
+    expect(DriverQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', fn() => null))->toBe(1)
+        ->and(DriverQueueHelper::getPendingPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->not->toBeNull();
 });
 
 test('Deployment and expire-mode purging wait for related pages with different URIs', function() {
     Blitz::$plugin->settings->refreshMode = SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE;
     [$include, $parent] = $this->uris;
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$include]);
-    SiteUriQueueHelper::add(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', [$parent]);
-    SiteUriQueueHelper::add(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', [$parent]);
-    expect(SiteUriQueueHelper::process(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', fn() => null))->toBe(0)
-        ->and(SiteUriQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', fn() => null))->toBe(0);
-    SiteUriQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', fn() => null);
-    SiteUriQueueHelper::process(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', fn() => null);
-    expect(SiteUriQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', fn() => null))->toBe(1);
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$include]);
+    DriverQueueHelper::add(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', [$parent]);
+    DriverQueueHelper::add(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', [$parent]);
+    expect(DriverQueueHelper::process(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', fn() => null))->toBe(0)
+        ->and(DriverQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', fn() => null))->toBe(0);
+    DriverQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', fn() => null);
+    DriverQueueHelper::process(DeployerHelper::DRIVER_ID, 'deployUrisWithProgress', fn() => null);
+    expect(DriverQueueHelper::process(CachePurgerHelper::DRIVER_ID, 'purgeUrisWithProgress', fn() => null))->toBe(1);
 });
 
 test('Install and upgrade migrations define the same two queue tables', function() {
@@ -265,7 +265,7 @@ test('Synchronous driver calls execute directly and leave queued work untouched'
     $component->$method([$a, $b]);
     $component->$method([$a], queue: false);
     expect($component->batches)->toBe([['work-a']])
-        ->and(SiteUriQueueHelper::getCount($driver, $method . 'WithProgress'))->toBe(2);
+        ->and(DriverQueueHelper::getPendingCount($driver, $method . 'WithProgress'))->toBe(2);
     ($this->drain)();
     expect($component->batches)->toBe([['work-a'], ['work-a', 'work-b']]);
 })->with(['cacheGenerator', 'deployer', 'cachePurger']);
@@ -283,7 +283,7 @@ test('Generation requested during a running batch is generated again', function(
 
 test('Generation descriptions match Craft’s batch wording', function(int $count, string $description) {
     $uris = array_slice($this->uris, 0, $count);
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', array_merge($uris, $uris));
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', array_merge($uris, $uris));
 
     expect((new GenerateCacheJob())->getDescription())->toBe($description);
 })->with([
@@ -310,7 +310,7 @@ test('Generation continuation descriptions refresh the remaining workload', func
 test('Single-batch purge and deployment jobs retain their normal descriptions', function(string $driverId, string $driverMethod, string $description) {
     $job = new DriverJob(['driverId' => $driverId, 'driverMethod' => $driverMethod, 'description' => $description]);
     [$a, $b] = $this->uris;
-    SiteUriQueueHelper::add($driverId, $driverMethod, [$a, $b, $a]);
+    DriverQueueHelper::add($driverId, $driverMethod, [$a, $b, $a]);
     expect($job->getDescription())->toBe($description);
 })->with([
     ['cachePurger', 'purgeUrisWithProgress', 'Purging Blitz cache'],
@@ -363,10 +363,10 @@ test('Custom components and methods share the queue without consuming each other
 
 test('Custom methods run independently of standard generation prerequisites', function() {
     [$a] = $this->uris;
-    SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$a]);
-    SiteUriQueueHelper::add(DeployerHelper::DRIVER_ID, 'customMethod', [$a]);
-    expect(SiteUriQueueHelper::process(DeployerHelper::DRIVER_ID, 'customMethod', fn() => null))->toBe(1)
-        ->and(SiteUriQueueHelper::getCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->toBe(1);
+    DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', [$a]);
+    DriverQueueHelper::add(DeployerHelper::DRIVER_ID, 'customMethod', [$a]);
+    expect(DriverQueueHelper::process(DeployerHelper::DRIVER_ID, 'customMethod', fn() => null))->toBe(1)
+        ->and(DriverQueueHelper::getPendingCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->toBe(1);
 });
 
 test('Releasing a custom driver cancels all its methods while retaining other drivers', function() {
@@ -377,7 +377,7 @@ test('Releasing a custom driver cancels all its methods while retaining other dr
     BaseDriverHelper::releaseDriverJobs('customDriver');
 
     expect((int)DriverQueueRecord::find()->count())->toBe(1)
-        ->and(SiteUriQueueHelper::getCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->toBe(1);
+        ->and(DriverQueueHelper::getPendingCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->toBe(1);
     ($this->drain)();
     expect($this->generator->batches)->toBe([['work-a']]);
 });
@@ -389,7 +389,7 @@ test('Releasing shared work leaves its jobs available for newer requests', funct
     $jobId = (new Query())->select('id')->from($this->queue->tableName)->where(['channel' => $this->queue->channel])->scalar();
     BaseDriverHelper::releaseDriverJobs($driverId);
 
-    expect(SiteUriQueueHelper::getCount($driverId, $method . 'WithProgress'))->toBe(0)
+    expect(DriverQueueHelper::getPendingCount($driverId, $method . 'WithProgress'))->toBe(0)
         ->and((new Query())->from($this->queue->tableName)->where(['id' => $jobId])->exists())->toBeTrue();
 
     $driver->$method([$b]);
@@ -471,7 +471,7 @@ test('Queue payloads contain no URL lists and stale jobs perform no driver calls
 test('Releasing generation jobs cancels their pending work and unused identities', function() {
     $this->generator->generateUris($this->uris);
     CacheGeneratorHelper::releaseGeneratorJobs();
-    expect(SiteUriQueueHelper::getPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->toBeNull()
+    expect(DriverQueueHelper::getPendingPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress'))->toBeNull()
         ->and((int)QueueSiteUriRecord::find()->count())->toBe(0);
     ($this->drain)();
     expect($this->generator->batches)->toBe([]);

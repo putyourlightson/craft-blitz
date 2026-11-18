@@ -70,7 +70,7 @@ class CacheGeneratorHelper extends BaseDriverHelper
         $description = Craft::t('blitz', 'Generating Blitz cache');
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
 
-        if (!SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', $siteUris, $priority)) {
+        if (!DriverQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', $siteUris, $priority)) {
             return;
         }
 

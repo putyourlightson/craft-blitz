@@ -20,7 +20,7 @@ use yii\db\Expression;
  *
  * @since 5.16.0
  */
-class SiteUriQueueHelper
+class DriverQueueHelper
 {
     /**
      * Preserves input order and priority so deduplication does not delay urgent URLs.
@@ -34,38 +34,38 @@ class SiteUriQueueHelper
         }
 
         $priority ??= Blitz::$plugin->settings->driverJobPriority ?? 1024;
-        $urisByHash = [];
+        $siteUrisByHash = [];
         foreach ($siteUris as $siteUri) {
             if (!is_array($siteUri)) {
                 $siteUri = $siteUri->toArray();
             }
             $siteUri['siteId'] = (int)$siteUri['siteId'];
             $hash = hash('sha256', $siteUri['siteId'] . ':' . $siteUri['uri']);
-            $urisByHash[$hash] ??= $siteUri;
+            $siteUrisByHash[$hash] ??= $siteUri;
         }
 
         $revision = StringHelper::UUID();
-        $table = DriverQueueRecord::tableName();
+        $queueTable = DriverQueueRecord::tableName();
         $db = Craft::$app->getDb();
 
         // Release the pending-work lock between chunks so bulk refreshes do not block saves.
-        foreach (array_chunk($urisByHash, 500, true) as $chunk) {
-            self::updatePending(function() use ($db, $chunk, $table, $priority, $revision, $driverId, $driverMethod) {
-                $idsByHash = QueueSiteUriRecord::find()
+        foreach (array_chunk($siteUrisByHash, 500, true) as $chunk) {
+            self::withQueueTransaction(function() use ($db, $chunk, $queueTable, $priority, $revision, $driverId, $driverMethod) {
+                $siteUriRowsByHash = QueueSiteUriRecord::find()
                     ->select(['id', 'uriHash'])
                     ->where(['uriHash' => array_keys($chunk)])
                     ->indexBy('uriHash')
                     ->asArray()
                     ->all();
-                $newUris = [];
+                $newSiteUriRows = [];
                 foreach ($chunk as $hash => $siteUri) {
-                    if (!isset($idsByHash[$hash])) {
-                        $newUris[] = [$siteUri['siteId'], $siteUri['uri'], $hash];
+                    if (!isset($siteUriRowsByHash[$hash])) {
+                        $newSiteUriRows[] = [$siteUri['siteId'], $siteUri['uri'], $hash];
                     }
                 }
-                if ($newUris !== []) {
-                    $db->createCommand()->batchInsert(QueueSiteUriRecord::tableName(), ['siteId', 'uri', 'uriHash'], $newUris)->execute();
-                    $idsByHash = QueueSiteUriRecord::find()
+                if ($newSiteUriRows !== []) {
+                    $db->createCommand()->batchInsert(QueueSiteUriRecord::tableName(), ['siteId', 'uri', 'uriHash'], $newSiteUriRows)->execute();
+                    $siteUriRowsByHash = QueueSiteUriRecord::find()
                         ->select(['id', 'uriHash'])
                         ->where(['uriHash' => array_keys($chunk)])
                         ->indexBy('uriHash')
@@ -73,30 +73,30 @@ class SiteUriQueueHelper
                         ->all();
                 }
 
-                $ids = [];
+                $siteUriIds = [];
                 foreach ($chunk as $hash => $siteUri) {
-                    $ids[] = (int)$idsByHash[$hash]['id'];
+                    $siteUriIds[] = (int)$siteUriRowsByHash[$hash]['id'];
                 }
-                $existingIds = DriverQueueRecord::find()
+                $existingSiteUriIds = DriverQueueRecord::find()
                     ->select('siteUriId')
-                    ->where(['siteUriId' => $ids, 'driverId' => $driverId, 'driverMethod' => $driverMethod])
+                    ->where(['siteUriId' => $siteUriIds, 'driverId' => $driverId, 'driverMethod' => $driverMethod])
                     ->column();
-                $existingSet = array_fill_keys($existingIds, true);
-                if ($existingIds !== []) {
+                $existingSiteUriIdSet = array_fill_keys($existingSiteUriIds, true);
+                if ($existingSiteUriIds !== []) {
                     // A new revision preserves requests made while a worker is processing the previous one.
-                    $db->createCommand()->update($table, [
+                    $db->createCommand()->update($queueTable, [
                         'revision' => $revision,
                         'priority' => new Expression('LEAST([[priority]], :priority)', [':priority' => $priority]),
-                    ], ['siteUriId' => $existingIds, 'driverId' => $driverId, 'driverMethod' => $driverMethod], [], false)->execute();
+                    ], ['siteUriId' => $existingSiteUriIds, 'driverId' => $driverId, 'driverMethod' => $driverMethod], [], false)->execute();
                 }
-                $newWork = [];
-                foreach ($ids as $id) {
-                    if (!isset($existingSet[$id])) {
-                        $newWork[] = [$id, $driverId, $driverMethod, $priority, $revision];
+                $newQueueRows = [];
+                foreach ($siteUriIds as $siteUriId) {
+                    if (!isset($existingSiteUriIdSet[$siteUriId])) {
+                        $newQueueRows[] = [$siteUriId, $driverId, $driverMethod, $priority, $revision];
                     }
                 }
-                if ($newWork !== []) {
-                    $db->createCommand()->batchInsert($table, ['siteUriId', 'driverId', 'driverMethod', 'priority', 'revision'], $newWork)->execute();
+                if ($newQueueRows !== []) {
+                    $db->createCommand()->batchInsert($queueTable, ['siteUriId', 'driverId', 'driverMethod', 'priority', 'revision'], $newQueueRows)->execute();
                 }
             });
         }
@@ -112,39 +112,39 @@ class SiteUriQueueHelper
     public static function process(string $driverId, string $driverMethod, callable $callback, ?int $limit = null): int
     {
         return self::withLock(substr(hash('sha256', $driverId . "\0" . $driverMethod), 0, 32), function() use ($driverId, $driverMethod, $callback, $limit) {
-            $query = self::query($driverId, $driverMethod, true)
+            $query = self::getPendingQuery($driverId, $driverMethod, true)
                 ->select(['work.id', 'work.siteUriId', 'work.revision', 'uri.siteId', 'uri.uri'])
                 ->innerJoin(['uri' => QueueSiteUriRecord::tableName()], '[[uri.id]] = [[work.siteUriId]]')
                 ->orderBy(['work.priority' => SORT_ASC, 'work.id' => SORT_ASC])
                 ->limit($limit);
-            $rows = $query->all();
-            if ($rows === []) {
+            $queueRows = $query->all();
+            if ($queueRows === []) {
                 return 0;
             }
 
-            $callback(array_map(fn(array $row) => new SiteUriModel(['siteId' => (int)$row['siteId'], 'uri' => $row['uri']]), $rows));
+            $callback(array_map(fn(array $queueRow) => new SiteUriModel(['siteId' => (int)$queueRow['siteId'], 'uri' => $queueRow['uri']]), $queueRows));
 
-            foreach (array_chunk($rows, 500) as $chunk) {
-                self::updatePending(function() use ($chunk) {
+            foreach (array_chunk($queueRows, 500) as $chunk) {
+                self::withQueueTransaction(function() use ($chunk) {
                     $condition = ['or'];
-                    foreach ($chunk as $row) {
-                        $condition[] = ['id' => $row['id'], 'revision' => $row['revision']];
+                    foreach ($chunk as $queueRow) {
+                        $condition[] = ['id' => $queueRow['id'], 'revision' => $queueRow['revision']];
                     }
                     Craft::$app->getDb()->createCommand()->delete(DriverQueueRecord::tableName(), $condition)->execute();
                     self::deleteUnusedSiteUris(array_column($chunk, 'siteUriId'));
                 });
             }
 
-            return count($rows);
+            return count($queueRows);
         });
     }
 
     /**
      * Includes blocked work so waiting operations retain their queue priority.
      */
-    public static function getPriority(string $driverId, string $driverMethod): ?int
+    public static function getPendingPriority(string $driverId, string $driverMethod): ?int
     {
-        $priority = self::query($driverId, $driverMethod, false)->min('work.priority');
+        $priority = self::getPendingQuery($driverId, $driverMethod, false)->min('work.priority');
 
         return $priority === null || $priority === false ? null : (int)$priority;
     }
@@ -152,7 +152,7 @@ class SiteUriQueueHelper
     /**
      * Includes blocked and executing work so job descriptions reflect all outstanding URLs.
      */
-    public static function getCount(string $driverId, string $driverMethod): int
+    public static function getPendingCount(string $driverId, string $driverMethod): int
     {
         return (int)DriverQueueRecord::find()->where(['driverId' => $driverId, 'driverMethod' => $driverMethod])->count();
     }
@@ -162,7 +162,7 @@ class SiteUriQueueHelper
      */
     public static function clear(string $driverId, ?string $driverMethod = null): void
     {
-        self::updatePending(function() use ($driverId, $driverMethod) {
+        self::withQueueTransaction(function() use ($driverId, $driverMethod) {
             $condition = ['driverId' => $driverId];
             if ($driverMethod !== null) {
                 $condition['driverMethod'] = $driverMethod;
@@ -176,13 +176,13 @@ class SiteUriQueueHelper
      * Applies prerequisites only when selecting executable work so counts and priorities
      * remain available while operations are blocked.
      */
-    private static function query(string $driverId, string $driverMethod, bool $ready): ActiveQuery
+    private static function getPendingQuery(string $driverId, string $driverMethod, bool $readyOnly): ActiveQuery
     {
         $query = DriverQueueRecord::find()
             ->alias('work')
             ->where(['work.driverId' => $driverId, 'work.driverMethod' => $driverMethod])
             ->asArray();
-        if (!$ready) {
+        if (!$readyOnly) {
             return $query;
         }
 
@@ -194,12 +194,12 @@ class SiteUriQueueHelper
             ],
             default => [],
         };
-        foreach ($dependencies as $id => $method) {
+        foreach ($dependencies as $dependencyDriverId => $dependencyMethod) {
             // Wait for the whole preceding operation so deployments remain batched and SSI parents purge last.
-            $pending = DriverQueueRecord::find()
+            $dependencyQuery = DriverQueueRecord::find()
                 ->select(new Expression('1'))
-                ->where(['driverId' => $id, 'driverMethod' => $method]);
-            $query->andWhere(['not exists', $pending]);
+                ->where(['driverId' => $dependencyDriverId, 'driverMethod' => $dependencyMethod]);
+            $query->andWhere(['not exists', $dependencyQuery]);
         }
 
         return $query;
@@ -228,7 +228,7 @@ class SiteUriQueueHelper
     /**
      * Serialises changes with cleanup so new work cannot lose its URI identity.
      */
-    private static function updatePending(callable $callback): mixed
+    private static function withQueueTransaction(callable $callback): mixed
     {
         return self::withLock('pending', fn() => Craft::$app->getDb()->transaction($callback));
     }
@@ -239,7 +239,7 @@ class SiteUriQueueHelper
     private static function withLock(string $name, callable $callback): mixed
     {
         $mutex = Craft::$app->getMutex();
-        $lock = 'blitz-site-uri-queue-' . $name;
+        $lock = 'blitz-driver-queue-' . $name;
         if (!$mutex->acquire($lock, Blitz::$plugin->settings->mutexTimeout)) {
             throw new RuntimeException('Unable to lock pending Blitz ' . $name . ' work.');
         }

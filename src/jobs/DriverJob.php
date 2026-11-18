@@ -9,7 +9,7 @@ use craft\helpers\App;
 use craft\helpers\Queue as QueueHelper;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\SiteUriQueueHelper;
+use putyourlightson\blitz\helpers\DriverQueueHelper;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
@@ -56,10 +56,10 @@ class DriverJob extends BaseJob implements RetryableJobInterface
         $this->queue = $queue;
 
         // Resolve the driver only when there is work so cancelled jobs can finish as no-ops.
-        $processed = SiteUriQueueHelper::process($this->driverId, $this->driverMethod,
+        $processedCount = DriverQueueHelper::process($this->driverId, $this->driverMethod,
             fn(array $siteUris) => call_user_func([Blitz::$plugin->get($this->driverId), $this->driverMethod], $siteUris, [$this, 'setProgressHandler']),
         );
-        $priority = SiteUriQueueHelper::getPriority($this->driverId, $this->driverMethod);
+        $priority = DriverQueueHelper::getPendingPriority($this->driverId, $this->driverMethod);
         if ($priority !== null) {
             // Let prerequisite work run before retrying blocked URLs.
             $nextJob = new self([
@@ -67,7 +67,7 @@ class DriverJob extends BaseJob implements RetryableJobInterface
                 'driverMethod' => $this->driverMethod,
                 'description' => $this->description,
             ]);
-            QueueHelper::push($nextJob, $priority, $processed === 0 ? 1 : 0, $this->getTtr(), $queue);
+            QueueHelper::push($nextJob, $priority, $processedCount === 0 ? 1 : 0, $this->getTtr(), $queue);
         }
     }
 
