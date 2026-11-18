@@ -5,7 +5,6 @@
 
 namespace putyourlightson\blitz\jobs;
 
-use Craft;
 use craft\helpers\App;
 use craft\helpers\Queue as QueueHelper;
 use craft\queue\BaseJob;
@@ -30,17 +29,6 @@ class DriverJob extends BaseJob implements RetryableJobInterface
      * @var Queue
      */
     private Queue $queue;
-
-    /**
-     * @inheritdoc
-     */
-    public function getDescription(): ?string
-    {
-        return Craft::t('blitz', '{description} ({count, plural, =1{# URL remaining} other{# URLs remaining}})', [
-            'description' => parent::getDescription(),
-            'count' => SiteUriQueueHelper::getCount($this->driverId, $this->driverMethod),
-        ]);
-    }
 
     /**
      * @inheritdoc

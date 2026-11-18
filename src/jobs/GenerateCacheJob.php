@@ -21,6 +21,11 @@ use yii\queue\RetryableJobInterface;
 class GenerateCacheJob extends BaseJob implements RetryableJobInterface
 {
     /**
+     * Carries the batch number forward so continuation jobs use Craft’s batch descriptions.
+     */
+    public int $batchIndex = 0;
+
+    /**
      * Used to set the progress on the appropriate queue.
      *
      * @see self::setProgressHandler()
@@ -32,13 +37,17 @@ class GenerateCacheJob extends BaseJob implements RetryableJobInterface
      */
     public function getDescription(): string
     {
+        $description = $this->description ?? Craft::t('blitz', 'Generating Blitz cache');
         $count = SiteUriQueueHelper::getCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
-        $batches = (int)ceil($count / Blitz::$plugin->settings->driverJobBatchSize);
+        $totalBatches = $this->batchIndex + max(1, (int)ceil($count / Blitz::$plugin->settings->driverJobBatchSize));
+        if ($totalBatches <= 1) {
+            return $description;
+        }
 
-        return Craft::t('blitz', '{description} ({count, plural, =1{# URL remaining} other{# URLs remaining}}, {batches, plural, =1{# batch remaining} other{# batches remaining}})', [
-            'description' => parent::getDescription() ?? Craft::t('blitz', 'Generating Blitz cache'),
-            'count' => $count,
-            'batches' => $batches,
+        return Craft::t('app', '{description} (batch {index, number} of {total, number})', [
+            'description' => $description,
+            'index' => $this->batchIndex + 1,
+            'total' => $totalBatches,
         ]);
     }
 
@@ -76,7 +85,11 @@ class GenerateCacheJob extends BaseJob implements RetryableJobInterface
         $priority = SiteUriQueueHelper::getPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
         if ($priority !== null) {
             // Continue generation before deployment jobs at the same priority.
-            QueueHelper::push(new self(['description' => $this->description]), $priority - 1, 0, $this->getTtr(), $queue);
+            $nextJob = new self([
+                'description' => $this->description,
+                'batchIndex' => $this->batchIndex + 1,
+            ]);
+            QueueHelper::push($nextJob, $priority - 1, 0, $this->getTtr(), $queue);
         }
     }
 

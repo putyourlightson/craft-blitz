@@ -281,16 +281,16 @@ test('Generation requested during a running batch is generated again', function(
     expect($this->generator->batches)->toBe([['work-a'], ['work-a']]);
 });
 
-test('Generation descriptions report unique pending URLs and remaining batches', function(int $count, string $remaining) {
+test('Generation descriptions match Craft’s batch wording', function(int $count, string $description) {
     $uris = array_slice($this->uris, 0, $count);
     SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', array_merge($uris, $uris));
 
-    expect((new GenerateCacheJob())->getDescription())->toBe('Generating Blitz cache (' . $remaining . ')');
+    expect((new GenerateCacheJob())->getDescription())->toBe($description);
 })->with([
-    [0, '0 URLs remaining, 0 batches remaining'],
-    [1, '1 URL remaining, 1 batch remaining'],
-    [2, '2 URLs remaining, 1 batch remaining'],
-    [3, '3 URLs remaining, 2 batches remaining'],
+    [0, 'Generating Blitz cache'],
+    [1, 'Generating Blitz cache'],
+    [2, 'Generating Blitz cache'],
+    [3, 'Generating Blitz cache (batch 1 of 2)'],
 ]);
 
 test('Generation continuation descriptions refresh the remaining workload', function() {
@@ -302,29 +302,24 @@ test('Generation continuation descriptions refresh the remaining workload', func
     ($this->drain)();
 
     expect($descriptions)->toBe([
-        'Generating Blitz cache (3 URLs remaining, 2 batches remaining)',
-        'Generating Blitz cache (1 URL remaining, 1 batch remaining)',
+        'Generating Blitz cache (batch 1 of 2)',
+        'Generating Blitz cache (batch 2 of 2)',
     ]);
 });
 
-test('Purge and deployment descriptions report their remaining shared URLs', function(string $driverId, string $driverMethod, string $description) {
+test('Single-batch purge and deployment jobs retain their normal descriptions', function(string $driverId, string $driverMethod, string $description) {
     $job = new DriverJob(['driverId' => $driverId, 'driverMethod' => $driverMethod, 'description' => $description]);
     [$a, $b] = $this->uris;
     SiteUriQueueHelper::add($driverId, $driverMethod, [$a, $b, $a]);
-    expect($job->getDescription())->toBe($description . ' (2 URLs remaining)');
-
-    SiteUriQueueHelper::process($driverId, $driverMethod, fn() => null, limit: 1);
-    expect($job->getDescription())->toBe($description . ' (1 URL remaining)');
-    SiteUriQueueHelper::clear($driverId, $driverMethod);
-    expect($job->getDescription())->toBe($description . ' (0 URLs remaining)');
+    expect($job->getDescription())->toBe($description);
 })->with([
     ['cachePurger', 'purgeUrisWithProgress', 'Purging Blitz cache'],
     ['deployer', 'deployUrisWithProgress', 'Deploying files'],
 ]);
 
-test('Custom driver methods report their pending workload', function() {
+test('Custom driver methods retain their configured descriptions', function() {
     $job = new DriverJob(['driverId' => 'deployer', 'driverMethod' => 'customMethod', 'description' => 'Custom operation']);
-    expect($job->getDescription())->toBe('Custom operation (0 URLs remaining)');
+    expect($job->getDescription())->toBe('Custom operation');
 });
 
 test('Custom components and methods share the queue without consuming each other’s work', function() {
