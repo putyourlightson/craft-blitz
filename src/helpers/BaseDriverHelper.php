@@ -5,7 +5,6 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use Craft;
 use craft\base\SavableComponent;
 use craft\db\Query;
 use craft\helpers\Component;
@@ -52,11 +51,12 @@ class BaseDriverHelper
      */
     public static function addDriverJob(array $siteUris, string $driverId, string $driverMethod, string $description = null, int $priority = null): void
     {
-        $siteUris = SiteUriHelper::getSiteUrisFlattenedToArrays($siteUris);
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
+        if (!SiteUriQueueHelper::add($driverId, $driverMethod, $siteUris, $priority)) {
+            return;
+        }
 
         $job = new DriverJob([
-            'siteUris' => $siteUris,
             'driverId' => $driverId,
             'driverMethod' => $driverMethod,
             'description' => $description,
@@ -73,7 +73,9 @@ class BaseDriverHelper
      */
     public static function releaseDriverJobs(string $driverId): void
     {
-        $queue = Craft::$app->getQueue();
+        SiteUriQueueHelper::clear($driverId);
+
+        $queue = Blitz::$plugin->queue;
 
         // Only release jobs if the queue is a Craft queue.
         if (!($queue instanceof \craft\queue\Queue)) {
@@ -85,20 +87,16 @@ class BaseDriverHelper
             ->select(['id'])
             ->where(['dateReserved' => null]);
 
-        if ($driverId === 'cacheGenerator') {
-            $query->andWhere(['like', 'job', '"putyourlightson\\blitz\\jobs\\GenerateCacheJob"']);
-        } elseif ($driverId === 'cachePurger') {
-            $query->andWhere(['or',
-                ['like', 'job', '"putyourlightson\\blitz\\jobs\\PurgeSiteJob"'],
-                ['and',
-                    ['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"'],
-                    ['like', 'job', '"' . $driverId . '"'],
-                ],
-            ]);
-        } else {
-            $query->andWhere(['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"']);
-            $query->andWhere(['like', 'job', '"' . $driverId . '"']);
+        $condition = ['and',
+            ['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"'],
+            ['like', 'job', '"' . $driverId . '"'],
+        ];
+        if ($driverId === CacheGeneratorHelper::DRIVER_ID) {
+            $condition = ['or', $condition, ['like', 'job', '"putyourlightson\\blitz\\jobs\\GenerateCacheJob"']];
+        } elseif ($driverId === CachePurgerHelper::DRIVER_ID) {
+            $condition = ['or', $condition, ['like', 'job', '"putyourlightson\\blitz\\jobs\\PurgeSiteJob"']];
         }
+        $query->andWhere($condition);
 
         $jobIds = $query->column();
 

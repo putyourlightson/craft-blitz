@@ -68,11 +68,13 @@ class CacheGeneratorHelper extends BaseDriverHelper
     public static function addGeneratorJob(array $siteUris, int $priority = null): void
     {
         $description = Craft::t('blitz', 'Generating Blitz cache');
-        $siteUris = SiteUriHelper::getSiteUrisFlattenedToArrays($siteUris);
         $priority = $priority ?? Blitz::$plugin->settings->driverJobPriority;
 
+        if (!SiteUriQueueHelper::add(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress', $siteUris, $priority)) {
+            return;
+        }
+
         $job = new GenerateCacheJob([
-            'siteUris' => $siteUris,
             'description' => $description,
         ]);
         Queue::push(

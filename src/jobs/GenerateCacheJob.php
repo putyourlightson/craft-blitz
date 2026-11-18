@@ -5,24 +5,21 @@
 
 namespace putyourlightson\blitz\jobs;
 
+use Craft;
 use craft\helpers\Queue as QueueHelper;
-use craft\queue\BaseBatchedJob;
+use craft\queue\BaseJob;
 use craft\queue\Queue as CraftQueue;
-use putyourlightson\blitz\batchers\SiteUriBatcher;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\CacheGeneratorHelper;
+use putyourlightson\blitz\helpers\SiteUriQueueHelper;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
 /**
  * @since 4.14.0
  */
-class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
+class GenerateCacheJob extends BaseJob implements RetryableJobInterface
 {
-    /**
-     * @var array[]
-     */
-    public array $siteUris;
-
     /**
      * Used to set the progress on the appropriate queue.
      *
@@ -33,11 +30,16 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
     /**
      * @inheritdoc
      */
-    public function init(): void
+    public function getDescription(): string
     {
-        parent::init();
+        $count = SiteUriQueueHelper::getCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
+        $batches = (int)ceil($count / Blitz::$plugin->settings->driverJobBatchSize);
 
-        $this->batchSize = Blitz::$plugin->settings->driverJobBatchSize;
+        return Craft::t('blitz', '{description} ({count, plural, =1{# URL remaining} other{# URLs remaining}}, {batches, plural, =1{# batch remaining} other{# batches remaining}})', [
+            'description' => parent::getDescription() ?? Craft::t('blitz', 'Generating Blitz cache'),
+            'count' => $count,
+            'batches' => $batches,
+        ]);
     }
 
     /**
@@ -61,28 +63,20 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
      */
     public function execute($queue): void
     {
-        // Decrement (increase) priority so that subsequent batches are prioritised.
-        if ($this->itemOffset === 0 && $this->priority > 0) {
-            $this->priority--;
-        }
-
         $this->queue = $queue;
-
-        /** @var array $siteUris */
-        $siteUris = $this->data()->getSlice($this->itemOffset, $this->batchSize);
-        Blitz::$plugin->cacheGenerator->generateUrisWithProgress($siteUris, [$this, 'setProgressHandler']);
-        $this->itemOffset += count($siteUris);
+        SiteUriQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress',
+            fn(array $siteUris) => Blitz::$plugin->cacheGenerator->generateUrisWithProgress($siteUris, [$this, 'setProgressHandler']),
+            Blitz::$plugin->settings->driverJobBatchSize,
+        );
 
         // Make sure the job is still reserved before spawning another job.
         if ($queue instanceof CraftQueue && !$queue->isReserved($queue->getJobId())) {
             return;
         }
-
-        // Spawn another job if there are more items
-        if ($this->itemOffset < $this->totalItems()) {
-            $nextJob = clone $this;
-            $nextJob->batchIndex++;
-            QueueHelper::push($nextJob, $this->priority, 0, $this->ttr, $queue);
+        $priority = SiteUriQueueHelper::getPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
+        if ($priority !== null) {
+            // Continue generation before deployment jobs at the same priority.
+            QueueHelper::push(new self(['description' => $this->description]), $priority - 1, 0, $this->getTtr(), $queue);
         }
     }
 
@@ -94,20 +88,5 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
         $progress = $total > 0 ? ($count / $total) : 0;
 
         $this->setProgress($this->queue, $progress, $label);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function loadData(): SiteUriBatcher
-    {
-        return new SiteUriBatcher($this->siteUris);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function processItem(mixed $item): void
-    {
     }
 }

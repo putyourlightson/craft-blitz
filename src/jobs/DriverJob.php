@@ -5,22 +5,17 @@
 
 namespace putyourlightson\blitz\jobs;
 
+use Craft;
 use craft\helpers\App;
+use craft\helpers\Queue as QueueHelper;
 use craft\queue\BaseJob;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\SiteUriQueueHelper;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
-/**
- * TODO: make driver jobs batchable.
- */
 class DriverJob extends BaseJob implements RetryableJobInterface
 {
-    /**
-     * @var array[]
-     */
-    public array $siteUris;
-
     /**
      * @var string
      */
@@ -35,6 +30,17 @@ class DriverJob extends BaseJob implements RetryableJobInterface
      * @var Queue
      */
     private Queue $queue;
+
+    /**
+     * @inheritdoc
+     */
+    public function getDescription(): ?string
+    {
+        return Craft::t('blitz', '{description} ({count, plural, =1{# URL remaining} other{# URLs remaining}})', [
+            'description' => parent::getDescription(),
+            'count' => SiteUriQueueHelper::getCount($this->driverId, $this->driverMethod),
+        ]);
+    }
 
     /**
      * @inheritdoc
@@ -65,7 +71,19 @@ class DriverJob extends BaseJob implements RetryableJobInterface
         $driver = Blitz::$plugin->get($this->driverId);
 
         if (is_callable([$driver, $this->driverMethod])) {
-            call_user_func([$driver, $this->driverMethod], $this->siteUris, [$this, 'setProgressHandler']);
+            $processed = SiteUriQueueHelper::process($this->driverId, $this->driverMethod,
+                fn(array $siteUris) => call_user_func([$driver, $this->driverMethod], $siteUris, [$this, 'setProgressHandler']),
+            );
+            $priority = SiteUriQueueHelper::getPriority($this->driverId, $this->driverMethod);
+            if ($priority !== null) {
+                // Let prerequisite work run before retrying blocked URLs.
+                $nextJob = new self([
+                    'driverId' => $this->driverId,
+                    'driverMethod' => $this->driverMethod,
+                    'description' => $this->description,
+                ]);
+                QueueHelper::push($nextJob, $priority, $processed === 0 ? 1 : 0, $this->getTtr(), $queue);
+            }
         }
     }
 

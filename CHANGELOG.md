@@ -2,6 +2,7 @@
 
 ## 5.16.0 - Unreleased
 
+- Added shared database tables to avoid generating, purging and deploying the same pending URLs more than once.
 - Added the `blitz/flush-tagged` console command and `blitz.flush-tagged` MCP tool.
 - Changed cache refreshes to clear and immediately purge updated elements’ own pages before checking dependencies and element queries.
 - Changed cache refreshes to generate updated elements’ own pages first.
