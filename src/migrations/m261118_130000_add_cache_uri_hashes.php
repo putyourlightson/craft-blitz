@@ -30,9 +30,9 @@ class m261118_130000_add_cache_uri_hashes extends Migration
         }
 
         if (!$this->db->columnExists($table, 'uriHash')) {
-            $this->addColumn($table, 'uriHash', $this->char(32)->notNull());
+            $this->addColumn($table, 'uriHash', $this->char(32)->notNull()->after('uri'));
         } else {
-            $this->alterColumn($table, 'uriHash', $this->char(32)->notNull());
+            $this->alterColumn($table, 'uriHash', $this->char(32)->notNull()->after('uri'));
         }
         $this->createIndex(null, $table, 'uriHash', true);
 
