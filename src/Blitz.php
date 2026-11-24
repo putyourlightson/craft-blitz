@@ -8,6 +8,9 @@ namespace putyourlightson\blitz;
 use Craft;
 use craft\base\Element;
 use craft\base\Plugin;
+use craft\db\Query;
+use craft\db\Table;
+use craft\elements\Entry;
 use craft\elements\User;
 use craft\events\BatchElementActionEvent;
 use craft\events\DefineHtmlEvent;
@@ -21,6 +24,7 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\log\MonologTarget;
+use craft\models\Section;
 use craft\services\Dashboard;
 use craft\services\Elements;
 use craft\services\Plugins;
@@ -401,7 +405,6 @@ class Blitz extends Plugin
         $events = [
             Elements::EVENT_AFTER_SAVE_ELEMENT,
             Elements::EVENT_AFTER_RESAVE_ELEMENT,
-            Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
             Elements::EVENT_AFTER_DELETE_ELEMENT,
             Elements::EVENT_AFTER_RESTORE_ELEMENT,
         ];
@@ -413,6 +416,25 @@ class Blitz extends Plugin
                 }
             );
         }
+
+        Event::on(Elements::class, Elements::EVENT_AFTER_UPDATE_SLUG_AND_URI,
+            function(ElementEvent $event) {
+                $element = $event->element;
+                /** @var ElementChangedBehavior|null $elementChanged */
+                $elementChanged = $element->getBehavior(ElementChangedBehavior::BEHAVIOR_NAME);
+                $originalElement = $elementChanged?->originalElement;
+
+                // Craft also fires this event when a queued update finds the URI already up to date.
+                if ($originalElement !== null
+                    && $element->slug === $originalElement->slug
+                    && $element->uri === $originalElement->uri
+                ) {
+                    return;
+                }
+
+                $this->refreshCache->addElement($element);
+            }
+        );
     }
 
     /**
@@ -420,13 +442,46 @@ class Blitz extends Plugin
      */
     private function registerStructureEvents(): void
     {
-        if ($this->settings->refreshCacheWhenElementMovedInStructure) {
-            Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
-                function(MoveElementEvent $event) {
-                    $this->refreshCache->addElement($event->element);
-                }
-            );
+        if (!$this->settings->refreshCacheWhenElementMovedInStructure) {
+            return;
         }
+
+        $positions = [];
+
+        Event::on(Structures::class, Structures::EVENT_BEFORE_MOVE_ELEMENT,
+            function(MoveElementEvent $event) use (&$positions) {
+                $entry = $event->element;
+                if ($entry instanceof Entry && $entry->getIsCanonical()) {
+                    $section = $entry->getSection();
+                    if ($section?->type === Section::TYPE_STRUCTURE && $section->structureId === $event->structureId) {
+                        $positions[$entry->id] = (new Query())
+                            ->select(['root', 'lft', 'level'])
+                            ->from(Table::STRUCTUREELEMENTS)
+                            ->where(['structureId' => $event->structureId, 'elementId' => $entry->id])
+                            ->one();
+                    }
+                }
+            }
+        );
+
+        Event::on(Structures::class, Structures::EVENT_AFTER_MOVE_ELEMENT,
+            function(MoveElementEvent $event) use (&$positions) {
+                $element = $event->element;
+                $position = $positions[$element->id] ?? false;
+                unset($positions[$element->id]);
+
+                // Craft can emit a structure update without changing the entry’s position.
+                if ($element instanceof Entry && $position && $position != [
+                    'root' => $element->root,
+                    'lft' => $element->lft,
+                    'level' => $element->level,
+                ]) {
+                    $this->refreshCache->addMovedEntry($element);
+                } else {
+                    $this->refreshCache->addElement($element);
+                }
+            }
+        );
     }
 
     /**

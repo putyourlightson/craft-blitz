@@ -30,6 +30,7 @@ class RefreshDataModel extends BaseDataModel
      *          elements: array<string, array{
      *              sourceIds: array<int, bool>,
      *              elementIds: array<int, bool>,
+     *              movedElementIds?: array<int, bool>,
      *              changedAttributes: array<int, array<string, bool>>,
      *              changedFields: array<int, array<int, bool>>,
      *              isChangedByAttributes: array<int, bool>,
@@ -86,6 +87,11 @@ class RefreshDataModel extends BaseDataModel
     public function getElementIds(string $elementType): array
     {
         return $this->getKeysAsValues(['elements', $elementType, 'elementIds']);
+    }
+
+    public function getIsMoved(string $elementType, int $elementId): bool
+    {
+        return $this->data['elements'][$elementType]['movedElementIds'][$elementId] ?? false;
     }
 
     /**
@@ -225,6 +231,13 @@ class RefreshDataModel extends BaseDataModel
         foreach ($elements as $element) {
             $this->addElement($element);
         }
+    }
+
+    public function addIsMoved(ElementInterface $element): void
+    {
+        $this->data['elements'][$element::class]['movedElementIds'][$element->id] = true;
+        $this->addIsChangedByAttributes($element, false);
+        $this->addIsChangedByFields($element, false);
     }
 
     public function addChangedAttribute(ElementInterface $element, string $attribute): void

@@ -186,6 +186,89 @@ test('Descendant URI changes use one refresh and deploy, including retries', fun
     'descendant missing from the primary site' => [false, true],
 ]);
 
+test('Structure moves refresh pages and menus once', function(bool $reparent, bool $refreshUnchanged) {
+    Blitz::$plugin->settings->refreshCacheWhenElementSavedUnchanged = $refreshUnchanged;
+    [$parent, $entry, $descendant] = $this->entries;
+    $target = new Entry([
+        'sectionId' => $parent->sectionId,
+        'typeId' => $parent->typeId,
+        'siteId' => $parent->siteId,
+        'title' => 'move-target-' . bin2hex(random_bytes(4)),
+    ]);
+    if (!$reparent) {
+        $target->setParent($parent);
+    }
+    expect(Craft::$app->getElements()->saveElement($target))->toBeTrue();
+
+    $entry = Entry::find()->id($entry->id)->siteId($entry->siteId)->one();
+    $subtree = fn() => Entry::find()->id([$entry->id, $descendant->id])
+        ->siteId('*')->unique(false)->orderBy(['elements.id' => SORT_ASC, 'elements_sites.siteId' => SORT_ASC])->all();
+    $siteUris = fn($entries) => array_map(
+        fn(Entry $entry) => new SiteUriModel(['siteId' => $entry->siteId, 'uri' => $entry->uri]),
+        $entries,
+    );
+    $oldUris = $siteUris($subtree());
+    $menuUri = $siteUris([$parent])[0];
+    $storage = Blitz::$plugin->cacheStorage;
+    Blitz::$plugin->cacheGenerator->generateUris([...$oldUris, $menuUri], queue: false);
+    $oldMenu = $storage->get($menuUri);
+    $oldLink = '>' . $entry->uri . '</a>';
+    $targetLink = '>' . $target->uri . '</a>';
+    expect($oldMenu)->toContain($oldLink, $targetLink)
+        ->and(strpos($oldMenu, $oldLink))->toBeLessThan(strpos($oldMenu, $targetLink));
+
+    Db::delete($this->queue->tableName, ['channel' => $this->queue->channel]);
+    $refresh = Blitz::$plugin->refreshCache;
+    $refresh->reset();
+    $structures = Craft::$app->getStructures();
+    $structureId = $this->section->structureId;
+    expect($reparent ? $structures->append($structureId, $entry, $target) : $structures->moveAfter($structureId, $entry, $target))
+        ->toBeTrue()
+        ->and($refresh->refreshData->getChangedAttributes(Entry::class, $entry->id))->toBe([]);
+
+    $jobs = [];
+    $errors = [];
+    $urisAfterRefresh = [];
+    $this->queue->on(Queue::EVENT_AFTER_EXEC, function($event) use (&$jobs, &$urisAfterRefresh, $subtree, $siteUris) {
+        $jobs[] = $event->job::class;
+        if ($event->job instanceof RefreshCacheJob) {
+            $urisAfterRefresh[] = $siteUris($subtree());
+        }
+    });
+    $this->queue->on(Queue::EVENT_AFTER_ERROR, function($event) use (&$errors) {
+        $errors[] = $event->error->getMessage();
+    });
+    $refresh->refresh();
+    for ($i = 0; $i < 10 && $this->queue->executeJob(); $i++) {
+        $refresh->refresh();
+    }
+
+    expect($errors)->toBe([])
+        ->and($jobs)->toBe([RefreshCacheJob::class, GenerateCacheJob::class, DriverJob::class, UpdateElementSlugsAndUris::class])
+        ->and($refresh->refreshData->isEmpty())->toBeTrue();
+
+    $menu = $storage->get($menuUri);
+    expect($menu)->not->toBe($oldMenu);
+    if ($reparent) {
+        $newUri = $target->uri . '/' . $entry->slug;
+        expect($menu)->toContain('>' . $newUri . '</a>', '>' . $newUri . '/' . $descendant->slug . '</a>')
+            ->not->toContain($oldLink);
+        foreach ($urisAfterRefresh[0] as $index => $newSiteUri) {
+            expect($newSiteUri->uri)->not->toBe($oldUris[$index]->uri)
+                ->and($storage->get($oldUris[$index]))->toBeNull()
+                ->and($storage->get($newSiteUri))->toContain($newSiteUri->uri);
+        }
+    } else {
+        expect($menu)->toContain($oldLink, $targetLink)
+            ->and(strpos($menu, $targetLink))->toBeLessThan(strpos($menu, $oldLink))
+            ->and($urisAfterRefresh[0])->toEqual($oldUris);
+    }
+})->with([
+    'reparenting' => [true, false],
+    'reparenting with refresh-on-unchanged enabled' => [true, true],
+    'reordering within the same parent' => [false, true],
+]);
+
 test('Descendant URI refresh skips entries without slug or URI changes', function() {
     $parent = $this->entries[0];
     $parent->title .= ' changed';

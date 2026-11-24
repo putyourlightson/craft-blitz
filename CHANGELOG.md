@@ -1,5 +1,9 @@
 # Release Notes for Blitz
 
+## 4.24.5 - Unreleased
+
+- Fixed a bug in which moving an entry to a different parent in a structure could require two cache refreshes.
+
 ## 4.24.4 - 2026-11-16
 
 - Fixed a bug in which deploying all cached pages could omit custom site URIs.

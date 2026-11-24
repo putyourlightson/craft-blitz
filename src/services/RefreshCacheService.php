@@ -179,6 +179,19 @@ class RefreshCacheService extends Component
      */
     public function addElement(ElementInterface $element): void
     {
+        $this->collectElement($element);
+    }
+
+    /**
+     * Adds an entry moved within its section’s structure to refresh.
+     */
+    public function addMovedEntry(Entry $entry): void
+    {
+        $this->collectElement($entry, true);
+    }
+
+    private function collectElement(ElementInterface $element, bool $moved = false): void
+    {
         // Refresh globals after saving, since they are populated on every request.
         if ($element instanceof GlobalSet) {
             if (!ElementHelper::isDraftOrRevision($element)
@@ -195,9 +208,9 @@ class RefreshCacheService extends Component
             return;
         }
 
-        // If the element has the element changed behavior
+        // A structure move affects menus independently of any changes recorded during a save.
         /** @var ElementChangedBehavior|null $elementChanged */
-        $elementChanged = $element->getBehavior(ElementChangedBehavior::BEHAVIOR_NAME);
+        $elementChanged = $moved ? null : $element->getBehavior(ElementChangedBehavior::BEHAVIOR_NAME);
 
         if ($elementChanged !== null) {
             // Don’t proceed if element has not changed (and the config setting allows)
@@ -225,6 +238,9 @@ class RefreshCacheService extends Component
 
         // Add element to refresh data
         $this->refreshData->addElement($element, $elementChanged);
+        if ($moved) {
+            $this->refreshData->addIsMoved($element);
+        }
 
         // Add element expiry dates
         $this->addElementExpiryDates($element);
