@@ -62,7 +62,6 @@ use putyourlightson\blitz\utilities\DiagnosticsUtility;
 use putyourlightson\blitz\variables\BlitzVariable;
 use putyourlightson\blitz\widgets\CacheWidget;
 use putyourlightson\sprig\Sprig;
-use WeakMap;
 use yii\base\Event;
 use yii\di\Instance;
 use yii\log\Logger;
@@ -447,15 +446,15 @@ class Blitz extends Plugin
             return;
         }
 
-        $positions = new WeakMap();
+        $positions = [];
 
         Event::on(Structures::class, Structures::EVENT_BEFORE_UPDATE_ELEMENT,
-            function(MoveElementEvent $event) use ($positions) {
+            function(MoveElementEvent $event) use (&$positions) {
                 $entry = $event->element;
                 if ($entry instanceof Entry && $entry->getIsCanonical()) {
                     $section = $entry->getSection();
                     if ($section?->type === Section::TYPE_STRUCTURE && $section->structureId === $event->structureId) {
-                        $positions[$entry] = (new Query())
+                        $positions[$entry->id] = (new Query())
                             ->select(['root', 'lft', 'level'])
                             ->from(Table::STRUCTUREELEMENTS)
                             ->where(['structureId' => $event->structureId, 'elementId' => $entry->id])
@@ -466,10 +465,10 @@ class Blitz extends Plugin
         );
 
         Event::on(Structures::class, Structures::EVENT_AFTER_UPDATE_ELEMENT,
-            function(MoveElementEvent $event) use ($positions) {
+            function(MoveElementEvent $event) use (&$positions) {
                 $element = $event->element;
-                $position = $positions[$element] ?? false;
-                unset($positions[$element]);
+                $position = $positions[$element->id] ?? false;
+                unset($positions[$element->id]);
 
                 // Craft can emit a structure update without changing the entry’s position.
                 if ($element instanceof Entry && $position && $position != [
