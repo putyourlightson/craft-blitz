@@ -6,6 +6,7 @@
 > All pending Blitz queue jobs must complete before updating, as their previous payload format is no longer supported.
 > The cache must be cleared or refreshed after this update completes.
 
+- Blitz now requires Craft CMS 5.9.0.
 - Added shared database tables to avoid generating, purging and deploying the same pending URLs more than once.
 - Added the `blitz/flush-tagged` console command and `blitz.flush-tagged` MCP tool.
 - Changed cache refreshes to clear and immediately purge updated elements’ own pages before checking dependencies and element queries.
@@ -13,6 +14,7 @@
 - Changed queued driver methods to receive `SiteUriModel` objects instead of arrays. Custom drivers may need updating.
 - Improved element query matching performance.
 - Fixed a bug in which releasing Blitz queue jobs could remove unrelated jobs.
+- Fixed a bug in which moving an entry to a different parent in a structure could require two cache refreshes.
 
 ## 5.15.0 - 2026-11-16
 

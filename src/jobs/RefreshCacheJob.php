@@ -53,7 +53,7 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     {
         $refreshData = RefreshDataModel::createFromData($this->data);
 
-        // Update descendant URIs and include those elements in the refresh.
+        // Update URIs for moved entries and affected descendants before resolving the URLs.
         RefreshCacheHelper::updateDescendantSlugsAndUris($refreshData);
 
         // Resolve element pages once, including updated descendants, for clearing, purging and generation.

@@ -35,19 +35,21 @@ use yii\log\Logger;
 class RefreshCacheHelper
 {
     /**
-     * Updates descendant URIs before resolving the URLs to refresh.
+     * Updates moved entries’ and descendants’ URIs before resolving the URLs to refresh.
      */
     public static function updateDescendantSlugsAndUris(RefreshDataModel $refreshData): void
     {
         $refreshCache = Blitz::$plugin->refreshCache;
         $pendingRefreshData = $refreshCache->refreshData;
+        $elements = Craft::$app->getElements();
 
         // Collect Craft’s URI update events in this refresh rather than queueing another one.
         $refreshCache->refreshData = $refreshData;
 
         try {
             foreach ($refreshData->getElementIds(Entry::class) as $elementId) {
-                if (!array_intersect(['slug', 'uri'], $refreshData->getChangedAttributes(Entry::class, $elementId))) {
+                $moved = $refreshData->getIsMoved(Entry::class, $elementId);
+                if (!$moved && !array_intersect(['slug', 'uri'], $refreshData->getChangedAttributes(Entry::class, $elementId))) {
                     continue;
                 }
 
@@ -65,7 +67,11 @@ class RefreshCacheHelper
 
                 // Walk each site separately so descendants absent from another site are included too.
                 foreach ($entries as $entry) {
-                    Craft::$app->getElements()->updateDescendantSlugsAndUris($entry, false);
+                    if ($moved) {
+                        $elements->updateElementSlugAndUri($entry, false, true, false);
+                    } else {
+                        $elements->updateDescendantSlugsAndUris($entry, false);
+                    }
                 }
             }
         } finally {
