@@ -47,3 +47,42 @@ test('Git deployment cannot delete files outside the repository', function(strin
     '../outside.txt',
     'pages/..\\..\\outside.txt',
 ]);
+
+test('Git deployment skips overlong paths and writes the other files in the batch', function() {
+    $repositoryPath = sys_get_temp_dir() . '/blitz-deployer-' . bin2hex(random_bytes(8));
+    FileHelper::createDirectory($repositoryPath);
+    $site = Craft::$app->getSites()->getPrimarySite();
+    $originalStorage = Blitz::$plugin->cacheStorage;
+    $storage = new class() extends FileStorage {
+        public array $requestedUris = [];
+
+        public function get(SiteUriModel $siteUri): ?string
+        {
+            $this->requestedUris[] = $siteUri->uri;
+
+            return 'Content';
+        }
+    };
+    Blitz::$plugin->set('cacheStorage', $storage);
+
+    try {
+        $deployer = new GitDeployer([
+            'gitRepositories' => [
+                $site->uid => ['repositoryPath' => $repositoryPath, 'branch' => '', 'remote' => ''],
+            ],
+        ]);
+        $deployer->on(GitDeployer::EVENT_BEFORE_COMMIT, function(CancelableEvent $event) {
+            $event->isValid = false;
+        });
+        $deployer->deployUrisWithProgress([
+            new SiteUriModel(['siteId' => $site->id, 'uri' => str_repeat('é', 128) . '.txt']),
+            new SiteUriModel(['siteId' => $site->id, 'uri' => 'inside.txt']),
+        ]);
+
+        expect($storage->requestedUris)->toBe(['inside.txt'])
+            ->and(file_get_contents($repositoryPath . '/inside.txt'))->toBe('Content');
+    } finally {
+        Blitz::$plugin->set('cacheStorage', $originalStorage);
+        FileHelper::removeDirectory($repositoryPath);
+    }
+});

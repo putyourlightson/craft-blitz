@@ -7,7 +7,6 @@ namespace putyourlightson\blitz\migrations;
 
 use craft\db\Migration;
 use craft\records\Site;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\records\DriverQueueRecord;
 use putyourlightson\blitz\records\QueueSiteUriRecord;
 
@@ -24,7 +23,7 @@ class m261118_120000_add_driverqueue_table extends Migration
             $this->createTable($table, [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string(Blitz::$plugin->settings->maxUriLength)->notNull(),
+                'uri' => $this->text()->notNull(),
                 'uriHash' => $this->char(32)->notNull(),
             ]);
             // Hash the full site/URI identity so long, case-sensitive URIs remain distinct on both databases.

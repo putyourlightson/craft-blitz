@@ -9,7 +9,6 @@ use Craft;
 use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
@@ -84,7 +83,7 @@ class Install extends Migration
             }
 
             // Cache URIs must match the case- and accent-sensitive storage paths.
-            $uriColumn = $this->string(Blitz::$plugin->settings->maxUriLength)
+            $uriColumn = $this->text()
                 ->append('COLLATE ' . $collation . ' NOT NULL');
 
             $this->createTable(CacheRecord::tableName(), [
@@ -218,7 +217,7 @@ class Install extends Migration
             $this->createTable(QueueSiteUriRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
-                'uri' => $this->string(Blitz::$plugin->settings->maxUriLength)->notNull(),
+                'uri' => $this->text()->notNull(),
                 'uriHash' => $this->char(32)->notNull(),
             ]);
         }
@@ -242,14 +241,10 @@ class Install extends Migration
      */
     protected function createIndexes(): void
     {
-        // Create a non-unique length-limited index on the URI column
-        $maxUriIndexLength = Blitz::$plugin->settings->maxUriIndexLength;
-        $uriColumn = "uri($maxUriIndexLength)";
-        if (Craft::$app->getDb()->getIsPgsql()) {
-            // Use a functional index for Postgres
-            $uriColumn = "LEFT(uri, $maxUriIndexLength)";
-        }
+        // PostgreSQL uses an expression index in place of a prefix index.
+        $uriColumn = $this->db->getIsPgsql() ? 'LEFT(uri, 767)' : 'uri(767)';
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', $uriColumn]);
+        $this->createIndex(null, CacheRecord::tableName(), 'siteId');
 
         // Hash the full site/URI identity so long, case-sensitive URIs remain distinct on both databases.
         $this->createIndex(null, CacheRecord::tableName(), 'uriHash', true);

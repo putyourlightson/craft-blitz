@@ -145,6 +145,21 @@ test('Shared identities distinguish sites, case, accents and long URI suffixes',
     expect($result)->toBe($uris);
 });
 
+test('Queued purges accept long URLs without truncating them', function() {
+    $short = $this->uris[0];
+    $long = new SiteUriModel([
+        'siteId' => $short->siteId,
+        'uri' => 'page?q=' . str_repeat('x', 3000),
+    ]);
+
+    $this->purger->purgeUris([$short, $long, $long]);
+
+    ($this->drain)();
+
+    expect($this->purger->batches)->toBe([[$short->uri, $long->uri]])
+        ->and((int)QueueSiteUriRecord::find()->count())->toBe(0);
+});
+
 test('Large refreshes enqueue in bounded chunks without losing order', function() {
     $siteId = $this->uris[0]->siteId;
     $uris = array_map(fn($i) => ['siteId' => $siteId, 'uri' => 'bulk-' . $i], range(1, 1200));

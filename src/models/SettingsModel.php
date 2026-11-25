@@ -488,16 +488,6 @@ class SettingsModel extends Model
     public int $maxRetryAttempts = 10;
 
     /**
-     * The maximum length of URIs that may be cached.
-     */
-    public int $maxUriLength = 2048;
-
-    /**
-     * The maximum length of index on the URI column.
-     */
-    public int $maxUriIndexLength = 767;
-
-    /**
      * The time in seconds to wait for mutex locks to be released.
      */
     public int $mutexTimeout = 1;

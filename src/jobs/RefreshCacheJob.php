@@ -11,6 +11,7 @@ use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
+use putyourlightson\blitz\services\RefreshCacheService;
 use yii\queue\RetryableJobInterface;
 
 class RefreshCacheJob extends BaseJob implements RetryableJobInterface
@@ -59,12 +60,13 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
         // Resolve element pages once, including updated descendants, for clearing, purging and generation.
         $elementSiteUris = RefreshCacheHelper::getElementSiteUris($refreshData);
 
-        // Clear and synchronously purge element pages before checking dependencies and queries.
-        if (Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear)) {
-            if ($elementSiteUris !== []) {
-                Blitz::$plugin->clearCache->clearUris($elementSiteUris);
-                Blitz::$plugin->cachePurger->purgeUris($elementSiteUris, queue: false);
-            }
+        // Wait for listeners to approve or filter the complete URI list before touching the cache.
+        if ($elementSiteUris !== []
+            && Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear)
+            && !Blitz::$plugin->refreshCache->hasEventHandlers(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE)
+        ) {
+            Blitz::$plugin->clearCache->clearUris($elementSiteUris);
+            Blitz::$plugin->cachePurger->purgeUris($elementSiteUris, queue: false);
         }
 
         // Collect direct dependencies and source-tag matches for the final refresh.

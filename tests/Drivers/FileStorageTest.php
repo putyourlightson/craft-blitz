@@ -39,4 +39,9 @@ test('File paths remain within the site cache directory', function(string $uri, 
         '/tmp/blitz-cache/example.com/pages/%2e%2e%2f%2e%2e%2fexample.com-sibling/index.html',
     ]],
     'sibling prefix' => ['../../example.com-sibling', []],
+    'overlong segment' => [str_repeat('é', 128), []],
+    'overlong path' => [str_repeat(str_repeat('a', 200) . '/', intdiv(PHP_MAXPATHLEN, 200) + 1), []],
+    'only the decoded filename fits' => [str_repeat('%C3%A9', 100), [
+        '/tmp/blitz-cache/example.com/' . str_repeat('é', 100) . '/index.html',
+    ]],
 ]);

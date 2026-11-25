@@ -29,6 +29,7 @@ use craft\services\Elements;
 use craft\web\View;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\BacktraceHelper;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -576,6 +577,11 @@ class GenerateCacheService extends Component
     public function save(string $content, SiteUriModel $siteUri): ?string
     {
         if ($this->options->cachingEnabled === false) {
+            return null;
+        }
+
+        $storage = Blitz::$plugin->cacheStorage;
+        if ($storage instanceof FileStorage && $storage->getFilePaths($siteUri) === []) {
             return null;
         }
 

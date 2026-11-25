@@ -83,27 +83,41 @@ test('Refresh jobs synchronously clear and purge only element pages before query
         $queriesChecked = true;
     };
     $afterClearHandler = function() use ($plugin, $entry, &$queriesChecked) {
-        expect($queriesChecked)->toBeFalse();
+        if ($queriesChecked) {
+            return;
+        }
         expect($plugin->cacheStorage->get(createSiteUri($entry->siteId, $entry->uri)))->toBeNull();
         foreach (['m-direct', 'n-explicit', 'z-direct', 'c-tagged', 'a-query', 'b-query', 'unrelated'] as $uri) {
             expect($plugin->cacheStorage->get(createSiteUri($entry->siteId, $uri)))->not->toBeNull();
         }
     };
-    $clearHandler = function(RefreshCacheEvent $event) use (&$clearedUris) {
-        $clearedUris = array_map(fn($siteUri) => $siteUri->uri, $event->siteUris);
+    $clearHandler = function(RefreshCacheEvent $event) use (&$clearedUris, &$queriesChecked) {
+        if (!$queriesChecked) {
+            $clearedUris = array_map(fn($siteUri) => $siteUri->uri, $event->siteUris);
+        }
     };
     $refreshHandler = function(RefreshCacheEvent $event) use (&$refreshedUris) {
         $refreshedUris = array_values(array_map(fn($siteUri) => $siteUri->uri, $event->siteUris));
-        $event->isValid = false;
     };
     $purgeHandler = function() use ($entry, &$queriesChecked, &$clearedUris) {
-        expect($queriesChecked)->toBeFalse()
-            ->and($clearedUris)->toBe([$entry->uri]);
+        if (!$queriesChecked) {
+            expect($clearedUris)->toBe([$entry->uri]);
+        }
     };
+    $originalRefresh = $plugin->refreshCache;
+    // The debug toolbar can register a listener for every event.
+    $refresh = new class() extends RefreshCacheService {
+        public function hasEventHandlers($name): bool
+        {
+            return $name !== self::EVENT_BEFORE_REFRESH_CACHE && parent::hasEventHandlers($name);
+        }
+    };
+    $plugin->set('refreshCache', $refresh);
+    $transaction = Craft::$app->getDb()->beginTransaction();
     Event::on(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE, $queryHandler);
     $plugin->clearCache->on(ClearCacheService::EVENT_BEFORE_CLEAR_CACHE, $clearHandler);
     $plugin->clearCache->on(ClearCacheService::EVENT_AFTER_CLEAR_CACHE, $afterClearHandler);
-    $plugin->refreshCache->on(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE, $refreshHandler);
+    $refresh->on(RefreshCacheService::EVENT_AFTER_REFRESH_CACHE, $refreshHandler);
     $this->purger->on(BaseCachePurger::EVENT_BEFORE_PURGE_CACHE, $purgeHandler);
 
     try {
@@ -124,10 +138,11 @@ test('Refresh jobs synchronously clear and purge only element pages before query
                 $this->purger->purgedSiteUris,
             ))->toBe($expectedClearedUris === [] ? [] : [$expectedClearedUris]);
     } finally {
+        $transaction->rollBack();
         Event::off(ElementQuery::class, ElementQuery::EVENT_BEFORE_PREPARE, $queryHandler);
         $plugin->clearCache->off(ClearCacheService::EVENT_AFTER_CLEAR_CACHE, $afterClearHandler);
         $plugin->clearCache->off(ClearCacheService::EVENT_BEFORE_CLEAR_CACHE, $clearHandler);
-        $plugin->refreshCache->off(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE, $refreshHandler);
+        $plugin->set('refreshCache', $originalRefresh);
         $plugin->settings->refreshMode = $previousRefreshMode;
         $this->purger->off(BaseCachePurger::EVENT_BEFORE_PURGE_CACHE, $purgeHandler);
     }
@@ -136,6 +151,54 @@ test('Refresh jobs synchronously clear and purge only element pages before query
     'expire and generate' => [SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE, false],
     'forced clear' => [SettingsModel::REFRESH_MODE_EXPIRE_AND_GENERATE, true],
 ]);
+
+test('Before refresh listeners can veto the refresh or remove element URLs', function(bool $veto) {
+    $plugin = Blitz::$plugin;
+    $previousRefreshMode = $plugin->settings->refreshMode;
+    $plugin->settings->refreshMode = SettingsModel::REFRESH_MODE_CLEAR;
+    $entry = createEntry();
+    $elementUri = createSiteUri($entry->siteId, $entry->uri);
+    $dependentUri = createSiteUri($entry->siteId, 'dependent-' . $entry->slug);
+    $plugin->cacheStorage->save(createOutput(), $elementUri);
+    $plugin->generateCache->reset();
+    $plugin->generateCache->options->cachingEnabled = true;
+    $plugin->generateCache->addElement($entry);
+    $plugin->generateCache->save(createOutput(), $dependentUri);
+
+    $refreshData = new RefreshDataModel();
+    $refreshData->addElementId(Entry::class, $entry->id, [$entry->siteId]);
+    $calls = 0;
+    $purgedUris = [];
+    $refreshHandler = function(RefreshCacheEvent $event) use ($plugin, $elementUri, $dependentUri, $veto, &$calls) {
+        $calls++;
+        expect($event->siteUris)->toEqual([$elementUri, $dependentUri])
+            ->and($plugin->cacheStorage->get($elementUri))->not->toBeNull()
+            ->and($plugin->cacheStorage->get($dependentUri))->not->toBeNull();
+        $event->isValid = !$veto;
+        unset($event->siteUris[0]);
+    };
+    $purgeHandler = function(RefreshCacheEvent $event) use (&$purgedUris) {
+        $purgedUris[] = array_values($event->siteUris);
+    };
+
+    $transaction = Craft::$app->getDb()->beginTransaction();
+    Event::on(RefreshCacheService::class, RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE, $refreshHandler);
+    $this->purger->on(BaseCachePurger::EVENT_BEFORE_PURGE_CACHE, $purgeHandler);
+
+    try {
+        (new RefreshCacheJob(['data' => $refreshData->data]))->execute($plugin->queue);
+
+        expect($calls)->toBe(1)
+            ->and($plugin->cacheStorage->get($elementUri))->not->toBeNull()
+            ->and($plugin->cacheStorage->get($dependentUri) !== null)->toBe($veto)
+            ->and($purgedUris)->toEqual($veto ? [] : [[$dependentUri]]);
+    } finally {
+        $transaction->rollBack();
+        Event::off(RefreshCacheService::class, RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE, $refreshHandler);
+        $this->purger->off(BaseCachePurger::EVENT_BEFORE_PURGE_CACHE, $purgeHandler);
+        $plugin->settings->refreshMode = $previousRefreshMode;
+    }
+})->with(['veto' => true, 'filter' => false]);
 
 test('Cache-ID-only refreshes skip early clearing and purging', function() {
     $plugin = Blitz::$plugin;

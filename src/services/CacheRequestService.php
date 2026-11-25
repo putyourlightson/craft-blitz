@@ -237,14 +237,6 @@ class CacheRequestService extends Component
             return false;
         }
 
-        // Ignore URIs that are longer than the max URI length
-        $maxUriLength = Blitz::$plugin->settings->maxUriLength;
-        if (strlen($uri) > $maxUriLength) {
-            Blitz::$plugin->debug('Page not cached because it exceeds the max URI length of {max}.', ['max' => $maxUriLength], $uri);
-
-            return false;
-        }
-
         // Ignore URIs with period-only segments
         $segments = explode('/', str_replace('\\', '/', rawurldecode($uri)));
         foreach ($segments as $segment) {
