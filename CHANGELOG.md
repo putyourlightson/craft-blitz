@@ -1,8 +1,21 @@
 # Release Notes for Blitz
 
-## 5.15.1 - Unreleased
+## 5.16.0 - 2026-11-25
 
-- Added the `blitz/flush-tagged` cache console command and `blitz.flush-tagged` MCP tool.
+> [!WARNING]
+> All pending Blitz queue jobs must complete before updating, as their previous payload format is no longer supported.
+> Clear the entire Blitz cache after the update completes.
+
+- Blitz now requires Craft CMS 5.9.0.
+- Added shared database tables to avoid generating, purging and deploying the same pending URLs more than once ([#864](https://github.com/putyourlightson/craft-blitz/issues/864)).
+- Added the `blitz/flush-tagged` console command and `blitz.flush-tagged` MCP tool.
+- Improved element query matching performance.
+- Changed cache refreshes to clear and immediately purge updated elements’ own pages before checking dependencies and element queries when no `beforeRefreshCache` listeners are registered.
+- Changed cache refreshes to generate updated elements’ own pages first.
+- Changed queued driver methods to receive `SiteUriModel` objects instead of arrays. Custom drivers may need updating.
+- Removed the `maxUriLength` and `maxUriIndexLength` settings. File Storage and Git deployment skip URIs whose paths exceed filesystem limits.
+- Fixed a bug in which releasing Blitz queue jobs could remove unrelated jobs.
+- Fixed a bug in which moving an entry to a different parent in a structure could require two cache refreshes.
 
 ## 5.15.0 - 2026-11-16
 

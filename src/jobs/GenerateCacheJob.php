@@ -5,23 +5,25 @@
 
 namespace putyourlightson\blitz\jobs;
 
+use Craft;
 use craft\helpers\Queue as QueueHelper;
-use craft\queue\BaseBatchedJob;
+use craft\queue\BaseJob;
 use craft\queue\Queue as CraftQueue;
-use putyourlightson\blitz\batchers\SiteUriBatcher;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\CacheGeneratorHelper;
+use putyourlightson\blitz\helpers\DriverQueueHelper;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
 /**
  * @since 4.14.0
  */
-class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
+class GenerateCacheJob extends BaseJob implements RetryableJobInterface
 {
     /**
-     * @var array[]
+     * Carries the batch number forward so continuation jobs use Craft’s batch descriptions.
      */
-    public array $siteUris;
+    public int $batchIndex = 0;
 
     /**
      * Used to set the progress on the appropriate queue.
@@ -33,11 +35,20 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
     /**
      * @inheritdoc
      */
-    public function init(): void
+    public function getDescription(): string
     {
-        parent::init();
+        $description = $this->description ?? Craft::t('blitz', 'Generating Blitz cache');
+        $pendingCount = DriverQueueHelper::getPendingCount(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
+        $totalBatches = $this->batchIndex + max(1, (int)ceil($pendingCount / Blitz::$plugin->settings->driverJobBatchSize));
+        if ($totalBatches <= 1) {
+            return $description;
+        }
 
-        $this->batchSize = Blitz::$plugin->settings->driverJobBatchSize;
+        return Craft::t('app', '{description} (batch {index, number} of {total, number})', [
+            'description' => $description,
+            'index' => $this->batchIndex + 1,
+            'total' => $totalBatches,
+        ]);
     }
 
     /**
@@ -61,28 +72,24 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
      */
     public function execute($queue): void
     {
-        // Decrement (increase) priority so that subsequent batches are prioritised.
-        if ($this->itemOffset === 0 && $this->priority > 0) {
-            $this->priority--;
-        }
-
         $this->queue = $queue;
-
-        /** @var array $siteUris */
-        $siteUris = $this->data()->getSlice($this->itemOffset, $this->batchSize);
-        Blitz::$plugin->cacheGenerator->generateUrisWithProgress($siteUris, [$this, 'setProgressHandler']);
-        $this->itemOffset += count($siteUris);
+        DriverQueueHelper::process(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress',
+            fn(array $siteUris) => Blitz::$plugin->cacheGenerator->generateUrisWithProgress($siteUris, [$this, 'setProgressHandler']),
+            Blitz::$plugin->settings->driverJobBatchSize,
+        );
 
         // Make sure the job is still reserved before spawning another job.
         if ($queue instanceof CraftQueue && !$queue->isReserved($queue->getJobId())) {
             return;
         }
-
-        // Spawn another job if there are more items
-        if ($this->itemOffset < $this->totalItems()) {
-            $nextJob = clone $this;
-            $nextJob->batchIndex++;
-            QueueHelper::push($nextJob, $this->priority, 0, $this->ttr, $queue);
+        $priority = DriverQueueHelper::getPendingPriority(CacheGeneratorHelper::DRIVER_ID, 'generateUrisWithProgress');
+        if ($priority !== null) {
+            // Continue generation before deployment jobs at the same priority.
+            $nextJob = new self([
+                'description' => $this->description,
+                'batchIndex' => $this->batchIndex + 1,
+            ]);
+            QueueHelper::push($nextJob, $priority - 1, 0, $this->getTtr(), $queue);
         }
     }
 
@@ -94,20 +101,5 @@ class GenerateCacheJob extends BaseBatchedJob implements RetryableJobInterface
         $progress = $total > 0 ? ($count / $total) : 0;
 
         $this->setProgress($this->queue, $progress, $label);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function loadData(): SiteUriBatcher
-    {
-        return new SiteUriBatcher($this->siteUris);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function processItem(mixed $item): void
-    {
     }
 }

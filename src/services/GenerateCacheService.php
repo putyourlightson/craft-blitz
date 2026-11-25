@@ -29,6 +29,7 @@ use craft\services\Elements;
 use craft\web\View;
 use putyourlightson\blitz\behaviors\BlitzCustomFieldBehavior;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\FileStorage;
 use putyourlightson\blitz\events\SaveCacheEvent;
 use putyourlightson\blitz\helpers\BacktraceHelper;
 use putyourlightson\blitz\helpers\ElementQueryHelper;
@@ -579,6 +580,11 @@ class GenerateCacheService extends Component
             return null;
         }
 
+        $storage = Blitz::$plugin->cacheStorage;
+        if ($storage instanceof FileStorage && $storage->getFilePaths($siteUri) === []) {
+            return null;
+        }
+
         // Don’t cache if the output contains any transform generation URLs
         // https://github.com/putyourlightson/craft-blitz/issues/125
         if (StringHelper::contains(stripslashes($content), 'assets/generate-transform')) {
@@ -600,10 +606,12 @@ class GenerateCacheService extends Component
 
         $db = Craft::$app->getDb();
 
+        $uriHash = SiteUriHelper::getSiteUriHash($siteUri->siteId, $siteUri->uri);
         $cacheValue = $siteUri->toArray();
+        $cacheValue['uriHash'] = $uriHash;
 
         // Delete cache records so we get a fresh cache.
-        CacheRecord::deleteAll($cacheValue);
+        CacheRecord::deleteAll(['uriHash' => $uriHash]);
 
         // Don’t paginate URIs that are already paginated.
         $paginate = SiteUriHelper::isPaginatedUri($siteUri->uri) ? null : $this->options->paginate;

@@ -10,6 +10,7 @@ use craft\helpers\App;
 use craft\helpers\FileHelper;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\events\RefreshCacheEvent;
+use putyourlightson\blitz\helpers\FilePathHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\services\CacheRequestService;
@@ -29,7 +30,7 @@ class FileStorage extends BaseCacheStorage
     /*
      * @const int
      */
-    public const MAX_FILE_PATH_SEGMENT_LENGTH = 255;
+    public const MAX_FILE_PATH_SEGMENT_LENGTH = FilePathHelper::MAX_SEGMENT_LENGTH;
 
     /**
      * @inheritdoc
@@ -98,7 +99,7 @@ class FileStorage extends BaseCacheStorage
 
         foreach ($filePaths as $filePath) {
             $filePath .= '.gz';
-            if (is_file($filePath)) {
+            if (FilePathHelper::isWithinLengthLimits($filePath) && is_file($filePath)) {
                 return file_get_contents($filePath);
             }
         }
@@ -242,7 +243,7 @@ class FileStorage extends BaseCacheStorage
             return [];
         }
 
-        $filePaths = [$filePath];
+        $filePaths = FilePathHelper::isWithinLengthLimits($filePath) ? [$filePath] : [];
 
         /**
          * If the filename includes URL encoded characters, create a copy with the characters decoded.
@@ -258,7 +259,10 @@ class FileStorage extends BaseCacheStorage
          */
         $decodedUri = rawurldecode($siteUri->uri);
         $decodedFilePath = $this->getNormalizedFilePath($sitePath, $decodedUri);
-        if ($decodedFilePath != $filePath && FileHelper::isWithin($decodedFilePath, $sitePath)) {
+        if ($decodedFilePath !== $filePath
+            && FileHelper::isWithin($decodedFilePath, $sitePath)
+            && FilePathHelper::isWithinLengthLimits($decodedFilePath)
+        ) {
             $filePaths[] = $decodedFilePath;
         }
 
@@ -413,16 +417,8 @@ class FileStorage extends BaseCacheStorage
      */
     private function saveToFile(string $filePath, string $value): void
     {
-        $segments = explode('/', $filePath);
-        foreach ($segments as $segment) {
-            if (strlen($segment) > self::MAX_FILE_PATH_SEGMENT_LENGTH) {
-                Blitz::$plugin->log('File cache storage could not save cached value due a file path segment greater than the max length of {length} characters in "{filePath}".', [
-                    'length' => self::MAX_FILE_PATH_SEGMENT_LENGTH,
-                    'filePath' => $filePath,
-                ], Logger::LEVEL_ERROR);
-
-                return;
-            }
+        if (!FilePathHelper::isWithinLengthLimits($filePath)) {
+            return;
         }
 
         try {
@@ -438,7 +434,9 @@ class FileStorage extends BaseCacheStorage
     private function delete(string $filePath): void
     {
         $this->deleteIfExists($filePath);
-        $this->deleteIfExists($filePath . '.gz');
+        if (FilePathHelper::isWithinLengthLimits($filePath . '.gz')) {
+            $this->deleteIfExists($filePath . '.gz');
+        }
     }
 
     /**

@@ -5,14 +5,18 @@
 
 namespace putyourlightson\blitz\helpers;
 
+use Craft;
 use craft\base\ElementInterface;
 use craft\db\Query;
 use craft\elements\db\ElementQuery;
 use craft\elements\db\ElementQueryInterface;
+use craft\elements\Entry;
 use craft\helpers\Json;
+use craft\models\Section;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\models\RefreshDataModel;
+use putyourlightson\blitz\models\SiteUriModel;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
 use putyourlightson\blitz\records\ElementQueryRecord;
@@ -30,6 +34,100 @@ use yii\log\Logger;
  */
 class RefreshCacheHelper
 {
+    /**
+     * Updates moved entries’ and descendants’ URIs before resolving the URLs to refresh.
+     */
+    public static function updateDescendantSlugsAndUris(RefreshDataModel $refreshData): void
+    {
+        $refreshCache = Blitz::$plugin->refreshCache;
+        $pendingRefreshData = $refreshCache->refreshData;
+        $elements = Craft::$app->getElements();
+
+        // Collect Craft’s URI update events in this refresh rather than queueing another one.
+        $refreshCache->refreshData = $refreshData;
+
+        try {
+            foreach ($refreshData->getElementIds(Entry::class) as $elementId) {
+                $moved = $refreshData->getIsMoved(Entry::class, $elementId);
+                if (!$moved && !array_intersect(['slug', 'uri'], $refreshData->getChangedAttributes(Entry::class, $elementId))) {
+                    continue;
+                }
+
+                $entries = Entry::find()->id($elementId)->siteId('*')->unique(false)->status(null)->all();
+                $entry = $entries[0] ?? null;
+
+                if ($entry === null || !$entry->getIsCanonical() || $entry->getSection()?->type !== Section::TYPE_STRUCTURE) {
+                    continue;
+                }
+
+                // Include descendants even on retries, when their URIs may already have been updated.
+                // Other sites are updated too, so conservatively refresh all their variants.
+                $descendantIds = Entry::find()->descendantOf($entry)->status(null)->siteId('*')->ids();
+                $refreshData->addElementIds(Entry::class, $descendantIds);
+
+                // Walk each site separately so descendants absent from another site are included too.
+                foreach ($entries as $entry) {
+                    if ($moved) {
+                        $elements->updateElementSlugAndUri($entry, false, true, false);
+                    } else {
+                        $elements->updateDescendantSlugsAndUris($entry, false);
+                    }
+                }
+            }
+        } finally {
+            $refreshCache->refreshData = $pendingRefreshData;
+        }
+    }
+
+    /**
+     * Returns the changed elements’ own site URIs, ordered by site ID and URI.
+     *
+     * @return SiteUriModel[]
+     */
+    public static function getElementSiteUris(RefreshDataModel $refreshData): array
+    {
+        $elementSiteUris = [];
+
+        // Merge in site URIs of element IDs to ensure that uncached elements are also generated
+        foreach ($refreshData->getElementTypes() as $elementType) {
+            /** @var class-string<ElementInterface> $elementType */
+            if ($elementType::hasUris()) {
+                $elementGroups = [];
+                foreach ($refreshData->getElementIds($elementType) as $elementId) {
+                    $siteIds = $refreshData->getElementSiteIds($elementType, $elementId);
+                    $siteIdsKey = $siteIds === null ? BaseDataModel::SITE_ID_ANY : implode(',', $siteIds);
+                    $elementGroups[$siteIdsKey]['siteIds'] = $siteIds;
+                    $elementGroups[$siteIdsKey]['elementIds'][] = $elementId;
+                }
+                foreach ($elementGroups as $elementGroup) {
+                    array_push($elementSiteUris, ...SiteUriHelper::getElementSiteUris($elementGroup['elementIds'], $elementGroup['siteIds']));
+                }
+            }
+        }
+
+        usort($elementSiteUris, fn(SiteUriModel $a, SiteUriModel $b) => ($a->siteId <=> $b->siteId) ?: strcmp($a->uri, $b->uri));
+
+        return $elementSiteUris;
+    }
+
+    /**
+     * Returns cache IDs matching the changed elements’ source tags.
+     *
+     * @param class-string<ElementInterface> $elementType
+     * @return int[]
+     */
+    public static function getSourceTagCacheIds(string $elementType, RefreshDataModel $refreshData): array
+    {
+        $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
+        $tags = [$sourceIdAttribute . ':*'];
+
+        foreach ($refreshData->getSourceIds($elementType) as $sourceId) {
+            $tags[] = $sourceIdAttribute . ':' . $sourceId;
+        }
+
+        return Blitz::$plugin->cacheTags->getCacheIds($tags);
+    }
+
     /**
      * Returns cache IDs for an element type using the provided refresh data.
      * If one or more custom fields caused the elements to change, then only
@@ -190,7 +288,7 @@ class RefreshCacheHelper
             return [];
         }
 
-        $elementQueryIds = [];
+        $elementQueryResults = [];
         /**
          * Execute the element query, deleting the record if any exception is thrown.
          * Avoid calling the `ids()` method, as it catches exceptions.
@@ -198,7 +296,7 @@ class RefreshCacheHelper
          * @see Query::column()
          */
         try {
-            $elementQueryIds = $elementQuery
+            $elementQueryResults = $elementQuery
                 ->select(['id' => 'elements.id', 'siteId' => 'elements_sites.siteId'])
                 ->createCommand()
                 ->queryAll();
@@ -206,13 +304,15 @@ class RefreshCacheHelper
             $elementQueryRecord->delete();
         }
 
-        if (empty($elementQueryIds)) {
+        if (empty($elementQueryResults)) {
             return [];
         }
 
+        // Build the lookup once to avoid scanning changed IDs for every query result.
+        $elementIdSet = array_fill_keys($elementIds, true);
         $matches = false;
-        foreach ($elementQueryIds as $row) {
-            if (!in_array($row['id'], $elementIds)) {
+        foreach ($elementQueryResults as $row) {
+            if (!isset($elementIdSet[$row['id']])) {
                 continue;
             }
             $siteIds = $refreshData->getElementSiteIds($elementType, (int)$row['id']);

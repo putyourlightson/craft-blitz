@@ -110,7 +110,7 @@ class GeneratorController extends Controller
                 Blitz::$plugin->cacheStorage->deleteUris([$siteUri]);
             }
 
-            CacheRecord::deleteAll($siteUri->toArray());
+            CacheRecord::deleteAll(['uriHash' => SiteUriHelper::getSiteUriHash($siteUri->siteId, $siteUri->uri)]);
         }
 
         return $response;

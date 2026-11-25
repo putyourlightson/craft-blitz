@@ -6,18 +6,12 @@
 namespace putyourlightson\blitz\jobs;
 
 use Craft;
-use craft\base\ElementInterface;
-use craft\elements\Entry;
-use craft\models\Section;
 use craft\queue\BaseJob;
-use craft\queue\QueueInterface;
 use putyourlightson\blitz\Blitz;
-use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
-use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\models\RefreshDataModel;
-use yii\queue\Queue;
+use putyourlightson\blitz\services\RefreshCacheService;
 use yii\queue\RetryableJobInterface;
 
 class RefreshCacheJob extends BaseJob implements RetryableJobInterface
@@ -60,48 +54,75 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     {
         $refreshData = RefreshDataModel::createFromData($this->data);
 
-        $this->updateDescendantSlugsAndUris($refreshData);
+        // Update URIs for moved entries and affected descendants before resolving the URLs.
+        RefreshCacheHelper::updateDescendantSlugsAndUris($refreshData);
 
-        $this->populateCacheIdsFromElementCaches($refreshData);
+        // Resolve element pages once, including updated descendants, for clearing, purging and generation.
+        $elementSiteUris = RefreshCacheHelper::getElementSiteUris($refreshData);
 
-        // Clear the site URIs early.
-        if (Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear)) {
-            $siteUris = SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds());
-            Blitz::$plugin->clearCache->clearUris($siteUris);
+        // Wait for listeners to approve or filter the complete URI list before touching the cache.
+        if ($elementSiteUris !== []
+            && Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear)
+            && !Blitz::$plugin->refreshCache->hasEventHandlers(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE)
+        ) {
+            Blitz::$plugin->clearCache->clearUris($elementSiteUris);
+            Blitz::$plugin->cachePurger->purgeUris($elementSiteUris, queue: false);
         }
 
-        $this->populateCacheIdsFromSourceTags($refreshData);
-        $this->populateCacheIdsFromElementQueryCaches($refreshData, $queue);
-
-        $siteUris = SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds());
-
-        // Merge in site URIs of element IDs to ensure that uncached elements are also generated
+        // Collect direct dependencies and source-tag matches for the final refresh.
         foreach ($refreshData->getElementTypes() as $elementType) {
-            /** @var class-string<ElementInterface> $elementType */
-            if ($elementType::hasUris()) {
-                $elementGroups = [];
-                foreach ($refreshData->getElementIds($elementType) as $elementId) {
-                    $siteIds = $refreshData->getElementSiteIds($elementType, $elementId);
-                    $siteIdsKey = $siteIds === null ? BaseDataModel::SITE_ID_ANY : implode(',', $siteIds);
-                    $elementGroups[$siteIdsKey]['siteIds'] = $siteIds;
-                    $elementGroups[$siteIdsKey]['elementIds'][] = $elementId;
-                }
-                foreach ($elementGroups as $elementGroup) {
-                    array_push($siteUris, ...SiteUriHelper::getElementSiteUris($elementGroup['elementIds'], $elementGroup['siteIds']));
+            $refreshData->addCacheIds(RefreshCacheHelper::getElementCacheIds($elementType, $refreshData));
+            $refreshData->addCacheIds(RefreshCacheHelper::getSourceTagCacheIds($elementType, $refreshData));
+        }
+
+        // Find cached pages affected by tracked element queries.
+        foreach ($refreshData->getElementTypes() as $elementType) {
+            if (!empty($refreshData->getElementIds($elementType))) {
+                $elementQueryRecords = RefreshCacheHelper::getElementTypeQueryRecords($elementType, $refreshData);
+                $total = count($elementQueryRecords);
+
+                foreach ($elementQueryRecords as $index => $elementQueryRecord) {
+                    $refreshData->addCacheIds(RefreshCacheHelper::getElementQueryCacheIds($elementQueryRecord, $refreshData));
+
+                    $count = $index + 1;
+                    $this->setProgress($queue, $count / $total,
+                        Craft::t('blitz', 'Checking {count} of {total} {elementType} queries', [
+                            'count' => $count,
+                            'total' => $total,
+                            'elementType' => $elementType::lowerDisplayName(),
+                        ])
+                    );
                 }
             }
         }
 
-        $siteUris = array_unique($siteUris, SORT_REGULAR);
+        // Site URIs to refresh, keyed by site ID and URI, to maintain order and uniqueness.
+        $siteUris = [];
+
+        // Generate element pages first.
+        foreach ($elementSiteUris as $siteUri) {
+            $siteUris[$siteUri->siteId . ':' . $siteUri->uri] ??= $siteUri;
+        }
+
+        // Append affected cached pages without duplicating element pages.
+        foreach (SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds()) as $siteUri) {
+            $siteUris[$siteUri->siteId . ':' . $siteUri->uri] ??= $siteUri;
+        }
+
         $purgeSiteUris = [];
 
         if (Blitz::$plugin->settings->shouldPurgeAssetImages()) {
-            // Purge assets whose image has changed
+            // Include changed asset images in the final purge.
             $assetIds = $refreshData->getAssetsChangedByFile();
             $purgeSiteUris = SiteUriHelper::getAssetSiteUris($assetIds);
         }
 
-        Blitz::$plugin->refreshCache->refreshSiteUris($siteUris, $purgeSiteUris, $this->forceClear, $this->forceGenerate);
+        Blitz::$plugin->refreshCache->refreshSiteUris(
+            array_values($siteUris),
+            $purgeSiteUris,
+            $this->forceClear,
+            $this->forceGenerate,
+        );
     }
 
     /**
@@ -110,110 +131,5 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
     protected function defaultDescription(): string
     {
         return Craft::t('blitz', 'Refreshing Blitz cache');
-    }
-
-    /**
-     * Updates descendant URIs before resolving the URLs to refresh.
-     */
-    private function updateDescendantSlugsAndUris(RefreshDataModel $refreshData): void
-    {
-        $refreshCache = Blitz::$plugin->refreshCache;
-        $pendingRefreshData = $refreshCache->refreshData;
-
-        // Collect Craft’s URI update events in this refresh rather than queueing another one.
-        $refreshCache->refreshData = $refreshData;
-
-        try {
-            foreach ($refreshData->getElementIds(Entry::class) as $elementId) {
-                if (!array_intersect(['slug', 'uri'], $refreshData->getChangedAttributes(Entry::class, $elementId))) {
-                    continue;
-                }
-
-                $entries = Entry::find()->id($elementId)->siteId('*')->unique(false)->status(null)->all();
-                $entry = $entries[0] ?? null;
-
-                if ($entry === null || !$entry->getIsCanonical() || $entry->getSection()?->type !== Section::TYPE_STRUCTURE) {
-                    continue;
-                }
-
-                // Include descendants even on retries, when their URIs may already have been updated.
-                // Other sites are updated too, so conservatively refresh all their variants.
-                $descendantIds = Entry::find()->descendantOf($entry)->status(null)->siteId('*')->ids();
-                $refreshData->addElementIds(Entry::class, $descendantIds);
-
-                // Walk each site separately so descendants absent from another site are included too.
-                foreach ($entries as $entry) {
-                    Craft::$app->getElements()->updateDescendantSlugsAndUris($entry, false);
-                }
-            }
-        } finally {
-            $refreshCache->refreshData = $pendingRefreshData;
-        }
-    }
-
-    /**
-     * Populates cache IDs from the element caches.
-     */
-    private function populateCacheIdsFromElementCaches(RefreshDataModel $refreshData): void
-    {
-        foreach ($refreshData->getElementTypes() as $elementType) {
-            $cacheIds = RefreshCacheHelper::getElementCacheIds($elementType, $refreshData);
-            $refreshData->addCacheIds($cacheIds);
-        }
-    }
-
-    /**
-     * Populates cache IDs from source tags.
-     */
-    private function populateCacheIdsFromSourceTags(RefreshDataModel $refreshData): void
-    {
-        foreach ($refreshData->getElementTypes() as $elementType) {
-            $sourceIdAttribute = ElementTypeHelper::getSourceIdAttribute($elementType);
-
-            $tags = [$sourceIdAttribute . ':*'];
-
-            foreach ($refreshData->getSourceIds($elementType) as $sourceId) {
-                $tags[] = $sourceIdAttribute . ':' . $sourceId;
-            }
-
-            $cacheIds = Blitz::$plugin->cacheTags->getCacheIds($tags);
-
-            $refreshData->addCacheIds($cacheIds);
-        }
-    }
-
-    /**
-     * Populates cache IDs from element query caches.
-     */
-    private function populateCacheIdsFromElementQueryCaches(RefreshDataModel $refreshData, Queue|QueueInterface $queue): void
-    {
-        foreach ($refreshData->getElementTypes() as $elementType) {
-            /** @var ElementInterface $elementType */
-            $elementIds = $refreshData->getElementIds($elementType);
-
-            if (count($elementIds)) {
-                $elementQueryRecords = RefreshCacheHelper::getElementTypeQueryRecords($elementType, $refreshData);
-
-                $total = count($elementQueryRecords);
-
-                if ($total > 0) {
-                    $count = 0;
-
-                    foreach ($elementQueryRecords as $elementQueryRecord) {
-                        $cacheIds = RefreshCacheHelper::getElementQueryCacheIds($elementQueryRecord, $refreshData);
-                        $refreshData->addCacheIds($cacheIds);
-
-                        $count++;
-                        $this->setProgress($queue, $count / $total,
-                            Craft::t('blitz', 'Checking {count} of {total} {elementType} queries', [
-                                'count' => $count,
-                                'total' => $total,
-                                'elementType' => $elementType::lowerDisplayName(),
-                            ])
-                        );
-                    }
-                }
-            }
-        }
     }
 }

@@ -277,12 +277,6 @@ return [
         // The maximum number of times to attempt retrying a failed queue job.
         //'maxRetryAttempts' => 10,
 
-        // The maximum length of URIs that may be cached. Increasing this value requires manually updating the limit in the `uri` column of the `blitz_caches` database table.
-        //'maxUriLength' => 2048,
-
-        // The maximum length of index on the URI column.
-        //'maxUriIndexLength' => 767,
-
         // The time in seconds to wait for mutex locks to be released.
         //'mutexTimeout' => 1,
 

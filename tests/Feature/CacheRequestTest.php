@@ -4,7 +4,6 @@
  * Tests whether requests are cacheable and under what circumstances.
  */
 
-use craft\helpers\StringHelper;
 use craft\web\TemplateResponseFormatter;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\SettingsModel;
@@ -219,18 +218,11 @@ test('Site URI with `index.php` and allowed action in URI is cacheable', functio
         ->toBeTrue();
 });
 
-test('Site URI with max URI length is cacheable', function() {
-    $siteUri = createSiteUri(uri: 'page' . StringHelper::randomString(Blitz::$plugin->settings->maxUriLength - 4));
+test('Site URI with more than 2048 bytes is cacheable', function() {
+    $siteUri = createSiteUri(uri: 'page' . str_repeat('a', 3000));
 
     expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
         ->toBeTrue();
-});
-
-test('Site URI with max URI length exceeded is not cacheable', function() {
-    $siteUri = createSiteUri(uri: 'page' . StringHelper::randomString(Blitz::$plugin->settings->maxUriLength));
-
-    expect(Blitz::$plugin->cacheRequest->getIsCacheableSiteUri($siteUri))
-        ->toBeFalse();
 });
 
 test('Site URI with period-only segments is not cacheable', function(string $uri) {

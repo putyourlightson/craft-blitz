@@ -63,7 +63,7 @@ class ExpireCacheService extends Component
     {
         return CacheRecord::find()
             ->where(['<=', 'expiryDate', Db::prepareDateForDb('now')])
-            ->andWhere($siteUri->toArray())
+            ->andWhere(['uriHash' => SiteUriHelper::getSiteUriHash($siteUri->siteId, $siteUri->uri)])
             ->exists();
     }
 

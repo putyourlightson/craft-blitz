@@ -9,11 +9,11 @@ use Craft;
 use craft\db\Migration;
 use craft\records\Element;
 use craft\records\Site;
-use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\models\BaseDataModel;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\CacheTagRecord;
 use putyourlightson\blitz\records\DriverDataRecord;
+use putyourlightson\blitz\records\DriverQueueRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
 use putyourlightson\blitz\records\ElementExpiryDateRecord;
 use putyourlightson\blitz\records\ElementFieldCacheRecord;
@@ -24,6 +24,7 @@ use putyourlightson\blitz\records\ElementQueryRecord;
 use putyourlightson\blitz\records\ElementQuerySiteRecord;
 use putyourlightson\blitz\records\ElementQuerySourceRecord;
 use putyourlightson\blitz\records\IncludeRecord;
+use putyourlightson\blitz\records\QueueSiteUriRecord;
 use putyourlightson\blitz\records\SsiIncludeCacheRecord;
 
 class Install extends Migration
@@ -49,6 +50,8 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
+        $this->dropTableIfExists(DriverQueueRecord::tableName());
+        $this->dropTableIfExists(QueueSiteUriRecord::tableName());
         $this->dropTableIfExists(DriverDataRecord::tableName());
         $this->dropTableIfExists(ElementQueryFieldRecord::tableName());
         $this->dropTableIfExists(ElementQueryAttributeRecord::tableName());
@@ -80,13 +83,14 @@ class Install extends Migration
             }
 
             // Cache URIs must match the case- and accent-sensitive storage paths.
-            $uriColumn = $this->string(Blitz::$plugin->settings->maxUriLength)
+            $uriColumn = $this->text()
                 ->append('COLLATE ' . $collation . ' NOT NULL');
 
             $this->createTable(CacheRecord::tableName(), [
                 'id' => $this->primaryKey(),
                 'siteId' => $this->integer()->notNull(),
                 'uri' => $uriColumn,
+                'uriHash' => $this->char(32)->notNull(),
                 'paginate' => $this->integer(),
                 'dateCached' => $this->dateTime(),
                 'expiryDate' => $this->dateTime(),
@@ -209,6 +213,26 @@ class Install extends Migration
             ]);
         }
 
+        if (!$this->db->tableExists(QueueSiteUriRecord::tableName())) {
+            $this->createTable(QueueSiteUriRecord::tableName(), [
+                'id' => $this->primaryKey(),
+                'siteId' => $this->integer()->notNull(),
+                'uri' => $this->text()->notNull(),
+                'uriHash' => $this->char(32)->notNull(),
+            ]);
+        }
+
+        if (!$this->db->tableExists(DriverQueueRecord::tableName())) {
+            $this->createTable(DriverQueueRecord::tableName(), [
+                'id' => $this->primaryKey(),
+                'siteUriId' => $this->integer()->notNull(),
+                'driverId' => $this->string()->notNull(),
+                'driverMethod' => $this->string()->notNull(),
+                'priority' => $this->integer()->notNull(),
+                'revision' => $this->char(36)->notNull(),
+            ]);
+        }
+
         return true;
     }
 
@@ -217,14 +241,13 @@ class Install extends Migration
      */
     protected function createIndexes(): void
     {
-        // Create a non-unique length-limited index on the URI column
-        $maxUriIndexLength = Blitz::$plugin->settings->maxUriIndexLength;
-        $uriColumn = "uri($maxUriIndexLength)";
-        if (Craft::$app->getDb()->getIsPgsql()) {
-            // Use a functional index for Postgres
-            $uriColumn = "LEFT(uri, $maxUriIndexLength)";
-        }
+        // PostgreSQL uses an expression index in place of a prefix index.
+        $uriColumn = $this->db->getIsPgsql() ? 'LEFT(uri, 767)' : 'uri(767)';
         $this->createIndex(null, CacheRecord::tableName(), ['siteId', $uriColumn]);
+        $this->createIndex(null, CacheRecord::tableName(), 'siteId');
+
+        // Hash the full site/URI identity so long, case-sensitive URIs remain distinct on both databases.
+        $this->createIndex(null, CacheRecord::tableName(), 'uriHash', true);
 
         $this->createIndex(null, CacheRecord::tableName(), 'expiryDate');
         $this->createIndex(null, ElementExpiryDateRecord::tableName(), 'elementId', true);
@@ -233,6 +256,10 @@ class Install extends Migration
         $this->createIndex(null, ElementQueryRecord::tableName(), 'type');
         $this->createIndex(null, CacheTagRecord::tableName(), 'tag');
         $this->createIndex(null, IncludeRecord::tableName(), 'index', true);
+
+        $this->createIndex(null, QueueSiteUriRecord::tableName(), 'uriHash', true);
+        $this->createIndex(null, DriverQueueRecord::tableName(), ['siteUriId', 'driverId', 'driverMethod'], true);
+        $this->createIndex(null, DriverQueueRecord::tableName(), ['driverId', 'driverMethod', 'priority', 'id']);
     }
 
     /**
@@ -240,6 +267,9 @@ class Install extends Migration
      */
     protected function addForeignKeys(): void
     {
+        $this->addForeignKey(null, QueueSiteUriRecord::tableName(), 'siteId', Site::tableName(), 'id', 'CASCADE', 'CASCADE');
+        $this->addForeignKey(null, DriverQueueRecord::tableName(), 'siteUriId', QueueSiteUriRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
+
         $this->addForeignKey(null, CacheRecord::tableName(), 'siteId', Site::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementCacheRecord::tableName(), 'cacheId', CacheRecord::tableName(), 'id', 'CASCADE', 'CASCADE');
         $this->addForeignKey(null, ElementCacheRecord::tableName(), 'elementId', Element::tableName(), 'id', 'CASCADE', 'CASCADE');

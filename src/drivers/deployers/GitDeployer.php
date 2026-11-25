@@ -15,6 +15,7 @@ use craft\helpers\FileHelper;
 use Exception;
 use GitElephant\Repository;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\helpers\FilePathHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use Symfony\Component\Process\Process;
 use yii\base\ErrorException;
@@ -135,7 +136,6 @@ class GitDeployer extends BaseDeployer
                     call_user_func($setProgressHandler, $count, $total, $progressLabel);
                 }
 
-                $value = Blitz::$plugin->cacheStorage->get($siteUri);
                 $filePath = FileHelper::normalizePath($repository['repositoryPath'] . '/' . $siteUri->uri);
 
                 // If the site URI has an HTML mime type, append `index.html`.
@@ -144,11 +144,13 @@ class GitDeployer extends BaseDeployer
                     $filePath .= '/index.html';
                 }
 
-                if (!FileHelper::isWithin($filePath, $repository['repositoryPath'])) {
+                if (!FileHelper::isWithin($filePath, $repository['repositoryPath'])
+                    || !FilePathHelper::isWithinLengthLimits($filePath)
+                ) {
                     continue;
                 }
 
-                $this->updateFile($filePath, $value);
+                $this->updateFile($filePath, Blitz::$plugin->cacheStorage->get($siteUri));
             }
 
             if (is_callable($setProgressHandler)) {

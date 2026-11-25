@@ -12,9 +12,10 @@ use craft\fields\data\MultiOptionsFieldData;
 use craft\fields\data\OptionData;
 use craft\helpers\App;
 use craft\helpers\Json;
-use craft\helpers\StringHelper;
 use craft\mutex\Mutex;
 use putyourlightson\blitz\Blitz;
+use putyourlightson\blitz\drivers\storage\FileStorage;
+use putyourlightson\blitz\drivers\storage\YiiCacheStorage;
 use putyourlightson\blitz\helpers\FieldHelper;
 use putyourlightson\blitz\records\CacheRecord;
 use putyourlightson\blitz\records\ElementCacheRecord;
@@ -85,21 +86,37 @@ test('Cached value is saved without output comments when file extension is not `
         ->not()->toContain('Cached by Blitz on');
 });
 
-test('Cache record with max URI length is saved', function() {
-    $siteUri = createSiteUri(uri: StringHelper::randomString(Blitz::$plugin->settings->maxUriLength));
-    Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
-    $count = CacheRecord::find()
-        ->where($siteUri->toArray())
-        ->count();
+test('A long URI is saved in Yii Cache Storage and tracked in the database', function() {
+    $plugin = Blitz::$plugin;
+    $storage = $plugin->cacheStorage;
+    $siteUri = createSiteUri(uri: 'page?q=' . str_repeat('x', 3000));
+    $plugin->set('cacheStorage', new YiiCacheStorage());
 
-    expect($count)
-        ->toEqual(1);
+    try {
+        $output = $plugin->generateCache->save(createOutput(), $siteUri);
+
+        expect($output)->not->toBeNull()
+            ->and($plugin->cacheStorage->get($siteUri))->toBe($output)
+            ->and(CacheRecord::find()->where($siteUri->toArray())->exists())->toBeTrue();
+    } finally {
+        $plugin->cacheStorage->deleteUris([$siteUri]);
+        $plugin->set('cacheStorage', $storage);
+    }
 });
 
-test('Cache record with max URI length exceeded throws exception', function() {
-    $siteUri = createSiteUri(uri: StringHelper::randomString(Blitz::$plugin->settings->maxUriLength + 1));
-    Blitz::$plugin->generateCache->save(createOutput(), $siteUri);
-})->throws(Exception::class);
+test('File Storage does not track a URI that exceeds its path limits', function() {
+    $plugin = Blitz::$plugin;
+    $storage = $plugin->cacheStorage;
+    $siteUri = createSiteUri(uri: str_repeat('é', 128));
+    $plugin->set('cacheStorage', new FileStorage());
+
+    try {
+        expect($plugin->generateCache->save(createOutput(), $siteUri))->toBeNull()
+            ->and(CacheRecord::find()->where($siteUri->toArray())->exists())->toBeFalse();
+    } finally {
+        $plugin->set('cacheStorage', $storage);
+    }
+});
 
 test('Element cache record is saved without custom fields', function() {
     $entry = createEntry();
