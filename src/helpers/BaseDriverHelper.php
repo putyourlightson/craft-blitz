@@ -5,13 +5,15 @@
 
 namespace putyourlightson\blitz\helpers;
 
-use Craft;
 use craft\base\SavableComponent;
-use craft\db\Query;
 use craft\helpers\Component;
 use craft\helpers\Queue;
+use craft\queue\Queue as CraftQueue;
 use putyourlightson\blitz\Blitz;
 use putyourlightson\blitz\jobs\DriverJob;
+use putyourlightson\blitz\jobs\GenerateCacheJob;
+use putyourlightson\blitz\jobs\PurgeSiteJob;
+use yii\base\InvalidArgumentException;
 
 class BaseDriverHelper
 {
@@ -73,37 +75,39 @@ class BaseDriverHelper
      */
     public static function releaseDriverJobs(string $driverId): void
     {
-        $queue = Craft::$app->getQueue();
+        $queue = Blitz::$plugin->queue;
 
-        // Only release jobs if the queue is a Craft queue.
-        if (!($queue instanceof \craft\queue\Queue)) {
+        if (!$queue instanceof CraftQueue) {
             return;
         }
 
-        $query = (new Query())
-            ->from([$queue->tableName])
-            ->select(['id'])
-            ->where(['dateReserved' => null]);
+        foreach ($queue->getJobInfo() as $info) {
+            if ($info['status'] === CraftQueue::STATUS_RESERVED) {
+                continue;
+            }
 
-        if ($driverId === 'cacheGenerator') {
-            $query->andWhere(['like', 'job', '"putyourlightson\\blitz\\jobs\\GenerateCacheJob"']);
-        } elseif ($driverId === 'cachePurger') {
-            $query->andWhere(['or',
-                ['like', 'job', '"putyourlightson\\blitz\\jobs\\PurgeSiteJob"'],
-                ['and',
-                    ['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"'],
-                    ['like', 'job', '"' . $driverId . '"'],
-                ],
-            ]);
-        } else {
-            $query->andWhere(['like', 'job', '"putyourlightson\\blitz\\jobs\\DriverJob"']);
-            $query->andWhere(['like', 'job', '"' . $driverId . '"']);
-        }
+            try {
+                $details = $queue->getJobDetails($info['id']);
+            } catch (InvalidArgumentException) {
+                // A worker may have completed the job since the list was fetched.
+                continue;
+            }
 
-        $jobIds = $query->column();
+            if ($details['status'] === CraftQueue::STATUS_RESERVED) {
+                continue;
+            }
 
-        foreach ($jobIds as $jobId) {
-            $queue->release($jobId);
+            $job = $details['job'];
+            $matches = match (true) {
+                $job instanceof GenerateCacheJob => $driverId === CacheGeneratorHelper::DRIVER_ID,
+                $job instanceof PurgeSiteJob => $driverId === CachePurgerHelper::DRIVER_ID,
+                $job instanceof DriverJob => $job->driverId === $driverId,
+                default => false,
+            };
+
+            if ($matches) {
+                $queue->release($info['id']);
+            }
         }
     }
 }

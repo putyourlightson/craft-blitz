@@ -1,8 +1,14 @@
 # Release Notes for Blitz
 
-## 4.24.5 - Unreleased
+## 4.25.0 - 2026-11-25
 
+> [!NOTE]
+> Clear the cache after updating to remove any previously orphaned cache files.
+
+- Fixed a bug in which URLs differing in case or accents could overwrite each other’s cache tracking records, leaving stale cache files ([#895](https://github.com/putyourlightson/craft-blitz/issues/895)).
 - Fixed a bug in which moving an entry to a different parent in a structure could require two cache refreshes.
+- Fixed a bug in which releasing Blitz queue jobs could remove unrelated jobs.
+- Fixed a bug in which cached files could be cleared before listeners could cancel or filter a refresh.
 
 ## 4.24.4 - 2026-11-16
 

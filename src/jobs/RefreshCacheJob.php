@@ -16,6 +16,7 @@ use putyourlightson\blitz\helpers\ElementTypeHelper;
 use putyourlightson\blitz\helpers\RefreshCacheHelper;
 use putyourlightson\blitz\helpers\SiteUriHelper;
 use putyourlightson\blitz\models\RefreshDataModel;
+use putyourlightson\blitz\services\RefreshCacheService;
 use yii\queue\Queue;
 use yii\queue\RetryableJobInterface;
 
@@ -66,8 +67,10 @@ class RefreshCacheJob extends BaseJob implements RetryableJobInterface
 
         $this->populateCacheIdsFromElementCaches($refreshData);
 
-        // Clear the site URIs early.
-        if (Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear)) {
+        // Let listeners approve or filter the full URI list before clearing any files.
+        if (Blitz::$plugin->settings->shouldClearOnRefresh($this->forceClear)
+            && !Blitz::$plugin->refreshCache->hasEventHandlers(RefreshCacheService::EVENT_BEFORE_REFRESH_CACHE)
+        ) {
             $siteUris = SiteUriHelper::getCachedSiteUris($refreshData->getCacheIds());
             Blitz::$plugin->clearCache->clearUris($siteUris);
         }
