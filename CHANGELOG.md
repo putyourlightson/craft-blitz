@@ -4,7 +4,7 @@
 
 > [!WARNING]
 > All pending Blitz queue jobs must complete before updating, as their previous payload format is no longer supported.
-> Clear or refresh the entire Blitz cache after the update completes.
+> Clear the entire Blitz cache after the update completes.
 
 - Blitz now requires Craft CMS 5.9.0.
 - Added shared database tables to avoid generating, purging and deploying the same pending URLs more than once.
