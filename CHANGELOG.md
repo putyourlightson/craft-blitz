@@ -7,7 +7,7 @@
 > Clear the entire Blitz cache after the update completes.
 
 - Blitz now requires Craft CMS 5.9.0.
-- Added shared database tables to avoid generating, purging and deploying the same pending URLs more than once.
+- Added shared database tables to avoid generating, purging and deploying the same pending URLs more than once ([#864](https://github.com/putyourlightson/craft-blitz/issues/864)).
 - Added the `blitz/flush-tagged` console command and `blitz.flush-tagged` MCP tool.
 - Improved element query matching performance.
 - Changed cache refreshes to clear and immediately purge updated elements’ own pages before checking dependencies and element queries when no `beforeRefreshCache` listeners are registered.
